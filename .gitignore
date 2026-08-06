@@ -41,3 +41,11 @@ release-artifacts/
 # Reference material — see CLAUDE.md for how to repopulate
 temp
 .superpowers/
+
+# Local stack state. /data holds the Grimoire database plus the seeded
+# users.json, which Grimoire renames to users.json.imported on first boot.
+docker/data/
+docker/.env
+# ...but the example is meant to be committed; the .env.* rule above would
+# otherwise swallow it since gitignore patterns match at any depth.
+!docker/.env.example
