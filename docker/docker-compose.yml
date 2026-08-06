@@ -1,24 +1,31 @@
 # Disposable Grimoire instance for local development.
 #
-#   cd docker && docker compose up -d
+#   cp docker/users.json.example docker/data/users.json   # before the first start
+#   cd docker && docker compose up -d --wait
 #   curl -sf http://localhost:9481/api/health
 #
-# From inside the devcontainer, localhost is the container — resolve the
-# stack's IP instead:
-#   docker inspect docker-grimoire-1 -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}'
+# From inside the devcontainer the published port lives on the host, so reach it
+# at http://host.docker.internal:9481 rather than localhost.
+#
+# First-run users come from /data/users.json, which Grimoire seeds at startup and
+# then renames to users.json.imported (backend/seed_users.py). That rename is
+# unguarded and startup has no except around it, so users.json must sit INSIDE a
+# mounted directory — bind-mounting it as a single file makes the rename fail and
+# the container will not start. Fixture logins are admin/admin, gm/gm,
+# player/player: throwaway credentials for a throwaway stack with a fixed dev
+# SECRET_KEY, never for a real deployment.
+#
+# Reset the instance:  docker compose down && rm -rf data
 #
 # The library is a bind mount so fixtures can be dropped in and picked up with
 # POST /api/rescan. Grimoire mounts it read-only: it has no upload API and
 # never writes to the library.
 #
-# IMPORTANT under docker-outside-of-docker: the daemon runs on the HOST, so a
-# bind mount path is resolved against the HOST filesystem, not the container's.
-# `./library` therefore does not work from inside the devcontainer — set
-# GRIMOIRE_LIBRARY to the repo's path as the host sees it:
-#
-#   GRIMOIRE_LIBRARY=$HOME/Development/grimoire-cli/docker/library docker compose up -d
-#
-# Put it in docker/.env (gitignored) to avoid retyping it.
+# IMPORTANT under docker-outside-of-docker: the daemon runs on the HOST, so bind
+# mount paths resolve against the HOST filesystem, not the container's.
+# `./library` and `./data` therefore do not work from inside the devcontainer —
+# set GRIMOIRE_LIBRARY and GRIMOIRE_DATA to the repo's path as the host sees it.
+# Put them in docker/.env (gitignored); see docker/.env.example.
 services:
   grimoire:
     image: hunterreadca/grimoire:latest
@@ -37,9 +44,17 @@ services:
       # OPDS must stay off — with it on, GET /api/openapi.json returns 500
       # (hunter-read/grimoire#276), and that spec is what the CLI is built from.
       - OPDS_ENABLED=false
+      # The smoke test logs in several times; the default is 10/minute.
+      - RATE_LIMIT_ENABLED=false
     volumes:
       - ${GRIMOIRE_LIBRARY:-./library}:/library:ro
-      - grimoire-data:/data
-
-volumes:
-  grimoire-data:
+      - ${GRIMOIRE_DATA:-./data}:/data
+    # The image already healthchecks /api/health, but with interval=30s and
+    # start_period=30s, which makes `up -d --wait` sit for up to a minute.
+    # Poll faster so CI and local starts are quick.
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request,sys; sys.exit(0 if urllib.request.urlopen('http://127.0.0.1:9481/api/health', timeout=4).status == 200 else 1)"]
+      interval: 5s
+      timeout: 5s
+      start_period: 10s
+      retries: 12
