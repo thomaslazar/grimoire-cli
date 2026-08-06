@@ -46,15 +46,7 @@ claude plugin install ponytail@ponytail 2>/dev/null || true
 claude plugin marketplace add thomaslazar/answer-first 2>/dev/null || true
 claude plugin install answer-first@razal-skills 2>/dev/null || true
 
-# --- Reference material ---
-# temp/ is gitignored, so a fresh clone starts without it. Fetch what is
-# cheap to fetch; see CLAUDE.md for what belongs there and why.
-mkdir -p temp
-if [ ! -d temp/grimoire ]; then
-  git clone --depth 1 https://github.com/hunter-read/grimoire.git temp/grimoire 2>/dev/null \
-    || echo "note: could not clone the Grimoire source into temp/grimoire — see CLAUDE.md"
-fi
-if [ ! -f temp/grimoire-openapi.json ] && [ -n "${GRIMOIRE_SERVER:-}" ]; then
-  curl -sf "${GRIMOIRE_SERVER%/}/api/openapi.json" -o temp/grimoire-openapi.json \
-    || echo "note: could not fetch the OpenAPI spec from $GRIMOIRE_SERVER"
-fi
+# Reference material in temp/ is deliberately NOT fetched here: the workspace is
+# a bind mount, so temp/ survives rebuilds and any fetch-on-create is a no-op
+# after the first one — while quietly deciding which upstream ref you read.
+# Fetch it by hand, at the ref your server runs; see CLAUDE.md.
