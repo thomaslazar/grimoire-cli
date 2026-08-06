@@ -5,10 +5,65 @@ be brief
 
 ## Status
 
-Early. The environment is set up; the CLI is not designed yet. What exists in
-`src/` is scaffolding to prove the toolchain works (config, auth plumbing,
-`systems list`, `self-test`) — it is a starting point, not an approved design.
-Design the command surface before extending it.
+Early. `login` works end to end against a disposable local stack and is covered
+by `docker/smoke-test.sh` in CI. Everything else in `src/` is still scaffolding
+to prove the toolchain works (config, auth plumbing, `systems list`,
+`self-test`) — a starting point, not an approved design.
+
+Open work, in order:
+
+1. **The metadata command surface** — `PATCH /api/systems/{id}` (17 fields),
+   `PATCH /api/books/{id}` (18 fields), `POST /api/rescan`. Design it before
+   extending `src/`. One question was raised and deliberately parked, not
+   decided: typed flags for the flat fields plus a `--json` escape hatch for the
+   three nested array-of-object fields, versus a raw-JSON-body-only interface.
+2. **Fixture generation** — `docker/seed.sh` and library content under
+   `docker/library/`. Login needed no content, so this was deferred.
+3. **`grimoire-management`** — the separate skills/rules repo, counterpart to
+   `abs-management`. Not started.
+
+## Local test stack
+
+A disposable Grimoire for anything that writes. Never test writes against a real
+instance.
+
+```bash
+mkdir -p docker/data
+cp docker/users.json.example docker/data/users.json   # before the first boot
+docker compose -f docker/docker-compose.yml up -d --wait
+bash docker/smoke-test.sh
+```
+
+- Users come from `/data/users.json`, which Grimoire seeds at startup and then
+  renames to `users.json.imported` (`backend/seed_users.py`). The rename is
+  unguarded and startup has no `except` around it, so the file must sit **inside**
+  a mounted directory — bind-mounting it as a single file stops the container
+  booting. Logins are `admin/admin`, `gm/gm`, `player/player`.
+- Nothing copies the fixture for you. Skipping that step yields a stack with no
+  users, whose only symptom is a 401.
+- Reset: `docker compose -f docker/docker-compose.yml down && rm -rf docker/data`,
+  then recreate and re-copy as above.
+- Under docker-outside-of-docker the daemon runs on the host, so bind paths
+  resolve against the **host** filesystem: set `GRIMOIRE_LIBRARY` and
+  `GRIMOIRE_DATA` to host paths (see `docker/.env.example`), and reach the stack
+  at `http://host.docker.internal:9481` rather than `localhost`.
+
+## Scanner behaviour, for the unwritten `seed.sh`
+
+Read from `temp/grimoire/`, not from the docs.
+
+- **Fixture content:** the scanner keys off extensions in
+  `backend/indexer/constants.py` — `.pdf/.epub/.djvu` for books,
+  `.png/.jpg/.jpeg/.gif/.webp/.bmp/.tiff/.svg` for images, plus archive and audio
+  sets. A handful of tiny generated PDFs and PNGs under
+  `docker/library/books/{system}/{category}/` is enough; no real books needed.
+- **Categories** come from the folder name under the system
+  (`backend/indexer/categories.py`); a folder named `Maps` **directly** under a
+  system becomes a map category, while at subfolder depth the name is inert.
+- After dropping files in, `POST /api/rescan`, then poll `GET /api/scan-status`.
+- Two behaviours worth fixtures: a loose `foo.pdf` directly under `books/`
+  becomes its own single-book system, and `one-page-rpgs/` (also `micro-rpgs/`,
+  `single-page-rpgs/`, `one-shot-rpgs/`) makes each file its own system.
 
 ## Git Conventions
 
@@ -80,7 +135,12 @@ below, and refresh both after a server upgrade.
 
 ## Live instance
 
-`https://grimoire.example.invalid` — one system, `Shadowrun 6 DE`, 227 books. Its
-`parent_system` / `edition` / `system_family` are deliberately left empty as a
-test fixture for the first real metadata command. OIDC is enabled via Pocket ID;
-`grimoire-cli login` uses the local password path, not OIDC.
+Set `GRIMOIRE_SERVER` to it, or `grimoire-cli config set server <url>` — the URL
+stays out of committed files; it is recorded in `temp/deployment-docs/`.
+
+One system, `Shadowrun 6 DE`, 227 books. Its `parent_system` / `edition` /
+`system_family` are deliberately left empty as a fixture for the first real
+metadata command — **don't spend it casually**. OIDC is enabled via Pocket ID;
+`grimoire-cli login` uses the local password path, not OIDC. Use it for read-side
+exploration and for discovering response shapes; use the local stack for anything
+that writes.
