@@ -7,6 +7,7 @@ point for the first session inside the devcontainer.
 ## Where things stand
 
 - `dotnet build GrimoireCli.sln` succeeds, `self-test` passes, `dotnet format --verify-no-changes` is clean (verified on the host with .NET 10.0.300).
+- `dotnet test tests/GrimoireCli.Tests/GrimoireCli.Tests.csproj` passes (24 tests), and `bash docker/smoke-test.sh` passes against the local stack — see "Next steps" below.
 - Git repo initialised on `main`. **Not published. Do not create the GitHub repo yet.**
 - It will be **public** when it is published, so before then: scrub the internal hostname from committed files (see "Before publishing" below).
 
@@ -25,9 +26,9 @@ before extending it** — the first real job is metadata on systems and books.
 
 ## Next steps, in order
 
-1. **Design the command surface.** Brainstorm first. The target job: fix and update metadata on existing entries — `PATCH /api/systems/{id}` (17 fields) and `PATCH /api/books/{id}` (18 fields), plus `POST /api/rescan`.
-2. **Seeded local test stack.** `docker/docker-compose.yml` brings up an empty Grimoire. It still needs a `docker/seed.sh`, the counterpart to `abs-cli`'s — see below.
-3. **Smoke test** against the AOT binary once there are commands worth exercising, then wire it into `.github/workflows/build.yml` (the job was deliberately left out).
+1. **Seeded local test stack — done.** `docker/docker-compose.yml` binds `${GRIMOIRE_DATA:-./data}` (no named volume), runs with `RATE_LIMIT_ENABLED=false`, and overrides the image healthcheck for fast polling so `up -d --wait` returns quickly. `docker/users.json.example` seeds `admin/admin`, `gm/gm`, `player/player` via Grimoire's own `/data/users.json` startup seeding — no `/api/auth/setup` call. Reset is `docker compose down && rm -rf docker/data`; that flow was re-run end to end in this session and reseeds cleanly. `docker/seed.sh` and library fixtures are still unwritten — login needs no content, so that is the next increment, not this one.
+2. **Smoke test — done.** `docker/smoke-test.sh` asserts health, `login` exits 0, config persists server+token, `systems list` emits valid JSON on stdout, a bad password exits 2 (`Program.cs`'s generic failure code — the test also greps stderr for "login failed" to stay specific) leaving the config untouched, and `self-test` exits 0. It does not start or seed the stack. Wired into `.github/workflows/build.yml` as a `smoke-test` job between `unit-test` and `build`, using `docker compose` directly rather than a `services:` container (Actions starts service containers before `actions/checkout`, which would never see the fixture). CI pulls `hunterreadca/grimoire:latest` unauthenticated — watch for Docker Hub rate limiting on a GitHub runner.
+3. **Design the command surface.** Still the main open work. The target job: fix and update metadata on existing entries — `PATCH /api/systems/{id}` (17 fields) and `PATCH /api/books/{id}` (18 fields), plus `POST /api/rescan`. One question was raised and deliberately parked, not decided: typed flags for the flat fields plus a `--json` escape hatch for the three nested array-of-object fields, versus a raw-JSON-body-only interface. Verified fact bearing on that choice: PATCH does `model_dump(exclude_none=True)`, so a JSON `null` is silently dropped — a field can never be cleared to null, and the integer fields (`year`, `month`, `day`) cannot be cleared at all, since `""` fails validation.
 4. **`grimoire-management`** — the separate skills/rules repo, counterpart to `abs-management`. Not started.
 
 ## Seeding a local instance — what was learned
