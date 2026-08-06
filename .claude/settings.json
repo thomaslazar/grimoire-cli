@@ -1,0 +1,48 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(dotnet:*)",
+      "Bash(docker build:*)",
+      "Bash(docker run:*)",
+      "Bash(docker ps:*)",
+      "Bash(docker compose:*)",
+      "Bash(git add:*)",
+      "Bash(git branch:*)",
+      "Bash(git remote:*)",
+      "Bash(git push:*)",
+      "Bash(git checkout:*)",
+      "Bash(git commit:*)",
+      "Bash(gh repo:*)",
+      "Bash(gh pr:*)",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "WebFetch(domain:api.github.com)",
+      "WebFetch(domain:docs.grimoirecodex.org)"
+    ],
+    "additionalDirectories": []
+  },
+  "spinnerVerbs": {
+    "mode": "replace",
+    "verbs": [
+      "Casting Zoltraak",
+      "Analyzing defensive magic",
+      "Collecting rare grimoires",
+      "Walking the same path again",
+      "Remembering the journey",
+      "Studying ancient spells",
+      "Waiting... time passes differently for elves",
+      "Learning what it means to understand humans",
+      "Finding flowers in a meadow",
+      "Deciphering a hero's legacy",
+      "Practicing magic that shows flowers",
+      "Regretting not learning more about him",
+      "Traveling north to the Demon King's castle",
+      "Realizing a decade is like the blink of an eye",
+      "Cleaning a statue in a ruined town",
+      "Watching the sunrise from Era",
+      "Taking the scenic route",
+      "Searching for the phantom ore",
+      "Passing the first-class mage exam"
+    ]
+  }
+}

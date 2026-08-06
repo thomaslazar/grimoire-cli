@@ -1,0 +1,78 @@
+name: Build and Test
+
+on:
+  pull_request:
+    branches: [main]
+  release:
+    types: [created]
+
+permissions:
+  contents: write
+
+jobs:
+  unit-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: '10.0.x'
+      - name: Check formatting
+        run: dotnet format GrimoireCli.sln --verify-no-changes
+      - name: Run unit tests
+        run: dotnet test tests/GrimoireCli.Tests/GrimoireCli.Tests.csproj
+
+  build:
+    needs: unit-test
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # Native AOT requires matching host arch on Linux/Windows.
+          # macOS supports arm64↔x64 cross-compilation via Xcode toolchain.
+          - os: ubuntu-latest
+            rid: linux-x64
+          - os: ubuntu-24.04-arm
+            rid: linux-arm64
+          - os: macos-latest
+            rid: osx-arm64
+          - os: macos-latest
+            rid: osx-x64
+          - os: windows-latest
+            rid: win-x64
+          - os: windows-11-arm
+            rid: win-arm64
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: '10.0.x'
+      - name: Publish
+        run: >
+          dotnet publish src/GrimoireCli/GrimoireCli.csproj
+          -c Release -r ${{ matrix.rid }} --self-contained true /p:PublishAot=true
+      - name: Run self-test (AOT integrity check)
+        shell: bash
+        run: |
+          BIN="src/GrimoireCli/bin/Release/net10.0/${{ matrix.rid }}/publish/grimoire-cli"
+          [ -f "${BIN}.exe" ] && BIN="${BIN}.exe"
+          "${BIN}" self-test
+      - name: Upload artifact
+        uses: actions/upload-artifact@v7
+        with:
+          name: grimoire-cli-${{ matrix.rid }}
+          path: src/GrimoireCli/bin/Release/net10.0/${{ matrix.rid }}/publish/
+          retention-days: 5
+      - name: Attach binary to GitHub Release
+        if: github.event_name == 'release'
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          BIN="src/GrimoireCli/bin/Release/net10.0/${{ matrix.rid }}/publish/grimoire-cli"
+          [ -f "${BIN}.exe" ] && BIN="${BIN}.exe"
+          EXT=""
+          [[ "$BIN" == *.exe ]] && EXT=".exe"
+          cp "$BIN" "grimoire-cli-${{ matrix.rid }}${EXT}"
+          gh release upload "${{ github.event.release.tag_name }}" "grimoire-cli-${{ matrix.rid }}${EXT}"
