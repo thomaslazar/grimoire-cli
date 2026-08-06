@@ -1,0 +1,84 @@
+using System.CommandLine;
+using GrimoireCli.Configuration;
+using GrimoireCli.Output;
+
+namespace GrimoireCli.Commands;
+
+public static class ConfigCommand
+{
+    private static readonly NLog.Logger _logger = NLog.LogManager.GetCurrentClassLogger();
+
+    public static Command Create()
+    {
+        var command = new Command("config", "Manage grimoire-cli configuration");
+        command.Subcommands.Add(CreateGetCommand());
+        command.Subcommands.Add(CreateSetCommand());
+        return command;
+    }
+
+    private static Command CreateGetCommand()
+    {
+        var command = new Command("get", "Show current configuration");
+        command.AddExamples("grimoire-cli config get");
+        command.SetAction(parseResult =>
+        {
+            var configManager = new ConfigManager();
+            var config = configManager.Load();
+            var display = new Dictionary<string, string>
+            {
+                ["server"] = config.Server ?? "(not set)",
+                ["accessToken"] = config.AccessToken != null ? "***" : "(not set)",
+                ["configPath"] = ConfigManager.DefaultConfigPath()
+            };
+            ConsoleOutput.WriteJson(display);
+            return 0;
+        });
+        return command;
+    }
+
+    private static Command CreateSetCommand()
+    {
+        var keyArg = new Argument<string>("key") { Description = "Configuration key (server)" };
+        var valueArg = new Argument<string>("value") { Description = "Configuration value" };
+        var command = new Command("set", "Set a configuration value")
+        {
+            keyArg,
+            valueArg
+        };
+        command.AddExamples("grimoire-cli config set server https://grimoire.example.com");
+        command.SetAction(parseResult =>
+        {
+            var key = parseResult.GetValue(keyArg)!;
+            var value = parseResult.GetValue(valueArg)!;
+            var configManager = new ConfigManager();
+            var config = configManager.Load();
+            var error = ApplyConfigSet(config, key, value);
+            if (error != null)
+            {
+                _logger.Error(error);
+                Environment.Exit(1);
+                return 1;
+            }
+            configManager.Save(config);
+            Console.Error.WriteLine($"Set {key} = {value}");
+            return 0;
+        });
+        return command;
+    }
+
+    /// <summary>
+    /// Applies a config key/value onto <paramref name="config"/>. Returns null
+    /// on success, otherwise the error message for an unknown key.
+    /// </summary>
+    internal static string? ApplyConfigSet(AppConfig config, string key, string value)
+    {
+        switch (key)
+        {
+            case "server":
+                config.Server = value;
+                return null;
+            default:
+                return $"Unknown config key: '{key}'. Valid keys: server";
+        }
+    }
+}

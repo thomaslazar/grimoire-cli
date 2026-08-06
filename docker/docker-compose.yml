@@ -1,0 +1,36 @@
+# Disposable Grimoire instance for local development.
+#
+#   cd docker && docker compose up -d
+#   curl -sf http://localhost:9481/api/health
+#
+# From inside the devcontainer, localhost is the container — resolve the
+# stack's IP instead:
+#   docker inspect docker-grimoire-1 -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}'
+#
+# The library is a bind mount so fixtures can be dropped into ./library and
+# picked up with POST /api/rescan. Grimoire mounts it read-only: it has no
+# upload API and never writes to the library.
+services:
+  grimoire:
+    image: hunterreadca/grimoire:latest
+    ports:
+      - "9481:9481"
+    environment:
+      # Disposable stack — a fixed key keeps sessions valid across restarts.
+      - SECRET_KEY=dev-only-not-a-real-secret
+      - LIBRARY_PATH=/library
+      - DATA_PATH=/data
+      - WORKERS=1
+      - TZ=Europe/Berlin
+      - LOG_LEVEL=debug
+      # OCR off: this stack is for exercising the API, not for indexing scans.
+      - OCR_ENABLED=false
+      # OPDS must stay off — with it on, GET /api/openapi.json returns 500
+      # (hunter-read/grimoire#276), and that spec is what the CLI is built from.
+      - OPDS_ENABLED=false
+    volumes:
+      - ./library:/library:ro
+      - grimoire-data:/data
+
+volumes:
+  grimoire-data:

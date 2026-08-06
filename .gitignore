@@ -1,0 +1,43 @@
+# IDE
+.idea/
+.vs/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Build outputs
+bin/
+obj/
+out/
+build/
+dist/
+publish/
+
+# Packages
+*.nupkg
+packages/
+node_modules/
+
+# User-specific files
+*.user
+*.suo
+*.log
+
+# Environment
+.env
+.env.*
+
+# Claude Code (machine-specific settings)
+.claude/settings.local.json
+
+# Release artifacts
+release-notes.md
+release-artifacts/
+
+# Reference material — see CLAUDE.md for how to repopulate
+temp
+.superpowers/
