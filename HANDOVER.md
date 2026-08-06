@@ -1,8 +1,9 @@
 # Handover — start here
 
-Written 2026-08-06, from the Mac, before any development inside the container.
-The environment is ready; the CLI is not designed. This file is the starting
-point for the first session inside the devcontainer.
+Last updated 2026-08-06, from inside the devcontainer. The environment is
+ready and the login + smoke-test path is built and passing; the metadata
+command surface is still not designed. This file is the starting point for
+the next session.
 
 ## Where things stand
 
@@ -26,8 +27,8 @@ before extending it** — the first real job is metadata on systems and books.
 
 ## Next steps, in order
 
-1. **Seeded local test stack — done.** `docker/docker-compose.yml` binds `${GRIMOIRE_DATA:-./data}` (no named volume), runs with `RATE_LIMIT_ENABLED=false`, and overrides the image healthcheck for fast polling so `up -d --wait` returns quickly. `docker/users.json.example` seeds `admin/admin`, `gm/gm`, `player/player` via Grimoire's own `/data/users.json` startup seeding — no `/api/auth/setup` call. Reset is `docker compose down && rm -rf docker/data`; that flow was re-run end to end in this session and reseeds cleanly. `docker/seed.sh` and library fixtures are still unwritten — login needs no content, so that is the next increment, not this one.
-2. **Smoke test — done.** `docker/smoke-test.sh` asserts health, `login` exits 0, config persists server+token, `systems list` emits valid JSON on stdout, a bad password exits 2 (`Program.cs`'s generic failure code — the test also greps stderr for "login failed" to stay specific) leaving the config untouched, and `self-test` exits 0. It does not start or seed the stack. Wired into `.github/workflows/build.yml` as a `smoke-test` job between `unit-test` and `build`, using `docker compose` directly rather than a `services:` container (Actions starts service containers before `actions/checkout`, which would never see the fixture). CI pulls `hunterreadca/grimoire:latest` unauthenticated — watch for Docker Hub rate limiting on a GitHub runner.
+1. **Seeded local test stack — done.** `docker/docker-compose.yml` binds `${GRIMOIRE_DATA:-./data}` (no named volume), runs with `RATE_LIMIT_ENABLED=false`, and overrides the image healthcheck for fast polling so `up -d --wait` returns quickly. `docker/users.json.example` seeds `admin/admin`, `gm/gm`, `player/player` via Grimoire's own `/data/users.json` startup seeding — no `/api/auth/setup` call. Reset is `docker compose down && rm -rf docker/data && mkdir -p docker/data && cp docker/users.json.example docker/data/users.json`; that flow was re-run end to end in this session and reseeds cleanly. (Skipping the `mkdir`/`cp` leaves an unseeded stack whose only symptom is a 401 after 30 retries.) `docker/seed.sh` and library fixtures are still unwritten — login needs no content, so that is the next increment, not this one.
+2. **Smoke test — done.** `docker/smoke-test.sh` asserts health, `login` exits 0, config persists server+token, `systems list` emits valid JSON on stdout, a bad password exits 2 (`Program.cs`'s generic failure code — the test also greps stderr for "login failed" and "401" to stay specific) leaving the config untouched, and `self-test` exits 0. It does not start or seed the stack. Wired into `.github/workflows/build.yml` as a `smoke-test` job between `unit-test` and `build`, using `docker compose` directly rather than a `services:` container (Actions starts service containers before `actions/checkout`, which would never see the fixture). CI pulls the Grimoire image unauthenticated, so a Docker Hub rate limit would show up as a red `smoke-test` job on an unrelated PR; fixing that needs a repository secret (authenticated pull), so it can't be done before the repo is published. Known wrinkle, pre-existing and out of scope for this branch: `LoginCommand.cs:101-111` wraps the post-save `/api/about` version check in the same `try` as the login call, so a transient `/api/about` failure reports `Login failed:` and exits 2 *after* the token was already written to config — worth fixing when the login path is next touched.
 3. **Design the command surface.** Still the main open work. The target job: fix and update metadata on existing entries — `PATCH /api/systems/{id}` (17 fields) and `PATCH /api/books/{id}` (18 fields), plus `POST /api/rescan`. One question was raised and deliberately parked, not decided: typed flags for the flat fields plus a `--json` escape hatch for the three nested array-of-object fields, versus a raw-JSON-body-only interface. Verified fact bearing on that choice: PATCH does `model_dump(exclude_none=True)`, so a JSON `null` is silently dropped — a field can never be cleared to null, and the integer fields (`year`, `month`, `day`) cannot be cleared at all, since `""` fails validation.
 4. **`grimoire-management`** — the separate skills/rules repo, counterpart to `abs-management`. Not started.
 
@@ -35,13 +36,15 @@ before extending it** — the first real job is metadata on systems and books.
 
 Read from `temp/grimoire/` (upstream source), not from the docs.
 
-- **First-run admin:** `POST /api/auth/setup` with `{"username","password"}` creates the initial admin and returns a JWT. It **fails once any user exists**, so it is once per fresh volume. `GET /api/auth/status` returns `{"initialized": bool}` — poll that to decide.
+- **Mechanism in use: `/data/users.json` startup seeding**, not an API call. Grimoire reads that file at boot (`backend/seed_users.py`), creates the listed users, then renames the file to `users.json.imported`. That rename is unguarded and startup has no `except` around it, so `users.json` must sit inside a mounted *directory* — bind-mounting it as a single file makes the rename fail and the container won't start. See `docker/users.json.example`; the compose file copies it into `docker/data/` before first boot.
+- **`POST /api/auth/setup` is real, and was considered and rejected.** It takes `{"username","password"}`, creates the initial admin, and returns a JWT — but it fails once any user exists, so it only ever covers one admin, not the `admin/gm/player` fixture set this branch needed, and `GET /api/auth/status` would have to be polled to know when it's safe to call. `users.json` seeding covers all three roles in one step with no polling. Don't re-litigate this.
 - **Both `/api/auth/setup` and `/api/auth/login` return `{"token": ..., "user": {...}}`** — the key is `token`, not `access_token`. `GrimoireApiClient.ExtractToken` already accepts either, but the spec types both responses as `{}`, so this is source-derived, not spec-derived.
-- **Auth endpoints are rate-limited** (`AUTH_RATE_LIMIT`, `backend/security.py`). `abs-cli`'s smoke test logs in at every section and had to disable ABS's limiter; check whether Grimoire's limit is configurable before copying that pattern, or log in once and reuse the token.
+- **Auth rate limiting, answered:** `AUTH_RATE_LIMIT` (`backend/security.py:32`) defaults to `10/minute`; `RATE_LIMIT_ENABLED=false` (`backend/security.py:45`) disables it entirely. `docker/docker-compose.yml` now sets `RATE_LIMIT_ENABLED=false` — the smoke test logs in several times per run and would otherwise trip the default limit.
 - **Fixture content:** the scanner keys off extensions in `backend/indexer/constants.py` — `.pdf/.epub/.djvu` for books, `.png/.jpg/.jpeg/.gif/.webp/.bmp/.tiff/.svg` for images, plus archive and audio sets. A handful of tiny generated PDFs and PNGs under `docker/library/books/{system}/{category}/` is enough; no real books needed.
 - **Categories** come from the folder name under the system (`backend/indexer/categories.py`), and a folder named `Maps` **directly under a system** becomes a map category — at subfolder depth the name is inert.
 - **After seeding files, `POST /api/rescan`**, then poll `GET /api/scan-status`.
 - Two scanner behaviours worth fixtures: a loose `foo.pdf` directly under `books/` becomes its own single-book system, and `one-page-rpgs/` (also `micro-rpgs/`, `single-page-rpgs/`, `one-shot-rpgs/`) makes each file its own system.
+- Still needed: `docker/seed.sh` to generate/drop the fixtures above — not written yet.
 
 ## Live instance
 
@@ -65,7 +68,7 @@ Also in `CLAUDE.md`. Verified against the live instance and the source.
 
 ## Reference material in `temp/` (gitignored)
 
-- `temp/grimoire/` — upstream source, shallow clone. The authoritative reference.
+- `temp/grimoire/` — upstream source, shallow clone pinned to the deployed release (v1.5.4). The authoritative reference.
 - `temp/grimoire-openapi.json` — live spec snapshot, v1.5.4: 130 paths, 66 schemas.
 - `temp/deployment-docs/` — the `Grimoire-deployment` design records and compose.
 
@@ -79,5 +82,5 @@ reference ref, which is how the unreleased-API confusion started.
 The repo is public-bound, so first:
 
 - Remove the internal hostname from `CLAUDE.md` and any other committed file; keep it in `temp/` only, and refer to `$GRIMOIRE_SERVER` in committed docs.
-- `.devcontainer/post-create.sh` hardcodes the host session path `-path-to-grimoire-cli`; make it a glob or drop it.
-- Decide whether `docker/library/` fixtures are generated by `seed.sh` (preferred) or committed.
+- `.devcontainer/post-create.sh` hardcodes the host session path `-path-to-grimoire-cli`; make it a glob or drop it. `docs/plans/2026-08-06-login-and-smoke-test.md` now has the same path four times too (in verification commands) — do not rewrite the plan itself, but scrub it before publishing.
+- Decide whether `docker/library/` fixtures are generated by `seed.sh` (preferred) or committed. `docker/library` is now a compose mount source in CI; dockerd creates a missing bind-source directory on its own, so dropping the `.gitkeep` later will not break the job.
