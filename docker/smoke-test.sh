@@ -6,6 +6,10 @@
 #
 # It does NOT start, seed or reset the stack — bring it up first (see
 # docker/docker-compose.yml). That keeps the script identical in CI and locally.
+#
+# WARNING: it writes $HOME/.grimoire-cli/config.json. Harmless in the
+# devcontainer (container HOME isn't the host's), but running this on a host
+# machine overwrites that host's saved grimoire-cli credentials.
 set -euo pipefail
 
 SERVER="${GRIMOIRE_SERVER:-http://host.docker.internal:9481}"
@@ -33,6 +37,12 @@ for i in $(seq 1 60); do
 done
 ok "health"
 
+# Clear any stale config first: without this, a regressed ConfigManager.Save
+# that silently writes nothing would still leave a *previous* run's config
+# behind, and checks 3/4 below would pass against stale data instead of
+# catching the regression.
+rm -f "$CONFIG"
+
 # 2. Login. Retried: the healthcheck can go green before user seeding commits,
 # so a first-attempt 401 is a race, not a failure.
 for i in $(seq 1 30); do
@@ -57,6 +67,9 @@ jq -e '.accessToken | type == "string" and length > 0' "$CONFIG" >/dev/null \
 ok "config has server and token"
 
 # 4. The token authenticates, and stdout is JSON with logs kept on stderr.
+# list.err is captured for diagnostics only (dumped on failure below) — nothing
+# is asserted about its contents. At the default log level (LogSetup.cs sets
+# minimum Warn) a clean run emits nothing to stderr anyway.
 "$CLI" systems list >"$WORK/list.out" 2>"$WORK/list.err" \
   || { cat "$WORK/list.err" >&2; fail "systems list exited non-zero"; }
 jq -e . "$WORK/list.out" >/dev/null \
@@ -71,8 +84,14 @@ printf 'definitely-wrong' | "$CLI" login --server "$SERVER" --username admin --p
 rc=$?
 set -e
 [ "$rc" -eq 2 ] || fail "bad password exited $rc, expected 2"
+# LoginCommand.cs prints "Login failed: <exception message>" for any
+# HttpRequestException — DNS failure, connection refused or a 500 would also
+# match "login failed", so also require "401" (verified empirically: a bad
+# password's HttpRequestException message includes "401 (Unauthorized)").
 grep -qi "login failed" "$WORK/bad.err" \
   || fail "bad password produced no 'Login failed' message: $(cat "$WORK/bad.err")"
+grep -q "401" "$WORK/bad.err" \
+  || fail "bad password stderr did not mention 401: $(cat "$WORK/bad.err")"
 cmp -s "$CONFIG" "$WORK/config.before" \
   || fail "a failed login modified $CONFIG"
 ok "bad password exits 2 and leaves the config untouched"
