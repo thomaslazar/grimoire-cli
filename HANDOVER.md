@@ -68,8 +68,10 @@ Also in `CLAUDE.md`. Verified against the live instance and the source.
 - `temp/grimoire-openapi.json` — live spec snapshot, v1.5.4: 130 paths, 66 schemas.
 - `temp/deployment-docs/` — the `Grimoire-deployment` design records and compose.
 
-`.devcontainer/post-create.sh` re-clones the source and (if `GRIMOIRE_SERVER` is
-set) refetches the spec. The deployment docs are copied by hand.
+All three are populated by hand. `temp/` is in the bind-mounted workspace and
+survives rebuilds, so `post-create.sh` no longer fetches any of it — a
+fetch-on-create is a no-op after the first run and silently chose `main` as the
+reference ref, which is how the unreleased-API confusion started.
 
 ## Before publishing
 

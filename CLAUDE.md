@@ -56,16 +56,21 @@ them, and don't trust the published docs over them.
 - **`GET /api/openapi.json` returns 500 when `OPDS_ENABLED=true`** — upstream `hunter-read/grimoire#276`. Both our live instance and `docker/docker-compose.yml` run with OPDS off so the spec serves.
 - **No upload API.** The library is mounted `:ro`; content arrives on the filesystem, then `POST /api/rescan`. A write channel is an open design question — see the `Grimoire-deployment` repo.
 - **`POST /api/rescan`** takes `metadata_mode: new | missing | replace` and a `scope` (e.g. `books/Shadowrun 6 DE/supplements`). `missing` reapplies OPF sidecars while treating any populated field as user-protected.
+- **PATCH drops nulls.** Both `PATCH /api/systems/{id}` and `PATCH /api/books/{id}` do `model_dump(exclude_none=True)` then `setattr` the rest, so a JSON `null` is *silently ignored* — a field cannot be cleared to null. Clearing means `""` / `[]`. Verified in v1.5.4 (`backend/routers/{systems,books}/core.py`).
+- **PATCH returns `{"status":"ok"}`**, not the updated row. Seeing the result takes a follow-up `GET`.
+- **`tags` on PATCH replace, they don't merge** (`tag_service.sync_tags_from_payload`); tags live in shared tables, not a column (upstream #235). v1.5.4 has no additive tag endpoint and **no bulk endpoints** — `POST /api/{books,systems}/bulk` and `/bulk/tags` are unreleased `main` work (#270).
+- **Renaming a system via PATCH is unguarded in v1.5.4.** `game_systems.name` is `unique=True` but the handler has no conflict check, so a duplicate name fails at commit as an opaque 500 rather than a 409, and the rename is not sticky — the scanner can re-derive the folder-based name on the next rescan. (`_apply_rename`, 409, and sticky renames are unreleased `main`, #261/#262.)
 - **Editions and language are metadata, not folders.** A new folder under `books/` creates a system row with only `name` set; `parent_system` / `edition` / `system_family` stay empty until a `PATCH /api/systems/{id}`.
 
 ## Reference material (`temp/`, gitignored)
 
-`temp/` holds everything used to ground API decisions. `.devcontainer/post-create.sh`
-repopulates what it can on container create.
+`temp/` holds everything used to ground API decisions. It lives in the bind-mounted
+workspace, so it survives container rebuilds — populate it by hand with the commands
+below, and refresh both after a server upgrade.
 
-- `temp/grimoire/` — the upstream source, the authoritative reference for behaviour and response shapes:
+- `temp/grimoire/` — the upstream source, the authoritative reference for behaviour and response shapes. **Pin it to the deployed release, never `main`** — `main` carries unreleased work (bulk endpoints, sticky renames) that no instance runs:
   ```bash
-  git clone --depth 1 https://github.com/hunter-read/grimoire.git temp/grimoire
+  git clone --depth 1 --branch v1.5.4 https://github.com/hunter-read/grimoire.git temp/grimoire
   ```
 - `temp/grimoire-openapi.json` — spec snapshot from a running instance (v1.5.4: 130 paths, 66 schemas):
   ```bash
