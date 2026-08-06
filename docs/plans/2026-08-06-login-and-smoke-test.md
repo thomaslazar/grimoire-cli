@@ -447,7 +447,7 @@ Note what is removed: the `volumes: grimoire-data:` top-level block and the `gri
 
 - [ ] **Step 5: Bring the stack up and verify seeding**
 
-The devcontainer needs the host path, so pass it explicitly. Substitute the real host path — this repo is bind-mounted from `/path/to/grimoire-cli`:
+The devcontainer needs the host path, so pass it explicitly. Substitute the host path this repo is bind-mounted from:
 
 ```bash
 mkdir -p docker/data

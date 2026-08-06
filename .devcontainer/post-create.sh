@@ -3,11 +3,17 @@
 set -euo pipefail
 
 # --- Claude Code session path symlink ---
-# Claude Code indexes sessions by project path. The host path differs from
-# the container path (/workspaces/grimoire-cli), so we symlink.
+# Claude Code indexes sessions by project path, and the host path differs from
+# the container path (/workspaces/grimoire-cli), so the same repo gets two
+# histories. Link the container's key at whichever host key already exists.
+# Globbed rather than hardcoded so this works from any checkout location; if the
+# host has never opened this project in Claude Code there is nothing to link yet.
 CONTAINER_KEY=$(pwd | sed 's|/|-|g')
-ln -sfn ~/.claude/projects/-path-to-grimoire-cli \
-  ~/.claude/projects/"$CONTAINER_KEY" 2>/dev/null || true
+HOST_KEY=$(find ~/.claude/projects -maxdepth 1 -name '*-grimoire-cli' \
+  ! -name "$CONTAINER_KEY" -print -quit 2>/dev/null || true)
+if [ -n "${HOST_KEY:-}" ]; then
+  ln -sfn "$HOST_KEY" ~/.claude/projects/"$CONTAINER_KEY" 2>/dev/null || true
+fi
 
 # Ensure directories Claude Code expects exist
 mkdir -p ~/.claude/plugins/cache
