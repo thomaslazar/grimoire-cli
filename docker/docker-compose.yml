@@ -7,9 +7,18 @@
 # stack's IP instead:
 #   docker inspect docker-grimoire-1 -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}'
 #
-# The library is a bind mount so fixtures can be dropped into ./library and
-# picked up with POST /api/rescan. Grimoire mounts it read-only: it has no
-# upload API and never writes to the library.
+# The library is a bind mount so fixtures can be dropped in and picked up with
+# POST /api/rescan. Grimoire mounts it read-only: it has no upload API and
+# never writes to the library.
+#
+# IMPORTANT under docker-outside-of-docker: the daemon runs on the HOST, so a
+# bind mount path is resolved against the HOST filesystem, not the container's.
+# `./library` therefore does not work from inside the devcontainer — set
+# GRIMOIRE_LIBRARY to the repo's path as the host sees it:
+#
+#   GRIMOIRE_LIBRARY=$HOME/Development/grimoire-cli/docker/library docker compose up -d
+#
+# Put it in docker/.env (gitignored) to avoid retyping it.
 services:
   grimoire:
     image: hunterreadca/grimoire:latest
@@ -29,7 +38,7 @@ services:
       # (hunter-read/grimoire#276), and that spec is what the CLI is built from.
       - OPDS_ENABLED=false
     volumes:
-      - ./library:/library:ro
+      - ${GRIMOIRE_LIBRARY:-./library}:/library:ro
       - grimoire-data:/data
 
 volumes:
