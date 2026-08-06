@@ -34,8 +34,14 @@ dotnet run --project src/GrimoireCli -- systems list | jq
 A disposable local instance lives in `docker/`:
 
 ```bash
-cd docker && docker compose up -d      # http://localhost:9481
+mkdir -p docker/data
+cp docker/users.json.example docker/data/users.json
+cd docker && docker compose up -d --wait      # http://localhost:9481
 ```
+
+Seeded logins are `admin/admin`, `gm/gm`, `player/player` — throwaway dev
+credentials only. From inside the devcontainer, reach the stack at
+`http://host.docker.internal:9481`, not `localhost`.
 
 Drop fixture content into `docker/library/` (Grimoire's layout: `books/{system}/{category}/`)
 and pick it up with `POST /api/rescan`.
