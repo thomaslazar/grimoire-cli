@@ -1,6 +1,7 @@
 # Disposable Grimoire instance for local development.
 #
-#   cp docker/users.json.example docker/data/users.json   # before the first start
+#   mkdir -p docker/data                                        # before the first start
+#   cp docker/users.json.example docker/data/users.json          # repo-root-relative
 #   cd docker && docker compose up -d --wait
 #   curl -sf http://localhost:9481/api/health
 #
@@ -28,7 +29,9 @@
 # Put them in docker/.env (gitignored); see docker/.env.example.
 services:
   grimoire:
-    image: hunterreadca/grimoire:latest
+    # Pinned to the release the live server runs (v1.5.4) — bump deliberately
+    # when that server is upgraded, don't float on :latest.
+    image: hunterreadca/grimoire:1.5.4
     ports:
       - "9481:9481"
     environment:
