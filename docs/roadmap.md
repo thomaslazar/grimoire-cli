@@ -34,13 +34,20 @@ covers the live HTTP path against it in CI.
   rulesets on a private repo. Apply protection when the repo goes public,
   requiring the `unit-test` and `smoke-test` checks with zero required approvals
   (a solo maintainer cannot approve their own PR).
-- `systems get --id ""` and `--id .` crash with an unhandled `JsonException`
-  and a raw stack trace at exit 1, instead of the exit-2 "not found" that
-  ordinary unknown ids produce. The empty path segment reaches Grimoire's SPA
-  catch-all, which returns HTML that the JSON deserializer chokes on. The
-  related and more serious case — `--id ../about` returning a full system
-  object with every field null at exit 0 — was fixed in this branch with
-  `Uri.EscapeDataString` on the path segment; percent-encoding cannot reach
-  the empty-id case because escaping an empty string is a no-op. The fix is a
-  client-side guard rejecting an empty or dot-only id, or catching a
-  non-JSON body and reporting it as an API error.
+- `systems get --id ""`, `--id .`, and `--id ../about` all crash the same
+  way — an unhandled `JsonException` and a raw stack trace at exit 1,
+  instead of the exit-2 "not found" that ordinary unknown ids produce. Only
+  the `../about` case changed: `Uri.EscapeDataString` on the path segment
+  stopped it from reaching `/api/about` and printing a full but bogus system
+  object (every field null, exit 0) as if it were real data — that
+  cross-endpoint read is genuinely closed. But Grimoire's ASGI layer decodes
+  `%2F` before routing, so the encoded segment still misses the single-segment
+  `{system_id}` route and falls through to the SPA's HTML catch-all, landing
+  on the same crash as the empty and dot cases. So this is one failure mode
+  with three triggers, not two separate bugs — a guard scoped to empty-or-dot
+  ids would leave `../about` crashing. The durable fix is to treat a non-JSON
+  response body as an API error instead of letting the deserializer throw,
+  with an id guard as an optional extra. (The encoding fix's test,
+  `tests/GrimoireCli.Tests/ApiEndpointsTests.cs:12`, only checks the built
+  path contains no literal `../` and never round-trips against a server —
+  which is how this went from one bug to another unnoticed.)

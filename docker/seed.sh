@@ -66,7 +66,7 @@ book "!!Dungeons & Dragons 5e EN"      adventures   "Lost Mine of Phandelver"  9
 book "Das Schwarze Auge 5 DE"          core         "DSA5 Regelwerk"          11
 book "Das Schwarze Auge 5 DE"          core         "DSA5 Aventurien"          4
 book "The Dark Eye 5 EN"               core         "TDE5 Core Rules"         11
-book "Vampire The Masquerade 5 EN"      core         "V5 Corebook"             13
+book "Vampire The Masquerade 5 EN"     core         "V5 Corebook"             13
 book "Fixture Explicit RPG (nsfw)"     core         "Fixture RPG Core Rules"  3
 
 # one-page-rpgs is a special collection: the scanner makes it ONE system whose
