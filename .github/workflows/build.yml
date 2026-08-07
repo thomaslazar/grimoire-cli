@@ -35,6 +35,10 @@ jobs:
           dotnet publish src/GrimoireCli/GrimoireCli.csproj
           -c Release -r linux-x64 --self-contained true -p:PublishAot=true
           -o ./publish
+      # PyMuPDF (python3-fitz) is what seed.sh uses to generate fixture PDFs;
+      # the devcontainer has it preinstalled, runners don't.
+      - name: Install fixture tooling
+        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends python3-fitz
       # Grimoire seeds its first users from /data/users.json at startup, so the
       # fixture must be in place before the container boots — hence a step here,
       # after checkout, rather than a `services:` container that starts before it.
@@ -43,6 +47,10 @@ jobs:
           mkdir -p docker/data
           cp docker/users.json.example docker/data/users.json
           docker compose -f docker/docker-compose.yml up -d --wait
+      - name: Seed fixtures
+        run: bash docker/seed.sh
+        env:
+          GRIMOIRE_SERVER: http://localhost:9481
       - name: Run smoke test against the AOT binary
         run: bash docker/smoke-test.sh
         env:
