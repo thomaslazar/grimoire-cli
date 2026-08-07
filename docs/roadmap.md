@@ -2,9 +2,10 @@
 
 ## Now
 
-Scaffolding plus a proven `login`. `src/` has `login`, `config get|set`,
-`systems list|get` and `self-test`; `docker/smoke-test.sh` covers the live HTTP
-path and runs in CI against a seeded local stack.
+`src/` has `login`, `config get|set`, `systems list|get` and `self-test`, all
+against endpoints tracked in [grimoire-api-coverage.md](grimoire-api-coverage.md).
+`docker/seed.sh` generates fixture library content and `docker/smoke-test.sh`
+covers the live HTTP path against it in CI.
 
 ## Next
 
@@ -20,11 +21,6 @@ path and runs in CI against a seeded local stack.
    [grimoire-api-notes.md](grimoire-api-notes.md) — PATCH drops nulls, and
    unknown keys are silently ignored, so a typo'd field name in a raw body
    returns `{"status":"ok"}` having changed nothing.
-
-2. **Fixture generation** — `docker/seed.sh` and library content under
-   `docker/library/`. Login needed no content, so this was deferred. The scanner
-   behaviour it has to satisfy is in
-   [grimoire-api-notes.md](grimoire-api-notes.md).
 
 ## Known wrinkles
 

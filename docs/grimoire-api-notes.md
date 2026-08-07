@@ -30,7 +30,7 @@ reading `main` is how the first round of wrong conclusions happened.
   `hunter-read/grimoire#276`. Both the live instance and the local stack run with
   OPDS off so the spec serves.
 
-## PATCH semantics
+## PATCH semantics and filtering
 
 Applies to both `PATCH /api/systems/{id}` and `PATCH /api/books/{id}`
 (`backend/routers/{systems,books}/core.py`).
@@ -59,6 +59,17 @@ Applies to both `PATCH /api/systems/{id}` and `PATCH /api/books/{id}`
   system row instead of updating the first. The rename does survive a rescan — the
   scanner matches on `slug` and never writes `name` (`backend/indexer/scan.py`).
   (`_apply_rename` and its 409 are unreleased `main`, #261/#262.)
+- **`GET /api/systems` filters are case-insensitive exact matches**, not
+  substrings (`_has_value` in `backend/routers/systems/core.py`): `edition=5`
+  matches `5` but never `5e`, and `genre=Cyber` never matches `Cyberpunk`. A list
+  field matches if any element equals the value; an empty or null field never
+  matches, so a freshly scanned system is excluded from every metadata filter.
+  `genre=` tests the `genres` list, not the legacy `genre` string.
+- **`category` on `GET /api/systems/{id}` is case-SENSITIVE**, unlike every other
+  filter. `core.py:154` compares with `==` (`b.category == category`) while
+  `genre` goes through `_has_value`, which lowercases both sides. So
+  `category=Core` returns no books and `category=core` returns them. Verified
+  against a running instance.
 
 ## Content and rescan
 
@@ -84,9 +95,37 @@ Needed for the unwritten `docker/seed.sh`.
 - **Categories** come from the folder name under the system
   (`backend/indexer/categories.py`). A folder named `Maps` **directly** under a
   system becomes a map category; at subfolder depth the name is inert.
-- Two behaviours worth fixtures: a loose `foo.pdf` directly under `books/` becomes
-  its own single-book system, and `one-page-rpgs/` (also `micro-rpgs/`,
-  `single-page-rpgs/`, `one-shot-rpgs/`) makes each file its own system.
+- **A loose file directly under `books/` is never indexed, but is still counted.**
+  `_scan_books` skips anything that isn't a directory
+  (`if not system_dir.is_dir(): continue`, `backend/indexer/scan.py:178`), so a
+  stray `foo.pdf` next to the system folders produces no system and no book.
+  `_count_eligible_files` doesn't apply the same skip, so it still counts the
+  file toward `total_books` — any wait loop polling
+  `scanned_books >= total_books` hangs forever with a loose file present.
+- **`one-page-rpgs/` (also `micro-rpgs/`, `single-page-rpgs/`, `one-shot-rpgs/`)
+  is one system, not one per file.** It gets `is_one_page: true`, and its
+  immediate subfolder names become category labels — the same rule as the
+  system-agnostic collection, not a per-file system split.
+- **Category folder names are aliases, not values.** `CATEGORY_MAP`
+  (`backend/indexer/constants.py`) normalises folder names onto canonical singular
+  categories: `supplements/`, `sourcebook/`, `guide/`, `companion/` all become
+  `supplement`. Canonical values are `core`, `supplement`, `adventure`,
+  `character-sheet`, `map`, `handout`, `homebrew`, `starter-set`. Filtering by the
+  folder name silently matches nothing.
+- **`(nsfw)` in a system folder name sets `is_explicit`** and is stripped from the
+  stored name, so `Vampire The Masquerade 5 EN (nsfw)/` becomes a system named
+  `Vampire The Masquerade 5 EN` with `is_explicit: true`.
+- **Leading `!`, `$`, `%` are stripped from system folder names**
+  (`strip_sort_prefix`), so `!!Dungeons & Dragons/` is stored as
+  `Dungeons & Dragons`. Only the contiguous leading run is removed.
+
+## Systems have no language field
+
+`GameSystemUpdate` has 17 fields and `serialize_system_summary` returns 23; neither
+includes `language`. It exists only on books (`BookUpdate.language`), and
+`GET /api/systems` has no `language` query parameter. A system's language can be
+expressed only through its name (the `Shadowrun 6 DE` convention), a tag, or
+per-book metadata.
 
 ## First-run users
 

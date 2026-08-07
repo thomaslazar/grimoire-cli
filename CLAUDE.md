@@ -33,11 +33,12 @@ dotnet test tests/GrimoireCli.Tests/GrimoireCli.Tests.csproj
 bash docker/smoke-test.sh
 ```
 
-The smoke test expects a running stack and does not seed one. Bring it up first:
+The smoke test expects a running, seeded stack; it neither starts nor seeds one. Bring it up and seed it first:
 
 ```bash
 mkdir -p docker/data && cp docker/users.json.example docker/data/users.json
 docker compose -f docker/docker-compose.yml up -d --wait
+bash docker/seed.sh
 ```
 
 - Copying the fixture before the first boot is required; skip it and the stack comes up with no users, whose only symptom is a 401. Logins are `admin/admin`, `gm/gm`, `player/player`.
@@ -57,6 +58,8 @@ docker compose -f docker/docker-compose.yml up -d --wait
 - **Once a feature branch exists, keep its docs edits on that branch** — they reach `main` via the PR.
 - **`CHANGELOG.md` is owned by the release process** (`release/v{version}` branches only). Never edit it from a feature branch.
 - Current state and open work live in [docs/roadmap.md](docs/roadmap.md).
+- **Any PR that adds, renames or removes a command, or changes a user-visible flag, updates the README Commands table in the same change.**
+- **Any PR that touches which endpoints are called updates [docs/grimoire-api-coverage.md](docs/grimoire-api-coverage.md) in the same change.**
 
 ## Code Formatting
 
@@ -73,6 +76,7 @@ docker compose -f docker/docker-compose.yml up -d --wait
 
 - **Thin pass-through.** Each command maps to a single Grimoire API endpoint. No smart defaults that pre-fetch extra data, no reading the response to emit derived warnings, no client-side mirroring of server policy. Workflows spanning multiple endpoints are the caller's job to compose. Higher-level orchestration belongs in the calling layer, not here.
 - **JSON in, JSON out.** stdout is valid JSON from the API; logs and human-facing lines go to stderr.
+- **Commands whose endpoint needs a non-default role call `command.AddRoleRequired("<role>")`**, and the string matches the `permissionHint` passed to the service call. `systems list` / `systems get` need no tag: any authenticated non-guest can read them.
 
 ## Help text
 

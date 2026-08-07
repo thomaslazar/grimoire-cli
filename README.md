@@ -79,9 +79,9 @@ The JWT is valid for 30 days. Grimoire has **no refresh endpoint**, so an expire
 |---------|-------------|
 | `login [--server <url>] [--username <u>] [--password <pw> \| --password-stdin]` | Authenticate and store the JWT (flags fall back to interactive prompts) |
 | `config get` | Show current configuration |
-| `config set <key> <value>` | Set a configuration value (`server`, `accessToken`) |
-| `systems list` | List all game systems |
-| `systems get --id <id>` | Get a single game system, with its books |
+| `config set <key> <value>` | Set a configuration value (`server` is the only valid key) |
+| `systems list [--sort name\|book_count\|page_count\|year] [--desc] [--genre <g>] [--family <f>] [--parent-system <p>] [--edition <e>] [--license <l>] [--explicit true\|false]` | List all game systems |
+| `systems get --id <id> [--book-sort category\|title\|page_count\|year] [--book-desc] [--genre <g>] [--category <c>] [--explicit true\|false]` | Get a single game system, with its books |
 | `self-test` | Verify binary integrity (AOT validation, no network required) |
 
 Every command supports `--help` with examples and caveats.
