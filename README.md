@@ -101,7 +101,9 @@ Warnings and errors go to stderr with a timestamp + level prefix:
 
 ### Dev container (recommended)
 
-The repo includes a dev container with .NET 10, the AOT toolchain (`clang`, `zlib1g-dev`), `gh`, and Docker-outside-of-Docker. Open in VS Code and reopen in container.
+The repo includes a dev container with .NET 10, the AOT toolchain (`clang`, `zlib1g-dev`), `gh`, Docker-outside-of-Docker, and `python3-fitz` (MuPDF bindings, used to generate library fixtures).
+
+After changing anything under `.devcontainer/`, rebuild the container — **Dev Containers: Rebuild Container** in VS Code — or the new tooling won't be present.
 
 ### Running tests
 
