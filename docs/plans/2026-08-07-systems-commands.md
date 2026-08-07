@@ -874,7 +874,8 @@ public static class SystemsCommand
             "--category core reports counts for the core books alone.",
             "",
             "--category takes the normalised category, not the folder name:",
-            "'supplement', not 'supplements'.");
+            "'supplement', not 'supplements'. It is also case-sensitive — 'Core'",
+            "matches nothing — while --genre is case-insensitive.);
         command.AddExamples(
             "grimoire-cli systems get --id <system-id>",
             "grimoire-cli systems get --id <system-id> --category core",
@@ -1391,6 +1392,11 @@ And under PATCH semantics / filtering:
   field matches if any element equals the value; an empty or null field never
   matches, so a freshly scanned system is excluded from every metadata filter.
   `genre=` tests the `genres` list, not the legacy `genre` string.
+- **`category` on `GET /api/systems/{id}` is case-SENSITIVE**, unlike every other
+  filter. `core.py:154` compares with `==` (`b.category == category`) while
+  `genre` goes through `_has_value`, which lowercases both sides. So
+  `category=Core` returns no books and `category=core` returns them. Verified
+  against a running instance.
 ```
 
 And under a new heading:
