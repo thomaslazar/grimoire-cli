@@ -102,7 +102,7 @@ Needed for the unwritten `docker/seed.sh`.
   `_count_eligible_files` doesn't apply the same skip, so it still counts the
   file toward `total_books` — any wait loop polling
   `scanned_books >= total_books` hangs forever with a loose file present.
-- **`one-page-rpgs/` (also `micro-rpgs/`, `single-page-rpgs/`, `one-shot-rpgs/`)
+- **`one-page-rpgs/` (also `single-page-rpgs/`, `one-shot-rpgs/`)
   is one system, not one per file.** It gets `is_one_page: true`, and its
   immediate subfolder names become category labels — the same rule as the
   system-agnostic collection, not a per-file system split.
@@ -121,7 +121,7 @@ Needed for the unwritten `docker/seed.sh`.
 
 ## Systems have no language field
 
-`GameSystemUpdate` has 17 fields and `serialize_system_summary` returns 23; neither
+`GameSystemUpdate` has 17 fields and `serialize_system_summary` returns 24; neither
 includes `language`. It exists only on books (`BookUpdate.language`), and
 `GET /api/systems` has no `language` query parameter. A system's language can be
 expressed only through its name (the `Shadowrun 6 DE` convention), a tag, or

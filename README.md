@@ -117,11 +117,12 @@ dotnet run --project src/GrimoireCli -- self-test
 # Smoke test against a local Grimoire
 mkdir -p docker/data && cp docker/users.json.example docker/data/users.json
 docker compose -f docker/docker-compose.yml up -d --wait
+bash docker/seed.sh
 bash docker/smoke-test.sh
 docker compose -f docker/docker-compose.yml down && rm -rf docker/data
 ```
 
-The fixture copy is required before the first boot — Grimoire seeds its users from `/data/users.json` at startup, and without it the stack comes up with no users. Seeded logins are `admin/admin`, `gm/gm`, `player/player`; throwaway dev credentials for a throwaway stack.
+The fixture copy is required before the first boot — Grimoire seeds its users from `/data/users.json` at startup, and without it the stack comes up with no users. Seeded logins are `admin/admin`, `gm/gm`, `player/player`; throwaway dev credentials for a throwaway stack. `docker/seed.sh` then populates the library with fixture books — `smoke-test.sh` asserts on that fixture set and fails without it.
 
 From inside the dev container the daemon runs on the host, so reach the stack at `http://host.docker.internal:9481` rather than `localhost`, and set `GRIMOIRE_LIBRARY` / `GRIMOIRE_DATA` to host paths — see `docker/.env.example`.
 
