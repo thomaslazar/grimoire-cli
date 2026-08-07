@@ -22,6 +22,36 @@ jobs:
       - name: Run unit tests
         run: dotnet test tests/GrimoireCli.Tests/GrimoireCli.Tests.csproj
 
+  smoke-test:
+    needs: unit-test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: '10.0.x'
+      - name: Build AOT binary
+        run: >
+          dotnet publish src/GrimoireCli/GrimoireCli.csproj
+          -c Release -r linux-x64 --self-contained true -p:PublishAot=true
+          -o ./publish
+      # Grimoire seeds its first users from /data/users.json at startup, so the
+      # fixture must be in place before the container boots — hence a step here,
+      # after checkout, rather than a `services:` container that starts before it.
+      - name: Start Grimoire
+        run: |
+          mkdir -p docker/data
+          cp docker/users.json.example docker/data/users.json
+          docker compose -f docker/docker-compose.yml up -d --wait
+      - name: Run smoke test against the AOT binary
+        run: bash docker/smoke-test.sh
+        env:
+          GRIMOIRE_SERVER: http://localhost:9481
+          CLI: ./publish/grimoire-cli
+      - name: Grimoire logs
+        if: failure()
+        run: docker compose -f docker/docker-compose.yml logs
+
   build:
     needs: unit-test
     strategy:
@@ -48,10 +78,29 @@ jobs:
       - uses: actions/setup-dotnet@v5
         with:
           dotnet-version: '10.0.x'
+      # Stamps non-release builds so --version and the User-Agent say which build
+      # this is. Releases pass nothing, keeping the version bare.
+      - name: Compute build id
+        id: build
+        shell: bash
+        env:
+          EVENT: ${{ github.event_name }}
+          PR: ${{ github.event.number }}
+          PR_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          if [ "$EVENT" = pull_request ]; then
+            echo "id=pr-$PR.$(echo "$PR_SHA" | cut -c1-7)" >> "$GITHUB_OUTPUT"
+          else
+            echo "id=" >> "$GITHUB_OUTPUT"
+          fi
       - name: Publish
-        run: >
-          dotnet publish src/GrimoireCli/GrimoireCli.csproj
-          -c Release -r ${{ matrix.rid }} --self-contained true /p:PublishAot=true
+        shell: bash
+        env:
+          BUILD_ID: ${{ steps.build.outputs.id }}
+        run: |
+          dotnet publish src/GrimoireCli/GrimoireCli.csproj \
+            -c Release -r ${{ matrix.rid }} --self-contained true -p:PublishAot=true \
+            ${BUILD_ID:+-p:BuildId=$BUILD_ID}
       - name: Run self-test (AOT integrity check)
         shell: bash
         run: |

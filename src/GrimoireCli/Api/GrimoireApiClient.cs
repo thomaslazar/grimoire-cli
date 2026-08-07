@@ -1,4 +1,5 @@
 using System.Net.Http.Headers;
+using System.Reflection;
 using System.Text;
 using System.Text.Json;
 using GrimoireCli.Configuration;
@@ -23,7 +24,7 @@ public class GrimoireApiClient
             // operations (rescan, reindex) can opt into a longer budget.
             Timeout = Timeout.InfiniteTimeSpan
         };
-        _http.DefaultRequestHeaders.UserAgent.ParseAdd($"grimoire-cli/{AssemblyVersion}");
+        _http.DefaultRequestHeaders.UserAgent.ParseAdd($"grimoire-cli/{ClientVersion}");
 
         if (config.AccessToken != null)
             _http.DefaultRequestHeaders.Authorization =
@@ -143,8 +144,14 @@ public class GrimoireApiClient
     private static readonly string MinSupportedVersion = "1.5.4";
     private static readonly string MaxTestedVersion = "1.5.4";
 
-    private static readonly string AssemblyVersion =
-        typeof(GrimoireApiClient).Assembly.GetName().Version?.ToString(3) ?? "0.0.0";
+    // The informational version carries CI's build stamp ("0.1.0+pr-1.a1b2c3d") so
+    // server logs identify which build called. It lives in an assembly-level
+    // attribute, which Native AOT can trim — self-test asserts it still resolves.
+    internal static readonly string ClientVersion =
+        typeof(GrimoireApiClient).Assembly
+            .GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion
+        ?? typeof(GrimoireApiClient).Assembly.GetName().Version?.ToString(3)
+        ?? "0.0.0";
 
     public static void CheckServerVersion(string? version)
     {

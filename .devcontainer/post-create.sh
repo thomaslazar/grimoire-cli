@@ -3,11 +3,14 @@
 set -euo pipefail
 
 # --- Claude Code session path symlink ---
-# Claude Code indexes sessions by project path. The host path differs from
-# the container path (/workspaces/grimoire-cli), so we symlink.
+# Claude Code keys sessions by project path, which differs between host and
+# container. Link the container's key at the host's so both share one history.
 CONTAINER_KEY=$(pwd | sed 's|/|-|g')
-ln -sfn ~/.claude/projects/-path-to-grimoire-cli \
-  ~/.claude/projects/"$CONTAINER_KEY" 2>/dev/null || true
+HOST_KEY=$(find ~/.claude/projects -maxdepth 1 -name '*-grimoire-cli' \
+  ! -name "$CONTAINER_KEY" -print -quit 2>/dev/null || true)
+if [ -n "${HOST_KEY:-}" ]; then
+  ln -sfn "$HOST_KEY" ~/.claude/projects/"$CONTAINER_KEY" 2>/dev/null || true
+fi
 
 # Ensure directories Claude Code expects exist
 mkdir -p ~/.claude/plugins/cache
@@ -45,16 +48,3 @@ claude plugin install ponytail@ponytail 2>/dev/null || true
 # --- answer-first: output-style skill (lead with the answer, cut preamble) ---
 claude plugin marketplace add thomaslazar/answer-first 2>/dev/null || true
 claude plugin install answer-first@razal-skills 2>/dev/null || true
-
-# --- Reference material ---
-# temp/ is gitignored, so a fresh clone starts without it. Fetch what is
-# cheap to fetch; see CLAUDE.md for what belongs there and why.
-mkdir -p temp
-if [ ! -d temp/grimoire ]; then
-  git clone --depth 1 https://github.com/hunter-read/grimoire.git temp/grimoire 2>/dev/null \
-    || echo "note: could not clone the Grimoire source into temp/grimoire — see CLAUDE.md"
-fi
-if [ ! -f temp/grimoire-openapi.json ] && [ -n "${GRIMOIRE_SERVER:-}" ]; then
-  curl -sf "${GRIMOIRE_SERVER%/}/api/openapi.json" -o temp/grimoire-openapi.json \
-    || echo "note: could not fetch the OpenAPI spec from $GRIMOIRE_SERVER"
-fi
