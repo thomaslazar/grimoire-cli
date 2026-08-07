@@ -12,5 +12,8 @@ public static class ApiEndpoints
     public const string About = "api/about";
 
     public const string Systems = "api/systems";
-    public static string System(string id) => $"api/systems/{id}";
+
+    // Escaped: an unencoded "../about" normalises out of /api/systems and onto
+    // /api/about, which returns 200 with an unrelated JSON body instead of a 404.
+    public static string System(string id) => $"api/systems/{Uri.EscapeDataString(id)}";
 }
