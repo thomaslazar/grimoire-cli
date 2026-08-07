@@ -80,6 +80,35 @@ public class GameSystemDtoTests
     }
 
     [Fact]
+    public void BookToleratesNullIndexedFlags()
+    {
+        // Indexed / index_failed / has_thumbnail come from nullable, uncoerced
+        // columns upstream, so the API can send null instead of a boolean —
+        // deserializing must not throw.
+        const string bookJson = """
+        {"id":"b1","title":"SR6 Grundregelwerk","indexed":null,"index_failed":null,
+         "has_thumbnail":null,"ocr_indexed":false,"is_explicit":false,"is_missing":false}
+        """;
+        var book = JsonSerializer.Deserialize(bookJson, AppJsonContext.Default.Book)!;
+        Assert.Null(book.Indexed);
+        Assert.Null(book.IndexFailed);
+        Assert.Null(book.HasThumbnail);
+    }
+
+    [Fact]
+    public void BookRoundTripsNonNullIndexedFlags()
+    {
+        const string bookJson = """
+        {"id":"b1","title":"SR6 Grundregelwerk","indexed":true,"index_failed":false,
+         "has_thumbnail":true,"ocr_indexed":false,"is_explicit":false,"is_missing":false}
+        """;
+        var book = JsonSerializer.Deserialize(bookJson, AppJsonContext.Default.Book)!;
+        Assert.True(book.Indexed);
+        Assert.False(book.IndexFailed);
+        Assert.True(book.HasThumbnail);
+    }
+
+    [Fact]
     public void ListOfSummariesDeserializes()
     {
         var list = JsonSerializer.Deserialize($"[{SummaryJson}]", AppJsonContext.Default.ListGameSystemSummary)!;

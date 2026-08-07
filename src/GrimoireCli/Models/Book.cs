@@ -67,11 +67,14 @@ public class Book
     [JsonPropertyName("day")]
     public int? Day { get; set; }
 
+    // Upstream emits these three raw (book.indexed, not bool(book.indexed)), and the
+    // backing columns are nullable, so the API can send null. IsExplicit/IsMissing
+    // below are bool()-coerced upstream and can't be null — don't "tidy" these back.
     [JsonPropertyName("indexed")]
-    public bool Indexed { get; set; }
+    public bool? Indexed { get; set; }
 
     [JsonPropertyName("index_failed")]
-    public bool IndexFailed { get; set; }
+    public bool? IndexFailed { get; set; }
 
     [JsonPropertyName("index_error")]
     public string? IndexError { get; set; }
@@ -82,8 +85,9 @@ public class Book
     [JsonPropertyName("ocr_dpi")]
     public int? OcrDpi { get; set; }
 
+    // Same nullable column, no bool() coercion upstream — see the comment on Indexed.
     [JsonPropertyName("has_thumbnail")]
-    public bool HasThumbnail { get; set; }
+    public bool? HasThumbnail { get; set; }
 
     [JsonPropertyName("tags")]
     public List<string>? Tags { get; set; }
