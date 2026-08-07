@@ -875,7 +875,7 @@ public static class SystemsCommand
             "",
             "--category takes the normalised category, not the folder name:",
             "'supplement', not 'supplements'. It is also case-sensitive — 'Core'",
-            "matches nothing — while --genre is case-insensitive.);
+            "matches nothing — while --genre is case-insensitive.");
         command.AddExamples(
             "grimoire-cli systems get --id <system-id>",
             "grimoire-cli systems get --id <system-id> --category core",
