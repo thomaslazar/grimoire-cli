@@ -11,6 +11,11 @@
 #
 # Re-runnable: the library is rebuilt from scratch each time. To reset the
 # database as well: docker compose -f docker/docker-compose.yml down && rm -rf docker/data
+#
+# Renaming/re-marking a fixture folder (e.g. dropping "(nsfw)") needs that
+# database reset, not just a re-seed: rescan only ever sets is_explicit=true,
+# never clears it on an existing system row (backend/indexer/scan.py:232-233
+# in temp/grimoire @ v1.5.4). A re-seed alone leaves the stale flag in place.
 set -euo pipefail
 
 SERVER="${GRIMOIRE_SERVER:-http://host.docker.internal:9481}"

@@ -122,6 +122,13 @@ flags on `systems get`.
 - **`(nsfw)` in a system folder name sets `is_explicit`** and is stripped from the
   stored name, so `Vampire The Masquerade 5 EN (nsfw)/` becomes a system named
   `Vampire The Masquerade 5 EN` with `is_explicit: true`.
+- **`is_explicit` only ever latches on, never off, via rescan.** The
+  existing-system branch is `elif is_nsfw and not system.is_explicit:
+  system.is_explicit = True` (`backend/indexer/scan.py:232-233`) — removing
+  `(nsfw)` from a folder name and rescanning does not clear the flag on that
+  system row; only the creation branch (`is_explicit=is_nsfw`, line 215) sets it
+  from the folder state. Clearing a stale flag needs a database reset, not a
+  rescan. Verified against source, not yet against a live instance.
 - **Leading `!`, `$`, `%` are stripped from system folder names**
   (`strip_sort_prefix`), so `!!Dungeons & Dragons/` is stored as
   `Dungeons & Dragons`. Only the contiguous leading run is removed.
