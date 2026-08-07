@@ -45,6 +45,21 @@ public static class HelpExtensions
         sections.Add(new Section(title, lines, HelpSectionPosition.Bottom, IsShape: true));
     }
 
+    /// <summary>Registers the generated response-shape sample for <typeparamref name="T"/>.</summary>
+    public static void AddResponseExample<T>(this Command command)
+        => command.AddShapeSection("Response shape", ResponseExamples.For(typeof(T)).Split('\n'));
+
+    /// <summary>
+    /// Registers a response-shape sample for an endpoint returning a bare array of
+    /// <typeparamref name="T"/>, which is what GET /api/systems does.
+    /// </summary>
+    public static void AddResponseExampleArray<T>(this Command command)
+    {
+        var element = ResponseExamples.For(typeof(T));
+        var indented = string.Join('\n', element.Split('\n').Select(l => "  " + l));
+        command.AddShapeSection("Response shape", $"[\n{indented}\n]".Split('\n'));
+    }
+
     public static void AddExamples(this Command command, params string[] examples)
         => command.AddHelpSection("Examples", HelpSectionPosition.Bottom, examples);
 

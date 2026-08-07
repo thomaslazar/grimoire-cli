@@ -60,6 +60,7 @@ public static class SystemsCommand
             "grimoire-cli systems list --sort book_count --desc",
             "grimoire-cli systems list --family Shadowrun --edition 6",
             "grimoire-cli systems list --explicit false");
+        command.AddResponseExampleArray<GameSystemSummary>();
         command.SetAction(async (parseResult, cancellationToken) =>
         {
             var (client, _) = CommandHelper.BuildClient();
@@ -103,6 +104,7 @@ public static class SystemsCommand
             "grimoire-cli systems get --id <system-id>",
             "grimoire-cli systems get --id <system-id> --category core",
             "grimoire-cli systems get --id <system-id> --book-sort page_count --book-desc");
+        command.AddResponseExample<GameSystemDetail>();
         command.SetAction(async (parseResult, cancellationToken) =>
         {
             var (client, _) = CommandHelper.BuildClient();
