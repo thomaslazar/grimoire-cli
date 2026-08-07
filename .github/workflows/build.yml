@@ -36,9 +36,8 @@ jobs:
           -c Release -r linux-x64 --self-contained true /p:PublishAot=true
           -o ./publish
       # Grimoire seeds its first users from /data/users.json at startup, so the
-      # fixture has to be in place before the container boots. A `services:`
-      # container starts before actions/checkout runs and could never see it,
-      # which is why the stack comes up here instead.
+      # fixture must be in place before the container boots — hence a step here,
+      # after checkout, rather than a `services:` container that starts before it.
       - name: Start Grimoire
         run: |
           mkdir -p docker/data
