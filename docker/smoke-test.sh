@@ -106,37 +106,63 @@ ok "self-test"
 # there; changing a fixture must change these numbers.
 EXPECTED_SYSTEMS=8
 
-count() { "$CLI" systems list "$@" 2>/dev/null | jq 'length'; }
+# syslist/sysget capture the CLI's own exit status via a plain assignment,
+# then abort with fail(). They must be called directly (e.g. `syslist ...`
+# on its own line), never nested inside `$(...)` — a nested substitution
+# would run fail()'s `exit 1` in the subshell the substitution creates,
+# which leaves only that subshell, not the script. Previously the CLI call
+# lived inside `count() { ... | jq 'length'; }`, itself invoked as
+# `$(count ...)`: a CLI that printed `[]` and then exited non-zero produced
+# a pipeline whose last command (jq) still succeeded, so the failure was
+# silently captured as the string "0" instead of aborting anything.
+syslist() {
+  LIST_JSON=$("$CLI" systems list "$@" 2>"$WORK/cli.err") \
+    || { cat "$WORK/cli.err" >&2; fail "systems list $* exited non-zero"; }
+  COUNT=$(echo "$LIST_JSON" | jq 'length')
+}
 
-[ "$(count)" -eq "$EXPECTED_SYSTEMS" ] \
-  || fail "expected $EXPECTED_SYSTEMS systems, got $(count)"
+sysget() {
+  GET_JSON=$("$CLI" systems get "$@" 2>"$WORK/cli.err") \
+    || { cat "$WORK/cli.err" >&2; fail "systems get $* exited non-zero"; }
+}
+
+syslist
+[ "$COUNT" -eq "$EXPECTED_SYSTEMS" ] || fail "expected $EXPECTED_SYSTEMS systems, got $COUNT"
 ok "systems list returns $EXPECTED_SYSTEMS systems"
 
-[ "$(count --genre Cyberpunk)" -eq 2 ] || fail "--genre Cyberpunk should match 2"
-[ "$(count --edition 6)" -eq 1 ] || fail "--edition 6 should match 1"
-[ "$(count --edition 5)" -eq 4 ] || fail "--edition 5 should match 4 across families"
-[ "$(count --license OGL)" -eq 1 ] || fail "--license OGL should match 1"
-[ "$(count --genre nope)" -eq 0 ] || fail "an unmatched filter should return []"
+syslist --genre Cyberpunk
+[ "$COUNT" -eq 2 ] || fail "--genre Cyberpunk should match 2"
+syslist --edition 6
+[ "$COUNT" -eq 1 ] || fail "--edition 6 should match 1"
+syslist --edition 5
+[ "$COUNT" -eq 4 ] || fail "--edition 5 should match 4 across families"
+syslist --license OGL
+[ "$COUNT" -eq 1 ] || fail "--license OGL should match 1"
+syslist --genre nope
+[ "$COUNT" -eq 0 ] || fail "an unmatched filter should return []"
 ok "filters narrow the result set"
 
 # Shadowrun 4 DE is seeded raw, so a family filter must exclude it.
-[ "$(count --family Shadowrun)" -eq 2 ] \
+syslist --family Shadowrun
+[ "$COUNT" -eq 2 ] \
   || fail "--family Shadowrun should match 2, not the raw Shadowrun 4 DE"
 ok "systems with empty metadata are excluded by filters"
 
 # The (nsfw) folder marker, not a PATCH, is what sets this.
-EXPLICIT=$("$CLI" systems list --explicit true | jq -r '.[].name')
+syslist --explicit true
+EXPLICIT=$(echo "$LIST_JSON" | jq -r '.[].name')
 [ "$EXPLICIT" = "Vampire The Masquerade 5 EN" ] \
   || fail "--explicit true returned '$EXPLICIT'"
 ok "--explicit true matches the nsfw-marked system"
 
 # Filter values with an ampersand must survive URL encoding.
-[ "$(count --parent-system "Dungeons & Dragons")" -eq 1 ] \
-  || fail "a filter value containing '&' did not round-trip"
+syslist --parent-system "Dungeons & Dragons"
+[ "$COUNT" -eq 1 ] || fail "a filter value containing '&' did not round-trip"
 ok "ampersand in a filter value round-trips"
 
 # Descending sort must actually be descending.
-COUNTS=$("$CLI" systems list --sort book_count --desc | jq '[.[].book_count]')
+syslist --sort book_count --desc
+COUNTS=$(echo "$LIST_JSON" | jq '[.[].book_count]')
 echo "$COUNTS" | jq -e '. == (. | sort | reverse)' >/dev/null \
   || fail "--sort book_count --desc was not descending: $COUNTS"
 ok "--sort book_count --desc is ordered"
@@ -150,19 +176,23 @@ grep -q "Must be one of" "$WORK/sort.err" || fail "no value-set message: $(cat "
 ok "--sort bogus is rejected at parse time"
 
 # systems get: filters apply to the books and change the reported counts.
-SR6=$("$CLI" systems list --edition 6 | jq -r '.[0].id')
-[ "$("$CLI" systems get --id "$SR6" | jq '.books | length')" -eq 3 ] \
+syslist --edition 6
+SR6=$(echo "$LIST_JSON" | jq -r '.[0].id')
+sysget --id "$SR6"
+[ "$(echo "$GET_JSON" | jq '.books | length')" -eq 3 ] \
   || fail "Shadowrun 6 DE should have 3 books"
-CORE=$("$CLI" systems get --id "$SR6" --category core)
-[ "$(echo "$CORE" | jq '.books | length')" -eq 2 ] || fail "--category core should keep 2 books"
-[ "$(echo "$CORE" | jq '.book_count')" -eq 2 ] \
+sysget --id "$SR6" --category core
+[ "$(echo "$GET_JSON" | jq '.books | length')" -eq 2 ] || fail "--category core should keep 2 books"
+[ "$(echo "$GET_JSON" | jq '.book_count')" -eq 2 ] \
   || fail "book_count should be recomputed from the filtered books"
 ok "systems get filters books and recomputes counts"
 
 # The canonical category, not the folder name.
-[ "$("$CLI" systems get --id "$SR6" --category supplements | jq '.books | length')" -eq 0 ] \
+sysget --id "$SR6" --category supplements
+[ "$(echo "$GET_JSON" | jq '.books | length')" -eq 0 ] \
   || fail "'supplements' is a folder name and should match nothing"
-[ "$("$CLI" systems get --id "$SR6" --category supplement | jq '.books | length')" -eq 1 ] \
+sysget --id "$SR6" --category supplement
+[ "$(echo "$GET_JSON" | jq '.books | length')" -eq 1 ] \
   || fail "'supplement' is the canonical category and should match 1"
 ok "category filtering uses canonical values"
 
