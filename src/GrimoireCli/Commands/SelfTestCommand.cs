@@ -55,6 +55,15 @@ public static class SelfTestCommand
                 || GrimoireApiClient.CompareVersions("1.5.4-rc1", "1.5.4") != 0)
                 failures.Add("CompareVersions produced a wrong ordering");
 
+            // The User-Agent reads an assembly-level attribute, which trimming can
+            // strip: it compiles fine and goes empty only in a published binary.
+            var version = GrimoireApiClient.ClientVersion;
+            var assemblyVersion = typeof(GrimoireApiClient).Assembly.GetName().Version?.ToString(3);
+            if (string.IsNullOrWhiteSpace(version) || version == "0.0.0")
+                failures.Add("Informational version did not resolve");
+            else if (assemblyVersion != null && !version.StartsWith(assemblyVersion, StringComparison.Ordinal))
+                failures.Add($"Informational version '{version}' does not start with assembly version '{assemblyVersion}'");
+
             // Login-response token extraction across the plausible spellings.
             if (GrimoireApiClient.ExtractToken("{\"access_token\":\"t\"}") != "t"
                 || GrimoireApiClient.ExtractToken("{\"token\":\"t\"}") != "t"

@@ -42,6 +42,8 @@ chmod +x grimoire-cli
 
 **macOS users:** the binaries are not signed or notarized, so Gatekeeper blocks them on first run. Clear the quarantine attribute with `sudo xattr -d com.apple.quarantine grimoire-cli`.
 
+CI-built binaries stamp their origin into the version, so an installed one identifies itself — `grimoire-cli --version` prints `0.1.0+pr-1.a1b2c3d` for a pull-request build and a bare `0.1.0` for a release. The same string goes out in the `User-Agent`.
+
 ## Quick start
 
 ```bash
@@ -95,7 +97,7 @@ Warnings and errors go to stderr with a timestamp + level prefix:
 2026-08-07T14:23:45.123Z ERROR Not authenticated, or the token has expired. Run: grimoire-cli login
 ```
 
-Add `--debug` (or set `GRIMOIRE_DEBUG=1`) to also emit one line per HTTP call, token-expiry decisions, and version-check decisions. Add `--log-json` to switch stderr to single-line JSON. The bearer token is never logged.
+`--debug` and `--log-json` are root options, so they go **before** the subcommand — `grimoire-cli --debug systems list`, not `systems list --debug`. `--debug` (or `GRIMOIRE_DEBUG=1`) adds one line per HTTP call, plus token-expiry and version-check decisions; `--log-json` switches stderr to single-line JSON. The bearer token is never logged.
 
 ## Development
 
