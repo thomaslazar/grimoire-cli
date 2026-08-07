@@ -33,7 +33,7 @@ jobs:
       - name: Build AOT binary
         run: >
           dotnet publish src/GrimoireCli/GrimoireCli.csproj
-          -c Release -r linux-x64 --self-contained true /p:PublishAot=true
+          -c Release -r linux-x64 --self-contained true -p:PublishAot=true
           -o ./publish
       # Grimoire seeds its first users from /data/users.json at startup, so the
       # fixture must be in place before the container boots — hence a step here,
@@ -99,7 +99,7 @@ jobs:
           BUILD_ID: ${{ steps.build.outputs.id }}
         run: |
           dotnet publish src/GrimoireCli/GrimoireCli.csproj \
-            -c Release -r ${{ matrix.rid }} --self-contained true /p:PublishAot=true \
+            -c Release -r ${{ matrix.rid }} --self-contained true -p:PublishAot=true \
             ${BUILD_ID:+-p:BuildId=$BUILD_ID}
       - name: Run self-test (AOT integrity check)
         shell: bash
