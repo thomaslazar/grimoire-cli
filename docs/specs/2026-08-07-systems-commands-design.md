@@ -118,8 +118,10 @@ procedure below — not to let unknown fields leak through unmodelled.
 
 ### Parse-time validation of sort keys
 
-`--sort` and `--book-sort` use `AcceptOnlyFromAmong`, so an unknown value fails at
-parse time instead of silently returning differently-ordered data. This is a
+`--sort` and `--book-sort` reject unknown values at parse time instead of silently
+returning differently-ordered data. The mechanism is `Option.Validators` —
+`AcceptOnlyFromAmong` exists only on `Argument` in System.CommandLine 2.0.7, not on
+`Option`. This is a
 deliberate, narrow exception to "no client-side mirroring of server policy": the
 value sets are tiny, fixed, already enumerated in the flag description, and the
 server's failure mode is silent. `--book-sort` accepts `category` as well as the
@@ -254,23 +256,39 @@ The `&` in that name is also deliberate: it is what the real folder looks like, 
 No `maps/` fixture. Maps are a top-level library section beside `books/`, not a
 system category, and nothing in `systems list` / `systems get` surfaces them.
 
-Plus the two scanner edge cases from the API notes: a loose `stray.pdf` directly
-under `books/`, and `one-page-rpgs/` with two files. Both become their own systems
-and give the list rows with **no** metadata at all, so "filter matches nothing"
-and "sort with null year" are covered.
+Plus `one-page-rpgs/` with two files, which the scanner treats as a **single**
+special-collection system (`is_one_page: true`) rather than one system per file.
+It contributes a row with no metadata at all, so "filter matches nothing" and
+"sort with null year" are covered.
 
-That is **10 systems** total (7 named + 1 stray + 2 one-page), and every filter has
-both matching and non-matching rows:
+**Correction, verified against v1.5.4 and the running stack:** the API notes
+inherited two claims from the original handover that are both false, and this
+spec previously repeated them.
+
+- A loose PDF directly under `books/` does **not** become its own system.
+  `_scan_books` skips non-directories outright (`if not system_dir.is_dir(): continue`,
+  `backend/indexer/scan.py:178`), so the file is never indexed. Worse for a seed
+  script, `_count_eligible_files` still counts it in `total_books`, so a wait loop
+  that polls `scanned_books >= total_books` never terminates.
+- `one-page-rpgs/` does not make each file its own system. It is one system whose
+  immediate subfolder names become category labels, exactly like the
+  system-agnostic collection.
+
+No loose-file fixture is seeded, therefore. Both corrections belong in
+`grimoire-api-notes.md` — see §10.
+
+That is **8 systems** total (7 named + `one-page-rpgs`), and every filter has both
+matching and non-matching rows:
 
 - `--genre`: Cyberpunk 2, Fantasy 3, Horror 1
 - `--family`: Shadowrun 2, The Dark Eye 2, D&D 1, World of Darkness 1
 - `--parent-system`: Shadowrun 2, the rest 1 each
-- `--edition`: `5` matches 3 (SR5, DSA5, TDE5 — deliberately ambiguous across
-  families), `5e` matches 1, `6` matches 1
+- `--edition`: `5` matches 4 (SR5, DSA5, TDE5 and Vampire 5 — deliberately
+  ambiguous across families), `5e` matches 1, `6` matches 1
 - `--license`: OGL 1
-- `--explicit true`: 1; `--explicit false`: 9
-- four systems (`Shadowrun 4 DE`, the stray, the two one-page) match **no**
-  metadata filter at all
+- `--explicit true`: 1; `--explicit false`: 7
+- two systems (`Shadowrun 4 DE` and `one-page-rpgs`) match **no** metadata filter
+  at all
 - sorts: `book_count` 1–3, `page_count` varied per book, `year` 2013–2019 with the
   three metadata-less systems null (which sort last regardless of direction —
   `_sort_systems` special-cases that, and the smoke test asserts it)
@@ -366,17 +384,16 @@ writes `src/GrimoireCli/Commands/ResponseExamples.g.cs`, plus
 `docker/smoke-test.sh` gains a seeded-data section. It currently asserts against an
 empty instance; it will now run after `seed.sh` and assert:
 
-- `systems list` returns an array of exactly **10** systems — the seven named
-  folders, plus `stray.pdf` becoming its own single-book system, plus one per file
-  in `one-page-rpgs/` (two). The number is defined once as a constant in
-  `smoke-test.sh` beside the fixture list it mirrors, so adding a fixture forces the
-  assertion to be updated rather than silently loosened.
+- `systems list` returns an array of exactly **8** systems — the seven named
+  folders plus the `one-page-rpgs` collection. The number is defined once as a
+  constant in `smoke-test.sh` beside the fixture list it mirrors, so adding a
+  fixture forces the assertion to be updated rather than silently loosened.
 - `--family Shadowrun` returns exactly 2, not 3: the raw `Shadowrun 4 DE` must be
   excluded, proving an empty field is not matched loosely
 - each sort key returns valid JSON, and `--sort page_count --desc` is ordered
   descending (checked with `jq`, not assumed)
 - each filter narrows the result: `--genre Cyberpunk` returns the two Shadowrun
-  systems, `--edition 6` returns one, `--edition 5` returns three across different
+  systems, `--edition 6` returns one, `--edition 5` returns four across different
   families, `--explicit true` returns Vampire only, `--parent-system Shadowrun`
   returns two, `--family "The Dark Eye"` returns the DE and EN pair, and
   `--license OGL` returns D&D only

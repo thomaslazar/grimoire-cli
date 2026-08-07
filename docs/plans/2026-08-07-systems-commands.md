@@ -134,7 +134,7 @@ git commit -m "test: add pymupdf fixture generator for the local stack"
 
 **Interfaces:**
 - Consumes: `docker/make-fixtures.py` from Task 2.
-- Produces: a seeded stack with **10 systems**. Task 10's smoke assertions depend on the exact fixture set below.
+- Produces: a seeded stack with **8 systems**. Task 10's smoke assertions depend on the exact fixture set below.
 
 Verified API facts this task depends on:
 - `POST /api/rescan` body `{"metadata_mode":"new"}` returns `{"status":"scan_started"}`.
@@ -224,14 +224,15 @@ book "Das Schwarze Auge 5 DE"          core         "DSA5 Aventurien"          4
 book "The Dark Eye 5 EN"               core         "TDE5 Core Rules"         11
 book "Vampire The Masquerade 5 EN (nsfw)" core      "V5 Corebook"             13
 
-# Scanner edge cases: a loose file at the books root becomes its own system, and
-# each file under one-page-rpgs/ becomes its own system.
-python3 "$HERE/make-fixtures.py" "$LIBRARY/books/stray.pdf" 2
+# one-page-rpgs is a special collection: the scanner makes it ONE system whose
+# subfolder names become category labels, not one system per file. A loose PDF at
+# the books root is skipped entirely (scan.py requires a directory), so none is
+# seeded — it would never be indexed yet would still inflate total_books.
 mkdir -p "$LIBRARY/books/one-page-rpgs"
 python3 "$HERE/make-fixtures.py" "$LIBRARY/books/one-page-rpgs/Lasers and Feelings.pdf" 1
 python3 "$HERE/make-fixtures.py" "$LIBRARY/books/one-page-rpgs/Honey Heist.pdf" 1
 
-EXPECTED_BOOKS=15
+EXPECTED_BOOKS=14
 say "wrote $EXPECTED_BOOKS fixture books"
 
 # 4. Rescan, then wait for completion. `running` reads false before the scan
@@ -272,7 +273,7 @@ patch_system "Vampire The Masquerade 5 EN" '{"system_family":"World of Darkness"
 
 COUNT=$(curl -sf "$SERVER/api/systems" -H "$AUTH" | jq 'length')
 say "seed complete — $COUNT systems"
-[ "$COUNT" -eq 10 ] || fail "expected 10 systems, got $COUNT"
+[ "$COUNT" -eq 8 ] || fail "expected 8 systems, got $COUNT"
 ```
 
 Note the PATCH names have no `!!` prefix and no `(nsfw)` suffix: the scanner strips both, so the stored names are `Dungeons & Dragons 5e EN` and `Vampire The Masquerade 5 EN`. If `patch_system` reports "no system named …", that assumption broke and is worth reporting rather than renaming the fixture folders.
@@ -290,7 +291,7 @@ chmod +x docker/seed.sh
 bash docker/seed.sh
 ```
 
-Substitute the host path this repo is bind-mounted from — under docker-outside-of-docker the daemon resolves bind paths on the host. Expected: ends with `seed complete — 10 systems`.
+Substitute the host path this repo is bind-mounted from — under docker-outside-of-docker the daemon resolves bind paths on the host. Expected: ends with `seed complete — 8 systems`.
 
 - [ ] **Step 4: Verify the fixture set matches what Task 10 will assert**
 
@@ -302,7 +303,7 @@ curl -sf "http://host.docker.internal:9481/api/systems?family=Shadowrun" -H "Aut
 curl -sf "http://host.docker.internal:9481/api/systems?explicit=true" -H "Authorization: Bearer $TOKEN" | jq '.[].name'
 curl -sf "http://host.docker.internal:9481/api/systems?edition=5" -H "Authorization: Bearer $TOKEN" | jq 'length'
 ```
-Expected: `2`, `2` (Shadowrun 4 DE is raw and must not match), `"Vampire The Masquerade 5 EN"`, `3`.
+Expected: `2`, `2` (Shadowrun 4 DE is raw and must not match), `"Vampire The Masquerade 5 EN"`, `4` — edition `5` is carried by Shadowrun 5 DE, Das Schwarze Auge 5 DE, The Dark Eye 5 EN and Vampire The Masquerade 5 EN.
 
 If `explicit=true` returns nothing, the `(nsfw)` folder convention did not apply — report it; do not fall back to PATCHing `is_explicit`, because the fixture exists to prove the scanner behaviour.
 
@@ -1189,7 +1190,7 @@ Change the header comment to state that it requires a seeded stack (`bash docker
 # --- seeded data -------------------------------------------------------------
 # Requires docker/seed.sh to have run. Counts mirror the fixture set defined
 # there; changing a fixture must change these numbers.
-EXPECTED_SYSTEMS=10
+EXPECTED_SYSTEMS=8
 
 count() { "$CLI" systems list "$@" 2>/dev/null | jq 'length'; }
 
@@ -1199,7 +1200,7 @@ ok "systems list returns $EXPECTED_SYSTEMS systems"
 
 [ "$(count --genre Cyberpunk)" -eq 2 ] || fail "--genre Cyberpunk should match 2"
 [ "$(count --edition 6)" -eq 1 ] || fail "--edition 6 should match 1"
-[ "$(count --edition 5)" -eq 3 ] || fail "--edition 5 should match 3 across families"
+[ "$(count --edition 5)" -eq 4 ] || fail "--edition 5 should match 4 across families"
 [ "$(count --license OGL)" -eq 1 ] || fail "--license OGL should match 1"
 [ "$(count --genre nope)" -eq 0 ] || fail "an unmatched filter should return []"
 ok "filters narrow the result set"
@@ -1367,6 +1368,19 @@ Add to `docs/grimoire-api-notes.md` under Scanner behaviour:
   (`strip_sort_prefix`), so `!!Dungeons & Dragons/` is stored as
   `Dungeons & Dragons`. Only the contiguous leading run is removed.
 ```
+
+**Two existing bullets in that file are wrong and must be replaced, not appended
+to.** They were inherited from the original handover and are contradicted by
+v1.5.4's source and by the running stack:
+
+- The file claims a loose `foo.pdf` directly under `books/` becomes its own
+  single-book system. It does not: `_scan_books` skips non-directories
+  (`if not system_dir.is_dir(): continue`, `backend/indexer/scan.py:178`), so the
+  file is never indexed at all — while `_count_eligible_files` still counts it in
+  `total_books`, which will hang any wait loop polling `scanned_books >= total_books`.
+- The file claims `one-page-rpgs/` makes each file its own system. It does not: it
+  is **one** system with `is_one_page: true`, whose immediate subfolder names become
+  category labels, exactly like the system-agnostic collection.
 
 And under PATCH semantics / filtering:
 
