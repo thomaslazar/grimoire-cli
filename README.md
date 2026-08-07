@@ -6,8 +6,6 @@ Native AOT binary. No runtime required. ~10 MB.
 
 > **Note:** This tool was built using agentic software engineering (AI-assisted coding) and reviewed by a human. See the git history for details.
 
-> **Status: early.** `login` works end to end and is covered by a smoke test in CI. The metadata command surface — the job this CLI exists for — is not designed yet; what is in `src/` beyond login is scaffolding. See [docs/roadmap.md](docs/roadmap.md).
-
 ## Features
 
 - **JSON-only output** — stdout is always valid JSON from the Grimoire API, logs and errors go to stderr
@@ -18,7 +16,7 @@ Native AOT binary. No runtime required. ~10 MB.
 
 ## Installation
 
-No releases yet. Build from source, or grab a binary from a CI run.
+Build from source, or download a binary from a CI run.
 
 ### Build from source
 
@@ -152,7 +150,6 @@ Tested against Grimoire **v1.5.4**. The CLI warns on login if the server reports
 ## Related
 
 - [`deployment-repo`](https://github.com/thomaslazar/deployment-repo) — the deployed instance: compose, design records, upstream bug reports
-- `management-repo` — planned skills/rules repo, the counterpart to `management-repo`
 
 ## License
 
