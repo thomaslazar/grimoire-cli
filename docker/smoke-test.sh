@@ -4,21 +4,19 @@
 #   bash docker/smoke-test.sh
 #   GRIMOIRE_SERVER=http://localhost:9481 CLI=./publish/grimoire-cli bash docker/smoke-test.sh
 #
-# It does NOT start, seed or reset the stack — bring it up first (see
-# docker/docker-compose.yml). That keeps the script identical in CI and locally.
+# Expects a stack that is already up (see docker/docker-compose.yml), which keeps
+# the script identical in CI and locally.
 #
 # WARNING: it writes $HOME/.grimoire-cli/config.json. Harmless in the
 # devcontainer (container HOME isn't the host's), but running this on a host
 # machine overwrites that host's saved grimoire-cli credentials.
 set -euo pipefail
 
+# GRIMOIRE_SERVER stays unexported: `systems list` must resolve the server from
+# the config file `login` wrote, so a login that persisted nothing still fails.
 SERVER="${GRIMOIRE_SERVER:-http://host.docker.internal:9481}"
 CLI="${CLI:-src/GrimoireCli/bin/Debug/net10.0/grimoire-cli}"
 CONFIG="$HOME/.grimoire-cli/config.json"
-
-# Deliberately NOT exporting GRIMOIRE_SERVER: `systems list` must resolve the
-# server from the config file that `login` wrote. With it in the environment,
-# a login that failed to persist anything would still pass this test.
 
 WORK=$(mktemp -d)
 trap 'rm -rf "$WORK"' EXIT

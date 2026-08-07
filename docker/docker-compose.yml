@@ -19,8 +19,7 @@
 # Reset the instance:  docker compose down && rm -rf data
 #
 # The library is a bind mount so fixtures can be dropped in and picked up with
-# POST /api/rescan. Grimoire mounts it read-only: it has no upload API and
-# never writes to the library.
+# POST /api/rescan. Grimoire mounts it read-only.
 #
 # IMPORTANT under docker-outside-of-docker: the daemon runs on the HOST, so bind
 # mount paths resolve against the HOST filesystem, not the container's.
