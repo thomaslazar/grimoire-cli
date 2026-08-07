@@ -3,7 +3,8 @@
 Behaviour verified against Grimoire **v1.5.4** — the release the live instance
 and `docker/docker-compose.yml` both run — by reading `temp/grimoire/` at that
 tag and by calling the API. Don't re-derive these, and don't trust the published
-docs over them. Re-verify after a server upgrade.
+docs over them. Re-verify after a server upgrade — see
+[grimoire-compatibility.md](grimoire-compatibility.md) for the bump procedure.
 
 `main` upstream carries unreleased work (bulk endpoints, guarded renames) that no
 instance runs. Pinning the reference clone to the release tag is not optional;
@@ -85,7 +86,8 @@ Applies to both `PATCH /api/systems/{id}` and `PATCH /api/books/{id}`
 
 ## Scanner behaviour
 
-Needed for the unwritten `docker/seed.sh`.
+Backs `docker/seed.sh`'s fixture layout and the `--category` / `--book-sort`
+flags on `systems get`.
 
 - **Fixture content:** the scanner keys off extensions in
   `backend/indexer/constants.py` — `.pdf/.epub/.djvu` for books,

@@ -290,8 +290,10 @@ matching and non-matching rows:
 - two systems (`Shadowrun 4 DE` and `one-page-rpgs`) match **no** metadata filter
   at all
 - sorts: `book_count` 1–3, `page_count` varied per book, `year` 2013–2019 with the
-  three metadata-less systems null (which sort last regardless of direction —
-  `_sort_systems` special-cases that, and the smoke test asserts it)
+  three metadata-less systems null. `_sort_systems` keys on `(year is None, year)`
+  with a plain `reverse` flag, so `--desc` reverses the null-ness too: null-year
+  systems sort last ascending but **first** descending. The smoke test only
+  asserts `--sort book_count --desc`; it does not cover `--sort year` at all.
 
 ### 3. `docker/seed.sh`
 
