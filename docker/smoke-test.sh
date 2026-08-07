@@ -104,7 +104,7 @@ ok "self-test"
 # --- seeded data -------------------------------------------------------------
 # Requires docker/seed.sh to have run. Counts mirror the fixture set defined
 # there; changing a fixture must change these numbers.
-EXPECTED_SYSTEMS=8
+EXPECTED_SYSTEMS=9
 
 # syslist/sysget capture the CLI's own exit status via a plain assignment,
 # then abort with fail(). They must be called directly (e.g. `syslist ...`
@@ -151,7 +151,7 @@ ok "systems with empty metadata are excluded by filters"
 # The (nsfw) folder marker, not a PATCH, is what sets this.
 syslist --explicit true
 EXPLICIT=$(echo "$LIST_JSON" | jq -r '.[].name')
-[ "$EXPLICIT" = "Vampire The Masquerade 5 EN" ] \
+[ "$EXPLICIT" = "Fixture Explicit RPG" ] \
   || fail "--explicit true returned '$EXPLICIT'"
 ok "--explicit true matches the nsfw-marked system"
 

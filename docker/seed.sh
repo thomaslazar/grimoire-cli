@@ -61,7 +61,8 @@ book "!!Dungeons & Dragons 5e EN"      adventures   "Lost Mine of Phandelver"  9
 book "Das Schwarze Auge 5 DE"          core         "DSA5 Regelwerk"          11
 book "Das Schwarze Auge 5 DE"          core         "DSA5 Aventurien"          4
 book "The Dark Eye 5 EN"               core         "TDE5 Core Rules"         11
-book "Vampire The Masquerade 5 EN (nsfw)" core      "V5 Corebook"             13
+book "Vampire The Masquerade 5 EN"      core         "V5 Corebook"             13
+book "Fixture Explicit RPG (nsfw)"     core         "Fixture RPG Core Rules"  3
 
 # one-page-rpgs is a special collection: the scanner makes it ONE system whose
 # subfolder names become category labels, not one system per file. A loose PDF at
@@ -71,7 +72,7 @@ mkdir -p "$LIBRARY/books/one-page-rpgs"
 python3 "$HERE/make-fixtures.py" "$LIBRARY/books/one-page-rpgs/Lasers and Feelings.pdf" 1
 python3 "$HERE/make-fixtures.py" "$LIBRARY/books/one-page-rpgs/Honey Heist.pdf" 1
 
-EXPECTED_BOOKS=14
+EXPECTED_BOOKS=15
 say "wrote $EXPECTED_BOOKS fixture books"
 
 # 4. Rescan, then wait for completion. `running` reads false before the scan
@@ -112,4 +113,4 @@ patch_system "Vampire The Masquerade 5 EN" '{"system_family":"World of Darkness"
 
 COUNT=$(curl -sf "$SERVER/api/systems" -H "$AUTH" | jq 'length')
 say "seed complete — $COUNT systems"
-[ "$COUNT" -eq 8 ] || fail "expected 8 systems, got $COUNT"
+[ "$COUNT" -eq 9 ] || fail "expected 9 systems, got $COUNT"
