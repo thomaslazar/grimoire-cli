@@ -147,10 +147,6 @@ Verified API behaviour worth reading before designing a command: [docs/grimoire-
 
 Tested against Grimoire **v1.5.4**. The CLI warns on login if the server reports a version outside the tested range.
 
-## Related
-
-- [`deployment-repo`](https://github.com/thomaslazar/deployment-repo) — the deployed instance: compose, design records, upstream bug reports
-
 ## License
 
 [MIT](LICENSE)

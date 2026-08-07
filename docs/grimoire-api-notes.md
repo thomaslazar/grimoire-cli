@@ -63,8 +63,8 @@ Applies to both `PATCH /api/systems/{id}` and `PATCH /api/books/{id}`
 ## Content and rescan
 
 - **No upload API.** The library is mounted `:ro`; content arrives on the
-  filesystem, then `POST /api/rescan`. A write channel is an open design question —
-  see the `deployment-repo` repo.
+  filesystem, then `POST /api/rescan`. A write channel is an open design question,
+  tracked outside this repo.
 - **`POST /api/rescan`** takes `metadata_mode: new | missing | replace` and a
   `scope` (e.g. `books/<system>/supplements`). `missing` reapplies OPF sidecars
   while treating any populated field as user-protected. Poll `GET /api/scan-status`.

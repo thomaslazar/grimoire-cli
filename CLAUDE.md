@@ -95,7 +95,7 @@ The upstream source is the authoritative reference for behaviour and response sh
   ```bash
   curl -sf "$GRIMOIRE_SERVER/api/openapi.json" -o temp/grimoire-openapi.json
   ```
-- `temp/deployment-docs/` — design records copied from the `deployment-repo` repo, including the live instance's URL and library structure.
+- `temp/deployment-docs/` — deployment design records copied in by hand, including the live instance's URL and library structure.
 - `temp/` sits in the bind-mounted workspace and survives container rebuilds; populate it by hand.
 
 Verified API behaviour that the source alone is slow to reveal — read this before designing a command: [docs/grimoire-api-notes.md](docs/grimoire-api-notes.md).
