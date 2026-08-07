@@ -71,7 +71,7 @@ docker compose -f docker/docker-compose.yml up -d --wait
 
 ## CLI design principles
 
-- **Thin pass-through.** Each command maps to a single Grimoire API endpoint. No smart defaults that pre-fetch extra data, no reading the response to emit derived warnings, no client-side mirroring of server policy. Workflows spanning multiple endpoints are the caller's job to compose. Higher-level orchestration belongs in the `grimoire-management` skills repo, not here.
+- **Thin pass-through.** Each command maps to a single Grimoire API endpoint. No smart defaults that pre-fetch extra data, no reading the response to emit derived warnings, no client-side mirroring of server policy. Workflows spanning multiple endpoints are the caller's job to compose. Higher-level orchestration belongs in the calling layer, not here.
 - **JSON in, JSON out.** stdout is valid JSON from the API; logs and human-facing lines go to stderr.
 
 ## Help text

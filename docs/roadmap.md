@@ -26,9 +26,6 @@ path and runs in CI against a seeded local stack.
    behaviour it has to satisfy is in
    [grimoire-api-notes.md](grimoire-api-notes.md).
 
-3. **`grimoire-management`** — the skills/rules repo, counterpart to
-   `abs-management`. Not started.
-
 ## Known wrinkles
 
 - `LoginCommand` wraps the post-save `/api/about` version check in the same `try`

@@ -63,9 +63,9 @@ to trigger seeding (works, but needs a paragraph of comment to justify itself).
 The devcontainer's `HOME` is `/home/vscode` inside the container, and
 `devcontainer.json` binds only `~/.claude/projects` and the peon packs. A smoke
 run in the container writes `/home/vscode/.grimoire-cli/config.json` and cannot
-touch the host's. Live testing happens with a PR build installed via the
-`grimoire-management` install skill, against the real server — the same workflow
-as `abs-cli`. No `--config` flag, no `GRIMOIRE_CONFIG` env var, no `HOME` override.
+touch the host's. Live testing happens with a PR build installed from its CI
+artifact and run against the real server. No `--config` flag, no
+`GRIMOIRE_CONFIG` env var, no `HOME` override.
 
 ## Changes
 
@@ -164,4 +164,4 @@ The project is wired for xunit.v3 and empty. Four cheap tests give the
 - `bash docker/smoke-test.sh` passes locally against that stack and in CI
 - `dotnet format GrimoireCli.sln --verify-no-changes` is clean
 - the `smoke-test` job passes on a pull request, and the `build` job's artifacts
-  remain installable by the `grimoire-management` install skill
+  remain downloadable and runnable
