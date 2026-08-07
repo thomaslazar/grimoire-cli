@@ -84,9 +84,9 @@ public static class SystemsCommand
     {
         var idOption = new Option<string>("--id") { Description = "System ID", Required = true };
         var bookSortOption = ChoiceOption("--book-sort", "Sort the books (category | title | page_count | year); default category", BookSortKeys);
-        var bookDescOption = new Option<bool>("--book-desc") { Description = "Sort the books descending" };
+        var bookDescOption = new Option<bool>("--book-desc") { Description = "Sort the books descending; no effect with the default --book-sort category" };
         var genreOption = new Option<string?>("--genre") { Description = "Keep only books with this genre" };
-        var categoryOption = new Option<string?>("--category") { Description = "Keep only books in this category (core | supplement | adventure | character-sheet | map | handout | homebrew | starter-set)" };
+        var categoryOption = new Option<string?>("--category") { Description = "Keep only books in this category, e.g. core, supplement, adventure — not a closed set, see Notes" };
         var explicitOption = new Option<bool?>("--explicit") { Description = "Keep only books with this explicit flag (true | false)" };
         var command = new Command("get", "Get one game system, with its books")
         {
@@ -99,7 +99,12 @@ public static class SystemsCommand
             "",
             "--category takes the normalised category, not the folder name:",
             "'supplement', not 'supplements'. It is also case-sensitive — 'Core'",
-            "matches nothing — while --genre is case-insensitive.");
+            "matches nothing — while --genre is case-insensitive. Values aren't a",
+            "closed set: an unmapped folder becomes its own slug, and books at a",
+            "special-collection root (e.g. one-page-rpgs) are 'uncategorized'.",
+            "",
+            "--book-desc only takes effect with --book-sort title|page_count|year;",
+            "the default (category) and its fallback are unordered server-side.");
         command.AddExamples(
             "grimoire-cli systems get --id <system-id>",
             "grimoire-cli systems get --id <system-id> --category core",

@@ -106,12 +106,17 @@ Needed for the unwritten `docker/seed.sh`.
   is one system, not one per file.** It gets `is_one_page: true`, and its
   immediate subfolder names become category labels — the same rule as the
   system-agnostic collection, not a per-file system split.
-- **Category folder names are aliases, not values.** `CATEGORY_MAP`
-  (`backend/indexer/constants.py`) normalises folder names onto canonical singular
-  categories: `supplements/`, `sourcebook/`, `guide/`, `companion/` all become
-  `supplement`. Canonical values are `core`, `supplement`, `adventure`,
-  `character-sheet`, `map`, `handout`, `homebrew`, `starter-set`. Filtering by the
-  folder name silently matches nothing.
+- **Category values are not a closed set.** `CATEGORY_MAP`
+  (`backend/indexer/constants.py`) normalises known folder-name aliases
+  (`supplements/`, `sourcebook/`, `guide/`, `companion/`, …) onto the canonical
+  `core`, `supplement`, `adventure`, `character-sheet`, `map`, `handout`,
+  `homebrew`, `starter-set`. A top-level folder that matches none of them
+  becomes its own category: `guess_category` (`categories.py:153`) falls back
+  to the slugified folder name (`Extras/` → `extras`). Special-collection roots
+  (`one-page-rpgs/`, system-agnostic folders) go through `agnostic_category`
+  (`categories.py:175`) instead, which slugs the immediate subfolder and yields
+  `uncategorized` for books with no subfolder at all — confirmed live: this
+  branch's `one-page-rpgs` fixture returns `category: "uncategorized"`.
 - **`(nsfw)` in a system folder name sets `is_explicit`** and is stripped from the
   stored name, so `Vampire The Masquerade 5 EN (nsfw)/` becomes a system named
   `Vampire The Masquerade 5 EN` with `is_explicit: true`.
