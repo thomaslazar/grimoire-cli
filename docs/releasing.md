@@ -16,14 +16,39 @@ do not — so a first release is a checklist rather than an improvisation.
 
 ## What a first release still needs
 
-| Prerequisite | Why |
-|---|---|
-| A `thomaslazar/homebrew-grimoire-cli` tap repository | `update-homebrew` clones and pushes to it |
-| A `HOMEBREW_TAP_TOKEN` repository secret | that job authenticates with it; without it the job fails after the binaries are already attached |
-| The repo to be public, or a paid plan | `main` is unprotected because GitHub Free offers neither branch protection nor rulesets on private repos — see [roadmap.md](roadmap.md) |
+| Prerequisite | State | Why |
+|---|---|---|
+| A `thomaslazar/homebrew-grimoire-cli` tap repository | **done** — public, initialised with a commit on `main` | `update-homebrew` clones and pushes to it; an empty repository has no HEAD to clone |
+| A `HOMEBREW_TAP_TOKEN` repository secret | **outstanding** | that job authenticates with it; without it the job fails *after* the binaries are already attached, leaving a partial release |
+| The repo to be public, or a paid plan | outstanding, not blocking | `main` is unprotected because GitHub Free offers neither branch protection nor rulesets on private repos — see [roadmap.md](roadmap.md) |
 
 `install.sh` and `install.ps1` will not work until the first tag exists, since
 they resolve GitHub release assets.
+
+### Creating the tap token
+
+A fine-grained token scoped to the tap alone, rather than a classic `repo` token
+that would grant write to every repository on the account:
+
+1. <https://github.com/settings/personal-access-tokens/new>
+2. Resource owner `thomaslazar`; repository access *Only select repositories* →
+   `homebrew-grimoire-cli`.
+3. Repository permissions → **Contents: Read and write**. That is the only
+   permission needed — the job clones the tap and pushes one commit. Metadata:
+   read is added automatically.
+4. Store it without putting the value in a shell history or a transcript:
+   ```bash
+   gh secret set HOMEBREW_TAP_TOKEN --repo thomaslazar/grimoire-cli   # prompts, no echo
+   gh secret list --repo thomaslazar/grimoire-cli                     # confirms, value never readable
+   ```
+
+The workflow authenticates as
+`https://x-access-token:${HOMEBREW_TAP_TOKEN}@github.com/…`, which is the form
+GitHub expects for token auth over HTTPS.
+
+**Token expiry is a real failure mode.** When it lapses, `update-homebrew` starts
+failing after a release has already published its binaries. A calendar reminder
+is worth more than a distant expiry date.
 
 ## Process
 

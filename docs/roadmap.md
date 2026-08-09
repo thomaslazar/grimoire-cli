@@ -24,20 +24,25 @@ covers the live HTTP path against it in CI.
 
 ## Known wrinkles
 
-- Fixed: `LoginCommand` used to wrap the post-save `/api/about` version check in
-  the same `try` as the login itself, so a transient failure there reported
-  `Login failed:` and exited 2 *after* the token was already written. Grimoire's
-  login response carries no version field (confirmed against `temp/grimoire`
-  v1.5.4 and the live login body), so abs-cli's read-it-off-the-login-body trick
-  isn't available; the probe now runs after login's `try` in its own `try`, and
-  its failure is a stderr warning that exits 0 — login genuinely succeeded.
 - CI pulls the Grimoire image unauthenticated, so a Docker Hub rate limit would
   surface as a red `smoke-test` job on an unrelated PR. Needs a repository secret.
 - `main` is unprotected: GitHub Free allows neither branch protection nor
   rulesets on a private repo. Apply protection when the repo goes public,
   requiring the `unit-test` and `smoke-test` checks with zero required approvals
   (a solo maintainer cannot approve their own PR).
-- Fixed: `systems get --id ""`, `--id .`, and `--id ../about` used to crash —
+
+## Resolved on the systems-commands branch
+
+Kept because each one records behaviour that is easy to reintroduce.
+
+- `LoginCommand` used to wrap the post-save `/api/about` version check in
+  the same `try` as the login itself, so a transient failure there reported
+  `Login failed:` and exited 2 *after* the token was already written. Grimoire's
+  login response carries no version field (confirmed against `temp/grimoire`
+  v1.5.4 and the live login body), so abs-cli's read-it-off-the-login-body trick
+  isn't available; the probe now runs after login's `try` in its own `try`, and
+  its failure is a stderr warning that exits 0 — login genuinely succeeded.
+- `systems get --id ""`, `--id .`, and `--id ../about` used to crash —
   an unhandled `JsonException` and a raw stack trace at exit 1, because each
   misses the `/api/systems/{system_id}` route and falls through to Grimoire's
   SPA catch-all, which answers with an HTML 200. The typed client overloads
