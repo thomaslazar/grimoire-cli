@@ -1,4 +1,3 @@
-using System.Text.Json;
 using GrimoireCli.Api;
 using GrimoireCli.Models;
 
@@ -23,8 +22,7 @@ public class SystemsService
             ("edition", edition),
             ("license", license),
             ("explicit", isExplicit?.ToString().ToLowerInvariant()));
-        var json = await _client.GetAsync(ApiEndpoints.Systems + query);
-        return JsonSerializer.Deserialize(json, AppJsonContext.Default.ListGameSystemSummary) ?? new();
+        return await _client.GetAsync(ApiEndpoints.Systems + query, AppJsonContext.Default.ListGameSystemSummary);
     }
 
     public async Task<GameSystemDetail> GetAsync(
@@ -36,9 +34,9 @@ public class SystemsService
             ("genre", genre),
             ("category", category),
             ("explicit", isExplicit?.ToString().ToLowerInvariant()));
-        var json = await _client.GetAsync(
+        return await _client.GetAsync(
             ApiEndpoints.System(id) + query,
+            AppJsonContext.Default.GameSystemDetail,
             notFoundHint: "No system with that ID. List them with: grimoire-cli systems list");
-        return JsonSerializer.Deserialize(json, AppJsonContext.Default.GameSystemDetail)!;
     }
 }

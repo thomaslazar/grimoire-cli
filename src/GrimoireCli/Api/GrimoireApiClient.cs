@@ -2,6 +2,7 @@ using System.Net.Http.Headers;
 using System.Reflection;
 using System.Text;
 using System.Text.Json;
+using System.Text.Json.Serialization.Metadata;
 using GrimoireCli.Configuration;
 using GrimoireCli.Models;
 
@@ -99,6 +100,12 @@ public class GrimoireApiClient
         return await response.Content.ReadAsStringAsync(cts.Token);
     }
 
+    public async Task<T> GetAsync<T>(string endpoint, JsonTypeInfo<T> typeInfo, string? permissionHint = null, string? notFoundHint = null, TimeSpan? timeout = null)
+    {
+        var json = await GetAsync(endpoint, permissionHint, notFoundHint, timeout);
+        return Deserialize(json, typeInfo, endpoint);
+    }
+
     public async Task<string> PatchAsync(string endpoint, string jsonBody, string? permissionHint = null, string? notFoundHint = null, TimeSpan? timeout = null)
     {
         WarnIfTokenExpired();
@@ -107,6 +114,12 @@ public class GrimoireApiClient
         var response = await _http.PatchAsync(endpoint, content, cts.Token);
         await EnsureSuccessAsync(response, permissionHint, notFoundHint);
         return await response.Content.ReadAsStringAsync(cts.Token);
+    }
+
+    public async Task<T> PatchAsync<T>(string endpoint, string jsonBody, JsonTypeInfo<T> typeInfo, string? permissionHint = null, string? notFoundHint = null, TimeSpan? timeout = null)
+    {
+        var json = await PatchAsync(endpoint, jsonBody, permissionHint, notFoundHint, timeout);
+        return Deserialize(json, typeInfo, endpoint);
     }
 
     public async Task<string> PostAsync(string endpoint, string jsonBody, string? permissionHint = null, string? notFoundHint = null, TimeSpan? timeout = null)
@@ -119,6 +132,12 @@ public class GrimoireApiClient
         return await response.Content.ReadAsStringAsync(cts.Token);
     }
 
+    public async Task<T> PostAsync<T>(string endpoint, string jsonBody, JsonTypeInfo<T> typeInfo, string? permissionHint = null, string? notFoundHint = null, TimeSpan? timeout = null)
+    {
+        var json = await PostAsync(endpoint, jsonBody, permissionHint, notFoundHint, timeout);
+        return Deserialize(json, typeInfo, endpoint);
+    }
+
     public async Task<string> DeleteAsync(string endpoint, string? permissionHint = null, string? notFoundHint = null, TimeSpan? timeout = null)
     {
         WarnIfTokenExpired();
@@ -126,6 +145,33 @@ public class GrimoireApiClient
         var response = await _http.DeleteAsync(endpoint, cts.Token);
         await EnsureSuccessAsync(response, permissionHint, notFoundHint);
         return await response.Content.ReadAsStringAsync(cts.Token);
+    }
+
+    public async Task<T> DeleteAsync<T>(string endpoint, JsonTypeInfo<T> typeInfo, string? permissionHint = null, string? notFoundHint = null, TimeSpan? timeout = null)
+    {
+        var json = await DeleteAsync(endpoint, permissionHint, notFoundHint, timeout);
+        return Deserialize(json, typeInfo, endpoint);
+    }
+
+    // Shared by every typed overload above. Grimoire's SPA catch-all answers an
+    // unroutable request (an empty, ".", or otherwise mis-encoded id) with an
+    // HTML 200, not an API error — so deserialization is where that case must be
+    // caught. Routes it through the same log-and-exit(2) mechanism as
+    // EnsureSuccessAsync rather than letting JsonException surface as a raw
+    // stack trace.
+    internal static T Deserialize<T>(string json, JsonTypeInfo<T> typeInfo, string endpoint)
+    {
+        try
+        {
+            return JsonSerializer.Deserialize(json, typeInfo)
+                ?? throw new InvalidOperationException($"Failed to deserialize response from {endpoint}");
+        }
+        catch (JsonException)
+        {
+            _logger.Error($"Response from {endpoint} was not JSON. Check the id/endpoint and server URL.");
+            Environment.Exit(2);
+            throw;
+        }
     }
 
     // Grimoire issues a 30-day JWT and exposes no refresh endpoint, so there is
