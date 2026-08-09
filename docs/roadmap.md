@@ -54,15 +54,12 @@ covers the live HTTP path against it in CI.
 
 ## Parity with abs-cli
 
-`abs-cli` is the reference (see CLAUDE.md). Two gaps remain, each its own increment:
+`abs-cli` is the reference (see CLAUDE.md). The docs set and the release plumbing
+are now in place; what remains is the prerequisites a first release needs, which
+are external to this repo:
 
-1. **The docs set.** abs-cli has nine `docs/` files with no counterpart here:
-   `architecture.md`, `authentication.md`, `build.md`, `cli-design.md`,
-   `configuration.md`, `dev-container.md`, `input-output.md`, `releasing.md`,
-   `testing.md`. Some of that content exists in `CLAUDE.md` and `README.md` and
-   wants moving rather than writing. `releasing.md` is the one whose absence bites
-   first — there is no written release process here at all.
-2. **Release plumbing.** `CHANGELOG.md`, `install.sh`, `install.ps1`, deb packaging
-   and the Homebrew tap job (abs-cli's CI has an `update-homebrew` job; ours has
-   three jobs to its four). Dead weight until the first tag, but better in place
-   before it than improvised at it.
+- a `thomaslazar/homebrew-grimoire-cli` tap repository, and a `HOMEBREW_TAP_TOKEN`
+  secret, or the `update-homebrew` job fails after the binaries are already
+  attached. See [releasing.md](releasing.md).
+- `install.sh` / `install.ps1` resolve GitHub release assets, so they do nothing
+  until the first tag exists.
