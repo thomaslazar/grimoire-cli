@@ -89,7 +89,8 @@ The docs set and the release plumbing (`CHANGELOG.md`, `install.sh`, `install.ps
 
 - **Thin pass-through.** Each command maps to a single Grimoire API endpoint. No smart defaults that pre-fetch extra data, no reading the response to emit derived warnings, no client-side mirroring of server policy. Workflows spanning multiple endpoints are the caller's job to compose. Higher-level orchestration belongs in the calling layer, not here.
 - **JSON in, JSON out.** stdout is valid JSON from the API; logs and human-facing lines go to stderr.
-- **Commands whose endpoint needs a non-default role call `command.AddRoleRequired("<role>")`**, and the string matches the `permissionHint` passed to the service call. `systems list` / `systems get` need no tag: any authenticated non-guest can read them.
+- **Commands whose endpoint needs a non-default role call `command.AddRoleRequired("<role>")`**, and the string matches the `permissionHint` passed to the service call. `systems list` / `systems get` need no tag: any authenticated non-guest can read them, so the mechanism is currently exercised only by `RoleSectionTests` — the first write command is what will use it for real.
+- **`--server` and `--token` are declared per-subcommand on commands that call the API**, matching abs-cli, and threaded into `CommandHelper.BuildClient` so the flag tier of `flags > env > file` is actually reachable. They are not on `config` (no API call) or `self-test` (offline). Write commands have not opted in yet — a deliberate call for whoever designs the first one.
 
 ## Help text
 
