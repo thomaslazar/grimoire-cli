@@ -1,7 +1,7 @@
 using System.CommandLine;
 using GrimoireCli.Commands;
 
-namespace GrimoireCli.Tests;
+namespace GrimoireCli.Tests.Commands;
 
 public class SystemsCommandTests
 {

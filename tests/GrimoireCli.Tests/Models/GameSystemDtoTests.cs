@@ -1,7 +1,7 @@
 using System.Text.Json;
 using GrimoireCli.Models;
 
-namespace GrimoireCli.Tests;
+namespace GrimoireCli.Tests.Models;
 
 public class GameSystemDtoTests
 {
