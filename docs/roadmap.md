@@ -51,3 +51,18 @@ covers the live HTTP path against it in CI.
   `tests/GrimoireCli.Tests/ApiEndpointsTests.cs:12`, only checks the built
   path contains no literal `../` and never round-trips against a server —
   which is how this went from one bug to another unnoticed.)
+
+## Parity with abs-cli
+
+`abs-cli` is the reference (see CLAUDE.md). Two gaps remain, each its own increment:
+
+1. **The docs set.** abs-cli has nine `docs/` files with no counterpart here:
+   `architecture.md`, `authentication.md`, `build.md`, `cli-design.md`,
+   `configuration.md`, `dev-container.md`, `input-output.md`, `releasing.md`,
+   `testing.md`. Some of that content exists in `CLAUDE.md` and `README.md` and
+   wants moving rather than writing. `releasing.md` is the one whose absence bites
+   first — there is no written release process here at all.
+2. **Release plumbing.** `CHANGELOG.md`, `install.sh`, `install.ps1`, deb packaging
+   and the Homebrew tap job (abs-cli's CI has an `update-homebrew` job; ours has
+   three jobs to its four). Dead weight until the first tag, but better in place
+   before it than improvised at it.

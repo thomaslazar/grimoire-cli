@@ -72,6 +72,19 @@ bash docker/seed.sh
 - Comment what the code does or why it must be this way — never what was deliberately left out. If something isn't done, its absence needs no defence.
 - Prefer stating a requirement positively ("the server must come from the saved config") over narrating a rejected alternative.
 
+## Relationship to abs-cli
+
+`abs-cli` is the mature reference for this pair of tools. **Match its structure and conventions unless there is a reason, and record the reason here** — drift between the two costs more than the occasional awkward fit.
+
+Deliberate deviations today:
+
+- **`docs/grimoire-api-coverage.md` is generated, not hand-maintained.** `tools/generate-api-coverage.py` builds it from the spec plus the role dependency on each route in `temp/grimoire`. Grimoire publishes an OpenAPI spec and ABS does not, so abs-cli has to maintain its table by hand. Update `IMPLEMENTED` in that script, not the markdown.
+- **Grouped by the spec's own OpenAPI tags** rather than hand-picked resource headings, for the same reason: the grouping is machine-derived and cannot drift from the API.
+- **`docs/grimoire-api-notes.md` has no abs-cli counterpart.** Grimoire types nearly every response as `{}`, so verified behaviour needs somewhere to live; ABS's behaviour is read from its server source on demand.
+- **Tests add a `Models/` area** alongside abs-cli's `Api` / `Commands` / `Configuration` / `Output` / `Services`, because the response DTOs are a distinct surface here.
+
+Known gaps, tracked in [docs/roadmap.md](docs/roadmap.md): abs-cli has nine `docs/` files with no counterpart here, and the release plumbing (`CHANGELOG.md`, `install.sh`, `install.ps1`, deb packaging, Homebrew tap job) does not exist yet.
+
 ## CLI design principles
 
 - **Thin pass-through.** Each command maps to a single Grimoire API endpoint. No smart defaults that pre-fetch extra data, no reading the response to emit derived warnings, no client-side mirroring of server policy. Workflows spanning multiple endpoints are the caller's job to compose. Higher-level orchestration belongs in the calling layer, not here.
