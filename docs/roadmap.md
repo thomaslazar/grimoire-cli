@@ -24,10 +24,13 @@ covers the live HTTP path against it in CI.
 
 ## Known wrinkles
 
-- `LoginCommand` wraps the post-save `/api/about` version check in the same `try`
-  as the login itself, so a transient failure there reports `Login failed:` and
-  exits 2 *after* the token was already written. Worth fixing when the login path
-  is next touched.
+- Fixed: `LoginCommand` used to wrap the post-save `/api/about` version check in
+  the same `try` as the login itself, so a transient failure there reported
+  `Login failed:` and exited 2 *after* the token was already written. Grimoire's
+  login response carries no version field (confirmed against `temp/grimoire`
+  v1.5.4 and the live login body), so abs-cli's read-it-off-the-login-body trick
+  isn't available; the probe now runs after login's `try` in its own `try`, and
+  its failure is a stderr warning that exits 0 — login genuinely succeeded.
 - CI pulls the Grimoire image unauthenticated, so a Docker Hub rate limit would
   surface as a red `smoke-test` job on an unrelated PR. Needs a repository secret.
 - `main` is unprotected: GitHub Free allows neither branch protection nor
