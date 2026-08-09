@@ -33,4 +33,33 @@ public class DeserializeTests
         Assert.Throws<JsonException>(
             () => JsonSerializer.Deserialize(html, AppJsonContext.Default.GameSystemSummary));
     }
+
+    // A 200 with a genuinely-JSON-but-truncated body (a server cutting the
+    // response short) must also land in the JsonException catch — it is not
+    // just an HTML-shaped failure. Same reason Deserialize itself isn't
+    // called: its failure path calls Environment.Exit.
+    [Fact]
+    public void TruncatedJsonBodyFailsWithJsonException()
+    {
+        const string truncated = "{\"id\":\"sr6\",\"name\":\"Shadowrun 6 DE\",\"book_count\":22";
+        Assert.Throws<JsonException>(
+            () => JsonSerializer.Deserialize(truncated, AppJsonContext.Default.GameSystemSummary));
+    }
+
+    // The one piece of the failure path that IS a pure function reachable
+    // without a server or Environment.Exit: the --debug body truncation
+    // Deserialize uses so a huge HTML page doesn't flood stderr.
+    [Fact]
+    public void TruncateForLoggingLeavesShortBodiesUntouched()
+    {
+        Assert.Equal("short body", GrimoireApiClient.TruncateForLogging("short body"));
+    }
+
+    [Fact]
+    public void TruncateForLoggingCutsLongBodiesWithLengthAndEllipsis()
+    {
+        var body = new string('x', 600);
+        var result = GrimoireApiClient.TruncateForLogging(body, maxChars: 500);
+        Assert.Equal(new string('x', 500) + "... (truncated, 600 chars total)", result);
+    }
 }

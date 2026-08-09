@@ -166,13 +166,25 @@ public class GrimoireApiClient
             return JsonSerializer.Deserialize(json, typeInfo)
                 ?? throw new InvalidOperationException($"Failed to deserialize response from {endpoint}");
         }
-        catch (JsonException)
+        catch (JsonException ex)
         {
-            _logger.Error($"Response from {endpoint} was not JSON. Check the id/endpoint and server URL.");
+            // The body itself is the diagnostic that distinguishes an HTML SPA
+            // catch-all from a truncated-but-otherwise-valid JSON response, and
+            // ex.Message carries the line/byte position — but a full HTML page
+            // or huge payload on stderr would flood the terminal, so it's
+            // truncated and gated behind --debug rather than always shown.
+            _logger.Debug($"unparseable body from {endpoint}: {TruncateForLogging(json)}");
+            _logger.Debug($"JsonException: {ex.Message}");
+            _logger.Error($"Response from {endpoint} could not be parsed as JSON. Run with --debug to see the response body and parse error.");
             Environment.Exit(2);
             throw;
         }
     }
+
+    internal static string TruncateForLogging(string body, int maxChars = 500)
+        => body.Length > maxChars
+            ? $"{body[..maxChars]}... (truncated, {body.Length} chars total)"
+            : body;
 
     // Grimoire issues a 30-day JWT and exposes no refresh endpoint, so there is
     // nothing to renew — the only remedy for an expired token is another login.

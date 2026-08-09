@@ -212,7 +212,7 @@ for bad_id in "" "." "../about"; do
   "$CLI" systems get --id "$bad_id" >/dev/null 2>"$WORK/badid.err"; rc=$?
   set -e
   [ "$rc" -eq 2 ] || fail "id '$bad_id' should exit 2, got $rc: $(cat "$WORK/badid.err")"
-  grep -qi "not json" "$WORK/badid.err" \
+  grep -qi "could not be parsed as JSON" "$WORK/badid.err" \
     || fail "id '$bad_id' gave no not-JSON message: $(cat "$WORK/badid.err")"
   grep -qi "at System\.\|StackTrace\|Unhandled exception" "$WORK/badid.err" \
     && fail "id '$bad_id' leaked a stack trace: $(cat "$WORK/badid.err")"
