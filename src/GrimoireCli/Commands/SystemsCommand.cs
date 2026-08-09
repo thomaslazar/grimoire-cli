@@ -46,10 +46,13 @@ public static class SystemsCommand
         var editionOption = new Option<string?>("--edition") { Description = "Filter by edition" };
         var licenseOption = new Option<string?>("--license") { Description = "Filter by license" };
         var explicitOption = new Option<bool?>("--explicit") { Description = "Filter by explicit flag (true | false); omit for both" };
+        var serverOption = new Option<string?>("--server") { Description = "Server URL override" };
+        var tokenOption = new Option<string?>("--token") { Description = "JWT override; used for this invocation only, not stored" };
         var command = new Command("list", "List all game systems")
         {
             sortOption, descOption, genreOption, familyOption,
-            parentOption, editionOption, licenseOption, explicitOption
+            parentOption, editionOption, licenseOption, explicitOption,
+            serverOption, tokenOption
         };
         command.AddHelpSection("Notes", HelpSectionPosition.Top,
             "Filters are case-insensitive exact matches, not substrings: --edition 5",
@@ -63,7 +66,9 @@ public static class SystemsCommand
         command.AddResponseExampleArray<GameSystemSummary>();
         command.SetAction(async (parseResult, cancellationToken) =>
         {
-            var (client, _) = CommandHelper.BuildClient();
+            var server = parseResult.GetValue(serverOption);
+            var token = parseResult.GetValue(tokenOption);
+            var (client, _) = CommandHelper.BuildClient(serverOverride: server, tokenOverride: token);
             var service = new SystemsService(client);
             var result = await service.ListAsync(
                 parseResult.GetValue(sortOption),
@@ -88,9 +93,12 @@ public static class SystemsCommand
         var genreOption = new Option<string?>("--genre") { Description = "Keep only books with this genre" };
         var categoryOption = new Option<string?>("--category") { Description = "Keep only books in this category, e.g. core, supplement, adventure — not a closed set, see Notes" };
         var explicitOption = new Option<bool?>("--explicit") { Description = "Keep only books with this explicit flag (true | false)" };
+        var serverOption = new Option<string?>("--server") { Description = "Server URL override" };
+        var tokenOption = new Option<string?>("--token") { Description = "JWT override; used for this invocation only, not stored" };
         var command = new Command("get", "Get one game system, with its books")
         {
-            idOption, bookSortOption, bookDescOption, genreOption, categoryOption, explicitOption
+            idOption, bookSortOption, bookDescOption, genreOption, categoryOption, explicitOption,
+            serverOption, tokenOption
         };
         command.AddHelpSection("Notes", HelpSectionPosition.Top,
             "--genre, --category and --explicit filter the books, not the system, and",
@@ -112,7 +120,9 @@ public static class SystemsCommand
         command.AddResponseExample<GameSystemDetail>();
         command.SetAction(async (parseResult, cancellationToken) =>
         {
-            var (client, _) = CommandHelper.BuildClient();
+            var server = parseResult.GetValue(serverOption);
+            var token = parseResult.GetValue(tokenOption);
+            var (client, _) = CommandHelper.BuildClient(serverOverride: server, tokenOverride: token);
             var service = new SystemsService(client);
             var result = await service.GetAsync(
                 parseResult.GetValue(idOption)!,

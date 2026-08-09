@@ -130,6 +130,30 @@ syslist
 [ "$COUNT" -eq "$EXPECTED_SYSTEMS" ] || fail "expected $EXPECTED_SYSTEMS systems, got $COUNT"
 ok "systems list returns $EXPECTED_SYSTEMS systems"
 
+# --- override flags -----------------------------------------------------------
+# --server/--token are the flag tier of ConfigManager.Resolve — the tested
+# precedence logic (ConfigManagerTests.cs) is otherwise unreachable through the
+# CLI, since no command declared the flags until now. Config is deliberately
+# emptied first so a config-file fallback can't mask a broken flag.
+TOKEN=$(jq -r .accessToken "$CONFIG")
+cp "$CONFIG" "$WORK/config.saved"
+echo '{}' >"$CONFIG"
+
+syslist --server "$SERVER" --token "$TOKEN"
+[ "$COUNT" -eq "$EXPECTED_SYSTEMS" ] \
+  || fail "systems list --server/--token returned $COUNT with an emptied config, expected $EXPECTED_SYSTEMS"
+ok "systems list --server/--token succeeds against an emptied config"
+
+set +e
+"$CLI" systems list --server "$SERVER" --token "bogus-token" >/dev/null 2>"$WORK/badtoken.err"; rc=$?
+set -e
+[ "$rc" -eq 2 ] || fail "a bogus --token should exit 2, got $rc"
+grep -qi "not authenticated" "$WORK/badtoken.err" \
+  || fail "a bogus --token gave no 'Not authenticated' message: $(cat "$WORK/badtoken.err")"
+ok "a bogus --token against a correct --server exits 2"
+
+cp "$WORK/config.saved" "$CONFIG"
+
 syslist --genre Cyberpunk
 [ "$COUNT" -eq 2 ] || fail "--genre Cyberpunk should match 2"
 syslist --edition 6
