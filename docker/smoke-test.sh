@@ -203,4 +203,20 @@ set -e
 grep -qi "not found" "$WORK/nf.err" || fail "no not-found hint: $(cat "$WORK/nf.err")"
 ok "systems get on a missing id exits 2 with a hint"
 
+# An empty id, ".", and "../about" all miss the /api/systems/{id} route and land
+# on Grimoire's SPA catch-all, which answers with an HTML 200 instead of a JSON
+# 404. Each must be caught as a JSON-parse failure and exit 2 with a readable
+# message on stderr — not an unhandled JsonException and a raw stack trace.
+for bad_id in "" "." "../about"; do
+  set +e
+  "$CLI" systems get --id "$bad_id" >/dev/null 2>"$WORK/badid.err"; rc=$?
+  set -e
+  [ "$rc" -eq 2 ] || fail "id '$bad_id' should exit 2, got $rc: $(cat "$WORK/badid.err")"
+  grep -qi "not json" "$WORK/badid.err" \
+    || fail "id '$bad_id' gave no not-JSON message: $(cat "$WORK/badid.err")"
+  grep -qi "at System\.\|StackTrace\|Unhandled exception" "$WORK/badid.err" \
+    && fail "id '$bad_id' leaked a stack trace: $(cat "$WORK/badid.err")"
+done
+ok "systems get on an empty, '.', or '../about' id exits 2 with no stack trace"
+
 echo "smoke: all checks passed" >&2

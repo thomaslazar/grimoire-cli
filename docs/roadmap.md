@@ -34,23 +34,14 @@ covers the live HTTP path against it in CI.
   rulesets on a private repo. Apply protection when the repo goes public,
   requiring the `unit-test` and `smoke-test` checks with zero required approvals
   (a solo maintainer cannot approve their own PR).
-- `systems get --id ""`, `--id .`, and `--id ../about` all crash the same
-  way — an unhandled `JsonException` and a raw stack trace at exit 1,
-  instead of the exit-2 "not found" that ordinary unknown ids produce. Only
-  the `../about` case changed: `Uri.EscapeDataString` on the path segment
-  stopped it from reaching `/api/about` and printing a full but bogus system
-  object (every field null, exit 0) as if it were real data — that
-  cross-endpoint read is genuinely closed. But Grimoire's ASGI layer decodes
-  `%2F` before routing, so the encoded segment still misses the single-segment
-  `{system_id}` route and falls through to the SPA's HTML catch-all, landing
-  on the same crash as the empty and dot cases. So this is one failure mode
-  with three triggers, not two separate bugs — a guard scoped to empty-or-dot
-  ids would leave `../about` crashing. The durable fix is to treat a non-JSON
-  response body as an API error instead of letting the deserializer throw,
-  with an id guard as an optional extra. (The encoding fix's test,
-  `tests/GrimoireCli.Tests/ApiEndpointsTests.cs:12`, only checks the built
-  path contains no literal `../` and never round-trips against a server —
-  which is how this went from one bug to another unnoticed.)
+- Fixed: `systems get --id ""`, `--id .`, and `--id ../about` used to crash —
+  an unhandled `JsonException` and a raw stack trace at exit 1, because each
+  misses the `/api/systems/{system_id}` route and falls through to Grimoire's
+  SPA catch-all, which answers with an HTML 200. The typed client overloads
+  (`GrimoireApiClient.GetAsync<T>` etc.) now catch `JsonException` during
+  deserialization and route it through the same log-and-exit(2) path as any
+  other API error, so all three exit 2 with a readable "not JSON" message
+  instead. Covered by `docker/smoke-test.sh`.
 
 ## Parity with abs-cli
 
