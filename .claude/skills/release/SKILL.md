@@ -40,7 +40,7 @@ only symptom is a 401:
 
 ```bash
 docker compose -f docker/docker-compose.yml down
-rm -rf docker/data
+rm -rf docker/data docker/library/books
 mkdir -p docker/data && cp docker/users.json.example docker/data/users.json
 docker compose -f docker/docker-compose.yml up -d --wait
 bash docker/seed.sh
@@ -49,9 +49,15 @@ docker compose -f docker/docker-compose.yml down
 rm -rf publish/
 ```
 
-> Under docker-outside-of-docker the daemon runs on the host: reach the stack at
+> The library must go too, not just the database: the boot scan indexes
+> whatever is on disk, so a database-only reset leaves the old tree to be
+> re-indexed as stale rows that still count toward `book_count`.
+>
+> Under docker-outside-of-docker the daemon runs on the host: set
+> `GRIMOIRE_LIBRARY` and `GRIMOIRE_DATA` to host paths, reach the stack at
 > `http://host.docker.internal:9481`, not `localhost`, and set
-> `GRIMOIRE_LIBRARY_LOCAL` if the library lives outside the repo. See `CLAUDE.md`.
+> `GRIMOIRE_LIBRARY_LOCAL` if the library lives outside the repo. See `CLAUDE.md`
+> for the full set.
 
 If any check fails, stop and report the issue. Do not proceed.
 

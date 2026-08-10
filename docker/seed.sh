@@ -5,12 +5,16 @@
 #   GRIMOIRE_SERVER=http://localhost:9481 bash docker/seed.sh
 #
 # Writes fixture PDFs into the library directory, rescans, then PATCHes the
-# metadata that folder structure cannot express (edition, family, parent system,
-# genre, license, year). Grimoire mounts the library read-only, so seeding writes
-# from this side and the server only reads.
+# metadata that folder structure cannot express (family, genres, license, year).
+# edition and parent_system are left out of the PATCH bodies — a container child
+# already has both folder-derived from the scan. Grimoire mounts the library
+# read-only, so seeding writes from this side and the server only reads.
 #
 # Re-runnable: the library is rebuilt from scratch each time. To reset the
-# database as well: docker compose -f docker/docker-compose.yml down && rm -rf docker/data
+# database as well: docker compose -f docker/docker-compose.yml down, then
+# rm -rf docker/data docker/library/books — the boot scan indexes whatever
+# library tree is on disk, so a database-only reset leaves stale rows that
+# survive as is_missing and still count toward book_count.
 #
 # Renaming/re-marking a fixture folder (e.g. dropping "(nsfw)") needs that
 # database reset, not just a re-seed: rescan only ever sets is_explicit=true,

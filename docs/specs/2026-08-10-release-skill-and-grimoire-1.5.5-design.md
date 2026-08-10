@@ -128,7 +128,9 @@ reason is written down.
   stack with no users whose only symptom is a 401. Under
   docker-outside-of-docker the daemon runs on the host, so the server is reached
   at `host.docker.internal:9481` and `GRIMOIRE_LIBRARY_LOCAL` governs where
-  fixtures are written. Reset is `down && rm -rf docker/data`, not `down -v`.
+  fixtures are written. Reset is `down && rm -rf docker/data docker/library/books`,
+  not `down -v` — a database-only reset leaves the boot scan to re-index the old
+  library tree as stale rows.
 - **The `--version` check asserts bare output.** Release builds pass no
   `BuildId`, so `--version` must print `0.1.0` and not `0.1.0+pr-12.abc1234`.
   A suffix here means the release build picked up PR build metadata. See
