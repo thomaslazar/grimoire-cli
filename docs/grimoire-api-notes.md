@@ -6,9 +6,10 @@ tag and by calling the API. Don't re-derive these, and don't trust the published
 docs over them. Re-verify after a server upgrade — see
 [grimoire-compatibility.md](grimoire-compatibility.md) for the bump procedure.
 
-`main` upstream carries unreleased work (bulk endpoints, guarded renames) that no
-instance runs. Pinning the reference clone to the release tag is not optional;
-reading `main` is how the first round of wrong conclusions happened.
+`main` upstream carries unreleased work that no instance runs. Pinning the
+reference clone to the release tag is not optional; reading `main` is how the
+first round of wrong conclusions happened. Bulk endpoints and guarded renames
+were both examples of this at v1.5.4 — both shipped in v1.5.5, see below.
 
 ## Auth
 
@@ -49,17 +50,32 @@ Applies to both `PATCH /api/systems/{id}` and `PATCH /api/books/{id}`
 - **The response is `{"status":"ok"}`**, not the updated row. Seeing the result
   takes a follow-up `GET`.
 - **`tags` replace, they don't merge** (`tag_service.sync_tags_from_payload`).
-  Tags live in shared tables rather than a column (upstream #235). v1.5.4 has no
-  additive tag endpoint and **no bulk endpoints** — `POST /api/{books,systems}/bulk`
-  and `/bulk/tags` are unreleased `main` work (#270).
-- **Renaming a system is unguarded and desyncs the slug.** `name` and `slug` are
-  both `unique=True` (`backend/models/library.py:24-25`). The handler has no
-  conflict check, so a duplicate name fails at commit as an opaque 500 rather than
-  a 409. It writes only `name`; `slug` keeps its old folder-derived value, so the
-  two diverge permanently and renaming the folder on disk creates a *second*
-  system row instead of updating the first. The rename does survive a rescan — the
-  scanner matches on `slug` and never writes `name` (`backend/indexer/scan.py`).
-  (`_apply_rename` and its 409 are unreleased `main`, #261/#262.)
+  Tags live in shared tables rather than a column (upstream #235). v1.5.4 had no
+  additive tag endpoint and no bulk endpoints. **v1.5.5 ships both** (issue
+  #270): `POST /api/{books,systems,maps,tokens,audio}/bulk` applies per-item
+  edits in one transaction (`run_bulk_update` / `apply_updates`,
+  `backend/services/bulk_service.py:49-123`), and `/bulk/tags` additively
+  applies tags across the whole selection the same way (`run_bulk_add_tags`,
+  `backend/services/bulk_service.py:126-166`, request shape in
+  `backend/routers/_bulk_schemas.py`). An unresolved id, or a `validate` hook
+  rejection (e.g. a system name clash), fails only its own item — reported in
+  the response's `errors` — not the whole batch.
+- **Renaming a system was unguarded on v1.5.4.** `name` and `slug` are both
+  `unique=True` (`backend/models/library.py:24-25`); the handler had no
+  conflict check, so a duplicate name failed at commit as an opaque 500 rather
+  than a 409, and it wrote only `name` — `slug` keeps its old folder-derived
+  value regardless, so the two diverge permanently and renaming the folder on
+  disk creates a *second* system row instead of updating the first.
+  **v1.5.5 guards the rename** (`_apply_rename`,
+  `backend/routers/systems/core.py:314-334`, issue #261/#262): a name clash now
+  raises a 409, and a successful rename sets `GameSystem.name_is_custom`
+  (`backend/models/library.py:76`). This supersedes the old "scanner never
+  writes `name`" mechanism — the scanner now only skips refreshing `name` from
+  the folder when `name_is_custom` is set (`if not system.name_is_custom and
+  system.name != name`, `backend/indexer/scan.py:358`), so an unrenamed
+  (default-named) system's display name still tracks a folder rename. The
+  slug-divergence behaviour above is unaffected either way; the full rename
+  write-up has not been re-verified end-to-end against v1.5.5 beyond this.
 - **`GET /api/systems` filters are case-insensitive exact matches**, not
   substrings (`_has_value` in `backend/routers/systems/core.py`): `edition=5`
   matches `5` but never `5e`, and `genre=Cyber` never matches `Cyberpunk`. A list
@@ -80,9 +96,13 @@ Applies to both `PATCH /api/systems/{id}` and `PATCH /api/books/{id}`
 - **`POST /api/rescan`** takes `metadata_mode: new | missing | replace` and a
   `scope` (e.g. `books/<system>/supplements`). `missing` reapplies OPF sidecars
   while treating any populated field as user-protected. Poll `GET /api/scan-status`.
-- **Editions and language are metadata, not folders.** A new folder under `books/`
-  creates a system row with only `name` set; `parent_system` / `edition` /
-  `system_family` stay empty until a `PATCH /api/systems/{id}`.
+- **Editions and language are metadata, not folders.** A new *flat* (non-container)
+  folder under `books/` creates a system row with only `name` set; `parent_system`
+  / `edition` / `system_family` stay empty until a `PATCH /api/systems/{id}`.
+  This no longer covers the whole story in v1.5.5: a folder scanned as a
+  *container child* gets `parent_system` and `edition` auto-populated at
+  creation instead — see "System containers" below. `system_family` still has
+  no folder route either way.
 
 ## Scanner behaviour
 
@@ -104,6 +124,7 @@ flags on `systems get`.
   `_count_eligible_files` doesn't apply the same skip, so it still counts the
   file toward `total_books` — any wait loop polling
   `scanned_books >= total_books` hangs forever with a loose file present.
+
 ### One-page collections
 
 Verified against v1.5.5 (`backend/indexer/constants.py:95-105`,
@@ -163,7 +184,7 @@ Verified against v1.5.5. Every citation is a file in `temp/grimoire`.
 - `edition` is the child folder name **verbatim** (`indexer/scan.py:490`): a
   folder called `6 DE` yields edition `6 DE`, not `6`.
 - `parent_system` is still a free-text column, auto-set to the container's name
-  on child creation (`indexer/scan.py:331`). Both it and the real `parent_id`
+  on child creation (`indexer/scan.py:332`). Both it and the real `parent_id`
   foreign key are returned.
 - Sort prefixes are stripped before the container name is used
   (`indexer/scan.py:188`), so `!!Dungeons & Dragons` yields `Dungeons & Dragons`.
