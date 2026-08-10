@@ -55,24 +55,37 @@ book() {  # book <system-folder> <category-folder> <filename> <pages>
   python3 "$HERE/make-fixtures.py" "$dir/$3.pdf" "$4"
 }
 
-book "Shadowrun 6 DE"                  core         "SR6 Grundregelwerk"      12
-book "Shadowrun 6 DE"                  core         "SR6 Kreuzfeuer"           8
-book "Shadowrun 6 DE"                  supplements  "SR6 Strassengrimoire"     6
-book "Shadowrun 5 DE"                  core         "SR5 Grundregelwerk"      10
-book "Shadowrun 5 DE"                  core         "SR5 Datenpfade"           5
-book "Shadowrun 4 DE"                  core         "SR4 Grundregelwerk"       7
-book "!!Dungeons & Dragons 5e EN"      core         "Players Handbook"        14
-book "!!Dungeons & Dragons 5e EN"      adventures   "Lost Mine of Phandelver"  9
-book "Das Schwarze Auge 5 DE"          core         "DSA5 Regelwerk"          11
-book "Das Schwarze Auge 5 DE"          core         "DSA5 Aventurien"          4
-book "The Dark Eye 5 EN"               core         "TDE5 Core Rules"         11
-book "Vampire The Masquerade 5 EN"     core         "V5 Corebook"             13
-book "Fixture Explicit RPG (nsfw)"     core         "Fixture RPG Core Rules"  3
+container() {  # container <folder> — mark a folder as a parent-system container
+  mkdir -p "$LIBRARY/books/$1"
+  touch "$LIBRARY/books/$1/.parent-system-container"
+}
 
-# one-page-rpgs is a special collection: the scanner makes it ONE system whose
-# subfolder names become category labels, not one system per file. A loose PDF at
-# the books root is skipped entirely (scan.py requires a directory), so none is
-# seeded — it would never be indexed yet would still inflate total_books.
+container "Shadowrun"
+container "Das Schwarze Auge"
+container "The Dark Eye"
+container "!!Dungeons & Dragons"
+container "Vampire The Masquerade"
+
+book "Shadowrun/6 DE"                  core         "SR6 Grundregelwerk"      12
+book "Shadowrun/6 DE"                  core         "SR6 Kreuzfeuer"           8
+book "Shadowrun/6 DE"                  supplements  "SR6 Strassengrimoire"     6
+book "Shadowrun/5 DE"                  core         "SR5 Grundregelwerk"      10
+book "Shadowrun/5 DE"                  core         "SR5 Datenpfade"           5
+book "Shadowrun/4 DE"                  core         "SR4 Grundregelwerk"       7
+book "!!Dungeons & Dragons/5e EN"      core         "Players Handbook"        14
+book "!!Dungeons & Dragons/5e EN"      adventures   "Lost Mine of Phandelver"  9
+book "Das Schwarze Auge/5 DE"          core         "DSA5 Regelwerk"          11
+book "Das Schwarze Auge/5 DE"          core         "DSA5 Aventurien"          4
+book "The Dark Eye/5 EN"               core         "TDE5 Core Rules"         11
+book "Vampire The Masquerade/5 EN"     core         "V5 Corebook"             13
+book "Fixture Explicit RPG (nsfw)"     core         "Fixture RPG Core Rules"   3
+
+# one-page-rpgs is a reserved slug, so v1.5.5 treats it as a one-page CONTAINER
+# with no marker file: each loose PDF becomes its own single-book system, named
+# by prettify_collection_name — which capitalises any word with no uppercase in
+# it, so "Lasers and Feelings" indexes as "Lasers And Feelings". On v1.5.4 the
+# same folder produced ONE system with its subfolders as categories. A loose PDF
+# at the books root is still skipped entirely (scan.py requires a directory).
 mkdir -p "$LIBRARY/books/one-page-rpgs"
 python3 "$HERE/make-fixtures.py" "$LIBRARY/books/one-page-rpgs/Lasers and Feelings.pdf" 1
 python3 "$HERE/make-fixtures.py" "$LIBRARY/books/one-page-rpgs/Honey Heist.pdf" 1
@@ -95,12 +108,15 @@ for i in $(seq 1 90); do
 done
 say "scan complete ($SCANNED books)"
 
-# 5. Apply the metadata folders cannot express. Shadowrun 4 DE is deliberately
-#    left raw — it mirrors a fresh import and is the fixture the future metadata
-#    commands will target.
+# 5. Apply the metadata folders cannot express. edition and parent_system are
+#    folder-derived under a container, so they are deliberately absent here —
+#    patching them would mask whether derivation works. system_family has no
+#    folder route on v1.5.5 (.system-family-container is main-only). Shadowrun
+#    4 DE is left raw: it mirrors a fresh import and is the fixture the future
+#    metadata commands will target.
 patch_system() {  # patch_system <system name> <json body>
   local name="$1" body="$2" id
-  id=$(curl -sf "$SERVER/api/systems" -H "$AUTH" \
+  id=$(curl -sf "$SERVER/api/systems?include_children=true" -H "$AUTH" \
        | jq -r --arg n "$name" '.[] | select(.name == $n) | .id')
   [ -n "$id" ] || fail "no system named '$name' after the scan"
   curl -sf -X PATCH "$SERVER/api/systems/$id" -H "$AUTH" \
@@ -109,13 +125,15 @@ patch_system() {  # patch_system <system name> <json body>
   say "patched $name"
 }
 
-patch_system "Shadowrun 6 DE" '{"system_family":"Shadowrun","parent_system":"Shadowrun","edition":"6","genres":["Cyberpunk"],"year":2019,"publishers":[{"name":"Pegasus Spiele","url":""}]}'
-patch_system "Shadowrun 5 DE" '{"system_family":"Shadowrun","parent_system":"Shadowrun","edition":"5","genres":["Cyberpunk"],"year":2013,"publishers":[{"name":"Pegasus Spiele","url":""}]}'
-patch_system "Dungeons & Dragons 5e EN" '{"system_family":"D&D","parent_system":"Dungeons & Dragons","edition":"5e","genres":["Fantasy"],"license":"OGL","year":2014,"publishers":[{"name":"Wizards of the Coast","url":""}]}'
-patch_system "Das Schwarze Auge 5 DE" '{"system_family":"The Dark Eye","parent_system":"Das Schwarze Auge","edition":"5","genres":["Fantasy"],"year":2015,"publishers":[{"name":"Ulisses Spiele","url":""}]}'
-patch_system "The Dark Eye 5 EN" '{"system_family":"The Dark Eye","parent_system":"The Dark Eye","edition":"5","genres":["Fantasy"],"year":2016,"publishers":[{"name":"Ulisses North America","url":""}]}'
-patch_system "Vampire The Masquerade 5 EN" '{"system_family":"World of Darkness","parent_system":"Vampire: The Masquerade","edition":"5","genres":["Horror"],"year":2018,"publishers":[{"name":"Renegade Game Studios","url":""}]}'
+patch_system "Shadowrun 6 DE" '{"system_family":"Shadowrun","genres":["Cyberpunk"],"year":2019,"publishers":[{"name":"Pegasus Spiele","url":""}]}'
+patch_system "Shadowrun 5 DE" '{"system_family":"Shadowrun","genres":["Cyberpunk"],"year":2013,"publishers":[{"name":"Pegasus Spiele","url":""}]}'
+patch_system "Dungeons & Dragons 5e EN" '{"system_family":"D&D","genres":["Fantasy"],"license":"OGL","year":2014,"publishers":[{"name":"Wizards of the Coast","url":""}]}'
+patch_system "Das Schwarze Auge 5 DE" '{"system_family":"The Dark Eye","genres":["Fantasy"],"year":2015,"publishers":[{"name":"Ulisses Spiele","url":""}]}'
+patch_system "The Dark Eye 5 EN" '{"system_family":"The Dark Eye","genres":["Fantasy"],"year":2016,"publishers":[{"name":"Ulisses North America","url":""}]}'
+patch_system "Vampire The Masquerade 5 EN" '{"system_family":"World of Darkness","genres":["Horror"],"year":2018,"publishers":[{"name":"Renegade Game Studios","url":""}]}'
 
-COUNT=$(curl -sf "$SERVER/api/systems" -H "$AUTH" | jq 'length')
-say "seed complete — $COUNT systems"
-[ "$COUNT" -eq 9 ] || fail "expected 9 systems, got $COUNT"
+TOP=$(curl -sf "$SERVER/api/systems" -H "$AUTH" | jq 'length')
+ALL=$(curl -sf "$SERVER/api/systems?include_children=true" -H "$AUTH" | jq 'length')
+say "seed complete — $TOP top-level systems, $ALL including children"
+[ "$TOP" -eq 7 ] || fail "expected 7 top-level systems, got $TOP"
+[ "$ALL" -eq 16 ] || fail "expected 16 systems including children, got $ALL"
