@@ -74,7 +74,9 @@ bash docker/seed.sh
 
 ## Relationship to abs-cli
 
-`abs-cli` is the mature reference for this pair of tools. **Match its structure and conventions unless there is a reason, and record the reason here** — drift between the two costs more than the occasional awkward fit.
+`abs-cli` is the mature reference for this pair of tools. Its conventions, systems and hard-won rules were worked out there first. **The point is to harvest that work, not to mirror it: before deriving a convention here, check whether abs-cli already settled it, and adopt what it settled.** Re-deriving a solved problem is the cost being avoided.
+
+Parity is therefore the default rather than the goal. A difference that follows from a genuine local difference needs no ceremony; record one here only when a reader might otherwise "fix" it back. Do not diverge on something abs-cli deliberately decided without a reason that survives being written down.
 
 Deliberate deviations today:
 
@@ -117,6 +119,8 @@ The docs set and the release plumbing (`install.sh`, `install.ps1`, deb packagin
 - **Document every non-obvious caveat** at the call site — destructive side effects, hidden API behaviours (children hidden before filters apply, folder-derived fields that ignore a PATCH), outcome-affecting defaults. The CLI is thin, so API quirks leak through; help text is where they must surface, not spec docs.
 - **Don't state what's already visible.** Skip anything apparent from the flags, subcommand list, or response-shape sample: no verb-by-verb group narration, no "X cannot change" when there's no such flag, no restating a flag's own description or a response field. A `ChoiceOption` renders its own value set, so the description must not repeat it.
 - **Cross-references are one-way** (consumer → producer) and allowed only when required to use *this* command: where a required input comes from, a behaviour warning, a piping pitfall, a shared external dependency. Never sell another command's use case.
+
+These rules exist because help text sits on the hot path for the agents driving this CLI, where every repeated word is paid for on each invocation. They are not a style guide to enforce everywhere: `login` states its `--password` caveat in both the flag description and the Notes, and that stays — it runs once per month, and a security caveat is not the worse for being said twice.
 
 ## Grimoire Source Reference
 
