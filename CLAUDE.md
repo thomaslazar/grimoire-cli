@@ -82,6 +82,13 @@ Deliberate deviations today:
 - **Grouped by the spec's own OpenAPI tags** rather than hand-picked resource headings, for the same reason: the grouping is machine-derived and cannot drift from the API.
 - **`docs/grimoire-api-notes.md` has no abs-cli counterpart.** Grimoire types nearly every response as `{}`, so verified behaviour needs somewhere to live; ABS's behaviour is read from its server source on demand.
 - **Tests add a `Models/` area** alongside abs-cli's `Api` / `Commands` / `Configuration` / `Output` / `Services`, because the response DTOs are a distinct surface here.
+- **The `release` skill carries an extra step reconciling the supported server
+  range.** `MinSupportedVersion` / `MaxTestedVersion`, the compatibility matrix
+  and the README line must agree before a tag is cut. abs-cli has no counterpart
+  because it has no login-time version gate. Its preflight also differs: the
+  `docker/users.json.example` fixture must be copied before first boot, and the
+  `--version` check asserts bare output because PR builds carry a
+  `+pr-<n>.<sha7>` suffix.
 
 The docs set and the release plumbing (`install.sh`, `install.ps1`, deb packaging, Homebrew tap job) are in place, and the `thomaslazar/homebrew-grimoire-cli` tap repo exists. What remains before a first release is narrower — see [docs/releasing.md](docs/releasing.md).
 

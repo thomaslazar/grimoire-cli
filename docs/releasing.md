@@ -18,8 +18,13 @@ do not — so a first release is a checklist rather than an improvisation.
 | Prerequisite | State | Why |
 |---|---|---|
 | A `thomaslazar/homebrew-grimoire-cli` tap repository | **done** — public, initialised with a commit on `main` | `update-homebrew` clones and pushes to it; an empty repository has no HEAD to clone |
-| A `HOMEBREW_TAP_TOKEN` repository secret | **outstanding** | that job authenticates with it; without it the job fails *after* the binaries are already attached, leaving a partial release |
+| A `HOMEBREW_TAP_TOKEN` repository secret | **done** — set 2026-08-09 | that job authenticates with it; without it the job fails *after* the binaries are already attached, leaving a partial release |
 | The repo to be public, or a paid plan | outstanding, not blocking | `main` is unprotected because GitHub Free offers neither branch protection nor rulesets on private repos — see [roadmap.md](roadmap.md) |
+
+The process below is automated by the `release` skill
+(`.claude/skills/release/SKILL.md`), which is invoked by name and never
+model-initiated. The prose is kept because a reader looking for the process
+should not have to know the skill exists.
 
 `install.sh` and `install.ps1` will not work until the first tag exists, since
 they resolve GitHub release assets.
