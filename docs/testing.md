@@ -53,8 +53,9 @@ actual published artifact, on every RID, in CI — see the `build` job below.
 
 ### 3. Smoke Tests (bash, against live Grimoire)
 
-16 assertions running the AOT binary against a real Grimoire Docker instance
-seeded with 9 systems and 15 books:
+26 assertions running the AOT binary against a real Grimoire Docker instance
+seeded with 7 top-level systems (16 including container children) and 15
+books:
 
 - Health check, login, config persistence (server + token written to
   `~/.grimoire-cli/config.json`)
@@ -80,9 +81,9 @@ CLI=./path/to/grimoire-cli bash docker/smoke-test.sh
 **The smoke test requires `docker/seed.sh` to have already run.** Unlike
 abs-cli's smoke test, `smoke-test.sh` itself is idempotent — it only reads
 and logs in, so rerunning it alone is safe. But it asserts on exact fixture
-counts (9 systems, 15 books, specific filter matches), so skipping the seed
-step fails nearly every check below the login line, not just the ones that
-obviously depend on data.
+counts (7 top-level systems, 16 including children, 15 books, specific
+filter matches), so skipping the seed step fails nearly every check below
+the login line, not just the ones that obviously depend on data.
 
 ## Fixture Generation
 
@@ -95,9 +96,11 @@ before the smoke-test job builds the stack.
 
 After writing the PDFs, `seed.sh` triggers `POST /api/rescan`, waits for the
 scan to finish, then `PATCH`es the metadata that folder structure cannot
-express (edition, family, parent system, genre, license, year, publishers).
-Shadowrun 4 DE is deliberately left unpatched — a raw, freshly-scanned system
-is itself a fixture, for the metadata commands not yet built.
+express (family, genres, license, year, publishers) — `edition` and
+`parent_system` are left out, because a container child already has them
+folder-derived from the scan. Shadowrun 4 DE is deliberately left unpatched
+entirely, so its `system_family` stays empty — a fixture for the metadata
+commands not yet built.
 
 **Renaming or re-marking a fixture folder needs a full reset, not just a
 re-seed.** `rescan` only ever sets `is_explicit=true` on a system row and
@@ -148,7 +151,7 @@ Three jobs, defined in `.github/workflows/build.yml`:
 | Job | What | Platforms |
 |-----|------|-----------|
 | unit-test | `dotnet format --verify-no-changes` + 51 unit tests | ubuntu-latest |
-| smoke-test | installs `python3-fitz`, publishes the AOT `linux-x64` binary, starts the stack, seeds it, runs `smoke-test.sh` (16 assertions) | ubuntu-latest only (needs Docker) |
+| smoke-test | installs `python3-fitz`, publishes the AOT `linux-x64` binary, starts the stack, seeds it, runs `smoke-test.sh` (26 assertions) | ubuntu-latest only (needs Docker) |
 | build | AOT publish + `self-test` per RID | linux-x64, linux-arm64, osx-arm64, osx-x64, win-x64, win-arm64 |
 
 The smoke test is Linux-only because it needs a Docker Grimoire container.

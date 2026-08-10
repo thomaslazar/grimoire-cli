@@ -1,6 +1,6 @@
 namespace GrimoireCli.Api;
 
-// Paths are taken from a running instance's /api/openapi.json (v1.5.4). No snapshot is
+// Paths are taken from a running instance's /api/openapi.json (v1.5.5). No snapshot is
 // committed — it would go stale; fetch a fresh one into temp/ instead (see CLAUDE.md).
 // Only the endpoints the CLI currently uses are listed; add rows as commands land
 // rather than transcribing all 130.

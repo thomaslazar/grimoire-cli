@@ -29,6 +29,7 @@
 services:
   grimoire:
     # Pinned to the release this CLI targets (v1.5.5) — bump deliberately
+    # when the target changes, don't float on :latest.
     image: hunterreadca/grimoire:1.5.5
     ports:
       - "9481:9481"

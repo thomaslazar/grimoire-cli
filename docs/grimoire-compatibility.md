@@ -4,8 +4,7 @@
 
 | grimoire-cli | Grimoire | Status |
 |---|---|---|
-| 0.1.x | 1.5.4 | initial support |
-| 0.1.x | 1.5.5 | system containers; `parent_id` / `include_children` |
+| 0.1.x | 1.5.5 | initial support; system containers; `parent_id` / `include_children` |
 
 ## Runtime check
 

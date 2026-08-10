@@ -42,7 +42,7 @@ citation has historically been a claim that was wrong.
 | container markers | `.parent-system-container` / `.one-page-container` files, or a `(parent-system)` / `(one-page)` folder-name suffix | `indexer/constants.py:52,65` |
 | child display name | `f"{container.name} {folder.name}"` — so `Shadowrun` + `6 DE` = `Shadowrun 6 DE` | `indexer/scan.py:443` (`_child_display_name`) |
 | `edition` | set from the child folder name **verbatim**: folder `6 DE` gives edition `6 DE`, not `6` | `indexer/scan.py:490` |
-| `parent_system` | still a free-text column, but auto-set to the container's name on child creation | `indexer/scan.py:331` |
+| `parent_system` | still a free-text column, but auto-set to the container's name on child creation | `indexer/scan.py:332` |
 | sort prefixes | stripped from the container folder name before it is used, so `!!Dungeons & Dragons` still yields `Dungeons & Dragons` | `indexer/scan.py:188` |
 | category depth | `system_depth=3` is hardcoded, so the category folder must sit exactly one level below the edition folder | `indexer/scan.py:504` |
 | `GET /api/systems` params | gains exactly `parent_id` (string) and `include_children` (bool, default `false`); children are hidden from the default listing | `routers/systems/core.py:42,83` |
@@ -217,7 +217,7 @@ docker/library/books/
 │   └── 5 EN/core/
 ├── Fixture Explicit RPG (nsfw)/   flat — the ordinary-system and nsfw case
 │   └── core/
-└── one-page-rpgs/                 .one-page-container
+└── one-page-rpgs/                 reserved slug, no marker file
     ├── Honey Heist.pdf
     └── Lasers and Feelings.pdf
 ```

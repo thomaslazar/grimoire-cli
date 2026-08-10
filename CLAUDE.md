@@ -44,7 +44,7 @@ bash docker/seed.sh
 - Copying the fixture before the first boot is required; skip it and the stack comes up with no users, whose only symptom is a 401. Logins are `admin/admin`, `gm/gm`, `player/player`.
 - Reset with `docker compose -f docker/docker-compose.yml down`, then `rm -rf docker/data docker/library/books`, then recreate as above — the boot scan indexes whatever library tree is on disk, so a database-only reset leaves stale rows that survive as `is_missing` and still count toward `book_count`. Unlike `abs-cli`'s, this smoke test is idempotent — it only reads and logs in.
 - Under docker-outside-of-docker the daemon runs on the host: set `GRIMOIRE_LIBRARY` and `GRIMOIRE_DATA` to host paths (see `docker/.env.example`) and reach the stack at `http://host.docker.internal:9481`, not `localhost`. `docker/seed.sh` writes fixtures itself rather than through the daemon, so it reads the container-side path from a separate var, `GRIMOIRE_LIBRARY_LOCAL` (defaults to `docker/library`) — pointing `GRIMOIRE_LIBRARY` at a library outside the repo without also setting this writes fixtures into `docker/library` while the server scans an empty tree.
-- **Anything that writes goes to the local stack, never the live instance.** Its one system has `parent_system` / `edition` / `system_family` deliberately empty as a fixture for the first metadata command — don't spend it casually.
+- **Anything that writes goes to the local stack, never the live instance.** `Shadowrun 4 DE` is left unpatched by `seed.sh`, so `system_family` is deliberately empty as a fixture for the first metadata command — `parent_system` and `edition` are already populated, folder-derived from being a container child. Don't spend it casually.
 
 ## Post-PR verification
 

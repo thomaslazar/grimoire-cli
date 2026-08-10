@@ -70,11 +70,10 @@ Kept because each one records behaviour that is easy to reintroduce.
 ## Parity with abs-cli
 
 `abs-cli` is the reference (see CLAUDE.md). The docs set and the release plumbing
-are now in place; what remains is the prerequisites a first release needs, which
-are external to this repo:
+are now in place, and both first-release prerequisites external to this repo are
+done: the `thomaslazar/homebrew-grimoire-cli` tap repository exists, and the
+`HOMEBREW_TAP_TOKEN` secret was set 2026-08-09. See [releasing.md](releasing.md).
+What remains is narrower:
 
-- a `thomaslazar/homebrew-grimoire-cli` tap repository, and a `HOMEBREW_TAP_TOKEN`
-  secret, or the `update-homebrew` job fails after the binaries are already
-  attached. See [releasing.md](releasing.md).
 - `install.sh` / `install.ps1` resolve GitHub release assets, so they do nothing
   until the first tag exists.

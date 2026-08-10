@@ -1,6 +1,6 @@
 # Authentication
 
-## Token Model (Grimoire 1.5.4)
+## Token Model (Grimoire 1.5.5)
 
 Grimoire uses `HTTPBearer` with a single JWT. There is no access/refresh pair:
 
@@ -94,7 +94,7 @@ production deployment may not — a burst of failed logins there can return
 - `src/GrimoireCli/Commands/LoginCommand.cs` — prompts, stdin/flag password
   handling, config write.
 - Grimoire server: `docs/grimoire-api-notes.md` "Auth" section, verified
-  against `temp/grimoire` at v1.5.4.
+  against `temp/grimoire` at v1.5.5.
 
 ## Diagnostic logging
 

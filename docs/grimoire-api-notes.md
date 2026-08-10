@@ -56,7 +56,7 @@ Applies to both `PATCH /api/systems/{id}` and `PATCH /api/books/{id}`
   edits in one transaction (`run_bulk_update` / `apply_updates`,
   `backend/services/bulk_service.py:49-123`), and `/bulk/tags` additively
   applies tags across the whole selection the same way (`run_bulk_add_tags`,
-  `backend/services/bulk_service.py:126-166`, request shape in
+  `backend/services/bulk_service.py:126-161`, request shape in
   `backend/routers/_bulk_schemas.py`). An unresolved id, or a `validate` hook
   rejection (e.g. a system name clash), fails only its own item — reported in
   the response's `errors` — not the whole batch.
@@ -83,7 +83,7 @@ Applies to both `PATCH /api/systems/{id}` and `PATCH /api/books/{id}`
   matches, so a freshly scanned system is excluded from every metadata filter.
   `genre=` tests the `genres` list, not the legacy `genre` string.
 - **`category` on `GET /api/systems/{id}` is case-SENSITIVE**, unlike every other
-  filter. `core.py:154` compares with `==` (`b.category == category`) while
+  filter. `core.py:175` compares with `==` (`b.category == category`) while
   `genre` goes through `_has_value`, which lowercases both sides. So
   `category=Core` returns no books and `category=core` returns them. Verified
   against a running instance.
@@ -119,7 +119,7 @@ flags on `systems get`.
   system becomes a map category; at subfolder depth the name is inert.
 - **A loose file directly under `books/` is never indexed, but is still counted.**
   `_scan_books` skips anything that isn't a directory
-  (`if not system_dir.is_dir(): continue`, `backend/indexer/scan.py:178`), so a
+  (`if not system_dir.is_dir(): continue`, `backend/indexer/scan.py:398`), so a
   stray `foo.pdf` next to the system folders produces no system and no book.
   `_count_eligible_files` doesn't apply the same skip, so it still counts the
   file toward `total_books` — any wait loop polling
@@ -204,7 +204,7 @@ Verified against v1.5.5. Every citation is a file in `temp/grimoire`.
 
 ## Systems have no language field
 
-`GameSystemUpdate` has 17 fields and `serialize_system_summary` returns 24; neither
+`GameSystemUpdate` has 17 fields and `serialize_system_summary` returns 31; neither
 includes `language`. It exists only on books (`BookUpdate.language`), and
 `GET /api/systems` has no `language` query parameter. A system's language can be
 expressed only through its name (the `Shadowrun 6 DE` convention), a tag, or
