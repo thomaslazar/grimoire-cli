@@ -46,22 +46,32 @@ public static class SystemsCommand
         var editionOption = new Option<string?>("--edition") { Description = "Filter by edition" };
         var licenseOption = new Option<string?>("--license") { Description = "Filter by license" };
         var explicitOption = new Option<bool?>("--explicit") { Description = "Filter by explicit flag (true | false); omit for both" };
+        var parentIdOption = new Option<string?>("--parent-id") { Description = "List only the children of this container" };
+        var includeChildrenOption = new Option<bool>("--include-children") { Description = "Include container children, which are hidden by default" };
         var serverOption = new Option<string?>("--server") { Description = "Server URL override" };
         var tokenOption = new Option<string?>("--token") { Description = "JWT override; used for this invocation only, not stored" };
         var command = new Command("list", "List all game systems")
         {
             sortOption, descOption, genreOption, familyOption,
             parentOption, editionOption, licenseOption, explicitOption,
+            parentIdOption, includeChildrenOption,
             serverOption, tokenOption
         };
         command.AddHelpSection("Notes", HelpSectionPosition.Top,
             "Filters are case-insensitive exact matches, not substrings: --edition 5",
             "does not match 5e. They test stored metadata, which the scanner leaves",
-            "empty — a freshly imported system matches no filter at all.");
+            "empty — a freshly imported system matches no filter at all.",
+            "",
+            "Container children are hidden by default, and that check runs BEFORE",
+            "every filter. On a library using containers the metadata lives on the",
+            "children, so --edition/--genre/--family/--license return [] with exit 0",
+            "unless --include-children is also passed. --parent-id lists one",
+            "container's children and implies them.");
         command.AddExamples(
             "grimoire-cli systems list",
             "grimoire-cli systems list --sort book_count --desc",
-            "grimoire-cli systems list --family Shadowrun --edition 6",
+            "grimoire-cli systems list --include-children --family Shadowrun",
+            "grimoire-cli systems list --parent-id <container-id>",
             "grimoire-cli systems list --explicit false");
         command.AddResponseExampleArray<GameSystemSummary>();
         command.SetAction(async (parseResult, cancellationToken) =>
@@ -78,7 +88,9 @@ public static class SystemsCommand
                 parseResult.GetValue(parentOption),
                 parseResult.GetValue(editionOption),
                 parseResult.GetValue(licenseOption),
-                parseResult.GetValue(explicitOption));
+                parseResult.GetValue(explicitOption),
+                parseResult.GetValue(parentIdOption),
+                parseResult.GetValue(includeChildrenOption));
             ConsoleOutput.WriteJson(result, AppJsonContext.Default.ListGameSystemSummary);
             return 0;
         });
