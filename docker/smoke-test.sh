@@ -103,8 +103,10 @@ ok "self-test"
 
 # --- seeded data -------------------------------------------------------------
 # Requires docker/seed.sh to have run. Counts mirror the fixture set defined
-# there; changing a fixture must change these numbers.
-EXPECTED_SYSTEMS=9
+# there; changing a fixture must change these numbers. EXPECTED_SYSTEMS is the
+# top-level listing: container children are hidden unless asked for.
+EXPECTED_SYSTEMS=7
+EXPECTED_ALL_SYSTEMS=16
 
 # syslist/sysget capture the CLI's own exit status via a plain assignment,
 # then abort with fail(). They must be called directly (e.g. `syslist ...`
@@ -130,6 +132,49 @@ syslist
 [ "$COUNT" -eq "$EXPECTED_SYSTEMS" ] || fail "expected $EXPECTED_SYSTEMS systems, got $COUNT"
 ok "systems list returns $EXPECTED_SYSTEMS systems"
 
+syslist --include-children
+[ "$COUNT" -eq "$EXPECTED_ALL_SYSTEMS" ] \
+  || fail "--include-children should return $EXPECTED_ALL_SYSTEMS, got $COUNT"
+ok "--include-children returns $EXPECTED_ALL_SYSTEMS systems"
+
+# The container is a shelf of systems: kind "parent", three editions, no books.
+syslist
+CONTAINER=$(echo "$LIST_JSON" | jq -r '.[] | select(.name == "Shadowrun")')
+[ "$(echo "$CONTAINER" | jq -r .container_kind)" = "parent" ] \
+  || fail "Shadowrun should be a parent container"
+[ "$(echo "$CONTAINER" | jq -r .child_count)" -eq 3 ] \
+  || fail "Shadowrun should hold 3 editions"
+ok "the Shadowrun container reports kind=parent and child_count=3"
+
+# A child carries the folder-derived edition and a link back to its container.
+syslist --include-children
+CHILD=$(echo "$LIST_JSON" | jq -r '.[] | select(.name == "Shadowrun 6 DE")')
+[ -n "$CHILD" ] || fail "Shadowrun 6 DE missing — the container did not adopt it"
+[ "$(echo "$CHILD" | jq -r .edition)" = "6 DE" ] \
+  || fail "edition should be folder-derived as '6 DE', got '$(echo "$CHILD" | jq -r .edition)'"
+[ "$(echo "$CHILD" | jq -r .parent_name)" = "Shadowrun" ] \
+  || fail "parent_name should be Shadowrun"
+ok "a container child carries a derived edition and parent_name"
+
+# --parent-id selects exactly one container's children.
+CONTAINER_ID=$(echo "$LIST_JSON" | jq -r '.[] | select(.name == "Shadowrun") | .id')
+syslist --parent-id "$CONTAINER_ID"
+[ "$COUNT" -eq 3 ] || fail "--parent-id should return the 3 Shadowrun editions, got $COUNT"
+ok "--parent-id lists one container's children"
+
+# The reserved slug one-page-rpgs becomes a one-page container with no marker
+# file, and each loose PDF becomes its own system.
+syslist
+ONEPAGE=$(echo "$LIST_JSON" | jq -r '.[] | select(.name == "one-page-rpgs")')
+[ "$(echo "$ONEPAGE" | jq -r .container_kind)" = "one-page" ] \
+  || fail "one-page-rpgs should be a one-page container"
+[ "$(echo "$ONEPAGE" | jq -r .child_count)" -eq 2 ] \
+  || fail "one-page-rpgs should hold 2 games"
+syslist --include-children
+echo "$LIST_JSON" | jq -e '.[] | select(.name == "Lasers And Feelings")' >/dev/null \
+  || fail "expected 'Lasers And Feelings' — prettify_collection_name capitalises 'and'"
+ok "one-page-rpgs is a container holding 2 single-book systems"
+
 # --- override flags -----------------------------------------------------------
 # --server/--token are the flag tier of ConfigManager.Resolve — the tested
 # precedence logic (ConfigManagerTests.cs) is otherwise unreachable through the
@@ -154,38 +199,51 @@ ok "a bogus --token against a correct --server exits 2"
 
 cp "$WORK/config.saved" "$CONFIG"
 
+# The child-hiding check runs BEFORE the filters, so a filter on metadata that
+# only children carry returns [] with exit 0 — indistinguishable from a genuine
+# miss. This asserts the trap exists rather than working around it.
 syslist --genre Cyberpunk
+[ "$COUNT" -eq 0 ] \
+  || fail "--genre without --include-children should return 0, got $COUNT"
+ok "a filter without --include-children returns [] on a containerised library"
+
+syslist --include-children --genre Cyberpunk
 [ "$COUNT" -eq 2 ] || fail "--genre Cyberpunk should match 2"
-syslist --edition 6
-[ "$COUNT" -eq 1 ] || fail "--edition 6 should match 1"
-syslist --edition 5
-[ "$COUNT" -eq 4 ] || fail "--edition 5 should match 4 across families"
-syslist --license OGL
+syslist --include-children --edition "6 DE"
+[ "$COUNT" -eq 1 ] || fail "--edition '6 DE' should match 1"
+syslist --include-children --edition "5 DE"
+[ "$COUNT" -eq 2 ] || fail "--edition '5 DE' should match 2 across families"
+syslist --include-children --edition "5 EN"
+[ "$COUNT" -eq 2 ] || fail "--edition '5 EN' should match 2 across families"
+syslist --include-children --license OGL
 [ "$COUNT" -eq 1 ] || fail "--license OGL should match 1"
-syslist --genre nope
+syslist --include-children --genre nope
 [ "$COUNT" -eq 0 ] || fail "an unmatched filter should return []"
 ok "filters narrow the result set"
 
 # Shadowrun 4 DE is seeded raw, so a family filter must exclude it.
-syslist --family Shadowrun
+syslist --include-children --family Shadowrun
 [ "$COUNT" -eq 2 ] \
   || fail "--family Shadowrun should match 2, not the raw Shadowrun 4 DE"
 ok "systems with empty metadata are excluded by filters"
 
-# The (nsfw) folder marker, not a PATCH, is what sets this.
+# The (nsfw) folder marker, not a PATCH, is what sets this. The system is flat,
+# so it needs no --include-children.
 syslist --explicit true
 EXPLICIT=$(echo "$LIST_JSON" | jq -r '.[].name')
 [ "$EXPLICIT" = "Fixture Explicit RPG" ] \
   || fail "--explicit true returned '$EXPLICIT'"
 ok "--explicit true matches the nsfw-marked system"
 
-# Filter values with an ampersand must survive URL encoding.
-syslist --parent-system "Dungeons & Dragons"
+# Filter values with an ampersand must survive URL encoding. parent_system is
+# now folder-derived from the container name, with its !! sort prefix stripped.
+syslist --include-children --parent-system "Dungeons & Dragons"
 [ "$COUNT" -eq 1 ] || fail "a filter value containing '&' did not round-trip"
 ok "ampersand in a filter value round-trips"
 
-# Descending sort must actually be descending.
-syslist --sort book_count --desc
+# Descending sort must actually be descending. Containers hold no books
+# directly, so this runs over children to avoid a near-all-zero comparison.
+syslist --include-children --sort book_count --desc
 COUNTS=$(echo "$LIST_JSON" | jq '[.[].book_count]')
 echo "$COUNTS" | jq -e '. == (. | sort | reverse)' >/dev/null \
   || fail "--sort book_count --desc was not descending: $COUNTS"
@@ -200,7 +258,7 @@ grep -q "Must be one of" "$WORK/sort.err" || fail "no value-set message: $(cat "
 ok "--sort bogus is rejected at parse time"
 
 # systems get: filters apply to the books and change the reported counts.
-syslist --edition 6
+syslist --include-children --edition "6 DE"
 SR6=$(echo "$LIST_JSON" | jq -r '.[0].id')
 sysget --id "$SR6"
 [ "$(echo "$GET_JSON" | jq '.books | length')" -eq 3 ] \
