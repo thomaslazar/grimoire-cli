@@ -82,6 +82,8 @@ Deliberate deviations today:
 - **Grouped by the spec's own OpenAPI tags** rather than hand-picked resource headings, for the same reason: the grouping is machine-derived and cannot drift from the API.
 - **`docs/grimoire-api-notes.md` has no abs-cli counterpart.** Grimoire types nearly every response as `{}`, so verified behaviour needs somewhere to live; ABS's behaviour is read from its server source on demand.
 - **Tests add a `Models/` area** alongside abs-cli's `Api` / `Commands` / `Configuration` / `Output` / `Services`, because the response DTOs are a distinct surface here.
+- **The README Commands table rule lives under "Docs, specs & roadmap", not "Command implementation conventions"** where abs-cli keeps it. It is paired there with the API-coverage rule, which abs-cli has no counterpart for, and splitting the pair to match abs-cli's placement would cost more than the drift does.
+- **No confirm-gated command.** abs-cli exempts `libraries delete` from thin pass-through with a type-the-name prompt. Nothing here is destructive enough to need one yet; the first delete command decides whether to adopt it.
 - **The `release` skill carries an extra step reconciling the supported server
   range.** `MinSupportedVersion` / `MaxTestedVersion`, the compatibility matrix
   and the README line must agree before a tag is cut. abs-cli has no counterpart
@@ -96,8 +98,16 @@ The docs set and the release plumbing (`install.sh`, `install.ps1`, deb packagin
 
 - **Thin pass-through.** Each command maps to a single Grimoire API endpoint. No smart defaults that pre-fetch extra data, no reading the response to emit derived warnings, no client-side mirroring of server policy. Workflows spanning multiple endpoints are the caller's job to compose. Higher-level orchestration belongs in the calling layer, not here.
 - **JSON in, JSON out.** stdout is valid JSON from the API; logs and human-facing lines go to stderr.
-- **Commands whose endpoint needs a non-default role call `command.AddRoleRequired("<role>")`**, and the string matches the `permissionHint` passed to the service call. `systems list` / `systems get` need no tag: any authenticated non-guest can read them, so the mechanism is currently exercised only by `RoleSectionTests` — the first write command is what will use it for real.
-- **`--server` and `--token` are declared per-subcommand on commands that call the API**, matching abs-cli, and threaded into `CommandHelper.BuildClient` so the flag tier of `flags > env > file` is actually reachable. They are not on `config` (no API call) or `self-test` (offline). Write commands have not opted in yet — a deliberate call for whoever designs the first one.
+
+## Command implementation conventions
+
+- **Role tagging.** Every command whose endpoint carries a non-default role dependency MUST call `command.AddRoleRequired("<role>")` immediately after construction. Grimoire has three dependencies (`temp/grimoire/backend/routers/`): `require_admin` → tag `admin`, `require_gm_or_admin` → tag `gm or admin`, and `require_not_guest`, which is the default for reads and gets **no** tag. The tag must agree with the router's actual dependency, not with what the docs claim.
+- **Role hint mirroring.** When the service call passes a `permissionHint`, it MUST agree with the tag and read as a noun phrase, because `GrimoireApiClient` renders it as `Permission denied. This operation requires {hint}.` — tag `admin` ↔ hint `"the admin role"`; tag `gm or admin` ↔ hint `"the gm or admin role"`. The help-section tag and the 403 message always agree.
+- **`--server` and `--token` are declared per-subcommand on commands that call the API**, matching abs-cli, and threaded into `CommandHelper.BuildClient` so the flag tier of `flags > env > file` is actually reachable. They are not on `config` (no API call) or `self-test` (offline).
+- **Positional args for value-only subcommands.** Subcommands whose parameters ARE the values, with no ID key, take positional args rather than flags — `config set <key> <value>`. ID-keyed resources use `update --id --field`, where the flags mirror the API's body field names.
+- **README Commands table and API coverage** are updated in the same PR — see [Docs, specs & roadmap](#docs-specs--roadmap).
+
+`systems list` / `systems get` need no role tag: any authenticated non-guest can read them, so the mechanism is currently exercised only by `RoleSectionTests`. The first write command is what will use it for real, and is also the first to decide whether write commands take `--server` / `--token`.
 
 ## Help text
 
