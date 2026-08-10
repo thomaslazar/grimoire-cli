@@ -103,9 +103,10 @@ The docs set and the release plumbing (`install.sh`, `install.ps1`, deb packagin
 
 `--help` is the primary interface for the AI agents that consume this CLI, and every word costs tokens. Keep it terse and self-contained.
 
-- **Terse.** One-liners over prose, bullets over paragraphs.
-- **Document every non-obvious caveat** at the call site — destructive side effects, hidden API behaviours, outcome-affecting defaults. The CLI is thin, so API quirks leak through; help text is where they must surface.
-- **Don't state what's already visible** from the flags or subcommand list.
+- **Terse.** One-liners over prose, bullets over paragraphs, no "useful when…" framing. Calibrate against `SystemsCommand.cs`, whose Notes blocks are sized to what abs-cli allows.
+- **Document every non-obvious caveat** at the call site — destructive side effects, hidden API behaviours (children hidden before filters apply, folder-derived fields that ignore a PATCH), outcome-affecting defaults. The CLI is thin, so API quirks leak through; help text is where they must surface, not spec docs.
+- **Don't state what's already visible.** Skip anything apparent from the flags, subcommand list, or response-shape sample: no verb-by-verb group narration, no "X cannot change" when there's no such flag, no restating a flag's own description or a response field. A `ChoiceOption` renders its own value set, so the description must not repeat it.
+- **Cross-references are one-way** (consumer → producer) and allowed only when required to use *this* command: where a required input comes from, a behaviour warning, a piping pitfall, a shared external dependency. Never sell another command's use case.
 
 ## Grimoire Source Reference
 
