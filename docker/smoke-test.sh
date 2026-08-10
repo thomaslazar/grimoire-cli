@@ -162,6 +162,14 @@ syslist --parent-id "$CONTAINER_ID"
 [ "$COUNT" -eq 3 ] || fail "--parent-id should return the 3 Shadowrun editions, got $COUNT"
 ok "--parent-id lists one container's children"
 
+# systems get on a container populates its `children` array — the one place a
+# missing [JsonSerializable] registration on the nested summary shape would
+# surface in the AOT binary.
+sysget --id "$CONTAINER_ID"
+[ "$(echo "$GET_JSON" | jq '.children | length')" -eq 3 ] \
+  || fail "Shadowrun container should have 3 children"
+ok "systems get on a container returns its children"
+
 # The reserved slug one-page-rpgs becomes a one-page container with no marker
 # file, and each loose PDF becomes its own system.
 syslist
