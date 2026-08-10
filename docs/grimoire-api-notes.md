@@ -1,6 +1,6 @@
 # Grimoire API notes
 
-Behaviour verified against Grimoire **v1.5.4** — the release the live instance
+Behaviour verified against Grimoire **v1.5.5** — the release the live instance
 and `docker/docker-compose.yml` both run — by reading `temp/grimoire/` at that
 tag and by calling the API. Don't re-derive these, and don't trust the published
 docs over them. Re-verify after a server upgrade — see
@@ -104,34 +104,82 @@ flags on `systems get`.
   `_count_eligible_files` doesn't apply the same skip, so it still counts the
   file toward `total_books` — any wait loop polling
   `scanned_books >= total_books` hangs forever with a loose file present.
-- **`one-page-rpgs/` (also `single-page-rpgs/`, `one-shot-rpgs/`)
-  is one system, not one per file.** It gets `is_one_page: true`, and its
-  immediate subfolder names become category labels — the same rule as the
-  system-agnostic collection, not a per-file system split.
+### One-page collections
+
+Verified against v1.5.5 (`backend/indexer/constants.py:95-105`,
+`backend/indexer/categories.py::detect_container_kind`).
+
+The reserved slugs are `one-page-rpgs`, `single-page-rpgs`, `one-shot-rpgs` and
+`micro-rpgs`. **`micro-rpgs` is new in v1.5.5** (upstream #262) — it did not
+exist in v1.5.4, where recording it as fabricated was correct.
+
+A reserved slug **declares a one-page container on its own**, with no marker
+file: `detect_container_kind` returns `"one-page"` for it. Each loose file
+directly under such a folder becomes its own single-book system, named by
+`prettify_collection_name`, which capitalises any word containing no uppercase
+letter — so `Lasers and Feelings.pdf` indexes as `Lasers And Feelings`.
+
+Marker files are tested first, so a `.parent-system-container` in a
+reserved-slug folder overrides the one-page flavour.
+
+On v1.5.4 the same folder produced one system whose immediate subfolders became
+category labels. Any claim about this behaviour must name a version.
+
 - **Category values are not a closed set.** `CATEGORY_MAP`
   (`backend/indexer/constants.py`) normalises known folder-name aliases
   (`supplements/`, `sourcebook/`, `guide/`, `companion/`, …) onto the canonical
   `core`, `supplement`, `adventure`, `character-sheet`, `map`, `handout`,
   `homebrew`, `starter-set`. A top-level folder that matches none of them
-  becomes its own category: `guess_category` (`categories.py:153`) falls back
-  to the slugified folder name (`Extras/` → `extras`). Special-collection roots
-  (`one-page-rpgs/`, system-agnostic folders) go through `agnostic_category`
-  (`categories.py:175`) instead, which slugs the immediate subfolder and yields
-  `uncategorized` for books with no subfolder at all — confirmed live: this
-  branch's `one-page-rpgs` fixture returns `category: "uncategorized"`.
+  becomes its own category: `guess_category` (`categories.py:200-234`) falls
+  back to the slugified folder name (`Extras/` → `extras`). System-agnostic
+  folders go through `agnostic_category` (`categories.py:237-249`) instead,
+  which slugs the immediate subfolder and yields `uncategorized` for books with
+  no subfolder at all. One-page folders no longer take this path in v1.5.5 —
+  they're a container (see above), so each loose file gets ordinary category
+  inference as its own single-book system.
 - **`(nsfw)` in a system folder name sets `is_explicit`** and is stripped from the
   stored name, so `Vampire The Masquerade 5 EN (nsfw)/` becomes a system named
   `Vampire The Masquerade 5 EN` with `is_explicit: true`.
 - **`is_explicit` only ever latches on, never off, via rescan.** The
-  existing-system branch is `elif is_nsfw and not system.is_explicit:
-  system.is_explicit = True` (`backend/indexer/scan.py:232-233`) — removing
+  existing-system branch is `if folder.is_nsfw and not system.is_explicit:
+  system.is_explicit = True` (`backend/indexer/scan.py:347-348`) — removing
   `(nsfw)` from a folder name and rescanning does not clear the flag on that
-  system row; only the creation branch (`is_explicit=is_nsfw`, line 215) sets it
-  from the folder state. Clearing a stale flag needs a database reset, not a
+  system row; only the creation branch (`is_explicit=folder.is_nsfw`, line 327)
+  sets it from the folder state. Clearing a stale flag needs a database reset, not a
   rescan. Verified against source, not yet against a live instance.
 - **Leading `!`, `$`, `%` are stripped from system folder names**
   (`strip_sort_prefix`), so `!!Dungeons & Dragons/` is stored as
   `Dungeons & Dragons`. Only the contiguous leading run is removed.
+
+### System containers
+
+Verified against v1.5.5. Every citation is a file in `temp/grimoire`.
+
+- A folder becomes a container via a `.parent-system-container` /
+  `.one-page-container` marker file, a `(parent-system)` / `(one-page)` name
+  suffix, or a reserved one-page slug (`indexer/categories.py::detect_container_kind`).
+- A child's display name is `"<container> <folder>"` (`indexer/scan.py:443`), so
+  `Shadowrun` + `6 DE` is `Shadowrun 6 DE`.
+- `edition` is the child folder name **verbatim** (`indexer/scan.py:490`): a
+  folder called `6 DE` yields edition `6 DE`, not `6`.
+- `parent_system` is still a free-text column, auto-set to the container's name
+  on child creation (`indexer/scan.py:331`). Both it and the real `parent_id`
+  foreign key are returned.
+- Sort prefixes are stripped before the container name is used
+  (`indexer/scan.py:188`), so `!!Dungeons & Dragons` yields `Dungeons & Dragons`.
+- `system_depth` is the constant 3 (`indexer/scan.py:504`), so a category folder
+  must sit exactly one level below the edition folder. Nesting containers is
+  unavailable until `.system-family-container` reaches a tagged release.
+- **`GET /api/systems` hides container children before applying any filter**
+  (`routers/systems/core.py:78-95`). A filter on metadata only children carry
+  returns `[]` with exit 0 unless `include_children=true` is also sent.
+- `GET /api/systems/{id}` returns the summary shape plus `books` **and**
+  `children` (`routers/systems/core.py:186-196`).
+- `Book.category` is assigned in exactly two places: the new-book insert
+  (`indexer/scan.py:782`) and a re-home, guarded by
+  `if existing.game_system_id != system.id` (`indexer/scan.py:730`). An ordinary
+  rescan does **not** re-derive it, so a `PATCH category` holds — but converting
+  a folder into a container re-homes every book in it and does reset it.
 
 ## Systems have no language field
 

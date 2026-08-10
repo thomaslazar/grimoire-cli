@@ -14,8 +14,8 @@
 #
 # Renaming/re-marking a fixture folder (e.g. dropping "(nsfw)") needs that
 # database reset, not just a re-seed: rescan only ever sets is_explicit=true,
-# never clears it on an existing system row (backend/indexer/scan.py:232-233
-# in temp/grimoire @ v1.5.4). A re-seed alone leaves the stale flag in place.
+# never clears it on an existing system row (backend/indexer/scan.py:347-348
+# in temp/grimoire @ v1.5.5). A re-seed alone leaves the stale flag in place.
 set -euo pipefail
 
 SERVER="${GRIMOIRE_SERVER:-http://host.docker.internal:9481}"

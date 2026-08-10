@@ -102,12 +102,16 @@ is itself a fixture, for the metadata commands not yet built.
 **Renaming or re-marking a fixture folder needs a full reset, not just a
 re-seed.** `rescan` only ever sets `is_explicit=true` on a system row and
 never clears it — a one-way latch in Grimoire's scanner
-(`backend/indexer/scan.py` in `temp/grimoire` @ v1.5.4). Dropping the
+(`backend/indexer/scan.py` in `temp/grimoire` @ v1.5.5). Dropping the
 `(nsfw)` marker from a folder name and re-running `seed.sh` leaves the stale
-flag in place; only a database reset picks up the change:
+flag in place; only a database reset picks up the change. The library tree
+must also go, not just the database: the boot scan indexes whatever is on
+disk, so a stale folder survives as an `is_missing` row that still counts
+toward `book_count`.
 
 ```bash
-docker compose -f docker/docker-compose.yml down && rm -rf docker/data
+docker compose -f docker/docker-compose.yml down
+rm -rf docker/data docker/library/books
 mkdir -p docker/data && cp docker/users.json.example docker/data/users.json
 docker compose -f docker/docker-compose.yml up -d --wait
 bash docker/seed.sh

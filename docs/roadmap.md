@@ -22,6 +22,22 @@ covers the live HTTP path against it in CI.
    unknown keys are silently ignored, so a typo'd field name in a raw body
    returns `{"status":"ok"}` having changed nothing.
 
+### Reopened by Grimoire v1.5.5
+
+- **Bulk endpoints shipped.** `POST /api/{books,systems,maps,tokens,audio}/bulk`
+  and `/bulk/tags` are released, not unreleased `main` work as
+  `docs/plans/2026-08-06-login-and-smoke-test.md` recorded. The parked metadata
+  command design question — typed flags plus a `--json` escape hatch, versus a
+  raw-JSON body — now has a third option, and needs deciding before that command
+  is built.
+- **29 new routes are uncovered**: 13 bulk, 7 add-on management, 6 metadata
+  lookup (`metadata-sources` / `metadata-search` / `metadata-fetch` on books and
+  systems), 3 system cover. See `docs/grimoire-api-coverage.md`.
+- **Metadata add-ons** (`backend/addons/`) fetch server-side with a per-field
+  diff review, and ship with DriveThruRPG and TTRPG Wiki sources. They cover
+  `isbn`, `artists` and `genres` on books and `system_family` on systems — work
+  previously assumed to be CLI-only.
+
 ## Known wrinkles
 
 - CI pulls the Grimoire image unauthenticated, so a Docker Hub rate limit would
