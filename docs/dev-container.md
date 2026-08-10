@@ -59,12 +59,15 @@ stack with a fixed dev `SECRET_KEY`.
 Reset:
 
 ```bash
-docker compose -f docker/docker-compose.yml down && rm -rf docker/data
+docker compose -f docker/docker-compose.yml down
+rm -rf docker/data docker/library/books
 ```
 
 A reset — not just a re-seed — is needed after renaming or re-marking a fixture
-folder, because a rescan never clears a stale `is_explicit`. See
-[grimoire-api-notes.md](grimoire-api-notes.md).
+folder, because a rescan never clears a stale `is_explicit`. The library must go
+too: the boot scan indexes whatever tree is on disk, so a database-only reset
+leaves the old tree to be re-indexed as stale rows that still count toward
+`book_count`. See [grimoire-api-notes.md](grimoire-api-notes.md).
 
 ## Reference material
 

@@ -58,4 +58,12 @@ public class SystemsCommandTests
         Assert.Empty(Root().Parse("systems list --genre Cyberpunk --family Shadowrun --edition 6").Errors);
         Assert.Empty(Root().Parse("systems list --genre \"a genre that does not exist\"").Errors);
     }
+
+    [Fact]
+    public void ListAcceptsParentIdAndIncludeChildren()
+    {
+        var command = SystemsCommand.Create();
+        var result = command.Parse("list --parent-id abc123 --include-children");
+        Assert.Empty(result.Errors);
+    }
 }

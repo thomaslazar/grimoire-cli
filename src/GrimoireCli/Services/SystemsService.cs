@@ -11,7 +11,8 @@ public class SystemsService
 
     public async Task<List<GameSystemSummary>> ListAsync(
         string? sort, bool desc, string? genre, string? family,
-        string? parentSystem, string? edition, string? license, bool? isExplicit)
+        string? parentSystem, string? edition, string? license, bool? isExplicit,
+        string? parentId, bool includeChildren)
     {
         var query = QueryBuilder.Build(
             ("sort", sort),
@@ -21,7 +22,9 @@ public class SystemsService
             ("parent_system", parentSystem),
             ("edition", edition),
             ("license", license),
-            ("explicit", isExplicit?.ToString().ToLowerInvariant()));
+            ("explicit", isExplicit?.ToString().ToLowerInvariant()),
+            ("parent_id", parentId),
+            ("include_children", includeChildren ? "true" : null));
         return await _client.GetAsync(ApiEndpoints.Systems + query, AppJsonContext.Default.ListGameSystemSummary);
     }
 

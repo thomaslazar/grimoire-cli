@@ -53,6 +53,14 @@ public class HelpOutputTests
     }
 
     [Fact]
+    public void SystemsList_PlainHelp_DocumentsThatChildrenAreHiddenByDefault()
+    {
+        var output = RenderHelp(helpFull: false, "systems", "list");
+        Assert.Contains("--include-children", output);
+        Assert.Contains("hidden", output, StringComparison.OrdinalIgnoreCase);
+    }
+
+    [Fact]
     public void SystemsList_HelpFull_ShowsResponseShapeAsArray_AndOmitsHint()
     {
         var output = RenderHelp(helpFull: true, "systems", "list");

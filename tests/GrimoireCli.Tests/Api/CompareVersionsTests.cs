@@ -40,4 +40,10 @@ public class CompareVersionsTests
     {
         Assert.Equal(0, GrimoireApiClient.CompareVersions("dev", "0.0.0"));
     }
+
+    [Fact]
+    public void OneFiveFiveIsNewerThanOneFiveFour()
+    {
+        Assert.True(GrimoireApiClient.CompareVersions("1.5.5", "1.5.4") > 0);
+    }
 }

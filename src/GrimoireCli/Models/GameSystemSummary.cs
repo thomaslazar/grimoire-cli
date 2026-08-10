@@ -75,4 +75,31 @@ public class GameSystemSummary
 
     [JsonPropertyName("is_one_page")]
     public bool IsOnePage { get; set; }
+
+    [JsonPropertyName("has_cover")]
+    public bool HasCover { get; set; }
+
+    // System containers (upstream #261/#262). A container is a folder whose
+    // immediate children are systems rather than categories: "" for an ordinary
+    // system, "parent" for a parent-system container whose subfolders are
+    // editions, "one-page" for a one-page collection.
+    [JsonPropertyName("container_kind")]
+    public string? ContainerKind { get; set; }
+
+    [JsonPropertyName("parent_id")]
+    public string? ParentId { get; set; }
+
+    [JsonPropertyName("parent_name")]
+    public string? ParentName { get; set; }
+
+    [JsonPropertyName("parent_is_one_page")]
+    public bool ParentIsOnePage { get; set; }
+
+    // True once a user renames the system in the UI, after which the scanner
+    // stops overwriting the name on rescan.
+    [JsonPropertyName("name_is_custom")]
+    public bool NameIsCustom { get; set; }
+
+    [JsonPropertyName("child_count")]
+    public int ChildCount { get; set; }
 }

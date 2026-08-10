@@ -22,6 +22,22 @@ covers the live HTTP path against it in CI.
    unknown keys are silently ignored, so a typo'd field name in a raw body
    returns `{"status":"ok"}` having changed nothing.
 
+### Reopened by Grimoire v1.5.5
+
+- **Bulk endpoints shipped.** `POST /api/{books,systems,maps,tokens,audio}/bulk`
+  and `/bulk/tags` are released, not unreleased `main` work as
+  `docs/plans/2026-08-06-login-and-smoke-test.md` recorded. The parked metadata
+  command design question — typed flags plus a `--json` escape hatch, versus a
+  raw-JSON body — now has a third option, and needs deciding before that command
+  is built.
+- **29 new routes are uncovered**: 13 bulk, 7 add-on management, 6 metadata
+  lookup (`metadata-sources` / `metadata-search` / `metadata-fetch` on books and
+  systems), 3 system cover. See `docs/grimoire-api-coverage.md`.
+- **Metadata add-ons** (`backend/addons/`) fetch server-side with a per-field
+  diff review, and ship with DriveThruRPG and TTRPG Wiki sources. They cover
+  `isbn`, `artists` and `genres` on books and `system_family` on systems — work
+  previously assumed to be CLI-only.
+
 ## Known wrinkles
 
 - CI pulls the Grimoire image unauthenticated, so a Docker Hub rate limit would
@@ -54,11 +70,10 @@ Kept because each one records behaviour that is easy to reintroduce.
 ## Parity with abs-cli
 
 `abs-cli` is the reference (see CLAUDE.md). The docs set and the release plumbing
-are now in place; what remains is the prerequisites a first release needs, which
-are external to this repo:
+are now in place, and both first-release prerequisites external to this repo are
+done: the `thomaslazar/homebrew-grimoire-cli` tap repository exists, and the
+`HOMEBREW_TAP_TOKEN` secret was set 2026-08-09. See [releasing.md](releasing.md).
+What remains is narrower:
 
-- a `thomaslazar/homebrew-grimoire-cli` tap repository, and a `HOMEBREW_TAP_TOKEN`
-  secret, or the `update-homebrew` job fails after the binaries are already
-  attached. See [releasing.md](releasing.md).
 - `install.sh` / `install.ps1` resolve GitHub release assets, so they do nothing
   until the first tag exists.

@@ -114,4 +114,55 @@ public class GameSystemDtoTests
         var list = JsonSerializer.Deserialize($"[{SummaryJson}]", AppJsonContext.Default.ListGameSystemSummary)!;
         Assert.Equal("Shadowrun 6 DE", Assert.Single(list).Name);
     }
+
+    // A container child as v1.5.5 serializes it: the seven container fields are
+    // additions to the 1.5.4 shape, and absent them the CLI silently drops them.
+    private const string ChildJson = """
+    {"id":"child","name":"Shadowrun 6 DE","slug":"shadowrun-6-de","description":null,
+     "publishers":[],"character_builder_url":null,"character_builder_urls":[],
+     "urls":[],"tags":[],"genre":"","genres":["Cyberpunk"],"dice_materials":[],
+     "system_family":"Shadowrun","parent_system":"Shadowrun","edition":"6 DE",
+     "license":"","year":2019,"book_count":3,"total_page_count":26,
+     "cover_image":null,"cover_book_id":null,"has_cover":true,"is_explicit":false,
+     "is_system_agnostic":false,"is_one_page":false,"container_kind":"",
+     "parent_id":"container","parent_name":"Shadowrun","parent_is_one_page":false,
+     "name_is_custom":false,"child_count":0}
+    """;
+
+    private const string ContainerDetailJson = """
+    {"id":"container","name":"Shadowrun","slug":"shadowrun","container_kind":"parent",
+     "parent_id":null,"parent_name":"","parent_is_one_page":false,
+     "name_is_custom":false,"child_count":1,"has_cover":false,"book_count":0,
+     "total_page_count":0,"is_explicit":false,"is_system_agnostic":false,
+     "is_one_page":false,"books":[],
+     "children":[{"id":"child","name":"Shadowrun 6 DE","edition":"6 DE",
+                  "parent_id":"container","child_count":0}]}
+    """;
+
+    [Fact]
+    public void SummaryDeserializesTheContainerFields()
+    {
+        var s = JsonSerializer.Deserialize(ChildJson, AppJsonContext.Default.GameSystemSummary)!;
+        Assert.True(s.HasCover);
+        Assert.Equal("", s.ContainerKind);
+        Assert.Equal("container", s.ParentId);
+        Assert.Equal("Shadowrun", s.ParentName);
+        Assert.False(s.ParentIsOnePage);
+        Assert.False(s.NameIsCustom);
+        Assert.Equal(0, s.ChildCount);
+        Assert.Equal("6 DE", s.Edition);
+    }
+
+    [Fact]
+    public void DetailDeserializesNestedChildren()
+    {
+        var d = JsonSerializer.Deserialize(ContainerDetailJson, AppJsonContext.Default.GameSystemDetail)!;
+        Assert.Equal("parent", d.ContainerKind);
+        Assert.Equal(1, d.ChildCount);
+        Assert.Null(d.ParentId);
+        Assert.NotNull(d.Children);
+        Assert.Single(d.Children!);
+        Assert.Equal("Shadowrun 6 DE", d.Children![0].Name);
+        Assert.Equal("6 DE", d.Children![0].Edition);
+    }
 }

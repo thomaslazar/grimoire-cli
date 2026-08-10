@@ -2,7 +2,7 @@
 
 Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any) that implements it.
 
-- **Reference:** spec from a running instance at `temp/grimoire-openapi.json` (v1.5.4, 130 paths, 178 operations) and the upstream source at `temp/grimoire/backend/routers/`. Tested range: `1.5.4` only (`GrimoireApiClient.cs`).
+- **Reference:** spec from a running instance at `temp/grimoire-openapi.json` (v1.5.5, 156 paths, 207 operations) and the upstream source at `temp/grimoire/backend/routers/`. Tested range: `1.5.5` only (`GrimoireApiClient.cs`).
 - **Perm** column uses Grimoire's roles (`admin` / `gm or admin` / `not guest`); blank = any authenticated user. `?` = a dependency this script could not resolve.
 - ✅ = covered by a CLI command · — = not implemented · 🔒 = internal-only (no user-facing verb); 🔒 rows never count as covered.
 - **Regenerate with `tools/generate-api-coverage.py`; update `IMPLEMENTED` there in the same PR as any change to which endpoints the CLI calls.**
@@ -12,10 +12,11 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | Tag | Covered / Total |
 |-----|-----------------|
 | (untagged) | 0 / 1 |
-| audio | 0 / 7 |
+| addons | 0 / 7 |
+| audio | 0 / 10 |
 | auth | 1 / 10 |
 | bookmarks | 0 / 4 |
-| books | 0 / 11 |
+| books | 0 / 16 |
 | campaigns | 0 / 68 |
 | downloads | 0 / 1 |
 | export | 0 / 1 |
@@ -24,15 +25,15 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | logs | 0 / 1 |
 | lookups | 0 / 15 |
 | maintenance | 0 / 2 |
-| maps | 0 / 8 |
+| maps | 0 / 11 |
 | saved-filters | 0 / 4 |
 | search | 0 / 1 |
 | settings | 0 / 5 |
-| systems | 2 / 5 |
+| systems | 2 / 13 |
 | tags | 0 / 6 |
-| tokens | 0 / 7 |
+| tokens | 0 / 10 |
 | users | 0 / 12 |
-| **Total** | **3 / 178** |
+| **Total** | **3 / 207** |
 
 1 operation(s) are internal-only (🔒) and excluded from covered counts.
 
@@ -42,6 +43,18 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 |--------|------|-------------|------|-----|
 | GET | `/{full_path}` | Serve Frontend |  | — |
 
+## addons
+
+| Method | Path | Description | Perm | CLI |
+|--------|------|-------------|------|-----|
+| GET | `/api/addons` | List add-ons | admin | — |
+| POST | `/api/addons/refresh` | Refresh the add-on index | admin | — |
+| PATCH | `/api/addons/settings` | Update add-on settings | admin | — |
+| POST | `/api/addons/update-all` | Update all add-ons | admin | — |
+| PATCH | `/api/addons/{addon_id}` | Enable, disable, or approve an add-on | admin | — |
+| DELETE | `/api/addons/{addon_id}` | Uninstall an add-on | admin | — |
+| POST | `/api/addons/{addon_id}/install` | Install or update an add-on | admin | — |
+
 ## audio
 
 | Method | Path | Description | Perm | CLI |
@@ -49,6 +62,9 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | GET | `/api/audio` | List audio | not guest | — |
 | GET | `/api/audio-folders` | List audio folders | not guest | — |
 | PATCH | `/api/audio-folders` | Set tags on an audio folder | gm or admin | — |
+| POST | `/api/audio-folders/bulk` | Bulk set audio folder tags | gm or admin | — |
+| POST | `/api/audio/bulk` | Bulk update audio tracks | gm or admin | — |
+| POST | `/api/audio/bulk/tags` | Bulk add tags to audio tracks | gm or admin | — |
 | GET | `/api/audio/{audio_id}` | Get an audio track |  | — |
 | PATCH | `/api/audio/{audio_id}` | Update audio metadata | gm or admin | — |
 | GET | `/api/audio/{audio_id}/artwork` | Audio artwork |  | — |
@@ -83,9 +99,14 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | Method | Path | Description | Perm | CLI |
 |--------|------|-------------|------|-----|
 | GET | `/api/books` | List books | not guest | — |
+| POST | `/api/books/bulk` | Bulk update books | gm or admin | — |
+| POST | `/api/books/bulk/tags` | Bulk add tags to books | gm or admin | — |
 | GET | `/api/books/{book_id}` | Get a book |  | — |
 | PATCH | `/api/books/{book_id}` | Update book metadata | gm or admin | — |
 | GET | `/api/books/{book_id}/file` | Download book file |  | — |
+| POST | `/api/books/{book_id}/metadata-fetch` | Fetch metadata for review | gm or admin | — |
+| POST | `/api/books/{book_id}/metadata-search` | Search a metadata source | gm or admin | — |
+| GET | `/api/books/{book_id}/metadata-sources` | List metadata sources | gm or admin | — |
 | GET | `/api/books/{book_id}/page/{page_num}` | Render a PDF page as WebP |  | — |
 | GET | `/api/books/{book_id}/page/{page_num}/text` | Get page text |  | — |
 | GET | `/api/books/{book_id}/page/{page_num}/words` | Get page word bounding boxes |  | — |
@@ -237,7 +258,10 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 |--------|------|-------------|------|-----|
 | GET | `/api/map-folders` | List map folders | not guest | — |
 | PATCH | `/api/map-folders` | Set tags on a map folder | gm or admin | — |
+| POST | `/api/map-folders/bulk` | Bulk set map folder tags | gm or admin | — |
 | GET | `/api/maps` | List maps | not guest | — |
+| POST | `/api/maps/bulk` | Bulk update maps | gm or admin | — |
+| POST | `/api/maps/bulk/tags` | Bulk add tags to maps | gm or admin | — |
 | GET | `/api/maps/{map_id}` | Get a map |  | — |
 | PATCH | `/api/maps/{map_id}` | Update map metadata | gm or admin | — |
 | GET | `/api/maps/{map_id}/file` | Download map file |  | — |
@@ -274,10 +298,18 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | Method | Path | Description | Perm | CLI |
 |--------|------|-------------|------|-----|
 | GET | `/api/systems` | List all game systems | not guest | `systems list` ✅ |
+| POST | `/api/systems/bulk` | Bulk update game systems | gm or admin | — |
+| POST | `/api/systems/bulk/tags` | Bulk add tags to game systems | gm or admin | — |
 | GET | `/api/systems/{system_id}` | Get a game system | not guest | `systems get` ✅ |
 | PATCH | `/api/systems/{system_id}` | Update game system metadata | gm or admin | — |
 | GET | `/api/systems/{system_id}/book-folders` | List book folders |  | — |
 | PATCH | `/api/systems/{system_id}/book-folders` | Set tags on a book folder | gm or admin | — |
+| GET | `/api/systems/{system_id}/cover` | System cover image |  | — |
+| POST | `/api/systems/{system_id}/cover` | Upload a system cover | gm or admin | — |
+| DELETE | `/api/systems/{system_id}/cover` | Remove an uploaded system cover | gm or admin | — |
+| POST | `/api/systems/{system_id}/metadata-fetch` | Fetch metadata for review | gm or admin | — |
+| POST | `/api/systems/{system_id}/metadata-search` | Search a metadata source | gm or admin | — |
+| GET | `/api/systems/{system_id}/metadata-sources` | List metadata sources | gm or admin | — |
 
 ## tags
 
@@ -296,7 +328,10 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 |--------|------|-------------|------|-----|
 | GET | `/api/token-folders` | List token folders | not guest | — |
 | PATCH | `/api/token-folders` | Set tags on a token folder | gm or admin | — |
+| POST | `/api/token-folders/bulk` | Bulk set token folder tags | gm or admin | — |
 | GET | `/api/tokens` | List tokens | not guest | — |
+| POST | `/api/tokens/bulk` | Bulk update tokens | gm or admin | — |
+| POST | `/api/tokens/bulk/tags` | Bulk add tags to tokens | gm or admin | — |
 | GET | `/api/tokens/{token_id}` | Get a token |  | — |
 | PATCH | `/api/tokens/{token_id}` | Update token metadata | gm or admin | — |
 | GET | `/api/tokens/{token_id}/file` | Download token file |  | — |

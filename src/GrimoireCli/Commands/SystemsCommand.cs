@@ -38,7 +38,7 @@ public static class SystemsCommand
 
     private static Command CreateListCommand()
     {
-        var sortOption = ChoiceOption("--sort", "Sort field (name | book_count | page_count | year); default name", SystemSortKeys);
+        var sortOption = ChoiceOption("--sort", "Sort field; default name", SystemSortKeys);
         var descOption = new Option<bool>("--desc") { Description = "Sort descending" };
         var genreOption = new Option<string?>("--genre") { Description = "Filter by genre" };
         var familyOption = new Option<string?>("--family") { Description = "Filter by system family" };
@@ -46,22 +46,30 @@ public static class SystemsCommand
         var editionOption = new Option<string?>("--edition") { Description = "Filter by edition" };
         var licenseOption = new Option<string?>("--license") { Description = "Filter by license" };
         var explicitOption = new Option<bool?>("--explicit") { Description = "Filter by explicit flag (true | false); omit for both" };
+        var parentIdOption = new Option<string?>("--parent-id") { Description = "List only the children of this container" };
+        var includeChildrenOption = new Option<bool>("--include-children") { Description = "Include container children (hidden by default)" };
         var serverOption = new Option<string?>("--server") { Description = "Server URL override" };
-        var tokenOption = new Option<string?>("--token") { Description = "JWT override; used for this invocation only, not stored" };
+        var tokenOption = new Option<string?>("--token") { Description = "Token override; not stored" };
         var command = new Command("list", "List all game systems")
         {
             sortOption, descOption, genreOption, familyOption,
             parentOption, editionOption, licenseOption, explicitOption,
+            parentIdOption, includeChildrenOption,
             serverOption, tokenOption
         };
         command.AddHelpSection("Notes", HelpSectionPosition.Top,
             "Filters are case-insensitive exact matches, not substrings: --edition 5",
-            "does not match 5e. They test stored metadata, which the scanner leaves",
-            "empty — a freshly imported system matches no filter at all.");
+            "does not match 5e. A freshly imported system has no metadata and",
+            "matches nothing.",
+            "",
+            "Children are hidden before filters apply, so --genre/--family/--edition/",
+            "--license return [] unless --include-children is passed; --parent-id",
+            "implies it.");
         command.AddExamples(
             "grimoire-cli systems list",
             "grimoire-cli systems list --sort book_count --desc",
-            "grimoire-cli systems list --family Shadowrun --edition 6",
+            "grimoire-cli systems list --include-children --family Shadowrun",
+            "grimoire-cli systems list --parent-id <container-id>",
             "grimoire-cli systems list --explicit false");
         command.AddResponseExampleArray<GameSystemSummary>();
         command.SetAction(async (parseResult, cancellationToken) =>
@@ -78,7 +86,9 @@ public static class SystemsCommand
                 parseResult.GetValue(parentOption),
                 parseResult.GetValue(editionOption),
                 parseResult.GetValue(licenseOption),
-                parseResult.GetValue(explicitOption));
+                parseResult.GetValue(explicitOption),
+                parseResult.GetValue(parentIdOption),
+                parseResult.GetValue(includeChildrenOption));
             ConsoleOutput.WriteJson(result, AppJsonContext.Default.ListGameSystemSummary);
             return 0;
         });
@@ -88,31 +98,29 @@ public static class SystemsCommand
     private static Command CreateGetCommand()
     {
         var idOption = new Option<string>("--id") { Description = "System ID", Required = true };
-        var bookSortOption = ChoiceOption("--book-sort", "Sort the books (category | title | page_count | year); default category", BookSortKeys);
-        var bookDescOption = new Option<bool>("--book-desc") { Description = "Sort the books descending; no effect with the default --book-sort category" };
+        var bookSortOption = ChoiceOption("--book-sort", "Sort the books; default category", BookSortKeys);
+        var bookDescOption = new Option<bool>("--book-desc") { Description = "Sort the books descending" };
         var genreOption = new Option<string?>("--genre") { Description = "Keep only books with this genre" };
-        var categoryOption = new Option<string?>("--category") { Description = "Keep only books in this category, e.g. core, supplement, adventure — not a closed set, see Notes" };
+        var categoryOption = new Option<string?>("--category") { Description = "Keep only books in this category (core, supplement, adventure, …)" };
         var explicitOption = new Option<bool?>("--explicit") { Description = "Keep only books with this explicit flag (true | false)" };
         var serverOption = new Option<string?>("--server") { Description = "Server URL override" };
-        var tokenOption = new Option<string?>("--token") { Description = "JWT override; used for this invocation only, not stored" };
+        var tokenOption = new Option<string?>("--token") { Description = "Token override; not stored" };
         var command = new Command("get", "Get one game system, with its books")
         {
             idOption, bookSortOption, bookDescOption, genreOption, categoryOption, explicitOption,
             serverOption, tokenOption
         };
         command.AddHelpSection("Notes", HelpSectionPosition.Top,
-            "--genre, --category and --explicit filter the books, not the system, and",
-            "book_count / total_page_count are recomputed from the filtered list — so",
-            "--category core reports counts for the core books alone.",
+            "--genre, --category and --explicit filter the books, not the system;",
+            "book_count and total_page_count are recomputed from what survives.",
             "",
-            "--category takes the normalised category, not the folder name:",
-            "'supplement', not 'supplements'. It is also case-sensitive — 'Core'",
-            "matches nothing — while --genre is case-insensitive. Values aren't a",
-            "closed set: an unmapped folder becomes its own slug, and books at a",
-            "special-collection root (e.g. one-page-rpgs) are 'uncategorized'.",
+            "--category takes the normalised value, not the folder name",
+            "('supplement', not 'supplements'), and is case-sensitive; --genre is",
+            "not. Values are open-ended: an unmapped folder becomes its own slug,",
+            "and a book with no subfolder under a system-agnostic root is",
+            "'uncategorized'.",
             "",
-            "--book-desc only takes effect with --book-sort title|page_count|year;",
-            "the default (category) and its fallback are unordered server-side.");
+            "--book-desc applies only to --book-sort title|page_count|year.");
         command.AddExamples(
             "grimoire-cli systems get --id <system-id>",
             "grimoire-cli systems get --id <system-id> --category core",

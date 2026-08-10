@@ -42,9 +42,9 @@ bash docker/seed.sh
 ```
 
 - Copying the fixture before the first boot is required; skip it and the stack comes up with no users, whose only symptom is a 401. Logins are `admin/admin`, `gm/gm`, `player/player`.
-- Reset with `docker compose -f docker/docker-compose.yml down && rm -rf docker/data`, then recreate as above. Unlike `abs-cli`'s, this smoke test is idempotent — it only reads and logs in.
+- Reset with `docker compose -f docker/docker-compose.yml down`, then `rm -rf docker/data docker/library/books`, then recreate as above — the boot scan indexes whatever library tree is on disk, so a database-only reset leaves stale rows that survive as `is_missing` and still count toward `book_count`. Unlike `abs-cli`'s, this smoke test is idempotent — it only reads and logs in.
 - Under docker-outside-of-docker the daemon runs on the host: set `GRIMOIRE_LIBRARY` and `GRIMOIRE_DATA` to host paths (see `docker/.env.example`) and reach the stack at `http://host.docker.internal:9481`, not `localhost`. `docker/seed.sh` writes fixtures itself rather than through the daemon, so it reads the container-side path from a separate var, `GRIMOIRE_LIBRARY_LOCAL` (defaults to `docker/library`) — pointing `GRIMOIRE_LIBRARY` at a library outside the repo without also setting this writes fixtures into `docker/library` while the server scans an empty tree.
-- **Anything that writes goes to the local stack, never the live instance.** Its one system has `parent_system` / `edition` / `system_family` deliberately empty as a fixture for the first metadata command — don't spend it casually.
+- **Anything that writes goes to the local stack, never the live instance.** `Shadowrun 4 DE` is left unpatched by `seed.sh`, so `system_family` is deliberately empty as a fixture for the first metadata command — `parent_system` and `edition` are already populated, folder-derived from being a container child. Don't spend it casually.
 
 ## Post-PR verification
 
@@ -74,7 +74,9 @@ bash docker/seed.sh
 
 ## Relationship to abs-cli
 
-`abs-cli` is the mature reference for this pair of tools. **Match its structure and conventions unless there is a reason, and record the reason here** — drift between the two costs more than the occasional awkward fit.
+`abs-cli` is the mature reference for this pair of tools. Its conventions, systems and hard-won rules were worked out there first. **The point is to harvest that work, not to mirror it: before deriving a convention here, check whether abs-cli already settled it, and adopt what it settled.** Re-deriving a solved problem is the cost being avoided.
+
+Parity is therefore the default rather than the goal. A difference that follows from a genuine local difference needs no ceremony; record one here only when a reader might otherwise "fix" it back. Do not diverge on something abs-cli deliberately decided without a reason that survives being written down.
 
 Deliberate deviations today:
 
@@ -82,6 +84,15 @@ Deliberate deviations today:
 - **Grouped by the spec's own OpenAPI tags** rather than hand-picked resource headings, for the same reason: the grouping is machine-derived and cannot drift from the API.
 - **`docs/grimoire-api-notes.md` has no abs-cli counterpart.** Grimoire types nearly every response as `{}`, so verified behaviour needs somewhere to live; ABS's behaviour is read from its server source on demand.
 - **Tests add a `Models/` area** alongside abs-cli's `Api` / `Commands` / `Configuration` / `Output` / `Services`, because the response DTOs are a distinct surface here.
+- **The README Commands table rule lives under "Docs, specs & roadmap", not "Command implementation conventions"** where abs-cli keeps it. It is paired there with the API-coverage rule, which abs-cli has no counterpart for, and splitting the pair to match abs-cli's placement would cost more than the drift does.
+- **No confirm-gated command.** abs-cli exempts `libraries delete` from thin pass-through with a type-the-name prompt. Nothing here is destructive enough to need one yet; the first delete command decides whether to adopt it.
+- **The `release` skill carries an extra step reconciling the supported server
+  range.** `MinSupportedVersion` / `MaxTestedVersion`, the compatibility matrix
+  and the README line must agree before a tag is cut. abs-cli has no counterpart
+  because it has no login-time version gate. Its preflight also differs: the
+  `docker/users.json.example` fixture must be copied before first boot, and the
+  `--version` check asserts bare output because PR builds carry a
+  `+pr-<n>.<sha7>` suffix.
 
 The docs set and the release plumbing (`install.sh`, `install.ps1`, deb packaging, Homebrew tap job) are in place, and the `thomaslazar/homebrew-grimoire-cli` tap repo exists. What remains before a first release is narrower — see [docs/releasing.md](docs/releasing.md).
 
@@ -89,16 +100,27 @@ The docs set and the release plumbing (`install.sh`, `install.ps1`, deb packagin
 
 - **Thin pass-through.** Each command maps to a single Grimoire API endpoint. No smart defaults that pre-fetch extra data, no reading the response to emit derived warnings, no client-side mirroring of server policy. Workflows spanning multiple endpoints are the caller's job to compose. Higher-level orchestration belongs in the calling layer, not here.
 - **JSON in, JSON out.** stdout is valid JSON from the API; logs and human-facing lines go to stderr.
-- **Commands whose endpoint needs a non-default role call `command.AddRoleRequired("<role>")`**, and the string matches the `permissionHint` passed to the service call. `systems list` / `systems get` need no tag: any authenticated non-guest can read them, so the mechanism is currently exercised only by `RoleSectionTests` — the first write command is what will use it for real.
-- **`--server` and `--token` are declared per-subcommand on commands that call the API**, matching abs-cli, and threaded into `CommandHelper.BuildClient` so the flag tier of `flags > env > file` is actually reachable. They are not on `config` (no API call) or `self-test` (offline). Write commands have not opted in yet — a deliberate call for whoever designs the first one.
+
+## Command implementation conventions
+
+- **Role tagging.** Every command whose endpoint carries a non-default role dependency MUST call `command.AddRoleRequired("<role>")` immediately after construction. Grimoire has three role dependencies (`temp/grimoire/backend/routers/`): `require_admin` → tag `admin`, `require_gm_or_admin` → tag `gm or admin`, and `require_not_guest`, which is the default for reads and gets **no** tag. A route guarded by `get_current_user` (or `get_current_user_optional`, or nothing at all, as `POST /api/auth/login` is) carries no role and likewise gets no tag. The tag must agree with the router's actual dependency, not with what the docs claim.
+- **Role hint mirroring.** When the service call passes a `permissionHint`, it MUST agree with the tag and read as a noun phrase, because `GrimoireApiClient` renders it as `Permission denied. This operation requires {hint}.` — tag `admin` ↔ hint `"the admin role"`; tag `gm or admin` ↔ hint `"the gm or admin role"`. The help-section tag and the 403 message always agree.
+- **`--server` and `--token` are declared per-subcommand on commands that consume a saved token**, matching abs-cli, and threaded into `CommandHelper.BuildClient` so the flag tier of `flags > env > file` is actually reachable. Two exceptions, both principled: `login` takes `--server` alone, because it *produces* the token and builds its own client directly; `config` and `self-test` take neither, having no API call at all.
+- **Positional args for value-only subcommands.** Subcommands whose parameters ARE the values, with no ID key, take positional args rather than flags — `config set <key> <value>`. ID-keyed resources use `update --id --field`, where the flags mirror the API's body field names.
+- **README Commands table and API coverage** are updated in the same PR — see [Docs, specs & roadmap](#docs-specs--roadmap).
+
+`systems list` / `systems get` need no role tag: any authenticated non-guest can read them, so the mechanism is currently exercised only by `RoleSectionTests`. The first write command is what will use it for real, and is also the first to decide whether write commands take `--server` / `--token`.
 
 ## Help text
 
 `--help` is the primary interface for the AI agents that consume this CLI, and every word costs tokens. Keep it terse and self-contained.
 
-- **Terse.** One-liners over prose, bullets over paragraphs.
-- **Document every non-obvious caveat** at the call site — destructive side effects, hidden API behaviours, outcome-affecting defaults. The CLI is thin, so API quirks leak through; help text is where they must surface.
-- **Don't state what's already visible** from the flags or subcommand list.
+- **Terse.** One-liners over prose, bullets over paragraphs, no "useful when…" framing. Calibrate against `SystemsCommand.cs`, whose Notes blocks are sized to what abs-cli allows.
+- **Document every non-obvious caveat** at the call site — destructive side effects, hidden API behaviours (children hidden before filters apply, folder-derived fields that ignore a PATCH), outcome-affecting defaults. The CLI is thin, so API quirks leak through; help text is where they must surface, not spec docs.
+- **Don't state what's already visible.** Skip anything apparent from the flags, subcommand list, or response-shape sample: no verb-by-verb group narration, no "X cannot change" when there's no such flag, no restating a flag's own description or a response field. A `ChoiceOption` renders its own value set, so the description must not repeat it.
+- **Cross-references are one-way** (consumer → producer) and allowed only when required to use *this* command: where a required input comes from, a behaviour warning, a piping pitfall, a shared external dependency. Never sell another command's use case.
+
+These rules exist because help text sits on the hot path for the agents driving this CLI, where every repeated word is paid for on each invocation. They are not a style guide to enforce everywhere: `login` states its `--password` caveat in both the flag description and the Notes, and that stays — it runs once per month, and a security caveat is not the worse for being said twice.
 
 ## Grimoire Source Reference
 
@@ -107,7 +129,7 @@ The upstream source is the authoritative reference for behaviour and response sh
 - Expected location: `temp/grimoire/` (gitignored). **Pin it to the deployed release, never `main`** — `main` carries unreleased work that no instance runs:
   ```bash
   # Match MinSupportedVersion / MaxTestedVersion in src/GrimoireCli/Api/GrimoireApiClient.cs
-  git clone --depth 1 --branch v1.5.4 https://github.com/hunter-read/grimoire.git temp/grimoire
+  git clone --depth 1 --branch v1.5.5 https://github.com/hunter-read/grimoire.git temp/grimoire
   ```
 - `temp/grimoire-openapi.json` — spec snapshot pulled from a running instance; refresh after a server upgrade:
   ```bash

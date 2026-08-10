@@ -80,7 +80,7 @@ The JWT is valid for 30 days. Grimoire has **no refresh endpoint**, so an expire
 | `login [--server <url>] [--username <u>] [--password <pw> \| --password-stdin]` | Authenticate and store the JWT (flags fall back to interactive prompts) |
 | `config get` | Show current configuration |
 | `config set <key> <value>` | Set a configuration value (`server` is the only valid key) |
-| `systems list [--sort name\|book_count\|page_count\|year] [--desc] [--genre <g>] [--family <f>] [--parent-system <p>] [--edition <e>] [--license <l>] [--explicit true\|false]` | List all game systems |
+| `systems list [--sort name\|book_count\|page_count\|year] [--desc] [--genre <g>] [--family <f>] [--parent-system <p>] [--edition <e>] [--license <l>] [--explicit true\|false] [--parent-id <id>] [--include-children]` | List all game systems |
 | `systems get --id <id> [--book-sort category\|title\|page_count\|year] [--book-desc] [--genre <g>] [--category <c>] [--explicit true\|false]` | Get a single game system, with its books |
 | `self-test` | Verify binary integrity (AOT validation, no network required) |
 
@@ -119,7 +119,7 @@ mkdir -p docker/data && cp docker/users.json.example docker/data/users.json
 docker compose -f docker/docker-compose.yml up -d --wait
 bash docker/seed.sh
 bash docker/smoke-test.sh
-docker compose -f docker/docker-compose.yml down && rm -rf docker/data
+docker compose -f docker/docker-compose.yml down && rm -rf docker/data docker/library/books
 ```
 
 The fixture copy is required before the first boot — Grimoire seeds its users from `/data/users.json` at startup, and without it the stack comes up with no users. Seeded logins are `admin/admin`, `gm/gm`, `player/player`; throwaway dev credentials for a throwaway stack. `docker/seed.sh` then populates the library with fixture books — `smoke-test.sh` asserts on that fixture set and fails without it.
@@ -148,7 +148,7 @@ Verified API behaviour worth reading before designing a command: [docs/grimoire-
 
 ## Compatibility
 
-Tested against Grimoire **v1.5.4**. The CLI warns on login if the server reports a version outside the tested range. See [docs/grimoire-compatibility.md](docs/grimoire-compatibility.md) for the version matrix and the bump procedure.
+Tested against Grimoire **v1.5.5**. The CLI warns on login if the server reports a version outside the tested range. See [docs/grimoire-compatibility.md](docs/grimoire-compatibility.md) for the version matrix and the bump procedure.
 
 ## License
 

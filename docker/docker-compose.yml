@@ -28,9 +28,9 @@
 # Put them in docker/.env (gitignored); see docker/.env.example.
 services:
   grimoire:
-    # Pinned to the release the live server runs (v1.5.4) — bump deliberately
-    # when that server is upgraded, don't float on :latest.
-    image: hunterreadca/grimoire:1.5.4
+    # Pinned to the release this CLI targets (v1.5.5) — bump deliberately
+    # when the target changes, don't float on :latest.
+    image: hunterreadca/grimoire:1.5.5
     ports:
       - "9481:9481"
     environment:
