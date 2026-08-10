@@ -12,7 +12,6 @@ do not — so a first release is a checklist rather than an improvisation.
 - An `update-homebrew` job refreshes a tap formula from
   `.github/homebrew/grimoire-cli.rb.template`.
 - `install.sh` and `install.ps1` fetch a named or latest release.
-- `CHANGELOG.md` exists with an `## [Unreleased]` section only.
 
 ## What a first release still needs
 
@@ -52,9 +51,10 @@ is worth more than a distant expiry date.
 
 ## Process
 
-1. **Branch.** `release/v{version}` off `main`. `CHANGELOG.md` is owned by this
-   branch and is never edited from a feature branch — that rule is in
-   `CLAUDE.md`.
+1. **Branch.** `release/v{version}` off `main`. **`CHANGELOG.md` does not exist in
+   the repository and is not created by feature work** — it is written on this
+   branch, by this process, and only here. That rule is in `CLAUDE.md`; a
+   changelog assembled ahead of a release is a changelog nobody trusts.
 2. **Set the version.** `<Version>` in `src/GrimoireCli/GrimoireCli.csproj`.
    Release builds pass no `BuildId`, so `--version` prints it bare while PR
    builds carry a `+pr-<n>.<sha7>` suffix — see [build.md](build.md).
@@ -63,8 +63,11 @@ is worth more than a distant expiry date.
    login-time warning and must agree with the matrix in
    [grimoire-compatibility.md](grimoire-compatibility.md). If this release adds
    support for a newer Grimoire, both move together.
-4. **Write the changelog entry.** Move `## [Unreleased]` items under the new
-   version with a date. Describe behaviour, not commits.
+4. **Write the changelog.** On the first release this means creating
+   `CHANGELOG.md`; afterwards, adding a section for the new version above the
+   previous one. Either way it is written here, from `git log` since the last tag,
+   and describes behaviour rather than commits — what a user can now do, or what
+   changed under them.
 5. **Verify before tagging**, per `CLAUDE.md`'s pre-PR gate plus the published
    binary:
    ```bash

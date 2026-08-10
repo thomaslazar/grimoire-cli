@@ -83,7 +83,7 @@ Deliberate deviations today:
 - **`docs/grimoire-api-notes.md` has no abs-cli counterpart.** Grimoire types nearly every response as `{}`, so verified behaviour needs somewhere to live; ABS's behaviour is read from its server source on demand.
 - **Tests add a `Models/` area** alongside abs-cli's `Api` / `Commands` / `Configuration` / `Output` / `Services`, because the response DTOs are a distinct surface here.
 
-The docs set and the release plumbing (`CHANGELOG.md`, `install.sh`, `install.ps1`, deb packaging, Homebrew tap job) are in place, and the `thomaslazar/homebrew-grimoire-cli` tap repo exists. What remains before a first release is narrower — see [docs/releasing.md](docs/releasing.md).
+The docs set and the release plumbing (`install.sh`, `install.ps1`, deb packaging, Homebrew tap job) are in place, and the `thomaslazar/homebrew-grimoire-cli` tap repo exists. What remains before a first release is narrower — see [docs/releasing.md](docs/releasing.md).
 
 ## CLI design principles
 
