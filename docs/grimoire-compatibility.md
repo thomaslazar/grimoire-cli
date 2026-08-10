@@ -5,11 +5,12 @@
 | grimoire-cli | Grimoire | Status |
 |---|---|---|
 | 0.1.x | 1.5.4 | initial support |
+| 0.1.x | 1.5.5 | system containers; `parent_id` / `include_children` |
 
 ## Runtime check
 
 `src/GrimoireCli/Api/GrimoireApiClient.cs` defines `MinSupportedVersion` and
-`MaxTestedVersion`, both currently `"1.5.4"`. `login` calls `GET /api/about`
+`MaxTestedVersion`, both currently `"1.5.5"`. `login` calls `GET /api/about`
 after saving the token and compares the reported server version against that
 range:
 

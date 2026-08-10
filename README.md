@@ -148,7 +148,7 @@ Verified API behaviour worth reading before designing a command: [docs/grimoire-
 
 ## Compatibility
 
-Tested against Grimoire **v1.5.4**. The CLI warns on login if the server reports a version outside the tested range. See [docs/grimoire-compatibility.md](docs/grimoire-compatibility.md) for the version matrix and the bump procedure.
+Tested against Grimoire **v1.5.5**. The CLI warns on login if the server reports a version outside the tested range. See [docs/grimoire-compatibility.md](docs/grimoire-compatibility.md) for the version matrix and the bump procedure.
 
 ## License
 

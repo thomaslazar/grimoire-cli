@@ -114,7 +114,7 @@ The upstream source is the authoritative reference for behaviour and response sh
 - Expected location: `temp/grimoire/` (gitignored). **Pin it to the deployed release, never `main`** — `main` carries unreleased work that no instance runs:
   ```bash
   # Match MinSupportedVersion / MaxTestedVersion in src/GrimoireCli/Api/GrimoireApiClient.cs
-  git clone --depth 1 --branch v1.5.4 https://github.com/hunter-read/grimoire.git temp/grimoire
+  git clone --depth 1 --branch v1.5.5 https://github.com/hunter-read/grimoire.git temp/grimoire
   ```
 - `temp/grimoire-openapi.json` — spec snapshot pulled from a running instance; refresh after a server upgrade:
   ```bash
