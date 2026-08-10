@@ -120,8 +120,8 @@ public static class SystemsCommand
             "--category takes the normalised category, not the folder name:",
             "'supplement', not 'supplements'. It is also case-sensitive — 'Core'",
             "matches nothing — while --genre is case-insensitive. Values aren't a",
-            "closed set: an unmapped folder becomes its own slug, and books at a",
-            "special-collection root (e.g. one-page-rpgs) are 'uncategorized'.",
+            "closed set: an unmapped folder becomes its own slug, and a book with",
+            "no subfolder under a system-agnostic root is 'uncategorized'.",
             "",
             "--book-desc only takes effect with --book-sort title|page_count|year;",
             "the default (category) and its fallback are unordered server-side.");
