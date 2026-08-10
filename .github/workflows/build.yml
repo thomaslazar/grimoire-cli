@@ -35,6 +35,10 @@ jobs:
           dotnet publish src/GrimoireCli/GrimoireCli.csproj
           -c Release -r linux-x64 --self-contained true -p:PublishAot=true
           -o ./publish
+      # PyMuPDF (python3-fitz) is what seed.sh uses to generate fixture PDFs;
+      # the devcontainer has it preinstalled, runners don't.
+      - name: Install fixture tooling
+        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends python3-fitz
       # Grimoire seeds its first users from /data/users.json at startup, so the
       # fixture must be in place before the container boots — hence a step here,
       # after checkout, rather than a `services:` container that starts before it.
@@ -43,6 +47,10 @@ jobs:
           mkdir -p docker/data
           cp docker/users.json.example docker/data/users.json
           docker compose -f docker/docker-compose.yml up -d --wait
+      - name: Seed fixtures
+        run: bash docker/seed.sh
+        env:
+          GRIMOIRE_SERVER: http://localhost:9481
       - name: Run smoke test against the AOT binary
         run: bash docker/smoke-test.sh
         env:
@@ -125,3 +133,76 @@ jobs:
           [[ "$BIN" == *.exe ]] && EXT=".exe"
           cp "$BIN" "grimoire-cli-${{ matrix.rid }}${EXT}"
           gh release upload "${{ github.event.release.tag_name }}" "grimoire-cli-${{ matrix.rid }}${EXT}"
+      - name: Build and upload deb package
+        if: github.event_name == 'release' && startsWith(matrix.rid, 'linux-')
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          VERSION="${{ github.event.release.tag_name }}"
+          VERSION_NUM="${VERSION#v}"
+          if [ "${{ matrix.rid }}" = "linux-x64" ]; then
+            ARCH="amd64"
+          else
+            ARCH="arm64"
+          fi
+          PKG_DIR="grimoire-cli_${VERSION_NUM}_${ARCH}"
+          mkdir -p "${PKG_DIR}/DEBIAN"
+          mkdir -p "${PKG_DIR}/usr/local/bin"
+          printf "Package: grimoire-cli\n" > "${PKG_DIR}/DEBIAN/control"
+          printf "Version: %s\n" "${VERSION_NUM}" >> "${PKG_DIR}/DEBIAN/control"
+          printf "Section: utils\n" >> "${PKG_DIR}/DEBIAN/control"
+          printf "Priority: optional\n" >> "${PKG_DIR}/DEBIAN/control"
+          printf "Architecture: %s\n" "${ARCH}" >> "${PKG_DIR}/DEBIAN/control"
+          printf "Maintainer: Thomas Lazar <thomas@razal.de>\n" >> "${PKG_DIR}/DEBIAN/control"
+          printf "Description: Command-line interface for Grimoire\n" >> "${PKG_DIR}/DEBIAN/control"
+          printf " A CLI tool for Grimoire, a self-hosted TTRPG library manager.\n" >> "${PKG_DIR}/DEBIAN/control"
+          printf "Homepage: https://github.com/thomaslazar/grimoire-cli\n" >> "${PKG_DIR}/DEBIAN/control"
+          BIN="src/GrimoireCli/bin/Release/net10.0/${{ matrix.rid }}/publish/grimoire-cli"
+          cp "$BIN" "${PKG_DIR}/usr/local/bin/grimoire-cli"
+          chmod 755 "${PKG_DIR}/usr/local/bin/grimoire-cli"
+          dpkg-deb --build --root-owner-group "$PKG_DIR"
+          gh release upload "${{ github.event.release.tag_name }}" "${PKG_DIR}.deb"
+
+  # Requires the `HOMEBREW_TAP_TOKEN` secret and the `thomaslazar/homebrew-grimoire-cli`
+  # tap repo to exist — neither does yet. This job will fail on the first
+  # release until both prerequisites are set up.
+  update-homebrew:
+    if: github.event_name == 'release'
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - name: Download release binaries
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          TAG="${{ github.event.release.tag_name }}"
+          for RID in osx-arm64 osx-x64 linux-x64 linux-arm64; do
+            gh release download "$TAG" -R thomaslazar/grimoire-cli -p "grimoire-cli-${RID}" -D .
+          done
+      - name: Update Homebrew tap
+        env:
+          HOMEBREW_TAP_TOKEN: ${{ secrets.HOMEBREW_TAP_TOKEN }}
+        run: |
+          VERSION="${{ github.event.release.tag_name }}"
+          VERSION_NUM="${VERSION#v}"
+          SHA_OSX_ARM64=$(sha256sum grimoire-cli-osx-arm64 | cut -d' ' -f1)
+          SHA_OSX_X64=$(sha256sum grimoire-cli-osx-x64 | cut -d' ' -f1)
+          SHA_LINUX_X64=$(sha256sum grimoire-cli-linux-x64 | cut -d' ' -f1)
+          SHA_LINUX_ARM64=$(sha256sum grimoire-cli-linux-arm64 | cut -d' ' -f1)
+          git clone https://x-access-token:${HOMEBREW_TAP_TOKEN}@github.com/thomaslazar/homebrew-grimoire-cli.git tap
+          mkdir -p tap/Formula
+          sed -e "s/@@VERSION@@/${VERSION_NUM}/g" \
+              -e "s/@@SHA256_OSX_ARM64@@/${SHA_OSX_ARM64}/g" \
+              -e "s/@@SHA256_OSX_X64@@/${SHA_OSX_X64}/g" \
+              -e "s/@@SHA256_LINUX_X64@@/${SHA_LINUX_X64}/g" \
+              -e "s/@@SHA256_LINUX_ARM64@@/${SHA_LINUX_ARM64}/g" \
+              .github/homebrew/grimoire-cli.rb.template > tap/Formula/grimoire-cli.rb
+          cd tap
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add Formula/grimoire-cli.rb
+          git diff --cached --quiet && echo "No formula changes" && exit 0
+          git commit -m "Update grimoire-cli to ${VERSION}"
+          git push

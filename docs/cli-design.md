@@ -1,0 +1,179 @@
+# CLI Design
+
+## Status
+
+Early. Only `login`, `config`, `systems` and `self-test` exist. This
+document describes the design principles applied so far and the pattern to
+extend — it is not a finished command surface. See
+[roadmap.md](roadmap.md) for what's planned next.
+
+## Command Pattern
+
+```
+grimoire-cli <resource> <action> [options]
+```
+
+Same shape as abs-cli: a resource noun, an action verb, then options. Unlike
+abs-cli's `items`/`libraries`/`authors`/… sprawl, Grimoire's resource surface
+is much smaller — one system, one set of books per system — so the resource
+list below is short by design, not by omission.
+
+## Thin pass-through
+
+Each command maps to exactly one Grimoire API endpoint (see
+[grimoire-api-coverage.md](grimoire-api-coverage.md) for the full generated
+endpoint-to-role table). No command pre-fetches extra data, reads the
+response to synthesize a derived warning, or mirrors server-side policy
+client-side. A workflow spanning multiple endpoints — e.g. "rescan, then
+patch every book missing a genre" — is the caller's job to compose from
+single-endpoint commands, or belongs in a higher-level orchestration layer
+outside this CLI.
+
+## Systems
+
+The only resource implemented today. Maps to `GET /api/systems` and
+`GET /api/systems/{id}`.
+
+| Command | Grimoire Endpoint | Description |
+|---------|-------------------|--------------|
+| `grimoire-cli systems list [--sort name\|book_count\|page_count\|year] [--desc] [--genre <g>] [--family <f>] [--parent-system <p>] [--edition <e>] [--license <l>] [--explicit true\|false]` | `GET /api/systems` | List all game systems |
+| `grimoire-cli systems get --id <id> [--book-sort category\|title\|page_count\|year] [--book-desc] [--genre <g>] [--category <c>] [--explicit true\|false]` | `GET /api/systems/{id}` | Get one system, with its books |
+
+Every query parameter the two endpoints accept is exposed as a flag — no
+parameter is left unmapped, and no flag exists that isn't backed by a
+parameter.
+
+## Login / Config / Self-test
+
+Not resource commands in the same sense — see
+[authentication.md](authentication.md) for `login`,
+[configuration.md](configuration.md) for `config get`/`config set`, and
+below for `self-test`.
+
+## Flag conventions
+
+- **`--desc` booleans, not `--order asc|desc`.** `systems list --sort
+  book_count --desc` rather than `--sort book_count --order desc`. Matches
+  abs-cli's `items list --sort ... --desc`.
+- **Tri-state `Option<bool?>` for nullable server booleans.** `--explicit
+  true|false` on `systems list`/`systems get` filters on Grimoire's
+  `is_explicit` field, which can be true, false, or unset — a plain
+  `Option<bool>` can't express "omit the filter" versus "filter for false",
+  so these are `bool?` and unset means no filter at all.
+- **Positional arguments for value-only subcommands.** `config set <key>
+  <value>` uses two `Argument<string>`s, not `--key`/`--value` options —
+  there's nothing to disambiguate by name once the subcommand name has fixed
+  the shape.
+
+## Sort key validation
+
+Sort keys are validated at parse time via `Option.Validators`
+(`SystemsCommand.ChoiceOption`), rejecting an unrecognized `--sort`/
+`--book-sort` value with a parse error rather than sending it to the server.
+This matters because Grimoire silently falls back to its default sort order
+on an unknown key — the request still succeeds with exit 0, just ordered
+differently than asked, which is a much worse failure mode than a rejected
+flag.
+
+`Argument<T>` has `AcceptOnlyFromAmong` for exactly this in System.CommandLine
+2.0.7; `Option<T>` does not, which is why `ChoiceOption` hand-rolls the same
+check via a validator delegate plus `CompletionSources` for shell completion.
+
+**Filter values are not validated** the same way — `--genre`, `--family`,
+`--parent-system`, `--edition`, `--license`, `--category` all accept any
+string. Unlike sort keys (a fixed, server-defined enum), valid filter values
+depend on what's actually in the library — genres, families and editions are
+free-text metadata fields, so there's no closed set to validate against
+client-side. An unmatched filter returns an empty or unfiltered result, not
+a wrong-but-successful one.
+
+## Help Text
+
+`--help` is written for the agents that consume this CLI, not for humans
+skimming a terminal — see the "Help text" section in `CLAUDE.md` for the
+terseness rules. Two mechanics worth calling out here:
+
+- **`AddHelpSection` / `AddExamples`** (`src/GrimoireCli/Commands/HelpExtensions.cs`)
+  attach a "Notes" section (non-obvious caveats, positioned above the
+  auto-generated Options block) and an "Examples" section (positioned below)
+  to any command.
+- **`--help-full`** is a recursive root option that additionally prints a
+  generated "Response shape" block per command — a JSON sample derived from
+  the response DTO via `AddResponseExample<T>()` / `AddResponseExampleArray<T>()`,
+  sourced from `Commands/ResponseExamples.g.cs` (generated by
+  `tools/GenerateResponseExamples` from the types on `AppJsonContext`, and
+  checked for drift by `ResponseExamplesDriftTest`). Plain `--help` prints a
+  one-line hint ("Run --help-full to see response shape(s).") instead of the
+  block itself, to keep the default help short.
+
+```
+$ grimoire-cli systems get --help
+
+Notes:
+  --genre, --category and --explicit filter the books, not the system, and
+  book_count / total_page_count are recomputed from the filtered list — so
+  --category core reports counts for the core books alone.
+  ...
+
+Description:
+  Get one game system, with its books
+
+Usage:
+  grimoire-cli systems get [options]
+
+Options:
+  --id <id> (REQUIRED)      System ID
+  --book-sort <book-sort>   Sort the books (category | title | page_count | year); default category
+  ...
+
+Examples:
+  grimoire-cli systems get --id <system-id>
+  grimoire-cli systems get --id <system-id> --category core
+  grimoire-cli systems get --id <system-id> --book-sort page_count --book-desc
+
+Run --help-full to see response shape(s).
+```
+
+## Role tagging
+
+Commands whose endpoint requires a non-default role call
+`command.AddRoleRequired("<role>")`, rendering a "Role required" section
+above the Notes section. `systems list`/`systems get` carry no tag — reads
+need only a non-guest account. No write command exists yet to exercise the
+`gm`/`admin` tags; when one lands, the tag string must match the
+`permissionHint` passed into the corresponding `GrimoireApiClient` call so
+the 403 message and the help text agree.
+
+## Self-Test
+
+A built-in AOT integrity check that exercises source-generated JSON
+round-trips, JWT `exp` parsing, version comparison, and the informational
+version's assembly-attribute lookup — all without network access. Native
+AOT trims reflection paths that compile fine and only fail at runtime on a
+published binary, so this is what CI runs against every platform RID before
+release.
+
+| Command | Description |
+|---------|-------------|
+| `grimoire-cli self-test` | Runs the offline checks in `SelfTestCommand.cs` |
+
+Exit code 0 on success, 1 on the first recorded failure (all failures are
+collected and printed before exiting, not just the first). Output goes to
+stderr, consistent with every other human-facing message.
+
+## Deviations from abs-cli
+
+Recorded here rather than only in `CLAUDE.md`'s "Relationship to abs-cli",
+per that section's own instruction to record deviations where they're found:
+
+- **No filter-encoding layer.** abs-cli's filters go through a
+  `group.base64(value)` scheme dictated by the ABS API. Grimoire's list
+  filters are plain query parameters (`?genre=Sci-Fi`), built by
+  `QueryBuilder.Build` — no encoding step to hide from the user.
+- **No pagination flags yet.** abs-cli's `items list` takes `--limit`/
+  `--page`; `GET /api/systems` returns a bare array with no pagination
+  envelope, so `systems list` has none either. This will need revisiting if
+  a paginated list endpoint is implemented.
+- **No upload/cover/image commands.** Grimoire's library is mounted
+  read-only; there is no upload API. Content arrives on disk, then
+  `POST /api/rescan` — not modeled as a CLI command yet.

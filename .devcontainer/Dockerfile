@@ -3,11 +3,15 @@ FROM mcr.microsoft.com/devcontainers/dotnet:10.0
 # Native AOT compilation dependencies + Python (needed by peon-ping installer)
 # + jq (post-create edits ~/.claude/settings.json; also handy for poking at
 #   Grimoire responses, which are raw JSON pass-through).
+# python3-fitz is the MuPDF binding — the same library Grimoire reads PDFs with,
+# used by docker/seed.sh to generate fixture PDFs and cover images, so anything it
+# writes is by definition parseable by the indexer.
 RUN apt-get update && apt-get install -y --no-install-recommends \
     clang \
     zlib1g-dev \
     python3 \
     python3-pip \
+    python3-fitz \
     jq \
     && rm -rf /var/lib/apt/lists/*
 

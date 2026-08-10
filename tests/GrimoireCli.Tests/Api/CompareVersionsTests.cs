@@ -1,6 +1,6 @@
 using GrimoireCli.Api;
 
-namespace GrimoireCli.Tests;
+namespace GrimoireCli.Tests.Api;
 
 public class CompareVersionsTests
 {

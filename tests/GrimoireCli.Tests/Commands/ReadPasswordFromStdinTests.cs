@@ -1,6 +1,6 @@
 using GrimoireCli.Commands;
 
-namespace GrimoireCli.Tests;
+namespace GrimoireCli.Tests.Commands;
 
 public class ReadPasswordFromStdinTests
 {

@@ -80,6 +80,7 @@ public static class LoginCommand
                 Environment.Exit(1);
             }
             var client = new GrimoireApiClient(new AppConfig { Server = server });
+            AppConfig config;
             try
             {
                 var body = await client.LoginAsync(username!, password!);
@@ -90,7 +91,7 @@ public static class LoginCommand
                     Console.Error.WriteLine(body);
                     Environment.Exit(2);
                 }
-                var config = configManager.Load();
+                config = configManager.Load();
                 config.Server = server;
                 config.AccessToken = token;
                 configManager.Save(config);
@@ -98,16 +99,26 @@ public static class LoginCommand
                 Console.Error.WriteLine(expiry != null
                     ? $"Logged in to {server} (token expires {expiry:yyyy-MM-dd})"
                     : $"Logged in to {server}");
-                // /api/about is unauthenticated-safe and carries the server version;
-                // warn here rather than on every later command.
+            }
+            catch (HttpRequestException ex)
+            {
+                _logger.Error($"Login failed: {ex.Message}");
+                Environment.Exit(2);
+                throw;
+            }
+            // The token is already saved at this point, so a failure here is not a
+            // login failure — it's a warning, not a reason to report exit 2 and make
+            // the caller think they need to log in again. /api/about requires the
+            // token just saved and carries the server version.
+            try
+            {
                 var authed = new GrimoireApiClient(config);
                 var about = await authed.GetAsync(ApiEndpoints.About);
                 GrimoireApiClient.CheckServerVersion(GrimoireApiClient.ReadStringProperty(about, "version"));
             }
             catch (HttpRequestException ex)
             {
-                _logger.Error($"Login failed: {ex.Message}");
-                Environment.Exit(2);
+                _logger.Warn($"Logged in, but could not check server version: {ex.Message}");
             }
             return 0;
         });

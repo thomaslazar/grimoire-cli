@@ -1,6 +1,6 @@
 using GrimoireCli.Configuration;
 
-namespace GrimoireCli.Tests;
+namespace GrimoireCli.Tests.Configuration;
 
 public class ConfigManagerTests
 {

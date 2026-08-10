@@ -33,16 +33,17 @@ dotnet test tests/GrimoireCli.Tests/GrimoireCli.Tests.csproj
 bash docker/smoke-test.sh
 ```
 
-The smoke test expects a running stack and does not seed one. Bring it up first:
+The smoke test expects a running, seeded stack; it neither starts nor seeds one. Bring it up and seed it first:
 
 ```bash
 mkdir -p docker/data && cp docker/users.json.example docker/data/users.json
 docker compose -f docker/docker-compose.yml up -d --wait
+bash docker/seed.sh
 ```
 
 - Copying the fixture before the first boot is required; skip it and the stack comes up with no users, whose only symptom is a 401. Logins are `admin/admin`, `gm/gm`, `player/player`.
 - Reset with `docker compose -f docker/docker-compose.yml down && rm -rf docker/data`, then recreate as above. Unlike `abs-cli`'s, this smoke test is idempotent — it only reads and logs in.
-- Under docker-outside-of-docker the daemon runs on the host: set `GRIMOIRE_LIBRARY` and `GRIMOIRE_DATA` to host paths (see `docker/.env.example`) and reach the stack at `http://host.docker.internal:9481`, not `localhost`.
+- Under docker-outside-of-docker the daemon runs on the host: set `GRIMOIRE_LIBRARY` and `GRIMOIRE_DATA` to host paths (see `docker/.env.example`) and reach the stack at `http://host.docker.internal:9481`, not `localhost`. `docker/seed.sh` writes fixtures itself rather than through the daemon, so it reads the container-side path from a separate var, `GRIMOIRE_LIBRARY_LOCAL` (defaults to `docker/library`) — pointing `GRIMOIRE_LIBRARY` at a library outside the repo without also setting this writes fixtures into `docker/library` while the server scans an empty tree.
 - **Anything that writes goes to the local stack, never the live instance.** Its one system has `parent_system` / `edition` / `system_family` deliberately empty as a fixture for the first metadata command — don't spend it casually.
 
 ## Post-PR verification
@@ -57,6 +58,8 @@ docker compose -f docker/docker-compose.yml up -d --wait
 - **Once a feature branch exists, keep its docs edits on that branch** — they reach `main` via the PR.
 - **`CHANGELOG.md` is owned by the release process** (`release/v{version}` branches only). Never edit it from a feature branch.
 - Current state and open work live in [docs/roadmap.md](docs/roadmap.md).
+- **Any PR that adds, renames or removes a command, or changes a user-visible flag, updates the README Commands table in the same change.**
+- **Any PR that touches which endpoints are called updates [docs/grimoire-api-coverage.md](docs/grimoire-api-coverage.md) in the same change.**
 
 ## Code Formatting
 
@@ -69,10 +72,25 @@ docker compose -f docker/docker-compose.yml up -d --wait
 - Comment what the code does or why it must be this way — never what was deliberately left out. If something isn't done, its absence needs no defence.
 - Prefer stating a requirement positively ("the server must come from the saved config") over narrating a rejected alternative.
 
+## Relationship to abs-cli
+
+`abs-cli` is the mature reference for this pair of tools. **Match its structure and conventions unless there is a reason, and record the reason here** — drift between the two costs more than the occasional awkward fit.
+
+Deliberate deviations today:
+
+- **`docs/grimoire-api-coverage.md` is generated, not hand-maintained.** `tools/generate-api-coverage.py` builds it from the spec plus the role dependency on each route in `temp/grimoire`. Grimoire publishes an OpenAPI spec and ABS does not, so abs-cli has to maintain its table by hand. Update `IMPLEMENTED` in that script, not the markdown.
+- **Grouped by the spec's own OpenAPI tags** rather than hand-picked resource headings, for the same reason: the grouping is machine-derived and cannot drift from the API.
+- **`docs/grimoire-api-notes.md` has no abs-cli counterpart.** Grimoire types nearly every response as `{}`, so verified behaviour needs somewhere to live; ABS's behaviour is read from its server source on demand.
+- **Tests add a `Models/` area** alongside abs-cli's `Api` / `Commands` / `Configuration` / `Output` / `Services`, because the response DTOs are a distinct surface here.
+
+The docs set and the release plumbing (`install.sh`, `install.ps1`, deb packaging, Homebrew tap job) are in place, and the `thomaslazar/homebrew-grimoire-cli` tap repo exists. What remains before a first release is narrower — see [docs/releasing.md](docs/releasing.md).
+
 ## CLI design principles
 
 - **Thin pass-through.** Each command maps to a single Grimoire API endpoint. No smart defaults that pre-fetch extra data, no reading the response to emit derived warnings, no client-side mirroring of server policy. Workflows spanning multiple endpoints are the caller's job to compose. Higher-level orchestration belongs in the calling layer, not here.
 - **JSON in, JSON out.** stdout is valid JSON from the API; logs and human-facing lines go to stderr.
+- **Commands whose endpoint needs a non-default role call `command.AddRoleRequired("<role>")`**, and the string matches the `permissionHint` passed to the service call. `systems list` / `systems get` need no tag: any authenticated non-guest can read them, so the mechanism is currently exercised only by `RoleSectionTests` — the first write command is what will use it for real.
+- **`--server` and `--token` are declared per-subcommand on commands that call the API**, matching abs-cli, and threaded into `CommandHelper.BuildClient` so the flag tier of `flags > env > file` is actually reachable. They are not on `config` (no API call) or `self-test` (offline). Write commands have not opted in yet — a deliberate call for whoever designs the first one.
 
 ## Help text
 
