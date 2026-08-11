@@ -248,10 +248,7 @@ public static class SystemsCommand
             "non-empty errors list — a partial application, not a failure.",
             "",
             "updated reports ids, not fields: an id there means the row resolved,",
-            "not that any value changed.",
-            "",
-            "Renaming is permanent, and \"\" not null clears a field — same as",
-            "systems update.");
+            "not that any value changed.");
         command.AddExamples(
             "grimoire-cli systems batch-update --input items.json",
             "jq -c '{items: .}' edits.json | grimoire-cli systems batch-update --stdin");
