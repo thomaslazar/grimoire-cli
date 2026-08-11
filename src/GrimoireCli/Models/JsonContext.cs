@@ -15,5 +15,8 @@ namespace GrimoireCli.Models;
 [JsonSerializable(typeof(LinkEntry))]
 [JsonSerializable(typeof(AppConfig))]
 [JsonSerializable(typeof(Dictionary<string, string>))]
+[JsonSerializable(typeof(GameSystemUpdateRequest))]
+[JsonSerializable(typeof(PublisherEntryRequest))]
+[JsonSerializable(typeof(LinkEntryRequest))]
 [JsonSourceGenerationOptions(WriteIndented = true)]
 public partial class AppJsonContext : JsonSerializerContext;
