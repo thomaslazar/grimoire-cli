@@ -18,5 +18,11 @@ namespace GrimoireCli.Models;
 [JsonSerializable(typeof(GameSystemUpdateRequest))]
 [JsonSerializable(typeof(PublisherEntryRequest))]
 [JsonSerializable(typeof(LinkEntryRequest))]
+[JsonSerializable(typeof(BulkUpdateResult))]
+[JsonSerializable(typeof(BulkTagResult))]
+[JsonSerializable(typeof(BulkError))]
+[JsonSerializable(typeof(GameSystemBulkItemRequest))]
+[JsonSerializable(typeof(GameSystemBulkUpdateRequest))]
+[JsonSerializable(typeof(BulkAddTagsRequest))]
 [JsonSourceGenerationOptions(WriteIndented = true)]
 public partial class AppJsonContext : JsonSerializerContext;

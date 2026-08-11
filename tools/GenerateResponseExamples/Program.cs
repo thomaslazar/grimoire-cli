@@ -98,6 +98,9 @@ internal static class Program
             typeof(GameSystemUpdateRequest),
             typeof(PublisherEntryRequest),
             typeof(LinkEntryRequest),
+            typeof(GameSystemBulkItemRequest),
+            typeof(GameSystemBulkUpdateRequest),
+            typeof(BulkAddTagsRequest),
         };
 
         // JsonSerializableAttribute.Type is not a public property in .NET 8 —
