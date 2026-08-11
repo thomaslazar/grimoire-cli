@@ -10,11 +10,10 @@ reflection-based serialization — bugs only surface in the real binary.
 
 ### 1. Unit Tests (xUnit v3)
 
-51 tests covering pure logic, help-output assertions, and JSON-shape drift
+110 tests covering pure logic, help-output assertions, and JSON-shape drift
 guards with no network or binary dependency:
 
-- `Api/` — `ApiEndpointsTests`, `CompareVersionsTests`, `ExtractTokenTests`,
-  `QueryBuilderTests`
+- `Api/` — `CompareVersionsTests`, `ExtractTokenTests`, `GeneratedClientTests`
 - `Commands/` — `ReadPasswordFromStdinTests`, `ResponseExamplesDriftTest`,
   `ResponseExamplesJsonValidTest`, `SystemsCommandTests`
 - `Configuration/` — `ConfigManagerTests`
@@ -36,8 +35,9 @@ Two of these are generated-artifact guards rather than ordinary logic tests:
 ### 2. Self-Test (built-in command)
 
 Offline integrity check exercising the AOT-sensitive code paths without
-network access — source-generated JSON round-trips for `AppConfig`,
-`LoginRequest` and `Dictionary<string,string>`, JWT expiry parsing, version
+network access — source-generated JSON round-trips for `AppConfig` and
+`Dictionary<string,string>`, the generated `LoginRequest` serializing the way
+`GrimoireApiClient.LoginAsync` actually sends it, JWT expiry parsing, version
 comparison, informational-version resolution, and login-response token
 extraction:
 
@@ -150,7 +150,7 @@ Three jobs, defined in `.github/workflows/build.yml`:
 
 | Job | What | Platforms |
 |-----|------|-----------|
-| unit-test | `dotnet format --verify-no-changes` + 51 unit tests | ubuntu-latest |
+| unit-test | `dotnet format --verify-no-changes` + 110 unit tests | ubuntu-latest |
 | smoke-test | installs `python3-fitz`, publishes the AOT `linux-x64` binary, starts the stack, seeds it, runs `smoke-test.sh` (26 assertions) | ubuntu-latest only (needs Docker) |
 | build | AOT publish + `self-test` per RID | linux-x64, linux-arm64, osx-arm64, osx-x64, win-x64, win-arm64 |
 

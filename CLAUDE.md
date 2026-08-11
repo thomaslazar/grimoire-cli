@@ -122,19 +122,30 @@ The docs set and the release plumbing (`install.sh`, `install.ps1`, deb packagin
 
 These rules exist because help text sits on the hot path for the agents driving this CLI, where every repeated word is paid for on each invocation. They are not a style guide to enforce everywhere: `login` states its `--password` caveat in both the flag description and the Notes, and that stays — it runs once per month, and a security caveat is not the worse for being said twice.
 
+## API client generation
+
+**The API interface is generated from the OpenAPI spec by tooling, not hand-written.** The spec is a published contract and a standard artefact; generating from it is what makes the client's surface reliable rather than a transcription that can quietly drift. The generator is the baseline, and hand-written code covers only what the spec cannot express.
+
+- **The spec comes from the running stack, never from a file.** `docker/docker-compose.yml` pins the exact release the CLI targets, so its `/api/openapi.json` cannot disagree with what we build against. A snapshot on disk can be stale and has to be remembered; a container cannot contradict itself.
+  ```bash
+  docker compose -f docker/docker-compose.yml up -d --wait
+  # then generate straight from http://host.docker.internal:9481/api/openapi.json
+  ```
+- **Generate with a .NET-native generator** — Kiota is the fit: a `dotnet tool`, handles the spec's OpenAPI 3.1, emits C#. No node or java is available in the devcontainer.
+- **What the spec gives you and what it does not.** 84 of the 86 component schemas are request bodies (the other 2, `HTTPValidationError` and `ValidationError`, are response-only), so request bodies, paths, methods and query parameters come from the generator and are trustworthy. Of 207 operations' 410 responses, 192 success responses type as `{}` and the rest are 204s or `HTTPValidationError` 422s — **no success response carries a schema** (FastAPI without `response_model`), so response DTOs are the documented gap — those are hand-written from `temp/grimoire/`'s serializers and stay hand-written.
+- **On a Grimoire version bump, regenerate and diff.** That diff is the authoritative list of what changed in the API surface, and it replaces reading release notes and hoping. See [docs/grimoire-compatibility.md](docs/grimoire-compatibility.md).
+- **Regenerate with `bash tools/generate-api-client.sh`** — reads the spec from the running stack and rewrites `src/GrimoireCli/Generated/`. Never hand-edit that tree; it is committed so a version bump produces a reviewable diff.
+
 ## Grimoire Source Reference
 
-The upstream source is the authoritative reference for behaviour and response shapes. The OpenAPI spec types nearly every response as `{}` (FastAPI without `response_model`), and the published docs have been wrong before.
+The upstream source is the authoritative reference for **behaviour and response shapes** — the half the spec does not cover (see above). The published docs have been wrong before.
 
 - Expected location: `temp/grimoire/` (gitignored). **Pin it to the deployed release, never `main`** — `main` carries unreleased work that no instance runs:
   ```bash
   # Match MinSupportedVersion / MaxTestedVersion in src/GrimoireCli/Api/GrimoireApiClient.cs
   git clone --depth 1 --branch v1.5.5 https://github.com/hunter-read/grimoire.git temp/grimoire
   ```
-- `temp/grimoire-openapi.json` — spec snapshot pulled from a running instance; refresh after a server upgrade:
-  ```bash
-  curl -sf "$GRIMOIRE_SERVER/api/openapi.json" -o temp/grimoire-openapi.json
-  ```
+- **No spec snapshot is kept.** The spec comes from the running stack's `/api/openapi.json` at the moment it is needed — see [API client generation](#api-client-generation). A file on disk can be stale; the pinned container cannot.
 - `temp/deployment-docs/` — deployment design records copied in by hand, including the live instance's URL and library structure.
 - `temp/` sits in the bind-mounted workspace and survives container rebuilds; populate it by hand.
 

@@ -1,0 +1,2 @@
+# Kiota output — regenerate with tools/generate-api-client.sh, never hand-edit.
+src/GrimoireCli/Generated/** linguist-generated=true

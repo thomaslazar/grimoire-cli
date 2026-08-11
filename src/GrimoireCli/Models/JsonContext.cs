@@ -13,16 +13,6 @@ namespace GrimoireCli.Models;
 [JsonSerializable(typeof(PublisherEntry))]
 [JsonSerializable(typeof(LinkEntry))]
 [JsonSerializable(typeof(AppConfig))]
-[JsonSerializable(typeof(LoginRequest))]
 [JsonSerializable(typeof(Dictionary<string, string>))]
 [JsonSourceGenerationOptions(WriteIndented = true)]
 public partial class AppJsonContext : JsonSerializerContext;
-
-public class LoginRequest
-{
-    [JsonPropertyName("username")]
-    public string Username { get; set; } = "";
-
-    [JsonPropertyName("password")]
-    public string Password { get; set; } = "";
-}

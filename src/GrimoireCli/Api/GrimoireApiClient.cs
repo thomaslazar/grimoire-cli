@@ -1,10 +1,12 @@
 using System.Net.Http.Headers;
 using System.Reflection;
-using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization.Metadata;
 using GrimoireCli.Configuration;
 using GrimoireCli.Models;
+using Microsoft.Kiota.Abstractions;
+using Microsoft.Kiota.Abstractions.Authentication;
+using Microsoft.Kiota.Http.HttpClientLibrary;
 
 namespace GrimoireCli.Api;
 
@@ -12,6 +14,19 @@ public class GrimoireApiClient
 {
     private static readonly NLog.Logger _logger = NLog.LogManager.GetCurrentClassLogger();
     private readonly HttpClient _http;
+    private readonly IRequestAdapter _adapter;
+
+    /// <summary>
+    /// The generated request builders. They construct URLs, query strings and
+    /// bodies from the OpenAPI spec; this class still owns sending and errors.
+    /// Build requests with a builder's <c>ToXRequestInformation</c> method and send
+    /// them through <see cref="SendAsync(RequestInformation, string?, string?, TimeSpan?)"/>
+    /// — never call a generated execute method (e.g. <c>GetAsync</c>) directly. Those
+    /// bypass <see cref="EnsureSuccessAsync"/>, the exit-code mapping and
+    /// <see cref="WarnIfTokenExpired"/>, and throw <c>ApiException</c> with the
+    /// response body discarded on failure.
+    /// </summary>
+    public Generated.GrimoireApiClient Api { get; }
 
     public static readonly TimeSpan DefaultRequestTimeout = TimeSpan.FromSeconds(100);
 
@@ -20,6 +35,12 @@ public class GrimoireApiClient
         var debugHandler = new DebugHttpHandler(new HttpClientHandler());
         _http = new HttpClient(debugHandler)
         {
+            // Every request now carries an absolute URI from the generated builders, so
+            // this no longer does any routing — but it still does two real jobs: the
+            // `Uri` constructor validates `config.Server` eagerly, so a malformed
+            // `--server` throws here rather than at first send, and the debug line below
+            // reads it. Do not delete it, and do not "keep it in sync" with
+            // `_adapter.BaseUrl`, which correctly has no trailing slash.
             BaseAddress = new Uri(config.Server!.TrimEnd('/') + "/"),
             // Timeouts are managed per-request via CancellationTokenSource so long
             // operations (rescan, reindex) can opt into a longer budget.
@@ -31,6 +52,16 @@ public class GrimoireApiClient
             _http.DefaultRequestHeaders.Authorization =
                 new AuthenticationHeaderValue("Bearer", config.AccessToken);
         _logger.Debug($"client base address: {_http.BaseAddress}");
+
+        // Kiota builds requests; we send them. The adapter is handed our own
+        // HttpClient so the debug handler, User-Agent and bearer header apply,
+        // and authentication stays on the default headers rather than moving to
+        // a Kiota provider.
+        _adapter = new HttpClientRequestAdapter(new AnonymousAuthenticationProvider(), httpClient: _http)
+        {
+            BaseUrl = config.Server!.TrimEnd('/')
+        };
+        Api = new Generated.GrimoireApiClient(_adapter);
     }
 
     /// <summary>
@@ -40,13 +71,13 @@ public class GrimoireApiClient
     /// </summary>
     public async Task<string> LoginAsync(string username, string password)
     {
-        var loginRequest = new LoginRequest { Username = username, Password = password };
-        var content = new StringContent(
-            JsonSerializer.Serialize(loginRequest, AppJsonContext.Default.LoginRequest),
-            Encoding.UTF8, "application/json");
+        var body = new Generated.Models.LoginRequest { Username = username, Password = password };
+        var info = Api.Api.Auth.Login.ToPostRequestInformation(body);
 
         using var cts = new CancellationTokenSource(DefaultRequestTimeout);
-        var response = await _http.PostAsync(ApiEndpoints.Login, content, cts.Token);
+        var request = await _adapter.ConvertToNativeRequestAsync<HttpRequestMessage>(info, cts.Token)
+            ?? throw new InvalidOperationException("Failed to build login request");
+        var response = await _http.SendAsync(request, cts.Token);
         response.EnsureSuccessStatusCode();
         return await response.Content.ReadAsStringAsync(cts.Token);
     }
@@ -91,66 +122,27 @@ public class GrimoireApiClient
         }
     }
 
-    public async Task<string> GetAsync(string endpoint, string? permissionHint = null, string? notFoundHint = null, TimeSpan? timeout = null)
+    /// <summary>
+    /// Sends a request built by a generated builder. Converting to a native
+    /// HttpRequestMessage and sending it here — rather than through Kiota's
+    /// SendPrimitiveAsync — keeps the response body on failures, which the error
+    /// messages include, and leaves EnsureSuccessAsync unchanged.
+    /// </summary>
+    public async Task<string> SendAsync(RequestInformation info, string? permissionHint = null, string? notFoundHint = null, TimeSpan? timeout = null)
     {
         WarnIfTokenExpired();
         using var cts = new CancellationTokenSource(timeout ?? DefaultRequestTimeout);
-        var response = await _http.GetAsync(endpoint, cts.Token);
+        var request = await _adapter.ConvertToNativeRequestAsync<HttpRequestMessage>(info, cts.Token)
+            ?? throw new InvalidOperationException($"Failed to build request for {info.URI.AbsolutePath}");
+        var response = await _http.SendAsync(request, cts.Token);
         await EnsureSuccessAsync(response, permissionHint, notFoundHint);
         return await response.Content.ReadAsStringAsync(cts.Token);
     }
 
-    public async Task<T> GetAsync<T>(string endpoint, JsonTypeInfo<T> typeInfo, string? permissionHint = null, string? notFoundHint = null, TimeSpan? timeout = null)
+    public async Task<T> SendAsync<T>(RequestInformation info, JsonTypeInfo<T> typeInfo, string? permissionHint = null, string? notFoundHint = null, TimeSpan? timeout = null)
     {
-        var json = await GetAsync(endpoint, permissionHint, notFoundHint, timeout);
-        return Deserialize(json, typeInfo, endpoint);
-    }
-
-    public async Task<string> PatchAsync(string endpoint, string jsonBody, string? permissionHint = null, string? notFoundHint = null, TimeSpan? timeout = null)
-    {
-        WarnIfTokenExpired();
-        using var cts = new CancellationTokenSource(timeout ?? DefaultRequestTimeout);
-        var content = new StringContent(jsonBody, Encoding.UTF8, "application/json");
-        var response = await _http.PatchAsync(endpoint, content, cts.Token);
-        await EnsureSuccessAsync(response, permissionHint, notFoundHint);
-        return await response.Content.ReadAsStringAsync(cts.Token);
-    }
-
-    public async Task<T> PatchAsync<T>(string endpoint, string jsonBody, JsonTypeInfo<T> typeInfo, string? permissionHint = null, string? notFoundHint = null, TimeSpan? timeout = null)
-    {
-        var json = await PatchAsync(endpoint, jsonBody, permissionHint, notFoundHint, timeout);
-        return Deserialize(json, typeInfo, endpoint);
-    }
-
-    public async Task<string> PostAsync(string endpoint, string jsonBody, string? permissionHint = null, string? notFoundHint = null, TimeSpan? timeout = null)
-    {
-        WarnIfTokenExpired();
-        using var cts = new CancellationTokenSource(timeout ?? DefaultRequestTimeout);
-        var content = new StringContent(jsonBody, Encoding.UTF8, "application/json");
-        var response = await _http.PostAsync(endpoint, content, cts.Token);
-        await EnsureSuccessAsync(response, permissionHint, notFoundHint);
-        return await response.Content.ReadAsStringAsync(cts.Token);
-    }
-
-    public async Task<T> PostAsync<T>(string endpoint, string jsonBody, JsonTypeInfo<T> typeInfo, string? permissionHint = null, string? notFoundHint = null, TimeSpan? timeout = null)
-    {
-        var json = await PostAsync(endpoint, jsonBody, permissionHint, notFoundHint, timeout);
-        return Deserialize(json, typeInfo, endpoint);
-    }
-
-    public async Task<string> DeleteAsync(string endpoint, string? permissionHint = null, string? notFoundHint = null, TimeSpan? timeout = null)
-    {
-        WarnIfTokenExpired();
-        using var cts = new CancellationTokenSource(timeout ?? DefaultRequestTimeout);
-        var response = await _http.DeleteAsync(endpoint, cts.Token);
-        await EnsureSuccessAsync(response, permissionHint, notFoundHint);
-        return await response.Content.ReadAsStringAsync(cts.Token);
-    }
-
-    public async Task<T> DeleteAsync<T>(string endpoint, JsonTypeInfo<T> typeInfo, string? permissionHint = null, string? notFoundHint = null, TimeSpan? timeout = null)
-    {
-        var json = await DeleteAsync(endpoint, permissionHint, notFoundHint, timeout);
-        return Deserialize(json, typeInfo, endpoint);
+        var json = await SendAsync(info, permissionHint, notFoundHint, timeout);
+        return Deserialize(json, typeInfo, info.URI.PathAndQuery);
     }
 
     // Shared by every typed overload above. Grimoire's SPA catch-all answers an

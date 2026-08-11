@@ -31,10 +31,17 @@ public static class SelfTestCommand
             if (back?.Server != config.Server || back.AccessToken != config.AccessToken)
                 failures.Add("AppConfig JSON round-trip failed");
 
-            var request = JsonSerializer.Serialize(
-                new LoginRequest { Username = "u", Password = "p" }, AppJsonContext.Default.LoginRequest);
+            // The generated LoginRequest is the wire body login actually sends (see
+            // GrimoireApiClient.LoginAsync) — build it the same way, offline, so this
+            // covers the path that runs rather than a hand-written stand-in for it.
+            var loginAdapter = new Microsoft.Kiota.Http.HttpClientLibrary.HttpClientRequestAdapter(
+                new Microsoft.Kiota.Abstractions.Authentication.AnonymousAuthenticationProvider());
+            var loginInfo = new GrimoireCli.Generated.GrimoireApiClient(loginAdapter).Api.Auth.Login
+                .ToPostRequestInformation(new GrimoireCli.Generated.Models.LoginRequest { Username = "u", Password = "p" });
+            using var loginBody = new StreamReader(loginInfo.Content!);
+            var request = loginBody.ReadToEnd();
             if (!request.Contains("\"username\"") || !request.Contains("\"password\""))
-                failures.Add("LoginRequest did not serialize with snake_case-free API field names");
+                failures.Add("Generated LoginRequest did not serialize with the expected field names");
 
             var dict = JsonSerializer.Serialize(
                 new Dictionary<string, string> { ["k"] = "v" }, AppJsonContext.Default.DictionaryStringString);
