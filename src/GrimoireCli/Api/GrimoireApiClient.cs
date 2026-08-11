@@ -136,7 +136,8 @@ public class GrimoireApiClient
     {
         WarnIfTokenExpired();
         using var cts = new CancellationTokenSource(timeout ?? DefaultRequestTimeout);
-        var request = await _adapter.ConvertToNativeRequestAsync<HttpRequestMessage>(info, cts.Token);
+        var request = await _adapter.ConvertToNativeRequestAsync<HttpRequestMessage>(info, cts.Token)
+            ?? throw new InvalidOperationException($"Failed to build request for {info.URI.AbsolutePath}");
         var response = await _http.SendAsync(request, cts.Token);
         await EnsureSuccessAsync(response, permissionHint, notFoundHint);
         return await response.Content.ReadAsStringAsync(cts.Token);
