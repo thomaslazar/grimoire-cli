@@ -5,6 +5,9 @@ using System.Text.Json;
 using System.Text.Json.Serialization.Metadata;
 using GrimoireCli.Configuration;
 using GrimoireCli.Models;
+using Microsoft.Kiota.Abstractions;
+using Microsoft.Kiota.Abstractions.Authentication;
+using Microsoft.Kiota.Http.HttpClientLibrary;
 
 namespace GrimoireCli.Api;
 
@@ -12,6 +15,13 @@ public class GrimoireApiClient
 {
     private static readonly NLog.Logger _logger = NLog.LogManager.GetCurrentClassLogger();
     private readonly HttpClient _http;
+    private readonly IRequestAdapter _adapter;
+
+    /// <summary>
+    /// The generated request builders. They construct URLs, query strings and
+    /// bodies from the OpenAPI spec; this class still owns sending and errors.
+    /// </summary>
+    public Generated.GrimoireApiClient Api { get; }
 
     public static readonly TimeSpan DefaultRequestTimeout = TimeSpan.FromSeconds(100);
 
@@ -31,6 +41,16 @@ public class GrimoireApiClient
             _http.DefaultRequestHeaders.Authorization =
                 new AuthenticationHeaderValue("Bearer", config.AccessToken);
         _logger.Debug($"client base address: {_http.BaseAddress}");
+
+        // Kiota builds requests; we send them. The adapter is handed our own
+        // HttpClient so the debug handler, User-Agent and bearer header apply,
+        // and authentication stays on the default headers rather than moving to
+        // a Kiota provider.
+        _adapter = new HttpClientRequestAdapter(new AnonymousAuthenticationProvider(), httpClient: _http)
+        {
+            BaseUrl = config.Server!.TrimEnd('/')
+        };
+        Api = new Generated.GrimoireApiClient(_adapter);
     }
 
     /// <summary>
@@ -104,6 +124,28 @@ public class GrimoireApiClient
     {
         var json = await GetAsync(endpoint, permissionHint, notFoundHint, timeout);
         return Deserialize(json, typeInfo, endpoint);
+    }
+
+    /// <summary>
+    /// Sends a request built by a generated builder. Converting to a native
+    /// HttpRequestMessage and sending it here — rather than through Kiota's
+    /// SendPrimitiveAsync — keeps the response body on failures, which the error
+    /// messages include, and leaves EnsureSuccessAsync unchanged.
+    /// </summary>
+    public async Task<string> SendAsync(RequestInformation info, string? permissionHint = null, string? notFoundHint = null, TimeSpan? timeout = null)
+    {
+        WarnIfTokenExpired();
+        using var cts = new CancellationTokenSource(timeout ?? DefaultRequestTimeout);
+        var request = await _adapter.ConvertToNativeRequestAsync<HttpRequestMessage>(info, cts.Token);
+        var response = await _http.SendAsync(request, cts.Token);
+        await EnsureSuccessAsync(response, permissionHint, notFoundHint);
+        return await response.Content.ReadAsStringAsync(cts.Token);
+    }
+
+    public async Task<T> SendAsync<T>(RequestInformation info, JsonTypeInfo<T> typeInfo, string? permissionHint = null, string? notFoundHint = null, TimeSpan? timeout = null)
+    {
+        var json = await SendAsync(info, permissionHint, notFoundHint, timeout);
+        return Deserialize(json, typeInfo, info.URI.AbsolutePath);
     }
 
     public async Task<string> PatchAsync(string endpoint, string jsonBody, string? permissionHint = null, string? notFoundHint = null, TimeSpan? timeout = null)
