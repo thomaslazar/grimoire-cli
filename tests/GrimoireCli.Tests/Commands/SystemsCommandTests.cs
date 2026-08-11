@@ -66,4 +66,33 @@ public class SystemsCommandTests
         var result = command.Parse("list --parent-id abc123 --include-children");
         Assert.Empty(result.Errors);
     }
+
+    [Fact]
+    public void UpdateRequiresAnId()
+    {
+        Assert.NotEmpty(Root().Parse("systems update --stdin").Errors);
+    }
+
+    [Fact]
+    public void UpdateAcceptsEitherInputSource()
+    {
+        Assert.Empty(Root().Parse("systems update --id x --stdin").Errors);
+        Assert.Empty(Root().Parse("systems update --id x --input body.json").Errors);
+    }
+
+    [Fact]
+    public void UpdateRejectsBothInputSourcesAtParseTime()
+    {
+        var result = Root().Parse("systems update --id x --stdin --input body.json");
+        Assert.NotEmpty(result.Errors);
+        Assert.Contains("not both", result.Errors[0].Message);
+    }
+
+    [Fact]
+    public void UpdateRejectsNeitherInputSourceAtParseTime()
+    {
+        var result = Root().Parse("systems update --id x");
+        Assert.NotEmpty(result.Errors);
+        Assert.Contains("--input", result.Errors[0].Message);
+    }
 }

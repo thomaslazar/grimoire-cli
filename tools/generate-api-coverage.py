@@ -44,6 +44,7 @@ IMPLEMENTED = {
     "GET /api/about": "🔒 version check inside `login`",
     "GET /api/systems": "`systems list` ✅",
     "GET /api/systems/{system_id}": "`systems get` ✅",
+    "PATCH /api/systems/{system_id}": "`systems update` ✅",
 }
 
 ROLE_LABEL = {

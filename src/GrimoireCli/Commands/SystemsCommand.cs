@@ -7,6 +7,7 @@ namespace GrimoireCli.Commands;
 
 public static class SystemsCommand
 {
+    private static readonly NLog.Logger _logger = NLog.LogManager.GetCurrentClassLogger();
     private static readonly string[] SystemSortKeys = ["name", "book_count", "page_count", "year"];
     private static readonly string[] BookSortKeys = ["category", "title", "page_count", "year"];
 
@@ -15,6 +16,7 @@ public static class SystemsCommand
         var command = new Command("systems", "Game systems (the folders under books/)");
         command.Subcommands.Add(CreateListCommand());
         command.Subcommands.Add(CreateGetCommand());
+        command.Subcommands.Add(CreateUpdateCommand());
         return command;
     }
 
@@ -140,6 +142,84 @@ public static class SystemsCommand
                 parseResult.GetValue(categoryOption),
                 parseResult.GetValue(explicitOption));
             ConsoleOutput.WriteJson(result, AppJsonContext.Default.GameSystemDetail);
+            return 0;
+        });
+        return command;
+    }
+
+    /// <summary>
+    /// Declares --input / --stdin as mutually exclusive and exactly one required,
+    /// as a command validator so the refusal is a parse error (exit 1) before any
+    /// client is built.
+    /// </summary>
+    private static void RequireExactlyOneBodySource(
+        Command command, Option<string?> inputOption, Option<bool> stdinOption)
+    {
+        command.Validators.Add(result =>
+        {
+            var hasInput = result.GetValue(inputOption) != null;
+            var hasStdin = result.GetValue(stdinOption);
+            if (hasInput && hasStdin)
+                result.AddError("Provide --input or --stdin, not both.");
+            else if (!hasInput && !hasStdin)
+                result.AddError("A request body is required. Provide --input <file> or --stdin.");
+        });
+    }
+
+    private static Command CreateUpdateCommand()
+    {
+        var idOption = new Option<string>("--id") { Description = "System ID", Required = true };
+        var inputOption = new Option<string?>("--input") { Description = "Read the body from this file" };
+        var stdinOption = new Option<bool>("--stdin") { Description = "Read the body from stdin" };
+        var serverOption = new Option<string?>("--server") { Description = "Server URL override" };
+        var tokenOption = new Option<string?>("--token") { Description = "Token override; not stored" };
+        var command = new Command("update", "Update one game system's metadata")
+        {
+            idOption, inputOption, stdinOption, serverOption, tokenOption
+        };
+        command.AddRoleRequired("gm or admin");
+        RequireExactlyOneBodySource(command, inputOption, stdinOption);
+        command.AddHelpSection("Notes", HelpSectionPosition.Top,
+            "Body is Grimoire's own field object, without id. Editable fields:",
+            "name, description, publishers, character_builder_url,",
+            "character_builder_urls, urls, tags, genre, genres, dice_materials,",
+            "system_family, parent_system, edition, license, year, cover_book_id,",
+            "is_explicit. An unknown field is rejected before the request is made.",
+            "",
+            "Renaming is permanent: setting name marks it custom, and the scanner",
+            "then never re-derives it from the folder again, on any later rescan.",
+            "",
+            "Clear a field with \"\". An explicit null is dropped server-side and",
+            "does nothing.",
+            "",
+            "genre and character_builder_url are legacy singles; prefer genres",
+            "and character_builder_urls.",
+            "",
+            "Responds {\"status\": \"ok\"} — it does not echo the system, so read",
+            "the result back with: grimoire-cli systems get --id <id>");
+        command.AddExamples(
+            "grimoire-cli systems update --id <id> --input metadata.json",
+            "echo '{\"system_family\":\"Shadowrun\"}' | grimoire-cli systems update --id <id> --stdin");
+        command.SetAction(async (parseResult, cancellationToken) =>
+        {
+            string body;
+            try
+            {
+                body = JsonBodyInput.Read(parseResult.GetValue(inputOption), parseResult.GetValue(stdinOption));
+                JsonBodyInput.Validate(body, AppJsonContext.Default.GameSystemUpdateRequest,
+                    "pass it with --id");
+            }
+            catch (BodyInputException ex)
+            {
+                _logger.Error(ex.Message);
+                return 1;
+            }
+            var (client, _) = CommandHelper.BuildClient(
+                serverOverride: parseResult.GetValue(serverOption),
+                tokenOverride: parseResult.GetValue(tokenOption));
+            var service = new SystemsService(client);
+            var response = await service.UpdateAsync(parseResult.GetValue(idOption)!, body);
+            ConsoleOutput.WriteRawJson(response);
             return 0;
         });
         return command;

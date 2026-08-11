@@ -319,4 +319,45 @@ for bad_id in "" "." "../about"; do
 done
 ok "systems get on an empty, '.', or '../about' id exits 2 with no stack trace"
 
+# The first write in this suite. Shadowrun 4 DE is seeded raw for exactly this.
+# description is the field used deliberately: no assertion above filters on it,
+# so re-running the suite converges instead of drifting. Do NOT write
+# system_family here — the "--family Shadowrun should match 2" check depends on
+# this system having none.
+syslist --include-children
+SR4=$(echo "$LIST_JSON" | jq -r '.[] | select(.name == "Shadowrun 4 DE") | .id')
+[ -n "$SR4" ] || fail "no Shadowrun 4 DE fixture to write to"
+
+echo '{"description":"smoke fixture description"}' \
+  | "$CLI" systems update --id "$SR4" --stdin >"$WORK/upd.out" 2>"$WORK/upd.err" \
+  || { cat "$WORK/upd.err" >&2; fail "systems update exited non-zero"; }
+jq -e '.status == "ok"' "$WORK/upd.out" >/dev/null \
+  || fail "update should answer {\"status\":\"ok\"}: $(cat "$WORK/upd.out")"
+sysget --id "$SR4"
+[ "$(echo "$GET_JSON" | jq -r .description)" = "smoke fixture description" ] \
+  || fail "the written description did not read back: $(echo "$GET_JSON" | jq -r .description)"
+ok "systems update writes a field and systems get reads it back"
+
+# An unknown field is refused client-side: exit 1, and no request is made.
+printf '{"descriptoin":"typo"}' >"$WORK/typo.json"
+set +e
+"$CLI" systems update --id "$SR4" --input "$WORK/typo.json" >/dev/null 2>"$WORK/typo.err"; rc=$?
+set -e
+[ "$rc" -eq 1 ] || fail "an unknown field should exit 1, got $rc: $(cat "$WORK/typo.err")"
+grep -q "descriptoin" "$WORK/typo.err" || fail "no offending field named: $(cat "$WORK/typo.err")"
+grep -q "description" "$WORK/typo.err" || fail "no suggestion offered: $(cat "$WORK/typo.err")"
+ok "an unknown field exits 1 before any request"
+
+# Both sources, and neither, are parse-time refusals.
+set +e
+"$CLI" systems update --id "$SR4" --stdin --input "$WORK/typo.json" >/dev/null 2>"$WORK/both.err"; rc=$?
+set -e
+[ "$rc" -eq 1 ] || fail "--stdin with --input should exit 1, got $rc"
+grep -q "not both" "$WORK/both.err" || fail "no mutual-exclusion message: $(cat "$WORK/both.err")"
+set +e
+"$CLI" systems update --id "$SR4" >/dev/null 2>"$WORK/none.err"; rc=$?
+set -e
+[ "$rc" -eq 1 ] || fail "no body source should exit 1, got $rc"
+ok "--input and --stdin are mutually exclusive and one is required"
+
 echo "smoke: all checks passed" >&2

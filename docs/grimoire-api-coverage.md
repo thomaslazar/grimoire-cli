@@ -29,11 +29,11 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | saved-filters | 0 / 4 |
 | search | 0 / 1 |
 | settings | 0 / 5 |
-| systems | 2 / 13 |
+| systems | 3 / 13 |
 | tags | 0 / 6 |
 | tokens | 0 / 10 |
 | users | 0 / 12 |
-| **Total** | **4 / 220** |
+| **Total** | **5 / 220** |
 
 1 operation(s) are internal-only (🔒) and excluded from covered counts.
 
@@ -314,7 +314,7 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | POST | `/api/systems/bulk` | Bulk update game systems | gm or admin | — |
 | POST | `/api/systems/bulk/tags` | Bulk add tags to game systems | gm or admin | — |
 | GET | `/api/systems/{system_id}` | Get a game system | not guest | `systems get` ✅ |
-| PATCH | `/api/systems/{system_id}` | Update game system metadata | gm or admin | — |
+| PATCH | `/api/systems/{system_id}` | Update game system metadata | gm or admin | `systems update` ✅ |
 | GET | `/api/systems/{system_id}/book-folders` | List book folders |  | — |
 | PATCH | `/api/systems/{system_id}/book-folders` | Set tags on a book folder | gm or admin | — |
 | GET | `/api/systems/{system_id}/cover` | System cover image |  | — |

@@ -4,13 +4,10 @@ using GrimoireCli.Commands;
 namespace GrimoireCli.Tests.Commands;
 
 /// <summary>
-/// AddRoleRequired is currently unused by any real command — every endpoint the
-/// CLI calls today (login, config, systems list/get, self-test) is readable by
-/// any authenticated non-guest role, so none qualifies under CLAUDE.md's rule
-/// that it's reserved for endpoints needing a non-default role. These tests
-/// exercise the mechanism directly on a throwaway command, the way abs-cli's
-/// PermissionSectionTests exercises its equivalent, rather than bolting it onto
-/// a command that doesn't need it.
+/// AddRoleRequired's first real call sites are the systems write commands
+/// (require_gm_or_admin). These tests exercise the mechanism directly on a
+/// throwaway command, the way abs-cli's PermissionSectionTests does, and assert
+/// that the commands which need no role carry no tag.
 /// </summary>
 public class RoleSectionTests
 {
@@ -60,5 +57,17 @@ public class RoleSectionTests
     {
         var output = RenderHelp(SystemsCommand.Create());
         Assert.DoesNotContain("Role required:", output);
+    }
+
+    [Fact]
+    public void SystemsUpdateCommandHasTheGmOrAdminRoleSection()
+    {
+        var root = new RootCommand { SystemsCommand.Create() };
+        root.UseCustomHelpSections();
+        var output = new StringWriter();
+        root.Parse(new[] { "systems", "update", "--help" })
+            .Invoke(new InvocationConfiguration { Output = output });
+        Assert.Contains("Role required:", output.ToString());
+        Assert.Contains("gm or admin", output.ToString());
     }
 }
