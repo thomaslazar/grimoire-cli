@@ -72,7 +72,7 @@ Applies to both `PATCH /api/systems/{id}` and `PATCH /api/books/{id}`
   (`backend/models/library.py:76`). This supersedes the old "scanner never
   writes `name`" mechanism — the scanner now only skips refreshing `name` from
   the folder when `name_is_custom` is set (`if not system.name_is_custom and
-  system.name != name`, `backend/indexer/scan.py:358`), so an unrenamed
+  system.name != name`, `backend/indexer/scan.py:376`), so an unrenamed
   (default-named) system's display name still tracks a folder rename. The
   slug-divergence behaviour above is unaffected either way; the full rename
   write-up has not been re-verified end-to-end against v1.5.5 beyond this.
@@ -87,6 +87,36 @@ Applies to both `PATCH /api/systems/{id}` and `PATCH /api/books/{id}`
   `genre` goes through `_has_value`, which lowercases both sides. So
   `category=Core` returns no books and `category=core` returns them. Verified
   against a running instance.
+
+## Systems writes and `me`
+
+Verified against v1.5.6, backing `systems update`, `systems batch-update`,
+`systems batch-tag` and `me`.
+
+- **`PATCH /api/systems/{id}` answers `{"status":"ok"}`** and echoes nothing
+  back (`routers/systems/core.py:311`); a follow-up `GET` is the only way to
+  see the result.
+- **The payload that reaches the row has already had nulls and unknown keys
+  removed** (`payload = data.model_dump(exclude_none=True)`,
+  `routers/systems/core.py:302`): a JSON `null` is dropped rather than
+  clearing the field, so `""` is the only way to clear a string.
+- **A rename sets `name_is_custom` permanently**
+  (`routers/systems/core.py:334`), after which the scanner stops re-deriving
+  the name from the folder (`indexer/scan.py:376`). Renaming to the system's
+  own current value returns before the flag is touched
+  (`routers/systems/core.py:325-326`), so it stays folder-derived.
+- **Bulk update is skip-and-continue.** An unresolved id or a validation
+  rejection (e.g. a name clash) is reported in `errors` and does not fail the
+  rest of the batch. The transaction commits once, only if at least one item
+  applied, and the request is capped at `MAX_BULK_ITEMS = 1000` items
+  (`services/bulk_service.py:106-122`, `:38`).
+- **`bulk/tags` merges and never removes** existing tags, and returns the
+  full post-merge display-tag set for every updated id
+  (`services/bulk_service.py:157-161`).
+- **`GET /api/auth/me` sets a session cookie as a side effect** when called
+  with a bearer token and no existing cookie, reusing that token rather than
+  minting a new one (`routers/auth/core.py:167-170`) — a bare read has a
+  write side effect on the client's cookie jar.
 
 ## Content and rescan
 

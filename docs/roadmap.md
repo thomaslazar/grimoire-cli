@@ -2,37 +2,40 @@
 
 ## Now
 
-`src/` has `login`, `config get|set`, `systems list|get` and `self-test`, all
-against endpoints tracked in [grimoire-api-coverage.md](grimoire-api-coverage.md).
-`docker/seed.sh` generates fixture library content and `docker/smoke-test.sh`
-covers the live HTTP path against it in CI.
+`src/` has `login`, `config get|set`, `me`, `self-test` and
+`systems list|get|update|batch-update|batch-tag`, all against endpoints tracked
+in [grimoire-api-coverage.md](grimoire-api-coverage.md) (7 of 220 operations;
+`systems` 5/13, `auth` 2/10). `docker/seed.sh` generates fixture library content
+and `docker/smoke-test.sh` covers the live HTTP path — including the write
+commands — against it in CI.
+
+The metadata-write design question — typed flags versus a raw-JSON body — is
+decided for systems: `systems update`/`batch-update`/`batch-tag` take a body
+from `--input` or `--stdin`, validated by strict request DTOs that reject
+unknown keys before the request is sent
+([grimoire-api-coverage.md](grimoire-api-coverage.md) records the routes; the
+design is in `docs/specs/2026-08-10-systems-write-commands-design.md`).
 
 ## Next
 
-1. **The metadata command surface.** The job this CLI exists for: read and fix
-   metadata on existing entries — `PATCH /api/systems/{id}` (17 fields),
-   `PATCH /api/books/{id}` (18 fields), and `POST /api/rescan` to reapply OPF
-   sidecars. Design it before extending `src/`.
-
-   One question is parked, not decided: typed flags for the flat fields plus a
-   `--json` escape hatch for the three nested array-of-object fields
-   (`publishers`, `urls`, `character_builder_urls`), versus a raw-JSON-body-only
-   interface. What bears on it is in
-   [grimoire-api-notes.md](grimoire-api-notes.md) — PATCH drops nulls, and
-   unknown keys are silently ignored, so a typo'd field name in a raw body
-   returns `{"status":"ok"}` having changed nothing.
+1. **Books have no commands at all.** The larger metadata surface — read
+   side, then `PATCH /api/books/{id}`, `POST /api/books/bulk`, `/bulk/tags` —
+   is its own design, following the same `--input`/`--stdin` and strict-DTO
+   shape settled for systems.
+2. **Remaining systems endpoints**: cover (get/upload/delete), book-folders
+   (list/update), and the metadata-lookup trio (`metadata-sources`,
+   `metadata-search`, `metadata-fetch`).
 
 ### Reopened by Grimoire v1.5.5
 
 - **Bulk endpoints shipped.** `POST /api/{books,systems,maps,tokens,audio}/bulk`
   and `/bulk/tags` are released, not unreleased `main` work as
-  `docs/plans/2026-08-06-login-and-smoke-test.md` recorded. The parked metadata
-  command design question — typed flags plus a `--json` escape hatch, versus a
-  raw-JSON body — now has a third option, and needs deciding before that command
-  is built.
-- **29 new routes are uncovered**: 13 bulk, 7 add-on management, 6 metadata
-  lookup (`metadata-sources` / `metadata-search` / `metadata-fetch` on books and
-  systems), 3 system cover. See `docs/grimoire-api-coverage.md`.
+  `docs/plans/2026-08-06-login-and-smoke-test.md` recorded. `systems batch-update`
+  and `systems batch-tag` are the first commands built against them.
+- **29 new routes were uncovered** at the time: 13 bulk, 7 add-on management, 6
+  metadata lookup (`metadata-sources` / `metadata-search` / `metadata-fetch` on
+  books and systems), 3 system cover. Systems' bulk pair is now covered; the
+  rest are tracked under "Next" above and in `docs/grimoire-api-coverage.md`.
 - **Metadata add-ons** (`backend/addons/`) fetch server-side with a per-field
   diff review, and ship with DriveThruRPG and TTRPG Wiki sources. They cover
   `isbn`, `artists` and `genres` on books and `system_family` on systems — work
