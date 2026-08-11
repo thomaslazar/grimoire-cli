@@ -134,7 +134,7 @@ These rules exist because help text sits on the hot path for the agents driving 
 - **Generate with a .NET-native generator** — Kiota is the fit: a `dotnet tool`, handles the spec's OpenAPI 3.1, emits C#. No node or java is available in the devcontainer.
 - **What the spec gives you and what it does not.** All 86 component schemas are request models, so request bodies, paths, methods and query parameters come from the generator and are trustworthy. **All 207 responses are typed `{}`** (FastAPI without `response_model`), so response DTOs are the documented gap — those are hand-written from `temp/grimoire/`'s serializers and stay hand-written.
 - **On a Grimoire version bump, regenerate and diff.** That diff is the authoritative list of what changed in the API surface, and it replaces reading release notes and hoping. See [docs/grimoire-compatibility.md](docs/grimoire-compatibility.md).
-- Generated output is a build/reference artefact under `temp/`, not committed — it regenerates from the spec.
+- **Regenerate with `bash tools/generate-api-client.sh`** — reads the spec from the running stack and rewrites `src/GrimoireCli/Generated/`. Never hand-edit that tree; it is committed so a version bump produces a reviewable diff.
 
 ## Grimoire Source Reference
 

@@ -131,7 +131,8 @@ From inside the dev container the daemon runs on the host, so reach the stack at
 ```
 src/GrimoireCli/
   Commands/       # CLI command definitions (System.CommandLine)
-  Api/            # HTTP client, endpoints, token helper, debug handler
+  Api/            # HTTP client, token helper, debug handler
+  Generated/      # Kiota client, generated from the OpenAPI spec — never hand-edit
   Models/         # JsonContext — every type crossing the JSON boundary, for AOT
   Configuration/  # Config file, env var, flag resolution
   Output/         # JSON stdout, stderr logging setup
@@ -143,6 +144,8 @@ docker/
 docs/                  # API notes, roadmap, specs and plans
 temp/                  # reference material, gitignored — see CLAUDE.md
 ```
+
+`src/GrimoireCli/Generated/` regenerates with `bash tools/generate-api-client.sh` against a running stack; see [CLAUDE.md](CLAUDE.md) for the policy.
 
 Verified API behaviour worth reading before designing a command: [docs/grimoire-api-notes.md](docs/grimoire-api-notes.md).
 
