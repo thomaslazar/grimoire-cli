@@ -1168,24 +1168,23 @@ Append to `tests/GrimoireCli.Tests/Commands/SystemsCommandTests.cs`:
     }
 ```
 
-And in a new test class in the same file's namespace (or appended to `RoleSectionTests`), assert the tag:
+And append to `tests/GrimoireCli.Tests/Commands/RoleSectionTests.cs` — this is the tag's first real call site, which is what that class exists to guard:
 
 ```csharp
     [Fact]
     public void SystemsUpdateCommandHasTheGmOrAdminRoleSection()
     {
-        var systems = SystemsCommand.Create();
-        var update = systems.Subcommands.Single(c => c.Name == "update");
-        var root = new RootCommand { systems };
+        var root = new RootCommand { SystemsCommand.Create() };
         root.UseCustomHelpSections();
         var output = new StringWriter();
         root.Parse(new[] { "systems", "update", "--help" })
             .Invoke(new InvocationConfiguration { Output = output });
         Assert.Contains("Role required:", output.ToString());
         Assert.Contains("gm or admin", output.ToString());
-        Assert.NotNull(update);
     }
 ```
+
+`RenderHelp` in that class parses `command.Name --help`, which cannot reach a subcommand, so this test builds its own invocation rather than reusing it.
 
 - [ ] **Step 6: Run them and watch them fail**
 
