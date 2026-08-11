@@ -76,6 +76,7 @@ public class JsonBodyInputTests
         var ex = Assert.Throws<BodyInputException>(() => Validate("""{"system_familly":"x"}"""));
         Assert.Contains("system_familly", ex.Message);
         Assert.Contains("system_family", ex.Message);
+        Assert.Contains("Did you mean", ex.Message);
     }
 
     [Fact]
@@ -99,6 +100,7 @@ public class JsonBodyInputTests
     {
         var ex = Assert.Throws<BodyInputException>(() => Validate("""{"urls":[{"lable":"x"}]}"""));
         Assert.Contains("$.urls[0].lable", ex.Message);
+        Assert.DoesNotContain("Did you mean", ex.Message);
     }
 
     [Fact]
@@ -114,5 +116,12 @@ public class JsonBodyInputTests
     {
         var ex = Assert.Throws<BodyInputException>(() => Validate("{not json"));
         Assert.Contains("not valid JSON", ex.Message);
+    }
+
+    [Fact]
+    public void ReportsAWrongRootShape()
+    {
+        var ex = Assert.Throws<BodyInputException>(() => Validate("[]"));
+        Assert.Contains("must be a JSON object", ex.Message);
     }
 }

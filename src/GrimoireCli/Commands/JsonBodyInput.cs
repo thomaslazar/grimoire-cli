@@ -68,15 +68,30 @@ public static class JsonBodyInput
     {
         var key = UnknownKey(ex);
         if (key == null)
-            // Path is null for some parse failures and "$" (the document root, naming
-            // no real field) for others — System.Text.Json is not consistent about
-            // which. Either way there is no field to point at, so both read as
-            // "the document itself is bad" rather than "this field is bad".
-            return ex.Path is null or "$"
-                ? $"The request body is not valid JSON. {ex.Message}"
-                : $"The request body is invalid at {ex.Path}. {ex.Message}";
+        {
+            // Path is null for some parse failures. Path == "$" (the document root)
+            // covers two different problems that read the same way to a human but
+            // need different advice: a genuine syntax error, or JSON that parsed
+            // fine but isn't an object at all ([], 42, "hello") — the converter's
+            // own wording ("could not be converted") is what tells them apart, since
+            // both leave the same root path behind.
+            if (ex.Path is null)
+                return $"The request body is not valid JSON. {ex.Message}";
+            if (ex.Path == "$")
+                return ex.Message.Contains("could not be converted", StringComparison.Ordinal)
+                    ? $"The request body must be a JSON object. {ex.Message}"
+                    : $"The request body is not valid JSON. {ex.Message}";
+            return $"The request body is invalid at {ex.Path}. {ex.Message}";
+        }
 
         var message = $"Unknown field '{key}' in the request body at {ex.Path}.";
+        if (!IsTopLevelPath(ex.Path!))
+            // The key lives inside a nested list entry (urls[i], publishers[i], ...);
+            // typeInfo only describes the top-level type, so a suggestion or an
+            // allowed-field list drawn from it would name fields that don't even
+            // exist at this location. Name the key and its path and stop there.
+            return message;
+
         if (key == "id")
             return $"{message} 'id' is not an editable field — {idHint}.";
 
@@ -90,6 +105,14 @@ public static class JsonBodyInput
         return nearest != null
             ? $"{message} Did you mean '{nearest}'?"
             : $"{message} Allowed fields: {string.Join(", ", allowed)}.";
+    }
+
+    // True when the path names a field directly on the root object ("$.year"),
+    // false when it points inside a nested list entry ("$.urls[0].lable").
+    private static bool IsTopLevelPath(string path)
+    {
+        var lastDot = path.LastIndexOf('.');
+        return lastDot >= 0 && path[..lastDot] == "$";
     }
 
     // The unmapped-member message is the only one whose Path's last segment is a
