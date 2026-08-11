@@ -95,4 +95,33 @@ public class SystemsCommandTests
         Assert.NotEmpty(result.Errors);
         Assert.Contains("--input", result.Errors[0].Message);
     }
+
+    [Theory]
+    [InlineData("systems batch-update --stdin")]
+    [InlineData("systems batch-update --input items.json")]
+    [InlineData("systems batch-tag --stdin")]
+    [InlineData("systems batch-tag --input tags.json")]
+    public void BatchCommandsAcceptEitherInputSource(string input)
+    {
+        Assert.Empty(Root().Parse(input).Errors);
+    }
+
+    [Theory]
+    [InlineData("systems batch-update")]
+    [InlineData("systems batch-tag")]
+    [InlineData("systems batch-update --stdin --input items.json")]
+    [InlineData("systems batch-tag --stdin --input tags.json")]
+    public void BatchCommandsRequireExactlyOneInputSource(string input)
+    {
+        Assert.NotEmpty(Root().Parse(input).Errors);
+    }
+
+    // Neither takes --id: the ids are in the body.
+    [Theory]
+    [InlineData("systems batch-update --stdin --id x")]
+    [InlineData("systems batch-tag --stdin --id x")]
+    public void BatchCommandsTakeNoIdFlag(string input)
+    {
+        Assert.NotEmpty(Root().Parse(input).Errors);
+    }
 }

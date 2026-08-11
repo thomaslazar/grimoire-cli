@@ -45,6 +45,8 @@ IMPLEMENTED = {
     "GET /api/systems": "`systems list` ✅",
     "GET /api/systems/{system_id}": "`systems get` ✅",
     "PATCH /api/systems/{system_id}": "`systems update` ✅",
+    "POST /api/systems/bulk": "`systems batch-update` ✅",
+    "POST /api/systems/bulk/tags": "`systems batch-tag` ✅",
 }
 
 ROLE_LABEL = {

@@ -360,4 +360,62 @@ set -e
 [ "$rc" -eq 1 ] || fail "no body source should exit 1, got $rc"
 ok "--input and --stdin are mutually exclusive and one is required"
 
+# batch-update: one good id and one bogus id must exit 3, applying the good one.
+# license, not description or system_family: no assertion above filters on a
+# license other than OGL, so this stays idempotent across re-runs.
+cat >"$WORK/batch.json" <<JSON
+{"items":[{"id":"$SR4","license":"Smoke Fixture License"},
+          {"id":"no-such-id","license":"x"}]}
+JSON
+set +e
+"$CLI" systems batch-update --input "$WORK/batch.json" >"$WORK/batch.out" 2>"$WORK/batch.err"; rc=$?
+set -e
+[ "$rc" -eq 3 ] || fail "a partial batch should exit 3, got $rc: $(cat "$WORK/batch.err")"
+jq -e --arg id "$SR4" '.updated | index($id) != null' "$WORK/batch.out" >/dev/null \
+  || fail "the good id should be in updated: $(cat "$WORK/batch.out")"
+jq -e '.errors | length == 1 and .[0].id == "no-such-id"' "$WORK/batch.out" >/dev/null \
+  || fail "the bogus id should be the only error: $(cat "$WORK/batch.out")"
+ok "batch-update applies the good id and exits 3 on a partial"
+
+# A fully-applying batch exits 0.
+echo "{\"items\":[{\"id\":\"$SR4\",\"license\":\"Smoke Fixture License\"}]}" \
+  | "$CLI" systems batch-update --stdin >"$WORK/batch2.out" 2>"$WORK/batch2.err" \
+  || { cat "$WORK/batch2.err" >&2; fail "a fully-applying batch should exit 0"; }
+jq -e '.errors | length == 0' "$WORK/batch2.out" >/dev/null \
+  || fail "no errors expected: $(cat "$WORK/batch2.out")"
+ok "batch-update exits 0 when every item applies"
+
+# batch-tag is additive: the second call must not displace the first tag.
+echo "{\"ids\":[\"$SR4\"],\"tags\":[\"smoke-alpha\"]}" \
+  | "$CLI" systems batch-tag --stdin >"$WORK/tag1.out" 2>"$WORK/tag1.err" \
+  || { cat "$WORK/tag1.err" >&2; fail "batch-tag exited non-zero"; }
+echo "{\"ids\":[\"$SR4\"],\"tags\":[\"smoke-beta\"]}" \
+  | "$CLI" systems batch-tag --stdin >"$WORK/tag2.out" 2>"$WORK/tag2.err" \
+  || { cat "$WORK/tag2.err" >&2; fail "the second batch-tag exited non-zero"; }
+jq -e --arg id "$SR4" '.tags[$id] | index("smoke-alpha") != null and index("smoke-beta") != null' \
+  "$WORK/tag2.out" >/dev/null \
+  || fail "batch-tag should have merged both tags: $(cat "$WORK/tag2.out")"
+sysget --id "$SR4"
+echo "$GET_JSON" | jq -e '.tags | index("smoke-alpha") != null' >/dev/null \
+  || fail "the first tag did not survive the second call: $(echo "$GET_JSON" | jq -c .tags)"
+ok "batch-tag adds a tag and leaves the existing one in place"
+
+# A bogus id alone is still exit 3, and no ids resolve.
+echo '{"ids":["no-such-id"],"tags":["smoke-alpha"]}' \
+  >"$WORK/tagbad.json"
+set +e
+"$CLI" systems batch-tag --input "$WORK/tagbad.json" >"$WORK/tagbad.out" 2>"$WORK/tagbad.err"; rc=$?
+set -e
+[ "$rc" -eq 3 ] || fail "an all-bogus batch-tag should exit 3, got $rc"
+ok "batch-tag exits 3 when an id does not resolve"
+
+# An unknown key in a batch item is refused client-side.
+printf '{"items":[{"id":"%s","licence":"typo"}]}' "$SR4" >"$WORK/batchtypo.json"
+set +e
+"$CLI" systems batch-update --input "$WORK/batchtypo.json" >/dev/null 2>"$WORK/batchtypo.err"; rc=$?
+set -e
+[ "$rc" -eq 1 ] || fail "an unknown field in an item should exit 1, got $rc"
+grep -q "licence" "$WORK/batchtypo.err" || fail "no offending field named: $(cat "$WORK/batchtypo.err")"
+ok "an unknown field inside a batch item exits 1"
+
 echo "smoke: all checks passed" >&2

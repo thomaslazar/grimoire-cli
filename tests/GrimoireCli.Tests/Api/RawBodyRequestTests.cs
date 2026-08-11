@@ -55,4 +55,24 @@ public class RawBodyRequestTests
         info.PathParameters["baseurl"] = "http://example.test";
         Assert.Contains("..%2Fabout", info.URI.AbsoluteUri);
     }
+
+    [Fact]
+    public void BatchUpdateUsesPostOnTheBulkPath()
+    {
+        var info = Client().Api.Api.Systems.Bulk.ToPostRequestInformation(
+            new GrimoireCli.Generated.Models.GameSystemBulkUpdate());
+        info.PathParameters["baseurl"] = "http://example.test";
+        Assert.Equal(Method.POST, info.HttpMethod);
+        Assert.Equal("/api/systems/bulk", info.URI.AbsolutePath);
+    }
+
+    [Fact]
+    public void BatchTagUsesPostOnTheBulkTagsPath()
+    {
+        var info = Client().Api.Api.Systems.Bulk.Tags.ToPostRequestInformation(
+            new GrimoireCli.Generated.Models.BulkAddTags());
+        info.PathParameters["baseurl"] = "http://example.test";
+        Assert.Equal(Method.POST, info.HttpMethod);
+        Assert.Equal("/api/systems/bulk/tags", info.URI.AbsolutePath);
+    }
 }

@@ -17,6 +17,8 @@ public static class SystemsCommand
         command.Subcommands.Add(CreateListCommand());
         command.Subcommands.Add(CreateGetCommand());
         command.Subcommands.Add(CreateUpdateCommand());
+        command.Subcommands.Add(CreateBatchUpdateCommand());
+        command.Subcommands.Add(CreateBatchTagCommand());
         return command;
     }
 
@@ -221,6 +223,108 @@ public static class SystemsCommand
             var response = await service.UpdateAsync(parseResult.GetValue(idOption)!, body);
             ConsoleOutput.WriteRawJson(response);
             return 0;
+        });
+        return command;
+    }
+
+    private static Command CreateBatchUpdateCommand()
+    {
+        var inputOption = new Option<string?>("--input") { Description = "Read the body from this file" };
+        var stdinOption = new Option<bool>("--stdin") { Description = "Read the body from stdin" };
+        var serverOption = new Option<string?>("--server") { Description = "Server URL override" };
+        var tokenOption = new Option<string?>("--token") { Description = "Token override; not stored" };
+        var command = new Command("batch-update", "Update many game systems in one transaction")
+        {
+            inputOption, stdinOption, serverOption, tokenOption
+        };
+        command.AddRoleRequired("gm or admin");
+        RequireExactlyOneBodySource(command, inputOption, stdinOption);
+        command.AddHelpSection("Notes", HelpSectionPosition.Top,
+            "Body is {\"items\": [{\"id\": \"…\", …fields}]}, at most 1000 items;",
+            "fields are those of: grimoire-cli systems update --help",
+            "",
+            "Skip-and-continue: an unresolved id or a rejected item lands in",
+            "errors and the rest still apply. Exit 3 means HTTP 200 with a",
+            "non-empty errors list — a partial application, not a failure.",
+            "",
+            "updated reports ids, not fields: an id there means the row resolved,",
+            "not that any value changed.",
+            "",
+            "Renaming is permanent, and \"\" not null clears a field — same as",
+            "systems update.");
+        command.AddExamples(
+            "grimoire-cli systems batch-update --input items.json",
+            "jq -c '{items: .}' edits.json | grimoire-cli systems batch-update --stdin");
+        command.AddResponseExample<BulkUpdateResult>();
+        command.SetAction(async (parseResult, cancellationToken) =>
+        {
+            string body;
+            try
+            {
+                body = JsonBodyInput.Read(parseResult.GetValue(inputOption), parseResult.GetValue(stdinOption));
+                JsonBodyInput.Validate(body, AppJsonContext.Default.GameSystemBulkUpdateRequest,
+                    "put it in each item");
+            }
+            catch (BodyInputException ex)
+            {
+                _logger.Error(ex.Message);
+                return 1;
+            }
+            var (client, _) = CommandHelper.BuildClient(
+                serverOverride: parseResult.GetValue(serverOption),
+                tokenOverride: parseResult.GetValue(tokenOption));
+            var result = await new SystemsService(client).BatchUpdateAsync(body);
+            ConsoleOutput.WriteJson(result, AppJsonContext.Default.BulkUpdateResult);
+            return BulkExit.CodeFor(result.Errors);
+        });
+        return command;
+    }
+
+    private static Command CreateBatchTagCommand()
+    {
+        var inputOption = new Option<string?>("--input") { Description = "Read the body from this file" };
+        var stdinOption = new Option<bool>("--stdin") { Description = "Read the body from stdin" };
+        var serverOption = new Option<string?>("--server") { Description = "Server URL override" };
+        var tokenOption = new Option<string?>("--token") { Description = "Token override; not stored" };
+        var command = new Command("batch-tag", "Add tags to many game systems")
+        {
+            inputOption, stdinOption, serverOption, tokenOption
+        };
+        command.AddRoleRequired("gm or admin");
+        RequireExactlyOneBodySource(command, inputOption, stdinOption);
+        command.AddHelpSection("Notes", HelpSectionPosition.Top,
+            "Body is {\"ids\": [\"…\"], \"tags\": [\"…\"]}, both non-empty, at most",
+            "1000 ids.",
+            "",
+            "Additive only: it merges with each system's existing tags and never",
+            "removes one. To replace a tag set, use batch-update with tags.",
+            "",
+            "Exit 3 means HTTP 200 with a non-empty errors list — some ids did",
+            "not resolve while the rest were tagged.");
+        command.AddExamples(
+            "grimoire-cli systems batch-tag --input tags.json",
+            "echo '{\"ids\":[\"<id>\"],\"tags\":[\"cyberpunk\"]}' | grimoire-cli systems batch-tag --stdin");
+        command.AddResponseExample<BulkTagResult>();
+        command.SetAction(async (parseResult, cancellationToken) =>
+        {
+            string body;
+            try
+            {
+                body = JsonBodyInput.Read(parseResult.GetValue(inputOption), parseResult.GetValue(stdinOption));
+                JsonBodyInput.Validate(body, AppJsonContext.Default.BulkAddTagsRequest,
+                    "put it in ids");
+            }
+            catch (BodyInputException ex)
+            {
+                _logger.Error(ex.Message);
+                return 1;
+            }
+            var (client, _) = CommandHelper.BuildClient(
+                serverOverride: parseResult.GetValue(serverOption),
+                tokenOverride: parseResult.GetValue(tokenOption));
+            var result = await new SystemsService(client).BatchTagAsync(body);
+            ConsoleOutput.WriteJson(result, AppJsonContext.Default.BulkTagResult);
+            return BulkExit.CodeFor(result.Errors);
         });
         return command;
     }

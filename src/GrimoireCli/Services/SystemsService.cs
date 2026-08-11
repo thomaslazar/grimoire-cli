@@ -67,4 +67,32 @@ public class SystemsService
             permissionHint: "the gm or admin role",
             notFoundHint: "No system with that ID. List them with: grimoire-cli systems list");
     }
+
+    /// <summary>
+    /// POST /api/systems/bulk. One transaction, skip-and-continue: an unresolved id
+    /// or a rejected item goes to errors and the rest still apply. Tag creation is
+    /// serialised here, which per-item concurrent PATCHes could not do.
+    /// </summary>
+    public async Task<BulkUpdateResult> BatchUpdateAsync(string rawBody)
+    {
+        var info = _client.Api.Api.Systems.Bulk.ToPostRequestInformation(
+            new Generated.Models.GameSystemBulkUpdate());
+        info.SetStreamContent(new MemoryStream(Encoding.UTF8.GetBytes(rawBody)), "application/json");
+        return await _client.SendAsync(
+            info,
+            AppJsonContext.Default.BulkUpdateResult,
+            permissionHint: "the gm or admin role");
+    }
+
+    /// <summary>POST /api/systems/bulk/tags. Additive: it never removes a tag.</summary>
+    public async Task<BulkTagResult> BatchTagAsync(string rawBody)
+    {
+        var info = _client.Api.Api.Systems.Bulk.Tags.ToPostRequestInformation(
+            new Generated.Models.BulkAddTags());
+        info.SetStreamContent(new MemoryStream(Encoding.UTF8.GetBytes(rawBody)), "application/json");
+        return await _client.SendAsync(
+            info,
+            AppJsonContext.Default.BulkTagResult,
+            permissionHint: "the gm or admin role");
+    }
 }
