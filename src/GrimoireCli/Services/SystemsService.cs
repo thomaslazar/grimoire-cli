@@ -14,31 +14,37 @@ public class SystemsService
         string? parentSystem, string? edition, string? license, bool? isExplicit,
         string? parentId, bool includeChildren)
     {
-        var query = QueryBuilder.Build(
-            ("sort", sort),
-            ("order", desc ? "desc" : null),
-            ("genre", genre),
-            ("family", family),
-            ("parent_system", parentSystem),
-            ("edition", edition),
-            ("license", license),
-            ("explicit", isExplicit?.ToString().ToLowerInvariant()),
-            ("parent_id", parentId),
-            ("include_children", includeChildren ? "true" : null));
-        return await _client.GetAsync(ApiEndpoints.Systems + query, AppJsonContext.Default.ListGameSystemSummary);
+        var info = _client.Api.Api.Systems.ToGetRequestInformation(c =>
+        {
+            c.QueryParameters.Sort = sort;
+            c.QueryParameters.Order = desc ? "desc" : null;
+            c.QueryParameters.Genre = genre;
+            c.QueryParameters.Family = family;
+            c.QueryParameters.ParentSystem = parentSystem;
+            c.QueryParameters.Edition = edition;
+            c.QueryParameters.License = license;
+            c.QueryParameters.Explicit = isExplicit;
+            c.QueryParameters.ParentId = parentId;
+            // Sent only when true: the server default is false, so an omitted
+            // parameter and an explicit false mean the same thing.
+            c.QueryParameters.IncludeChildren = includeChildren ? true : null;
+        });
+        return await _client.SendAsync(info, AppJsonContext.Default.ListGameSystemSummary);
     }
 
     public async Task<GameSystemDetail> GetAsync(
         string id, string? bookSort, bool bookDesc, string? genre, string? category, bool? isExplicit)
     {
-        var query = QueryBuilder.Build(
-            ("book_sort", bookSort),
-            ("book_order", bookDesc ? "desc" : null),
-            ("genre", genre),
-            ("category", category),
-            ("explicit", isExplicit?.ToString().ToLowerInvariant()));
-        return await _client.GetAsync(
-            ApiEndpoints.System(id) + query,
+        var info = _client.Api.Api.Systems[id].ToGetRequestInformation(c =>
+        {
+            c.QueryParameters.BookSort = bookSort;
+            c.QueryParameters.BookOrder = bookDesc ? "desc" : null;
+            c.QueryParameters.Genre = genre;
+            c.QueryParameters.Category = category;
+            c.QueryParameters.Explicit = isExplicit;
+        });
+        return await _client.SendAsync(
+            info,
             AppJsonContext.Default.GameSystemDetail,
             notFoundHint: "No system with that ID. List them with: grimoire-cli systems list");
     }
