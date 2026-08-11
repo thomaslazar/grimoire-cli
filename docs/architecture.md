@@ -78,5 +78,7 @@ These are generated and committed, each guarded by a test or a script:
 
 Workflows spanning several endpoints are the caller's job. The reference
 material used to ground API decisions lives in `temp/` (gitignored): the upstream
-source pinned at the deployed release tag, and a spec snapshot pulled from a
-running instance. See `CLAUDE.md` for how to populate it.
+source pinned at the deployed release tag. No spec snapshot is kept on disk —
+the generator and `tools/generate-api-client.sh` always read the spec fresh
+from a running instance, so it cannot go stale. See `CLAUDE.md` for how to
+populate `temp/`.

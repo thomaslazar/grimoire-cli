@@ -168,8 +168,8 @@ per that section's own instruction to record deviations where they're found:
 
 - **No filter-encoding layer.** abs-cli's filters go through a
   `group.base64(value)` scheme dictated by the ABS API. Grimoire's list
-  filters are plain query parameters (`?genre=Sci-Fi`), built by
-  `QueryBuilder.Build` — no encoding step to hide from the user.
+  filters are plain query parameters (`?genre=Sci-Fi`), built by the
+  generated request builders — no encoding step to hide from the user.
 - **No pagination flags yet.** abs-cli's `items list` takes `--limit`/
   `--page`; `GET /api/systems` returns a bare array with no pagination
   envelope, so `systems list` has none either. This will need revisiting if

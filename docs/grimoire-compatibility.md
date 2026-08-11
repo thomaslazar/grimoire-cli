@@ -31,36 +31,24 @@ hard gate.
    git -C temp/grimoire checkout vX.Y.Z
    ```
 
-2. Diff the two specs structurally. No spec snapshot is committed to this
-   repo — start each version's container in turn and pull its spec fresh:
+2. **Bump the Grimoire image tag in `docker/docker-compose.yml` and restart the
+   stack on the new version first** — the client is regenerated from a running
+   server, never a file on disk:
 
    ```bash
-   for v in 1.5.4 X.Y.Z; do
-     docker run -d --rm --name spec-$v -p 9500:9481 -e OPDS_ENABLED=false hunterreadca/grimoire:$v
-     until curl -sf localhost:9500/api/openapi.json -o /tmp/spec-$v.json; do sleep 2; done
-     docker stop spec-$v
-   done
-   python3 -c "
-   import json
-   a = json.load(open('/tmp/spec-1.5.4.json')); b = json.load(open('/tmp/spec-X.Y.Z.json'))
-   print('added paths:', sorted(set(b['paths']) - set(a['paths'])))
-   print('removed paths:', sorted(set(a['paths']) - set(b['paths'])))
-   "
+   docker compose -f docker/docker-compose.yml up -d --wait
    ```
 
-3. **Regenerate the API client against both specs and diff the output.** This is
-   the authoritative list of what changed in the request surface — paths,
-   methods, query parameters and every request body — and it beats reading
-   release notes:
+3. **Regenerate the committed client and review the diff.** This is the
+   authoritative list of what changed in the request surface — paths, methods,
+   query parameters and every request body — and it beats reading release
+   notes. Regenerating in place is what makes the diff exist at all: the
+   previous output has to already be in git for `git diff` to show anything.
 
    ```bash
-   kiota generate -d /tmp/spec-1.5.4.json -l CSharp -o /tmp/client-old
-   kiota generate -d /tmp/spec-X.Y.Z.json -l CSharp -o /tmp/client-new
-   diff -ru /tmp/client-old /tmp/client-new
+   bash tools/generate-api-client.sh
+   git diff src/GrimoireCli/Generated
    ```
-
-   The generated output is a reference artefact — never committed, never the
-   shipped runtime client.
 
 4. Diff the serializers backing the untyped response shapes — the spec types
    almost every response as `{}`, so the generator cannot see them and this is
@@ -70,8 +58,8 @@ hard gate.
    git -C temp/grimoire diff vOLD..vNEW -- backend/routers/*/_serializers.py backend/routers/*/core.py backend/models/
    ```
 
-5. Update DTOs, flags and help text to match. Bump the Grimoire image tag in
-   `docker/docker-compose.yml`. Re-run `bash docker/seed.sh` and
+5. Update DTOs, flags and help text to match. Re-run `bash docker/seed.sh` and
    `bash docker/smoke-test.sh`. Update `MinSupportedVersion` /
    `MaxTestedVersion` in `GrimoireApiClient.cs`, the matrix above, and the
-   compatibility line in `README.md` — all in the same PR as the code change.
+   compatibility line in `README.md` — all in the same PR as the code change,
+   alongside the regenerated `src/GrimoireCli/Generated/`.
