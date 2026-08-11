@@ -1,10 +1,15 @@
 #!/usr/bin/env python3
-"""Regenerate docs/grimoire-api-coverage.md from a spec snapshot and the upstream source.
+"""Regenerate docs/grimoire-api-coverage.md from the live spec and the upstream source.
 
 Two inputs, both required:
 
-  temp/grimoire-openapi.json   paths, methods, summaries — lifted from a running
-                               instance (never committed; see CLAUDE.md)
+  the local stack's /api/openapi.json   paths, methods, summaries — fetched from
+                               the running container, which pins the exact
+                               release this CLI targets. No snapshot file is kept
+                               anywhere: a file has to be remembered and can be
+                               stale, whereas the container cannot disagree with
+                               itself. Start it first:
+                                 docker compose -f docker/docker-compose.yml up -d --wait
   temp/grimoire/               the upstream source at the deployed release tag,
                                read for the role each route requires
 
@@ -18,12 +23,16 @@ Usage: tools/generate-api-coverage.py [output-path]
 """
 import ast
 import json
+import os
 import re
 import sys
+import urllib.error
+import urllib.request
 from pathlib import Path
 
 REPO = Path(__file__).resolve().parent.parent
-SPEC = REPO / "temp" / "grimoire-openapi.json"
+SERVER = os.environ.get("GRIMOIRE_SERVER", "http://host.docker.internal:9481")
+SPEC_URL = f"{SERVER}/api/openapi.json"
 SOURCE = REPO / "temp" / "grimoire"
 DEFAULT_OUT = REPO / "docs" / "grimoire-api-coverage.md"
 
@@ -188,12 +197,18 @@ def handler_dependency_roles(package: Path) -> dict[str, str]:
 
 
 def main() -> int:
-    if not SPEC.exists():
-        sys.exit(f"missing {SPEC} — fetch it from a running instance (see CLAUDE.md)")
     if not SOURCE.exists():
         sys.exit(f"missing {SOURCE} — clone the upstream source at the deployed tag (see CLAUDE.md)")
 
-    spec = json.loads(SPEC.read_text(encoding="utf-8"))
+    try:
+        with urllib.request.urlopen(SPEC_URL, timeout=30) as response:
+            spec = json.loads(response.read().decode("utf-8"))
+    except (urllib.error.URLError, TimeoutError) as exc:
+        sys.exit(
+            f"cannot reach {SPEC_URL} ({exc}) — start the stack first:\n"
+            "  docker compose -f docker/docker-compose.yml up -d --wait\n"
+            "Override the host with GRIMOIRE_SERVER."
+        )
     version = spec["info"]["version"]
     roles = resolve_roles(dependency_roles(SOURCE), spec["paths"])
 
@@ -221,7 +236,7 @@ def main() -> int:
         f"Map of every Grimoire HTTP API operation and the `grimoire-cli` command "
         f"(if any) that implements it.",
         "",
-        f"- **Reference:** spec from a running instance at `temp/grimoire-openapi.json` "
+        f"- **Reference:** spec fetched live from the pinned stack's `/api/openapi.json` "
         f"(v{version}, {len(spec['paths'])} paths, {total} operations) and the upstream "
         f"source at `temp/grimoire/backend/routers/`. Tested range: `{version}` only "
         f"(`GrimoireApiClient.cs`).",

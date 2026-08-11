@@ -48,15 +48,29 @@ hard gate.
    "
    ```
 
-3. Diff the serializers backing the untyped response shapes — the spec types
-   almost every response as `{}`, so this is where shape changes actually
-   show up:
+3. **Regenerate the API client against both specs and diff the output.** This is
+   the authoritative list of what changed in the request surface — paths,
+   methods, query parameters and every request body — and it beats reading
+   release notes:
+
+   ```bash
+   kiota generate -d /tmp/spec-1.5.4.json -l CSharp -o /tmp/client-old
+   kiota generate -d /tmp/spec-X.Y.Z.json -l CSharp -o /tmp/client-new
+   diff -ru /tmp/client-old /tmp/client-new
+   ```
+
+   The generated output is a reference artefact — never committed, never the
+   shipped runtime client.
+
+4. Diff the serializers backing the untyped response shapes — the spec types
+   almost every response as `{}`, so the generator cannot see them and this is
+   where response changes actually show up:
 
    ```bash
    git -C temp/grimoire diff vOLD..vNEW -- backend/routers/*/_serializers.py backend/routers/*/core.py backend/models/
    ```
 
-4. Update DTOs, flags and help text to match. Bump the Grimoire image tag in
+5. Update DTOs, flags and help text to match. Bump the Grimoire image tag in
    `docker/docker-compose.yml`. Re-run `bash docker/seed.sh` and
    `bash docker/smoke-test.sh`. Update `MinSupportedVersion` /
    `MaxTestedVersion` in `GrimoireApiClient.cs`, the matrix above, and the
