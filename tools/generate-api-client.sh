@@ -15,11 +15,29 @@ set -euo pipefail
 
 SERVER="${GRIMOIRE_SERVER:-http://host.docker.internal:9481}"
 OUT="src/GrimoireCli/Generated"
+LOCK_FILE="$OUT/kiota-lock.json"
 
 command -v kiota >/dev/null 2>&1 \
   || { echo "kiota not on PATH — dotnet tool install --global Microsoft.OpenApi.Kiota" >&2; exit 1; }
-curl -sf "$SERVER/api/openapi.json" -o /dev/null \
+
+# The committed tree records the generator version that produced it. A newer
+# Kiota picked up by a rebuilt devcontainer would mix generator churn into a
+# regeneration diff whose entire value is showing API changes only.
+if [ -f "$LOCK_FILE" ]; then
+  EXPECTED_VERSION=$(jq -r '.kiotaVersion' "$LOCK_FILE")
+  INSTALLED_VERSION=$(kiota --version 2>&1 | head -1 | cut -d+ -f1)
+  if [ "$INSTALLED_VERSION" != "$EXPECTED_VERSION" ]; then
+    echo "kiota $INSTALLED_VERSION is installed, but $LOCK_FILE was generated with $EXPECTED_VERSION." >&2
+    echo "Install the matching version: dotnet tool update --global Microsoft.OpenApi.Kiota --version $EXPECTED_VERSION" >&2
+    exit 1
+  fi
+fi
+
+SPEC_JSON=$(curl -sf "$SERVER/api/openapi.json") \
   || { echo "no spec at $SERVER/api/openapi.json — is the stack up?" >&2; exit 1; }
+# GRIMOIRE_SERVER is honoured, so a maintainer may have it pointed at the live
+# instance by mistake — make the source of the spec visible before generating.
+echo "generating from $SERVER (Grimoire $(echo "$SPEC_JSON" | jq -r '.info.version'))" >&2
 
 kiota generate \
   --openapi "$SERVER/api/openapi.json" \

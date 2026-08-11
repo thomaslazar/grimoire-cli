@@ -39,8 +39,13 @@ jq '. + {statusLine: {type: "command", command: "/home/vscode/.claude/statusline
 # --- Kiota: generates the API client from Grimoire's OpenAPI spec ---
 # The client's request surface is generated, not transcribed (see CLAUDE.md).
 # Installed here so a fresh container can regenerate without hunting for the tool.
-dotnet tool install --global Microsoft.OpenApi.Kiota 2>/dev/null || \
-  dotnet tool update --global Microsoft.OpenApi.Kiota 2>/dev/null || true
+# Pinned to the version that produced the committed tree
+# (src/GrimoireCli/Generated/kiota-lock.json) so a container rebuild can't pick up
+# a newer generator and mix generator churn into a version-bump diff.
+# tools/generate-api-client.sh checks this at run time; bump both together.
+KIOTA_VERSION=$(jq -r '.kiotaVersion' src/GrimoireCli/Generated/kiota-lock.json 2>/dev/null || echo 1.34.1)
+dotnet tool install --global Microsoft.OpenApi.Kiota --version "$KIOTA_VERSION" 2>/dev/null || \
+  dotnet tool update --global Microsoft.OpenApi.Kiota --version "$KIOTA_VERSION" 2>/dev/null || true
 
 # `dotnet tool install --global` writes to ~/.dotnet/tools, which is not on PATH
 # in a non-login shell. Add it once rather than per-invocation.
