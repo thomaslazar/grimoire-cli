@@ -8,6 +8,7 @@ namespace GrimoireCli.Models;
 // be registered here or it fails at runtime, not at build time.
 [JsonSerializable(typeof(GameSystemSummary))]
 [JsonSerializable(typeof(GameSystemDetail))]
+[JsonSerializable(typeof(MeResponse))]
 [JsonSerializable(typeof(List<GameSystemSummary>))]
 [JsonSerializable(typeof(Book))]
 [JsonSerializable(typeof(PublisherEntry))]

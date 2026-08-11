@@ -14,7 +14,7 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | (untagged) | 0 / 1 |
 | addons | 0 / 7 |
 | audio | 0 / 10 |
-| auth | 1 / 10 |
+| auth | 2 / 10 |
 | bookmarks | 0 / 4 |
 | books | 0 / 16 |
 | campaigns | 0 / 81 |
@@ -33,7 +33,7 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | tags | 0 / 6 |
 | tokens | 0 / 10 |
 | users | 0 / 12 |
-| **Total** | **3 / 220** |
+| **Total** | **4 / 220** |
 
 1 operation(s) are internal-only (🔒) and excluded from covered counts.
 
@@ -78,7 +78,7 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | POST | `/api/auth/guest-login` | Log in as a guest |  | — |
 | POST | `/api/auth/login` | Log in |  | `login` ✅ |
 | POST | `/api/auth/logout` | Log out |  | — |
-| GET | `/api/auth/me` | Get current user |  | — |
+| GET | `/api/auth/me` | Get current user |  | `me` ✅ |
 | GET | `/api/auth/openid/callback` | OIDC callback |  | — |
 | POST | `/api/auth/openid/discover` | Fetch OIDC discovery document | admin | — |
 | GET | `/api/auth/openid/login` | Start an OIDC login |  | — |

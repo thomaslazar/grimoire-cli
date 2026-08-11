@@ -101,6 +101,16 @@ ok "bad password exits 2 and leaves the config untouched"
   || { cat "$WORK/self.err" >&2; fail "self-test exited non-zero"; }
 ok "self-test"
 
+# 6b. me: the caller's own account, and the role a write command will need.
+ME_JSON=$("$CLI" me 2>"$WORK/me.err") \
+  || { cat "$WORK/me.err" >&2; fail "me exited non-zero"; }
+[ "$(echo "$ME_JSON" | jq -r .username)" = "admin" ] \
+  || fail "me should report username admin: $ME_JSON"
+[ "$(echo "$ME_JSON" | jq -r .role)" = "admin" ] \
+  || fail "me should report role admin: $ME_JSON"
+[ "$(echo "$ME_JSON" | jq -r .id)" != "null" ] || fail "me returned no id: $ME_JSON"
+ok "me reports the seeded admin account"
+
 # --- seeded data -------------------------------------------------------------
 # Requires docker/seed.sh to have run. Counts mirror the fixture set defined
 # there; changing a fixture must change these numbers. EXPECTED_SYSTEMS is the

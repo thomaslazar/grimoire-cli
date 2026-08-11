@@ -78,6 +78,7 @@ The JWT is valid for 30 days. Grimoire has **no refresh endpoint**, so an expire
 | Command | Description |
 |---------|-------------|
 | `login [--server <url>] [--username <u>] [--password <pw> \| --password-stdin]` | Authenticate and store the JWT (flags fall back to interactive prompts) |
+| `me` | Show the authenticated account (id, username, role, flags) |
 | `config get` | Show current configuration |
 | `config set <key> <value>` | Set a configuration value (`server` is the only valid key) |
 | `systems list [--sort name\|book_count\|page_count\|year] [--desc] [--genre <g>] [--family <f>] [--parent-system <p>] [--edition <e>] [--license <l>] [--explicit true\|false] [--parent-id <id>] [--include-children]` | List all game systems |
