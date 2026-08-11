@@ -19,6 +19,12 @@ public class GrimoireApiClient
     /// <summary>
     /// The generated request builders. They construct URLs, query strings and
     /// bodies from the OpenAPI spec; this class still owns sending and errors.
+    /// Build requests with a builder's <c>ToXRequestInformation</c> method and send
+    /// them through <see cref="SendAsync(RequestInformation, string?, string?, TimeSpan?)"/>
+    /// — never call a generated execute method (e.g. <c>GetAsync</c>) directly. Those
+    /// bypass <see cref="EnsureSuccessAsync"/>, the exit-code mapping and
+    /// <see cref="WarnIfTokenExpired"/>, and throw <c>ApiException</c> with the
+    /// response body discarded on failure.
     /// </summary>
     public Generated.GrimoireApiClient Api { get; }
 
@@ -29,6 +35,12 @@ public class GrimoireApiClient
         var debugHandler = new DebugHttpHandler(new HttpClientHandler());
         _http = new HttpClient(debugHandler)
         {
+            // Every request now carries an absolute URI from the generated builders, so
+            // this no longer does any routing — but it still does two real jobs: the
+            // `Uri` constructor validates `config.Server` eagerly, so a malformed
+            // `--server` throws here rather than at first send, and the debug line below
+            // reads it. Do not delete it, and do not "keep it in sync" with
+            // `_adapter.BaseUrl`, which correctly has no trailing slash.
             BaseAddress = new Uri(config.Server!.TrimEnd('/') + "/"),
             // Timeouts are managed per-request via CancellationTokenSource so long
             // operations (rescan, reindex) can opt into a longer budget.
@@ -130,7 +142,7 @@ public class GrimoireApiClient
     public async Task<T> SendAsync<T>(RequestInformation info, JsonTypeInfo<T> typeInfo, string? permissionHint = null, string? notFoundHint = null, TimeSpan? timeout = null)
     {
         var json = await SendAsync(info, permissionHint, notFoundHint, timeout);
-        return Deserialize(json, typeInfo, info.URI.AbsolutePath);
+        return Deserialize(json, typeInfo, info.URI.PathAndQuery);
     }
 
     // Shared by every typed overload above. Grimoire's SPA catch-all answers an
