@@ -77,17 +77,3 @@ What remains is narrower:
 
 - `install.sh` / `install.ps1` resolve GitHub release assets, so they do nothing
   until the first tag exists.
-
-### Unblocked by Grimoire v1.5.6
-
-- **Nested containers shipped** (upstream #301). `.system-family-container`,
-  `.publisher-container` and a generic `.container` now exist, containers
-  recurse, and `system_depth` follows the nesting (`2 + depth`) instead of the
-  old constant 3. A family container fills in each child's `system_family`;
-  a publisher fills in `publishers`.
-- This unblocks the DSA layout that `grimoire-management`'s library-structure
-  design recorded as waiting on a tagged release, and it means `system_family`
-  is no longer PATCH-only for shelves that adopt a family container.
-- The fixtures deliberately use no family container yet, so `seed.sh` still
-  PATCHes `system_family`. Exercising a nested shelf is worth doing when the
-  real library adopts one.
