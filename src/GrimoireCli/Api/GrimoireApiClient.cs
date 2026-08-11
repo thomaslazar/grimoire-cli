@@ -1,6 +1,5 @@
 using System.Net.Http.Headers;
 using System.Reflection;
-using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization.Metadata;
 using GrimoireCli.Configuration;
@@ -111,21 +110,6 @@ public class GrimoireApiClient
         }
     }
 
-    public async Task<string> GetAsync(string endpoint, string? permissionHint = null, string? notFoundHint = null, TimeSpan? timeout = null)
-    {
-        WarnIfTokenExpired();
-        using var cts = new CancellationTokenSource(timeout ?? DefaultRequestTimeout);
-        var response = await _http.GetAsync(endpoint, cts.Token);
-        await EnsureSuccessAsync(response, permissionHint, notFoundHint);
-        return await response.Content.ReadAsStringAsync(cts.Token);
-    }
-
-    public async Task<T> GetAsync<T>(string endpoint, JsonTypeInfo<T> typeInfo, string? permissionHint = null, string? notFoundHint = null, TimeSpan? timeout = null)
-    {
-        var json = await GetAsync(endpoint, permissionHint, notFoundHint, timeout);
-        return Deserialize(json, typeInfo, endpoint);
-    }
-
     /// <summary>
     /// Sends a request built by a generated builder. Converting to a native
     /// HttpRequestMessage and sending it here — rather than through Kiota's
@@ -147,53 +131,6 @@ public class GrimoireApiClient
     {
         var json = await SendAsync(info, permissionHint, notFoundHint, timeout);
         return Deserialize(json, typeInfo, info.URI.AbsolutePath);
-    }
-
-    public async Task<string> PatchAsync(string endpoint, string jsonBody, string? permissionHint = null, string? notFoundHint = null, TimeSpan? timeout = null)
-    {
-        WarnIfTokenExpired();
-        using var cts = new CancellationTokenSource(timeout ?? DefaultRequestTimeout);
-        var content = new StringContent(jsonBody, Encoding.UTF8, "application/json");
-        var response = await _http.PatchAsync(endpoint, content, cts.Token);
-        await EnsureSuccessAsync(response, permissionHint, notFoundHint);
-        return await response.Content.ReadAsStringAsync(cts.Token);
-    }
-
-    public async Task<T> PatchAsync<T>(string endpoint, string jsonBody, JsonTypeInfo<T> typeInfo, string? permissionHint = null, string? notFoundHint = null, TimeSpan? timeout = null)
-    {
-        var json = await PatchAsync(endpoint, jsonBody, permissionHint, notFoundHint, timeout);
-        return Deserialize(json, typeInfo, endpoint);
-    }
-
-    public async Task<string> PostAsync(string endpoint, string jsonBody, string? permissionHint = null, string? notFoundHint = null, TimeSpan? timeout = null)
-    {
-        WarnIfTokenExpired();
-        using var cts = new CancellationTokenSource(timeout ?? DefaultRequestTimeout);
-        var content = new StringContent(jsonBody, Encoding.UTF8, "application/json");
-        var response = await _http.PostAsync(endpoint, content, cts.Token);
-        await EnsureSuccessAsync(response, permissionHint, notFoundHint);
-        return await response.Content.ReadAsStringAsync(cts.Token);
-    }
-
-    public async Task<T> PostAsync<T>(string endpoint, string jsonBody, JsonTypeInfo<T> typeInfo, string? permissionHint = null, string? notFoundHint = null, TimeSpan? timeout = null)
-    {
-        var json = await PostAsync(endpoint, jsonBody, permissionHint, notFoundHint, timeout);
-        return Deserialize(json, typeInfo, endpoint);
-    }
-
-    public async Task<string> DeleteAsync(string endpoint, string? permissionHint = null, string? notFoundHint = null, TimeSpan? timeout = null)
-    {
-        WarnIfTokenExpired();
-        using var cts = new CancellationTokenSource(timeout ?? DefaultRequestTimeout);
-        var response = await _http.DeleteAsync(endpoint, cts.Token);
-        await EnsureSuccessAsync(response, permissionHint, notFoundHint);
-        return await response.Content.ReadAsStringAsync(cts.Token);
-    }
-
-    public async Task<T> DeleteAsync<T>(string endpoint, JsonTypeInfo<T> typeInfo, string? permissionHint = null, string? notFoundHint = null, TimeSpan? timeout = null)
-    {
-        var json = await DeleteAsync(endpoint, permissionHint, notFoundHint, timeout);
-        return Deserialize(json, typeInfo, endpoint);
     }
 
     // Shared by every typed overload above. Grimoire's SPA catch-all answers an
