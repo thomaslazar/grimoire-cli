@@ -2086,7 +2086,7 @@ In `docs/grimoire-api-notes.md`, add a section covering what a future reader wou
 
 - `PATCH /api/systems/{id}` answers `{"status":"ok"}` and echoes nothing (`routers/systems/core.py:311`).
 - Unknown keys are dropped by pydantic and never surface as an error (`:302`); explicit nulls are dropped by `model_dump(exclude_none=True)`, so `""` is the only way to clear a field.
-- A rename sets `name_is_custom` permanently, after which the scanner stops re-deriving the name (`:334`, `indexer/scan.py:358`); renaming to the same value returns early and does **not** set the flag (`:325-326`).
+- A rename sets `name_is_custom` permanently, after which the scanner stops re-deriving the name (`:334`, `indexer/scan.py:376`); renaming to the same value returns early and does **not** set the flag (`:325-326`).
 - Bulk is skip-and-continue, commits once and only if at least one item applied, and caps at `MAX_BULK_ITEMS = 1000` (`services/bulk_service.py:96`, `:38`).
 - `bulk/tags` merges and never removes, and returns the full display-tag set per updated id (`:157-161`).
 - `GET /api/auth/me` sets a session cookie when called with a bearer token and no cookie, reusing the existing token rather than minting one (`routers/auth/core.py:167-170`).
