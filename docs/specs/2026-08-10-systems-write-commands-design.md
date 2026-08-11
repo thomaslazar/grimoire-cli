@@ -1,17 +1,12 @@
 # Systems write commands and `me` — design
 
 **Date:** 2026-08-10
-**Status:** Approved, then **deferred** on 2026-08-11 behind the generated-API-client
-migration. Not yet implemented.
-**Targets:** Grimoire **v1.5.5**, the version the CLI and the live instance both run.
-
-> **§3.2 needs revisiting before this is built.** It designs hand-written request
-> DTOs carrying `[JsonUnmappedMemberHandling(Disallow)]`. Once the client is
-> generated from the OpenAPI spec, request types come from the generator instead
-> — and the spec already defines all four of them (`GameSystemUpdate`,
-> `GameSystemBulkItem`, `GameSystemBulkUpdate`, `BulkAddTags`). The *behaviour*
-> §3.2 specifies is still what we want; the question is whether the generator
-> produces it or we wrap what it produces. Everything else here stands.
+**Status:** Approved. Deferred on 2026-08-11 behind the generated-API-client
+migration; §3.2 revised against the generated client on 2026-08-11 and now in
+implementation.
+**Targets:** Grimoire **v1.5.6**, the version the CLI targets. Written against
+v1.5.5; every mechanic in §2 was re-verified at the `v1.5.6` tag on 2026-08-11
+and none changed, so the citations below are v1.5.6 line numbers.
 
 ---
 
@@ -37,9 +32,9 @@ landing before any way to find what to write to would be the wrong order.
 
 ---
 
-## 2. Verified v1.5.5 mechanics
+## 2. Verified mechanics
 
-Read from `temp/grimoire` at the `v1.5.5` tag. Every row cites its source,
+Read from `temp/grimoire` at the `v1.5.6` tag. Every row cites its source,
 because an uncited claim in this repo has historically been a wrong one.
 
 | mechanic | verified behaviour | source |
@@ -47,7 +42,7 @@ because an uncited claim in this repo has historically been a wrong one.
 | editable fields | 17 on `GameSystemUpdate`: `name`, `description`, `publishers`, `character_builder_url`, `character_builder_urls`, `urls`, `tags`, `genre`, `genres`, `dice_materials`, `system_family`, `parent_system`, `edition`, `license`, `year`, `cover_book_id`, `is_explicit` | `routers/systems/_schemas.py` |
 | legacy singles | `genre` and `character_builder_url` are kept for backward compatibility; new clients send `genres` / `character_builder_urls` | same file, inline comments |
 | single PATCH response | `{"status": "ok"}` — it does not echo the system, so it confirms nothing about what changed | `routers/systems/core.py:311` |
-| unknown keys | dropped by pydantic before `model_dump`, so they never reach the database and never surface as an error | `routers/systems/core.py:351` |
+| unknown keys | dropped by pydantic before `model_dump`, so they never reach the database and never surface as an error | `routers/systems/core.py:302` |
 | nulls | `model_dump(exclude_none=True)` drops explicit nulls, so `null` is a silent no-op. Clearing a field needs `""` | same line |
 | bulk failure mode | skip-and-continue: an unresolved id or a rejected item goes to `errors`, the rest still apply. Returns `{updated: [ids], errors: [{id, detail}]}`, committing once and only if at least one item applied | `services/bulk_service.py::run_bulk_update` |
 | bulk cap | `MAX_BULK_ITEMS = 1000` | `services/bulk_service.py` |
@@ -57,9 +52,9 @@ because an uncited claim in this repo has historically been a wrong one.
 | `bulk/tags` validation | `ids` and `tags` both required and non-empty; `ids` capped at 1000 | `routers/_bulk_schemas.py::BulkAddTags` |
 | **rename is sticky** | changing `name` sets `name_is_custom = True`, after which the scanner's `if not system.name_is_custom` gate stops re-deriving the name from the folder — permanently | `routers/systems/core.py:314-334`, `indexer/scan.py:358` |
 | rename to same value | a no-op that returns early and does **not** set the flag | `routers/systems/core.py:326-327` |
-| name clash | 409 on the single-item handler, a per-item `errors` entry in bulk | `routers/systems/core.py:330-333` |
-| blank name | rejected by a validator (422) — `name` is the system's identity and is NOT NULL | `routers/systems/_schemas.py` |
-| role | all three write routes are `require_gm_or_admin` | `routers/systems/core.py:338`, `:358` |
+| name clash | 409 on the single-item handler, a per-item `errors` entry in bulk | `routers/systems/core.py:303-308`, `:327-333` |
+| blank name | rejected by a validator (422) — `name` is the system's identity and is NOT NULL | `routers/systems/_schemas.py:82-91` |
+| role | all three write routes are `require_gm_or_admin` | `routers/systems/core.py:294`, `:339`, `:359` |
 | `me` role | `GET /api/auth/me` is `Depends(get_current_user)` — any authenticated user, no role | `routers/auth/core.py:157-161` |
 | `me` response | `{id, username, display_name, email, role, allow_explicit, campaign_access, oidc_linked}` | `routers/auth/core.py:177-186` |
 | `me` side effect | sets a session cookie when the caller authenticated by Bearer without one, reusing the existing token rather than minting a new one | `routers/auth/core.py:167-170` |
@@ -111,7 +106,24 @@ Bodies are Grimoire's own shapes, passed through unchanged:
 
 ### 3.2 Request DTOs validate the body
 
-The CLI gains **dedicated request types**, separate from the response types it
+The generated client supplies the **URL, method and path parameters**; the body
+is validated by hand-written request types. The spec does define all four body
+schemas (`GameSystemUpdate`, `GameSystemBulkItem`, `GameSystemBulkUpdate`,
+`BulkAddTags`) and Kiota generates them, but neither can do this job — verified
+2026-08-11 against the committed `Generated/Models/GameSystemUpdate.cs`:
+
+- It is an **`IAdditionalDataHolder`** (`:12`), its constructor seeds
+  `AdditionalData` (`:156`), and `Serialize` ends in
+  `writer.WriteAdditionalData(AdditionalData)` (`:221`). An unknown key is
+  therefore **transmitted** to the server, which drops it silently — strictly
+  worse than the hand-written approach, because it makes the silent no-op §3.2
+  exists to prevent harder to catch, not easier.
+- FastAPI emits `anyOf: [string, null]` for every nullable field, so each becomes
+  a **composed-type wrapper**: `Name` is a `GameSystemUpdate.GameSystemUpdate_name?`
+  (`:100`), not a `string`. Fourteen of the seventeen fields are wrapped this way;
+  only `publishers`, `urls` and `character_builder_urls` come through as plain lists.
+
+So the CLI gains **dedicated request types**, separate from the response types it
 already has:
 
 | type | fields | mirrors | used by |
@@ -160,6 +172,20 @@ Two consequences fall out for free:
 The raw body is validated by deserializing it, then **sent unchanged**. The CLI
 never re-serializes the user's JSON, so it cannot alter what was meant — an
 explicit `""` stays `""`, and an omitted field stays omitted.
+
+Sending it unchanged is what decides how the two halves meet. The generated
+builder's `ToPatchRequestInformation` takes a generated body and serializes it,
+so the request is built with a throwaway empty instance and its content then
+replaced with the user's bytes:
+
+```csharp
+var info = client.Api.Api.Systems[id].ToPatchRequestInformation(new GameSystemUpdate());
+info.SetStreamContent(new MemoryStream(Encoding.UTF8.GetBytes(rawJson)), "application/json");
+```
+
+The builder therefore contributes only what it is trustworthy for — the URL
+template, the path parameter and the method — and the generated model never
+reaches the wire.
 
 `JsonException` is translated into a readable message rather than surfaced raw:
 the offending key, its nearest match from `JsonTypeInfo.Properties`, and for
