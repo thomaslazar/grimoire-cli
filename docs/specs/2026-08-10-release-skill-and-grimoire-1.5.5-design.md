@@ -3,8 +3,6 @@
 **Date:** 2026-08-10
 **Status:** Design approved, not yet implemented.
 **Targets:** Grimoire **v1.5.5** (released 2026-08-07), replacing v1.5.4.
-**Related:** `grimoire-management` `docs/specs/2026-08-10-library-structure-design.md`,
-which sets the folder grammar this repo's fixtures now mirror.
 
 ---
 
@@ -53,33 +51,18 @@ citation has historically been a claim that was wrong.
 | one-page child naming | `prettify_collection_name` capitalises any word containing no uppercase letter, so `Lasers and Feelings.pdf` becomes **`Lasers And Feelings`** | `indexer/categories.py:72-80` |
 | `category` durability | re-derived **only when a book is re-homed to a different system**, not on every scan. A `PATCH category` still survives an ordinary rescan | `indexer/scan.py:725-731` — see §2.1 |
 
-### 2.1 Corrections to the library spec
+### 2.1 When `category` is re-derived
 
-Two claims in `grimoire-management`'s library structure spec do not survive a
-read of the tag. Both are reported back there; they are recorded here because
-this spec would otherwise inherit them.
+Worth stating precisely, because a `PATCH category` looks durable until it is
+not. In the whole backend, `Book.category` is assigned in exactly two places:
+`scan.py:782`, the new-book insert, and `scan.py:730`, which is guarded by
+`if existing.game_system_id != system.id` — a **re-home**, not a rescan.
 
-**`category` is not re-derived on every scan.** The library spec's §2.0 and §2.2
-state that v1.5.5 flipped this, that the folder is therefore the sole durable
-owner of category, and that any design leaning on `PATCH category` would be
-silently re-shelved after the upgrade. In the whole backend, `Book.category` is
-assigned in exactly two places: `scan.py:782`, the new-book insert, and
-`scan.py:730`, which is guarded by `if existing.game_system_id != system.id` —
-a **re-home**, not a rescan. An ordinary rescan leaves an existing book's
-category untouched, exactly as on 1.5.4, so a `PATCH category` does hold.
-
-The practical difference matters for their pass rather than ours. Their
-conclusion — put category in the folder — remains the right call, and is safer
-than the mechanism they attribute it to. But the failure they are guarding
-against is not gradual drift on every scan; it is a **single wipe at the moment
-of the container migration**, because turning a folder into a container re-homes
-every book in it and that is precisely the branch that re-derives. A PATCHed
-category set before their steps 1–2 is lost; one set afterwards persists.
-
-**`0004_expand_metadata` does not exist.** The migrations added between `v1.5.4`
-and `v1.5.5` are `0012_campaign_icon_color` and `0013_system_containers`. The
-container work is real and the advice to back up before migrating is sound; the
-migration name in their step 0 is not.
+So an ordinary rescan leaves an existing book's category untouched and a
+`PATCH category` holds. What resets it is a book moving to a different system,
+which is what happens when a folder is turned into a container: every book in
+it is re-homed onto the new child systems, and that is the branch that
+re-derives.
 
 ### 2.2 New response fields
 
@@ -156,11 +139,9 @@ process should not have to know that.
 not widened to span both releases: the local stack pins one image tag, so a
 claimed 1.5.4 range would be a range nothing exercises.
 
-The consequence is accepted deliberately — the live instance still runs 1.5.4
-and will emit a login-time warning until it is upgraded. That warning is
-advisory and never refuses to run, and the library structure spec makes the
-upgrade a prerequisite of its own first pass, so the instance is moving to 1.5.5
-regardless.
+The consequence is accepted deliberately — a server still on 1.5.4 emits a
+login-time warning until it is upgraded. That warning is advisory and never
+refuses to run.
 
 ### 4.2 Model changes
 
@@ -196,10 +177,10 @@ the help-text rules require surfacing at the call site.
 
 ## 5. Part C — the fixture library
 
-The fixture is restructured to mirror the grammar the real library is adopting,
-on the principle that a fixture which does not resemble the library it stands in
-for cannot catch the failures that library will produce. Every fixture system
-carrying an edition token becomes a container child.
+The fixture is restructured onto containers, because a fixture that exercises
+none of the server's container handling cannot catch the failures that handling
+produces. Every fixture system carrying an edition token becomes a container
+child.
 
 ```
 docker/library/books/
@@ -271,8 +252,8 @@ folder route on v1.5.5 — `.system-family-container` is `main`-only — so thes
 keep the PATCH path exercised.
 
 PATCHes continue to target **child** rows by name, as they do today. Container
-rows are left unpatched, which is also what the real library will look like:
-a container is a shelf, and its metadata is the editions it holds.
+rows are left unpatched: a container is a shelf, and the metadata lives on the
+systems it holds.
 
 `Shadowrun 4 DE` stays unpatched. It mirrors a fresh import and remains the
 fixture the first metadata command will target.
@@ -401,4 +382,4 @@ verified by running the commands it contains by hand.
 
 `parent_system` and `parent_id` are both returned by v1.5.5 and the CLI passes
 both through. That is not an open question — thin pass-through settles it — and
-is recorded here only because the library spec asks which one the CLI surfaces.
+is noted only because the two fields invite the question.
