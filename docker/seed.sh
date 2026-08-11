@@ -19,7 +19,7 @@
 # Renaming/re-marking a fixture folder (e.g. dropping "(nsfw)") needs that
 # database reset, not just a re-seed: rescan only ever sets is_explicit=true,
 # never clears it on an existing system row (backend/indexer/scan.py:347-348
-# in temp/grimoire @ v1.5.5). A re-seed alone leaves the stale flag in place.
+# in temp/grimoire @ v1.5.6). A re-seed alone leaves the stale flag in place.
 set -euo pipefail
 
 SERVER="${GRIMOIRE_SERVER:-http://host.docker.internal:9481}"
@@ -84,7 +84,7 @@ book "The Dark Eye/5 EN"               core         "TDE5 Core Rules"         11
 book "Vampire The Masquerade/5 EN"     core         "V5 Corebook"             13
 book "Fixture Explicit RPG (nsfw)"     core         "Fixture RPG Core Rules"   3
 
-# one-page-rpgs is a reserved slug, so v1.5.5 treats it as a one-page CONTAINER
+# one-page-rpgs is a reserved slug, so v1.5.6 treats it as a one-page CONTAINER
 # with no marker file: each loose PDF becomes its own single-book system, named
 # by prettify_collection_name — which capitalises any word with no uppercase in
 # it, so "Lasers and Feelings" indexes as "Lasers And Feelings". On v1.5.4 the
@@ -114,10 +114,11 @@ say "scan complete ($SCANNED books)"
 
 # 5. Apply the metadata folders cannot express. edition and parent_system are
 #    folder-derived under a container, so they are deliberately absent here —
-#    patching them would mask whether derivation works. system_family has no
-#    folder route on v1.5.5 (.system-family-container is main-only). Shadowrun
-#    4 DE is left raw: it mirrors a fresh import and is the fixture the future
-#    metadata commands will target.
+#    patching them would mask whether derivation works. system_family is
+#    PATCHed because these fixtures use no .system-family-container — v1.5.6
+#    added one (upstream #301), so a family shelf would derive it from the
+#    folder instead. Shadowrun 4 DE is left raw: it mirrors a fresh import and
+#    is the fixture the future metadata commands will target.
 patch_system() {  # patch_system <system name> <json body>
   local name="$1" body="$2" id
   id=$(curl -sf "$SERVER/api/systems?include_children=true" -H "$AUTH" \

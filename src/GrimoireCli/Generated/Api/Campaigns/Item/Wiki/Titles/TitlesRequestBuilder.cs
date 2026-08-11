@@ -34,7 +34,7 @@ namespace GrimoireCli.Generated.Api.Campaigns.Item.Wiki.Titles
         {
         }
         /// <summary>
-        /// Lightweight list of {title, slug} for the [[link]] autocomplete.
+        /// Page list backing the `[[link]]` autocomplete.Each entry carries the page id and its headings so the editor can offer both`[[Title]]` and `[[Title:#Heading]]` completions, plus `ambiguous` — true whenanother visible page shares this slug. The editor appends `:id-&lt;id&gt;` only forambiguous titles, keeping ordinary links readable while still being able toaddress a colliding page at all (issue #287).GM-only spans are stripped from non-owners&apos; bodies before headings are read,so a heading hidden inside `||...||` can&apos;t leak through the autocomplete.
         /// </summary>
         /// <returns>A <see cref="UntypedNode"/></returns>
         /// <param name="cancellationToken">Cancellation token to use when cancelling requests</param>
@@ -57,7 +57,7 @@ namespace GrimoireCli.Generated.Api.Campaigns.Item.Wiki.Titles
             return await RequestAdapter.SendAsync<UntypedNode>(requestInfo, UntypedNode.CreateFromDiscriminatorValue, errorMapping, cancellationToken).ConfigureAwait(false);
         }
         /// <summary>
-        /// Lightweight list of {title, slug} for the [[link]] autocomplete.
+        /// Page list backing the `[[link]]` autocomplete.Each entry carries the page id and its headings so the editor can offer both`[[Title]]` and `[[Title:#Heading]]` completions, plus `ambiguous` — true whenanother visible page shares this slug. The editor appends `:id-&lt;id&gt;` only forambiguous titles, keeping ordinary links readable while still being able toaddress a colliding page at all (issue #287).GM-only spans are stripped from non-owners&apos; bodies before headings are read,so a heading hidden inside `||...||` can&apos;t leak through the autocomplete.
         /// </summary>
         /// <returns>A <see cref="RequestInformation"/></returns>
         /// <param name="requestConfiguration">Configuration for the request such as headers, query parameters, and middleware options.</param>
@@ -85,7 +85,7 @@ namespace GrimoireCli.Generated.Api.Campaigns.Item.Wiki.Titles
             return new global::GrimoireCli.Generated.Api.Campaigns.Item.Wiki.Titles.TitlesRequestBuilder(rawUrl, RequestAdapter);
         }
         /// <summary>
-        /// Lightweight list of {title, slug} for the [[link]] autocomplete.
+        /// Page list backing the `[[link]]` autocomplete.Each entry carries the page id and its headings so the editor can offer both`[[Title]]` and `[[Title:#Heading]]` completions, plus `ambiguous` — true whenanother visible page shares this slug. The editor appends `:id-&lt;id&gt;` only forambiguous titles, keeping ordinary links readable while still being able toaddress a colliding page at all (issue #287).GM-only spans are stripped from non-owners&apos; bodies before headings are read,so a heading hidden inside `||...||` can&apos;t leak through the autocomplete.
         /// </summary>
         [global::System.CodeDom.Compiler.GeneratedCode("Kiota", "1.0.0")]
         public partial class TitlesRequestBuilderGetQueryParameters 

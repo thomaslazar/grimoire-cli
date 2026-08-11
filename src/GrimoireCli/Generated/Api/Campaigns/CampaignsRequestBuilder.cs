@@ -53,7 +53,7 @@ namespace GrimoireCli.Generated.Api.Campaigns
         /// </summary>
         /// <param name="pathParameters">Path parameters for the request</param>
         /// <param name="requestAdapter">The request adapter to use to execute the requests.</param>
-        public CampaignsRequestBuilder(Dictionary<string, object> pathParameters, IRequestAdapter requestAdapter) : base(requestAdapter, "{+baseurl}/api/campaigns{?token*}", pathParameters)
+        public CampaignsRequestBuilder(Dictionary<string, object> pathParameters, IRequestAdapter requestAdapter) : base(requestAdapter, "{+baseurl}/api/campaigns{?include_archived*,token*}", pathParameters)
         {
         }
         /// <summary>
@@ -61,11 +61,11 @@ namespace GrimoireCli.Generated.Api.Campaigns
         /// </summary>
         /// <param name="rawUrl">The raw URL to use for the request builder.</param>
         /// <param name="requestAdapter">The request adapter to use to execute the requests.</param>
-        public CampaignsRequestBuilder(string rawUrl, IRequestAdapter requestAdapter) : base(requestAdapter, "{+baseurl}/api/campaigns{?token*}", rawUrl)
+        public CampaignsRequestBuilder(string rawUrl, IRequestAdapter requestAdapter) : base(requestAdapter, "{+baseurl}/api/campaigns{?include_archived*,token*}", rawUrl)
         {
         }
         /// <summary>
-        /// List campaigns for the current user
+        /// Campaigns the user owns or belongs to.Archived campaigns are left out unless ``include_archived`` is set, so thedefault list stays the active games. The flag returns archived campaigns*alongside* the active ones (rather than only archived), letting the UItoggle between &quot;active&quot; and &quot;everything&quot; with one request either way.
         /// </summary>
         /// <returns>A <see cref="UntypedNode"/></returns>
         /// <param name="cancellationToken">Cancellation token to use when cancelling requests</param>
@@ -113,7 +113,7 @@ namespace GrimoireCli.Generated.Api.Campaigns
             return await RequestAdapter.SendAsync<UntypedNode>(requestInfo, UntypedNode.CreateFromDiscriminatorValue, errorMapping, cancellationToken).ConfigureAwait(false);
         }
         /// <summary>
-        /// List campaigns for the current user
+        /// Campaigns the user owns or belongs to.Archived campaigns are left out unless ``include_archived`` is set, so thedefault list stays the active games. The flag returns archived campaigns*alongside* the active ones (rather than only archived), letting the UItoggle between &quot;active&quot; and &quot;everything&quot; with one request either way.
         /// </summary>
         /// <returns>A <see cref="RequestInformation"/></returns>
         /// <param name="requestConfiguration">Configuration for the request such as headers, query parameters, and middleware options.</param>
@@ -163,11 +163,13 @@ namespace GrimoireCli.Generated.Api.Campaigns
             return new global::GrimoireCli.Generated.Api.Campaigns.CampaignsRequestBuilder(rawUrl, RequestAdapter);
         }
         /// <summary>
-        /// List campaigns for the current user
+        /// Campaigns the user owns or belongs to.Archived campaigns are left out unless ``include_archived`` is set, so thedefault list stays the active games. The flag returns archived campaigns*alongside* the active ones (rather than only archived), letting the UItoggle between &quot;active&quot; and &quot;everything&quot; with one request either way.
         /// </summary>
         [global::System.CodeDom.Compiler.GeneratedCode("Kiota", "1.0.0")]
         public partial class CampaignsRequestBuilderGetQueryParameters 
         {
+            [QueryParameter("include_archived")]
+            public bool? IncludeArchived { get; set; }
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
             [QueryParameter("token")]

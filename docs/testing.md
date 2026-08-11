@@ -105,7 +105,7 @@ commands not yet built.
 **Renaming or re-marking a fixture folder needs a full reset, not just a
 re-seed.** `rescan` only ever sets `is_explicit=true` on a system row and
 never clears it — a one-way latch in Grimoire's scanner
-(`backend/indexer/scan.py` in `temp/grimoire` @ v1.5.5). Dropping the
+(`backend/indexer/scan.py` in `temp/grimoire` @ v1.5.6). Dropping the
 `(nsfw)` marker from a folder name and re-running `seed.sh` leaves the stale
 flag in place; only a database reset picks up the change. The library tree
 must also go, not just the database: the boot scan indexes whatever is on

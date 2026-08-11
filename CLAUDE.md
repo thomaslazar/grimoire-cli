@@ -143,7 +143,7 @@ The upstream source is the authoritative reference for **behaviour and response 
 - Expected location: `temp/grimoire/` (gitignored). **Pin it to the deployed release, never `main`** — `main` carries unreleased work that no instance runs:
   ```bash
   # Match MinSupportedVersion / MaxTestedVersion in src/GrimoireCli/Api/GrimoireApiClient.cs
-  git clone --depth 1 --branch v1.5.5 https://github.com/hunter-read/grimoire.git temp/grimoire
+  git clone --depth 1 --branch v1.5.6 https://github.com/hunter-read/grimoire.git temp/grimoire
   ```
 - **No spec snapshot is kept.** The spec comes from the running stack's `/api/openapi.json` at the moment it is needed — see [API client generation](#api-client-generation). A file on disk can be stale; the pinned container cannot.
 - `temp/deployment-docs/` — deployment design records copied in by hand, including the live instance's URL and library structure.
