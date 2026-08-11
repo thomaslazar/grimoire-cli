@@ -37,6 +37,15 @@ public class GeneratedClientTests
     }
 
     [Fact]
+    public void ANonAsciiFilterValueIsPercentEncoded()
+    {
+        var info = Client().Api.Api.Systems.ToGetRequestInformation(c =>
+            c.QueryParameters.Genre = "Straße");
+        info.PathParameters["baseurl"] = "http://example.test";
+        Assert.Contains("genre=Stra%C3%9Fe", info.URI.AbsoluteUri);
+    }
+
+    [Fact]
     public void APathParameterCannotEscapeItsSegment()
     {
         var info = Client().Api.Api.Systems["../about"].ToGetRequestInformation();
