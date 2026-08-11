@@ -34,7 +34,7 @@ namespace GrimoireCli.Generated.Api.Campaigns.Item.Wiki.Export
         {
         }
         /// <summary>
-        /// Export every wiki page of an owned campaign as a markdown zip or JSON bundle.
+        /// Export a campaign&apos;s wiki as a markdown zip or JSON bundle.Available to any campaign viewer, not just the owner: a player who is leaving(or moving to another platform) can take their copy of the campaign with them.Deliberately still works on an archived campaign — archiving is exactly whensomeone wants their notes out — since exporting reads rather than writes.A non-owner receives only what they can already see in the app: pages thatfail ``can_view_page`` are omitted entirely, and ``||GM secrets||`` arestripped from the bodies of the pages that remain. The owner exports theunfiltered wiki, as before.
         /// </summary>
         /// <returns>A <see cref="UntypedNode"/></returns>
         /// <param name="cancellationToken">Cancellation token to use when cancelling requests</param>
@@ -57,7 +57,7 @@ namespace GrimoireCli.Generated.Api.Campaigns.Item.Wiki.Export
             return await RequestAdapter.SendAsync<UntypedNode>(requestInfo, UntypedNode.CreateFromDiscriminatorValue, errorMapping, cancellationToken).ConfigureAwait(false);
         }
         /// <summary>
-        /// Export every wiki page of an owned campaign as a markdown zip or JSON bundle.
+        /// Export a campaign&apos;s wiki as a markdown zip or JSON bundle.Available to any campaign viewer, not just the owner: a player who is leaving(or moving to another platform) can take their copy of the campaign with them.Deliberately still works on an archived campaign — archiving is exactly whensomeone wants their notes out — since exporting reads rather than writes.A non-owner receives only what they can already see in the app: pages thatfail ``can_view_page`` are omitted entirely, and ``||GM secrets||`` arestripped from the bodies of the pages that remain. The owner exports theunfiltered wiki, as before.
         /// </summary>
         /// <returns>A <see cref="RequestInformation"/></returns>
         /// <param name="requestConfiguration">Configuration for the request such as headers, query parameters, and middleware options.</param>
@@ -85,7 +85,7 @@ namespace GrimoireCli.Generated.Api.Campaigns.Item.Wiki.Export
             return new global::GrimoireCli.Generated.Api.Campaigns.Item.Wiki.Export.ExportRequestBuilder(rawUrl, RequestAdapter);
         }
         /// <summary>
-        /// Export every wiki page of an owned campaign as a markdown zip or JSON bundle.
+        /// Export a campaign&apos;s wiki as a markdown zip or JSON bundle.Available to any campaign viewer, not just the owner: a player who is leaving(or moving to another platform) can take their copy of the campaign with them.Deliberately still works on an archived campaign — archiving is exactly whensomeone wants their notes out — since exporting reads rather than writes.A non-owner receives only what they can already see in the app: pages thatfail ``can_view_page`` are omitted entirely, and ``||GM secrets||`` arestripped from the bodies of the pages that remain. The owner exports theunfiltered wiki, as before.
         /// </summary>
         [global::System.CodeDom.Compiler.GeneratedCode("Kiota", "1.0.0")]
         public partial class ExportRequestBuilderGetQueryParameters 

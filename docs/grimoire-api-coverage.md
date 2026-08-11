@@ -2,7 +2,7 @@
 
 Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any) that implements it.
 
-- **Reference:** spec fetched live from the pinned stack's `/api/openapi.json` (v1.5.5, 156 paths, 207 operations) and the upstream source at `temp/grimoire/backend/routers/`. Tested range: `1.5.5` only (`GrimoireApiClient.cs`).
+- **Reference:** spec fetched live from the pinned stack's `/api/openapi.json` (v1.5.6, 166 paths, 220 operations) and the upstream source at `temp/grimoire/backend/routers/`. Tested range: `1.5.6` only (`GrimoireApiClient.cs`).
 - **Perm** column uses Grimoire's roles (`admin` / `gm or admin` / `not guest`); blank = any authenticated user. `?` = a dependency this script could not resolve.
 - ✅ = covered by a CLI command · — = not implemented · 🔒 = internal-only (no user-facing verb); 🔒 rows never count as covered.
 - **Regenerate with `tools/generate-api-coverage.py`; update `IMPLEMENTED` there in the same PR as any change to which endpoints the CLI calls.**
@@ -17,7 +17,7 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | auth | 1 / 10 |
 | bookmarks | 0 / 4 |
 | books | 0 / 16 |
-| campaigns | 0 / 68 |
+| campaigns | 0 / 81 |
 | downloads | 0 / 1 |
 | export | 0 / 1 |
 | favorites | 0 / 3 |
@@ -33,7 +33,7 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | tags | 0 / 6 |
 | tokens | 0 / 10 |
 | users | 0 / 12 |
-| **Total** | **3 / 207** |
+| **Total** | **3 / 220** |
 
 1 operation(s) are internal-only (🔒) and excluded from covered counts.
 
@@ -128,6 +128,7 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | GET | `/api/campaigns/{campaign_id}` | Get a campaign |  | — |
 | PATCH | `/api/campaigns/{campaign_id}` | Update a campaign |  | — |
 | DELETE | `/api/campaigns/{campaign_id}` | Delete a campaign |  | — |
+| PUT | `/api/campaigns/{campaign_id}/archive` | Archive or unarchive a campaign |  | — |
 | GET | `/api/campaigns/{campaign_id}/availability` | Get availability chart for upcoming sessions |  | — |
 | PUT | `/api/campaigns/{campaign_id}/availability/{session_date}` | Set availability for a session date |  | — |
 | PUT | `/api/campaigns/{campaign_id}/availability/{session_date}/cancel` | GM: cancel or uncancel a session date |  | — |
@@ -139,6 +140,7 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | PUT | `/api/campaigns/{campaign_id}/categories/reorder` | Reorder categories |  | — |
 | PATCH | `/api/campaigns/{campaign_id}/categories/{category_id}` | Rename a category |  | — |
 | DELETE | `/api/campaigns/{campaign_id}/categories/{category_id}` | Delete a category (mode: uncategorize \| delete_items) |  | — |
+| POST | `/api/campaigns/{campaign_id}/convert-to-group` | Convert a personal campaign into a GM-run group campaign |  | — |
 | GET | `/api/campaigns/{campaign_id}/eligible-members` | List users that can be invited |  | — |
 | POST | `/api/campaigns/{campaign_id}/files` | Upload a campaign file (GM); links it as a resource |  | — |
 | GET | `/api/campaigns/{campaign_id}/files/{file_id}` | Download a campaign file (honours resource visibility) |  | — |
@@ -183,6 +185,17 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | POST | `/api/campaigns/{campaign_id}/wiki/import` | Import wiki pages (markdown / json / LegendKeeper) |  | — |
 | PUT | `/api/campaigns/{campaign_id}/wiki/reorder` | Reorder wiki pages (drag-and-drop) |  | — |
 | GET | `/api/campaigns/{campaign_id}/wiki/search` | Search wiki pages |  | — |
+| GET | `/api/campaigns/{campaign_id}/wiki/templates` | List the campaign's note templates |  | — |
+| POST | `/api/campaigns/{campaign_id}/wiki/templates` | Write a new note template |  | — |
+| GET | `/api/campaigns/{campaign_id}/wiki/templates/browse` | Browse the community note-template catalogue |  | — |
+| POST | `/api/campaigns/{campaign_id}/wiki/templates/download/{template_id}` | Download a community note template into the campaign |  | — |
+| PUT | `/api/campaigns/{campaign_id}/wiki/templates/source` | Set the note-template catalogue URL |  | — |
+| POST | `/api/campaigns/{campaign_id}/wiki/templates/upload` | Add a note template from an uploaded .md file |  | — |
+| GET | `/api/campaigns/{campaign_id}/wiki/templates/{template_id}` | Get a note template incl. its body |  | — |
+| PATCH | `/api/campaigns/{campaign_id}/wiki/templates/{template_id}` | Edit a note template |  | — |
+| DELETE | `/api/campaigns/{campaign_id}/wiki/templates/{template_id}` | Delete a note template |  | — |
+| GET | `/api/campaigns/{campaign_id}/wiki/templates/{template_id}/export` | Export a note template as a .zip folder |  | — |
+| POST | `/api/campaigns/{campaign_id}/wiki/templates/{template_id}/use` | Create a wiki page from a note template |  | — |
 | GET | `/api/campaigns/{campaign_id}/wiki/titles` | Wiki page titles for [[link]] autocomplete |  | — |
 | GET | `/api/campaigns/{campaign_id}/wiki/{page_id}` | Get a wiki page |  | — |
 | PATCH | `/api/campaigns/{campaign_id}/wiki/{page_id}` | Update a wiki page |  | — |

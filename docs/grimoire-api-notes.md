@@ -1,6 +1,6 @@
 # Grimoire API notes
 
-Behaviour verified against Grimoire **v1.5.5** — the release the live instance
+Behaviour verified against Grimoire **v1.5.6** — the release the live instance
 and `docker/docker-compose.yml` both run — by reading `temp/grimoire/` at that
 tag and by calling the API. Don't re-derive these, and don't trust the published
 docs over them. Re-verify after a server upgrade — see
@@ -99,10 +99,12 @@ Applies to both `PATCH /api/systems/{id}` and `PATCH /api/books/{id}`
 - **Editions and language are metadata, not folders.** A new *flat* (non-container)
   folder under `books/` creates a system row with only `name` set; `parent_system`
   / `edition` / `system_family` stay empty until a `PATCH /api/systems/{id}`.
-  This no longer covers the whole story in v1.5.5: a folder scanned as a
+  This no longer covers the whole story from v1.5.5 on: a folder scanned as a
   *container child* gets `parent_system` and `edition` auto-populated at
-  creation instead — see "System containers" below. `system_family` still has
-  no folder route either way.
+  creation instead — see "System containers" below. **`system_family` gained a
+  folder route in v1.5.6** (upstream #301): a `.system-family-container` fills
+  it in on each child. It remains PATCH-only for a shelf that uses no family
+  container, which is what `docker/seed.sh`'s fixtures do.
 
 ## Scanner behaviour
 
@@ -174,11 +176,23 @@ category labels. Any claim about this behaviour must name a version.
 
 ### System containers
 
-Verified against v1.5.5. Every citation is a file in `temp/grimoire`.
+Verified against v1.5.6. Every citation is a file in `temp/grimoire`.
 
-- A folder becomes a container via a `.parent-system-container` /
-  `.one-page-container` marker file, a `(parent-system)` / `(one-page)` name
-  suffix, or a reserved one-page slug (`indexer/categories.py::detect_container_kind`).
+- **Five container kinds as of v1.5.6** (upstream #301, which added the last
+  three): `parent` (children are editions of one game), `one-page`,
+  `family` (related but distinct systems sharing a lineage), `publisher`
+  (one company's systems), and `generic` — a bare `.container` shelf that
+  claims no relationship and propagates nothing (`indexer/constants.py`).
+- A folder becomes a container via a marker file
+  (`.parent-system-container`, `.one-page-container`,
+  `.system-family-container`, `.publisher-container`, `.container`), the
+  equivalent folder-name suffix, or a reserved one-page slug
+  (`indexer/categories.py::detect_container_kind`). A folder carrying more
+  than one declaration resolves by `CONTAINER_PRECEDENCE`, most specific
+  first, so markers and suffixes can never disagree.
+- **Only `parent` sets its children's `parent_system`.** A `family` container
+  fills in each child's `system_family`, a `publisher` fills in `publishers`,
+  and `generic` propagates nothing.
 - A child's display name is `"<container> <folder>"` (`indexer/scan.py:443`), so
   `Shadowrun` + `6 DE` is `Shadowrun 6 DE`.
 - `edition` is the child folder name **verbatim** (`indexer/scan.py:490`): a
@@ -188,9 +202,12 @@ Verified against v1.5.5. Every citation is a file in `temp/grimoire`.
   foreign key are returned.
 - Sort prefixes are stripped before the container name is used
   (`indexer/scan.py:188`), so `!!Dungeons & Dragons` yields `Dungeons & Dragons`.
-- `system_depth` is the constant 3 (`indexer/scan.py:504`), so a category folder
-  must sit exactly one level below the edition folder. Nesting containers is
-  unavailable until `.system-family-container` reaches a tagged release.
+- **Containers nest as of v1.5.6.** `_scan_container` recurses into a child
+  that is itself a container (`indexer/scan.py:493`), and category depth
+  follows it: `system_depth=2 + depth` (`indexer/scan.py:557`), where `depth`
+  counts the containers above a child. On v1.5.5 that was the constant 3, so
+  only one container level worked — any claim that nesting is unavailable
+  describes v1.5.5 and earlier.
 - **`GET /api/systems` hides container children before applying any filter**
   (`routers/systems/core.py:78-95`). A filter on metadata only children carry
   returns `[]` with exit 0 unless `include_children=true` is also sent.

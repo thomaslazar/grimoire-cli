@@ -5,6 +5,7 @@ using GrimoireCli.Generated.Api.Campaigns.Item.Wiki.Import;
 using GrimoireCli.Generated.Api.Campaigns.Item.Wiki.Item;
 using GrimoireCli.Generated.Api.Campaigns.Item.Wiki.Reorder;
 using GrimoireCli.Generated.Api.Campaigns.Item.Wiki.Search;
+using GrimoireCli.Generated.Api.Campaigns.Item.Wiki.Templates;
 using GrimoireCli.Generated.Api.Campaigns.Item.Wiki.Titles;
 using GrimoireCli.Generated.Models;
 using Microsoft.Kiota.Abstractions.Extensions;
@@ -42,6 +43,11 @@ namespace GrimoireCli.Generated.Api.Campaigns.Item.Wiki
         public global::GrimoireCli.Generated.Api.Campaigns.Item.Wiki.Search.SearchRequestBuilder Search
         {
             get => new global::GrimoireCli.Generated.Api.Campaigns.Item.Wiki.Search.SearchRequestBuilder(PathParameters, RequestAdapter);
+        }
+        /// <summary>The templates property</summary>
+        public global::GrimoireCli.Generated.Api.Campaigns.Item.Wiki.Templates.TemplatesRequestBuilder Templates
+        {
+            get => new global::GrimoireCli.Generated.Api.Campaigns.Item.Wiki.Templates.TemplatesRequestBuilder(PathParameters, RequestAdapter);
         }
         /// <summary>The titles property</summary>
         public global::GrimoireCli.Generated.Api.Campaigns.Item.Wiki.Titles.TitlesRequestBuilder Titles
