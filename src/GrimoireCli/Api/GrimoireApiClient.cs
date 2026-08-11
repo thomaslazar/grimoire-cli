@@ -57,21 +57,11 @@ public class GrimoireApiClient
     /// POST /api/auth/login. Returns the raw response body — the OpenAPI spec types
     /// this response as an empty schema, so the token key is located by inspection
     /// rather than by a generated model. See <see cref="ExtractToken"/>.
-    ///
-    /// The request body is written by hand rather than through the generated
-    /// <see cref="Generated.Models.LoginRequest"/>: its Kiota-generated Serialize
-    /// writes "password" before "username", which would reorder the wire body
-    /// relative to what this method has always sent. The generated builder is
-    /// still used to build the request shell (URL, headers) so the login path
-    /// doesn't hand-roll the endpoint route; only the content is overridden.
     /// </summary>
     public async Task<string> LoginAsync(string username, string password)
     {
-        var loginRequest = new LoginRequest { Username = username, Password = password };
-        var body = JsonSerializer.Serialize(loginRequest, AppJsonContext.Default.LoginRequest);
-
-        var info = Api.Api.Auth.Login.ToPostRequestInformation(new Generated.Models.LoginRequest());
-        info.SetStreamContent(new MemoryStream(Encoding.UTF8.GetBytes(body)), "application/json");
+        var body = new Generated.Models.LoginRequest { Username = username, Password = password };
+        var info = Api.Api.Auth.Login.ToPostRequestInformation(body);
 
         using var cts = new CancellationTokenSource(DefaultRequestTimeout);
         var request = await _adapter.ConvertToNativeRequestAsync<HttpRequestMessage>(info, cts.Token)
