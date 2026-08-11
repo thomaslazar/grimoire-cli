@@ -87,14 +87,12 @@ internal static class Program
         // Reflect over AppJsonContext's [JsonSerializable] attributes — the
         // single source of truth for types that cross the CLI↔server boundary.
         // Exclude types that aren't response payloads:
-        //  - LoginRequest (request body only)
         //  - AppConfig (local config, never a response)
         //  - raw Dictionary/List helper registrations (not command responses;
         //    the array shape for GET /api/systems is composed at the call site
         //    by AddResponseExampleArray<T>)
         var excluded = new HashSet<Type>
         {
-            typeof(LoginRequest),
             typeof(AppConfig),
         };
 
