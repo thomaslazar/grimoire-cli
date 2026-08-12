@@ -124,4 +124,48 @@ public class SystemsCommandTests
     {
         Assert.NotEmpty(Root().Parse(input).Errors);
     }
+
+    private static string RenderHelp(string[] path, bool full)
+    {
+        var root = new RootCommand("test") { SystemsCommand.Create() };
+        root.UseCustomHelpSections();
+        var output = new StringWriter();
+        root.Parse([.. path, full ? "--help-full" : "--help"])
+            .Invoke(new InvocationConfiguration { Output = output });
+        return output.ToString();
+    }
+
+    // The block is rendered from the generated model, so this is also the guard on
+    // that: a regeneration that dropped a model's properties (microsoft/kiota#2338)
+    // would empty the help output as well as the validation.
+    [Fact]
+    public void UpdateListsItsRequestFieldsFromTheGeneratedModel()
+    {
+        var output = RenderHelp(["systems", "update"], full: true);
+        var expected = new GrimoireCli.Generated.Models.GameSystemUpdate()
+            .GetFieldDeserializers().Keys;
+        Assert.Equal(17, expected.Count);
+        Assert.Contains("Request fields:", output);
+        foreach (var field in expected)
+            Assert.Contains(field, output);
+    }
+
+    [Fact]
+    public void BatchUpdateListsTheItemFieldsIncludingId()
+    {
+        var output = RenderHelp(["systems", "batch-update"], full: true);
+        Assert.Contains("Request fields:", output);
+        Assert.Contains("id", output);
+        Assert.Contains("system_family", output);
+    }
+
+    // Field lists cost tokens on every invocation, so they stay behind --help-full
+    // with the response shapes rather than loading the default help.
+    [Fact]
+    public void RequestFieldsStayBehindHelpFull()
+    {
+        var output = RenderHelp(["systems", "update"], full: false);
+        Assert.DoesNotContain("Request fields:", output);
+        Assert.Contains("Run --help-full", output);
+    }
 }

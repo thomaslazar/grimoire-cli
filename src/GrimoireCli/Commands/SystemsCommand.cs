@@ -182,23 +182,17 @@ public static class SystemsCommand
         command.AddRoleRequired("gm or admin");
         RequireExactlyOneBodySource(command, inputOption, stdinOption);
         command.AddHelpSection("Notes", HelpSectionPosition.Top,
-            "Body is Grimoire's own field object, without id. Editable fields:",
-            "name, description, publishers, character_builder_url,",
-            "character_builder_urls, urls, tags, genre, genres, dice_materials,",
-            "system_family, parent_system, edition, license, year, cover_book_id,",
-            "is_explicit. An unknown field is rejected before the request is made.",
-            "",
             "Renaming is permanent: setting name marks it custom, and the scanner",
-            "then never re-derives it from the folder again, on any later rescan.",
+            "never re-derives it from the folder again.",
             "",
-            "Clear a field with \"\". An explicit null is dropped server-side and",
-            "does nothing.",
+            "Clear a field with \"\"; an explicit null does nothing.",
             "",
-            "genre and character_builder_url are legacy singles; prefer genres",
-            "and character_builder_urls.",
+            "Prefer genres and character_builder_urls; the singles are legacy.",
             "",
-            "Responds {\"status\": \"ok\"} — it does not echo the system, so read",
-            "the result back with: grimoire-cli systems get --id <id>");
+            "Responds {\"status\": \"ok\"} and echoes nothing — read back with:",
+            "grimoire-cli systems get --id <id>");
+        command.AddRequestShape(new Generated.Models.GameSystemUpdate(),
+            "The body is a flat object of these, all optional; id is not one of them.");
         command.AddExamples(
             "grimoire-cli systems update --id <id> --input metadata.json",
             "echo '{\"system_family\":\"Shadowrun\"}' | grimoire-cli systems update --id <id> --stdin");
@@ -240,21 +234,19 @@ public static class SystemsCommand
         command.AddRoleRequired("gm or admin");
         RequireExactlyOneBodySource(command, inputOption, stdinOption);
         command.AddHelpSection("Notes", HelpSectionPosition.Top,
-            "Body is {\"items\": [{\"id\": \"…\", …fields}]}, at most 1000 items;",
-            "fields are those of: grimoire-cli systems update --help",
+            "At most 1000 items.",
             "",
-            "Skip-and-continue: an unresolved id or a rejected item lands in",
-            "errors and the rest still apply. Exit 3 means HTTP 200 with a",
-            "non-empty errors list — a partial application, not a failure.",
-            "",
-            "updated reports ids, not fields: an id there means the row resolved,",
-            "not that any value changed.",
+            "Skip-and-continue: a bad id or item lands in errors, the rest apply.",
+            "Exit 3 is HTTP 200 with a non-empty errors list — a partial write.",
+            "updated lists the ids that resolved, not the fields that changed.",
             "",
             "Renaming is permanent and \"\" not null clears a field — see",
             "systems update.");
         command.AddExamples(
             "grimoire-cli systems batch-update --input items.json",
             "jq -c '{items: .}' edits.json | grimoire-cli systems batch-update --stdin");
+        command.AddRequestShape(new Generated.Models.GameSystemBulkItem(),
+            "The body is {\"items\": [ … ]}; each item requires id, plus any of:");
         command.AddResponseExample<BulkUpdateResult>();
         command.SetAction(async (parseResult, cancellationToken) =>
         {
@@ -293,17 +285,18 @@ public static class SystemsCommand
         command.AddRoleRequired("gm or admin");
         RequireExactlyOneBodySource(command, inputOption, stdinOption);
         command.AddHelpSection("Notes", HelpSectionPosition.Top,
-            "Body is {\"ids\": [\"…\"], \"tags\": [\"…\"]}, both non-empty, at most",
-            "1000 ids.",
+            "ids and tags are both required and non-empty; max 1000 ids.",
             "",
-            "Additive only: it merges with each system's existing tags and never",
-            "removes one. To replace a tag set, use batch-update with tags.",
+            "Additive only: merges with existing tags, never removes one. To",
+            "replace a set, use batch-update with tags.",
             "",
-            "Exit 3 means HTTP 200 with a non-empty errors list — some ids did",
-            "not resolve while the rest were tagged.");
+            "Exit 3 is HTTP 200 with a non-empty errors list — some ids did not",
+            "resolve while the rest were tagged.");
         command.AddExamples(
             "grimoire-cli systems batch-tag --input tags.json",
             "echo '{\"ids\":[\"<id>\"],\"tags\":[\"cyberpunk\"]}' | grimoire-cli systems batch-tag --stdin");
+        command.AddRequestShape(new Generated.Models.BulkAddTags(),
+            "The body is a flat object of:");
         command.AddResponseExample<BulkTagResult>();
         command.SetAction(async (parseResult, cancellationToken) =>
         {
