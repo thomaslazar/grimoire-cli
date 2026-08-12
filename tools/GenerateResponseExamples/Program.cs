@@ -91,16 +91,9 @@ internal static class Program
         //  - raw Dictionary/List helper registrations (not command responses;
         //    the array shape for GET /api/systems is composed at the call site
         //    by AddResponseExampleArray<T>)
-        //  - request DTOs (GameSystemUpdateRequest and friends) — bodies, not payloads
         var excluded = new HashSet<Type>
         {
             typeof(AppConfig),
-            typeof(GameSystemUpdateRequest),
-            typeof(PublisherEntryRequest),
-            typeof(LinkEntryRequest),
-            typeof(GameSystemBulkItemRequest),
-            typeof(GameSystemBulkUpdateRequest),
-            typeof(BulkAddTagsRequest),
         };
 
         // JsonSerializableAttribute.Type is not a public property in .NET 8 —

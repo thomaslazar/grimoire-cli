@@ -208,7 +208,7 @@ public static class SystemsCommand
             try
             {
                 body = JsonBodyInput.Read(parseResult.GetValue(inputOption), parseResult.GetValue(stdinOption));
-                JsonBodyInput.Validate(body, AppJsonContext.Default.GameSystemUpdateRequest,
+                JsonBodyInput.Validate(body, Generated.Models.GameSystemUpdate.CreateFromDiscriminatorValue,
                     "pass it with --id");
             }
             catch (BodyInputException ex)
@@ -262,7 +262,7 @@ public static class SystemsCommand
             try
             {
                 body = JsonBodyInput.Read(parseResult.GetValue(inputOption), parseResult.GetValue(stdinOption));
-                JsonBodyInput.Validate(body, AppJsonContext.Default.GameSystemBulkUpdateRequest,
+                JsonBodyInput.Validate(body, Generated.Models.GameSystemBulkUpdate.CreateFromDiscriminatorValue,
                     "put it in each item");
             }
             catch (BodyInputException ex)
@@ -311,7 +311,7 @@ public static class SystemsCommand
             try
             {
                 body = JsonBodyInput.Read(parseResult.GetValue(inputOption), parseResult.GetValue(stdinOption));
-                JsonBodyInput.Validate(body, AppJsonContext.Default.BulkAddTagsRequest,
+                JsonBodyInput.Validate(body, Generated.Models.BulkAddTags.CreateFromDiscriminatorValue,
                     "put it in ids");
             }
             catch (BodyInputException ex)
