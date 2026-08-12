@@ -11,8 +11,8 @@ commands — against it in CI.
 
 The metadata-write design question — typed flags versus a raw-JSON body — is
 decided for systems: `systems update`/`batch-update`/`batch-tag` take a body
-from `--input` or `--stdin`, validated by strict request DTOs that reject
-unknown keys before the request is sent
+from `--input` or `--stdin`, validated against the endpoint's generated model,
+which rejects unknown keys at any depth before the request is sent
 ([grimoire-api-coverage.md](grimoire-api-coverage.md) records the routes; the
 design is in `docs/specs/2026-08-10-systems-write-commands-design.md`).
 

@@ -8,7 +8,9 @@
 
 **Tech Stack:** C# / .NET 10, System.CommandLine, source-generated `System.Text.Json`, Kiota-generated request builders, Native AOT, xUnit, bash.
 
-**Design spec:** [`docs/specs/2026-08-10-systems-write-commands-design.md`](../specs/2026-08-10-systems-write-commands-design.md). Read it first — §2 is the verified server behaviour, §3.2 is why the generated request models are not used.
+**Design spec:** [`docs/specs/2026-08-10-systems-write-commands-design.md`](../specs/2026-08-10-systems-write-commands-design.md). Read it first — §2 is the verified server behaviour, §3.2 is how a body is validated.
+
+> **Superseded in part, after execution.** Tasks 2 and 5 built hand-written request DTOs, which have since been deleted: the generated models validate request bodies directly, once the spec is normalised past [microsoft/kiota#2338](https://github.com/microsoft/kiota/issues/2338). The spec's §3.2 is current; this plan's Task 2 and Task 5 record what was built on the way there, and their steps no longer describe the code.
 
 ## Global Constraints
 
