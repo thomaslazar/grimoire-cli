@@ -1,3 +1,4 @@
+using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization.Metadata;
 
@@ -16,17 +17,27 @@ public class BodyInputException : Exception
 /// </summary>
 public static class JsonBodyInput
 {
-    public static string Read(string? inputPath, bool useStdin)
+    // Shared with SystemsCommand.RequireExactlyOneBodySource, which enforces the
+    // same both/neither rule as a parse validator so the CLI's own refusal fires
+    // first. This copy stays reachable only through direct unit tests.
+    internal const string BothSourcesMessage = "Provide --input or --stdin, not both.";
+    internal const string NeitherSourceMessage = "A request body is required. Provide --input <file> or --stdin.";
+
+    public static string Read(string? inputPath, bool useStdin, TextReader? stdin = null)
     {
         if (inputPath != null && useStdin)
-            throw new BodyInputException("Provide --input or --stdin, not both.");
+            throw new BodyInputException(BothSourcesMessage);
         if (inputPath == null && !useStdin)
-            throw new BodyInputException("A request body is required. Provide --input <file> or --stdin.");
+            throw new BodyInputException(NeitherSourceMessage);
 
         string body;
         if (useStdin)
         {
-            body = Console.In.ReadToEnd();
+            // Console.In decodes with Console.InputEncoding, which on Windows is
+            // the console code page (commonly 437/1252), not UTF-8. Read the raw
+            // stream ourselves so non-ASCII bodies survive on every platform.
+            var reader = stdin ?? new StreamReader(Console.OpenStandardInput(), new UTF8Encoding(false));
+            body = reader.ReadToEnd();
             if (string.IsNullOrWhiteSpace(body))
                 throw new BodyInputException("The request body on stdin is empty.");
         }
@@ -36,7 +47,7 @@ public static class JsonBodyInput
             {
                 body = File.ReadAllText(inputPath!);
             }
-            catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+            catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or ArgumentException or NotSupportedException)
             {
                 throw new BodyInputException($"Could not read {inputPath}: {ex.Message}");
             }

@@ -41,6 +41,30 @@ public class JsonBodyInputTests
     }
 
     [Fact]
+    public void RejectsAMalformedPathWithoutACrash()
+    {
+        // File.ReadAllText("") throws ArgumentException, not IOException — a
+        // widened catch is what turns this into a readable refusal instead of an
+        // unhandled exception and a stack trace on stderr.
+        var ex = Assert.Throws<BodyInputException>(() => JsonBodyInput.Read("", useStdin: false));
+        Assert.Contains("Could not read", ex.Message);
+    }
+
+    [Fact]
+    public void RejectsEmptyStdin()
+    {
+        var ex = Assert.Throws<BodyInputException>(() => JsonBodyInput.Read(null, useStdin: true, stdin: new StringReader("   ")));
+        Assert.Contains("empty", ex.Message);
+    }
+
+    [Fact]
+    public void ReadsNonAsciiStdinIntact()
+    {
+        const string body = """{"description":"Über Straße — café"}""";
+        Assert.Equal(body, JsonBodyInput.Read(null, useStdin: true, stdin: new StringReader(body)));
+    }
+
+    [Fact]
     public void RejectsAMissingFile()
     {
         var missing = Path.Combine(Path.GetTempPath(), $"absent-{Guid.NewGuid():N}.json");

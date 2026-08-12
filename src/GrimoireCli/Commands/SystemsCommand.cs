@@ -162,9 +162,9 @@ public static class SystemsCommand
             var hasInput = result.GetValue(inputOption) != null;
             var hasStdin = result.GetValue(stdinOption);
             if (hasInput && hasStdin)
-                result.AddError("Provide --input or --stdin, not both.");
+                result.AddError(JsonBodyInput.BothSourcesMessage);
             else if (!hasInput && !hasStdin)
-                result.AddError("A request body is required. Provide --input <file> or --stdin.");
+                result.AddError(JsonBodyInput.NeitherSourceMessage);
         });
     }
 
