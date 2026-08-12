@@ -229,6 +229,16 @@ public class JsonBodyInputTests
         Assert.DoesNotContain("at $.name.", ex.Message);
     }
 
+    // A root offender's location is known without searching, so a legal namesake
+    // deeper in the body does not cost it its path.
+    [Fact]
+    public void KeepsTheRootPathWhenTheNameRecursLegallyDeeper()
+    {
+        var ex = Assert.Throws<BodyInputException>(
+            () => ValidateBatch("""{"name":"x","items":[{"id":"a","name":"legal"}]}"""));
+        Assert.Contains("at $.name", ex.Message);
+    }
+
     // An id inside a nested entry is not the id that belongs in --id.
     [Fact]
     public void GivesTheIdAdviceOnlyAtTheRoot()

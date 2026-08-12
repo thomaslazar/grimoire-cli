@@ -128,8 +128,9 @@ public static class JsonBodyInput
                 _logger.Debug($"request body did not parse against the generated model: {ex.Message}");
                 if (unknown.Count > 0)
                     throw new BodyInputException(Describe(unknown, json, idHint));
-                _logger.Warn("Could not check nested fields: a value in the body stopped the parse. "
-                             + "Top-level fields were checked. Run with --debug for the parse error.");
+                _logger.Warn("A value in the body stopped the field check early. The top-level fields "
+                             + "were checked and any nested object reached before it was too. Run with "
+                             + "--debug for the parse error.");
                 return;
             }
             if (unknown.Count > 0)
@@ -151,7 +152,11 @@ public static class JsonBodyInput
         List<(string Key, IEnumerable<string> Allowed, bool AtRoot)> unknown, string json, string idHint)
     {
         var (key, allowed, atRoot) = unknown[0];
-        var location = PathOf(json, key) is { } path ? $" at {path}" : "";
+        // A root offender's location is known outright, so it survives a name that
+        // also appears — legally — deeper in the body. Only a nested one has to be
+        // found by name, and only then can the match be ambiguous.
+        var found = atRoot ? $"$.{key}" : PathOf(json, key);
+        var location = found is null ? "" : $" at {found}";
         var message = $"Unknown field '{key}' in the request body{location}.";
         if (unknown.Count > 1)
             message += $" ({unknown.Count - 1} more: {string.Join(", ", unknown.Skip(1).Select(u => $"'{u.Key}'"))})";
