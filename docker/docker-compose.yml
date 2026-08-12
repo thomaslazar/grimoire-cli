@@ -51,6 +51,8 @@ services:
     volumes:
       - ${GRIMOIRE_LIBRARY:-./library}:/library:ro
       - ${GRIMOIRE_DATA:-./data}:/data
+    networks:
+      - grimoire-cli-dev
     # The image already healthchecks /api/health, but with interval=30s and
     # start_period=30s, which makes `up -d --wait` sit for up to a minute.
     # Poll faster so CI and local starts are quick.
@@ -60,3 +62,11 @@ services:
       timeout: 5s
       start_period: 10s
       retries: 12
+
+# Named explicitly because the default would be derived from this file's parent
+# directory: every project whose compose file lives in docker/ would share one
+# `docker_default` bridge, and a stack from another repo would then sit on the
+# same network as this one. abs-cli names its network for the same reason.
+networks:
+  grimoire-cli-dev:
+    name: grimoire-cli-dev
