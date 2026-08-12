@@ -7,13 +7,30 @@ using System.IO;
 using System;
 namespace GrimoireCli.Generated.Models
 {
+    /// <summary>
+    /// A labeled link on a book (publisher / DriveThruRPG page, etc.).
+    /// </summary>
     [global::System.CodeDom.Compiler.GeneratedCode("Kiota", "1.0.0")]
-    #pragma warning disable CS1591
     public partial class Backend__routers__books___schemas__LinkEntry : IAdditionalDataHolder, IParsable
-    #pragma warning restore CS1591
     {
         /// <summary>Stores additional data not described in the OpenAPI description found when deserializing. Can be used for serialization as well.</summary>
         public IDictionary<string, object> AdditionalData { get; set; }
+        /// <summary>The label property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public string? Label { get; set; }
+#nullable restore
+#else
+        public string Label { get; set; }
+#endif
+        /// <summary>The url property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public string? Url { get; set; }
+#nullable restore
+#else
+        public string Url { get; set; }
+#endif
         /// <summary>
         /// Instantiates a new <see cref="global::GrimoireCli.Generated.Models.Backend__routers__books___schemas__LinkEntry"/> and sets the default values.
         /// </summary>
@@ -39,6 +56,8 @@ namespace GrimoireCli.Generated.Models
         {
             return new Dictionary<string, Action<IParseNode>>
             {
+                { "label", n => { Label = n.GetStringValue(); } },
+                { "url", n => { Url = n.GetStringValue(); } },
             };
         }
         /// <summary>
@@ -48,6 +67,8 @@ namespace GrimoireCli.Generated.Models
         public virtual void Serialize(ISerializationWriter writer)
         {
             if(ReferenceEquals(writer, null)) throw new ArgumentNullException(nameof(writer));
+            writer.WriteStringValue("label", Label);
+            writer.WriteStringValue("url", Url);
             writer.WriteAdditionalData(AdditionalData);
         }
     }
