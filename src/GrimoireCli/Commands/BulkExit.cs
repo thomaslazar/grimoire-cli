@@ -3,9 +3,11 @@ using GrimoireCli.Models;
 namespace GrimoireCli.Commands;
 
 /// <summary>
-/// Maps a bulk response to an exit code. 3 means HTTP 200 with items skipped —
-/// distinct from 2 (the request failed) and 1 (a client-side refusal), because an
-/// unattended caller has to tell "nothing was applied" from "most of it was".
+/// Maps a bulk response to an exit code. 3 means the request succeeded (HTTP 200)
+/// and at least one item was skipped, distinct from 2 (the request itself failed)
+/// and 1 (a client-side refusal before any request was made). stdout still carries
+/// the full `updated`/`errors` JSON, so an unattended caller can act on which items
+/// landed and which didn't — including the all-skipped case, which is also a 3.
 /// </summary>
 public static class BulkExit
 {

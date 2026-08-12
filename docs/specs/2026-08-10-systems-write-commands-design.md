@@ -51,7 +51,7 @@ because an uncited claim in this repo has historically been a wrong one.
 | `bulk/tags` is additive | merges with existing tags and never removes one. Returns `{updated, errors, tags: {id: [display tags]}}` | `services/bulk_service.py::run_bulk_add_tags` |
 | `bulk/tags` validation | `ids` and `tags` both required and non-empty; `ids` capped at 1000 | `routers/_bulk_schemas.py::BulkAddTags` |
 | **rename is sticky** | changing `name` sets `name_is_custom = True`, after which the scanner's `if not system.name_is_custom` gate stops re-deriving the name from the folder — permanently | `routers/systems/core.py:314-334`, `indexer/scan.py:376` |
-| rename to same value | a no-op that returns early and does **not** set the flag | `routers/systems/core.py:326-327` |
+| rename to same value | a no-op that returns early and does **not** set the flag | `routers/systems/core.py:325-326` |
 | name clash | 409 on the single-item handler, a per-item `errors` entry in bulk | `routers/systems/core.py:303-308`, `:327-333` |
 | blank name | rejected by a validator (422) — `name` is the system's identity and is NOT NULL | `routers/systems/_schemas.py:82-91` |
 | role | all three write routes are `require_gm_or_admin` | `routers/systems/core.py:294`, `:339`, `:359` |
@@ -129,7 +129,7 @@ already has:
 | type | fields | mirrors | used by |
 |---|---|---|---|
 | `GameSystemUpdateRequest` | the 17 editable, none required | `GameSystemUpdate` | `update` |
-| `GameSystemBulkItem` | those 17 **plus a required `id`** | `GameSystemBulkItem` | items of `batch-update` |
+| `GameSystemBulkItemRequest` | those 17 **plus a required `id`** | `GameSystemBulkItem` | items of `batch-update` |
 | `GameSystemBulkUpdateRequest` | `items`, required | `GameSystemBulkUpdate` | `batch-update` |
 | `BulkAddTagsRequest` | `ids`, `tags`, both required | `BulkAddTags` | `batch-tag` |
 

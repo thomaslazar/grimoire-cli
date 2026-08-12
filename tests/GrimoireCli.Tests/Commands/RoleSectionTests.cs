@@ -59,13 +59,16 @@ public class RoleSectionTests
         Assert.DoesNotContain("Role required:", output);
     }
 
-    [Fact]
-    public void SystemsUpdateCommandHasTheGmOrAdminRoleSection()
+    [Theory]
+    [InlineData("update")]
+    [InlineData("batch-update")]
+    [InlineData("batch-tag")]
+    public void SystemsWriteCommandHasTheGmOrAdminRoleSection(string subcommand)
     {
         var root = new RootCommand { SystemsCommand.Create() };
         root.UseCustomHelpSections();
         var output = new StringWriter();
-        root.Parse(new[] { "systems", "update", "--help" })
+        root.Parse(new[] { "systems", subcommand, "--help" })
             .Invoke(new InvocationConfiguration { Output = output });
         Assert.Contains("Role required:", output.ToString());
         Assert.Contains("gm or admin", output.ToString());

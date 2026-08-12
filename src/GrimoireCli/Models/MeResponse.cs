@@ -23,8 +23,10 @@ public class MeResponse
     [JsonPropertyName("allow_explicit")]
     public bool AllowExplicit { get; set; }
 
-    // A bool, not a list: the server collapses the user's campaign_access column
-    // to "has access to any campaign" before sending it (routers/auth/core.py:184).
+    // Whether the user may create campaigns, be added to new campaigns, and manage
+    // campaign content (backend/models/users.py:34-37). It is a plain boolean
+    // permission column; the server treats a NULL value as enabled rather than
+    // sending it through (routers/auth/core.py:176).
     [JsonPropertyName("campaign_access")]
     public bool CampaignAccess { get; set; }
 

@@ -4,8 +4,8 @@
 
 `src/` has `login`, `config get|set`, `me`, `self-test` and
 `systems list|get|update|batch-update|batch-tag`, all against endpoints tracked
-in [grimoire-api-coverage.md](grimoire-api-coverage.md) (7 of 220 operations;
-`systems` 5/13, `auth` 2/10). `docker/seed.sh` generates fixture library content
+in [grimoire-api-coverage.md](grimoire-api-coverage.md), which owns the current
+coverage counts. `docker/seed.sh` generates fixture library content
 and `docker/smoke-test.sh` covers the live HTTP path — including the write
 commands — against it in CI.
 
