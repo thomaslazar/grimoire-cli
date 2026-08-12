@@ -348,6 +348,32 @@ grep -q "descriptoin" "$WORK/typo.err" || fail "no offending field named: $(cat 
 grep -q "description" "$WORK/typo.err" || fail "no suggestion offered: $(cat "$WORK/typo.err")"
 ok "an unknown field exits 1 before any request"
 
+# Nested objects, both ways. The generated entry models only describe their own
+# fields because the spec is normalized before generation (kiota#2338), so this
+# is what proves that workaround still holds in the shipped binary: a valid
+# nested body applies, and a typo one level down is refused with its path.
+cat >"$WORK/nested.json" <<'JSON'
+{"publishers":[{"name":"Smoke Fixture Press","url":""}],
+ "urls":[{"label":"Fixture","url":"https://example.test"}]}
+JSON
+"$CLI" systems update --id "$SR4" --input "$WORK/nested.json" >/dev/null 2>"$WORK/nested.err" \
+  || { cat "$WORK/nested.err" >&2; fail "a valid nested body should apply"; }
+sysget --id "$SR4"
+[ "$(echo "$GET_JSON" | jq -r '.publishers[0].name')" = "Smoke Fixture Press" ] \
+  || fail "the nested publisher did not read back: $(echo "$GET_JSON" | jq -c .publishers)"
+ok "a valid nested body applies"
+
+set +e
+echo '{"publishers":[{"nmae":"typo"}]}' \
+  | "$CLI" systems update --id "$SR4" --stdin >/dev/null 2>"$WORK/nestedtypo.err"; rc=$?
+set -e
+[ "$rc" -eq 1 ] || fail "a nested typo should exit 1, got $rc: $(cat "$WORK/nestedtypo.err")"
+grep -q 'publishers\[0\].nmae' "$WORK/nestedtypo.err" \
+  || fail "no path to the nested typo: $(cat "$WORK/nestedtypo.err")"
+grep -q "'name'" "$WORK/nestedtypo.err" \
+  || fail "no suggestion from the nested model: $(cat "$WORK/nestedtypo.err")"
+ok "a typo inside a nested entry exits 1 with its path"
+
 # Both sources, and neither, are parse-time refusals.
 set +e
 "$CLI" systems update --id "$SR4" --stdin --input "$WORK/typo.json" >/dev/null 2>"$WORK/both.err"; rc=$?

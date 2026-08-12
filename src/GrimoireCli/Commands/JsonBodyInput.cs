@@ -90,20 +90,29 @@ public static class JsonBodyInput
                 throw new BodyInputException(
                     $"The request body must be a JSON object, not {Describe(document.RootElement.ValueKind)}.");
 
-            // Kiota routes any key a model does not declare into its AdditionalData
-            // rather than failing, and propagates this callback into every nested
-            // object it parses — so one hook catches unknown fields at every depth,
-            // each paired with the model that rejected it.
-            var unknown = new List<(string Key, IEnumerable<string> Allowed)>();
-            var node = new JsonParseNode(document.RootElement)
+            var node = new JsonParseNode(document.RootElement);
+
+            // The root's keys are checked without parsing any value, so this cannot
+            // be skipped by a value the parser chokes on — and a misspelled field at
+            // the top level is the case that matters most.
+            var rootAllowed = factory(node).GetFieldDeserializers().Keys;
+            var unknown = document.RootElement.EnumerateObject()
+                .Where(property => !rootAllowed.Contains(property.Name))
+                .Select(property => (Key: property.Name, Allowed: (IEnumerable<string>)rootAllowed, AtRoot: true))
+                .ToList();
+            if (unknown.Count > 0)
+                throw new BodyInputException(Describe(unknown, json, idHint));
+
+            // Nested objects need the values parsed. Kiota routes any key a model does
+            // not declare into its AdditionalData rather than failing, and propagates
+            // this callback into every object it parses, so one hook reaches every
+            // depth — each key paired with the model that rejected it.
+            node.OnAfterAssignFieldValues = parsed =>
             {
-                OnAfterAssignFieldValues = parsed =>
-                {
-                    if (parsed is not IAdditionalDataHolder holder || holder.AdditionalData.Count == 0) return;
-                    var allowed = parsed.GetFieldDeserializers().Keys;
-                    foreach (var key in holder.AdditionalData.Keys)
-                        unknown.Add((key, allowed));
-                }
+                if (parsed is not IAdditionalDataHolder holder || holder.AdditionalData.Count == 0) return;
+                var allowed = parsed.GetFieldDeserializers().Keys;
+                foreach (var key in holder.AdditionalData.Keys)
+                    unknown.Add((key, allowed, false));
             };
             try
             {
@@ -111,11 +120,16 @@ public static class JsonBodyInput
             }
             catch (Exception ex) when (ex is JsonException or InvalidOperationException or FormatException)
             {
-                // A value of the wrong type lands here. The server reports those as a
-                // 422 rather than dropping them, so the body is let through with the
-                // parse failure recorded for --debug rather than refused on a guess
-                // about which value the model choked on.
+                // Kiota's getters tolerate most wrong types, returning null rather than
+                // throwing; a number too large for its target is the case that does throw,
+                // and the server accepts some of those, so silence here would let a typo
+                // elsewhere in the body through unexamined. Report what was found and say
+                // plainly that the rest went unchecked.
                 _logger.Debug($"request body did not parse against the generated model: {ex.Message}");
+                if (unknown.Count > 0)
+                    throw new BodyInputException(Describe(unknown, json, idHint));
+                _logger.Warn("Could not check nested fields: a value in the body stopped the parse. "
+                             + "Top-level fields were checked. Run with --debug for the parse error.");
                 return;
             }
             if (unknown.Count > 0)
@@ -133,20 +147,23 @@ public static class JsonBodyInput
         _ => "a value"
     };
 
-    private static string Describe(List<(string Key, IEnumerable<string> Allowed)> unknown, string json, string idHint)
+    private static string Describe(
+        List<(string Key, IEnumerable<string> Allowed, bool AtRoot)> unknown, string json, string idHint)
     {
-        var (key, allowed) = unknown[0];
+        var (key, allowed, atRoot) = unknown[0];
         var location = PathOf(json, key) is { } path ? $" at {path}" : "";
         var message = $"Unknown field '{key}' in the request body{location}.";
         if (unknown.Count > 1)
             message += $" ({unknown.Count - 1} more: {string.Join(", ", unknown.Skip(1).Select(u => $"'{u.Key}'"))})";
-        if (key == "id")
+        // Only the root's id belongs elsewhere; inside a batch item an id is required,
+        // and inside a nested entry it is just another unknown field.
+        if (key == "id" && atRoot)
             return $"{message} 'id' is not an editable field — {idHint}.";
 
         var candidates = allowed.ToList();
         var nearest = candidates
             .Select(name => (name, distance: Distance(key, name)))
-            .Where(c => c.distance <= 3)
+            .Where(c => c.distance <= SuggestionThreshold(key))
             .OrderBy(c => c.distance)
             .Select(c => c.name)
             .FirstOrDefault();
@@ -155,18 +172,32 @@ public static class JsonBodyInput
             : $"{message} Allowed fields: {string.Join(", ", candidates)}.";
     }
 
+    // A fixed edit distance is far too generous on short keys: at 3, "a" reaches
+    // "name" and every four-letter field is everyone's neighbour. Scale it instead,
+    // so a suggestion means the key was nearly right rather than merely short.
+    private static int SuggestionThreshold(string key) => key.Length switch
+    {
+        <= 4 => 1,
+        <= 7 => 2,
+        _ => 3
+    };
+
     /// <summary>
     /// Locates a property by name so the message can point at it. The callback that
     /// reports an unknown key knows the model that rejected it but not where in the
-    /// document it sat; the first match is enough to steer a caller to the right
-    /// entry of a batch body.
+    /// document it sat, so the name is matched against the raw body — and only a name
+    /// occurring exactly once can be placed that way. When it appears more than once,
+    /// the offender is ambiguous: naming the wrong one would send a caller to rename a
+    /// field that is perfectly legal where it sits.
     /// </summary>
     private static string? PathOf(string json, string key)
     {
         try
         {
             using var document = JsonDocument.Parse(json);
-            return Search(document.RootElement, key, "$");
+            var found = new List<string>();
+            Search(document.RootElement, key, "$", found);
+            return found.Count == 1 ? found[0] : null;
         }
         catch (JsonException)
         {
@@ -174,14 +205,15 @@ public static class JsonBodyInput
         }
     }
 
-    private static string? Search(JsonElement element, string key, string path)
+    private static void Search(JsonElement element, string key, string path, List<string> found)
     {
+        if (found.Count > 1) return;
         if (element.ValueKind == JsonValueKind.Object)
         {
             foreach (var property in element.EnumerateObject())
             {
-                if (property.Name == key) return $"{path}.{key}";
-                if (Search(property.Value, key, $"{path}.{property.Name}") is { } found) return found;
+                if (property.Name == key) found.Add($"{path}.{key}");
+                Search(property.Value, key, $"{path}.{property.Name}", found);
             }
         }
         else if (element.ValueKind == JsonValueKind.Array)
@@ -189,30 +221,32 @@ public static class JsonBodyInput
             var index = 0;
             foreach (var item in element.EnumerateArray())
             {
-                if (Search(item, key, $"{path}[{index}]") is { } found) return found;
+                Search(item, key, $"{path}[{index}]", found);
                 index++;
             }
         }
-        return null;
     }
 
-    // Levenshtein, iterative with two rows. Only ever runs on one rejected key
-    // against at most 18 field names, so nothing here needs to be clever.
+    // Optimal string alignment: Levenshtein plus adjacent transposition at cost 1,
+    // so "nmae" is one edit from "name" rather than two. Typing two letters in the
+    // wrong order is the common miss, and on a four-letter field name it is the only
+    // one a threshold tight enough to be trustworthy can still afford to catch.
+    // Runs once per rejected key against at most 18 names, so a full matrix is fine.
     private static int Distance(string a, string b)
     {
-        var previous = new int[b.Length + 1];
-        var current = new int[b.Length + 1];
-        for (var j = 0; j <= b.Length; j++) previous[j] = j;
+        var d = new int[a.Length + 1, b.Length + 1];
+        for (var i = 0; i <= a.Length; i++) d[i, 0] = i;
+        for (var j = 0; j <= b.Length; j++) d[0, j] = j;
         for (var i = 1; i <= a.Length; i++)
         {
-            current[0] = i;
             for (var j = 1; j <= b.Length; j++)
             {
                 var cost = a[i - 1] == b[j - 1] ? 0 : 1;
-                current[j] = Math.Min(Math.Min(current[j - 1] + 1, previous[j] + 1), previous[j - 1] + cost);
+                d[i, j] = Math.Min(Math.Min(d[i - 1, j] + 1, d[i, j - 1] + 1), d[i - 1, j - 1] + cost);
+                if (i > 1 && j > 1 && a[i - 1] == b[j - 2] && a[i - 2] == b[j - 1])
+                    d[i, j] = Math.Min(d[i, j], d[i - 2, j - 2] + 1);
             }
-            (previous, current) = (current, previous);
         }
-        return previous[b.Length];
+        return d[a.Length, b.Length];
     }
 }

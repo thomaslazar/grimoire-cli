@@ -200,6 +200,59 @@ public class JsonBodyInputTests
         Validate("""{"publishers":[]}""");
     }
 
+    // A number too large for its target makes Kiota's parse throw. The root's keys
+    // are checked without parsing any value precisely so that a body like this — which
+    // the server accepts, storing the year and dropping the typo — still gets refused.
+    [Fact]
+    public void StillCatchesATypoWhenAValueStopsTheParse()
+    {
+        var ex = Assert.Throws<BodyInputException>(() => Validate("""{"year":99999999999999999999,"nmae":"x"}"""));
+        Assert.Contains("nmae", ex.Message);
+    }
+
+    // The offending key is located by name in the raw body, so a name appearing more
+    // than once cannot be placed: pointing at the wrong one would tell a caller to
+    // rename a field that is legal where it sits.
+    [Fact]
+    public void OmitsThePathWhenTheNameIsAmbiguous()
+    {
+        var ex = Assert.Throws<BodyInputException>(() => Validate("""{"urls":[{"name":"bad"}]}"""));
+        Assert.Contains("'name'", ex.Message);
+        Assert.Contains("label", ex.Message);
+    }
+
+    [Fact]
+    public void DoesNotPointAtALegalFieldThatSharesTheName()
+    {
+        var ex = Assert.Throws<BodyInputException>(
+            () => Validate("""{"name":"legal","urls":[{"name":"bad"}]}"""));
+        Assert.DoesNotContain("at $.name.", ex.Message);
+    }
+
+    // An id inside a nested entry is not the id that belongs in --id.
+    [Fact]
+    public void GivesTheIdAdviceOnlyAtTheRoot()
+    {
+        var ex = Assert.Throws<BodyInputException>(() => Validate("""{"urls":[{"id":"x"}]}"""));
+        Assert.DoesNotContain(IdHint, ex.Message);
+    }
+
+    // Two letters in the wrong order is the common typo, and on a short field name
+    // it is the only miss the tightened threshold can still afford to suggest for.
+    [Fact]
+    public void SuggestsAcrossATransposition()
+    {
+        var ex = Assert.Throws<BodyInputException>(() => Validate("""{"nmae":"x"}"""));
+        Assert.Contains("Did you mean 'name'?", ex.Message);
+    }
+
+    [Fact]
+    public void OffersNoSuggestionForAKeyThatResemblesNothing()
+    {
+        var ex = Assert.Throws<BodyInputException>(() => Validate("""{"a":1}"""));
+        Assert.DoesNotContain("Did you mean", ex.Message);
+    }
+
     [Fact]
     public void ReportsEveryUnknownFieldNotJustTheFirst()
     {

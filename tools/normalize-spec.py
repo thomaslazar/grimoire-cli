@@ -32,10 +32,12 @@ def collapse(node, stats):
         arrays = [b for b in branches if isinstance(b, dict) and b.get("type") == "array"]
         if len(arrays) == 1 and any(is_null_branch(b) for b in branches):
             collapsed = dict(arrays[0])
-            # Keep the wrapper's own annotations; the branch has no title of its own.
-            for key, value in node.items():
-                if key != "anyOf" and key not in collapsed:
-                    collapsed[key] = value
+            # Carry over the wrapper's annotations only. Anything else it grows
+            # later (a `default`, say) would be a constraint on the union, not on
+            # the array, and pasting it onto the branch would change its meaning.
+            for key in ("title", "description"):
+                if key in node and key not in collapsed:
+                    collapsed[key] = node[key]
             stats.append(collapsed.get("title", "?"))
             return collapse(collapsed, stats)
 
