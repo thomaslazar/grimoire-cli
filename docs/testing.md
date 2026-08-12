@@ -150,21 +150,26 @@ Three jobs, defined in `.github/workflows/build.yml`:
 
 | Job | What | Platforms |
 |-----|------|-----------|
-| unit-test | `dotnet format --verify-no-changes` + 110 unit tests | ubuntu-latest |
-| smoke-test | installs `python3-fitz`, publishes the AOT `linux-x64` binary, starts the stack, seeds it, runs `smoke-test.sh` (26 assertions) | ubuntu-latest only (needs Docker) |
+| unit-test | `dotnet format --verify-no-changes` + the xUnit suite | ubuntu-latest |
+| smoke-test | installs `python3-fitz`, publishes the AOT `linux-x64` binary, starts the stack, seeds it, runs `smoke-test.sh` | ubuntu-latest only (needs Docker) |
 | build | AOT publish + `self-test` per RID | linux-x64, linux-arm64, osx-arm64, osx-x64, win-x64, win-arm64 |
 
 The smoke test is Linux-only because it needs a Docker Grimoire container.
 `self-test` runs on all six platforms to validate AOT integrity everywhere a
 binary actually ships, not just the one CI happens to build on.
 
+The Grimoire image is pulled unauthenticated, so a Docker Hub rate limit
+surfaces as a red `smoke-test` job on a PR that changed nothing related. A
+repository secret with Docker Hub credentials would remove that failure mode.
+
 ## Deviations from abs-cli
 
 - **The smoke test is idempotent.** abs-cli's mutates server state on every
-  run (creates/updates/deletes items); grimoire-cli's only reads and logs
-  in, because the library mount is read-only and the metadata-writing
-  commands don't exist yet. Once `systems`/`books` `PATCH` commands land,
-  expect this to change.
+  run (creates/updates/deletes items). grimoire-cli's writes too, since the
+  write commands landed, but only to the `Shadowrun 4 DE` fixture and only
+  values fixed in the script, so a second run converges instead of drifting.
+  A write whose expected value depends on the fixture's prior state would
+  break that, and the suite is run twice before a PR to prove it hasn't.
 - **Fixtures are generated, not fixed files.** abs-cli seeds from checked-in
   audio fixtures; grimoire-cli generates PDFs on the fly via
   `docker/make-fixtures.py` so the tooling and the target format are

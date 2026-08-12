@@ -49,7 +49,7 @@ public class HelpOutputTests
     {
         var output = RenderHelp(helpFull: false, "systems", "list");
         Assert.DoesNotContain("Response shape:", output);
-        Assert.Contains("Run --help-full to see response shape(s).", output);
+        Assert.Contains("Run --help-full to see the request and response shapes.", output);
     }
 
     [Fact]
@@ -93,7 +93,7 @@ public class HelpOutputTests
     {
         var output = RenderHelp(helpFull: false, "systems", "get");
         Assert.DoesNotContain("Response shape:", output);
-        Assert.Contains("Run --help-full to see response shape(s).", output);
+        Assert.Contains("Run --help-full to see the request and response shapes.", output);
     }
 
     [Fact]

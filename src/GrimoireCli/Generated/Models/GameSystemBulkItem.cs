@@ -50,10 +50,10 @@ namespace GrimoireCli.Generated.Models
         /// <summary>The dice_materials property</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
-        public global::GrimoireCli.Generated.Models.GameSystemBulkItem.GameSystemBulkItem_dice_materials? DiceMaterials { get; set; }
+        public List<string>? DiceMaterials { get; set; }
 #nullable restore
 #else
-        public global::GrimoireCli.Generated.Models.GameSystemBulkItem.GameSystemBulkItem_dice_materials DiceMaterials { get; set; }
+        public List<string> DiceMaterials { get; set; }
 #endif
         /// <summary>The edition property</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
@@ -74,10 +74,10 @@ namespace GrimoireCli.Generated.Models
         /// <summary>The genres property</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
-        public global::GrimoireCli.Generated.Models.GameSystemBulkItem.GameSystemBulkItem_genres? Genres { get; set; }
+        public List<string>? Genres { get; set; }
 #nullable restore
 #else
-        public global::GrimoireCli.Generated.Models.GameSystemBulkItem.GameSystemBulkItem_genres Genres { get; set; }
+        public List<string> Genres { get; set; }
 #endif
         /// <summary>The id property</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
@@ -138,10 +138,10 @@ namespace GrimoireCli.Generated.Models
         /// <summary>The tags property</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
-        public global::GrimoireCli.Generated.Models.GameSystemBulkItem.GameSystemBulkItem_tags? Tags { get; set; }
+        public List<string>? Tags { get; set; }
 #nullable restore
 #else
-        public global::GrimoireCli.Generated.Models.GameSystemBulkItem.GameSystemBulkItem_tags Tags { get; set; }
+        public List<string> Tags { get; set; }
 #endif
         /// <summary>The urls property</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
@@ -188,10 +188,10 @@ namespace GrimoireCli.Generated.Models
                 { "character_builder_urls", n => { CharacterBuilderUrls = n.GetCollectionOfObjectValues<global::GrimoireCli.Generated.Models.Backend__routers__systems___schemas__LinkEntry>(global::GrimoireCli.Generated.Models.Backend__routers__systems___schemas__LinkEntry.CreateFromDiscriminatorValue)?.AsList(); } },
                 { "cover_book_id", n => { CoverBookId = n.GetObjectValue<global::GrimoireCli.Generated.Models.GameSystemBulkItem.GameSystemBulkItem_cover_book_id>(global::GrimoireCli.Generated.Models.GameSystemBulkItem.GameSystemBulkItem_cover_book_id.CreateFromDiscriminatorValue); } },
                 { "description", n => { Description = n.GetObjectValue<global::GrimoireCli.Generated.Models.GameSystemBulkItem.GameSystemBulkItem_description>(global::GrimoireCli.Generated.Models.GameSystemBulkItem.GameSystemBulkItem_description.CreateFromDiscriminatorValue); } },
-                { "dice_materials", n => { DiceMaterials = n.GetObjectValue<global::GrimoireCli.Generated.Models.GameSystemBulkItem.GameSystemBulkItem_dice_materials>(global::GrimoireCli.Generated.Models.GameSystemBulkItem.GameSystemBulkItem_dice_materials.CreateFromDiscriminatorValue); } },
+                { "dice_materials", n => { DiceMaterials = n.GetCollectionOfPrimitiveValues<string>()?.AsList(); } },
                 { "edition", n => { Edition = n.GetObjectValue<global::GrimoireCli.Generated.Models.GameSystemBulkItem.GameSystemBulkItem_edition>(global::GrimoireCli.Generated.Models.GameSystemBulkItem.GameSystemBulkItem_edition.CreateFromDiscriminatorValue); } },
                 { "genre", n => { Genre = n.GetObjectValue<global::GrimoireCli.Generated.Models.GameSystemBulkItem.GameSystemBulkItem_genre>(global::GrimoireCli.Generated.Models.GameSystemBulkItem.GameSystemBulkItem_genre.CreateFromDiscriminatorValue); } },
-                { "genres", n => { Genres = n.GetObjectValue<global::GrimoireCli.Generated.Models.GameSystemBulkItem.GameSystemBulkItem_genres>(global::GrimoireCli.Generated.Models.GameSystemBulkItem.GameSystemBulkItem_genres.CreateFromDiscriminatorValue); } },
+                { "genres", n => { Genres = n.GetCollectionOfPrimitiveValues<string>()?.AsList(); } },
                 { "id", n => { Id = n.GetStringValue(); } },
                 { "is_explicit", n => { IsExplicit = n.GetObjectValue<global::GrimoireCli.Generated.Models.GameSystemBulkItem.GameSystemBulkItem_is_explicit>(global::GrimoireCli.Generated.Models.GameSystemBulkItem.GameSystemBulkItem_is_explicit.CreateFromDiscriminatorValue); } },
                 { "license", n => { License = n.GetObjectValue<global::GrimoireCli.Generated.Models.GameSystemBulkItem.GameSystemBulkItem_license>(global::GrimoireCli.Generated.Models.GameSystemBulkItem.GameSystemBulkItem_license.CreateFromDiscriminatorValue); } },
@@ -199,7 +199,7 @@ namespace GrimoireCli.Generated.Models
                 { "parent_system", n => { ParentSystem = n.GetObjectValue<global::GrimoireCli.Generated.Models.GameSystemBulkItem.GameSystemBulkItem_parent_system>(global::GrimoireCli.Generated.Models.GameSystemBulkItem.GameSystemBulkItem_parent_system.CreateFromDiscriminatorValue); } },
                 { "publishers", n => { Publishers = n.GetCollectionOfObjectValues<global::GrimoireCli.Generated.Models.PublisherEntry>(global::GrimoireCli.Generated.Models.PublisherEntry.CreateFromDiscriminatorValue)?.AsList(); } },
                 { "system_family", n => { SystemFamily = n.GetObjectValue<global::GrimoireCli.Generated.Models.GameSystemBulkItem.GameSystemBulkItem_system_family>(global::GrimoireCli.Generated.Models.GameSystemBulkItem.GameSystemBulkItem_system_family.CreateFromDiscriminatorValue); } },
-                { "tags", n => { Tags = n.GetObjectValue<global::GrimoireCli.Generated.Models.GameSystemBulkItem.GameSystemBulkItem_tags>(global::GrimoireCli.Generated.Models.GameSystemBulkItem.GameSystemBulkItem_tags.CreateFromDiscriminatorValue); } },
+                { "tags", n => { Tags = n.GetCollectionOfPrimitiveValues<string>()?.AsList(); } },
                 { "urls", n => { Urls = n.GetCollectionOfObjectValues<global::GrimoireCli.Generated.Models.Backend__routers__systems___schemas__LinkEntry>(global::GrimoireCli.Generated.Models.Backend__routers__systems___schemas__LinkEntry.CreateFromDiscriminatorValue)?.AsList(); } },
                 { "year", n => { Year = n.GetObjectValue<global::GrimoireCli.Generated.Models.GameSystemBulkItem.GameSystemBulkItem_year>(global::GrimoireCli.Generated.Models.GameSystemBulkItem.GameSystemBulkItem_year.CreateFromDiscriminatorValue); } },
             };
@@ -215,10 +215,10 @@ namespace GrimoireCli.Generated.Models
             writer.WriteCollectionOfObjectValues<global::GrimoireCli.Generated.Models.Backend__routers__systems___schemas__LinkEntry>("character_builder_urls", CharacterBuilderUrls);
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.GameSystemBulkItem.GameSystemBulkItem_cover_book_id>("cover_book_id", CoverBookId);
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.GameSystemBulkItem.GameSystemBulkItem_description>("description", Description);
-            writer.WriteObjectValue<global::GrimoireCli.Generated.Models.GameSystemBulkItem.GameSystemBulkItem_dice_materials>("dice_materials", DiceMaterials);
+            writer.WriteCollectionOfPrimitiveValues<string>("dice_materials", DiceMaterials);
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.GameSystemBulkItem.GameSystemBulkItem_edition>("edition", Edition);
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.GameSystemBulkItem.GameSystemBulkItem_genre>("genre", Genre);
-            writer.WriteObjectValue<global::GrimoireCli.Generated.Models.GameSystemBulkItem.GameSystemBulkItem_genres>("genres", Genres);
+            writer.WriteCollectionOfPrimitiveValues<string>("genres", Genres);
             writer.WriteStringValue("id", Id);
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.GameSystemBulkItem.GameSystemBulkItem_is_explicit>("is_explicit", IsExplicit);
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.GameSystemBulkItem.GameSystemBulkItem_license>("license", License);
@@ -226,7 +226,7 @@ namespace GrimoireCli.Generated.Models
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.GameSystemBulkItem.GameSystemBulkItem_parent_system>("parent_system", ParentSystem);
             writer.WriteCollectionOfObjectValues<global::GrimoireCli.Generated.Models.PublisherEntry>("publishers", Publishers);
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.GameSystemBulkItem.GameSystemBulkItem_system_family>("system_family", SystemFamily);
-            writer.WriteObjectValue<global::GrimoireCli.Generated.Models.GameSystemBulkItem.GameSystemBulkItem_tags>("tags", Tags);
+            writer.WriteCollectionOfPrimitiveValues<string>("tags", Tags);
             writer.WriteCollectionOfObjectValues<global::GrimoireCli.Generated.Models.Backend__routers__systems___schemas__LinkEntry>("urls", Urls);
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.GameSystemBulkItem.GameSystemBulkItem_year>("year", Year);
             writer.WriteAdditionalData(AdditionalData);
@@ -436,74 +436,6 @@ namespace GrimoireCli.Generated.Models
             }
         }
         /// <summary>
-        /// Composed type wrapper for classes <see cref="global::GrimoireCli.Generated.Models.GameSystemBulkItem_dice_materialsMember1"/>, List&lt;string&gt;
-        /// </summary>
-        [global::System.CodeDom.Compiler.GeneratedCode("Kiota", "1.0.0")]
-        public partial class GameSystemBulkItem_dice_materials : IComposedTypeWrapper, IParsable
-        {
-            /// <summary>Composed type representation for type <see cref="global::GrimoireCli.Generated.Models.GameSystemBulkItem_dice_materialsMember1"/></summary>
-#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
-#nullable enable
-            public global::GrimoireCli.Generated.Models.GameSystemBulkItem_dice_materialsMember1? GameSystemBulkItemDiceMaterialsMember1 { get; set; }
-#nullable restore
-#else
-            public global::GrimoireCli.Generated.Models.GameSystemBulkItem_dice_materialsMember1 GameSystemBulkItemDiceMaterialsMember1 { get; set; }
-#endif
-            /// <summary>Composed type representation for type List&lt;string&gt;</summary>
-#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
-#nullable enable
-            public List<string>? String { get; set; }
-#nullable restore
-#else
-            public List<string> String { get; set; }
-#endif
-            /// <summary>
-            /// Creates a new instance of the appropriate class based on discriminator value
-            /// </summary>
-            /// <returns>A <see cref="global::GrimoireCli.Generated.Models.GameSystemBulkItem.GameSystemBulkItem_dice_materials"/></returns>
-            /// <param name="parseNode">The parse node to use to read the discriminator value and create the object</param>
-            public static global::GrimoireCli.Generated.Models.GameSystemBulkItem.GameSystemBulkItem_dice_materials CreateFromDiscriminatorValue(IParseNode parseNode)
-            {
-                if(ReferenceEquals(parseNode, null)) throw new ArgumentNullException(nameof(parseNode));
-                var result = new global::GrimoireCli.Generated.Models.GameSystemBulkItem.GameSystemBulkItem_dice_materials();
-                if(parseNode.GetCollectionOfPrimitiveValues<string>()?.AsList() is List<string> stringValue)
-                {
-                    result.String = stringValue;
-                }
-                else {
-                    result.GameSystemBulkItemDiceMaterialsMember1 = new global::GrimoireCli.Generated.Models.GameSystemBulkItem_dice_materialsMember1();
-                }
-                return result;
-            }
-            /// <summary>
-            /// The deserialization information for the current model
-            /// </summary>
-            /// <returns>A IDictionary&lt;string, Action&lt;IParseNode&gt;&gt;</returns>
-            public virtual IDictionary<string, Action<IParseNode>> GetFieldDeserializers()
-            {
-                if(GameSystemBulkItemDiceMaterialsMember1 != null)
-                {
-                    return ParseNodeHelper.MergeDeserializersForIntersectionWrapper(GameSystemBulkItemDiceMaterialsMember1);
-                }
-                return new Dictionary<string, Action<IParseNode>>();
-            }
-            /// <summary>
-            /// Serializes information the current object
-            /// </summary>
-            /// <param name="writer">Serialization writer to use to serialize this model</param>
-            public virtual void Serialize(ISerializationWriter writer)
-            {
-                if(ReferenceEquals(writer, null)) throw new ArgumentNullException(nameof(writer));
-                if(String != null)
-                {
-                    writer.WriteCollectionOfPrimitiveValues<string>(null, String);
-                }
-                else {
-                    writer.WriteObjectValue<global::GrimoireCli.Generated.Models.GameSystemBulkItem_dice_materialsMember1>(null, GameSystemBulkItemDiceMaterialsMember1);
-                }
-            }
-        }
-        /// <summary>
         /// Composed type wrapper for classes <see cref="global::GrimoireCli.Generated.Models.GameSystemBulkItem_editionMember1"/>, <see cref="string"/>
         /// </summary>
         [global::System.CodeDom.Compiler.GeneratedCode("Kiota", "1.0.0")]
@@ -636,74 +568,6 @@ namespace GrimoireCli.Generated.Models
                 }
                 else {
                     writer.WriteObjectValue<global::GrimoireCli.Generated.Models.GameSystemBulkItem_genreMember1>(null, GameSystemBulkItemGenreMember1);
-                }
-            }
-        }
-        /// <summary>
-        /// Composed type wrapper for classes <see cref="global::GrimoireCli.Generated.Models.GameSystemBulkItem_genresMember1"/>, List&lt;string&gt;
-        /// </summary>
-        [global::System.CodeDom.Compiler.GeneratedCode("Kiota", "1.0.0")]
-        public partial class GameSystemBulkItem_genres : IComposedTypeWrapper, IParsable
-        {
-            /// <summary>Composed type representation for type <see cref="global::GrimoireCli.Generated.Models.GameSystemBulkItem_genresMember1"/></summary>
-#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
-#nullable enable
-            public global::GrimoireCli.Generated.Models.GameSystemBulkItem_genresMember1? GameSystemBulkItemGenresMember1 { get; set; }
-#nullable restore
-#else
-            public global::GrimoireCli.Generated.Models.GameSystemBulkItem_genresMember1 GameSystemBulkItemGenresMember1 { get; set; }
-#endif
-            /// <summary>Composed type representation for type List&lt;string&gt;</summary>
-#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
-#nullable enable
-            public List<string>? String { get; set; }
-#nullable restore
-#else
-            public List<string> String { get; set; }
-#endif
-            /// <summary>
-            /// Creates a new instance of the appropriate class based on discriminator value
-            /// </summary>
-            /// <returns>A <see cref="global::GrimoireCli.Generated.Models.GameSystemBulkItem.GameSystemBulkItem_genres"/></returns>
-            /// <param name="parseNode">The parse node to use to read the discriminator value and create the object</param>
-            public static global::GrimoireCli.Generated.Models.GameSystemBulkItem.GameSystemBulkItem_genres CreateFromDiscriminatorValue(IParseNode parseNode)
-            {
-                if(ReferenceEquals(parseNode, null)) throw new ArgumentNullException(nameof(parseNode));
-                var result = new global::GrimoireCli.Generated.Models.GameSystemBulkItem.GameSystemBulkItem_genres();
-                if(parseNode.GetCollectionOfPrimitiveValues<string>()?.AsList() is List<string> stringValue)
-                {
-                    result.String = stringValue;
-                }
-                else {
-                    result.GameSystemBulkItemGenresMember1 = new global::GrimoireCli.Generated.Models.GameSystemBulkItem_genresMember1();
-                }
-                return result;
-            }
-            /// <summary>
-            /// The deserialization information for the current model
-            /// </summary>
-            /// <returns>A IDictionary&lt;string, Action&lt;IParseNode&gt;&gt;</returns>
-            public virtual IDictionary<string, Action<IParseNode>> GetFieldDeserializers()
-            {
-                if(GameSystemBulkItemGenresMember1 != null)
-                {
-                    return ParseNodeHelper.MergeDeserializersForIntersectionWrapper(GameSystemBulkItemGenresMember1);
-                }
-                return new Dictionary<string, Action<IParseNode>>();
-            }
-            /// <summary>
-            /// Serializes information the current object
-            /// </summary>
-            /// <param name="writer">Serialization writer to use to serialize this model</param>
-            public virtual void Serialize(ISerializationWriter writer)
-            {
-                if(ReferenceEquals(writer, null)) throw new ArgumentNullException(nameof(writer));
-                if(String != null)
-                {
-                    writer.WriteCollectionOfPrimitiveValues<string>(null, String);
-                }
-                else {
-                    writer.WriteObjectValue<global::GrimoireCli.Generated.Models.GameSystemBulkItem_genresMember1>(null, GameSystemBulkItemGenresMember1);
                 }
             }
         }
@@ -1038,74 +902,6 @@ namespace GrimoireCli.Generated.Models
                 }
                 else {
                     writer.WriteObjectValue<global::GrimoireCli.Generated.Models.GameSystemBulkItem_system_familyMember1>(null, GameSystemBulkItemSystemFamilyMember1);
-                }
-            }
-        }
-        /// <summary>
-        /// Composed type wrapper for classes <see cref="global::GrimoireCli.Generated.Models.GameSystemBulkItem_tagsMember1"/>, List&lt;string&gt;
-        /// </summary>
-        [global::System.CodeDom.Compiler.GeneratedCode("Kiota", "1.0.0")]
-        public partial class GameSystemBulkItem_tags : IComposedTypeWrapper, IParsable
-        {
-            /// <summary>Composed type representation for type <see cref="global::GrimoireCli.Generated.Models.GameSystemBulkItem_tagsMember1"/></summary>
-#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
-#nullable enable
-            public global::GrimoireCli.Generated.Models.GameSystemBulkItem_tagsMember1? GameSystemBulkItemTagsMember1 { get; set; }
-#nullable restore
-#else
-            public global::GrimoireCli.Generated.Models.GameSystemBulkItem_tagsMember1 GameSystemBulkItemTagsMember1 { get; set; }
-#endif
-            /// <summary>Composed type representation for type List&lt;string&gt;</summary>
-#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
-#nullable enable
-            public List<string>? String { get; set; }
-#nullable restore
-#else
-            public List<string> String { get; set; }
-#endif
-            /// <summary>
-            /// Creates a new instance of the appropriate class based on discriminator value
-            /// </summary>
-            /// <returns>A <see cref="global::GrimoireCli.Generated.Models.GameSystemBulkItem.GameSystemBulkItem_tags"/></returns>
-            /// <param name="parseNode">The parse node to use to read the discriminator value and create the object</param>
-            public static global::GrimoireCli.Generated.Models.GameSystemBulkItem.GameSystemBulkItem_tags CreateFromDiscriminatorValue(IParseNode parseNode)
-            {
-                if(ReferenceEquals(parseNode, null)) throw new ArgumentNullException(nameof(parseNode));
-                var result = new global::GrimoireCli.Generated.Models.GameSystemBulkItem.GameSystemBulkItem_tags();
-                if(parseNode.GetCollectionOfPrimitiveValues<string>()?.AsList() is List<string> stringValue)
-                {
-                    result.String = stringValue;
-                }
-                else {
-                    result.GameSystemBulkItemTagsMember1 = new global::GrimoireCli.Generated.Models.GameSystemBulkItem_tagsMember1();
-                }
-                return result;
-            }
-            /// <summary>
-            /// The deserialization information for the current model
-            /// </summary>
-            /// <returns>A IDictionary&lt;string, Action&lt;IParseNode&gt;&gt;</returns>
-            public virtual IDictionary<string, Action<IParseNode>> GetFieldDeserializers()
-            {
-                if(GameSystemBulkItemTagsMember1 != null)
-                {
-                    return ParseNodeHelper.MergeDeserializersForIntersectionWrapper(GameSystemBulkItemTagsMember1);
-                }
-                return new Dictionary<string, Action<IParseNode>>();
-            }
-            /// <summary>
-            /// Serializes information the current object
-            /// </summary>
-            /// <param name="writer">Serialization writer to use to serialize this model</param>
-            public virtual void Serialize(ISerializationWriter writer)
-            {
-                if(ReferenceEquals(writer, null)) throw new ArgumentNullException(nameof(writer));
-                if(String != null)
-                {
-                    writer.WriteCollectionOfPrimitiveValues<string>(null, String);
-                }
-                else {
-                    writer.WriteObjectValue<global::GrimoireCli.Generated.Models.GameSystemBulkItem_tagsMember1>(null, GameSystemBulkItemTagsMember1);
                 }
             }
         }

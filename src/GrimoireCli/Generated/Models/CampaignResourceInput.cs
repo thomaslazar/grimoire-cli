@@ -14,12 +14,45 @@ namespace GrimoireCli.Generated.Models
     {
         /// <summary>Stores additional data not described in the OpenAPI description found when deserializing. Can be used for serialization as well.</summary>
         public IDictionary<string, object> AdditionalData { get; set; }
+        /// <summary>The resource_id property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public string? ResourceId { get; set; }
+#nullable restore
+#else
+        public string ResourceId { get; set; }
+#endif
+        /// <summary>The resource_type property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public string? ResourceType { get; set; }
+#nullable restore
+#else
+        public string ResourceType { get; set; }
+#endif
+        /// <summary>The shared_user_ids property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public List<string>? SharedUserIds { get; set; }
+#nullable restore
+#else
+        public List<string> SharedUserIds { get; set; }
+#endif
+        /// <summary>The visibility property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public string? Visibility { get; set; }
+#nullable restore
+#else
+        public string Visibility { get; set; }
+#endif
         /// <summary>
         /// Instantiates a new <see cref="global::GrimoireCli.Generated.Models.CampaignResourceInput"/> and sets the default values.
         /// </summary>
         public CampaignResourceInput()
         {
             AdditionalData = new Dictionary<string, object>();
+            Visibility = "gm";
         }
         /// <summary>
         /// Creates a new instance of the appropriate class based on discriminator value
@@ -39,6 +72,10 @@ namespace GrimoireCli.Generated.Models
         {
             return new Dictionary<string, Action<IParseNode>>
             {
+                { "resource_id", n => { ResourceId = n.GetStringValue(); } },
+                { "resource_type", n => { ResourceType = n.GetStringValue(); } },
+                { "shared_user_ids", n => { SharedUserIds = n.GetCollectionOfPrimitiveValues<string>()?.AsList(); } },
+                { "visibility", n => { Visibility = n.GetStringValue(); } },
             };
         }
         /// <summary>
@@ -48,6 +85,10 @@ namespace GrimoireCli.Generated.Models
         public virtual void Serialize(ISerializationWriter writer)
         {
             if(ReferenceEquals(writer, null)) throw new ArgumentNullException(nameof(writer));
+            writer.WriteStringValue("resource_id", ResourceId);
+            writer.WriteStringValue("resource_type", ResourceType);
+            writer.WriteCollectionOfPrimitiveValues<string>("shared_user_ids", SharedUserIds);
+            writer.WriteStringValue("visibility", Visibility);
             writer.WriteAdditionalData(AdditionalData);
         }
     }

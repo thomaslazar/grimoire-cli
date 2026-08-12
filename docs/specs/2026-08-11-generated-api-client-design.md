@@ -153,9 +153,9 @@ Behaviour-neutral throughout. Each step ends with the full gate set green.
 
 The deferred systems write commands
 ([design](2026-08-10-systems-write-commands-design.md)) resume after this, and
-its §3.2 is revisited: request DTOs now come from the generator, so the question
-becomes whether `[JsonUnmappedMemberHandling(Disallow)]` behaviour is achievable
-on generated types or must be wrapped.
+its §3.2 is revisited. Answered there: the generated models validate request
+bodies directly, through the field lists they publish, so the CLI mirrors no part
+of the API's shape.
 
 ---
 

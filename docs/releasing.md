@@ -19,7 +19,7 @@ do not — so a first release is a checklist rather than an improvisation.
 |---|---|---|
 | A `thomaslazar/homebrew-grimoire-cli` tap repository | **done** — public, initialised with a commit on `main` | `update-homebrew` clones and pushes to it; an empty repository has no HEAD to clone |
 | A `HOMEBREW_TAP_TOKEN` repository secret | **done** — set 2026-08-09 | that job authenticates with it; without it the job fails *after* the binaries are already attached, leaving a partial release |
-| The repo to be public, or a paid plan | outstanding, not blocking | `main` is unprotected because GitHub Free offers neither branch protection nor rulesets on private repos — see [roadmap.md](roadmap.md) |
+| The repo to be public, or a paid plan | outstanding, not blocking | `main` is unprotected: GitHub Free offers neither branch protection nor rulesets on a private repo. When the repo goes public, require the `unit-test` and `smoke-test` checks with zero required approvals — a solo maintainer cannot approve their own PR |
 
 The process below is automated by the `release` skill
 (`.claude/skills/release/SKILL.md`), which is invoked by name and never

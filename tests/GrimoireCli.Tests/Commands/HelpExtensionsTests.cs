@@ -95,7 +95,7 @@ public class HelpExtensionsTests
         cmd.AddResponseExample<GameSystemSummary>();
         var output = RenderHelp(cmd);
         Assert.DoesNotContain("Response shape:", output);
-        Assert.Contains("Run --help-full to see response shape(s).", output);
+        Assert.Contains("Run --help-full to see the request and response shapes.", output);
     }
 
     [Fact]

@@ -78,10 +78,14 @@ The JWT is valid for 30 days. Grimoire has **no refresh endpoint**, so an expire
 | Command | Description |
 |---------|-------------|
 | `login [--server <url>] [--username <u>] [--password <pw> \| --password-stdin]` | Authenticate and store the JWT (flags fall back to interactive prompts) |
+| `me` | Show the authenticated account (id, username, role, flags) |
 | `config get` | Show current configuration |
 | `config set <key> <value>` | Set a configuration value (`server` is the only valid key) |
 | `systems list [--sort name\|book_count\|page_count\|year] [--desc] [--genre <g>] [--family <f>] [--parent-system <p>] [--edition <e>] [--license <l>] [--explicit true\|false] [--parent-id <id>] [--include-children]` | List all game systems |
 | `systems get --id <id> [--book-sort category\|title\|page_count\|year] [--book-desc] [--genre <g>] [--category <c>] [--explicit true\|false]` | Get a single game system, with its books |
+| `systems update --id <id> {--input <file> \| --stdin}` | Update one system's metadata (gm or admin) |
+| `systems batch-update {--input <file> \| --stdin}` | Update many systems in one transaction; exit 3 if partial (gm or admin) |
+| `systems batch-tag {--input <file> \| --stdin}` | Add tags to many systems, additively; exit 3 if partial (gm or admin) |
 | `self-test` | Verify binary integrity (AOT validation, no network required) |
 
 Every command supports `--help` with examples and caveats.

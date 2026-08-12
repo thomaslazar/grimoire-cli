@@ -34,10 +34,10 @@ namespace GrimoireCli.Generated.Models
         /// <summary>The tags property</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
-        public global::GrimoireCli.Generated.Models.AudioBulkItem.AudioBulkItem_tags? Tags { get; set; }
+        public List<string>? Tags { get; set; }
 #nullable restore
 #else
-        public global::GrimoireCli.Generated.Models.AudioBulkItem.AudioBulkItem_tags Tags { get; set; }
+        public List<string> Tags { get; set; }
 #endif
         /// <summary>
         /// Instantiates a new <see cref="global::GrimoireCli.Generated.Models.AudioBulkItem"/> and sets the default values.
@@ -66,7 +66,7 @@ namespace GrimoireCli.Generated.Models
             {
                 { "description", n => { Description = n.GetObjectValue<global::GrimoireCli.Generated.Models.AudioBulkItem.AudioBulkItem_description>(global::GrimoireCli.Generated.Models.AudioBulkItem.AudioBulkItem_description.CreateFromDiscriminatorValue); } },
                 { "id", n => { Id = n.GetStringValue(); } },
-                { "tags", n => { Tags = n.GetObjectValue<global::GrimoireCli.Generated.Models.AudioBulkItem.AudioBulkItem_tags>(global::GrimoireCli.Generated.Models.AudioBulkItem.AudioBulkItem_tags.CreateFromDiscriminatorValue); } },
+                { "tags", n => { Tags = n.GetCollectionOfPrimitiveValues<string>()?.AsList(); } },
             };
         }
         /// <summary>
@@ -78,7 +78,7 @@ namespace GrimoireCli.Generated.Models
             if(ReferenceEquals(writer, null)) throw new ArgumentNullException(nameof(writer));
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.AudioBulkItem.AudioBulkItem_description>("description", Description);
             writer.WriteStringValue("id", Id);
-            writer.WriteObjectValue<global::GrimoireCli.Generated.Models.AudioBulkItem.AudioBulkItem_tags>("tags", Tags);
+            writer.WriteCollectionOfPrimitiveValues<string>("tags", Tags);
             writer.WriteAdditionalData(AdditionalData);
         }
         /// <summary>
@@ -146,74 +146,6 @@ namespace GrimoireCli.Generated.Models
                 }
                 else {
                     writer.WriteObjectValue<global::GrimoireCli.Generated.Models.AudioBulkItem_descriptionMember1>(null, AudioBulkItemDescriptionMember1);
-                }
-            }
-        }
-        /// <summary>
-        /// Composed type wrapper for classes <see cref="global::GrimoireCli.Generated.Models.AudioBulkItem_tagsMember1"/>, List&lt;string&gt;
-        /// </summary>
-        [global::System.CodeDom.Compiler.GeneratedCode("Kiota", "1.0.0")]
-        public partial class AudioBulkItem_tags : IComposedTypeWrapper, IParsable
-        {
-            /// <summary>Composed type representation for type <see cref="global::GrimoireCli.Generated.Models.AudioBulkItem_tagsMember1"/></summary>
-#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
-#nullable enable
-            public global::GrimoireCli.Generated.Models.AudioBulkItem_tagsMember1? AudioBulkItemTagsMember1 { get; set; }
-#nullable restore
-#else
-            public global::GrimoireCli.Generated.Models.AudioBulkItem_tagsMember1 AudioBulkItemTagsMember1 { get; set; }
-#endif
-            /// <summary>Composed type representation for type List&lt;string&gt;</summary>
-#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
-#nullable enable
-            public List<string>? String { get; set; }
-#nullable restore
-#else
-            public List<string> String { get; set; }
-#endif
-            /// <summary>
-            /// Creates a new instance of the appropriate class based on discriminator value
-            /// </summary>
-            /// <returns>A <see cref="global::GrimoireCli.Generated.Models.AudioBulkItem.AudioBulkItem_tags"/></returns>
-            /// <param name="parseNode">The parse node to use to read the discriminator value and create the object</param>
-            public static global::GrimoireCli.Generated.Models.AudioBulkItem.AudioBulkItem_tags CreateFromDiscriminatorValue(IParseNode parseNode)
-            {
-                if(ReferenceEquals(parseNode, null)) throw new ArgumentNullException(nameof(parseNode));
-                var result = new global::GrimoireCli.Generated.Models.AudioBulkItem.AudioBulkItem_tags();
-                if(parseNode.GetCollectionOfPrimitiveValues<string>()?.AsList() is List<string> stringValue)
-                {
-                    result.String = stringValue;
-                }
-                else {
-                    result.AudioBulkItemTagsMember1 = new global::GrimoireCli.Generated.Models.AudioBulkItem_tagsMember1();
-                }
-                return result;
-            }
-            /// <summary>
-            /// The deserialization information for the current model
-            /// </summary>
-            /// <returns>A IDictionary&lt;string, Action&lt;IParseNode&gt;&gt;</returns>
-            public virtual IDictionary<string, Action<IParseNode>> GetFieldDeserializers()
-            {
-                if(AudioBulkItemTagsMember1 != null)
-                {
-                    return ParseNodeHelper.MergeDeserializersForIntersectionWrapper(AudioBulkItemTagsMember1);
-                }
-                return new Dictionary<string, Action<IParseNode>>();
-            }
-            /// <summary>
-            /// Serializes information the current object
-            /// </summary>
-            /// <param name="writer">Serialization writer to use to serialize this model</param>
-            public virtual void Serialize(ISerializationWriter writer)
-            {
-                if(ReferenceEquals(writer, null)) throw new ArgumentNullException(nameof(writer));
-                if(String != null)
-                {
-                    writer.WriteCollectionOfPrimitiveValues<string>(null, String);
-                }
-                else {
-                    writer.WriteObjectValue<global::GrimoireCli.Generated.Models.AudioBulkItem_tagsMember1>(null, AudioBulkItemTagsMember1);
                 }
             }
         }

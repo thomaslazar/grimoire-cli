@@ -1,17 +1,12 @@
 # Systems write commands and `me` — design
 
 **Date:** 2026-08-10
-**Status:** Approved, then **deferred** on 2026-08-11 behind the generated-API-client
-migration. Not yet implemented.
-**Targets:** Grimoire **v1.5.5**, the version the CLI and the live instance both run.
-
-> **§3.2 needs revisiting before this is built.** It designs hand-written request
-> DTOs carrying `[JsonUnmappedMemberHandling(Disallow)]`. Once the client is
-> generated from the OpenAPI spec, request types come from the generator instead
-> — and the spec already defines all four of them (`GameSystemUpdate`,
-> `GameSystemBulkItem`, `GameSystemBulkUpdate`, `BulkAddTags`). The *behaviour*
-> §3.2 specifies is still what we want; the question is whether the generator
-> produces it or we wrap what it produces. Everything else here stands.
+**Status:** Approved. Deferred on 2026-08-11 behind the generated-API-client
+migration; §3.2 revised against the generated client on 2026-08-11 and now in
+implementation.
+**Targets:** Grimoire **v1.5.6**, the version the CLI targets. Written against
+v1.5.5; every mechanic in §2 was re-verified at the `v1.5.6` tag on 2026-08-11
+and none changed, so the citations below are v1.5.6 line numbers.
 
 ---
 
@@ -37,9 +32,9 @@ landing before any way to find what to write to would be the wrong order.
 
 ---
 
-## 2. Verified v1.5.5 mechanics
+## 2. Verified mechanics
 
-Read from `temp/grimoire` at the `v1.5.5` tag. Every row cites its source,
+Read from `temp/grimoire` at the `v1.5.6` tag. Every row cites its source,
 because an uncited claim in this repo has historically been a wrong one.
 
 | mechanic | verified behaviour | source |
@@ -47,7 +42,7 @@ because an uncited claim in this repo has historically been a wrong one.
 | editable fields | 17 on `GameSystemUpdate`: `name`, `description`, `publishers`, `character_builder_url`, `character_builder_urls`, `urls`, `tags`, `genre`, `genres`, `dice_materials`, `system_family`, `parent_system`, `edition`, `license`, `year`, `cover_book_id`, `is_explicit` | `routers/systems/_schemas.py` |
 | legacy singles | `genre` and `character_builder_url` are kept for backward compatibility; new clients send `genres` / `character_builder_urls` | same file, inline comments |
 | single PATCH response | `{"status": "ok"}` — it does not echo the system, so it confirms nothing about what changed | `routers/systems/core.py:311` |
-| unknown keys | dropped by pydantic before `model_dump`, so they never reach the database and never surface as an error | `routers/systems/core.py:351` |
+| unknown keys | dropped by pydantic before `model_dump`, so they never reach the database and never surface as an error | `routers/systems/core.py:302` |
 | nulls | `model_dump(exclude_none=True)` drops explicit nulls, so `null` is a silent no-op. Clearing a field needs `""` | same line |
 | bulk failure mode | skip-and-continue: an unresolved id or a rejected item goes to `errors`, the rest still apply. Returns `{updated: [ids], errors: [{id, detail}]}`, committing once and only if at least one item applied | `services/bulk_service.py::run_bulk_update` |
 | bulk cap | `MAX_BULK_ITEMS = 1000` | `services/bulk_service.py` |
@@ -55,11 +50,11 @@ because an uncited claim in this repo has historically been a wrong one.
 | tags | live in shared tables, not a column; `apply_updates` syncs them via the tag service and pops them from the `setattr` loop | `services/bulk_service.py::apply_updates` |
 | `bulk/tags` is additive | merges with existing tags and never removes one. Returns `{updated, errors, tags: {id: [display tags]}}` | `services/bulk_service.py::run_bulk_add_tags` |
 | `bulk/tags` validation | `ids` and `tags` both required and non-empty; `ids` capped at 1000 | `routers/_bulk_schemas.py::BulkAddTags` |
-| **rename is sticky** | changing `name` sets `name_is_custom = True`, after which the scanner's `if not system.name_is_custom` gate stops re-deriving the name from the folder — permanently | `routers/systems/core.py:314-334`, `indexer/scan.py:358` |
-| rename to same value | a no-op that returns early and does **not** set the flag | `routers/systems/core.py:326-327` |
-| name clash | 409 on the single-item handler, a per-item `errors` entry in bulk | `routers/systems/core.py:330-333` |
-| blank name | rejected by a validator (422) — `name` is the system's identity and is NOT NULL | `routers/systems/_schemas.py` |
-| role | all three write routes are `require_gm_or_admin` | `routers/systems/core.py:338`, `:358` |
+| **rename is sticky** | changing `name` sets `name_is_custom = True`, after which the scanner's `if not system.name_is_custom` gate stops re-deriving the name from the folder — permanently | `routers/systems/core.py:314-334`, `indexer/scan.py:376` |
+| rename to same value | a no-op that returns early and does **not** set the flag | `routers/systems/core.py:325-326` |
+| name clash | 409 on the single-item handler, a per-item `errors` entry in bulk | `routers/systems/core.py:303-308`, `:327-333` |
+| blank name | rejected by a validator (422) — `name` is the system's identity and is NOT NULL | `routers/systems/_schemas.py:82-91` |
+| role | all three write routes are `require_gm_or_admin` | `routers/systems/core.py:294`, `:339`, `:359` |
 | `me` role | `GET /api/auth/me` is `Depends(get_current_user)` — any authenticated user, no role | `routers/auth/core.py:157-161` |
 | `me` response | `{id, username, display_name, email, role, allow_explicit, campaign_access, oidc_linked}` | `routers/auth/core.py:177-186` |
 | `me` side effect | sets a session cookie when the caller authenticated by Bearer without one, reusing the existing token rather than minting a new one | `routers/auth/core.py:167-170` |
@@ -109,62 +104,79 @@ Bodies are Grimoire's own shapes, passed through unchanged:
 | `batch-update` | `{"items": [{"id": "…", …fields}]}`, at most 1000 items |
 | `batch-tag` | `{"ids": ["…"], "tags": ["…"]}`, both non-empty, at most 1000 ids |
 
-### 3.2 Request DTOs validate the body
+### 3.2 The generated models validate the body
 
-The CLI gains **dedicated request types**, separate from the response types it
-already has:
+The generated client supplies the **URL, method and path parameters**, and the
+generated model for the endpoint supplies the **allowed field names**. Nothing in
+the CLI mirrors the API's fields: a hand-written copy of a field list is a second
+place for the API to be described, and the second place is the one that goes
+stale.
 
-| type | fields | mirrors | used by |
-|---|---|---|---|
-| `GameSystemUpdateRequest` | the 17 editable, none required | `GameSystemUpdate` | `update` |
-| `GameSystemBulkItem` | those 17 **plus a required `id`** | `GameSystemBulkItem` | items of `batch-update` |
-| `GameSystemBulkUpdateRequest` | `items`, required | `GameSystemBulkUpdate` | `batch-update` |
-| `BulkAddTagsRequest` | `ids`, `tags`, both required | `BulkAddTags` | `batch-tag` |
+A Kiota model publishes its own field list as `GetFieldDeserializers().Keys`, and
+routes any key it does not declare into `AdditionalData` rather than failing. That
+is the hook: parse the body with Kiota's own `JsonParseNode`, and anything landing
+in `AdditionalData` is a field the endpoint does not define. `JsonParseNode`
+propagates the `OnAfterAssignFieldValues` callback into every nested object it
+parses, so one hook catches unknown keys at every depth — each paired with the
+model that rejected it, which is where the "did you mean" suggestion comes from.
 
-The item type is **not** the same as `update`'s body: the batch item carries a
-required `id` where the single-item body must not carry one at all. Sharing one
-type between them would either allow `id` where it is rejected, or reject it
-where it is mandatory.
+| endpoint | model driving validation | where the id lives |
+|---|---|---|
+| `update` | `GameSystemUpdate` | `--id`, never the body |
+| `batch-update` | `GameSystemBulkUpdate` → `GameSystemBulkItem` | required on each item |
+| `batch-tag` | `BulkAddTags` | in `ids` |
 
-Each carries `[JsonUnmappedMemberHandling(JsonUnmappedMemberHandling.Disallow)]`,
-so **System.Text.Json rejects an unknown key itself** — verified working under
-the source generator, which is what Native AOT requires. A misspelled field
-throws a `JsonException` naming the offending property, before any HTTP request
-is made.
+Two consequences fall out. **`id` is rejected** by `update` because it is not an
+editable field, so a body pasted from a `systems get` dump fails rather than
+silently updating whatever `--id` names — while the same key inside a
+`batch-update` item is legitimate and passes, because there it is a declared
+field of `GameSystemBulkItem`. And **a wrong type is not refused**:
+`{"year": "soon"}` reaches the server, which answers 422. That is the right
+division — Grimoire *reports* a bad value and *silently drops* an unknown key, so
+the client-side check covers exactly the class the server will not report.
 
-This is not a deviation from thin pass-through, and needs no entry in
-`CLAUDE.md`. The CLI already maintains response DTOs bound to a Grimoire
-version; request DTOs are the same commitment facing the other way. There is no
-hand-written field list to drift, because the type *is* the list.
+#### Why the spec is normalised before generation
 
-Why it matters: Grimoire drops unknown keys at pydantic validation, so a
-misspelled field name produces `{"status": "ok"}` from `update` and — worse — an
-entry in `updated` from `batch-update`, having changed nothing. For a tool
-designed to run unattended, a silent no-op that reports success is the failure
-class least likely to be caught and most likely to be trusted.
+This only works because the generated models know their own fields, and four of
+them did not. Kiota drops every property of a schema reached only through an
+`anyOf: [array of $ref, null]` — [microsoft/kiota#2338](https://github.com/microsoft/kiota/issues/2338),
+open, and present in 1.34.1, the latest release. FastAPI emits exactly that
+wrapper for `Optional[list[Model]]`, which is how `publishers`, `urls` and
+`character_builder_urls` are declared, so `PublisherEntry` and both `LinkEntry`
+variants generated as empty shells: a valid body was indistinguishable from a
+typo inside one.
 
-Separating request from response types is what makes this correct. Deriving the
-allowed set from a response type would wave through `child_count`, `has_cover`
-and every other read-only field, since `GameSystemSummary` carries 31 fields
-where only 17 are editable.
-
-Two consequences fall out for free:
-
-- **`id` is rejected**, because it is not an editable field. A body pasted from
-  a `systems get` dump or a `batch-update` file fails rather than silently
-  updating whatever `--id` names.
-- **Type errors are caught too** — `{"year": "soon"}` fails on deserialization.
-  Validation therefore covers what the type expresses, names and types; value
-  ranges and business rules remain the server's.
+`tools/normalize-spec.py` collapses that wrapper to its array branch on the way
+into the generator, and the four models regain their fields. Measured on a
+minimal spec with two identical schemas, one referenced each way: 0 fields
+through the `anyOf` wrapper, 2 through a plain array. FastAPI is not at fault —
+OpenAPI 3.1 removed `nullable`, so a union with `null` is the correct encoding —
+and the spec Grimoire publishes is untouched; only the copy handed to Kiota is
+transformed. The branch it drops costs nothing here: an explicit
+`"publishers": null` still validates, verified, and the CLI never sends a
+generated request model anyway.
 
 The raw body is validated by deserializing it, then **sent unchanged**. The CLI
 never re-serializes the user's JSON, so it cannot alter what was meant — an
 explicit `""` stays `""`, and an omitted field stays omitted.
 
-`JsonException` is translated into a readable message rather than surfaced raw:
-the offending key, its nearest match from `JsonTypeInfo.Properties`, and for
-`id` specifically a note that it belongs in `--id` for `update` and in each item
-for `batch-update`.
+Sending it unchanged is what decides how the two halves meet. The generated
+builder's `ToPatchRequestInformation` takes a generated body and serializes it,
+so the request is built with a throwaway empty instance and its content then
+replaced with the user's bytes:
+
+```csharp
+var info = client.Api.Api.Systems[id].ToPatchRequestInformation(new GameSystemUpdate());
+info.SetStreamContent(new MemoryStream(Encoding.UTF8.GetBytes(rawJson)), "application/json");
+```
+
+The builder therefore contributes only what it is trustworthy for — the URL
+template, the path parameter and the method — and the generated model never
+reaches the wire.
+
+The refusal names the offending key, the path it sat at, its nearest match from
+the field list of the model that rejected it, and — for `id` on `update` — that
+it belongs in `--id` instead.
 
 ### 3.3 Exit codes
 
@@ -214,6 +226,12 @@ than in a doc:
   Harmless here — the CLI stores no cookies — but it is a write-ish side effect
   on a read.
 
+The rename/clear caveat is stated on both `update` and `batch-update` on
+purpose, the same repetition `login` accepts for its `--password` caveat:
+`batch-update` renames at up to 1000x the blast radius of `update`, so the one
+call-site rule yields to a caveat a reader is more likely to need right where
+they are about to trigger it.
+
 ---
 
 ## 5. Sequencing
@@ -222,11 +240,10 @@ Three increments, per the standing preference for one runnable step at a time:
 
 1. **`me`** — a new resource, no write risk, and it lands the role-awareness the
    write commands assume.
-2. **`systems update`** — `GameSystemUpdateRequest`, the `JsonException`
-   translation, and the first
-   `AddRoleRequired` call site.
-3. **`systems batch-update` and `batch-tag`** — their two request DTOs wrap the
-   item shape from step 2, and exit 3 arrives with them.
+2. **`systems update`** — validation against `GameSystemUpdate`, the readable
+   refusal message, and the first `AddRoleRequired` call site.
+3. **`systems batch-update` and `batch-tag`** — validation against
+   `GameSystemBulkUpdate` and `BulkAddTags`, and exit 3 arrives with them.
 
 Each is independently useful and independently reviewable.
 
@@ -272,5 +289,5 @@ All writes go to the local stack. The live instance is never a write target.
 | # | question | status |
 |---|---|---|
 | 1 | ~~Should `update` reject a body containing `id`?~~ | **RESOLVED.** Yes, and it needs no special case: `id` is not an editable field, so §3.2's check already rejects it. Only the message is special-cased |
-| 2 | ~~Does the field validator belong in `SystemsService` or a shared helper?~~ | **RESOLVED, and dissolved.** There is no validator to place. Each resource declares a request DTO and `System.Text.Json` does the checking, so `books update` next run adds `BookUpdateRequest` and inherits the behaviour. The only shared code is the `JsonException` → readable-message translation |
+| 2 | ~~Does the field validator belong in `SystemsService` or a shared helper?~~ | **RESOLVED.** One shared helper, `JsonBodyInput.Validate`, taking the endpoint's generated model. `books update` next run passes `BookUpdate.CreateFromDiscriminatorValue` and inherits the behaviour with no new type |
 | 3 | ~~Should an `--allow-unknown-fields` override exist?~~ | **RESOLVED. No.** The response DTOs already drop fields a newer Grimoire adds, with no escape hatch, and that is the accepted design. An override on writes alone would be inconsistent with reads and would undercut `MinSupportedVersion`/`MaxTestedVersion`, which is the compatibility mechanism |

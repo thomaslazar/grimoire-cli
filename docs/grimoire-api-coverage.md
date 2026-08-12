@@ -14,7 +14,7 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | (untagged) | 0 / 1 |
 | addons | 0 / 7 |
 | audio | 0 / 10 |
-| auth | 1 / 10 |
+| auth | 2 / 10 |
 | bookmarks | 0 / 4 |
 | books | 0 / 16 |
 | campaigns | 0 / 81 |
@@ -29,11 +29,11 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | saved-filters | 0 / 4 |
 | search | 0 / 1 |
 | settings | 0 / 5 |
-| systems | 2 / 13 |
+| systems | 5 / 13 |
 | tags | 0 / 6 |
 | tokens | 0 / 10 |
 | users | 0 / 12 |
-| **Total** | **3 / 220** |
+| **Total** | **7 / 220** |
 
 1 operation(s) are internal-only (🔒) and excluded from covered counts.
 
@@ -78,7 +78,7 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | POST | `/api/auth/guest-login` | Log in as a guest |  | — |
 | POST | `/api/auth/login` | Log in |  | `login` ✅ |
 | POST | `/api/auth/logout` | Log out |  | — |
-| GET | `/api/auth/me` | Get current user |  | — |
+| GET | `/api/auth/me` | Get current user |  | `me` ✅ |
 | GET | `/api/auth/openid/callback` | OIDC callback |  | — |
 | POST | `/api/auth/openid/discover` | Fetch OIDC discovery document | admin | — |
 | GET | `/api/auth/openid/login` | Start an OIDC login |  | — |
@@ -311,10 +311,10 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | Method | Path | Description | Perm | CLI |
 |--------|------|-------------|------|-----|
 | GET | `/api/systems` | List all game systems | not guest | `systems list` ✅ |
-| POST | `/api/systems/bulk` | Bulk update game systems | gm or admin | — |
-| POST | `/api/systems/bulk/tags` | Bulk add tags to game systems | gm or admin | — |
+| POST | `/api/systems/bulk` | Bulk update game systems | gm or admin | `systems batch-update` ✅ |
+| POST | `/api/systems/bulk/tags` | Bulk add tags to game systems | gm or admin | `systems batch-tag` ✅ |
 | GET | `/api/systems/{system_id}` | Get a game system | not guest | `systems get` ✅ |
-| PATCH | `/api/systems/{system_id}` | Update game system metadata | gm or admin | — |
+| PATCH | `/api/systems/{system_id}` | Update game system metadata | gm or admin | `systems update` ✅ |
 | GET | `/api/systems/{system_id}/book-folders` | List book folders |  | — |
 | PATCH | `/api/systems/{system_id}/book-folders` | Set tags on a book folder | gm or admin | — |
 | GET | `/api/systems/{system_id}/cover` | System cover image |  | — |

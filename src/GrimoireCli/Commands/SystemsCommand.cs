@@ -7,6 +7,7 @@ namespace GrimoireCli.Commands;
 
 public static class SystemsCommand
 {
+    private static readonly NLog.Logger _logger = NLog.LogManager.GetCurrentClassLogger();
     private static readonly string[] SystemSortKeys = ["name", "book_count", "page_count", "year"];
     private static readonly string[] BookSortKeys = ["category", "title", "page_count", "year"];
 
@@ -15,6 +16,9 @@ public static class SystemsCommand
         var command = new Command("systems", "Game systems (the folders under books/)");
         command.Subcommands.Add(CreateListCommand());
         command.Subcommands.Add(CreateGetCommand());
+        command.Subcommands.Add(CreateUpdateCommand());
+        command.Subcommands.Add(CreateBatchUpdateCommand());
+        command.Subcommands.Add(CreateBatchTagCommand());
         return command;
     }
 
@@ -141,6 +145,179 @@ public static class SystemsCommand
                 parseResult.GetValue(explicitOption));
             ConsoleOutput.WriteJson(result, AppJsonContext.Default.GameSystemDetail);
             return 0;
+        });
+        return command;
+    }
+
+    /// <summary>
+    /// Declares --input / --stdin as mutually exclusive and exactly one required,
+    /// as a command validator so the refusal is a parse error (exit 1) before any
+    /// client is built.
+    /// </summary>
+    private static void RequireExactlyOneBodySource(
+        Command command, Option<string?> inputOption, Option<bool> stdinOption)
+    {
+        command.Validators.Add(result =>
+        {
+            var hasInput = result.GetValue(inputOption) != null;
+            var hasStdin = result.GetValue(stdinOption);
+            if (hasInput && hasStdin)
+                result.AddError(JsonBodyInput.BothSourcesMessage);
+            else if (!hasInput && !hasStdin)
+                result.AddError(JsonBodyInput.NeitherSourceMessage);
+        });
+    }
+
+    private static Command CreateUpdateCommand()
+    {
+        var idOption = new Option<string>("--id") { Description = "System ID", Required = true };
+        var inputOption = new Option<string?>("--input") { Description = "Read the body from this file" };
+        var stdinOption = new Option<bool>("--stdin") { Description = "Read the body from stdin" };
+        var serverOption = new Option<string?>("--server") { Description = "Server URL override" };
+        var tokenOption = new Option<string?>("--token") { Description = "Token override; not stored" };
+        var command = new Command("update", "Update one game system's metadata")
+        {
+            idOption, inputOption, stdinOption, serverOption, tokenOption
+        };
+        command.AddRoleRequired("gm or admin");
+        RequireExactlyOneBodySource(command, inputOption, stdinOption);
+        command.AddHelpSection("Notes", HelpSectionPosition.Top,
+            "Renaming is permanent: setting name marks it custom, and the scanner",
+            "never re-derives it from the folder again.",
+            "",
+            "Clear a field with \"\"; an explicit null does nothing.",
+            "",
+            "Prefer genres and character_builder_urls; the singles are legacy.",
+            "",
+            "Responds {\"status\": \"ok\"} and echoes nothing — read back with:",
+            "grimoire-cli systems get --id <id>");
+        command.AddRequestShape(new Generated.Models.GameSystemUpdate(),
+            "The body is a flat object of these, all optional; id is not one of them.");
+        command.AddExamples(
+            "grimoire-cli systems update --id <id> --input metadata.json",
+            "echo '{\"system_family\":\"Shadowrun\"}' | grimoire-cli systems update --id <id> --stdin");
+        command.SetAction(async (parseResult, cancellationToken) =>
+        {
+            string body;
+            try
+            {
+                body = JsonBodyInput.Read(parseResult.GetValue(inputOption), parseResult.GetValue(stdinOption));
+                JsonBodyInput.Validate(body, Generated.Models.GameSystemUpdate.CreateFromDiscriminatorValue,
+                    "pass it with --id");
+            }
+            catch (BodyInputException ex)
+            {
+                _logger.Error(ex.Message);
+                return 1;
+            }
+            var (client, _) = CommandHelper.BuildClient(
+                serverOverride: parseResult.GetValue(serverOption),
+                tokenOverride: parseResult.GetValue(tokenOption));
+            var service = new SystemsService(client);
+            var response = await service.UpdateAsync(parseResult.GetValue(idOption)!, body);
+            ConsoleOutput.WriteRawJson(response);
+            return 0;
+        });
+        return command;
+    }
+
+    private static Command CreateBatchUpdateCommand()
+    {
+        var inputOption = new Option<string?>("--input") { Description = "Read the body from this file" };
+        var stdinOption = new Option<bool>("--stdin") { Description = "Read the body from stdin" };
+        var serverOption = new Option<string?>("--server") { Description = "Server URL override" };
+        var tokenOption = new Option<string?>("--token") { Description = "Token override; not stored" };
+        var command = new Command("batch-update", "Update many game systems in one transaction")
+        {
+            inputOption, stdinOption, serverOption, tokenOption
+        };
+        command.AddRoleRequired("gm or admin");
+        RequireExactlyOneBodySource(command, inputOption, stdinOption);
+        command.AddHelpSection("Notes", HelpSectionPosition.Top,
+            "At most 1000 items.",
+            "",
+            "Skip-and-continue: a bad id or item lands in errors, the rest apply.",
+            "Exit 3 is HTTP 200 with a non-empty errors list — a partial write.",
+            "updated lists the ids that resolved, not the fields that changed.",
+            "",
+            "Renaming is permanent and \"\" not null clears a field — see",
+            "systems update.");
+        command.AddExamples(
+            "grimoire-cli systems batch-update --input items.json",
+            "jq -c '{items: .}' edits.json | grimoire-cli systems batch-update --stdin");
+        command.AddRequestShape(new Generated.Models.GameSystemBulkItem(),
+            "The body is {\"items\": [ … ]}; each item requires id, plus any of:");
+        command.AddResponseExample<BulkUpdateResult>();
+        command.SetAction(async (parseResult, cancellationToken) =>
+        {
+            string body;
+            try
+            {
+                body = JsonBodyInput.Read(parseResult.GetValue(inputOption), parseResult.GetValue(stdinOption));
+                JsonBodyInput.Validate(body, Generated.Models.GameSystemBulkUpdate.CreateFromDiscriminatorValue,
+                    "put it in each item");
+            }
+            catch (BodyInputException ex)
+            {
+                _logger.Error(ex.Message);
+                return 1;
+            }
+            var (client, _) = CommandHelper.BuildClient(
+                serverOverride: parseResult.GetValue(serverOption),
+                tokenOverride: parseResult.GetValue(tokenOption));
+            var result = await new SystemsService(client).BatchUpdateAsync(body);
+            ConsoleOutput.WriteJson(result, AppJsonContext.Default.BulkUpdateResult);
+            return BulkExit.CodeFor(result.Errors);
+        });
+        return command;
+    }
+
+    private static Command CreateBatchTagCommand()
+    {
+        var inputOption = new Option<string?>("--input") { Description = "Read the body from this file" };
+        var stdinOption = new Option<bool>("--stdin") { Description = "Read the body from stdin" };
+        var serverOption = new Option<string?>("--server") { Description = "Server URL override" };
+        var tokenOption = new Option<string?>("--token") { Description = "Token override; not stored" };
+        var command = new Command("batch-tag", "Add tags to many game systems")
+        {
+            inputOption, stdinOption, serverOption, tokenOption
+        };
+        command.AddRoleRequired("gm or admin");
+        RequireExactlyOneBodySource(command, inputOption, stdinOption);
+        command.AddHelpSection("Notes", HelpSectionPosition.Top,
+            "ids and tags are both required and non-empty; max 1000 ids.",
+            "",
+            "Additive only: merges with existing tags, never removes one. To",
+            "replace a set, use batch-update with tags.",
+            "",
+            "Exit 3 is HTTP 200 with a non-empty errors list — some ids did not",
+            "resolve while the rest were tagged.");
+        command.AddExamples(
+            "grimoire-cli systems batch-tag --input tags.json",
+            "echo '{\"ids\":[\"<id>\"],\"tags\":[\"cyberpunk\"]}' | grimoire-cli systems batch-tag --stdin");
+        command.AddRequestShape(new Generated.Models.BulkAddTags(),
+            "The body is a flat object of:");
+        command.AddResponseExample<BulkTagResult>();
+        command.SetAction(async (parseResult, cancellationToken) =>
+        {
+            string body;
+            try
+            {
+                body = JsonBodyInput.Read(parseResult.GetValue(inputOption), parseResult.GetValue(stdinOption));
+                JsonBodyInput.Validate(body, Generated.Models.BulkAddTags.CreateFromDiscriminatorValue,
+                    "put it in ids");
+            }
+            catch (BodyInputException ex)
+            {
+                _logger.Error(ex.Message);
+                return 1;
+            }
+            var (client, _) = CommandHelper.BuildClient(
+                serverOverride: parseResult.GetValue(serverOption),
+                tokenOverride: parseResult.GetValue(tokenOption));
+            var result = await new SystemsService(client).BatchTagAsync(body);
+            ConsoleOutput.WriteJson(result, AppJsonContext.Default.BulkTagResult);
+            return BulkExit.CodeFor(result.Errors);
         });
         return command;
     }

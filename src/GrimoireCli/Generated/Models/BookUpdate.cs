@@ -17,18 +17,18 @@ namespace GrimoireCli.Generated.Models
         /// <summary>The artists property</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
-        public global::GrimoireCli.Generated.Models.BookUpdate.BookUpdate_artists? Artists { get; set; }
+        public List<string>? Artists { get; set; }
 #nullable restore
 #else
-        public global::GrimoireCli.Generated.Models.BookUpdate.BookUpdate_artists Artists { get; set; }
+        public List<string> Artists { get; set; }
 #endif
         /// <summary>The authors property</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
-        public global::GrimoireCli.Generated.Models.BookUpdate.BookUpdate_authors? Authors { get; set; }
+        public List<string>? Authors { get; set; }
 #nullable restore
 #else
-        public global::GrimoireCli.Generated.Models.BookUpdate.BookUpdate_authors Authors { get; set; }
+        public List<string> Authors { get; set; }
 #endif
         /// <summary>The category property</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
@@ -57,10 +57,10 @@ namespace GrimoireCli.Generated.Models
         /// <summary>The genres property</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
-        public global::GrimoireCli.Generated.Models.BookUpdate.BookUpdate_genres? Genres { get; set; }
+        public List<string>? Genres { get; set; }
 #nullable restore
 #else
-        public global::GrimoireCli.Generated.Models.BookUpdate.BookUpdate_genres Genres { get; set; }
+        public List<string> Genres { get; set; }
 #endif
         /// <summary>The isbn property</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
@@ -121,10 +121,10 @@ namespace GrimoireCli.Generated.Models
         /// <summary>The tags property</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
-        public global::GrimoireCli.Generated.Models.BookUpdate.BookUpdate_tags? Tags { get; set; }
+        public List<string>? Tags { get; set; }
 #nullable restore
 #else
-        public global::GrimoireCli.Generated.Models.BookUpdate.BookUpdate_tags Tags { get; set; }
+        public List<string> Tags { get; set; }
 #endif
         /// <summary>The title property</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
@@ -183,12 +183,12 @@ namespace GrimoireCli.Generated.Models
         {
             return new Dictionary<string, Action<IParseNode>>
             {
-                { "artists", n => { Artists = n.GetObjectValue<global::GrimoireCli.Generated.Models.BookUpdate.BookUpdate_artists>(global::GrimoireCli.Generated.Models.BookUpdate.BookUpdate_artists.CreateFromDiscriminatorValue); } },
-                { "authors", n => { Authors = n.GetObjectValue<global::GrimoireCli.Generated.Models.BookUpdate.BookUpdate_authors>(global::GrimoireCli.Generated.Models.BookUpdate.BookUpdate_authors.CreateFromDiscriminatorValue); } },
+                { "artists", n => { Artists = n.GetCollectionOfPrimitiveValues<string>()?.AsList(); } },
+                { "authors", n => { Authors = n.GetCollectionOfPrimitiveValues<string>()?.AsList(); } },
                 { "category", n => { Category = n.GetObjectValue<global::GrimoireCli.Generated.Models.BookUpdate.BookUpdate_category>(global::GrimoireCli.Generated.Models.BookUpdate.BookUpdate_category.CreateFromDiscriminatorValue); } },
                 { "day", n => { Day = n.GetObjectValue<global::GrimoireCli.Generated.Models.BookUpdate.BookUpdate_day>(global::GrimoireCli.Generated.Models.BookUpdate.BookUpdate_day.CreateFromDiscriminatorValue); } },
                 { "description", n => { Description = n.GetObjectValue<global::GrimoireCli.Generated.Models.BookUpdate.BookUpdate_description>(global::GrimoireCli.Generated.Models.BookUpdate.BookUpdate_description.CreateFromDiscriminatorValue); } },
-                { "genres", n => { Genres = n.GetObjectValue<global::GrimoireCli.Generated.Models.BookUpdate.BookUpdate_genres>(global::GrimoireCli.Generated.Models.BookUpdate.BookUpdate_genres.CreateFromDiscriminatorValue); } },
+                { "genres", n => { Genres = n.GetCollectionOfPrimitiveValues<string>()?.AsList(); } },
                 { "is_explicit", n => { IsExplicit = n.GetObjectValue<global::GrimoireCli.Generated.Models.BookUpdate.BookUpdate_is_explicit>(global::GrimoireCli.Generated.Models.BookUpdate.BookUpdate_is_explicit.CreateFromDiscriminatorValue); } },
                 { "isbn", n => { Isbn = n.GetObjectValue<global::GrimoireCli.Generated.Models.BookUpdate.BookUpdate_isbn>(global::GrimoireCli.Generated.Models.BookUpdate.BookUpdate_isbn.CreateFromDiscriminatorValue); } },
                 { "language", n => { Language = n.GetObjectValue<global::GrimoireCli.Generated.Models.BookUpdate.BookUpdate_language>(global::GrimoireCli.Generated.Models.BookUpdate.BookUpdate_language.CreateFromDiscriminatorValue); } },
@@ -196,7 +196,7 @@ namespace GrimoireCli.Generated.Models
                 { "month", n => { Month = n.GetObjectValue<global::GrimoireCli.Generated.Models.BookUpdate.BookUpdate_month>(global::GrimoireCli.Generated.Models.BookUpdate.BookUpdate_month.CreateFromDiscriminatorValue); } },
                 { "publisher", n => { Publisher = n.GetObjectValue<global::GrimoireCli.Generated.Models.BookUpdate.BookUpdate_publisher>(global::GrimoireCli.Generated.Models.BookUpdate.BookUpdate_publisher.CreateFromDiscriminatorValue); } },
                 { "publisher_url", n => { PublisherUrl = n.GetObjectValue<global::GrimoireCli.Generated.Models.BookUpdate.BookUpdate_publisher_url>(global::GrimoireCli.Generated.Models.BookUpdate.BookUpdate_publisher_url.CreateFromDiscriminatorValue); } },
-                { "tags", n => { Tags = n.GetObjectValue<global::GrimoireCli.Generated.Models.BookUpdate.BookUpdate_tags>(global::GrimoireCli.Generated.Models.BookUpdate.BookUpdate_tags.CreateFromDiscriminatorValue); } },
+                { "tags", n => { Tags = n.GetCollectionOfPrimitiveValues<string>()?.AsList(); } },
                 { "title", n => { Title = n.GetObjectValue<global::GrimoireCli.Generated.Models.BookUpdate.BookUpdate_title>(global::GrimoireCli.Generated.Models.BookUpdate.BookUpdate_title.CreateFromDiscriminatorValue); } },
                 { "urls", n => { Urls = n.GetCollectionOfObjectValues<global::GrimoireCli.Generated.Models.Backend__routers__books___schemas__LinkEntry>(global::GrimoireCli.Generated.Models.Backend__routers__books___schemas__LinkEntry.CreateFromDiscriminatorValue)?.AsList(); } },
                 { "version", n => { Version = n.GetObjectValue<global::GrimoireCli.Generated.Models.BookUpdate.BookUpdate_version>(global::GrimoireCli.Generated.Models.BookUpdate.BookUpdate_version.CreateFromDiscriminatorValue); } },
@@ -210,12 +210,12 @@ namespace GrimoireCli.Generated.Models
         public virtual void Serialize(ISerializationWriter writer)
         {
             if(ReferenceEquals(writer, null)) throw new ArgumentNullException(nameof(writer));
-            writer.WriteObjectValue<global::GrimoireCli.Generated.Models.BookUpdate.BookUpdate_artists>("artists", Artists);
-            writer.WriteObjectValue<global::GrimoireCli.Generated.Models.BookUpdate.BookUpdate_authors>("authors", Authors);
+            writer.WriteCollectionOfPrimitiveValues<string>("artists", Artists);
+            writer.WriteCollectionOfPrimitiveValues<string>("authors", Authors);
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.BookUpdate.BookUpdate_category>("category", Category);
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.BookUpdate.BookUpdate_day>("day", Day);
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.BookUpdate.BookUpdate_description>("description", Description);
-            writer.WriteObjectValue<global::GrimoireCli.Generated.Models.BookUpdate.BookUpdate_genres>("genres", Genres);
+            writer.WriteCollectionOfPrimitiveValues<string>("genres", Genres);
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.BookUpdate.BookUpdate_isbn>("isbn", Isbn);
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.BookUpdate.BookUpdate_is_explicit>("is_explicit", IsExplicit);
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.BookUpdate.BookUpdate_language>("language", Language);
@@ -223,148 +223,12 @@ namespace GrimoireCli.Generated.Models
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.BookUpdate.BookUpdate_month>("month", Month);
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.BookUpdate.BookUpdate_publisher>("publisher", Publisher);
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.BookUpdate.BookUpdate_publisher_url>("publisher_url", PublisherUrl);
-            writer.WriteObjectValue<global::GrimoireCli.Generated.Models.BookUpdate.BookUpdate_tags>("tags", Tags);
+            writer.WriteCollectionOfPrimitiveValues<string>("tags", Tags);
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.BookUpdate.BookUpdate_title>("title", Title);
             writer.WriteCollectionOfObjectValues<global::GrimoireCli.Generated.Models.Backend__routers__books___schemas__LinkEntry>("urls", Urls);
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.BookUpdate.BookUpdate_version>("version", Version);
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.BookUpdate.BookUpdate_year>("year", Year);
             writer.WriteAdditionalData(AdditionalData);
-        }
-        /// <summary>
-        /// Composed type wrapper for classes <see cref="global::GrimoireCli.Generated.Models.BookUpdate_artistsMember1"/>, List&lt;string&gt;
-        /// </summary>
-        [global::System.CodeDom.Compiler.GeneratedCode("Kiota", "1.0.0")]
-        public partial class BookUpdate_artists : IComposedTypeWrapper, IParsable
-        {
-            /// <summary>Composed type representation for type <see cref="global::GrimoireCli.Generated.Models.BookUpdate_artistsMember1"/></summary>
-#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
-#nullable enable
-            public global::GrimoireCli.Generated.Models.BookUpdate_artistsMember1? BookUpdateArtistsMember1 { get; set; }
-#nullable restore
-#else
-            public global::GrimoireCli.Generated.Models.BookUpdate_artistsMember1 BookUpdateArtistsMember1 { get; set; }
-#endif
-            /// <summary>Composed type representation for type List&lt;string&gt;</summary>
-#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
-#nullable enable
-            public List<string>? String { get; set; }
-#nullable restore
-#else
-            public List<string> String { get; set; }
-#endif
-            /// <summary>
-            /// Creates a new instance of the appropriate class based on discriminator value
-            /// </summary>
-            /// <returns>A <see cref="global::GrimoireCli.Generated.Models.BookUpdate.BookUpdate_artists"/></returns>
-            /// <param name="parseNode">The parse node to use to read the discriminator value and create the object</param>
-            public static global::GrimoireCli.Generated.Models.BookUpdate.BookUpdate_artists CreateFromDiscriminatorValue(IParseNode parseNode)
-            {
-                if(ReferenceEquals(parseNode, null)) throw new ArgumentNullException(nameof(parseNode));
-                var result = new global::GrimoireCli.Generated.Models.BookUpdate.BookUpdate_artists();
-                if(parseNode.GetCollectionOfPrimitiveValues<string>()?.AsList() is List<string> stringValue)
-                {
-                    result.String = stringValue;
-                }
-                else {
-                    result.BookUpdateArtistsMember1 = new global::GrimoireCli.Generated.Models.BookUpdate_artistsMember1();
-                }
-                return result;
-            }
-            /// <summary>
-            /// The deserialization information for the current model
-            /// </summary>
-            /// <returns>A IDictionary&lt;string, Action&lt;IParseNode&gt;&gt;</returns>
-            public virtual IDictionary<string, Action<IParseNode>> GetFieldDeserializers()
-            {
-                if(BookUpdateArtistsMember1 != null)
-                {
-                    return ParseNodeHelper.MergeDeserializersForIntersectionWrapper(BookUpdateArtistsMember1);
-                }
-                return new Dictionary<string, Action<IParseNode>>();
-            }
-            /// <summary>
-            /// Serializes information the current object
-            /// </summary>
-            /// <param name="writer">Serialization writer to use to serialize this model</param>
-            public virtual void Serialize(ISerializationWriter writer)
-            {
-                if(ReferenceEquals(writer, null)) throw new ArgumentNullException(nameof(writer));
-                if(String != null)
-                {
-                    writer.WriteCollectionOfPrimitiveValues<string>(null, String);
-                }
-                else {
-                    writer.WriteObjectValue<global::GrimoireCli.Generated.Models.BookUpdate_artistsMember1>(null, BookUpdateArtistsMember1);
-                }
-            }
-        }
-        /// <summary>
-        /// Composed type wrapper for classes <see cref="global::GrimoireCli.Generated.Models.BookUpdate_authorsMember1"/>, List&lt;string&gt;
-        /// </summary>
-        [global::System.CodeDom.Compiler.GeneratedCode("Kiota", "1.0.0")]
-        public partial class BookUpdate_authors : IComposedTypeWrapper, IParsable
-        {
-            /// <summary>Composed type representation for type <see cref="global::GrimoireCli.Generated.Models.BookUpdate_authorsMember1"/></summary>
-#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
-#nullable enable
-            public global::GrimoireCli.Generated.Models.BookUpdate_authorsMember1? BookUpdateAuthorsMember1 { get; set; }
-#nullable restore
-#else
-            public global::GrimoireCli.Generated.Models.BookUpdate_authorsMember1 BookUpdateAuthorsMember1 { get; set; }
-#endif
-            /// <summary>Composed type representation for type List&lt;string&gt;</summary>
-#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
-#nullable enable
-            public List<string>? String { get; set; }
-#nullable restore
-#else
-            public List<string> String { get; set; }
-#endif
-            /// <summary>
-            /// Creates a new instance of the appropriate class based on discriminator value
-            /// </summary>
-            /// <returns>A <see cref="global::GrimoireCli.Generated.Models.BookUpdate.BookUpdate_authors"/></returns>
-            /// <param name="parseNode">The parse node to use to read the discriminator value and create the object</param>
-            public static global::GrimoireCli.Generated.Models.BookUpdate.BookUpdate_authors CreateFromDiscriminatorValue(IParseNode parseNode)
-            {
-                if(ReferenceEquals(parseNode, null)) throw new ArgumentNullException(nameof(parseNode));
-                var result = new global::GrimoireCli.Generated.Models.BookUpdate.BookUpdate_authors();
-                if(parseNode.GetCollectionOfPrimitiveValues<string>()?.AsList() is List<string> stringValue)
-                {
-                    result.String = stringValue;
-                }
-                else {
-                    result.BookUpdateAuthorsMember1 = new global::GrimoireCli.Generated.Models.BookUpdate_authorsMember1();
-                }
-                return result;
-            }
-            /// <summary>
-            /// The deserialization information for the current model
-            /// </summary>
-            /// <returns>A IDictionary&lt;string, Action&lt;IParseNode&gt;&gt;</returns>
-            public virtual IDictionary<string, Action<IParseNode>> GetFieldDeserializers()
-            {
-                if(BookUpdateAuthorsMember1 != null)
-                {
-                    return ParseNodeHelper.MergeDeserializersForIntersectionWrapper(BookUpdateAuthorsMember1);
-                }
-                return new Dictionary<string, Action<IParseNode>>();
-            }
-            /// <summary>
-            /// Serializes information the current object
-            /// </summary>
-            /// <param name="writer">Serialization writer to use to serialize this model</param>
-            public virtual void Serialize(ISerializationWriter writer)
-            {
-                if(ReferenceEquals(writer, null)) throw new ArgumentNullException(nameof(writer));
-                if(String != null)
-                {
-                    writer.WriteCollectionOfPrimitiveValues<string>(null, String);
-                }
-                else {
-                    writer.WriteObjectValue<global::GrimoireCli.Generated.Models.BookUpdate_authorsMember1>(null, BookUpdateAuthorsMember1);
-                }
-            }
         }
         /// <summary>
         /// Composed type wrapper for classes <see cref="global::GrimoireCli.Generated.Models.BookUpdate_categoryMember1"/>, <see cref="string"/>
@@ -561,74 +425,6 @@ namespace GrimoireCli.Generated.Models
                 }
                 else {
                     writer.WriteObjectValue<global::GrimoireCli.Generated.Models.BookUpdate_descriptionMember1>(null, BookUpdateDescriptionMember1);
-                }
-            }
-        }
-        /// <summary>
-        /// Composed type wrapper for classes <see cref="global::GrimoireCli.Generated.Models.BookUpdate_genresMember1"/>, List&lt;string&gt;
-        /// </summary>
-        [global::System.CodeDom.Compiler.GeneratedCode("Kiota", "1.0.0")]
-        public partial class BookUpdate_genres : IComposedTypeWrapper, IParsable
-        {
-            /// <summary>Composed type representation for type <see cref="global::GrimoireCli.Generated.Models.BookUpdate_genresMember1"/></summary>
-#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
-#nullable enable
-            public global::GrimoireCli.Generated.Models.BookUpdate_genresMember1? BookUpdateGenresMember1 { get; set; }
-#nullable restore
-#else
-            public global::GrimoireCli.Generated.Models.BookUpdate_genresMember1 BookUpdateGenresMember1 { get; set; }
-#endif
-            /// <summary>Composed type representation for type List&lt;string&gt;</summary>
-#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
-#nullable enable
-            public List<string>? String { get; set; }
-#nullable restore
-#else
-            public List<string> String { get; set; }
-#endif
-            /// <summary>
-            /// Creates a new instance of the appropriate class based on discriminator value
-            /// </summary>
-            /// <returns>A <see cref="global::GrimoireCli.Generated.Models.BookUpdate.BookUpdate_genres"/></returns>
-            /// <param name="parseNode">The parse node to use to read the discriminator value and create the object</param>
-            public static global::GrimoireCli.Generated.Models.BookUpdate.BookUpdate_genres CreateFromDiscriminatorValue(IParseNode parseNode)
-            {
-                if(ReferenceEquals(parseNode, null)) throw new ArgumentNullException(nameof(parseNode));
-                var result = new global::GrimoireCli.Generated.Models.BookUpdate.BookUpdate_genres();
-                if(parseNode.GetCollectionOfPrimitiveValues<string>()?.AsList() is List<string> stringValue)
-                {
-                    result.String = stringValue;
-                }
-                else {
-                    result.BookUpdateGenresMember1 = new global::GrimoireCli.Generated.Models.BookUpdate_genresMember1();
-                }
-                return result;
-            }
-            /// <summary>
-            /// The deserialization information for the current model
-            /// </summary>
-            /// <returns>A IDictionary&lt;string, Action&lt;IParseNode&gt;&gt;</returns>
-            public virtual IDictionary<string, Action<IParseNode>> GetFieldDeserializers()
-            {
-                if(BookUpdateGenresMember1 != null)
-                {
-                    return ParseNodeHelper.MergeDeserializersForIntersectionWrapper(BookUpdateGenresMember1);
-                }
-                return new Dictionary<string, Action<IParseNode>>();
-            }
-            /// <summary>
-            /// Serializes information the current object
-            /// </summary>
-            /// <param name="writer">Serialization writer to use to serialize this model</param>
-            public virtual void Serialize(ISerializationWriter writer)
-            {
-                if(ReferenceEquals(writer, null)) throw new ArgumentNullException(nameof(writer));
-                if(String != null)
-                {
-                    writer.WriteCollectionOfPrimitiveValues<string>(null, String);
-                }
-                else {
-                    writer.WriteObjectValue<global::GrimoireCli.Generated.Models.BookUpdate_genresMember1>(null, BookUpdateGenresMember1);
                 }
             }
         }
@@ -1093,74 +889,6 @@ namespace GrimoireCli.Generated.Models
                 }
                 else {
                     writer.WriteObjectValue<global::GrimoireCli.Generated.Models.BookUpdate_publisher_urlMember1>(null, BookUpdatePublisherUrlMember1);
-                }
-            }
-        }
-        /// <summary>
-        /// Composed type wrapper for classes <see cref="global::GrimoireCli.Generated.Models.BookUpdate_tagsMember1"/>, List&lt;string&gt;
-        /// </summary>
-        [global::System.CodeDom.Compiler.GeneratedCode("Kiota", "1.0.0")]
-        public partial class BookUpdate_tags : IComposedTypeWrapper, IParsable
-        {
-            /// <summary>Composed type representation for type <see cref="global::GrimoireCli.Generated.Models.BookUpdate_tagsMember1"/></summary>
-#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
-#nullable enable
-            public global::GrimoireCli.Generated.Models.BookUpdate_tagsMember1? BookUpdateTagsMember1 { get; set; }
-#nullable restore
-#else
-            public global::GrimoireCli.Generated.Models.BookUpdate_tagsMember1 BookUpdateTagsMember1 { get; set; }
-#endif
-            /// <summary>Composed type representation for type List&lt;string&gt;</summary>
-#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
-#nullable enable
-            public List<string>? String { get; set; }
-#nullable restore
-#else
-            public List<string> String { get; set; }
-#endif
-            /// <summary>
-            /// Creates a new instance of the appropriate class based on discriminator value
-            /// </summary>
-            /// <returns>A <see cref="global::GrimoireCli.Generated.Models.BookUpdate.BookUpdate_tags"/></returns>
-            /// <param name="parseNode">The parse node to use to read the discriminator value and create the object</param>
-            public static global::GrimoireCli.Generated.Models.BookUpdate.BookUpdate_tags CreateFromDiscriminatorValue(IParseNode parseNode)
-            {
-                if(ReferenceEquals(parseNode, null)) throw new ArgumentNullException(nameof(parseNode));
-                var result = new global::GrimoireCli.Generated.Models.BookUpdate.BookUpdate_tags();
-                if(parseNode.GetCollectionOfPrimitiveValues<string>()?.AsList() is List<string> stringValue)
-                {
-                    result.String = stringValue;
-                }
-                else {
-                    result.BookUpdateTagsMember1 = new global::GrimoireCli.Generated.Models.BookUpdate_tagsMember1();
-                }
-                return result;
-            }
-            /// <summary>
-            /// The deserialization information for the current model
-            /// </summary>
-            /// <returns>A IDictionary&lt;string, Action&lt;IParseNode&gt;&gt;</returns>
-            public virtual IDictionary<string, Action<IParseNode>> GetFieldDeserializers()
-            {
-                if(BookUpdateTagsMember1 != null)
-                {
-                    return ParseNodeHelper.MergeDeserializersForIntersectionWrapper(BookUpdateTagsMember1);
-                }
-                return new Dictionary<string, Action<IParseNode>>();
-            }
-            /// <summary>
-            /// Serializes information the current object
-            /// </summary>
-            /// <param name="writer">Serialization writer to use to serialize this model</param>
-            public virtual void Serialize(ISerializationWriter writer)
-            {
-                if(ReferenceEquals(writer, null)) throw new ArgumentNullException(nameof(writer));
-                if(String != null)
-                {
-                    writer.WriteCollectionOfPrimitiveValues<string>(null, String);
-                }
-                else {
-                    writer.WriteObjectValue<global::GrimoireCli.Generated.Models.BookUpdate_tagsMember1>(null, BookUpdateTagsMember1);
                 }
             }
         }

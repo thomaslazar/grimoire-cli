@@ -101,6 +101,16 @@ ok "bad password exits 2 and leaves the config untouched"
   || { cat "$WORK/self.err" >&2; fail "self-test exited non-zero"; }
 ok "self-test"
 
+# 6b. me: the caller's own account, and the role a write command will need.
+ME_JSON=$("$CLI" me 2>"$WORK/me.err") \
+  || { cat "$WORK/me.err" >&2; fail "me exited non-zero"; }
+[ "$(echo "$ME_JSON" | jq -r .username)" = "admin" ] \
+  || fail "me should report username admin: $ME_JSON"
+[ "$(echo "$ME_JSON" | jq -r .role)" = "admin" ] \
+  || fail "me should report role admin: $ME_JSON"
+[ "$(echo "$ME_JSON" | jq -r .id)" != "null" ] || fail "me returned no id: $ME_JSON"
+ok "me reports the seeded admin account"
+
 # --- seeded data -------------------------------------------------------------
 # Requires docker/seed.sh to have run. Counts mirror the fixture set defined
 # there; changing a fixture must change these numbers. EXPECTED_SYSTEMS is the
@@ -308,5 +318,130 @@ for bad_id in "" "." "../about"; do
     && fail "id '$bad_id' leaked a stack trace: $(cat "$WORK/badid.err")"
 done
 ok "systems get on an empty, '.', or '../about' id exits 2 with no stack trace"
+
+# The first write in this suite. Shadowrun 4 DE is seeded raw for exactly this.
+# description is the field used deliberately: no assertion above filters on it,
+# so re-running the suite converges instead of drifting. Do NOT write
+# system_family here — the "--family Shadowrun should match 2" check depends on
+# this system having none.
+syslist --include-children
+SR4=$(echo "$LIST_JSON" | jq -r '.[] | select(.name == "Shadowrun 4 DE") | .id')
+[ -n "$SR4" ] || fail "no Shadowrun 4 DE fixture to write to"
+
+echo '{"description":"smoke fixture description"}' \
+  | "$CLI" systems update --id "$SR4" --stdin >"$WORK/upd.out" 2>"$WORK/upd.err" \
+  || { cat "$WORK/upd.err" >&2; fail "systems update exited non-zero"; }
+jq -e '.status == "ok"' "$WORK/upd.out" >/dev/null \
+  || fail "update should answer {\"status\":\"ok\"}: $(cat "$WORK/upd.out")"
+sysget --id "$SR4"
+[ "$(echo "$GET_JSON" | jq -r .description)" = "smoke fixture description" ] \
+  || fail "the written description did not read back: $(echo "$GET_JSON" | jq -r .description)"
+ok "systems update writes a field and systems get reads it back"
+
+# An unknown field is refused client-side: exit 1, and no request is made.
+printf '{"descriptoin":"typo"}' >"$WORK/typo.json"
+set +e
+"$CLI" systems update --id "$SR4" --input "$WORK/typo.json" >/dev/null 2>"$WORK/typo.err"; rc=$?
+set -e
+[ "$rc" -eq 1 ] || fail "an unknown field should exit 1, got $rc: $(cat "$WORK/typo.err")"
+grep -q "descriptoin" "$WORK/typo.err" || fail "no offending field named: $(cat "$WORK/typo.err")"
+grep -q "description" "$WORK/typo.err" || fail "no suggestion offered: $(cat "$WORK/typo.err")"
+ok "an unknown field exits 1 before any request"
+
+# Nested objects, both ways. The generated entry models only describe their own
+# fields because the spec is normalized before generation (kiota#2338), so this
+# is what proves that workaround still holds in the shipped binary: a valid
+# nested body applies, and a typo one level down is refused with its path.
+cat >"$WORK/nested.json" <<'JSON'
+{"publishers":[{"name":"Smoke Fixture Press","url":""}],
+ "urls":[{"label":"Fixture","url":"https://example.test"}]}
+JSON
+"$CLI" systems update --id "$SR4" --input "$WORK/nested.json" >/dev/null 2>"$WORK/nested.err" \
+  || { cat "$WORK/nested.err" >&2; fail "a valid nested body should apply"; }
+sysget --id "$SR4"
+[ "$(echo "$GET_JSON" | jq -r '.publishers[0].name')" = "Smoke Fixture Press" ] \
+  || fail "the nested publisher did not read back: $(echo "$GET_JSON" | jq -c .publishers)"
+ok "a valid nested body applies"
+
+set +e
+echo '{"publishers":[{"nmae":"typo"}]}' \
+  | "$CLI" systems update --id "$SR4" --stdin >/dev/null 2>"$WORK/nestedtypo.err"; rc=$?
+set -e
+[ "$rc" -eq 1 ] || fail "a nested typo should exit 1, got $rc: $(cat "$WORK/nestedtypo.err")"
+grep -q 'publishers\[0\].nmae' "$WORK/nestedtypo.err" \
+  || fail "no path to the nested typo: $(cat "$WORK/nestedtypo.err")"
+grep -q "'name'" "$WORK/nestedtypo.err" \
+  || fail "no suggestion from the nested model: $(cat "$WORK/nestedtypo.err")"
+ok "a typo inside a nested entry exits 1 with its path"
+
+# Both sources, and neither, are parse-time refusals.
+set +e
+"$CLI" systems update --id "$SR4" --stdin --input "$WORK/typo.json" >/dev/null 2>"$WORK/both.err"; rc=$?
+set -e
+[ "$rc" -eq 1 ] || fail "--stdin with --input should exit 1, got $rc"
+grep -q "not both" "$WORK/both.err" || fail "no mutual-exclusion message: $(cat "$WORK/both.err")"
+set +e
+"$CLI" systems update --id "$SR4" >/dev/null 2>"$WORK/none.err"; rc=$?
+set -e
+[ "$rc" -eq 1 ] || fail "no body source should exit 1, got $rc"
+ok "--input and --stdin are mutually exclusive and one is required"
+
+# batch-update: one good id and one bogus id must exit 3, applying the good one.
+# license, not description or system_family: no assertion above filters on a
+# license other than OGL, so this stays idempotent across re-runs.
+cat >"$WORK/batch.json" <<JSON
+{"items":[{"id":"$SR4","license":"Smoke Fixture License"},
+          {"id":"no-such-id","license":"x"}]}
+JSON
+set +e
+"$CLI" systems batch-update --input "$WORK/batch.json" >"$WORK/batch.out" 2>"$WORK/batch.err"; rc=$?
+set -e
+[ "$rc" -eq 3 ] || fail "a partial batch should exit 3, got $rc: $(cat "$WORK/batch.err")"
+jq -e --arg id "$SR4" '.updated | index($id) != null' "$WORK/batch.out" >/dev/null \
+  || fail "the good id should be in updated: $(cat "$WORK/batch.out")"
+jq -e '.errors | length == 1 and .[0].id == "no-such-id"' "$WORK/batch.out" >/dev/null \
+  || fail "the bogus id should be the only error: $(cat "$WORK/batch.out")"
+ok "batch-update applies the good id and exits 3 on a partial"
+
+# A fully-applying batch exits 0.
+echo "{\"items\":[{\"id\":\"$SR4\",\"license\":\"Smoke Fixture License\"}]}" \
+  | "$CLI" systems batch-update --stdin >"$WORK/batch2.out" 2>"$WORK/batch2.err" \
+  || { cat "$WORK/batch2.err" >&2; fail "a fully-applying batch should exit 0"; }
+jq -e '.errors | length == 0' "$WORK/batch2.out" >/dev/null \
+  || fail "no errors expected: $(cat "$WORK/batch2.out")"
+ok "batch-update exits 0 when every item applies"
+
+# batch-tag is additive: the second call must not displace the first tag.
+echo "{\"ids\":[\"$SR4\"],\"tags\":[\"smoke-alpha\"]}" \
+  | "$CLI" systems batch-tag --stdin >"$WORK/tag1.out" 2>"$WORK/tag1.err" \
+  || { cat "$WORK/tag1.err" >&2; fail "batch-tag exited non-zero"; }
+echo "{\"ids\":[\"$SR4\"],\"tags\":[\"smoke-beta\"]}" \
+  | "$CLI" systems batch-tag --stdin >"$WORK/tag2.out" 2>"$WORK/tag2.err" \
+  || { cat "$WORK/tag2.err" >&2; fail "the second batch-tag exited non-zero"; }
+jq -e --arg id "$SR4" '.tags[$id] | index("smoke-alpha") != null and index("smoke-beta") != null' \
+  "$WORK/tag2.out" >/dev/null \
+  || fail "batch-tag should have merged both tags: $(cat "$WORK/tag2.out")"
+sysget --id "$SR4"
+echo "$GET_JSON" | jq -e '.tags | index("smoke-alpha") != null' >/dev/null \
+  || fail "the first tag did not survive the second call: $(echo "$GET_JSON" | jq -c .tags)"
+ok "batch-tag adds a tag and leaves the existing one in place"
+
+# A bogus id alone is still exit 3, and no ids resolve.
+echo '{"ids":["no-such-id"],"tags":["smoke-alpha"]}' \
+  >"$WORK/tagbad.json"
+set +e
+"$CLI" systems batch-tag --input "$WORK/tagbad.json" >"$WORK/tagbad.out" 2>"$WORK/tagbad.err"; rc=$?
+set -e
+[ "$rc" -eq 3 ] || fail "an all-bogus batch-tag should exit 3, got $rc"
+ok "batch-tag exits 3 when an id does not resolve"
+
+# An unknown key in a batch item is refused client-side.
+printf '{"items":[{"id":"%s","licence":"typo"}]}' "$SR4" >"$WORK/batchtypo.json"
+set +e
+"$CLI" systems batch-update --input "$WORK/batchtypo.json" >/dev/null 2>"$WORK/batchtypo.err"; rc=$?
+set -e
+[ "$rc" -eq 1 ] || fail "an unknown field in an item should exit 1, got $rc"
+grep -q "licence" "$WORK/batchtypo.err" || fail "no offending field named: $(cat "$WORK/batchtypo.err")"
+ok "an unknown field inside a batch item exits 1"
 
 echo "smoke: all checks passed" >&2

@@ -2,6 +2,8 @@ using System.Collections.Concurrent;
 using System.CommandLine;
 using System.CommandLine.Help;
 using System.CommandLine.Invocation;
+using System.Text;
+using Microsoft.Kiota.Abstractions.Serialization;
 
 namespace GrimoireCli.Commands;
 
@@ -65,6 +67,34 @@ public static class HelpExtensions
         command.AddShapeSection("Response shape", $"[\n{indented}\n]".Split('\n'));
     }
 
+    /// <summary>
+    /// Registers the fields a request body may carry, read from the generated model
+    /// for the endpoint and hidden behind --help-full beside the response shape.
+    /// Names only: the generated model publishes its field names, and its property
+    /// types are composed-type wrappers whose underlying scalar is not reachable
+    /// without reflection that Native AOT trims. Nothing here is hand-written, so a
+    /// field added to the API appears as soon as the client is regenerated.
+    /// </summary>
+    public static void AddRequestShape<T>(this Command command, T model, params string[] preamble)
+        where T : IParsable
+        => command.AddShapeSection("Request fields",
+            [.. preamble, .. Wrap(model.GetFieldDeserializers().Keys.Order(StringComparer.Ordinal))]);
+
+    private static IEnumerable<string> Wrap(IEnumerable<string> names, int width = 66)
+    {
+        var line = new StringBuilder();
+        foreach (var name in names)
+        {
+            if (line.Length + name.Length + 2 > width)
+            {
+                yield return $"{line},";
+                line.Clear();
+            }
+            line.Append(line.Length == 0 ? name : $", {name}");
+        }
+        yield return line.ToString();
+    }
+
     public static void AddExamples(this Command command, params string[] examples)
         => command.AddHelpSection("Examples", HelpSectionPosition.Bottom, examples);
 
@@ -96,7 +126,7 @@ public static class HelpExtensions
         helpOption.Action = new CustomHelpAction(defaultAction, includeShapes: false);
         var fullHelp = new Option<bool>("--help-full")
         {
-            Description = "Show full help including response-shape blocks.",
+            Description = "Show full help including the request and response shapes.",
             Recursive = true,
             Action = new CustomHelpAction(defaultAction, includeShapes: true),
         };
@@ -129,7 +159,7 @@ public static class HelpExtensions
     {
         if (!CommandSections.TryGetValue(command, out var sections)) return;
         if (!sections.Any(s => s.IsShape)) return;
-        output.WriteLine("Run --help-full to see response shape(s).");
+        output.WriteLine("Run --help-full to see the request and response shapes.");
         output.WriteLine();
     }
 
