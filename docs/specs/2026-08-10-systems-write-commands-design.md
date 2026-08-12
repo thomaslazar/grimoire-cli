@@ -240,6 +240,12 @@ than in a doc:
   Harmless here — the CLI stores no cookies — but it is a write-ish side effect
   on a read.
 
+The rename/clear caveat is stated on both `update` and `batch-update` on
+purpose, the same repetition `login` accepts for its `--password` caveat:
+`batch-update` renames at up to 1000x the blast radius of `update`, so the one
+call-site rule yields to a caveat a reader is more likely to need right where
+they are about to trigger it.
+
 ---
 
 ## 5. Sequencing
