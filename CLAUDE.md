@@ -57,7 +57,7 @@ bash docker/seed.sh
 - **Hold spec/plan commits until the implementation branch exists**, then commit spec + plan + code together on that branch so design and delivery are reviewed as one unit.
 - **Once a feature branch exists, keep its docs edits on that branch** — they reach `main` via the PR.
 - **`CHANGELOG.md` is owned by the release process** (`release/v{version}` branches only). Never edit it from a feature branch.
-- Current state and open work live in [docs/roadmap.md](docs/roadmap.md).
+- **[docs/roadmap.md](docs/roadmap.md) lists intended work only**, and only what the maintainer has decided to do. It is not a status document, not a place to record findings, and not a running tally — never add to it to note that something happened or was discovered. What is implemented is in [docs/grimoire-api-coverage.md](docs/grimoire-api-coverage.md), verified server behaviour in [docs/grimoire-api-notes.md](docs/grimoire-api-notes.md), and what changed is in git.
 - **Any PR that adds, renames or removes a command, or changes a user-visible flag, updates the README Commands table in the same change.**
 - **Any PR that touches which endpoints are called updates [docs/grimoire-api-coverage.md](docs/grimoire-api-coverage.md) in the same change.**
 

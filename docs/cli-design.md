@@ -2,10 +2,11 @@
 
 ## Status
 
-Early. Only `login`, `config`, `systems` and `self-test` exist. This
-document describes the design principles applied so far and the pattern to
-extend — it is not a finished command surface. See
-[roadmap.md](roadmap.md) for what's planned next.
+Early: the command surface is not finished. This document describes the design
+principles applied so far and the pattern to extend. What exists is listed in the
+README's Commands table and mapped to endpoints in
+[grimoire-api-coverage.md](grimoire-api-coverage.md); [roadmap.md](roadmap.md)
+has what's planned next.
 
 ## Command Pattern
 
