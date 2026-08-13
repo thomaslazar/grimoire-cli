@@ -29,6 +29,19 @@ machine: on a machine with no config file, the first check via `--server`/
 `--token` creates one with only `lastVersionCheck` and `lastServerVersion`
 populated (`server` and `accessToken` stay unset until `login` writes them).
 
+## Reading and writing the file
+
+The file is written by creating a temporary file beside it and renaming over the
+target, which is atomic within a directory, so an interrupted write leaves the
+previous config intact. That matters here because the token it holds is valid for
+30 days with no refresh: losing it to a torn write costs a login, and the version
+check writes daily rather than only at login.
+
+A config file that is not valid JSON is reported on stderr and otherwise treated
+as absent, so a hand-edit gone wrong does not take every command down with it.
+`GRIMOIRE_SERVER` / `GRIMOIRE_TOKEN` still work in that state, and
+`grimoire-cli login` repairs the file by overwriting it.
+
 ## Precedence Order
 
 Highest wins (`ConfigManager.Resolve`):

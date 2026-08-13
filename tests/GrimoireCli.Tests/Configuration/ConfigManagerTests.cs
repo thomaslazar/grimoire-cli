@@ -181,4 +181,88 @@ public class ConfigManagerTests
             Directory.Delete(Path.GetDirectoryName(path)!, recursive: true);
         }
     }
+
+    // A config file that is not valid JSON used to kill every command with a raw
+    // JsonException and exit 1 — including the login that would repair it.
+    [Theory]
+    [InlineData("{not json")]
+    [InlineData("")]
+    [InlineData("{\"server\": \"http://x\"")]
+    [InlineData("[]")]
+    public void LoadTreatsAnUnparseableFileAsAbsent(string content)
+    {
+        var manager = InTempDir(out var path);
+        Directory.CreateDirectory(Path.GetDirectoryName(path)!);
+        File.WriteAllText(path, content);
+        try
+        {
+            var config = manager.Load();
+            Assert.Null(config.Server);
+            Assert.Null(config.AccessToken);
+        }
+        finally
+        {
+            Directory.Delete(Path.GetDirectoryName(path)!, recursive: true);
+        }
+    }
+
+    // Recovery has to work without the operator deleting anything by hand.
+    [Fact]
+    public void SaveOverwritesAnUnparseableFile()
+    {
+        var manager = InTempDir(out var path);
+        Directory.CreateDirectory(Path.GetDirectoryName(path)!);
+        File.WriteAllText(path, "{not json");
+        try
+        {
+            manager.Save(new AppConfig { Server = "http://example.test", AccessToken = "t" });
+            Assert.Equal("http://example.test", manager.Load().Server);
+        }
+        finally
+        {
+            Directory.Delete(Path.GetDirectoryName(path)!, recursive: true);
+        }
+    }
+
+    // The write goes to a temporary file and is renamed over the target, so a reader
+    // never sees a partial file. The temporary must not survive the write.
+    [Fact]
+    public void SaveLeavesNoTemporaryFileBehind()
+    {
+        var manager = InTempDir(out var path);
+        try
+        {
+            manager.Save(new AppConfig { Server = "http://example.test" });
+            var dir = Path.GetDirectoryName(path)!;
+            Assert.Equal(["config.json"], Directory.GetFiles(dir).Select(Path.GetFileName).Order());
+        }
+        finally
+        {
+            Directory.Delete(Path.GetDirectoryName(path)!, recursive: true);
+        }
+    }
+
+    // Losing a 30-day non-refreshable token to a torn write is the failure the
+    // rename protects against: the previous content stands until the new file is
+    // complete.
+    [Fact]
+    public void SavePreservesThePreviousFileUntilTheNewOneIsComplete()
+    {
+        var manager = InTempDir(out var path);
+        try
+        {
+            manager.Save(new AppConfig { Server = "http://first.test", AccessToken = "first" });
+            var before = File.ReadAllText(path);
+            manager.Save(new AppConfig { Server = "http://second.test", AccessToken = "second" });
+            var after = File.ReadAllText(path);
+            Assert.NotEqual(before, after);
+            Assert.Contains("second", after);
+            // A complete document either way — never a truncated one.
+            Assert.Equal("http://second.test", manager.Load().Server);
+        }
+        finally
+        {
+            Directory.Delete(Path.GetDirectoryName(path)!, recursive: true);
+        }
+    }
 }

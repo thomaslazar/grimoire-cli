@@ -482,4 +482,34 @@ set -e
 grep -q "licence" "$WORK/batchtypo.err" || fail "no offending field named: $(cat "$WORK/batchtypo.err")"
 ok "an unknown field inside a batch item exits 1"
 
+# A config file that is not valid JSON must not take the CLI down with it, and
+# logging in again must be enough to recover — no hand-editing, no rm. This runs
+# last because it ends by restoring the config the earlier checks depend on.
+cp "$CONFIG" "$WORK/config.backup.json"
+printf '{not json' > "$CONFIG"
+set +e
+"$CLI" systems list >"$WORK/corrupt.out" 2>"$WORK/corrupt.err"; rc=$?
+set -e
+[ "$rc" -ne 0 ] || fail "a corrupt config should not report success"
+grep -q "not valid JSON" "$WORK/corrupt.err" \
+  || fail "no readable message for a corrupt config: $(cat "$WORK/corrupt.err")"
+grep -qi "at System\.\|Unhandled exception" "$WORK/corrupt.err" \
+  && fail "a corrupt config leaked a stack trace: $(cat "$WORK/corrupt.err")"
+[ ! -s "$WORK/corrupt.out" ] || fail "stdout should stay empty on a config failure"
+ok "a corrupt config fails readably with no stack trace"
+
+printf 'admin' | "$CLI" login --server "$SERVER" --username admin --password-stdin \
+  >/dev/null 2>"$WORK/relogin.err" \
+  || { cat "$WORK/relogin.err" >&2; fail "login should recover from a corrupt config"; }
+jq -e --arg s "$SERVER" '.server == $s' "$CONFIG" >/dev/null \
+  || fail "login did not repair the config: $(cat "$CONFIG")"
+syslist
+[ "$COUNT" -eq "$EXPECTED_SYSTEMS" ] || fail "the CLI should work again after re-login"
+ok "login repairs a corrupt config"
+
+# No temporary file survives a write — the config is written by rename, not in place.
+[ -z "$(find "$(dirname "$CONFIG")" -name '*.tmp' -print -quit)" ] \
+  || fail "a temporary config file was left behind: $(ls "$(dirname "$CONFIG")")"
+ok "config writes leave no temporary file"
+
 echo "smoke: all checks passed" >&2
