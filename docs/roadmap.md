@@ -9,11 +9,23 @@ when it ships.
 
 ## Next
 
-1. **Books.** The larger metadata surface, and the only resource with no commands
-   at all. Read side first, then the writes — `PATCH /api/books/{id}`,
-   `POST /api/books/bulk`, `/bulk/tags` — following the `--input`/`--stdin` shape
-   settled for systems.
-2. **The remaining systems endpoints.** Cover (get/upload/delete), book-folders
-   (list/update), and the metadata-lookup trio: `metadata-sources`,
-   `metadata-search`, `metadata-fetch`. The trio wraps the server's add-on
-   system, which fetches server-side with a per-field diff and a field whitelist.
+1. **Books — metadata and maintenance.** The larger metadata surface, and the
+   only resource with no commands at all. `GET /api/books`, `GET /api/books/{id}`,
+   then the writes — `PATCH /api/books/{id}`, `POST /api/books/bulk`,
+   `/bulk/tags` — following the `--input`/`--stdin` shape settled for systems,
+   plus `POST /api/books/{id}/reindex` and `/rescan`. Together these cover the
+   workflow of dropping files into the library by hand, having them scanned and
+   indexed, and then correcting their metadata.
+2. **Metadata lookup, systems and books in one pass.** `metadata-sources`,
+   `metadata-search`, `metadata-fetch` on both resources. The trio wraps the
+   server's add-on system, which fetches server-side with a per-field diff and a
+   field whitelist — one design serving both resources rather than two. **The
+   first release is cut after this**, as the point where the CLI can find
+   metadata as well as edit it.
+3. **The remaining systems endpoints.** Cover (get/upload/delete) and
+   book-folders (list/update).
+4. **Book text extraction.** `toc`, `page/{n}/text`, `page/{n}/words` — all JSON,
+   and what an agent needs to read a rulebook rather than catalogue it.
+5. **Binary endpoints.** `books/{id}/file`, `/thumbnail`, `/page/{n}`, and systems
+   cover images. These return bytes, not JSON, so the first of them settles an
+   output convention the CLI has not needed until now.
