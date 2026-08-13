@@ -22,27 +22,9 @@ public static class SystemsCommand
         return command;
     }
 
-    /// <summary>
-    /// An option restricted to a fixed value set. The server silently falls back to
-    /// its default sort when given an unknown key, so an unrecognised value is
-    /// rejected here instead of returning differently-ordered data with exit 0.
-    /// </summary>
-    private static Option<string?> ChoiceOption(string name, string description, string[] allowed)
-    {
-        var option = new Option<string?>(name) { Description = description };
-        option.Validators.Add(result =>
-        {
-            var value = result.GetValueOrDefault<string?>();
-            if (value is not null && !allowed.Contains(value))
-                result.AddError($"'{value}' is not a valid value for {name}. Must be one of: {string.Join(", ", allowed)}");
-        });
-        option.CompletionSources.Add(allowed);
-        return option;
-    }
-
     private static Command CreateListCommand()
     {
-        var sortOption = ChoiceOption("--sort", "Sort field; default name", SystemSortKeys);
+        var sortOption = OptionHelpers.Choice("--sort", "Sort field; default name", SystemSortKeys);
         var descOption = new Option<bool>("--desc") { Description = "Sort descending" };
         var genreOption = new Option<string?>("--genre") { Description = "Filter by genre" };
         var familyOption = new Option<string?>("--family") { Description = "Filter by system family" };
@@ -102,7 +84,7 @@ public static class SystemsCommand
     private static Command CreateGetCommand()
     {
         var idOption = new Option<string>("--id") { Description = "System ID", Required = true };
-        var bookSortOption = ChoiceOption("--book-sort", "Sort the books; default category", BookSortKeys);
+        var bookSortOption = OptionHelpers.Choice("--book-sort", "Sort the books; default category", BookSortKeys);
         var bookDescOption = new Option<bool>("--book-desc") { Description = "Sort the books descending" };
         var genreOption = new Option<string?>("--genre") { Description = "Keep only books with this genre" };
         var categoryOption = new Option<string?>("--category") { Description = "Keep only books in this category (core, supplement, adventure, …)" };
@@ -149,25 +131,6 @@ public static class SystemsCommand
         return command;
     }
 
-    /// <summary>
-    /// Declares --input / --stdin as mutually exclusive and exactly one required,
-    /// as a command validator so the refusal is a parse error (exit 1) before any
-    /// client is built.
-    /// </summary>
-    private static void RequireExactlyOneBodySource(
-        Command command, Option<string?> inputOption, Option<bool> stdinOption)
-    {
-        command.Validators.Add(result =>
-        {
-            var hasInput = result.GetValue(inputOption) != null;
-            var hasStdin = result.GetValue(stdinOption);
-            if (hasInput && hasStdin)
-                result.AddError(JsonBodyInput.BothSourcesMessage);
-            else if (!hasInput && !hasStdin)
-                result.AddError(JsonBodyInput.NeitherSourceMessage);
-        });
-    }
-
     private static Command CreateUpdateCommand()
     {
         var idOption = new Option<string>("--id") { Description = "System ID", Required = true };
@@ -180,7 +143,7 @@ public static class SystemsCommand
             idOption, inputOption, stdinOption, serverOption, tokenOption
         };
         command.AddRoleRequired("gm or admin");
-        RequireExactlyOneBodySource(command, inputOption, stdinOption);
+        JsonBodyInput.RequireExactlyOneSource(command, inputOption, stdinOption);
         command.AddHelpSection("Notes", HelpSectionPosition.Top,
             "Renaming is permanent: setting name marks it custom, and the scanner",
             "never re-derives it from the folder again.",
@@ -231,7 +194,7 @@ public static class SystemsCommand
             inputOption, stdinOption, serverOption, tokenOption
         };
         command.AddRoleRequired("gm or admin");
-        RequireExactlyOneBodySource(command, inputOption, stdinOption);
+        JsonBodyInput.RequireExactlyOneSource(command, inputOption, stdinOption);
         command.AddHelpSection("Notes", HelpSectionPosition.Top,
             "At most 1000 items. Each item requires id, plus any of the other",
             "fields.",
@@ -282,7 +245,7 @@ public static class SystemsCommand
             inputOption, stdinOption, serverOption, tokenOption
         };
         command.AddRoleRequired("gm or admin");
-        RequireExactlyOneBodySource(command, inputOption, stdinOption);
+        JsonBodyInput.RequireExactlyOneSource(command, inputOption, stdinOption);
         command.AddHelpSection("Notes", HelpSectionPosition.Top,
             "ids and tags are both required and non-empty; max 1000 ids.",
             "",

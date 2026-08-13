@@ -125,15 +125,8 @@ public class SystemsCommandTests
         Assert.NotEmpty(Root().Parse(input).Errors);
     }
 
-    private static string RenderHelp(string[] path, bool full)
-    {
-        var root = new RootCommand("test") { SystemsCommand.Create() };
-        root.UseCustomHelpSections();
-        var output = new StringWriter();
-        root.Parse([.. path, full ? "--help-full" : "--help"])
-            .Invoke(new InvocationConfiguration { Output = output });
-        return output.ToString();
-    }
+    private static string RenderHelp(string[] path, bool full) =>
+        HelpRenderer.Render(SystemsCommand.Create(), path, full);
 
     // The block is rendered from the generated model, so this is also the guard on
     // that: a regeneration that dropped a model's properties (microsoft/kiota#2338)
