@@ -109,16 +109,11 @@ public static class LoginCommand
             // The token is already saved at this point, so a failure here is not a
             // login failure — it's a warning, not a reason to report exit 2 and make
             // the caller think they need to log in again. /api/about requires the
-            // token just saved and carries the server version.
-            try
-            {
-                var authed = new GrimoireApiClient(config);
-                await authed.CheckVersionNowAsync();
-            }
-            catch (HttpRequestException ex)
-            {
-                _logger.Warn($"Logged in, but could not check server version: {ex.Message}");
-            }
+            // token just saved and carries the server version. The probe catches its
+            // own failures (ProbeServerVersionAsync) and never throws, so there is
+            // nothing to catch here.
+            var authed = new GrimoireApiClient(config);
+            await authed.CheckVersionNowAsync();
             return 0;
         });
         return command;
