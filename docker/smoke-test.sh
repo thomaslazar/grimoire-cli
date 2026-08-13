@@ -612,24 +612,43 @@ for i in $(seq 1 30); do
 done
 
 # --- library scan --------------------------------------------------------------
-# "books/Shadowrun 4 DE" names no real directory — the container nests it at
-# books/Shadowrun/4 DE — but the server validates only that scope starts with a
-# known collection and does not escape the library root, not that it exists.
-# It is used deliberately: scan_started with nothing to actually walk keeps
-# this scoped rescan from touching any file the read-back checks above depend
-# on, which is what keeps a second run converging instead of drifting.
-"$CLI" library rescan --scope "books/Shadowrun 4 DE" \
+# The real path: the container nests Shadowrun 4 DE at books/Shadowrun/4 DE, not
+# books/Shadowrun 4 DE. That distinction matters here — resolve_scope validates
+# only that a scope begins with a known collection and does not escape the
+# library root, never that the target exists (docs/grimoire-api-notes.md), so
+# a scope matching nothing would still answer scan_started and this assertion
+# would pass against any syntactically valid books/-prefixed garbage. Only the
+# real path drives an actual walk, which is what the settled counters below
+# prove. metadata_mode defaults to "new", which only fills in brand-new book
+# records and leaves already-indexed metadata alone, so this does not disturb
+# the description/license/tags this suite wrote to Shadowrun 4 DE above.
+"$CLI" library rescan --scope "books/Shadowrun/4 DE" \
   >"$WORK/librescan.out" 2>"$WORK/librescan.err" \
   || { cat "$WORK/librescan.err" >&2; fail "library rescan exited non-zero"; }
 jq -e '.status == "scan_started"' "$WORK/librescan.out" >/dev/null \
   || fail "library rescan should answer scan_started: $(cat "$WORK/librescan.out")"
 ok "library rescan starts a scoped scan"
 
-STATUS_JSON=$("$CLI" library scan-status 2>"$WORK/cli.err") \
-  || { cat "$WORK/cli.err" >&2; fail "library scan-status exited non-zero"; }
+# Wait for the scoped scan to settle before reading its counters, or a
+# still-in-flight snapshot would read as a smaller, unstable number.
+for i in $(seq 1 30); do
+  STATUS_JSON=$("$CLI" library scan-status 2>"$WORK/cli.err") \
+    || { cat "$WORK/cli.err" >&2; fail "library scan-status exited non-zero"; }
+  [ "$(echo "$STATUS_JSON" | jq -r .running)" = "false" ] && break
+  [ "$i" -eq 30 ] && fail "the scoped rescan never finished"
+  sleep 1
+done
 echo "$STATUS_JSON" | jq -e '.running | type == "boolean"' >/dev/null \
   || fail "scan-status should carry a boolean running field: $STATUS_JSON"
-ok "library scan-status returns valid JSON with a running field"
+
+# total_books/scanned_books settling at 3 — Shadowrun 4 DE's own book count,
+# asserted earlier via books list --system-id — is something only a walk of
+# the real subtree produces; a scope matching nothing would leave both at 0.
+[ "$(echo "$STATUS_JSON" | jq -r .total_books)" -eq 3 ] \
+  || fail "a scoped rescan of Shadowrun 4 DE should settle on 3 books, got $(echo "$STATUS_JSON" | jq -r .total_books)"
+[ "$(echo "$STATUS_JSON" | jq -r .scanned_books)" -eq 3 ] \
+  || fail "a scoped rescan of Shadowrun 4 DE should scan all 3 books, got $(echo "$STATUS_JSON" | jq -r .scanned_books)"
+ok "library scan-status shows the scoped rescan actually walked its subtree"
 
 CANCEL_JSON=$("$CLI" library cancel-scan 2>"$WORK/cli.err") \
   || { cat "$WORK/cli.err" >&2; fail "library cancel-scan exited non-zero"; }

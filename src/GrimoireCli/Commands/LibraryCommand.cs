@@ -36,6 +36,7 @@ public static class LibraryCommand
             "--scope is a path from the library root beginning books/, maps/,",
             "tokens/ or audio/ — a system's path is the relative_path of its books",
             "in systems get.",
+            "A scope matching nothing still reports scan_started.",
             "",
             "Exit 3 is HTTP 200 with already_running: a scan was already in flight",
             "and this one did not start.");
