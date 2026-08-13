@@ -131,6 +131,7 @@ Each resolved property renders by type:
 | `List<string>` | `["<string>"]` |
 | `List<int?>` | `[0]` |
 | `IComposedTypeWrapper` | unwrap to the single non-`…Member1` property, then as above |
+| enum | `"<member1|member2|...>"` |
 | model reference | nested object, recursed |
 | `List<model>` | one-element array of the recursed object |
 | `UntypedNode` | `{}` |
