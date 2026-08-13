@@ -191,10 +191,10 @@ public static class SystemsCommand
             "",
             "Responds {\"status\": \"ok\"} and echoes nothing — read back with:",
             "grimoire-cli systems get --id <id>");
-        command.AddRequestShape<Generated.Models.GameSystemUpdate>();
         command.AddExamples(
             "grimoire-cli systems update --id <id> --input metadata.json",
             "echo '{\"system_family\":\"Shadowrun\"}' | grimoire-cli systems update --id <id> --stdin");
+        command.AddRequestShape<Generated.Models.GameSystemUpdate>();
         command.SetAction(async (parseResult, cancellationToken) =>
         {
             string body;
@@ -233,7 +233,8 @@ public static class SystemsCommand
         command.AddRoleRequired("gm or admin");
         RequireExactlyOneBodySource(command, inputOption, stdinOption);
         command.AddHelpSection("Notes", HelpSectionPosition.Top,
-            "At most 1000 items.",
+            "At most 1000 items. Each item requires id, plus any of the other",
+            "fields.",
             "",
             "Skip-and-continue: a bad id or item lands in errors, the rest apply.",
             "Exit 3 is HTTP 200 with a non-empty errors list — a partial write.",
