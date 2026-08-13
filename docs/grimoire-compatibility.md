@@ -78,8 +78,16 @@ checked most recently, not to any one server in particular.
    git -C temp/grimoire diff vOLD..vNEW -- backend/routers/*/_serializers.py backend/routers/*/core.py backend/models/
    ```
 
-5. Update DTOs, flags and help text to match. Re-run `bash docker/seed.sh` and
-   `bash docker/smoke-test.sh`. Update `MinSupportedVersion` /
-   `MaxTestedVersion` in `GrimoireApiClient.cs`, the matrix above, and the
-   compatibility line in `README.md` — all in the same PR as the code change,
-   alongside the regenerated `src/GrimoireCli/Generated/`.
+5. Update DTOs, flags and help text to match. Regenerate the two generated
+   example trees, now downstream of the client regeneration in step 3:
+
+   ```bash
+   dotnet run --project tools/GenerateResponseExamples -- src/GrimoireCli/Commands/ResponseExamples.g.cs
+   dotnet run --project tools/GenerateRequestExamples -- src/GrimoireCli/Commands/RequestExamples.g.cs
+   ```
+
+   Re-run `bash docker/seed.sh` and `bash docker/smoke-test.sh`. Update
+   `MinSupportedVersion` / `MaxTestedVersion` in `GrimoireApiClient.cs`, the
+   matrix above, and the compatibility line in `README.md` — all in the same
+   PR as the code change, alongside the regenerated
+   `src/GrimoireCli/Generated/`.

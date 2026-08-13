@@ -427,7 +427,7 @@ internal static class Program
 dotnet run --project tools/GenerateRequestExamples -- src/GrimoireCli/Commands/RequestExamples.g.cs
 ```
 
-Expected: `Wrote 85 samples to …` (a nearby count is fine — the model tree moves with the Grimoire version). If the run throws `NotSupportedException` or the wire-field `InvalidOperationException`, the model tree has a shape the walker has no rule for: add the rule, do not weaken the exception into a skip.
+Expected: `Wrote 84 samples to …` (a nearby count is fine — the model tree moves with the Grimoire version). If the run throws `NotSupportedException` or the wire-field `InvalidOperationException`, the model tree has a shape the walker has no rule for: add the rule, do not weaken the exception into a skip.
 
 - [ ] **Step 7: Run the tests to verify they pass**
 
@@ -748,7 +748,7 @@ learned it by being refused once.
 `--help-full` now prints a typed JSON body template, generated at build time by
 `tools/GenerateRequestExamples` from the Kiota models — names from
 `GetFieldDeserializers()`, the same set `JsonBodyInput.Validate` accepts, types
-from the properties with the composed-type wrappers unwrapped. All 85 request
+from the properties with the composed-type wrappers unwrapped. All 84 request
 models are generated, so write commands added later get their shape for free.
 
 `systems batch-update` now shows the `{"items": [...]}` envelope rather than the
@@ -772,6 +772,6 @@ Report the result without being asked. A PR is done at "all checks green", not a
 
 ## Self-Review
 
-**Spec coverage:** generator and two-tool decision → Task 1; discovery of all 85 minus the two response-only schemas → Task 1 Step 5; walker rule table → Task 1 Step 4; hard failure on an unresolvable wire name → Task 1 Step 4 plus the root-keys test in Step 1; depth guard → Task 1 Step 4; placeholders with no realistic-value overrides → Task 1 Step 4 (no `PropertyOverrides` equivalent); rendering and title → Task 2; `AddRequestShape<T>()` with `preamble` deleted → Task 2 Steps 3-4; envelope switch → Task 2 Step 4; required-ness staying in Notes → Task 2 Step 4; all four tests → Tasks 1 and 2; docs → Task 3.
+**Spec coverage:** generator and two-tool decision → Task 1; discovery of all 84 minus the two response-only schemas → Task 1 Step 5; walker rule table → Task 1 Step 4; hard failure on an unresolvable wire name → Task 1 Step 4 plus the root-keys test in Step 1; depth guard → Task 1 Step 4; placeholders with no realistic-value overrides → Task 1 Step 4 (no `PropertyOverrides` equivalent); rendering and title → Task 2; `AddRequestShape<T>()` with `preamble` deleted → Task 2 Steps 3-4; envelope switch → Task 2 Step 4; required-ness staying in Notes → Task 2 Step 4; all four tests → Tasks 1 and 2; docs → Task 3.
 
 **Type consistency:** `RequestExamples.For` / `.All` are produced in Task 1 Step 5 and consumed in Task 2 Step 3 and the Task 1 tests. `KiotaSampleWalker.Render(Type)` is called only from `Program.Main`. `AddRequestShape<T>()` is defined once and called three times with `GameSystemUpdate`, `GameSystemBulkUpdate`, `BulkAddTags` — all classes that exist in `GrimoireCli.Generated.Models` and satisfy `where T : IParsable`.

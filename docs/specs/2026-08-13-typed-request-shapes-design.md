@@ -100,14 +100,14 @@ drift test fails for one reason.
 Every public `IParsable` in the `GrimoireCli.Generated.Models` namespace that is
 not nested, not a `…Member1` shell, and not `HTTPValidationError` or
 `ValidationError` — per `CLAUDE.md`, the spec's only two response-only schemas.
-85 models today.
+84 models today.
 
 Generating all of them, rather than the three commands use, is what makes a new
 write command free. The alternative — an allowlist in the generator, as
 `generate-api-coverage.py` keeps `IMPLEMENTED` — puts a generator edit in the
 path of every new command, which is the friction this item exists to remove. The
 cost is string literals for models no command reaches; `ResponseExamples.g.cs` is
-8 KB for 8 DTOs, and 85 mostly-small request bodies land far below anything that
+8 KB for 8 DTOs, and 84 mostly-small request bodies land far below anything that
 matters against an AOT binary.
 
 ### Walking a model
@@ -221,7 +221,7 @@ right side of that trade.
 - `RequestExamplesJsonValidTest` — parses every sample in `All`, as the response
   counterpart does.
 - A generator-level assertion that every `GetFieldDeserializers()` key across all
-  85 models resolves to a property. The generator already fails on this; the test
+  84 models resolves to a property. The generator already fails on this; the test
   states it as a property of the whole surface, so a Grimoire version bump that
   introduces an unmappable name is a red test with a name that explains itself.
 - Existing help-output tests updated for the `Request shape` title and the sample
@@ -247,7 +247,7 @@ and the rule is revisited — which is the correct outcome, and better than the
 spec-sourced alternative, where the same change would silently desynchronise help
 from validation.
 
-**Binary growth from unused samples.** 85 samples of string literals, none
+**Binary growth from unused samples.** 84 samples of string literals, none
 trimmable since they sit in a static initialiser. Measured against the AOT
 binary after implementation; if it is ever material, an allowlist is a small
 change to one file.

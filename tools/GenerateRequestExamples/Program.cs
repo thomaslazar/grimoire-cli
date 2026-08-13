@@ -10,6 +10,12 @@ internal static class Program
     /// Emits a static class with a Type→JSON-sample dictionary for every request
     /// model in the generated Kiota client, for --help-full to print as a body
     /// template.
+    ///
+    /// The emitter below is near-verbatim <c>tools/GenerateResponseExamples/Program.cs</c>'s
+    /// — header, dictionary scaffolding, Quote, line-ending normalisation. That
+    /// duplication is deliberate (the two tools' walkers are independent by
+    /// design; see the design doc), so a change to the emitted format must be
+    /// made in both places on purpose.
     /// </summary>
     public static int Main(string[] args)
     {
@@ -38,6 +44,9 @@ internal static class Program
         foreach (var type in types.OrderBy(t => t.FullName, StringComparer.Ordinal))
         {
             var sample = KiotaSampleWalker.Render(type);
+            // Unlike the response emitter's FullTypeName(), this uses Type.FullName
+            // raw — safe only because DiscoverRequestTypes() filters out !t.IsNested,
+            // so none of these names contain FullName's '+' nested-type separator.
             sb.Append("        { typeof(").Append(type.FullName).AppendLine("),");
             sb.Append("          ").Append(Quote(sample)).AppendLine(" },");
         }

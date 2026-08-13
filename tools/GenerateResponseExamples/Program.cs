@@ -14,6 +14,12 @@ internal static class Program
     /// registered on AppJsonContext via [JsonSerializable], skipping types that
     /// are not meaningful response payloads (auth request bodies, local config,
     /// Dictionary/List helper registrations).
+    ///
+    /// The emitter below is near-verbatim <c>tools/GenerateRequestExamples/Program.cs</c>'s
+    /// — header, dictionary scaffolding, Quote, line-ending normalisation. That
+    /// duplication is deliberate (the two tools' walkers are independent by
+    /// design; see the design doc), so a change to the emitted format must be
+    /// made in both places on purpose.
     /// </summary>
     public static int Main(string[] args)
     {
