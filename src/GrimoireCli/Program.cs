@@ -21,6 +21,7 @@ rootCommand.Subcommands.Add(LoginCommand.Create());
 rootCommand.Subcommands.Add(MeCommand.Create());
 rootCommand.Subcommands.Add(ConfigCommand.Create());
 rootCommand.Subcommands.Add(SystemsCommand.Create());
+rootCommand.Subcommands.Add(BooksCommand.Create());
 rootCommand.Subcommands.Add(SelfTestCommand.Create());
 
 rootCommand.AddHelpSection("Environment variables",
