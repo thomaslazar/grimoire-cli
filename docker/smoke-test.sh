@@ -482,6 +482,161 @@ set -e
 grep -q "licence" "$WORK/batchtypo.err" || fail "no offending field named: $(cat "$WORK/batchtypo.err")"
 ok "an unknown field inside a batch item exits 1"
 
+# --- books --------------------------------------------------------------------
+# Requires docker/seed.sh to have run. EXPECTED_BOOKS mirrors the fixture count
+# there; changing a fixture must change this number. Shadowrun 4 DE additionally
+# carries 3 books across 2 categories, specifically so a --limit below that
+# system's own total proves paging rather than a coincidence of the global
+# count already exceeding it.
+EXPECTED_BOOKS=17
+
+booklist() {
+  LIST_JSON=$("$CLI" books list "$@" 2>"$WORK/cli.err") \
+    || { cat "$WORK/cli.err" >&2; fail "books list $* exited non-zero"; }
+}
+
+bookget() {
+  GET_JSON=$("$CLI" books get "$@" 2>"$WORK/cli.err") \
+    || { cat "$WORK/cli.err" >&2; fail "books get $* exited non-zero"; }
+}
+
+booklist
+[ "$(echo "$LIST_JSON" | jq -r .total)" -eq "$EXPECTED_BOOKS" ] \
+  || fail "expected $EXPECTED_BOOKS books, got $(echo "$LIST_JSON" | jq -r .total)"
+[ "$(echo "$LIST_JSON" | jq '.books | length')" -eq "$EXPECTED_BOOKS" ] \
+  || fail "the default limit should return every book, got $(echo "$LIST_JSON" | jq '.books | length')"
+ok "books list returns a total and a books array"
+
+booklist --system-id "$SR4" --limit 2
+[ "$(echo "$LIST_JSON" | jq -r .total)" -eq 3 ] \
+  || fail "Shadowrun 4 DE should report 3 books regardless of --limit, got $(echo "$LIST_JSON" | jq -r .total)"
+[ "$(echo "$LIST_JSON" | jq '.books | length')" -eq 2 ] \
+  || fail "--limit 2 should return 2 books, got $(echo "$LIST_JSON" | jq '.books | length')"
+FIRST_PAGE_ID=$(echo "$LIST_JSON" | jq -r '.books[0].id')
+ok "--limit narrows the page while total stays the system's full count"
+
+booklist --system-id "$SR4" --offset 2 --limit 2
+[ "$(echo "$LIST_JSON" | jq '.books | length')" -eq 1 ] \
+  || fail "offset 2 of 3 should leave exactly 1 book, got $(echo "$LIST_JSON" | jq '.books | length')"
+[ "$(echo "$LIST_JSON" | jq -r '.books[0].id')" != "$FIRST_PAGE_ID" ] \
+  || fail "--offset 2 should have skipped past the first page's lead book"
+ok "--offset advances to a different first id"
+
+booklist --category core
+[ "$(echo "$LIST_JSON" | jq '.books | length')" -gt 0 ] || fail "--category core matched nothing"
+echo "$LIST_JSON" | jq -e '.books | all(.category == "core")' >/dev/null \
+  || fail "--category core returned a non-core book: $(echo "$LIST_JSON" | jq -c '.books | map(.category)')"
+booklist --category Core
+[ "$(echo "$LIST_JSON" | jq -r .total)" -eq 0 ] \
+  || fail "'Core' should match nothing, got $(echo "$LIST_JSON" | jq -r .total)"
+ok "--category is case-sensitive"
+
+booklist --system-id "$SR4" --category core --limit 1
+SR4_BOOK=$(echo "$LIST_JSON" | jq -r '.books[0].id')
+[ -n "$SR4_BOOK" ] && [ "$SR4_BOOK" != null ] || fail "no core book under Shadowrun 4 DE"
+
+bookget --id "$SR4_BOOK"
+[ "$(echo "$GET_JSON" | jq -r '.game_system.id')" = "$SR4" ] \
+  || fail "books get should populate game_system: $(echo "$GET_JSON" | jq -c .game_system)"
+ok "books get returns the detail shape with game_system populated"
+
+# The first book write. Shadowrun 4 DE is seeded raw for exactly this, same as
+# the systems section above. description is used for the same reason: nothing
+# above filters on it, so re-running the suite converges instead of drifting.
+echo '{"description":"smoke fixture book description"}' \
+  | "$CLI" books update --id "$SR4_BOOK" --stdin >"$WORK/bupd.out" 2>"$WORK/bupd.err" \
+  || { cat "$WORK/bupd.err" >&2; fail "books update exited non-zero"; }
+jq -e '.status == "ok"' "$WORK/bupd.out" >/dev/null \
+  || fail "update should answer {\"status\":\"ok\"}: $(cat "$WORK/bupd.out")"
+bookget --id "$SR4_BOOK"
+[ "$(echo "$GET_JSON" | jq -r .description)" = "smoke fixture book description" ] \
+  || fail "the written description did not read back: $(echo "$GET_JSON" | jq -r .description)"
+ok "books update writes a field and books get reads it back"
+
+# batch-tag is additive: the second call must not displace the first tag.
+echo "{\"ids\":[\"$SR4_BOOK\"],\"tags\":[\"smoke-book-alpha\"]}" \
+  | "$CLI" books batch-tag --stdin >"$WORK/btag1.out" 2>"$WORK/btag1.err" \
+  || { cat "$WORK/btag1.err" >&2; fail "batch-tag exited non-zero"; }
+echo "{\"ids\":[\"$SR4_BOOK\"],\"tags\":[\"smoke-book-beta\"]}" \
+  | "$CLI" books batch-tag --stdin >"$WORK/btag2.out" 2>"$WORK/btag2.err" \
+  || { cat "$WORK/btag2.err" >&2; fail "the second batch-tag exited non-zero"; }
+jq -e --arg id "$SR4_BOOK" '.tags[$id] | index("smoke-book-alpha") != null and index("smoke-book-beta") != null' \
+  "$WORK/btag2.out" >/dev/null \
+  || fail "batch-tag should have merged both tags: $(cat "$WORK/btag2.out")"
+ok "batch-tag adds a tag and leaves the existing one in place"
+
+# batch-update: one good id and one bogus id must exit 3, applying the good
+# one. license, not description: nothing above filters on a book's license,
+# so this stays idempotent across re-runs.
+cat >"$WORK/bbatch.json" <<JSON
+{"items":[{"id":"$SR4_BOOK","license":"Smoke Fixture Book License"},
+          {"id":"no-such-id","license":"x"}]}
+JSON
+set +e
+"$CLI" books batch-update --input "$WORK/bbatch.json" >"$WORK/bbatch.out" 2>"$WORK/bbatch.err"; rc=$?
+set -e
+[ "$rc" -eq 3 ] || fail "a partial batch should exit 3, got $rc: $(cat "$WORK/bbatch.err")"
+jq -e --arg id "$SR4_BOOK" '.updated | index($id) != null' "$WORK/bbatch.out" >/dev/null \
+  || fail "the good id should be in updated: $(cat "$WORK/bbatch.out")"
+jq -e '.errors | length == 1 and .[0].id == "no-such-id"' "$WORK/bbatch.out" >/dev/null \
+  || fail "the bogus id should be the only error: $(cat "$WORK/bbatch.out")"
+ok "batch-update applies the good id and exits 3 on a partial, naming the bad id"
+
+# reindex is OCR-only, and the fixtures are real PDFs with a real text layer
+# (make-fixtures.py inserts real text), so the server always rejects with a
+# 400 — that rejection, not a successful re-index, is the assertable behaviour.
+set +e
+"$CLI" books reindex --id "$SR4_BOOK" >/dev/null 2>"$WORK/reindex.err"; rc=$?
+set -e
+[ "$rc" -ne 0 ] || fail "reindex on a text-layer fixture should have failed"
+grep -qi "bad request" "$WORK/reindex.err" \
+  || fail "reindex should have reported a 400: $(cat "$WORK/reindex.err")"
+ok "reindex rejects a fixture book with a 400"
+
+"$CLI" books rescan --id "$SR4_BOOK" >"$WORK/brescan.out" 2>"$WORK/brescan.err" \
+  || { cat "$WORK/brescan.err" >&2; fail "books rescan exited non-zero"; }
+jq -e '.status == "rescan_queued"' "$WORK/brescan.out" >/dev/null \
+  || fail "books rescan should answer rescan_queued: $(cat "$WORK/brescan.out")"
+ok "books rescan queues a re-read"
+
+# A single-book rescan sets the same running flag a full library scan uses
+# (rescan_single_book in temp/grimoire's backend/routers/library/_helpers.py),
+# so the library rescan below must wait for it to clear — otherwise it would
+# see running=true and answer already_running instead of scan_started.
+for i in $(seq 1 30); do
+  RUNNING=$("$CLI" library scan-status 2>"$WORK/cli.err" | jq -r .running) \
+    || { cat "$WORK/cli.err" >&2; fail "scan-status exited non-zero"; }
+  [ "$RUNNING" = "false" ] && break
+  [ "$i" -eq 30 ] && fail "the book rescan never finished"
+  sleep 1
+done
+
+# --- library scan --------------------------------------------------------------
+# "books/Shadowrun 4 DE" names no real directory — the container nests it at
+# books/Shadowrun/4 DE — but the server validates only that scope starts with a
+# known collection and does not escape the library root, not that it exists.
+# It is used deliberately: scan_started with nothing to actually walk keeps
+# this scoped rescan from touching any file the read-back checks above depend
+# on, which is what keeps a second run converging instead of drifting.
+"$CLI" library rescan --scope "books/Shadowrun 4 DE" \
+  >"$WORK/librescan.out" 2>"$WORK/librescan.err" \
+  || { cat "$WORK/librescan.err" >&2; fail "library rescan exited non-zero"; }
+jq -e '.status == "scan_started"' "$WORK/librescan.out" >/dev/null \
+  || fail "library rescan should answer scan_started: $(cat "$WORK/librescan.out")"
+ok "library rescan starts a scoped scan"
+
+STATUS_JSON=$("$CLI" library scan-status 2>"$WORK/cli.err") \
+  || { cat "$WORK/cli.err" >&2; fail "library scan-status exited non-zero"; }
+echo "$STATUS_JSON" | jq -e '.running | type == "boolean"' >/dev/null \
+  || fail "scan-status should carry a boolean running field: $STATUS_JSON"
+ok "library scan-status returns valid JSON with a running field"
+
+CANCEL_JSON=$("$CLI" library cancel-scan 2>"$WORK/cli.err") \
+  || { cat "$WORK/cli.err" >&2; fail "library cancel-scan exited non-zero"; }
+echo "$CANCEL_JSON" | jq -e 'has("status")' >/dev/null \
+  || fail "cancel-scan should report a status: $CANCEL_JSON"
+ok "library cancel-scan exits 0 and reports a status"
+
 # A config file that is not valid JSON must not take the CLI down with it, and
 # logging in again must be enough to recover — no hand-editing, no rm. This runs
 # last because it ends by restoring the config the earlier checks depend on.

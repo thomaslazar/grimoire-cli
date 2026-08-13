@@ -76,6 +76,8 @@ book "Shadowrun/6 DE"                  supplements  "SR6 Strassengrimoire"     6
 book "Shadowrun/5 DE"                  core         "SR5 Grundregelwerk"      10
 book "Shadowrun/5 DE"                  core         "SR5 Datenpfade"           5
 book "Shadowrun/4 DE"                  core         "SR4 Grundregelwerk"       7
+book "Shadowrun/4 DE"                  adventures   "SR4 Kampfhandbuch"        5
+book "Shadowrun/4 DE"                  supplements  "SR4 Strassengrimoire"     4
 book "!!Dungeons & Dragons/5e EN"      core         "Players Handbook"        14
 book "!!Dungeons & Dragons/5e EN"      adventures   "Lost Mine of Phandelver"  9
 book "Das Schwarze Auge/5 DE"          core         "DSA5 Regelwerk"          11
@@ -94,7 +96,7 @@ mkdir -p "$LIBRARY/books/one-page-rpgs"
 python3 "$HERE/make-fixtures.py" "$LIBRARY/books/one-page-rpgs/Lasers and Feelings.pdf" 1
 python3 "$HERE/make-fixtures.py" "$LIBRARY/books/one-page-rpgs/Honey Heist.pdf" 1
 
-EXPECTED_BOOKS=15
+EXPECTED_BOOKS=17
 say "wrote $EXPECTED_BOOKS fixture books"
 
 # 4. Rescan, then wait for completion. `running` reads false before the scan
