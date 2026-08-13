@@ -19,7 +19,7 @@ do not — so a first release is a checklist rather than an improvisation.
 |---|---|---|
 | A `thomaslazar/homebrew-grimoire-cli` tap repository | **done** — public, initialised with a commit on `main` | `update-homebrew` clones and pushes to it; an empty repository has no HEAD to clone |
 | A `HOMEBREW_TAP_TOKEN` repository secret | **done** — set 2026-08-09 | that job authenticates with it; without it the job fails *after* the binaries are already attached, leaving a partial release |
-| The repo to be public, or a paid plan | outstanding, not blocking | `main` is unprotected: GitHub Free offers neither branch protection nor rulesets on a private repo. When the repo goes public, require the `unit-test` and `smoke-test` checks with zero required approvals — a solo maintainer cannot approve their own PR |
+| Rulesets over `main` and `v*` | **done** — added 2026-08-13, once the repo went public | Both block deletion and non-fast-forward, and nothing else. Required status checks are deliberately absent: the rule applies to direct pushes too, and a fresh commit has no passing checks, so requiring them would forbid the doc-only commits that go straight to `main`. A bad commit is a revert; a force-push over `main` or a moved `v*` tag is not |
 
 The process below is automated by the `release` skill
 (`.claude/skills/release/SKILL.md`), which is invoked by name and never
