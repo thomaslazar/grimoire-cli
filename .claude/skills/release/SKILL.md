@@ -119,9 +119,10 @@ git commit -m "chore: bump version to ${VERSION_NUM}"
 ## Step 3: Reconcile the Supported Server Range
 
 `MinSupportedVersion` and `MaxTestedVersion` in
-`src/GrimoireCli/Api/GrimoireApiClient.cs` gate the login-time warning. They
-must agree with the matrix in `docs/grimoire-compatibility.md` and the
-compatibility line in `README.md` before a tag is cut.
+`src/GrimoireCli/Api/GrimoireApiClient.cs` gate the daily version-check warning
+(forced fresh at login). They must agree with the matrix in
+`docs/grimoire-compatibility.md` and the compatibility line in `README.md`
+before a tag is cut.
 
 ```bash
 grep -n "MinSupportedVersion\|MaxTestedVersion" src/GrimoireCli/Api/GrimoireApiClient.cs
