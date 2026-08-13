@@ -120,7 +120,7 @@ internal static class RequestExamples
         { typeof(GrimoireCli.Generated.Models.PublisherEntry),
           "{\n  \"name\": \"<string>\",\n  \"url\": \"<string>\"\n}" },
         { typeof(GrimoireCli.Generated.Models.RescanRequest),
-          "{\n  \"metadata_mode\": \"new\",\n  \"scope\": \"<string>\"\n}" },
+          "{\n  \"metadata_mode\": \"<new|missing|replace>\",\n  \"scope\": \"<string>\"\n}" },
         { typeof(GrimoireCli.Generated.Models.ResourceAdd),
           "{\n  \"category_id\": \"<string>\",\n  \"resource_id\": \"<string>\",\n  \"resource_type\": \"<string>\",\n  \"shared_user_ids\": [\n    \"<string>\"\n  ],\n  \"visibility\": \"<string>\"\n}" },
         { typeof(GrimoireCli.Generated.Models.ResourceBulkAdd),

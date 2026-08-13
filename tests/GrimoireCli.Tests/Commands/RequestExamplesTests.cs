@@ -62,14 +62,15 @@ public class RequestExamplesTests
     }
 
     // RescanRequest.MetadataMode is the tree's only true C# enum; the
-    // placeholder must be its [EnumMember] wire string ("new"), not the CLR
-    // member name ("New") a ToString() fallback would emit.
+    // placeholder must join every member's [EnumMember] wire string ("new",
+    // "missing", "replace"), not a CLR member name a ToString() fallback
+    // would emit, and not just one of the three as a real value.
     [Fact]
-    public void EnumsRenderTheirWireValue()
+    public void EnumsRenderTheirWireValuesAsAPlaceholder()
     {
         var sample = JsonDocument.Parse(
             RequestExamples.For(typeof(GrimoireCli.Generated.Models.RescanRequest))).RootElement;
-        Assert.Equal("new", sample.GetProperty("metadata_mode").GetString());
+        Assert.Equal("<new|missing|replace>", sample.GetProperty("metadata_mode").GetString());
     }
 
     [Fact]

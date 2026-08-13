@@ -82,15 +82,16 @@ public static class KiotaSampleWalker
             writer.WriteNumberValue(0);
             return;
         }
-        // Kiota tags each enum member [EnumMember] with its wire string.
-        // Enum.GetValues orders members by underlying numeric value, so the
-        // lowest-valued member's wire string stands in as the placeholder.
+        // Kiota tags each enum member [EnumMember] with its wire string. A
+        // placeholder must be a suggestion of what to send, not one real value
+        // standing in for the rest, so every member's wire string is joined
+        // into a single "<a|b|c>" placeholder.
         if (type.IsEnum)
         {
-            var lowest = Enum.GetValues(type).Cast<object>().First();
-            var wireValue = type.GetField(lowest.ToString()!)?.GetCustomAttribute<EnumMemberAttribute>()?.Value
-                ?? lowest.ToString()!;
-            writer.WriteStringValue(wireValue);
+            var wireValues = Enum.GetValues(type).Cast<object>()
+                .Select(member => type.GetField(member.ToString()!)?.GetCustomAttribute<EnumMemberAttribute>()?.Value
+                    ?? member.ToString()!);
+            writer.WriteStringValue($"<{string.Join('|', wireValues)}>");
             return;
         }
         // UntypedNode is free-form JSON the spec gives no shape for, and it also
@@ -129,8 +130,18 @@ public static class KiotaSampleWalker
     /// </summary>
     private static Type ValueBranch(Type wrapper)
     {
-        var branches = wrapper.GetProperties(BindingFlags.Public | BindingFlags.Instance)
+        var properties = wrapper.GetProperties(BindingFlags.Public | BindingFlags.Instance)
             .Where(p => p.Name != "AdditionalData")
+            .ToList();
+        foreach (var discarded in properties.Where(p => p.Name.EndsWith("Member1", StringComparison.Ordinal)))
+        {
+            var instance = (IParsable)Activator.CreateInstance(discarded.PropertyType)!;
+            if (instance.GetFieldDeserializers().Count != 0)
+                throw new NotSupportedException(
+                    $"'{discarded.PropertyType.Name}' is discarded as '{wrapper.Name}''s null branch but has " +
+                    "fields of its own; the unwrap rule assumes the discarded branch is always empty.");
+        }
+        var branches = properties
             .Where(p => !p.Name.EndsWith("Member1", StringComparison.Ordinal))
             .ToList();
         if (branches.Count != 1)
