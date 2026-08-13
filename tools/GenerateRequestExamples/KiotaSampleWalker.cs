@@ -82,13 +82,14 @@ public static class KiotaSampleWalker
             writer.WriteNumberValue(0);
             return;
         }
-        // Kiota emits an enum's own type per field, [EnumMember]-tagged with the
-        // wire string; the first declared member stands in as the placeholder.
+        // Kiota tags each enum member [EnumMember] with its wire string.
+        // Enum.GetValues orders members by underlying numeric value, so the
+        // lowest-valued member's wire string stands in as the placeholder.
         if (type.IsEnum)
         {
-            var first = Enum.GetValues(type).Cast<object>().First();
-            var wireValue = type.GetField(first.ToString()!)?.GetCustomAttribute<EnumMemberAttribute>()?.Value
-                ?? first.ToString()!;
+            var lowest = Enum.GetValues(type).Cast<object>().First();
+            var wireValue = type.GetField(lowest.ToString()!)?.GetCustomAttribute<EnumMemberAttribute>()?.Value
+                ?? lowest.ToString()!;
             writer.WriteStringValue(wireValue);
             return;
         }

@@ -61,6 +61,17 @@ public class RequestExamplesTests
         Assert.Equal("<string>", Assert.Single(tags.EnumerateArray()).GetString());
     }
 
+    // RescanRequest.MetadataMode is the tree's only true C# enum; the
+    // placeholder must be its [EnumMember] wire string ("new"), not the CLR
+    // member name ("New") a ToString() fallback would emit.
+    [Fact]
+    public void EnumsRenderTheirWireValue()
+    {
+        var sample = JsonDocument.Parse(
+            RequestExamples.For(typeof(GrimoireCli.Generated.Models.RescanRequest))).RootElement;
+        Assert.Equal("new", sample.GetProperty("metadata_mode").GetString());
+    }
+
     [Fact]
     public void NestedModelsRenderTheirOwnFields()
     {
