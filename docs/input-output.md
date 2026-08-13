@@ -13,7 +13,8 @@
 - **No `[JsonExtensionData]`.** An unmodelled field the server adds is
   silently dropped rather than passed through. This is deliberate: a dropped
   field is meant to be *noticed* — `tests/GrimoireCli.Tests/Commands/ResponseExamplesDriftTest.cs`
-  and `ResponseExamplesJsonValidTest.cs` guard the generated examples, and a
+  and `ResponseExamplesJsonValidTest.cs` guard the generated examples on the
+  response side, `RequestExamplesDriftTest.cs` on the request side, and a
   real server response gaining a field the DTOs don't know about is a signal
   to update the DTOs per the version-bump procedure in
   [grimoire-compatibility.md](grimoire-compatibility.md), not something to

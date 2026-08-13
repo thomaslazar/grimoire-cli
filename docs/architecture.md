@@ -12,6 +12,7 @@ Program.cs                 root command, global options, log setup, exit codes
     CommandHelper          resolves config into a client, exits if unconfigured
     HelpExtensions         Notes / Examples / Response shape sections, --help-full
     ResponseExamples.g.cs  generated samples (tools/GenerateResponseExamples)
+    RequestExamples.g.cs   generated body templates (tools/GenerateRequestExamples)
   Services/                one class per resource; builds the request, deserializes
   Api/                     GrimoireApiClient, TokenHelper, DebugHttpHandler
   Generated/               Kiota client — paths, path/query params, request bodies
@@ -71,6 +72,7 @@ These are generated and committed, each guarded by a test or a script:
 | File | Generator | Guard |
 |---|---|---|
 | `src/GrimoireCli/Commands/ResponseExamples.g.cs` | `tools/GenerateResponseExamples` | `ResponseExamplesDriftTest` regenerates and diffs |
+| `src/GrimoireCli/Commands/RequestExamples.g.cs` | `tools/GenerateRequestExamples` | `RequestExamplesDriftTest` regenerates and diffs |
 | `docs/grimoire-api-coverage.md` | `tools/generate-api-coverage.py` | roles cross-checked against the spec's own descriptions |
 | `src/GrimoireCli/Generated/` | `tools/generate-api-client.sh` | reviewed by the regeneration diff on a version bump, not a CI gate |
 
