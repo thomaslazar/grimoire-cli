@@ -113,8 +113,7 @@ public static class LoginCommand
             try
             {
                 var authed = new GrimoireApiClient(config);
-                var about = await authed.SendAsync(authed.Api.Api.About.ToGetRequestInformation());
-                GrimoireApiClient.CheckServerVersion(GrimoireApiClient.ReadStringProperty(about, "version"));
+                await authed.CheckVersionNowAsync();
             }
             catch (HttpRequestException ex)
             {

@@ -15,6 +15,8 @@ public class GrimoireApiClient
     private static readonly NLog.Logger _logger = NLog.LogManager.GetCurrentClassLogger();
     private readonly HttpClient _http;
     private readonly IRequestAdapter _adapter;
+    private readonly AppConfig _config;
+    private bool _versionCheckDone;
 
     /// <summary>
     /// The generated request builders. They construct URLs, query strings and
@@ -32,6 +34,7 @@ public class GrimoireApiClient
 
     public GrimoireApiClient(AppConfig config)
     {
+        _config = config;
         var debugHandler = new DebugHttpHandler(new HttpClientHandler());
         _http = new HttpClient(debugHandler)
         {
@@ -130,7 +133,7 @@ public class GrimoireApiClient
     /// </summary>
     public async Task<string> SendAsync(RequestInformation info, string? permissionHint = null, string? notFoundHint = null, TimeSpan? timeout = null)
     {
-        WarnIfTokenExpired();
+        await PreflightAsync();
         using var cts = new CancellationTokenSource(timeout ?? DefaultRequestTimeout);
         var request = await _adapter.ConvertToNativeRequestAsync<HttpRequestMessage>(info, cts.Token)
             ?? throw new InvalidOperationException($"Failed to build request for {info.URI.AbsolutePath}");
@@ -191,6 +194,100 @@ public class GrimoireApiClient
             _logger.Debug($"access token valid ({TokenHelper.SecondsUntilExpiry(token)}s remaining)");
     }
 
+    /// <summary>
+    /// Runs before every request. The token warning is per-request because it is
+    /// local and a long command can cross an expiry mid-run; the version check is
+    /// once per process, and at most once a day across processes.
+    /// </summary>
+    private async Task PreflightAsync()
+    {
+        WarnIfTokenExpired();
+        await EnsureVersionCheckedAsync();
+    }
+
+    private async Task EnsureVersionCheckedAsync()
+    {
+        if (_versionCheckDone) return;
+        _versionCheckDone = true;
+        if (!ShouldCheckVersion(_config.LastVersionCheck, DateTimeOffset.UtcNow))
+        {
+            _logger.Debug($"server version checked {_config.LastVersionCheck:u}, next due in "
+                          + $"{VersionCheckInterval - (DateTimeOffset.UtcNow - _config.LastVersionCheck!.Value):hh\\:mm}");
+            return;
+        }
+        var observed = await ProbeServerVersionAsync();
+        if (observed != null) RecordServerVersion(observed);
+    }
+
+    /// <summary>
+    /// GET /api/about on its own short budget, deliberately outside the normal send
+    /// path: a diagnostic may not exit the process through EnsureSuccessAsync, and
+    /// routing it through PreflightAsync would re-enter the check that triggered it.
+    /// Returns null on any failure, which leaves the timestamp alone so the next
+    /// invocation retries.
+    /// </summary>
+    private async Task<string?> ProbeServerVersionAsync()
+    {
+        try
+        {
+            using var cts = new CancellationTokenSource(VersionProbeTimeout);
+            var info = Api.Api.About.ToGetRequestInformation();
+            var request = await _adapter.ConvertToNativeRequestAsync<HttpRequestMessage>(info, cts.Token);
+            if (request == null) return null;
+            var response = await _http.SendAsync(request, cts.Token);
+            if (!response.IsSuccessStatusCode)
+            {
+                _logger.Debug($"version probe: {(int)response.StatusCode} from /api/about");
+                return null;
+            }
+            var body = await response.Content.ReadAsStringAsync(cts.Token);
+            return ReadStringProperty(body, "version");
+        }
+        catch (Exception ex)
+        {
+            // Unreachable, timed out, not JSON — all the same to a diagnostic. The
+            // real command will report the outage a moment later if there is one.
+            _logger.Debug($"version probe failed: {ex.Message}");
+            return null;
+        }
+    }
+
+    internal static readonly TimeSpan VersionProbeTimeout = TimeSpan.FromSeconds(3);
+
+    /// <summary>
+    /// One place owns "a version was observed", so the daily probe and login warn
+    /// and persist identically.
+    /// </summary>
+    internal void RecordServerVersion(string? observed)
+    {
+        if (observed == null) return;
+        var warning = VersionWarning(observed, _config.LastServerVersion);
+        if (warning != null) _logger.Warn(warning);
+        else _logger.Debug($"server version {observed} (in tested range {MinSupportedVersion}-{MaxTestedVersion})");
+
+        var checkedAt = DateTimeOffset.UtcNow;
+        try
+        {
+            new ConfigManager().UpdateVersionCheck(observed, checkedAt);
+        }
+        catch (Exception ex)
+        {
+            // An unwritable config only costs a re-probe next invocation.
+            _logger.Debug($"could not record the version check: {ex.Message}");
+        }
+        // Keep the in-memory config in step, so a later Save(_config) by the same
+        // process cannot write the stale values back over what was just recorded.
+        _config.LastServerVersion = observed;
+        _config.LastVersionCheck = checkedAt;
+    }
+
+    /// <summary>Probes and records regardless of the interval. Used by login, where a fresh verdict is the point.</summary>
+    public async Task CheckVersionNowAsync()
+    {
+        _versionCheckDone = true;
+        RecordServerVersion(await ProbeServerVersionAsync());
+    }
+
     private static readonly string MinSupportedVersion = "1.5.6";
     private static readonly string MaxTestedVersion = "1.5.6";
 
@@ -202,18 +299,6 @@ public class GrimoireApiClient
             .GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion
         ?? typeof(GrimoireApiClient).Assembly.GetName().Version?.ToString(3)
         ?? "0.0.0";
-
-    public static void CheckServerVersion(string? version)
-    {
-        if (string.IsNullOrEmpty(version)) return;
-
-        if (CompareVersions(version, MinSupportedVersion) < 0)
-            _logger.Warn($"Grimoire server version {version} is older than the minimum supported version ({MinSupportedVersion}). Some features may not work.");
-        else if (CompareVersions(version, MaxTestedVersion) > 0)
-            _logger.Warn($"Grimoire server version {version} has not been tested with this version of grimoire-cli. Proceed with caution.");
-        else
-            _logger.Debug($"server version {version} (in tested range {MinSupportedVersion}-{MaxTestedVersion})");
-    }
 
     internal static readonly TimeSpan VersionCheckInterval = TimeSpan.FromHours(24);
 
