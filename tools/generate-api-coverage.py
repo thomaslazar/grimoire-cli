@@ -47,6 +47,16 @@ IMPLEMENTED = {
     "PATCH /api/systems/{system_id}": "`systems update` ✅",
     "POST /api/systems/bulk": "`systems batch-update` ✅",
     "POST /api/systems/bulk/tags": "`systems batch-tag` ✅",
+    "GET /api/books": "`books list` ✅",
+    "GET /api/books/{book_id}": "`books get` ✅",
+    "PATCH /api/books/{book_id}": "`books update` ✅",
+    "POST /api/books/bulk": "`books batch-update` ✅",
+    "POST /api/books/bulk/tags": "`books batch-tag` ✅",
+    "POST /api/books/{book_id}/reindex": "`books reindex` ✅",
+    "POST /api/books/{book_id}/rescan": "`books rescan` ✅",
+    "POST /api/rescan": "`library rescan` ✅",
+    "GET /api/scan-status": "`library scan-status` ✅",
+    "POST /api/cancel-scan": "`library cancel-scan` ✅",
 }
 
 ROLE_LABEL = {

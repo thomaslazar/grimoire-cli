@@ -133,6 +133,16 @@ Verified against v1.5.6, backing `systems update`, `systems batch-update`,
   or naming a non-existent subtree walks nothing and completes instantly with
   no error, so `scan_started` alone confirms the request was well-formed, not
   that anything was scanned.
+- **`books rescan` and `library rescan` share one `running` flag.**
+  `rescan_single_book` (`backend/routers/library/_helpers.py:291-306`, backing
+  `POST /api/books/{id}/rescan`) and `run_rescan_sync`
+  (`backend/routers/library/_helpers.py:337-353`, backing `POST /api/rescan`)
+  both guard on and set the same status flag. A `books rescan` still in the
+  background makes a `library rescan` fired right after it answer
+  `already_running` (CLI exit 3) instead of `scan_started`, and the reverse
+  guards a single-book rescan into silently skipping itself rather than
+  racing a full scan. Verified live: calling the two back to back without
+  waiting for `GET /api/scan-status`'s `running` to clear reproduces it.
 - **Editions and language are metadata, not folders.** A new *flat* (non-container)
   folder under `books/` creates a system row with only `name` set; `parent_system`
   / `edition` / `system_family` stay empty until a `PATCH /api/systems/{id}`.
