@@ -7,8 +7,10 @@ public static class OptionHelpers
 {
     /// <summary>
     /// A string option restricted to a fixed value set, rejected at parse time and
-    /// offered as shell completions. The rendered help lists the values itself, so
-    /// the description must not repeat them.
+    /// offered as shell completions. A server that silently falls back to a default
+    /// when given an unknown value would otherwise return differently-shaped data
+    /// with exit 0, so an unrecognised value is rejected here instead. The rendered
+    /// help lists the values itself, so the description must not repeat them.
     /// </summary>
     public static Option<string?> Choice(string name, string description, string[] allowed)
     {

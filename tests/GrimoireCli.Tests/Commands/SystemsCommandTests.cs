@@ -30,6 +30,17 @@ public class SystemsCommandTests
         Assert.Contains("Must be one of: name, book_count, page_count, year", result.Errors[0].Message);
     }
 
+    // OptionHelpers.Choice relies on System.CommandLine rendering an option's own
+    // value set in its help line, so the CLI's description text does not repeat it
+    // (see CLAUDE.md). Pin the rendered form so an upgrade that changes it fails
+    // here instead of silently invalidating that convention.
+    [Fact]
+    public void SortOptionRendersItsValueSetInHelp()
+    {
+        var output = RenderHelp(["systems", "list"], full: false);
+        Assert.Contains("--sort <book_count|name|page_count|year>", output);
+    }
+
     [Fact]
     public void RejectsAnUnknownBookSortKey()
     {
