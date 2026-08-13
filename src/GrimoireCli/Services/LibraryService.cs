@@ -16,16 +16,29 @@ public class LibraryService
     /// </summary>
     public async Task<ScanTriggerResult> RescanAsync(string? scope, string? metadataMode)
     {
-        var body = new Generated.Models.RescanRequest();
-        // Kiota models the optional fields as composed types; assign through the
-        // wrapper so an omitted flag stays absent from the body.
-        if (scope is not null)
-            body.Scope = new Generated.Models.RescanRequest.RescanRequest_scope { String = scope };
-        if (metadataMode is not null)
-            body.MetadataMode = ParseMetadataMode(metadataMode);
+        var body = BuildBody(scope, metadataMode);
         var info = _client.Api.Api.Rescan.ToPostRequestInformation(body);
         return await _client.SendAsync(
             info, AppJsonContext.Default.ScanTriggerResult, permissionHint: "the admin role");
+    }
+
+    /// <summary>
+    /// Scope has no constructor default, so assigning through the composed-type
+    /// wrapper only when --scope is given already leaves it absent otherwise.
+    /// MetadataMode is a plain nullable enum that the generated constructor sets
+    /// to New unconditionally; null it out when --metadata-mode is omitted so the
+    /// CLI forwards the server's own default implicitly instead of pinning it —
+    /// thin pass-through, not a client-side mirror of server policy. Internal (not
+    /// private) so a test can pin that the constructor default cannot creep back
+    /// on a client regeneration.
+    /// </summary>
+    internal static Generated.Models.RescanRequest BuildBody(string? scope, string? metadataMode)
+    {
+        var body = new Generated.Models.RescanRequest();
+        if (scope is not null)
+            body.Scope = new Generated.Models.RescanRequest.RescanRequest_scope { String = scope };
+        body.MetadataMode = metadataMode is not null ? ParseMetadataMode(metadataMode) : null;
+        return body;
     }
 
     public async Task<ScanStatus> ScanStatusAsync()
