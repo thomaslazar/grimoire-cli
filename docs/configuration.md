@@ -34,9 +34,8 @@ populated (`server` and `accessToken` stay unset until `login` writes them).
 Highest wins (`ConfigManager.Resolve`):
 
 1. Command-line flags — `CommandHelper.BuildClient(serverOverride, tokenOverride)`
-   accepts a per-call override, but no command currently wires a `--server`/
-   `--token` flag through to it, so this tier is plumbing, not a usable flag,
-   as of this writing. `login`'s own `--server` writes straight to the file
+   accepts a per-call override; `systems` and `me` wire `--server`/`--token`
+   through to it. `login`'s own `--server` writes straight to the file
    instead of going through this resolution.
 2. Environment variables — `GRIMOIRE_SERVER`, `GRIMOIRE_TOKEN`
 3. Config file (`~/.grimoire-cli/config.json`)

@@ -101,7 +101,7 @@ grep -q "GET .*api/about" "$WORK/inwindow.err" \
   || fail "a check inside the window must not move the timestamp"
 ok "no probe inside the 24-hour window"
 
-# Backdated: probes, warns nothing (the stack is the tested version), and advances.
+# Backdated: probes and advances.
 jq '.lastVersionCheck = "2020-01-01T00:00:00+00:00"' "$CONFIG" > "$WORK/cfg" && mv "$WORK/cfg" "$CONFIG"
 "$CLI" --debug systems list >/dev/null 2>"$WORK/stale.err"
 grep -q "GET .*api/about 200" "$WORK/stale.err" \
