@@ -112,8 +112,9 @@ public static class LoginCommand
             // token just saved and carries the server version. The probe catches its
             // own failures (ProbeServerVersionAsync) and never throws, so there is
             // nothing to catch here.
-            var authed = new GrimoireApiClient(config);
-            await authed.CheckVersionNowAsync();
+            var authed = new GrimoireApiClient(config, configManager);
+            if (await authed.CheckVersionNowAsync() is null)
+                _logger.Warn("Logged in, but could not check the server version. Run with --debug for the reason.");
             return 0;
         });
         return command;

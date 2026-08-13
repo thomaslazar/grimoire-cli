@@ -92,7 +92,8 @@ ok "login records the server version"
 # probe happened — an unmoved timestamp alone would also be consistent with a
 # probe that ran and failed to persist.
 BEFORE=$(jq -r .lastVersionCheck "$CONFIG")
-"$CLI" --debug systems list >/dev/null 2>"$WORK/inwindow.err"
+"$CLI" --debug systems list >/dev/null 2>"$WORK/inwindow.err" \
+  || { cat "$WORK/inwindow.err" >&2; fail "systems list exited non-zero"; }
 grep -qi "next due in" "$WORK/inwindow.err" \
   || fail "a check inside the window should say it is not due: $(cat "$WORK/inwindow.err")"
 grep -q "GET .*api/about" "$WORK/inwindow.err" \
@@ -103,7 +104,8 @@ ok "no probe inside the 24-hour window"
 
 # Backdated: probes and advances.
 jq '.lastVersionCheck = "2020-01-01T00:00:00+00:00"' "$CONFIG" > "$WORK/cfg" && mv "$WORK/cfg" "$CONFIG"
-"$CLI" --debug systems list >/dev/null 2>"$WORK/stale.err"
+"$CLI" --debug systems list >/dev/null 2>"$WORK/stale.err" \
+  || { cat "$WORK/stale.err" >&2; fail "systems list exited non-zero"; }
 grep -q "GET .*api/about 200" "$WORK/stale.err" \
   || fail "a stale timestamp should have probed /api/about: $(cat "$WORK/stale.err")"
 [ "$(jq -r .lastVersionCheck "$CONFIG")" != "2020-01-01T00:00:00+00:00" ] \

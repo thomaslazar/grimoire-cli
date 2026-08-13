@@ -1,4 +1,5 @@
 using GrimoireCli.Api;
+using GrimoireCli.Configuration;
 
 namespace GrimoireCli.Tests.Api;
 
@@ -74,4 +75,29 @@ public class VersionCheckCadenceTests
     [Fact]
     public void AnUnchangedInRangeVersionStaysSilent()
         => Assert.Null(GrimoireApiClient.VersionWarning("1.5.6", previous: "1.5.6"));
+
+    // RecordServerVersion takes an injected ConfigManager (constructor parameter),
+    // so this proves persistence lands on that path rather than silently falling
+    // back to ~/.grimoire-cli/config.json — the fallback exists only for call
+    // sites with no ConfigManager already in hand.
+    [Fact]
+    public void RecordServerVersionPersistsThroughTheInjectedConfigManager()
+    {
+        var path = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName(), "config.json");
+        try
+        {
+            var configManager = new ConfigManager(path);
+            var client = new GrimoireApiClient(new AppConfig { Server = "http://localhost" }, configManager);
+
+            client.RecordServerVersion("1.5.6");
+
+            var onDisk = configManager.Load();
+            Assert.Equal("1.5.6", onDisk.LastServerVersion);
+            Assert.NotNull(onDisk.LastVersionCheck);
+        }
+        finally
+        {
+            Directory.Delete(Path.GetDirectoryName(path)!, recursive: true);
+        }
+    }
 }

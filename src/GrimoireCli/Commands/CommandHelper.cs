@@ -27,7 +27,7 @@ public static class CommandHelper
             Environment.Exit(1);
         }
 
-        return (new GrimoireApiClient(config), config);
+        return (new GrimoireApiClient(config, configManager), config);
     }
 
     public static string ReadJsonInput(string input)

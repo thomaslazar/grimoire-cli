@@ -10,8 +10,8 @@ public class AppConfig
     [JsonPropertyName("accessToken")]
     public string? AccessToken { get; set; }
 
-    // Written by the CLI, not by the operator: when the server version was last
-    // checked, and what it was. config set does not accept either.
+    // Written by the CLI's version-check cadence, not by the operator: when the
+    // server version was last checked, and what it was.
     [JsonPropertyName("lastVersionCheck")]
     public DateTimeOffset? LastVersionCheck { get; set; }
 

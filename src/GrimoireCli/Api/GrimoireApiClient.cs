@@ -16,6 +16,7 @@ public class GrimoireApiClient
     private readonly HttpClient _http;
     private readonly IRequestAdapter _adapter;
     private readonly AppConfig _config;
+    private readonly ConfigManager _configManager;
     private bool _versionCheckDone;
 
     /// <summary>
@@ -32,9 +33,10 @@ public class GrimoireApiClient
 
     public static readonly TimeSpan DefaultRequestTimeout = TimeSpan.FromSeconds(100);
 
-    public GrimoireApiClient(AppConfig config)
+    public GrimoireApiClient(AppConfig config, ConfigManager? configManager = null)
     {
         _config = config;
+        _configManager = configManager ?? new ConfigManager();
         var debugHandler = new DebugHttpHandler(new HttpClientHandler());
         _http = new HttpClient(debugHandler)
         {
@@ -197,7 +199,7 @@ public class GrimoireApiClient
     /// <summary>
     /// Runs before every request. The token warning is per-request because it is
     /// local and a long command can cross an expiry mid-run; the version check is
-    /// once per process, and at most once a day across processes.
+    /// once per client, and at most once a day across processes.
     /// </summary>
     private async Task PreflightAsync()
     {
@@ -209,10 +211,11 @@ public class GrimoireApiClient
     {
         if (_versionCheckDone) return;
         _versionCheckDone = true;
-        if (!ShouldCheckVersion(_config.LastVersionCheck, DateTimeOffset.UtcNow))
+        var now = DateTimeOffset.UtcNow;
+        if (!ShouldCheckVersion(_config.LastVersionCheck, now))
         {
             _logger.Debug($"server version checked {_config.LastVersionCheck:u}, next due in "
-                          + $"{VersionCheckInterval - (DateTimeOffset.UtcNow - _config.LastVersionCheck!.Value):hh\\:mm}");
+                          + $"{VersionCheckInterval - (now - _config.LastVersionCheck!.Value):hh\\:mm}");
             return;
         }
         var observed = await ProbeServerVersionAsync();
@@ -252,8 +255,6 @@ public class GrimoireApiClient
         }
     }
 
-    internal static readonly TimeSpan VersionProbeTimeout = TimeSpan.FromSeconds(3);
-
     /// <summary>
     /// One place owns "a version was observed", so the daily probe and login warn
     /// and persist identically.
@@ -268,7 +269,7 @@ public class GrimoireApiClient
         var checkedAt = DateTimeOffset.UtcNow;
         try
         {
-            new ConfigManager().UpdateVersionCheck(observed, checkedAt);
+            _configManager.UpdateVersionCheck(observed, checkedAt);
         }
         catch (Exception ex)
         {
@@ -281,11 +282,17 @@ public class GrimoireApiClient
         _config.LastVersionCheck = checkedAt;
     }
 
-    /// <summary>Probes and records regardless of the interval. Used by login, where a fresh verdict is the point.</summary>
-    public async Task CheckVersionNowAsync()
+    /// <summary>
+    /// Probes and records regardless of the interval. Used by login, where a fresh
+    /// verdict is the point. Returns the observed version, or null if the probe
+    /// failed, so the caller can tell "checked, in range" from "could not check".
+    /// </summary>
+    public async Task<string?> CheckVersionNowAsync()
     {
         _versionCheckDone = true;
-        RecordServerVersion(await ProbeServerVersionAsync());
+        var observed = await ProbeServerVersionAsync();
+        RecordServerVersion(observed);
+        return observed;
     }
 
     private static readonly string MinSupportedVersion = "1.5.6";
@@ -301,6 +308,7 @@ public class GrimoireApiClient
         ?? "0.0.0";
 
     internal static readonly TimeSpan VersionCheckInterval = TimeSpan.FromHours(24);
+    internal static readonly TimeSpan VersionProbeTimeout = TimeSpan.FromSeconds(3);
 
     /// <summary>
     /// True when the version is worth re-checking: never checked, a full interval
