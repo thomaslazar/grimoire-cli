@@ -23,7 +23,7 @@ public class BookDetail
     public int? PageCount { get; set; }
 
     [JsonPropertyName("file_size")]
-    public int? FileSize { get; set; }
+    public long? FileSize { get; set; }
 
     [JsonPropertyName("authors")]
     public List<string>? Authors { get; set; }
@@ -67,6 +67,10 @@ public class BookDetail
     [JsonPropertyName("tags")]
     public List<string>? Tags { get; set; }
 
+    // Upstream emits these two raw (book.indexed, not bool(book.indexed)), and
+    // the backing columns are nullable, so the API can send null. OcrIndexed/
+    // OcrPending/IsMissing/IsExplicit below are bool()-coerced upstream and
+    // can't be null — don't "tidy" these back. See Book.cs for the same split.
     [JsonPropertyName("indexed")]
     public bool? Indexed { get; set; }
 
@@ -74,25 +78,26 @@ public class BookDetail
     public bool? IndexFailed { get; set; }
 
     [JsonPropertyName("ocr_indexed")]
-    public bool? OcrIndexed { get; set; }
+    public bool OcrIndexed { get; set; }
 
     [JsonPropertyName("ocr_pending")]
-    public bool? OcrPending { get; set; }
+    public bool OcrPending { get; set; }
 
     [JsonPropertyName("ocr_dpi")]
     public int? OcrDpi { get; set; }
 
     [JsonPropertyName("is_missing")]
-    public bool? IsMissing { get; set; }
+    public bool IsMissing { get; set; }
 
     [JsonPropertyName("mime_type")]
     public string? MimeType { get; set; }
 
+    // Same nullable column, no bool() coercion upstream — see the comment above.
     [JsonPropertyName("has_thumbnail")]
     public bool? HasThumbnail { get; set; }
 
     [JsonPropertyName("is_explicit")]
-    public bool? IsExplicit { get; set; }
+    public bool IsExplicit { get; set; }
 
     // Null when the book has no assigned system, not an empty object.
     [JsonPropertyName("game_system")]

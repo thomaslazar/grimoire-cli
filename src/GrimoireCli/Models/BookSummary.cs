@@ -20,7 +20,7 @@ public class BookSummary
     public int? PageCount { get; set; }
 
     [JsonPropertyName("file_size")]
-    public int? FileSize { get; set; }
+    public long? FileSize { get; set; }
 
     [JsonPropertyName("mime_type")]
     public string? MimeType { get; set; }
@@ -28,6 +28,10 @@ public class BookSummary
     [JsonPropertyName("game_system_id")]
     public string? GameSystemId { get; set; }
 
+    // Upstream emits these two raw (b.indexed, not bool(b.indexed)), and the
+    // backing columns are nullable, so the API can send null. IsExplicit/
+    // IsMissing/OcrIndexed below are bool()-coerced upstream and can't be
+    // null — don't "tidy" these back. See Book.cs for the same split.
     [JsonPropertyName("has_thumbnail")]
     public bool? HasThumbnail { get; set; }
 
@@ -38,11 +42,11 @@ public class BookSummary
     public bool? IndexFailed { get; set; }
 
     [JsonPropertyName("ocr_indexed")]
-    public bool? OcrIndexed { get; set; }
+    public bool OcrIndexed { get; set; }
 
     [JsonPropertyName("is_explicit")]
-    public bool? IsExplicit { get; set; }
+    public bool IsExplicit { get; set; }
 
     [JsonPropertyName("is_missing")]
-    public bool? IsMissing { get; set; }
+    public bool IsMissing { get; set; }
 }

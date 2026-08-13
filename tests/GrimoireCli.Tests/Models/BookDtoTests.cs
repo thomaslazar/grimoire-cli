@@ -76,4 +76,59 @@ public class BookDtoTests
             AppJsonContext.Default.ScanTriggerResult)!;
         Assert.Equal("already_running", result.Status);
     }
+
+    // SQLite's INTEGER storage class is always 8 bytes regardless of the
+    // declared column width, so a multi-gigabyte scanned book's file_size
+    // can exceed int.MaxValue on the wire. A narrower type would throw.
+    [Fact]
+    public void BookSummaryFileSizeSurvivesBeyondIntRange()
+    {
+        const string json = """{"id": "b1", "file_size": 5000000000}""";
+        var book = JsonSerializer.Deserialize(json, AppJsonContext.Default.BookSummary)!;
+        Assert.Equal(5_000_000_000L, book.FileSize);
+    }
+
+    [Fact]
+    public void BookDetailFileSizeSurvivesBeyondIntRange()
+    {
+        const string json = """{"id": "b1", "file_size": 5000000000}""";
+        var book = JsonSerializer.Deserialize(json, AppJsonContext.Default.BookDetail)!;
+        Assert.Equal(5_000_000_000L, book.FileSize);
+    }
+
+    // is_explicit, is_missing and ocr_indexed are bool()-coerced upstream and
+    // never arrive null; indexed, index_failed and has_thumbnail pass through
+    // raw nullable columns and can. A null on the coerced trio would throw.
+    [Fact]
+    public void BookSummaryCoercedBooleansAreNonNullable()
+    {
+        const string json = """
+        {"id": "b1", "is_explicit": true, "is_missing": true, "ocr_indexed": true,
+         "indexed": null, "index_failed": null, "has_thumbnail": null}
+        """;
+        var book = JsonSerializer.Deserialize(json, AppJsonContext.Default.BookSummary)!;
+        Assert.True(book.IsExplicit);
+        Assert.True(book.IsMissing);
+        Assert.True(book.OcrIndexed);
+        Assert.Null(book.Indexed);
+        Assert.Null(book.IndexFailed);
+        Assert.Null(book.HasThumbnail);
+    }
+
+    [Fact]
+    public void BookDetailCoercedBooleansAreNonNullable()
+    {
+        const string json = """
+        {"id": "b1", "is_explicit": true, "is_missing": true, "ocr_indexed": true,
+         "ocr_pending": true, "indexed": null, "index_failed": null, "has_thumbnail": null}
+        """;
+        var book = JsonSerializer.Deserialize(json, AppJsonContext.Default.BookDetail)!;
+        Assert.True(book.IsExplicit);
+        Assert.True(book.IsMissing);
+        Assert.True(book.OcrIndexed);
+        Assert.True(book.OcrPending);
+        Assert.Null(book.Indexed);
+        Assert.Null(book.IndexFailed);
+        Assert.Null(book.HasThumbnail);
+    }
 }
