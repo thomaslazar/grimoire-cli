@@ -139,33 +139,47 @@ public class SystemsCommandTests
     // that: a regeneration that dropped a model's properties (microsoft/kiota#2338)
     // would empty the help output as well as the validation.
     [Fact]
-    public void UpdateListsItsRequestFieldsFromTheGeneratedModel()
+    public void UpdateShowsItsRequestShapeFromTheGeneratedModel()
     {
         var output = RenderHelp(["systems", "update"], full: true);
         var expected = new GrimoireCli.Generated.Models.GameSystemUpdate()
             .GetFieldDeserializers().Keys;
         Assert.Equal(17, expected.Count);
-        Assert.Contains("Request fields:", output);
+        Assert.Contains("Request shape:", output);
         foreach (var field in expected)
-            Assert.Contains(field, output);
+            Assert.Contains($"\"{field}\":", output);
     }
 
+    // Types are the point of the shape: a name list left "publishers is a list of
+    // {name, url}" and "year is a number" to be learned by being refused once.
     [Fact]
-    public void BatchUpdateListsTheItemFieldsIncludingId()
+    public void UpdateShowsFieldTypesNotJustNames()
+    {
+        var output = RenderHelp(["systems", "update"], full: true);
+        Assert.Contains("\"year\": 0", output);
+        Assert.Contains("\"is_explicit\": false", output);
+        Assert.Contains("\"name\": \"<string>\"", output);
+    }
+
+    // The bulk body is an envelope, and the sample is the model
+    // JsonBodyInput.Validate parses against — item fields nest inside items.
+    [Fact]
+    public void BatchUpdateShowsTheItemsEnvelope()
     {
         var output = RenderHelp(["systems", "batch-update"], full: true);
-        Assert.Contains("Request fields:", output);
-        Assert.Contains("id", output);
-        Assert.Contains("system_family", output);
+        Assert.Contains("Request shape:", output);
+        Assert.Contains("\"items\":", output);
+        Assert.Contains("\"id\":", output);
+        Assert.Contains("\"system_family\":", output);
     }
 
-    // Field lists cost tokens on every invocation, so they stay behind --help-full
+    // Shapes cost tokens on every invocation, so they stay behind --help-full
     // with the response shapes rather than loading the default help.
     [Fact]
-    public void RequestFieldsStayBehindHelpFull()
+    public void RequestShapeStaysBehindHelpFull()
     {
         var output = RenderHelp(["systems", "update"], full: false);
-        Assert.DoesNotContain("Request fields:", output);
+        Assert.DoesNotContain("Request shape:", output);
         Assert.Contains("Run --help-full", output);
     }
 }

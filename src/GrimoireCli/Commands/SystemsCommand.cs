@@ -191,8 +191,7 @@ public static class SystemsCommand
             "",
             "Responds {\"status\": \"ok\"} and echoes nothing — read back with:",
             "grimoire-cli systems get --id <id>");
-        command.AddRequestShape(new Generated.Models.GameSystemUpdate(),
-            "The body is a flat object of these, all optional; id is not one of them.");
+        command.AddRequestShape<Generated.Models.GameSystemUpdate>();
         command.AddExamples(
             "grimoire-cli systems update --id <id> --input metadata.json",
             "echo '{\"system_family\":\"Shadowrun\"}' | grimoire-cli systems update --id <id> --stdin");
@@ -245,8 +244,7 @@ public static class SystemsCommand
         command.AddExamples(
             "grimoire-cli systems batch-update --input items.json",
             "jq -c '{items: .}' edits.json | grimoire-cli systems batch-update --stdin");
-        command.AddRequestShape(new Generated.Models.GameSystemBulkItem(),
-            "The body is {\"items\": [ … ]}; each item requires id, plus any of:");
+        command.AddRequestShape<Generated.Models.GameSystemBulkUpdate>();
         command.AddResponseExample<BulkUpdateResult>();
         command.SetAction(async (parseResult, cancellationToken) =>
         {
@@ -295,8 +293,7 @@ public static class SystemsCommand
         command.AddExamples(
             "grimoire-cli systems batch-tag --input tags.json",
             "echo '{\"ids\":[\"<id>\"],\"tags\":[\"cyberpunk\"]}' | grimoire-cli systems batch-tag --stdin");
-        command.AddRequestShape(new Generated.Models.BulkAddTags(),
-            "The body is a flat object of:");
+        command.AddRequestShape<Generated.Models.BulkAddTags>();
         command.AddResponseExample<BulkTagResult>();
         command.SetAction(async (parseResult, cancellationToken) =>
         {
