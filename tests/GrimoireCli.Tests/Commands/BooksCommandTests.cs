@@ -57,6 +57,21 @@ public class BooksCommandTests
         Assert.Contains("year, month and day cannot be cleared", output);
     }
 
+    // The block is rendered from the generated model, so this is also the guard on
+    // that: a regeneration that dropped a model's properties (microsoft/kiota#2338)
+    // would empty the help output as well as the validation.
+    [Fact]
+    public void UpdateShowsItsRequestShapeFromTheGeneratedModel()
+    {
+        var output = RenderHelp(["books", "update"], full: true);
+        var expected = new GrimoireCli.Generated.Models.BookUpdate()
+            .GetFieldDeserializers().Keys;
+        Assert.Equal(18, expected.Count);
+        Assert.Contains("Request shape:", output);
+        foreach (var field in expected)
+            Assert.Contains($"\"{field}\":", output);
+    }
+
     // The bulk body is an envelope, and the sample is the model
     // JsonBodyInput.Validate parses against.
     [Fact]

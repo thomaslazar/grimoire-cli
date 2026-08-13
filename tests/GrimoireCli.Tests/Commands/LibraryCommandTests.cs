@@ -10,7 +10,11 @@ public class LibraryCommandTests
     public void AllThreeCarryTheAdminTag()
     {
         foreach (var verb in new[] { "rescan", "scan-status", "cancel-scan" })
-            Assert.Contains("admin", RenderHelp(["library", verb], full: false));
+        {
+            var output = RenderHelp(["library", verb], full: false);
+            Assert.Contains("Role required:", output);
+            Assert.Contains("Role required:\n  admin\n", output);
+        }
     }
 
     // The body is composed from flags, so a request shape would document a body

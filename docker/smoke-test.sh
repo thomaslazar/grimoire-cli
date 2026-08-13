@@ -652,9 +652,9 @@ ok "library scan-status shows the scoped rescan actually walked its subtree"
 
 CANCEL_JSON=$("$CLI" library cancel-scan 2>"$WORK/cli.err") \
   || { cat "$WORK/cli.err" >&2; fail "library cancel-scan exited non-zero"; }
-echo "$CANCEL_JSON" | jq -e 'has("status")' >/dev/null \
-  || fail "cancel-scan should report a status: $CANCEL_JSON"
-ok "library cancel-scan exits 0 and reports a status"
+echo "$CANCEL_JSON" | jq -e '.status == "not_running"' >/dev/null \
+  || fail "cancel-scan after the wait loop above should report not_running: $CANCEL_JSON"
+ok "library cancel-scan exits 0 and reports not_running"
 
 # A config file that is not valid JSON must not take the CLI down with it, and
 # logging in again must be enough to recover — no hand-editing, no rm. This runs
