@@ -215,6 +215,43 @@ public class GrimoireApiClient
             _logger.Debug($"server version {version} (in tested range {MinSupportedVersion}-{MaxTestedVersion})");
     }
 
+    internal static readonly TimeSpan VersionCheckInterval = TimeSpan.FromHours(24);
+
+    /// <summary>
+    /// True when the version is worth re-checking: never checked, a full interval
+    /// has passed, or the recorded time is in the future — which means the clock
+    /// moved backwards, and treating that as fresh would park the check forever.
+    /// </summary>
+    internal static bool ShouldCheckVersion(DateTimeOffset? lastCheck, DateTimeOffset now)
+        => lastCheck is null
+           || now - lastCheck.Value >= VersionCheckInterval
+           || lastCheck.Value > now;
+
+    /// <summary>
+    /// The warning for an observed server version, or null when there is nothing to
+    /// say. Pure so the wording is testable without capturing logs. The check is
+    /// provenance, not protection: it reports being off the tested versions and
+    /// never blocks.
+    /// </summary>
+    internal static string? VersionWarning(string? observed, string? previous)
+    {
+        if (string.IsNullOrEmpty(observed)) return null;
+
+        var moved = !string.IsNullOrEmpty(previous) && previous != observed
+            ? $"This server moved from Grimoire {previous} to {observed} since the last check. "
+            : "";
+
+        if (CompareVersions(observed, MinSupportedVersion) < 0)
+            return $"{moved}Grimoire server version {observed} is older than the minimum supported version "
+                   + $"({MinSupportedVersion}). Some features may not work.";
+
+        if (CompareVersions(observed, MaxTestedVersion) > 0)
+            return $"{moved}grimoire-cli {ClientVersion} was tested up to Grimoire {MaxTestedVersion}; "
+                   + $"this server is {observed}. Check for a newer grimoire-cli.";
+
+        return null;
+    }
+
     internal static int CompareVersions(string a, string b)
     {
         var aParts = ParseVersion(a);
