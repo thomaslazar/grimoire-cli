@@ -39,8 +39,8 @@ public static class BooksCommand
             systemIdOption, categoryOption, limitOption, offsetOption, serverOption, tokenOption
         };
         command.AddHelpSection("Notes", HelpSectionPosition.Top,
-            "--limit defaults to 100 and 422s above 500; page with --offset against",
-            "the total in the response.",
+            "--limit 422s above 500; page with --offset against the total in the",
+            "response.",
             "",
             "--category is the normalised value, not the folder name ('supplement',",
             "not 'supplements'), and is case-sensitive: Core matches nothing.",
@@ -295,7 +295,8 @@ public static class BooksCommand
             "thumbnail if the file changed. PDFs only: 400 on an epub or djvu, 404",
             "if the file is gone from disk.",
             "",
-            "Absorbed into a library scan already in progress; the response is",
+            "No-ops (silently skipped) under a library scan already running, and",
+            "blocks a library rescan started right after it; the response is",
             "rescan_queued either way. Watch it with:",
             "grimoire-cli library scan-status");
         command.AddExamples("grimoire-cli books rescan --id <book-id>");

@@ -78,28 +78,28 @@ public class BooksService
 
     /// <summary>
     /// POST /api/books/{id}/reindex. Queues background OCR and returns immediately;
-    /// the raw response is {"reindex_queued": ...}.
+    /// the raw response is {"reindex_queued": ...}. No notFoundHint: the endpoint
+    /// raises two distinct 404s ("Book not found" and "File not found on disk"),
+    /// and a hint would replace the server's detail with a message that cannot
+    /// tell them apart.
     /// </summary>
     public async Task<string> ReindexAsync(string id, int? ocrDpi)
     {
         var info = _client.Api.Api.Books[id].Reindex.ToPostRequestInformation(c => c.QueryParameters.OcrDpi = ocrDpi);
-        return await _client.SendAsync(
-            info,
-            permissionHint: "the gm or admin role",
-            notFoundHint: "No book with that ID. List them with: grimoire-cli books list");
+        return await _client.SendAsync(info, permissionHint: "the gm or admin role");
     }
 
     /// <summary>
     /// POST /api/books/{id}/rescan. Queues a background re-read and returns
     /// immediately; the raw response is {"rescan_queued": ...} whether it started
-    /// a new scan or was absorbed into one already running.
+    /// a new scan or no-oped under one already running. No notFoundHint: the
+    /// endpoint raises two distinct 404s ("Book not found" and "File not found on
+    /// disk"), and a hint would replace the server's detail with a message that
+    /// cannot tell them apart.
     /// </summary>
     public async Task<string> RescanAsync(string id)
     {
         var info = _client.Api.Api.Books[id].Rescan.ToPostRequestInformation();
-        return await _client.SendAsync(
-            info,
-            permissionHint: "the gm or admin role",
-            notFoundHint: "No book with that ID. List them with: grimoire-cli books list");
+        return await _client.SendAsync(info, permissionHint: "the gm or admin role");
     }
 }
