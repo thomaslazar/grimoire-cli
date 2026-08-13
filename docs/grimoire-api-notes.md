@@ -137,12 +137,15 @@ Verified against v1.5.6, backing `systems update`, `systems batch-update`,
   `rescan_single_book` (`backend/routers/library/_helpers.py:291-306`, backing
   `POST /api/books/{id}/rescan`) and `run_rescan_sync`
   (`backend/routers/library/_helpers.py:337-353`, backing `POST /api/rescan`)
-  both guard on and set the same status flag. A `books rescan` still in the
-  background makes a `library rescan` fired right after it answer
-  `already_running` (CLI exit 3) instead of `scan_started`, and the reverse
-  guards a single-book rescan into silently skipping itself rather than
-  racing a full scan. Verified live: calling the two back to back without
-  waiting for `GET /api/scan-status`'s `running` to clear reproduces it.
+  both guard on and set the same status flag. If a `books rescan` is still
+  running in the background, a `library rescan` fired right after it sees the
+  flag set and answers `already_running` (CLI exit 3) instead of
+  `scan_started`. The reverse guard runs the other way: a `books rescan`
+  fired while a `library rescan` is in progress sees the flag already set and
+  silently skips the single-book re-read rather than racing the full scan —
+  it still answers `rescan_queued`. Verified live: calling the two back to
+  back without waiting for `GET /api/scan-status`'s `running` to clear
+  reproduces both directions.
 - **Editions and language are metadata, not folders.** A new *flat* (non-container)
   folder under `books/` creates a system row with only `name` set; `parent_system`
   / `edition` / `system_family` stay empty until a `PATCH /api/systems/{id}`.
