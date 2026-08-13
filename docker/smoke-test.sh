@@ -37,6 +37,10 @@ for i in $(seq 1 60); do
 done
 ok "health"
 
+# The version the stack is actually running, read from the stack rather than
+# hardcoded, so a Grimoire bump doesn't also require editing this number.
+EXPECTED_VERSION=$(curl -sf "$SERVER/api/openapi.json" | jq -r .info.version)
+
 # Clear any stale config first: without this, a regressed ConfigManager.Save
 # that silently writes nothing would still leave a *previous* run's config
 # behind, and checks 3/4 below would pass against stale data instead of
@@ -75,6 +79,38 @@ ok "config has server and token"
 jq -e . "$WORK/list.out" >/dev/null \
   || fail "systems list stdout was not valid JSON: $(cat "$WORK/list.out")"
 ok "systems list returned JSON on stdout"
+
+# 4b. The version check runs on a cadence, not only at login.
+jq -e '.lastServerVersion == "'"$EXPECTED_VERSION"'"' "$CONFIG" >/dev/null \
+  || fail "login should have recorded the server version: $(cat "$CONFIG")"
+jq -e '.lastVersionCheck != null' "$CONFIG" >/dev/null \
+  || fail "login should have recorded a check timestamp"
+ok "login records the server version"
+
+# Inside the window: no probe, and the timestamp is untouched. DebugHttpHandler
+# logs every request it sends, so its absence for /api/about is what proves no
+# probe happened — an unmoved timestamp alone would also be consistent with a
+# probe that ran and failed to persist.
+BEFORE=$(jq -r .lastVersionCheck "$CONFIG")
+"$CLI" --debug systems list >/dev/null 2>"$WORK/inwindow.err"
+grep -qi "next due in" "$WORK/inwindow.err" \
+  || fail "a check inside the window should say it is not due: $(cat "$WORK/inwindow.err")"
+grep -q "GET .*api/about" "$WORK/inwindow.err" \
+  && fail "a check inside the window should not have probed /api/about: $(cat "$WORK/inwindow.err")"
+[ "$(jq -r .lastVersionCheck "$CONFIG")" = "$BEFORE" ] \
+  || fail "a check inside the window must not move the timestamp"
+ok "no probe inside the 24-hour window"
+
+# Backdated: probes, warns nothing (the stack is the tested version), and advances.
+jq '.lastVersionCheck = "2020-01-01T00:00:00+00:00"' "$CONFIG" > "$WORK/cfg" && mv "$WORK/cfg" "$CONFIG"
+"$CLI" --debug systems list >/dev/null 2>"$WORK/stale.err"
+grep -q "GET .*api/about 200" "$WORK/stale.err" \
+  || fail "a stale timestamp should have probed /api/about: $(cat "$WORK/stale.err")"
+[ "$(jq -r .lastVersionCheck "$CONFIG")" != "2020-01-01T00:00:00+00:00" ] \
+  || fail "a stale timestamp should have triggered a probe: $(cat "$WORK/stale.err")"
+jq -e '.lastServerVersion == "'"$EXPECTED_VERSION"'"' "$CONFIG" >/dev/null \
+  || fail "the probe should have recorded the version"
+ok "a stale timestamp triggers a probe and advances"
 
 # 5. A bad password fails cleanly and leaves the config alone.
 cp "$CONFIG" "$WORK/config.before"

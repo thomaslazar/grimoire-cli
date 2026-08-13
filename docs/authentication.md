@@ -53,9 +53,11 @@ the message above and a fresh `login` is required.
 
 `login` also calls `GET /api/about` right after saving the token and compares
 the reported server version against `MinSupportedVersion` /
-`MaxTestedVersion` (`GrimoireApiClient.CheckServerVersion`), warning on stderr
-if the server is older or newer than the tested range (1.5.6–1.5.6 today).
-This happens once at login rather than on every later command.
+`MaxTestedVersion` (`GrimoireApiClient.RecordServerVersion`), warning on
+stderr if the server is older or newer than the tested range (1.5.6–1.5.6
+today). This is a forced check; see
+[grimoire-compatibility.md](grimoire-compatibility.md#runtime-check) for the
+24-hour cadence that runs on every other command.
 
 OIDC accounts cannot log in through this command — Grimoire exposes OIDC on
 the server, but `grimoire-cli login` only ever calls the local
@@ -87,7 +89,7 @@ production deployment may not — a burst of failed logins there can return
 ## Source Reference
 
 - `src/GrimoireCli/Api/GrimoireApiClient.cs` — `LoginAsync`, `ExtractToken`,
-  `WarnIfTokenExpired`, `CheckServerVersion`.
+  `WarnIfTokenExpired`, `EnsureVersionCheckedAsync`, `RecordServerVersion`.
 - `src/GrimoireCli/Api/TokenHelper.cs` — JWT `exp` decoding, no signature
   verification (the CLI trusts its own token; verification is the server's
   job).

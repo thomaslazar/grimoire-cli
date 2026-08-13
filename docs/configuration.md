@@ -7,7 +7,9 @@ Location: `~/.grimoire-cli/config.json`
 ```json
 {
   "server": "https://grimoire.example.com",
-  "accessToken": "eyJhbG..."
+  "accessToken": "eyJhbG...",
+  "lastVersionCheck": "2026-08-13T07:01:15+00:00",
+  "lastServerVersion": "1.5.6"
 }
 ```
 
@@ -16,6 +18,16 @@ Keys are camelCase in the file (`AppConfig` in
 There is no `refreshToken` or `defaultLibrary` key — Grimoire issues no
 refresh token, and there's no equivalent of abs-cli's default-library concept
 yet (single-system live instance; `systems` commands take `--id` directly).
+
+`lastVersionCheck` and `lastServerVersion` are written by the CLI's own
+24-hour version-check cadence (see
+[grimoire-compatibility.md](grimoire-compatibility.md#runtime-check)), not by
+the operator — `config set` does not accept either key. The check runs
+against whatever server and token the command resolved — file, environment,
+or `--server`/`--token` flags — so it can run before any `login` on this
+machine: on a machine with no config file, the first check via `--server`/
+`--token` creates one with only `lastVersionCheck` and `lastServerVersion`
+populated (`server` and `accessToken` stay unset until `login` writes them).
 
 ## Precedence Order
 
