@@ -54,7 +54,24 @@ public class ConfigManager
                 ?? fileConfig.Server,
             AccessToken = flagToken
                 ?? envLookup("GRIMOIRE_TOKEN")
-                ?? fileConfig.AccessToken
+                ?? fileConfig.AccessToken,
+            LastVersionCheck = fileConfig.LastVersionCheck,
+            LastServerVersion = fileConfig.LastServerVersion
         };
+    }
+
+    /// <summary>
+    /// Records a version observation by read-modify-write of the config file.
+    /// Deliberately reads <see cref="Load"/> rather than a resolved config:
+    /// <see cref="Resolve"/> merges GRIMOIRE_SERVER and GRIMOIRE_TOKEN from the
+    /// environment, and persisting those would write a token to disk that the
+    /// operator chose to keep out of it.
+    /// </summary>
+    public void UpdateVersionCheck(string? serverVersion, DateTimeOffset checkedAt)
+    {
+        var onDisk = Load();
+        onDisk.LastServerVersion = serverVersion;
+        onDisk.LastVersionCheck = checkedAt;
+        Save(onDisk);
     }
 }

@@ -28,6 +28,8 @@ public static class ConfigCommand
             {
                 ["server"] = config.Server ?? "(not set)",
                 ["accessToken"] = config.AccessToken != null ? "***" : "(not set)",
+                ["lastVersionCheck"] = config.LastVersionCheck?.ToString("u") ?? "(never)",
+                ["lastServerVersion"] = config.LastServerVersion ?? "(unknown)",
                 ["configPath"] = ConfigManager.DefaultConfigPath()
             };
             ConsoleOutput.WriteJson(display);
