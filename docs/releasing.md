@@ -65,9 +65,9 @@ is worth more than a distant expiry date.
    builds carry a `+pr-<n>.<sha7>` suffix — see [build.md](build.md).
 3. **Reconcile the supported server range.** `MinSupportedVersion` and
    `MaxTestedVersion` in `src/GrimoireCli/Api/GrimoireApiClient.cs` gate the
-   login-time warning and must agree with the matrix in
-   [grimoire-compatibility.md](grimoire-compatibility.md). If this release adds
-   support for a newer Grimoire, both move together.
+   daily version-check warning (forced fresh at login) and must agree with the
+   matrix in [grimoire-compatibility.md](grimoire-compatibility.md). If this
+   release adds support for a newer Grimoire, both move together.
 4. **Write the changelog.** On the first release this means creating
    `CHANGELOG.md`; afterwards, adding a section for the new version above the
    previous one. Either way it is written here, from `git log` since the last tag,

@@ -225,7 +225,7 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 
 | Method | Path | Description | Perm | CLI |
 |--------|------|-------------|------|-----|
-| GET | `/api/about` | Build information |  | 🔒 version check inside `login` |
+| GET | `/api/about` | Build information |  | 🔒 24-hour version check (all commands), forced at login |
 | POST | `/api/cancel-scan` | Cancel running scan | admin | — |
 | GET | `/api/latest-release` | Latest published release |  | — |
 | POST | `/api/rescan` | Rescan and reindex library | admin | — |

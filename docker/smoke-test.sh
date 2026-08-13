@@ -37,6 +37,10 @@ for i in $(seq 1 60); do
 done
 ok "health"
 
+# The version the stack is actually running, read from the stack rather than
+# hardcoded, so a Grimoire bump doesn't also require editing this number.
+EXPECTED_VERSION=$(curl -sf "$SERVER/api/openapi.json" | jq -r .info.version)
+
 # Clear any stale config first: without this, a regressed ConfigManager.Save
 # that silently writes nothing would still leave a *previous* run's config
 # behind, and checks 3/4 below would pass against stale data instead of
@@ -75,6 +79,40 @@ ok "config has server and token"
 jq -e . "$WORK/list.out" >/dev/null \
   || fail "systems list stdout was not valid JSON: $(cat "$WORK/list.out")"
 ok "systems list returned JSON on stdout"
+
+# 4b. The version check runs on a cadence, not only at login.
+jq -e '.lastServerVersion == "'"$EXPECTED_VERSION"'"' "$CONFIG" >/dev/null \
+  || fail "login should have recorded the server version: $(cat "$CONFIG")"
+jq -e '.lastVersionCheck != null' "$CONFIG" >/dev/null \
+  || fail "login should have recorded a check timestamp"
+ok "login records the server version"
+
+# Inside the window: no probe, and the timestamp is untouched. DebugHttpHandler
+# logs every request it sends, so its absence for /api/about is what proves no
+# probe happened — an unmoved timestamp alone would also be consistent with a
+# probe that ran and failed to persist.
+BEFORE=$(jq -r .lastVersionCheck "$CONFIG")
+"$CLI" --debug systems list >/dev/null 2>"$WORK/inwindow.err" \
+  || { cat "$WORK/inwindow.err" >&2; fail "systems list exited non-zero"; }
+grep -qi "next due in" "$WORK/inwindow.err" \
+  || fail "a check inside the window should say it is not due: $(cat "$WORK/inwindow.err")"
+grep -q "GET .*api/about" "$WORK/inwindow.err" \
+  && fail "a check inside the window should not have probed /api/about: $(cat "$WORK/inwindow.err")"
+[ "$(jq -r .lastVersionCheck "$CONFIG")" = "$BEFORE" ] \
+  || fail "a check inside the window must not move the timestamp"
+ok "no probe inside the 24-hour window"
+
+# Backdated: probes and advances.
+jq '.lastVersionCheck = "2020-01-01T00:00:00+00:00"' "$CONFIG" > "$WORK/cfg" && mv "$WORK/cfg" "$CONFIG"
+"$CLI" --debug systems list >/dev/null 2>"$WORK/stale.err" \
+  || { cat "$WORK/stale.err" >&2; fail "systems list exited non-zero"; }
+grep -q "GET .*api/about 200" "$WORK/stale.err" \
+  || fail "a stale timestamp should have probed /api/about: $(cat "$WORK/stale.err")"
+[ "$(jq -r .lastVersionCheck "$CONFIG")" != "2020-01-01T00:00:00+00:00" ] \
+  || fail "a stale timestamp should have triggered a probe: $(cat "$WORK/stale.err")"
+jq -e '.lastServerVersion == "'"$EXPECTED_VERSION"'"' "$CONFIG" >/dev/null \
+  || fail "the probe should have recorded the version"
+ok "a stale timestamp triggers a probe and advances"
 
 # 5. A bad password fails cleanly and leaves the config alone.
 cp "$CONFIG" "$WORK/config.before"
@@ -443,5 +481,49 @@ set -e
 [ "$rc" -eq 1 ] || fail "an unknown field in an item should exit 1, got $rc"
 grep -q "licence" "$WORK/batchtypo.err" || fail "no offending field named: $(cat "$WORK/batchtypo.err")"
 ok "an unknown field inside a batch item exits 1"
+
+# A config file that is not valid JSON must not take the CLI down with it, and
+# logging in again must be enough to recover — no hand-editing, no rm. This runs
+# last because it ends by restoring the config the earlier checks depend on.
+# GRIMOIRE_TOKEN would satisfy the command from the environment and mask the
+# failure this asserts; the suite does not set it, and this makes that a
+# requirement rather than an assumption.
+unset GRIMOIRE_TOKEN
+printf '{not json' > "$CONFIG"
+set +e
+"$CLI" systems list >"$WORK/corrupt.out" 2>"$WORK/corrupt.err"; rc=$?
+set -e
+[ "$rc" -ne 0 ] || fail "a corrupt config should not report success"
+grep -q "not valid JSON" "$WORK/corrupt.err" \
+  || fail "no readable message for a corrupt config: $(cat "$WORK/corrupt.err")"
+grep -qi "at System\.\|Unhandled exception" "$WORK/corrupt.err" \
+  && fail "a corrupt config leaked a stack trace: $(cat "$WORK/corrupt.err")"
+[ ! -s "$WORK/corrupt.out" ] || fail "stdout should stay empty on a config failure"
+# The unparseable file is moved aside rather than left to be overwritten: it may
+# hold a 30-day token that a one-character fix would recover.
+[ -f "$CONFIG.corrupt" ] || fail "the corrupt config should have been kept aside"
+[ "$(cat "$CONFIG.corrupt")" = '{not json' ] \
+  || fail "the kept-aside file should hold the original bytes"
+grep -q "$CONFIG.corrupt" "$WORK/corrupt.err" \
+  || fail "the warning should name where the file went: $(cat "$WORK/corrupt.err")"
+rm -f "$CONFIG.corrupt"
+ok "a corrupt config is kept aside and fails readably with no stack trace"
+
+printf 'admin' | "$CLI" login --server "$SERVER" --username admin --password-stdin \
+  >/dev/null 2>"$WORK/relogin.err" \
+  || { cat "$WORK/relogin.err" >&2; fail "login should recover from a corrupt config"; }
+jq -e --arg s "$SERVER" '.server == $s' "$CONFIG" >/dev/null \
+  || fail "login did not repair the config: $(cat "$CONFIG")"
+syslist
+[ "$COUNT" -eq "$EXPECTED_SYSTEMS" ] || fail "the CLI should work again after re-login"
+ok "login repairs a corrupt config"
+
+# The config is replaced, not rewritten in place: no temporary survives, and the
+# file holding a 30-day bearer token is readable only by its owner.
+[ -z "$(find "$(dirname "$CONFIG")" -name '*.tmp' -print -quit)" ] \
+  || fail "a temporary config file was left behind: $(ls "$(dirname "$CONFIG")")"
+[ "$(stat -c '%a' "$CONFIG")" = "600" ] \
+  || fail "the config should be owner-only, got $(stat -c '%a' "$CONFIG")"
+ok "config writes leave no temporary file and stay owner-only"
 
 echo "smoke: all checks passed" >&2

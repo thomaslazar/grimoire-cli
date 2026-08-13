@@ -28,6 +28,8 @@ public static class ConfigCommand
             {
                 ["server"] = config.Server ?? "(not set)",
                 ["accessToken"] = config.AccessToken != null ? "***" : "(not set)",
+                ["lastVersionCheck"] = config.LastVersionCheck?.ToString("u") ?? "(never)",
+                ["lastServerVersion"] = config.LastServerVersion ?? "(unknown)",
                 ["configPath"] = ConfigManager.DefaultConfigPath()
             };
             ConsoleOutput.WriteJson(display);
@@ -59,7 +61,15 @@ public static class ConfigCommand
                 Environment.Exit(1);
                 return 1;
             }
-            configManager.Save(config);
+            try
+            {
+                configManager.Save(config);
+            }
+            catch (ConfigWriteException ex)
+            {
+                _logger.Error(ex.Message);
+                return 1;
+            }
             Console.Error.WriteLine($"Set {key} = {value}");
             return 0;
         });

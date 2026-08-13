@@ -41,7 +41,7 @@ DEFAULT_OUT = REPO / "docs" / "grimoire-api-coverage.md"
 IMPLEMENTED = {
     "POST /api/auth/login": "`login` ✅",
     "GET /api/auth/me": "`me` ✅",
-    "GET /api/about": "🔒 version check inside `login`",
+    "GET /api/about": "🔒 24-hour version check (all commands), forced at login",
     "GET /api/systems": "`systems list` ✅",
     "GET /api/systems/{system_id}": "`systems get` ✅",
     "PATCH /api/systems/{system_id}": "`systems update` ✅",

@@ -94,7 +94,17 @@ public static class LoginCommand
                 config = configManager.Load();
                 config.Server = server;
                 config.AccessToken = token;
-                configManager.Save(config);
+                try
+                {
+                    configManager.Save(config);
+                }
+                catch (ConfigWriteException ex)
+                {
+                    // The login worked, but a token that was never written is a token
+                    // the next command cannot use — report it as the failure it is.
+                    _logger.Error(ex.Message);
+                    Environment.Exit(1);
+                }
                 var expiry = TokenHelper.GetExpiration(token!);
                 Console.Error.WriteLine(expiry != null
                     ? $"Logged in to {server} (token expires {expiry:yyyy-MM-dd})"
@@ -109,17 +119,12 @@ public static class LoginCommand
             // The token is already saved at this point, so a failure here is not a
             // login failure — it's a warning, not a reason to report exit 2 and make
             // the caller think they need to log in again. /api/about requires the
-            // token just saved and carries the server version.
-            try
-            {
-                var authed = new GrimoireApiClient(config);
-                var about = await authed.SendAsync(authed.Api.Api.About.ToGetRequestInformation());
-                GrimoireApiClient.CheckServerVersion(GrimoireApiClient.ReadStringProperty(about, "version"));
-            }
-            catch (HttpRequestException ex)
-            {
-                _logger.Warn($"Logged in, but could not check server version: {ex.Message}");
-            }
+            // token just saved and carries the server version. The probe catches its
+            // own failures (ProbeServerVersionAsync) and never throws, so there is
+            // nothing to catch here.
+            var authed = new GrimoireApiClient(config, configManager);
+            if (await authed.CheckVersionNowAsync() is null)
+                _logger.Warn("Logged in, but could not check the server version. Run with --debug for the reason.");
             return 0;
         });
         return command;

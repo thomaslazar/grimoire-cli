@@ -89,7 +89,7 @@ Deliberate deviations today:
 - **The `release` skill carries an extra step reconciling the supported server
   range.** `MinSupportedVersion` / `MaxTestedVersion`, the compatibility matrix
   and the README line must agree before a tag is cut. abs-cli has no counterpart
-  because it has no login-time version gate. Its preflight also differs: the
+  because it has no version gate. Its preflight also differs: the
   `docker/users.json.example` fixture must be copied before first boot, and the
   `--version` check asserts bare output because PR builds carry a
   `+pr-<n>.<sha7>` suffix.
