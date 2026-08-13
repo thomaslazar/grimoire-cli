@@ -75,4 +75,31 @@ public class BooksService
             AppJsonContext.Default.BulkTagResult,
             permissionHint: "the gm or admin role");
     }
+
+    /// <summary>
+    /// POST /api/books/{id}/reindex. Queues background OCR and returns immediately;
+    /// the raw response is {"reindex_queued": ...}.
+    /// </summary>
+    public async Task<string> ReindexAsync(string id, int? ocrDpi)
+    {
+        var info = _client.Api.Api.Books[id].Reindex.ToPostRequestInformation(c => c.QueryParameters.OcrDpi = ocrDpi);
+        return await _client.SendAsync(
+            info,
+            permissionHint: "the gm or admin role",
+            notFoundHint: "No book with that ID. List them with: grimoire-cli books list");
+    }
+
+    /// <summary>
+    /// POST /api/books/{id}/rescan. Queues a background re-read and returns
+    /// immediately; the raw response is {"rescan_queued": ...} whether it started
+    /// a new scan or was absorbed into one already running.
+    /// </summary>
+    public async Task<string> RescanAsync(string id)
+    {
+        var info = _client.Api.Api.Books[id].Rescan.ToPostRequestInformation();
+        return await _client.SendAsync(
+            info,
+            permissionHint: "the gm or admin role",
+            notFoundHint: "No book with that ID. List them with: grimoire-cli books list");
+    }
 }

@@ -17,6 +17,8 @@ public static class BooksCommand
         command.Subcommands.Add(CreateUpdateCommand());
         command.Subcommands.Add(CreateBatchUpdateCommand());
         command.Subcommands.Add(CreateBatchTagCommand());
+        command.Subcommands.Add(CreateReindexCommand());
+        command.Subcommands.Add(CreateRescanCommand());
         return command;
     }
 
@@ -239,6 +241,73 @@ public static class BooksCommand
             var result = await new BooksService(client).BatchTagAsync(body);
             ConsoleOutput.WriteJson(result, AppJsonContext.Default.BulkTagResult);
             return BulkExit.CodeFor(result.Errors);
+        });
+        return command;
+    }
+
+    private static Command CreateReindexCommand()
+    {
+        var idOption = new Option<string>("--id") { Description = "Book ID", Required = true };
+        var dpiOption = new Option<int?>("--ocr-dpi")
+        {
+            Description = "OCR resolution for this book (72-600); omit for the server default",
+        };
+        var serverOption = new Option<string?>("--server") { Description = "Server URL override" };
+        var tokenOption = new Option<string?>("--token") { Description = "Token override; not stored" };
+        var command = new Command("reindex", "Re-run OCR on one book")
+        {
+            idOption, dpiOption, serverOption, tokenOption
+        };
+        command.AddRoleRequired("gm or admin");
+        command.AddHelpSection("Notes", HelpSectionPosition.Top,
+            "OCR only: 400 unless the book is an image-only PDF. A book with a real",
+            "text layer has nothing to re-OCR.",
+            "",
+            "Clears the book's search index and re-queues it from page 1. The OCR",
+            "runs in the background — watch it with:",
+            "grimoire-cli library scan-status");
+        command.AddExamples("grimoire-cli books reindex --id <book-id>");
+        command.SetAction(async (parseResult, cancellationToken) =>
+        {
+            var (client, _) = CommandHelper.BuildClient(
+                serverOverride: parseResult.GetValue(serverOption),
+                tokenOverride: parseResult.GetValue(tokenOption));
+            var service = new BooksService(client);
+            var response = await service.ReindexAsync(parseResult.GetValue(idOption)!, parseResult.GetValue(dpiOption));
+            ConsoleOutput.WriteRawJson(response);
+            return 0;
+        });
+        return command;
+    }
+
+    private static Command CreateRescanCommand()
+    {
+        var idOption = new Option<string>("--id") { Description = "Book ID", Required = true };
+        var serverOption = new Option<string?>("--server") { Description = "Server URL override" };
+        var tokenOption = new Option<string?>("--token") { Description = "Token override; not stored" };
+        var command = new Command("rescan", "Re-read one book from disk and rebuild its index")
+        {
+            idOption, serverOption, tokenOption
+        };
+        command.AddRoleRequired("gm or admin");
+        command.AddHelpSection("Notes", HelpSectionPosition.Top,
+            "Re-reads the file and rebuilds the index, refreshing page count and",
+            "thumbnail if the file changed. PDFs only: 400 on an epub or djvu, 404",
+            "if the file is gone from disk.",
+            "",
+            "Absorbed into a library scan already in progress; the response is",
+            "rescan_queued either way. Watch it with:",
+            "grimoire-cli library scan-status");
+        command.AddExamples("grimoire-cli books rescan --id <book-id>");
+        command.SetAction(async (parseResult, cancellationToken) =>
+        {
+            var (client, _) = CommandHelper.BuildClient(
+                serverOverride: parseResult.GetValue(serverOption),
+                tokenOverride: parseResult.GetValue(tokenOption));
+            var service = new BooksService(client);
+            var response = await service.RescanAsync(parseResult.GetValue(idOption)!);
+            ConsoleOutput.WriteRawJson(response);
+            return 0;
         });
         return command;
     }

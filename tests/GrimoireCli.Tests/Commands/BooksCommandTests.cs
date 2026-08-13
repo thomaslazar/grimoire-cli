@@ -74,4 +74,44 @@ public class BooksCommandTests
         Assert.Contains("\"ids\":", output);
         Assert.Contains("\"tags\":", output);
     }
+
+    [Fact]
+    public void MaintenanceCommandsCarryTheGmOrAdminTag()
+    {
+        foreach (var verb in new[] { "reindex", "rescan" })
+            Assert.Contains("gm or admin", RenderHelp(["books", verb], full: false));
+    }
+
+    // The DPI range belongs on the flag, so the Notes must not repeat it.
+    [Fact]
+    public void ReindexStatesItsDpiRangeOnceOnTheFlag()
+    {
+        var output = RenderHelp(["books", "reindex"], full: false);
+        Assert.Contains("72-600", output);
+        Assert.Equal(1, output.Split("72-600").Length - 1);
+    }
+
+    [Fact]
+    public void ReindexSaysItIsOcrOnlyAndPointsAtScanStatus()
+    {
+        var output = RenderHelp(["books", "reindex"], full: false);
+        Assert.Contains("OCR only", output);
+        Assert.Contains("library scan-status", output);
+    }
+
+    [Fact]
+    public void RescanWarnsThatALibraryScanAbsorbsIt()
+    {
+        var output = RenderHelp(["books", "rescan"], full: false);
+        Assert.Contains("rescan_queued either way", output);
+    }
+
+    // Status-only responses name their values in Notes instead of registering a
+    // shape, which would render them as "<string>".
+    [Fact]
+    public void MaintenanceCommandsRegisterNoResponseShape()
+    {
+        foreach (var verb in new[] { "reindex", "rescan" })
+            Assert.DoesNotContain("Response shape:", RenderHelp(["books", verb], full: true));
+    }
 }
