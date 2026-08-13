@@ -50,7 +50,7 @@ git commit -m "docs: design books and library commands"
 - Test: `tests/GrimoireCli.Tests/Models/BookDtoTests.cs`
 
 **Interfaces:**
-- Produces: `GrimoireCli.Models.BookSummary`, `BookDetail`, `BookListResponse` (`Total`, `Books`), `GameSystemRef` (`Id`, `Name`, `Slug`), `ScanStatus`, `ScanTriggerResult` (`Status`). Tasks 2, 4 and 5 consume them, and `AppJsonContext.Default.<Type>` is how each is serialized.
+- Produces: `GrimoireCli.Models.BookSummary`, `BookDetail`, `BookListResponse` (`Total`, `Books`), `GameSystemRef` (`Id`, `Name`, `Slug`), `ScanStatus`, `ScanTriggerResult` (`Status`). Tasks 3, 5 and 6 consume them, and `AppJsonContext.Default.<Type>` is how each is serialized.
 
 Field names below are the wire names from `temp/grimoire/backend/routers/books/core.py:46-119` and `backend/routers/library/_helpers.py:24-47`. Follow the existing style in `src/GrimoireCli/Models/Book.cs`: a public class, every property nullable, every property carrying `[JsonPropertyName("<wire name>")]`.
 
@@ -213,7 +213,116 @@ git commit -m "feat: add book and scan-status response dtos"
 
 ---
 
-### Task 2: `books list` and `books get`
+### Task 2: Extract the shared command and test helpers
+
+**Files:**
+- Create: `src/GrimoireCli/Commands/OptionHelpers.cs`
+- Modify: `src/GrimoireCli/Commands/JsonBodyInput.cs`
+- Modify: `src/GrimoireCli/Commands/SystemsCommand.cs`
+- Create: `tests/GrimoireCli.Tests/Commands/HelpRenderer.cs`
+- Modify: `tests/GrimoireCli.Tests/Commands/SystemsCommandTests.cs`
+
+**Interfaces:**
+- Produces: `OptionHelpers.Choice(string name, string description, string[] allowed)` → `Option<string?>`; `JsonBodyInput.RequireExactlyOneSource(Command command, Option<string?> inputOption, Option<bool> stdinOption)` → `void`; `HelpRenderer.Render(Command command, string[] path, bool full)` → `string`. Tasks 3, 4 and 6 and their tests call all three.
+
+Three helpers currently live as private members of `SystemsCommand` and `SystemsCommandTests`. Books and library need all three, so they move to shared homes now rather than being duplicated into each new file.
+
+**This task changes no behaviour.** It is a move plus call-site updates, and the existing suite is what proves it: every systems test must still pass, unchanged, at the end.
+
+- [ ] **Step 1: Confirm the suite is green before touching anything**
+
+Run: `dotnet test tests/GrimoireCli.Tests/GrimoireCli.Tests.csproj`
+Expected: PASS. Record the count — it must be identical after the move, since no test is added or removed.
+
+- [ ] **Step 2: Move `ChoiceOption` to `OptionHelpers.Choice`**
+
+Create `src/GrimoireCli/Commands/OptionHelpers.cs` holding the body of `SystemsCommand.ChoiceOption` verbatim, renamed to `Choice` and made public:
+
+```csharp
+using System.CommandLine;
+
+namespace GrimoireCli.Commands;
+
+/// <summary>Option factories shared across command groups.</summary>
+public static class OptionHelpers
+{
+    /// <summary>
+    /// A string option restricted to a fixed value set, rejected at parse time and
+    /// offered as shell completions. The rendered help lists the values itself, so
+    /// the description must not repeat them.
+    /// </summary>
+    public static Option<string?> Choice(string name, string description, string[] allowed)
+    {
+        var option = new Option<string?>(name) { Description = description };
+        option.Validators.Add(result =>
+        {
+            var value = result.GetValueOrDefault<string?>();
+            if (value is not null && !allowed.Contains(value))
+                result.AddError($"'{value}' is not a valid value for {name}. Must be one of: {string.Join(", ", allowed)}");
+        });
+        option.CompletionSources.Add(allowed);
+        return option;
+    }
+}
+```
+
+Delete `SystemsCommand.ChoiceOption` and point its four call sites at `OptionHelpers.Choice`.
+
+- [ ] **Step 3: Move `RequireExactlyOneBodySource` onto `JsonBodyInput`**
+
+`JsonBodyInput` already owns `BothSourcesMessage` and `NeitherSourceMessage`, so the validator that emits them belongs beside them. Move `SystemsCommand.RequireExactlyOneBodySource` there verbatim as a public static `RequireExactlyOneSource`, keeping its doc comment, and update its three call sites in `SystemsCommand`.
+
+- [ ] **Step 4: Move `RenderHelp` to a shared test helper**
+
+Create `tests/GrimoireCli.Tests/Commands/HelpRenderer.cs`. The existing version hard-codes `SystemsCommand.Create()`; the shared one takes the command under test:
+
+```csharp
+using System.CommandLine;
+using System.CommandLine.Invocation;
+using GrimoireCli.Commands;
+
+namespace GrimoireCli.Tests.Commands;
+
+internal static class HelpRenderer
+{
+    /// <summary>
+    /// Renders a subcommand's help exactly as the CLI would, including the custom
+    /// sections, so tests assert on what a user sees rather than on registration.
+    /// </summary>
+    public static string Render(Command command, string[] path, bool full)
+    {
+        var root = new RootCommand("test") { command };
+        root.UseCustomHelpSections();
+        var output = new StringWriter();
+        root.Parse([.. path, full ? "--help-full" : "--help"])
+            .Invoke(new InvocationConfiguration { Output = output });
+        return output.ToString();
+    }
+}
+```
+
+Delete `SystemsCommandTests.RenderHelp` and replace its calls with `HelpRenderer.Render(SystemsCommand.Create(), path, full)` — keeping a one-line private wrapper in the test class is fine if it keeps the call sites readable.
+
+- [ ] **Step 5: Prove nothing changed**
+
+```bash
+dotnet format GrimoireCli.sln
+dotnet build GrimoireCli.sln
+dotnet test tests/GrimoireCli.Tests/GrimoireCli.Tests.csproj
+```
+
+Expected: the same test count as Step 1, all passing. `ResponseExamplesDriftTest` and `RequestExamplesDriftTest` must also still pass — neither generator reads these files, so a failure there means something unrelated broke.
+
+- [ ] **Step 6: Commit**
+
+```bash
+git add src/GrimoireCli/Commands tests/GrimoireCli.Tests/Commands
+git commit -m "refactor: share the option, body-source and help-render helpers"
+```
+
+---
+
+### Task 3: `books list` and `books get`
 
 **Files:**
 - Create: `src/GrimoireCli/Services/BooksService.cs`
@@ -223,15 +332,15 @@ git commit -m "feat: add book and scan-status response dtos"
 
 **Interfaces:**
 - Consumes: `BookListResponse`, `BookDetail` from Task 1.
-- Produces: `BooksService.ListAsync(string? systemId, string? category, int limit, int? offset)` → `Task<BookListResponse>`; `BooksService.GetAsync(string id)` → `Task<BookDetail>`; `BooksCommand.Create()` → `Command`. Tasks 3 and 4 add methods to both classes.
+- Produces: `BooksService.ListAsync(string? systemId, string? category, int limit, int? offset)` → `Task<BookListResponse>`; `BooksService.GetAsync(string id)` → `Task<BookDetail>`; `BooksCommand.Create()` → `Command`. Tasks 4 and 5 add methods to both classes.
 
-Read `src/GrimoireCli/Services/SystemsService.cs` and `src/GrimoireCli/Commands/SystemsCommand.cs` first — this task mirrors their structure, and later tasks extend what you create here.
+Read `src/GrimoireCli/Services/SystemsService.cs` and `src/GrimoireCli/Commands/SystemsCommand.cs` first — this task mirrors their structure, and later tasks extend what you create here. Task 2 moved the shared helpers out of `SystemsCommand`; use `OptionHelpers.Choice`, `JsonBodyInput.RequireExactlyOneSource` and `HelpRenderer.Render` rather than writing local copies.
 
 The generated builders are `client.Api.Api.Books` (GET, query parameters `SystemId`, `Category`, `Limit`, `Offset`) and `client.Api.Api.Books[id]` (GET). The builder also exposes a `Token` query parameter for media access; it is unrelated to the JWT and this command does not set it.
 
 - [ ] **Step 1: Write the failing tests**
 
-Create `tests/GrimoireCli.Tests/Commands/BooksCommandTests.cs`. Copy the `RenderHelp` helper from `SystemsCommandTests.cs` verbatim — it builds a root command, invokes `--help` or `--help-full`, and captures the output — then:
+Create `tests/GrimoireCli.Tests/Commands/BooksCommandTests.cs`. Its `RenderHelp` is a one-line wrapper over the shared helper from Task 2 — `private static string RenderHelp(string[] path, bool full) => HelpRenderer.Render(BooksCommand.Create(), path, full);` — then:
 
 ```csharp
     [Fact]
@@ -378,7 +487,7 @@ git commit -m "feat: add books list and books get"
 
 ---
 
-### Task 3: `books update`, `batch-update` and `batch-tag`
+### Task 4: `books update`, `batch-update` and `batch-tag`
 
 **Files:**
 - Modify: `src/GrimoireCli/Services/BooksService.cs`
@@ -386,10 +495,10 @@ git commit -m "feat: add books list and books get"
 - Test: `tests/GrimoireCli.Tests/Commands/BooksCommandTests.cs`
 
 **Interfaces:**
-- Consumes: `BooksService` and `BooksCommand` from Task 2; `BulkUpdateResult`, `BulkTagResult`, `BulkExit`, `JsonBodyInput` as they already exist.
+- Consumes: `BooksService` and `BooksCommand` from Task 3; `BulkUpdateResult`, `BulkTagResult`, `BulkExit`, `JsonBodyInput` as they already exist.
 - Produces: `BooksService.UpdateAsync(string id, string rawBody)` → `Task<string>`; `BatchUpdateAsync(string rawBody)` → `Task<BulkUpdateResult>`; `BatchTagAsync(string rawBody)` → `Task<BulkTagResult>`.
 
-This mirrors `SystemsCommand`'s three write commands almost exactly. Read them, including `RequireExactlyOneBodySource`, which you will need here too — copy that private helper into `BooksCommand` rather than making it public on `SystemsCommand`, since the two command files are independent declarations.
+This mirrors `SystemsCommand`'s three write commands almost exactly. Read them. The `--input`/`--stdin` validator is `JsonBodyInput.RequireExactlyOneSource`, moved there in Task 2 — call it, do not reimplement it.
 
 Generated builders: `client.Api.Api.Books[id]` (PATCH, model `Generated.Models.BookUpdate`), `client.Api.Api.Books.Bulk` (POST, `Generated.Models.BookBulkUpdate`), `client.Api.Api.Books.Bulk.Tags` (POST, `Generated.Models.BulkAddTags`).
 
@@ -508,7 +617,7 @@ git commit -m "feat: add books write commands"
 
 ---
 
-### Task 4: `books reindex` and `books rescan`
+### Task 5: `books reindex` and `books rescan`
 
 **Files:**
 - Modify: `src/GrimoireCli/Services/BooksService.cs`
@@ -623,7 +732,7 @@ git commit -m "feat: add books reindex and books rescan"
 
 ---
 
-### Task 5: The `library` command group
+### Task 6: The `library` command group
 
 **Files:**
 - Create: `src/GrimoireCli/Services/LibraryService.cs`
@@ -643,7 +752,7 @@ These are the first `admin`-tagged commands in this CLI, so all three call `AddR
 
 - [ ] **Step 1: Write the failing tests**
 
-Create `tests/GrimoireCli.Tests/Commands/LibraryCommandTests.cs` with the same `RenderHelp` helper, then:
+Create `tests/GrimoireCli.Tests/Commands/LibraryCommandTests.cs`, wrapping the shared helper as in Task 3 — `private static string RenderHelp(string[] path, bool full) => HelpRenderer.Render(LibraryCommand.Create(), path, full);` — then:
 
 ```csharp
     [Fact]
@@ -756,7 +865,7 @@ public static class ScanExit
     }
 ```
 
-Both member names are verified against `src/GrimoireCli/Generated/Models/RescanRequest.cs` and `RescanRequest_metadata_mode.cs`: `RescanRequest.Scope` is the composed wrapper `RescanRequest.RescanRequest_scope` whose value branch is `String`, and `RescanRequest.MetadataMode` is the enum `RescanRequest_metadata_mode` with members `New`, `Missing`, `Replace` carrying `[EnumMember]` values `new`, `missing`, `replace`. `ParseMetadataMode` maps the flag's string onto that enum; the flag is a `ChoiceOption` over the same three values, so an unrecognised one is already a parse error before the service is reached.
+Both member names are verified against `src/GrimoireCli/Generated/Models/RescanRequest.cs` and `RescanRequest_metadata_mode.cs`: `RescanRequest.Scope` is the composed wrapper `RescanRequest.RescanRequest_scope` whose value branch is `String`, and `RescanRequest.MetadataMode` is the enum `RescanRequest_metadata_mode` with members `New`, `Missing`, `Replace` carrying `[EnumMember]` values `new`, `missing`, `replace`. `ParseMetadataMode` maps the flag's string onto that enum; the flag is an `OptionHelpers.Choice` over the same three values, so an unrecognised one is already a parse error before the service is reached.
 
 `ScanStatusAsync` is a plain GET returning `AppJsonContext.Default.ScanStatus`. `CancelScanAsync` posts with no body and returns the raw response string.
 
@@ -764,7 +873,7 @@ Both member names are verified against `src/GrimoireCli/Generated/Models/RescanR
 
 `LibraryCommand.Create()` returns `new Command("library", "Scan and index the library")`.
 
-`rescan` — description `"Scan the library for new and changed files"`, `--scope`, `--metadata-mode` as a `ChoiceOption` over `new`, `missing`, `replace` (copy `ChoiceOption` from `SystemsCommand` into `LibraryCommand`), description `"Re-apply OPF sidecar metadata"`, and:
+`rescan` — description `"Scan the library for new and changed files"`, `--scope`, `--metadata-mode` built with `OptionHelpers.Choice` over `new`, `missing`, `replace`, description `"Re-apply OPF sidecar metadata"`, and:
 
 ```csharp
         command.AddHelpSection("Notes", HelpSectionPosition.Top,
@@ -815,7 +924,7 @@ git commit -m "feat: add the library scan commands"
 
 ---
 
-### Task 6: Fixtures and smoke test
+### Task 7: Fixtures and smoke test
 
 **Files:**
 - Modify: `docker/seed.sh`
@@ -875,7 +984,7 @@ git commit -m "test: cover books and library commands in the smoke test"
 
 ---
 
-### Task 7: Documentation
+### Task 8: Documentation
 
 **Files:**
 - Modify: `README.md` (Commands table)
@@ -922,11 +1031,11 @@ git commit -m "docs: record the books and library commands"
 
 ---
 
-### Task 8: Pre-PR verification and PR
+### Task 9: Pre-PR verification and PR
 
 - [ ] **Step 1: Run all four checks**
 
-The stack must be running and seeded from Task 6.
+The stack must be running and seeded from Task 7.
 
 ```bash
 dotnet format GrimoireCli.sln --verify-no-changes
@@ -980,6 +1089,6 @@ EOF
 
 ## Self-Review
 
-**Spec coverage:** ten commands → Tasks 2-5; three book DTOs plus `ScanStatus`/`ScanTriggerResult`/`GameSystemRef` → Task 1; paging with a client-side default of 100 → Task 2 Step 4; the shape-block table including all three deliberate absences → Tasks 2 (`AddResponseExample<BookListResponse>` not the array helper), 4 (no response shape on the maintenance pair) and 5 (no request shape on `library rescan`); every Notes block verbatim → Tasks 2-5; role tags and permission hints → Tasks 2-5 plus the Global Constraints; exit 3 for `already_running` → Task 5's `ScanExit`; fixtures and smoke test → Task 6; README, coverage, exit-3 doc gap, roadmap → Task 7.
+**Spec coverage:** shared helpers extracted ahead of their second and third callers → Task 2; ten commands → Tasks 3-6; three book DTOs plus `ScanStatus`/`ScanTriggerResult`/`GameSystemRef` → Task 1; paging with a client-side default of 100 → Task 3 Step 4; the shape-block table including all three deliberate absences → Tasks 3 (`AddResponseExample<BookListResponse>` not the array helper), 5 (no response shape on the maintenance pair) and 6 (no request shape on `library rescan`); every Notes block verbatim → Tasks 3-6; role tags and permission hints → Tasks 3-6 plus the Global Constraints; exit 3 for `already_running` → Task 6's `ScanExit`; fixtures and smoke test → Task 7; README, coverage, exit-3 doc gap, roadmap → Task 8.
 
-**Type consistency:** `BooksService` is created in Task 2 and extended in Tasks 3 and 4; `BooksCommand.Create()` likewise. `BookListResponse.Total`/`.Books`, `BookDetail.GameSystem`, `ScanStatus.Running`/`.Phase`/`.ScannedBooks`/`.OcrCurrent` and `ScanTriggerResult.Status` are defined in Task 1 and used with those exact names in Tasks 2, 5 and their tests. `ScanExit.CodeFor(ScanTriggerResult)` takes the DTO, not a string, in both its definition and its test.
+**Type consistency:** `BooksService` is created in Task 3 and extended in Tasks 4 and 5; `BooksCommand.Create()` likewise. `BookListResponse.Total`/`.Books`, `BookDetail.GameSystem`, `ScanStatus.Running`/`.Phase`/`.ScannedBooks`/`.OcrCurrent` and `ScanTriggerResult.Status` are defined in Task 1 and used with those exact names in Tasks 3, 6 and their tests. `ScanExit.CodeFor(ScanTriggerResult)` takes the DTO, not a string, in both its definition and its test.
