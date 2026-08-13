@@ -52,6 +52,8 @@ git commit -m "docs: design books and library commands"
 **Interfaces:**
 - Produces: `GrimoireCli.Models.BookSummary`, `BookDetail`, `BookListResponse` (`Total`, `Books`), `GameSystemRef` (`Id`, `Name`, `Slug`), `ScanStatus`, `ScanTriggerResult` (`Status`). Tasks 3, 5 and 6 consume them, and `AppJsonContext.Default.<Type>` is how each is serialized.
 
+`file_size` is `long?` because SQLite's INTEGER storage class holds 8 bytes whatever the declared width, so a multi-gigabyte book's size can exceed `int.MaxValue` and an `int?` would throw rather than truncate. The booleans split the way `Book.cs` already splits them: the ones the server coerces with `bool(...)` or a comparison are non-nullable, the ones it passes through raw stay nullable.
+
 Field names below are the wire names from `temp/grimoire/backend/routers/books/core.py:46-119` and `backend/routers/library/_helpers.py:24-47`. Follow the existing style in `src/GrimoireCli/Models/Book.cs`: a public class, every property nullable, every property carrying `[JsonPropertyName("<wire name>")]`.
 
 - [ ] **Step 1: Write the failing test**
@@ -154,19 +156,23 @@ Expected: FAIL — build error, none of these types exist.
 | wire name | C# type |
 |---|---|
 | `id`, `title`, `filename`, `category`, `mime_type` | `string?` |
-| `page_count`, `file_size` | `int?` |
+| `page_count` | `int?` |
+| `file_size` | `long?` |
 | `game_system_id` | `string?` |
-| `has_thumbnail`, `indexed`, `index_failed`, `ocr_indexed`, `is_explicit`, `is_missing` | `bool?` |
+| `has_thumbnail`, `indexed`, `index_failed` | `bool?` |
+| `ocr_indexed`, `is_explicit`, `is_missing` | `bool` |
 
 `BookDetail.cs` — exactly what `GET /api/books/{id}` returns:
 
 | wire name | C# type |
 |---|---|
 | `id`, `title`, `filename`, `category`, `description`, `publisher`, `publisher_url`, `isbn`, `version`, `language`, `license`, `mime_type` | `string?` |
-| `page_count`, `file_size`, `year`, `month`, `day`, `ocr_dpi` | `int?` |
+| `page_count`, `year`, `month`, `day`, `ocr_dpi` | `int?` |
+| `file_size` | `long?` |
 | `authors`, `artists`, `genres`, `tags` | `List<string>?` |
 | `urls` | `List<LinkEntry>?` |
-| `indexed`, `index_failed`, `ocr_indexed`, `ocr_pending`, `is_missing`, `has_thumbnail`, `is_explicit` | `bool?` |
+| `indexed`, `index_failed`, `has_thumbnail` | `bool?` |
+| `ocr_indexed`, `ocr_pending`, `is_missing`, `is_explicit` | `bool` |
 | `game_system` | `GameSystemRef?` |
 
 `BookListResponse.cs` — `total` as `int?`, `books` as `List<BookSummary>?`.
