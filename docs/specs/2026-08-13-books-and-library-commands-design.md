@@ -162,8 +162,8 @@ Verbatim, so the implementer writes no prose of their own.
 **`books list`**
 
 ```
---limit defaults to 100 and 422s above 500; page with --offset against
-the total in the response.
+--limit 422s above 500; page with --offset against the total in the
+response.
 
 --category is the normalised value, not the folder name ('supplement',
 not 'supplements'), and is case-sensitive: Core matches nothing.
