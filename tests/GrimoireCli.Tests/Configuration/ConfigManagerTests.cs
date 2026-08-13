@@ -2,6 +2,9 @@ using GrimoireCli.Configuration;
 
 namespace GrimoireCli.Tests.Configuration;
 
+// Load warns when a config is unparseable, and NLog's configuration is
+// process-global, so these must not run beside a test asserting on log contents.
+[Collection("NLog")]
 public class ConfigManagerTests
 {
     private static ConfigManager InTempDir(out string path)
@@ -199,6 +202,10 @@ public class ConfigManagerTests
             var config = manager.Load();
             Assert.Null(config.Server);
             Assert.Null(config.AccessToken);
+            // The bytes are preserved beside the config: a hand-edit that broke a
+            // 30-day non-refreshable token must be recoverable.
+            Assert.Equal(content, File.ReadAllText($"{path}.corrupt"));
+            Assert.False(File.Exists(path));
         }
         finally
         {
@@ -242,27 +249,76 @@ public class ConfigManagerTests
         }
     }
 
-    // Losing a 30-day non-refreshable token to a torn write is the failure the
-    // rename protects against: the previous content stands until the new file is
-    // complete.
+    // The write must replace the file rather than rewrite it in place, which is what
+    // keeps a torn write from destroying the token already there. A hard link is how
+    // that becomes observable: an in-place write updates every link, while replacing
+    // the path leaves the link holding the old bytes. This test fails if Save goes
+    // back to File.WriteAllText.
     [Fact]
-    public void SavePreservesThePreviousFileUntilTheNewOneIsComplete()
+    public void SaveReplacesTheFileRatherThanRewritingItInPlace()
     {
         var manager = InTempDir(out var path);
+        var link = Path.Combine(Path.GetDirectoryName(path)!, "link.json");
         try
         {
             manager.Save(new AppConfig { Server = "http://first.test", AccessToken = "first" });
             var before = File.ReadAllText(path);
-            manager.Save(new AppConfig { Server = "http://second.test", AccessToken = "second" });
-            var after = File.ReadAllText(path);
-            Assert.NotEqual(before, after);
-            Assert.Contains("second", after);
-            // A complete document either way — never a truncated one.
+            File.CreateSymbolicLink(link, path);
+            using (var pin = new FileStream(path, FileMode.Open, FileAccess.Read))
+            {
+                // A reader holding the old file open must keep seeing the old bytes.
+                manager.Save(new AppConfig { Server = "http://second.test", AccessToken = "second" });
+                Assert.Equal(before, new StreamReader(pin).ReadToEnd());
+            }
             Assert.Equal("http://second.test", manager.Load().Server);
         }
         finally
         {
             Directory.Delete(Path.GetDirectoryName(path)!, recursive: true);
+        }
+    }
+
+    // The file holds a bearer token valid for 30 days, so it must not be left at
+    // whatever the umask allows — and replacing the path swaps in the new file's
+    // mode, which would silently undo an operator's chmod on every write.
+    [Fact]
+    public void SaveRestrictsThePermissionsToTheOwner()
+    {
+        if (OperatingSystem.IsWindows()) return;
+        var manager = InTempDir(out var path);
+        try
+        {
+            manager.Save(new AppConfig { AccessToken = "a-token" });
+            var mode = File.GetUnixFileMode(path);
+            Assert.Equal(UnixFileMode.UserRead | UnixFileMode.UserWrite, mode);
+            manager.Save(new AppConfig { AccessToken = "another" });
+            Assert.Equal(UnixFileMode.UserRead | UnixFileMode.UserWrite, File.GetUnixFileMode(path));
+        }
+        finally
+        {
+            Directory.Delete(Path.GetDirectoryName(path)!, recursive: true);
+        }
+    }
+
+    [Fact]
+    public void SaveReportsAnUnwritableConfigInsteadOfThrowingRaw()
+    {
+        if (OperatingSystem.IsWindows()) return;
+        var manager = InTempDir(out var path);
+        var dir = Path.GetDirectoryName(path)!;
+        Directory.CreateDirectory(dir);
+        // A directory the process cannot write is the realistic case: a read-only
+        // home, a full disk, a mount gone away.
+        File.SetUnixFileMode(dir, UnixFileMode.UserRead | UnixFileMode.UserExecute);
+        try
+        {
+            var ex = Assert.Throws<ConfigWriteException>(() => manager.Save(new AppConfig()));
+            Assert.Contains(path, ex.Message);
+        }
+        finally
+        {
+            File.SetUnixFileMode(dir, UnixFileMode.UserRead | UnixFileMode.UserWrite | UnixFileMode.UserExecute);
+            Directory.Delete(dir, recursive: true);
         }
     }
 }

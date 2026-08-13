@@ -31,16 +31,27 @@ populated (`server` and `accessToken` stay unset until `login` writes them).
 
 ## Reading and writing the file
 
-The file is written by creating a temporary file beside it and renaming over the
-target, which is atomic within a directory, so an interrupted write leaves the
+The file is written by filling a temporary file beside it and replacing the target
+with it, which is atomic within a directory, so an interrupted write leaves the
 previous config intact. That matters here because the token it holds is valid for
 30 days with no refresh: losing it to a torn write costs a login, and the version
-check writes daily rather than only at login.
+check writes daily rather than only at login. A power loss is not covered — the
+rename can land before the data — but a truncated file is then read as absent
+rather than as an error.
 
-A config file that is not valid JSON is reported on stderr and otherwise treated
-as absent, so a hand-edit gone wrong does not take every command down with it.
-`GRIMOIRE_SERVER` / `GRIMOIRE_TOKEN` still work in that state, and
-`grimoire-cli login` repairs the file by overwriting it.
+The file is `0600`, readable only by its owner, and stays that way across writes
+because the replacement carries the new file's mode.
+
+A config file that is not valid JSON is **moved to `config.json.corrupt`** and
+reported on stderr, then treated as absent. Moving it is what makes the token
+recoverable: the file usually still contains it, and the next write would
+otherwise replace the file wholesale. `GRIMOIRE_SERVER` / `GRIMOIRE_TOKEN` still
+work in that state, and `grimoire-cli login` writes a fresh config.
+
+A write that fails — a read-only home, a full disk — is reported as an error, and
+`login` and `config set` exit non-zero rather than claiming to have saved
+anything. The version check's own write is the exception: it is a diagnostic, so a
+failure there is a debug line and the check simply runs again next time.
 
 ## Precedence Order
 

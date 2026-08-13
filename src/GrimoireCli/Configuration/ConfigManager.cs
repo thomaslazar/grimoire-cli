@@ -3,6 +3,12 @@ using GrimoireCli.Models;
 
 namespace GrimoireCli.Configuration;
 
+/// <summary>The config file could not be written, with a message fit to print.</summary>
+public class ConfigWriteException : Exception
+{
+    public ConfigWriteException(string message, Exception inner) : base(message, inner) { }
+}
+
 public class ConfigManager
 {
     private static readonly NLog.Logger _logger = NLog.LogManager.GetCurrentClassLogger();
@@ -42,8 +48,7 @@ public class ConfigManager
         }
         catch (JsonException ex)
         {
-            _logger.Warn($"Ignoring {_configPath}: it is not valid JSON ({ex.Message}). "
-                         + "Run: grimoire-cli login — that overwrites it.");
+            QuarantineUnparseableConfig(ex);
             return new AppConfig();
         }
         catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
@@ -54,28 +59,77 @@ public class ConfigManager
     }
 
     /// <summary>
-    /// Writes the config by creating a temporary file beside it and renaming over
-    /// the target, so a reader never sees a half-written file and a crash mid-write
-    /// cannot destroy the token already there. The rename is atomic because the
-    /// temporary file is in the same directory, hence on the same filesystem.
-    /// This matters more since the version-check cadence writes daily rather than
-    /// only at login, and the token it would take with it lasts 30 days with no
-    /// refresh.
+    /// Moves an unparseable config aside before anything can overwrite it. The token
+    /// it holds is valid for 30 days and cannot be refreshed, and a file broken by a
+    /// hand-edit usually still contains it — but the next write would replace the file
+    /// wholesale, so leaving it in place would destroy on the following command what
+    /// the warning invites the operator to repair. Moving it also means the warning is
+    /// printed once rather than by every subsequent <see cref="Load"/> in the process.
     /// </summary>
+    private void QuarantineUnparseableConfig(JsonException ex)
+    {
+        var quarantine = $"{_configPath}.corrupt";
+        try
+        {
+            File.Move(_configPath, quarantine, overwrite: true);
+            _logger.Warn($"{_configPath} is not valid JSON ({ex.Message}). Moved it to "
+                         + $"{quarantine} and continuing without it. Run: grimoire-cli login");
+        }
+        catch (Exception moveFailure) when (moveFailure is IOException or UnauthorizedAccessException)
+        {
+            _logger.Warn($"Ignoring {_configPath}: it is not valid JSON ({ex.Message}). "
+                         + $"Could not move it aside ({moveFailure.Message}). Run: grimoire-cli login");
+        }
+    }
+
+    /// <summary>
+    /// Writes the config by filling a temporary file beside it and replacing the
+    /// target with it, so a reader never sees a half-written file and a process that
+    /// dies mid-write cannot destroy the token already there. Both paths are in the
+    /// same directory, hence the same filesystem, which is what makes the replacement
+    /// atomic. This matters more since the version-check cadence writes daily rather
+    /// than only at login, and the token it would take with it lasts 30 days with no
+    /// refresh. A power loss is not covered — the rename can land before the data —
+    /// but a truncated file is read as absent rather than as an error.
+    /// </summary>
+    /// <exception cref="ConfigWriteException">
+    /// The config could not be written. Callers that promise persistence — login,
+    /// config set — must report this rather than claim success; the version-check
+    /// cadence swallows it, because a diagnostic may not fail the command it precedes.
+    /// </exception>
     public void Save(AppConfig config)
     {
         var dir = Path.GetDirectoryName(_configPath);
-        if (dir != null && !Directory.Exists(dir))
-            Directory.CreateDirectory(dir);
-
         var json = JsonSerializer.Serialize(config, AppJsonContext.Default.AppConfig);
-        // Process id, not a random name: two processes writing at once each get their
-        // own file, and a leftover from a killed process is identifiable.
+        // Process id, not a random name: concurrent writers each get their own file,
+        // and a leftover from a killed process is identifiable. Concurrent writes are
+        // still last-one-wins as a whole — the replacement makes each write complete,
+        // not the read-modify-write around it atomic.
         var temp = $"{_configPath}.{Environment.ProcessId}.tmp";
         try
         {
+            if (dir != null && !Directory.Exists(dir))
+                Directory.CreateDirectory(dir);
             File.WriteAllText(temp, json);
-            File.Move(temp, _configPath, overwrite: true);
+            // The file carries a bearer token, so restrict it before it becomes the
+            // config: replacing the target swaps in this file's mode, which would
+            // otherwise be whatever the umask allows — and would silently undo an
+            // operator's chmod on every write.
+            if (!OperatingSystem.IsWindows())
+                File.SetUnixFileMode(temp, UnixFileMode.UserRead | UnixFileMode.UserWrite);
+            // Replace where the target exists: on Windows it is the call with the
+            // documented atomic-replacement semantics, and on Unix both are rename(2).
+            if (File.Exists(_configPath))
+                File.Replace(temp, _configPath, destinationBackupFileName: null);
+            else
+                File.Move(temp, _configPath);
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+        {
+            // Name the real config first: the underlying message names the temporary
+            // file, which the operator never chose and would not recognise on its own.
+            throw new ConfigWriteException(
+                $"Could not write {_configPath} (written via a temporary file beside it): {ex.Message}", ex);
         }
         finally
         {

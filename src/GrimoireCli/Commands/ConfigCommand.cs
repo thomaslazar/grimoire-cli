@@ -61,7 +61,15 @@ public static class ConfigCommand
                 Environment.Exit(1);
                 return 1;
             }
-            configManager.Save(config);
+            try
+            {
+                configManager.Save(config);
+            }
+            catch (ConfigWriteException ex)
+            {
+                _logger.Error(ex.Message);
+                return 1;
+            }
             Console.Error.WriteLine($"Set {key} = {value}");
             return 0;
         });

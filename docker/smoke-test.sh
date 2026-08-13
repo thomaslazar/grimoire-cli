@@ -485,7 +485,10 @@ ok "an unknown field inside a batch item exits 1"
 # A config file that is not valid JSON must not take the CLI down with it, and
 # logging in again must be enough to recover — no hand-editing, no rm. This runs
 # last because it ends by restoring the config the earlier checks depend on.
-cp "$CONFIG" "$WORK/config.backup.json"
+# GRIMOIRE_TOKEN would satisfy the command from the environment and mask the
+# failure this asserts; the suite does not set it, and this makes that a
+# requirement rather than an assumption.
+unset GRIMOIRE_TOKEN
 printf '{not json' > "$CONFIG"
 set +e
 "$CLI" systems list >"$WORK/corrupt.out" 2>"$WORK/corrupt.err"; rc=$?
@@ -496,7 +499,15 @@ grep -q "not valid JSON" "$WORK/corrupt.err" \
 grep -qi "at System\.\|Unhandled exception" "$WORK/corrupt.err" \
   && fail "a corrupt config leaked a stack trace: $(cat "$WORK/corrupt.err")"
 [ ! -s "$WORK/corrupt.out" ] || fail "stdout should stay empty on a config failure"
-ok "a corrupt config fails readably with no stack trace"
+# The unparseable file is moved aside rather than left to be overwritten: it may
+# hold a 30-day token that a one-character fix would recover.
+[ -f "$CONFIG.corrupt" ] || fail "the corrupt config should have been kept aside"
+[ "$(cat "$CONFIG.corrupt")" = '{not json' ] \
+  || fail "the kept-aside file should hold the original bytes"
+grep -q "$CONFIG.corrupt" "$WORK/corrupt.err" \
+  || fail "the warning should name where the file went: $(cat "$WORK/corrupt.err")"
+rm -f "$CONFIG.corrupt"
+ok "a corrupt config is kept aside and fails readably with no stack trace"
 
 printf 'admin' | "$CLI" login --server "$SERVER" --username admin --password-stdin \
   >/dev/null 2>"$WORK/relogin.err" \
@@ -507,9 +518,12 @@ syslist
 [ "$COUNT" -eq "$EXPECTED_SYSTEMS" ] || fail "the CLI should work again after re-login"
 ok "login repairs a corrupt config"
 
-# No temporary file survives a write — the config is written by rename, not in place.
+# The config is replaced, not rewritten in place: no temporary survives, and the
+# file holding a 30-day bearer token is readable only by its owner.
 [ -z "$(find "$(dirname "$CONFIG")" -name '*.tmp' -print -quit)" ] \
   || fail "a temporary config file was left behind: $(ls "$(dirname "$CONFIG")")"
-ok "config writes leave no temporary file"
+[ "$(stat -c '%a' "$CONFIG")" = "600" ] \
+  || fail "the config should be owner-only, got $(stat -c '%a' "$CONFIG")"
+ok "config writes leave no temporary file and stay owner-only"
 
 echo "smoke: all checks passed" >&2

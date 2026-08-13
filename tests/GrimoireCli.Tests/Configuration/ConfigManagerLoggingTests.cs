@@ -38,11 +38,14 @@ public class ConfigManagerLoggingTests
         try
         {
             new ConfigManager(path).Load();
-            var line = Assert.Single(target.Logs);
+            // Scoped to this test's own path: NLog's configuration is process-global,
+            // so another class's warning can land in this target even under the
+            // collection, and an unscoped Single() would fail on its arrival.
+            var line = Assert.Single(target.Logs, l => l.Contains(path));
             Assert.StartsWith("WARN ", line);
-            Assert.Contains(path, line);
             Assert.Contains("not valid JSON", line);
             Assert.Contains("grimoire-cli login", line);
+            Assert.Contains($"{path}.corrupt", line);
         }
         finally
         {
@@ -60,7 +63,7 @@ public class ConfigManagerLoggingTests
         {
             manager.Save(new AppConfig { Server = "http://example.test" });
             manager.Load();
-            Assert.Empty(target.Logs);
+            Assert.DoesNotContain(target.Logs, l => l.Contains(path));
         }
         finally
         {

@@ -94,7 +94,17 @@ public static class LoginCommand
                 config = configManager.Load();
                 config.Server = server;
                 config.AccessToken = token;
-                configManager.Save(config);
+                try
+                {
+                    configManager.Save(config);
+                }
+                catch (ConfigWriteException ex)
+                {
+                    // The login worked, but a token that was never written is a token
+                    // the next command cannot use — report it as the failure it is.
+                    _logger.Error(ex.Message);
+                    Environment.Exit(1);
+                }
                 var expiry = TokenHelper.GetExpiration(token!);
                 Console.Error.WriteLine(expiry != null
                     ? $"Logged in to {server} (token expires {expiry:yyyy-MM-dd})"
