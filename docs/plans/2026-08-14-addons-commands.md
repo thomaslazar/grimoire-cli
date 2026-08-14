@@ -649,15 +649,22 @@ Read `docker/docker-compose.yml`, `docker/seed.sh`, `docker/smoke-test.sh` and `
 
 ```yaml
 # Minimal valid add-on for the smoke test. AddonManifest is strict (extra keys
-# are rejected) but only id, name, version and kind are required; the fixture
-# answers no searches because install, update, upgrade and uninstall never
-# consult a source. The metadata-lookup work adds source/search/map here.
+# are rejected), and needs_a_backend requires a 'source' or 'script' block even
+# though this one is never run — install, update, upgrade and uninstall never
+# consult a source, so this is the smallest source+search pair that satisfies
+# validation without doing anything. The metadata-lookup work adds a map block.
 id: fixture-source
 name: Fixture Source
 version: 1.0.0
 kind: scraper
 target: game-system
 description: Local fixture for the grimoire-cli smoke test.
+source:
+  url: https://example.test/fixture-source-index.json
+  format: json
+search:
+  fields:
+    - field: name
 ```
 
 - [ ] **Step 2: Write the index generator**

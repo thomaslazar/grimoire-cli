@@ -685,7 +685,7 @@ REFRESH_JSON=$("$CLI" addons refresh 2>"$WORK/cli.err") \
 ok "addons refresh reaches the fixture index and reports 1 add-on"
 
 INSTALL_JSON=$("$CLI" addons install --id fixture-source 2>"$WORK/cli.err") \
-  || { cat "$WORK/cli.err" >&2; fail "addons install exited non-zero"; }
+  || { cat "$WORK/cli.err" >&2; fail "addons install exited non-zero (digest mismatch? re-run docker/seed.sh after editing docker/addon-index/fixture-source.yml — it regenerates index.json via make-addon-index.py)"; }
 [ "$(echo "$INSTALL_JSON" | jq -r .id)" = "fixture-source" ] \
   || fail "addons install returned the wrong id: $INSTALL_JSON"
 [ "$(echo "$INSTALL_JSON" | jq -r .enabled)" = "true" ] \

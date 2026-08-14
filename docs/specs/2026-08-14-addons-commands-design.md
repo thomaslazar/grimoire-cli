@@ -306,14 +306,21 @@ name: Fixture Source
 version: 1.0.0
 kind: scraper
 target: game-system
+source:
+  url: https://example.test/fixture-source-index.json
+  format: json
+search:
+  fields:
+    - field: name
 ```
 
-`AddonManifest` (`backend/addons/manifest.py:288`) is strict but requires only
-`id`, `name`, `version` and `kind: scraper`; `id` must be lowercase alphanumeric
-with hyphens. The fixture answers no searches, which install, update, upgrade and
-uninstall never consult. When the metadata trio lands, this same fixture grows
-`source`/`search`/`map` and becomes the fake source that makes `search` and
-`fetch` testable without scraping anyone.
+`AddonManifest` (`backend/addons/manifest.py:288`) is strict, and its
+`needs_a_backend` validator requires a `source` or `script` block; a `source`
+manifest also needs `search`. This is the smallest pair that satisfies
+validation without doing anything real — the fixture answers no searches,
+which install, update, upgrade and uninstall never consult. When the metadata
+trio lands, this same fixture grows a `map` block and becomes the fake source
+that makes `search` and `fetch` testable without scraping anyone.
 
 ### Smoke test
 

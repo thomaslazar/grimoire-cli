@@ -288,7 +288,7 @@ Verified against v1.5.6, backing the seven `addons` commands.
   nothing ships bundled with the server. Verified live: `addons list` reports
   `available: []` and a system's `metadata-sources` reports no source until
   `addons refresh` has run at least once.
-- **`fetch_json` carries no host allow-list** (`backend/addons/fetch.py:92-133`)
+- **`fetch_json` carries no host allow-list** (`backend/addons/fetch.py:92-134`)
   — it is plain httpx, restricted only by the `http(s)://` scheme check in
   `refresh_index` (`backend/addons/install.py:63-64`), not by destination.
   A URL on the docker-compose network works exactly like the published index,
