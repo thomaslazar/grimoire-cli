@@ -5,7 +5,9 @@
 #   GRIMOIRE_SERVER=http://localhost:9481 bash docker/seed.sh
 #
 # Writes fixture PDFs into the library directory, rescans, then PATCHes the
-# metadata that folder structure cannot express (family, genres, license, year).
+# metadata that folder structure cannot express (family, genres, license, year),
+# and generates the fixture add-on index the addons smoke-test section installs
+# from.
 # edition and parent_system are left out of the PATCH bodies — a container child
 # already has both folder-derived from the scan. Grimoire mounts the library
 # read-only, so seeding writes from this side and the server only reads.
@@ -144,3 +146,8 @@ ALL=$(curl -sf "$SERVER/api/systems?include_children=true" -H "$AUTH" | jq 'leng
 say "seed complete — $TOP top-level systems, $ALL including children"
 [ "$TOP" -eq 7 ] || fail "expected 7 top-level systems, got $TOP"
 [ "$ALL" -eq 16 ] || fail "expected 16 systems including children, got $ALL"
+
+# 6. Generate the add-on index from the checked-in fixture manifest, so its
+# digest can never drift from what's on disk. Served to the grimoire container
+# by the addon-index nginx service (docker-compose.yml).
+python3 "$HERE/make-addon-index.py"
