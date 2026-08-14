@@ -156,8 +156,9 @@ The agent:
 1. Enumerates systems (`grimoire-cli systems list --include-children`)
 2. Reads each one (`grimoire-cli systems get --id <id>`), which embeds the full metadata for that system's books — `books list` is the wrong tool here: it has no metadata filters and its summary omits `description` entirely, so the per-system read is what makes this one call per system instead of one per book
 3. Filters client-side for the gap (`jq '.books[] | select(.description == "" or .description == null)'`)
-4. Fixes what it is sure of, one book (`echo '{"description":"..."}' | grimoire-cli books update --id <id> --stdin`) or many in one transaction (`grimoire-cli books batch-update --stdin`)
-5. Escalates the ambiguous ones back to you
+4. **Comes back with the list before touching anything** — what it found, what it proposes for each, and which ones it is unsure about. A sweep across the library is the last place to discover a bad judgement after the fact
+5. Applies the approved set, one book (`echo '{"description":"..."}' | grimoire-cli books update --id <id> --stdin`) or many in one transaction (`grimoire-cli books batch-update --stdin`)
+6. Escalates the ones you flagged, or it did, and repeats
 
 A batch verb is skip-and-continue: it exits 3 on a partial failure and names each rejection in `errors`, so an agent that only checks for a zero exit will believe a half-applied change succeeded.
 
