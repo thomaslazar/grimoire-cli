@@ -24,5 +24,13 @@ namespace GrimoireCli.Models;
 [JsonSerializable(typeof(BulkUpdateResult))]
 [JsonSerializable(typeof(BulkTagResult))]
 [JsonSerializable(typeof(BulkError))]
+[JsonSerializable(typeof(AddonInstalled))]
+[JsonSerializable(typeof(AddonAvailable))]
+[JsonSerializable(typeof(AddonListResponse))]
+[JsonSerializable(typeof(AddonSettings))]
+[JsonSerializable(typeof(RefreshResult))]
+[JsonSerializable(typeof(UpgradeAllResult))]
+[JsonSerializable(typeof(AddonUpgrade))]
+[JsonSerializable(typeof(AddonUpgradeFailure))]
 [JsonSourceGenerationOptions(WriteIndented = true)]
 public partial class AppJsonContext : JsonSerializerContext;
