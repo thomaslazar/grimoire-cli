@@ -102,6 +102,7 @@ The JWT is valid for 30 days. Grimoire has **no refresh endpoint**, so an expire
 | `library rescan [--scope <path>] [--metadata-mode new\|missing\|replace]` | Scan the library for new and changed files; exit 3 if already running (admin) |
 | `library scan-status` | Show the running scan's progress (admin) |
 | `library cancel-scan` | Stop the running scan (admin) |
+| `library cleanup-missing` | Remove DB entries for files no longer on disk (admin; deletes each book's bookmarks too) |
 | `addons list` | List installed and available add-ons (admin) |
 | `addons refresh` | Fetch the add-on index (admin) |
 | `addons install --id <addon-id> [--approve-script]` | Install or upgrade one add-on (admin) |

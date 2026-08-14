@@ -24,7 +24,7 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | library | 3 / 6 |
 | logs | 0 / 1 |
 | lookups | 0 / 15 |
-| maintenance | 0 / 2 |
+| maintenance | 1 / 2 |
 | maps | 0 / 11 |
 | saved-filters | 0 / 4 |
 | search | 0 / 1 |
@@ -33,7 +33,7 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | tags | 0 / 6 |
 | tokens | 0 / 10 |
 | users | 0 / 12 |
-| **Total** | **30 / 220** |
+| **Total** | **31 / 220** |
 
 1 operation(s) are internal-only (🔒) and excluded from covered counts.
 
@@ -263,7 +263,7 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | Method | Path | Description | Perm | CLI |
 |--------|------|-------------|------|-----|
 | GET | `/api/health` | Liveness/readiness probe |  | — |
-| POST | `/api/maintenance/cleanup-missing` | Remove DB entries for missing files | admin | — |
+| POST | `/api/maintenance/cleanup-missing` | Remove DB entries for missing files | admin | `library cleanup-missing` ✅ |
 
 ## maps
 
