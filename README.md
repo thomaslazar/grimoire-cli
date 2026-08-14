@@ -9,6 +9,7 @@ Native AOT binary. No runtime required. ~10 MB.
 ## Features
 
 - **JSON-only output** — stdout is always valid JSON from the Grimoire API, logs and errors go to stderr
+- **Metadata lookup** — search Grimoire's add-on sources and get a per-field diff against what you already have; applying is your own explicit `update`
 - **Native AOT** — single self-contained binary, no .NET runtime needed
 - **Thin pass-through** — one command, one endpoint; no hidden pre-fetching or client-side policy
 - **Config precedence** — CLI flags > environment variables > config file
@@ -16,7 +17,76 @@ Native AOT binary. No runtime required. ~10 MB.
 
 ## Installation
 
-Build from source, or download a binary from a CI run.
+### Homebrew (macOS / Linux)
+
+```bash
+brew tap thomaslazar/grimoire-cli
+brew install grimoire-cli
+```
+
+### Install script (macOS / Linux)
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/thomaslazar/grimoire-cli/main/install.sh | bash
+```
+
+Installs to `~/.local/bin/grimoire-cli`. Override with environment variables:
+
+```bash
+# specific version
+curl -fsSL https://raw.githubusercontent.com/thomaslazar/grimoire-cli/main/install.sh | GRIMOIRE_CLI_VERSION=v0.1.0 bash
+
+# custom directory
+curl -fsSL https://raw.githubusercontent.com/thomaslazar/grimoire-cli/main/install.sh | GRIMOIRE_CLI_INSTALL_DIR=/usr/local/bin bash
+```
+
+### Install script (Windows)
+
+```powershell
+irm https://raw.githubusercontent.com/thomaslazar/grimoire-cli/main/install.ps1 | iex
+```
+
+Installs to `%LOCALAPPDATA%\grimoire-cli\`. Override with environment variables:
+
+```powershell
+# specific version
+$env:GRIMOIRE_CLI_VERSION = "v0.1.0"; irm https://raw.githubusercontent.com/thomaslazar/grimoire-cli/main/install.ps1 | iex
+
+# custom directory
+$env:GRIMOIRE_CLI_INSTALL_DIR = "C:\tools\grimoire-cli"; irm https://raw.githubusercontent.com/thomaslazar/grimoire-cli/main/install.ps1 | iex
+```
+
+### Deb package (Debian / Ubuntu)
+
+Download from the [latest release](https://github.com/thomaslazar/grimoire-cli/releases/latest):
+
+```bash
+sudo dpkg -i grimoire-cli_0.1.0_amd64.deb
+```
+
+### Download a release
+
+Grab the binary for your platform from the [latest release](https://github.com/thomaslazar/grimoire-cli/releases/latest):
+
+| Platform | Binary |
+|----------|--------|
+| Linux x64 | `grimoire-cli-linux-x64` |
+| Linux ARM64 | `grimoire-cli-linux-arm64` |
+| macOS Apple Silicon | `grimoire-cli-osx-arm64` |
+| macOS Intel | `grimoire-cli-osx-x64` |
+| Windows x64 | `grimoire-cli-win-x64.exe` |
+| Windows ARM64 | `grimoire-cli-win-arm64.exe` |
+
+```bash
+chmod +x grimoire-cli-linux-x64
+mv grimoire-cli-linux-x64 ~/.local/bin/grimoire-cli
+```
+
+**macOS users:** the binaries are not signed or notarized, so Gatekeeper blocks them on first run. Clear the quarantine attribute:
+
+```bash
+sudo xattr -d com.apple.quarantine grimoire-cli-osx-arm64
+```
 
 ### Build from source
 
