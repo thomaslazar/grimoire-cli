@@ -296,6 +296,38 @@ Verified against v1.5.6, backing the seven `addons` commands.
   --index-url` at the internal `addon-index` service instead of the real
   `raw.githubusercontent.com` catalogue.
 
+## Metadata lookup
+
+Verified against v1.5.6, backing `systems metadata-sources` / `metadata-search`
+/ `metadata-fetch` and their `books` counterparts, both live against the
+fixture add-on (`docker/addon-index/fixture-source.yml`) and via
+`docker/smoke-test.sh`.
+
+- **An omitted `--query` echoes back the fallback it actually searched.**
+  `systems metadata-search --id <SR4>` with no `--query` returned `"query":
+  "Shadowrun 4 DE"` — the system's own name, not a placeholder.
+- **`fields` came back in exactly the order `only_incoming`, `differs`,
+  `same`** for `systems metadata-fetch --identity`: `system_family`
+  (`only_incoming`, `current: null`), `parent_system` (`differs`, folder-derived
+  `"Shadowrun"` vs. the fixture's `"Shadowrun (fixture)"`), `description`
+  (`same`). Grouped by status, not by field-declaration order.
+- **A fetch changed nothing.** `systems get` on the same system after both an
+  `--identity` and a `--paste` fetch still reported `system_family: ""`, the
+  field the fetch had offered a value for.
+- **`--paste` resolved to the same `identity` the search returned** (
+  `shadowrun-4-de`) for `--paste https://fixture.test/systems/shadowrun-4-de`,
+  and the rest of the response was byte-identical to the `--identity` fetch.
+- **A `game-system`-targeted add-on does not appear as a book source.**
+  `books metadata-sources` on a book under the same system returned `"sources":
+  []` while `systems metadata-sources` for that system listed the fixture —
+  confirms target filtering, not that the endpoint is simply empty.
+- **400, not 502, for both bad-input cases actually seen.** `metadata-fetch
+  --identity <unknown>` against a real source returned `Bad request. {"detail":
+  "that result is no longer available from the source"}`; `metadata-search
+  --source-id <unknown>` returned `Bad request. {"detail":"add-on '<id>' is not
+  installed"}`. No 502 was produced in these live runs — the fixture add-on
+  never fails, so that path is unverified live.
+
 ## First-run users
 
 - Grimoire seeds users from `{DATA_PATH}/users.json` at startup
