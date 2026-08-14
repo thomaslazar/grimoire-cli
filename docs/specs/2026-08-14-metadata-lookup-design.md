@@ -145,8 +145,8 @@ second copy here would be a copy of something upstream deliberately does not
 duplicate.
 
 The resource noun appears in help text only where it changes meaning — the
-default that `--query` falls back to is the system's name or the book's title.
-That is one string, parameterised.
+default that `--query` falls back to on `search` is the system's name or the
+book's title. That is one string, parameterised.
 
 ### Validation
 
@@ -160,10 +160,14 @@ Parse-level only, and no mirroring of server policy:
   ("no result was chosen"); both is ambiguous, and the server silently prefers
   `paste`. Rejecting before the client is built keeps that from being a quiet
   surprise.
-- `--query` stays optional everywhere. Omitted, the server substitutes the
-  resource's own name or title, which is the common case. The CLI must not
-  pre-fill it — that would be client-side mirroring of a server default, and the
-  server's fallback reads the live record.
+- `--query` stays optional at the parse level on both commands, but only
+  `search` has a fallback: omitted, the server substitutes the resource's own
+  name or title, which is the common case. The CLI must not pre-fill it —
+  that would be client-side mirroring of a server default, and the server's
+  fallback reads the live record. `fetch` has no such fallback: it forwards
+  `query` unchanged into `addons.fetch_fields`, so omitting it against a
+  search-backed source is a 400 the caller must avoid by hand, normally by
+  passing back the same value `search` echoed.
 
 Whether `--paste` is supported by the chosen source is **not** validated
 client-side. It is server policy, it is already reported by `supports_paste`,

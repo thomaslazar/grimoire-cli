@@ -81,7 +81,7 @@ public static class MetadataCommands
             "sources answer per query, not from a catalogue.",
             "",
             "[] means the source matched nothing. 502 means it could not be reached",
-            "or returned junk.");
+            "or returned junk; 400 a configuration one, such as an unknown --source-id.");
         command.AddExamples($"grimoire-cli {resource} metadata-search --id <id> --source-id <source>");
         command.AddResponseExample<MetadataSearchResult>();
         command.SetAction(async (parseResult, cancellationToken) =>
@@ -109,7 +109,7 @@ public static class MetadataCommands
             Required = true,
         };
         var identityOption = new Option<string?>("--identity") { Description = "Candidate identity, from metadata-search" };
-        var queryOption = new Option<string?>("--query") { Description = $"Query the candidate came from; defaults to the {fallback}" };
+        var queryOption = new Option<string?>("--query") { Description = "Query the candidate came from; required for search-backed sources" };
         var pasteOption = new Option<string?>("--paste") { Description = "Source URL or bare ID, instead of --identity" };
         var serverOption = new Option<string?>("--server") { Description = "Server URL override" };
         var tokenOption = new Option<string?>("--token") { Description = "Token override; not stored" };
@@ -125,8 +125,9 @@ public static class MetadataCommands
             if (hasIdentity == hasPaste)
                 result.AddError("Pass exactly one of --identity or --paste.");
         });
+        var linkFields = resource == "systems" ? "urls and character_builder_urls" : "urls";
         command.AddHelpSection("Notes", HelpSectionPosition.Top,
-            $"Writes nothing. Reports, per field, what this resource has now and what",
+            "Writes nothing. Reports, per field, what this resource has now and what",
             $"the source offers; apply what you want with {resource} update.",
             "",
             "Exactly one of --identity (from metadata-search) or --paste (a source",
@@ -134,7 +135,7 @@ public static class MetadataCommands
             "",
             "status is only_incoming (empty here), differs, or same, sorted in that",
             "order. A field the source has nothing for is omitted, so nothing is ever",
-            "proposed to be blanked. incoming for urls and character_builder_urls is",
+            $"proposed to be blanked. incoming for {linkFields} is",
             "the union with the existing list, not a replacement.",
             "",
             "502 is a source failure, 400 a configuration one.");

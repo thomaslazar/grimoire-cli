@@ -771,6 +771,8 @@ set +e
   >/dev/null 2>"$WORK/fetchboth.err"; rc=$?
 set -e
 [ "$rc" -eq 1 ] || fail "metadata-fetch with both --identity and --paste should exit 1, got $rc"
+grep -q -- "--identity" "$WORK/fetchboth.err" \
+  || fail "no mention of --identity: $(cat "$WORK/fetchboth.err")"
 ok "metadata-fetch requires exactly one of --identity and --paste"
 
 UPDATE_JSON=$("$CLI" addons update --id fixture-source --enabled false 2>"$WORK/cli.err") \

@@ -67,6 +67,35 @@ public class MetadataCommandTests
         Assert.Contains("books update", BooksHelp("metadata-fetch", full: false));
     }
 
+    // fetch never substitutes a fallback for an omitted --query — only search
+    // does — so the flag description must not claim otherwise.
+    [Fact]
+    public void FetchQueryDescriptionDoesNotClaimAFallback()
+    {
+        var output = SystemsHelp("metadata-fetch", full: true);
+        Assert.Contains("required for search-backed sources", output);
+        Assert.DoesNotContain("defaults to the", output);
+    }
+
+    // character_builder_urls is not a mappable book field (manifest.py), so
+    // books' help must not carry a caveat that can never apply to it.
+    [Fact]
+    public void FetchNamesLinkFieldsPerResource()
+    {
+        Assert.Contains("urls and character_builder_urls", SystemsHelp("metadata-fetch", full: false));
+        var booksOutput = BooksHelp("metadata-fetch", full: false);
+        Assert.Contains("incoming for urls is", booksOutput);
+        Assert.DoesNotContain("character_builder_urls", booksOutput);
+    }
+
+    // A mistyped --source-id is a 400, same as fetch's; search's Notes must
+    // say so too.
+    [Fact]
+    public void SearchNamesThe400Case()
+    {
+        Assert.Contains("400", SystemsHelp("metadata-search", full: false));
+    }
+
     [Fact]
     public void SearchRendersItsResponseShape()
     {
