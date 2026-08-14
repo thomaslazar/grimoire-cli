@@ -23,26 +23,27 @@ public class AddonsService
             info, AppJsonContext.Default.RefreshResult, permissionHint: "the admin role");
     }
 
+    // No notFoundHint: install_addon raises only 502 (download failure) and 400
+    // (no such id in the index, already covered by install's own Note); there is
+    // no 404 path to hint at.
     public async Task<AddonInstalled> InstallAsync(string id, bool approveScript)
     {
         var body = new Generated.Models.AddonInstall { ApproveScript = approveScript };
         var info = _client.Api.Api.Addons[id].Install.ToPostRequestInformation(body);
         return await _client.SendAsync(
-            info,
-            AppJsonContext.Default.AddonInstalled,
-            permissionHint: "the admin role",
-            notFoundHint: "No add-on with that ID. List them with: grimoire-cli addons list");
+            info, AppJsonContext.Default.AddonInstalled, permissionHint: "the admin role");
     }
 
+    // No notFoundHint: update_addon's 404 has two distinct causes — no such
+    // add-on installed, or --script-approved true naming a script-free one —
+    // and a hint would replace the server's discriminating body with a message
+    // that cannot tell them apart.
     public async Task<AddonInstalled> UpdateAsync(string id, bool? enabled, bool? scriptApproved)
     {
         var body = BuildUpdateBody(enabled, scriptApproved);
         var info = _client.Api.Api.Addons[id].ToPatchRequestInformation(body);
         return await _client.SendAsync(
-            info,
-            AppJsonContext.Default.AddonInstalled,
-            permissionHint: "the admin role",
-            notFoundHint: "No add-on with that ID. List them with: grimoire-cli addons list");
+            info, AppJsonContext.Default.AddonInstalled, permissionHint: "the admin role");
     }
 
     /// <summary>

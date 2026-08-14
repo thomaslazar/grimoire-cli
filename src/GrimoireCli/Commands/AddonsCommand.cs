@@ -101,9 +101,8 @@ public static class AddonsCommand
             "",
             "Also upgrades: re-running on an installed add-on replaces it.",
             "",
-            "--approve-script is consent to run third-party code, recorded against",
-            "the script's digest and ignored for add-ons that ship no script. An",
-            "upgrade that changes the script drops back to unapproved.");
+            "Approval is per install: an add-on installed or upgraded without",
+            "--approve-script is unapproved, whatever it was before.");
         command.AddExamples("grimoire-cli addons install --id <addon-id> --approve-script");
         command.AddResponseExample<AddonInstalled>();
         command.SetAction(async (parseResult, cancellationToken) =>
@@ -135,7 +134,8 @@ public static class AddonsCommand
         command.AddHelpSection("Notes", HelpSectionPosition.Top,
             "Changes state, never version — upgrade with install or upgrade-all.",
             "",
-            "404 if no such add-on is installed.");
+            "404 if no such add-on is installed, or if --script-approved true names",
+            "an add-on that ships no script.");
         command.AddExamples("grimoire-cli addons update --id <addon-id> --enabled false");
         command.AddResponseExample<AddonInstalled>();
         command.SetAction(async (parseResult, cancellationToken) =>
@@ -233,7 +233,8 @@ public static class AddonsCommand
                 result.AddError("Pass --index-url, --allow-scripts, or both.");
         });
         command.AddHelpSection("Notes", HelpSectionPosition.Top,
-            "At least one flag is required.",
+            "At least one flag is required. There is no read path here; current",
+            "values are in addons list.",
             "",
             "Changing --index-url does not refetch; run addons refresh after.",
             "",

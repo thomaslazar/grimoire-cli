@@ -38,7 +38,8 @@ public class AddonsCommandTests
     {
         var output = RenderHelp(["addons", "install"], full: false);
         Assert.Contains("verified against the index's digest", output);
-        Assert.Contains("drops back to unapproved", output);
+        Assert.Contains("Approval is per install", output);
+        Assert.Contains("unapproved, whatever it was before", output);
     }
 
     [Fact]
