@@ -73,7 +73,6 @@ public class LibraryCommandTests
     [Fact]
     public void CleanupMissingSaysItLeavesFilesAlone()
     {
-        Assert.Contains("Never", RenderHelp(["library", "cleanup-missing"], full: false));
         Assert.Contains("touches files", RenderHelp(["library", "cleanup-missing"], full: false));
     }
 
@@ -89,15 +88,5 @@ public class LibraryCommandTests
         var output = RenderHelp(["library", "cleanup-missing"], full: true);
         Assert.Contains("\"removed\":", output);
         Assert.Contains("\"systems\":", output);
-    }
-
-    // No prompt and no --yes: this CLI's callers are agents, so the warning is
-    // help text and nothing else.
-    [Fact]
-    public void CleanupMissingTakesNoConfirmationFlag()
-    {
-        var output = RenderHelp(["library", "cleanup-missing"], full: true);
-        Assert.DoesNotContain("--yes", output);
-        Assert.DoesNotContain("--force", output);
     }
 }

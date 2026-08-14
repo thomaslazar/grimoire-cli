@@ -657,16 +657,15 @@ echo "$CANCEL_JSON" | jq -e '.status == "not_running"' >/dev/null \
 ok "library cancel-scan exits 0 and reports not_running"
 
 # --- cleanup-missing ------------------------------------------------------
-# Placed after the scan section so nothing is running (the endpoint answers 409
-# while a scan is) and after the EXPECTED_BOOKS assertions above, so a cleanup
-# that removes stale is_missing rows cannot invalidate a count asserted earlier
-# in the same run.
+# Placed after the scan section so nothing is running — the endpoint answers 409
+# while a scan is. It is safe beside the resource counts either side of it
+# because EXPECTED_BOOKS above already proves nothing is missing: a stack
+# carrying stale is_missing rows fails there and never reaches this block.
 #
-# The fixture library is fully present, so the honest assertion is the contract
-# rather than the first call's numbers: whatever the first call removes, the
-# second must find nothing left to remove. Asserting zero on the first call
-# would be asserting this stack's history — a database-only reset leaves stale
-# is_missing rows behind (see CLAUDE.md).
+# The assertion is the contract, not the first call's numbers: whatever the
+# first call removes, the second must find nothing left. That survives a change
+# to the fixture counts, where asserting zero on the first call would encode
+# this stack's history instead of the endpoint's behaviour.
 CLEANUP_JSON=$("$CLI" library cleanup-missing 2>"$WORK/cli.err") \
   || { cat "$WORK/cli.err" >&2; fail "library cleanup-missing exited non-zero"; }
 for key in books maps tokens audio systems; do

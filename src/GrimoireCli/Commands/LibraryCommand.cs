@@ -123,8 +123,8 @@ public static class LibraryCommand
         command.AddRoleRequired("admin");
         command.AddHelpSection("Notes", HelpSectionPosition.Top,
             "Deletes DB rows for files no longer on disk, each book's search index",
-            "and bookmarks with it, then prunes systems left with no books. Never",
-            "touches files.",
+            "and bookmarks with it, then prunes systems whose books are all gone —",
+            "unless a campaign or a surviving child keeps one. Never touches files.",
             "",
             "Normally a no-op. Run it after restructuring the library on disk.",
             "",

@@ -38,8 +38,9 @@ with the five keys fixed by `_do_cleanup` (`_helpers.py:113`).
 Per book whose file is gone it deletes that book's FTS rows
 (`DELETE FROM book_search`), every `Bookmark` pointing at it, and then the book,
 committing after each one so the write lock is released between rows. After the
-book sweep it prunes game systems left with no books
-(`_prune_orphaned_systems`), then sweeps maps, tokens and audio the same way.
+book sweep it prunes game systems whose books are all gone
+(`_prune_orphaned_systems`) — keeping any that a campaign references or that
+still has a surviving child — then sweeps maps, tokens and audio the same way.
 
 Two consequences worth carrying into help text, because neither is guessable:
 
@@ -167,8 +168,8 @@ Notes, verbatim:
 
 ```
 Deletes DB rows for files no longer on disk, each book's search index and
-bookmarks with it, then prunes systems left with no books. Never touches
-files.
+bookmarks with it, then prunes systems whose books are all gone — unless a
+campaign or a surviving child keeps one. Never touches files.
 
 Normally a no-op. Run it after restructuring the library on disk.
 

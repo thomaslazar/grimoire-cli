@@ -339,10 +339,11 @@ Verified against v1.5.6 by reading `backend/routers/maintenance/`, backing
   mount is treated as present and skipped. A directory that is simply gone
   returns False promptly and every row beneath it is removed. The asymmetry is
   deliberate and is the difference between a storage hiccup and data loss.
-- **It commits per row** (`_helpers.py:110-111`), so a failure part-way through
-  leaves earlier removals applied; the handler's `except` rolls back only the
-  uncommitted remainder. The comment gives the reason: releasing the write lock
-  between rows so a concurrent scanner session is not blocked.
+- **It commits per row** (`_helpers.py:127`, and per pruned system at `:99`), so
+  a failure part-way through leaves earlier removals applied; the handler's
+  `except` rolls back only the uncommitted remainder. The docstring at
+  `:110-111` gives the reason: releasing the write lock between rows so a
+  concurrent scanner session is not blocked.
 - **A book takes its search index and bookmarks with it**
   (`_helpers.py:122-126`): `DELETE FROM book_search`, then every `Bookmark`
   pointing at the book, then the book. Bookmarks are user data and a rescan
