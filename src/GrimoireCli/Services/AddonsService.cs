@@ -69,4 +69,35 @@ public class AddonsService
             permissionHint: "the admin role",
             notFoundHint: "No add-on with that ID. List them with: grimoire-cli addons list");
     }
+
+    public async Task<UpgradeAllResult> UpgradeAllAsync()
+    {
+        var info = _client.Api.Api.Addons.UpdateAll.ToPostRequestInformation();
+        return await _client.SendAsync(
+            info, AppJsonContext.Default.UpgradeAllResult, permissionHint: "the admin role");
+    }
+
+    public async Task<AddonSettings> SettingsAsync(string? indexUrl, bool? allowScripts)
+    {
+        var body = BuildSettingsBody(indexUrl, allowScripts);
+        var info = _client.Api.Api.Addons.Settings.ToPatchRequestInformation(body);
+        return await _client.SendAsync(
+            info, AppJsonContext.Default.AddonSettings, permissionHint: "the admin role");
+    }
+
+    /// <summary>
+    /// AllowScripts and IndexUrl are composed-type wrappers whose constructor
+    /// sets neither, so assigning through the wrapper only when the flag was
+    /// given leaves an omitted one absent from the body. Internal (not private)
+    /// so a test can pin that a client regeneration cannot silently change that.
+    /// </summary>
+    internal static Generated.Models.AddonSettingsUpdate BuildSettingsBody(string? indexUrl, bool? allowScripts)
+    {
+        var body = new Generated.Models.AddonSettingsUpdate();
+        if (indexUrl is not null)
+            body.IndexUrl = new Generated.Models.AddonSettingsUpdate.AddonSettingsUpdate_index_url { String = indexUrl };
+        if (allowScripts is not null)
+            body.AllowScripts = new Generated.Models.AddonSettingsUpdate.AddonSettingsUpdate_allow_scripts { Boolean = allowScripts.Value };
+        return body;
+    }
 }

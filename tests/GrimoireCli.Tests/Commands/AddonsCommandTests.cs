@@ -65,4 +65,36 @@ public class AddonsCommandTests
         Assert.DoesNotContain("Response shape:", RenderHelp(["addons", "uninstall"], full: true));
         Assert.Contains("{\"status\": \"ok\"}", RenderHelp(["addons", "uninstall"], full: false));
     }
+
+    [Fact]
+    public void EveryAddonCommandCarriesTheAdminTag()
+    {
+        foreach (var verb in new[] { "list", "refresh", "install", "update", "upgrade-all", "uninstall", "settings" })
+            Assert.Contains("Role required:\n  admin\n", RenderHelp(["addons", verb], full: false));
+    }
+
+    // No add-on body is written by the caller, so none of the seven documents one.
+    [Fact]
+    public void NoAddonCommandRegistersARequestShape()
+    {
+        foreach (var verb in new[] { "list", "refresh", "install", "update", "upgrade-all", "uninstall", "settings" })
+            Assert.DoesNotContain("Request shape:", RenderHelp(["addons", verb], full: true));
+    }
+
+    [Fact]
+    public void UpgradeAllDocumentsItsPartialFailure()
+    {
+        var output = RenderHelp(["addons", "upgrade-all"], full: true);
+        Assert.Contains("Exit 3", output);
+        Assert.Contains("\"failed\":", output);
+        Assert.Contains("not carried over", output);
+    }
+
+    [Fact]
+    public void SettingsRequiresAFlag()
+    {
+        var output = RenderHelp(["addons", "settings"], full: false);
+        Assert.Contains("At least one flag is required.", output);
+        Assert.Contains("does not refetch", output);
+    }
 }

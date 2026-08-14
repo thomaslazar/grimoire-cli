@@ -22,4 +22,20 @@ public class AddonsServiceTests
         Assert.False(body.Enabled!.Boolean);
         Assert.True(body.ScriptApproved!.Boolean);
     }
+
+    [Fact]
+    public void OmittedSettingsFlagsLeaveTheBodyEmpty()
+    {
+        var body = AddonsService.BuildSettingsBody(indexUrl: null, allowScripts: null);
+        Assert.Null(body.IndexUrl);
+        Assert.Null(body.AllowScripts);
+    }
+
+    [Fact]
+    public void GivenSettingsFlagsReachTheBody()
+    {
+        var body = AddonsService.BuildSettingsBody("https://example.test/index.json", allowScripts: true);
+        Assert.Equal("https://example.test/index.json", body.IndexUrl!.String);
+        Assert.True(body.AllowScripts!.Boolean);
+    }
 }

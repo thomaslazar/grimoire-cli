@@ -14,7 +14,9 @@ public static class AddonsCommand
         command.Subcommands.Add(CreateRefreshCommand());
         command.Subcommands.Add(CreateInstallCommand());
         command.Subcommands.Add(CreateUpdateCommand());
+        command.Subcommands.Add(CreateUpgradeAllCommand());
         command.Subcommands.Add(CreateUninstallCommand());
+        command.Subcommands.Add(CreateSettingsCommand());
         return command;
     }
 
@@ -176,6 +178,78 @@ public static class AddonsCommand
             var service = new AddonsService(client);
             var response = await service.UninstallAsync(parseResult.GetValue(idOption)!);
             ConsoleOutput.WriteRawJson(response);
+            return 0;
+        });
+        return command;
+    }
+
+    private static Command CreateUpgradeAllCommand()
+    {
+        var serverOption = new Option<string?>("--server") { Description = "Server URL override" };
+        var tokenOption = new Option<string?>("--token") { Description = "Token override; not stored" };
+        var command = new Command("upgrade-all", "Upgrade every installed add-on")
+        {
+            serverOption, tokenOption
+        };
+        command.AddRoleRequired("admin");
+        command.AddHelpSection("Notes", HelpSectionPosition.Top,
+            "Refreshes the index first, and carries on with the cached one if that",
+            "fails.",
+            "",
+            "Skip-and-continue: an add-on that cannot be upgraded lands in failed and",
+            "the rest still upgrade. Exit 3 is HTTP 200 with a non-empty failed list.",
+            "",
+            "Script approval is not carried over, so a script-backed add-on is",
+            "unapproved until re-approved with install --approve-script.");
+        command.AddExamples("grimoire-cli addons upgrade-all");
+        command.AddResponseExample<UpgradeAllResult>();
+        command.SetAction(async (parseResult, cancellationToken) =>
+        {
+            var (client, _) = CommandHelper.BuildClient(
+                serverOverride: parseResult.GetValue(serverOption),
+                tokenOverride: parseResult.GetValue(tokenOption));
+            var service = new AddonsService(client);
+            var result = await service.UpgradeAllAsync();
+            ConsoleOutput.WriteJson(result, AppJsonContext.Default.UpgradeAllResult);
+            return BulkExit.CodeFor(result.Failed);
+        });
+        return command;
+    }
+
+    private static Command CreateSettingsCommand()
+    {
+        var indexUrlOption = new Option<string?>("--index-url") { Description = "Add-on index URL" };
+        var allowScriptsOption = new Option<bool?>("--allow-scripts") { Description = "Allow add-on scripts to run (true | false)" };
+        var serverOption = new Option<string?>("--server") { Description = "Server URL override" };
+        var tokenOption = new Option<string?>("--token") { Description = "Token override; not stored" };
+        var command = new Command("settings", "Set the add-on index URL and script switch")
+        {
+            indexUrlOption, allowScriptsOption, serverOption, tokenOption
+        };
+        command.AddRoleRequired("admin");
+        command.Validators.Add(result =>
+        {
+            if (result.GetValue(indexUrlOption) is null && result.GetValue(allowScriptsOption) is null)
+                result.AddError("Pass --index-url, --allow-scripts, or both.");
+        });
+        command.AddHelpSection("Notes", HelpSectionPosition.Top,
+            "At least one flag is required.",
+            "",
+            "Changing --index-url does not refetch; run addons refresh after.",
+            "",
+            "--allow-scripts is the global switch. An add-on that ships a script also",
+            "needs its own approval, from install --approve-script.");
+        command.AddExamples("grimoire-cli addons settings --allow-scripts true");
+        command.AddResponseExample<AddonSettings>();
+        command.SetAction(async (parseResult, cancellationToken) =>
+        {
+            var (client, _) = CommandHelper.BuildClient(
+                serverOverride: parseResult.GetValue(serverOption),
+                tokenOverride: parseResult.GetValue(tokenOption));
+            var service = new AddonsService(client);
+            var result = await service.SettingsAsync(
+                parseResult.GetValue(indexUrlOption), parseResult.GetValue(allowScriptsOption));
+            ConsoleOutput.WriteJson(result, AppJsonContext.Default.AddonSettings);
             return 0;
         });
         return command;
