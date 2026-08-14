@@ -138,12 +138,23 @@ gains a matrix row.
 
 ## Step 4: Generate Release Notes
 
-Generate release notes into `release-notes.md` with two sections:
+Generate release notes into `temp/release-notes.md`. The full convention — and the
+reasons behind it — is in [docs/releasing.md](../../../docs/releasing.md#release-notes);
+the summary is:
 
-**Highlights** — 3-5 bullet points describing what's new in plain language.
-Focus on what users care about, not implementation details.
+An opening paragraph naming the kind of release and its theme, then:
 
-**Changes** — auto-grouped from conventional commits since last tag:
+**Highlights** — three to six bullets, each a **bold lead-in** followed by prose
+that says *why*, not only what. The only section allowed to explain itself.
+
+**Changes** — every conventional commit since the last tag, one bullet each with
+its prefix kept, grouped by type in this order and sorted alphabetically within
+each group: `Features` (`feat:`), `Fixes` (`fix:`), `Refactors` (`refactor:`),
+`Tests` (`test:`), `Chores` (`chore:`, `ci:`), `Docs` (`docs:`). Omit empty
+groups. Collapse to a single flat list only when a release has so few commits
+that the headings would outweigh the entries.
+
+Do not consolidate or curate the list — it is the record of what changed:
 
 ```bash
 LAST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
@@ -155,22 +166,44 @@ fi
 git log --oneline $RANGE --pretty="- %s" | grep -E "^- (feat|fix|refactor|docs|test|ci|chore):" | sort
 ```
 
-Write `release-notes.md` in this format:
+Write `temp/release-notes.md` in this format:
 
 ```markdown
-## {version} — YYYY-MM-DD
+## v{version} — YYYY-MM-DD
+
+{Kind of release, and its theme, in two or three lines.}
 
 ### Highlights
-- ...
+
+- **Bold lead-in.** Why it matters, not only what changed.
 
 ### Features
+
 - feat: ...
 
 ### Fixes
+
 - fix: ...
+
+### Refactors
+
+- refactor: ...
+
+### Tests
+
+- test: ...
+
+### Chores
+
+- chore: ...
+- ci: ...
+
+### Docs
+
+- docs: ...
 ```
 
-**GATE: Open `release-notes.md` in the editor** (e.g. `code release-notes.md`)
+**GATE: Open `temp/release-notes.md` in the editor** (e.g. `code temp/release-notes.md`)
 and ask the human to review and approve. If they want edits, make them and
 show again.
 
@@ -183,7 +216,7 @@ doesn't exist). Keep a header at the top:
 All notable changes to grimoire-cli are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
-{contents of release-notes.md}
+{contents of temp/release-notes.md}
 
 {previous entries...}
 ```
@@ -234,17 +267,17 @@ Show the PR URL. Wait for them to confirm the merge is done.
 ## Step 6: Tag and Create GitHub Release
 
 After the PR is merged, switch back to main and create the release.
-The `release-notes.md` from step 4 is still available (gitignored, not committed).
+The `temp/release-notes.md` from step 4 is still available (gitignored, not committed).
 
 ```bash
 git checkout main
 git pull
-gh release create "${VERSION}" --title "${VERSION}" --notes-file release-notes.md
+gh release create "${VERSION}" --title "${VERSION}" --notes-file temp/release-notes.md
 ```
 
 Clean up after the release is created:
 ```bash
-rm release-notes.md
+rm temp/release-notes.md
 ```
 
 Show the release URL.

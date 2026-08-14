@@ -1,8 +1,7 @@
 # Releasing
 
-**No release has been cut yet.** This file documents the process to follow,
-modelled on `abs-cli`'s, and is explicit about which pieces exist here and which
-do not — so a first release is a checklist rather than an improvisation.
+This file documents the release process, modelled on `abs-cli`'s. `v0.1.0` was
+the first release cut with it.
 
 ## What exists today
 
@@ -13,7 +12,11 @@ do not — so a first release is a checklist rather than an improvisation.
   `.github/homebrew/grimoire-cli.rb.template`.
 - `install.sh` and `install.ps1` fetch a named or latest release.
 
-## What a first release still needs
+## Standing prerequisites
+
+All three were in place before `v0.1.0`. They are kept here because each one
+fails in a way that is easy to misread later — a lapsed token in particular
+fails *after* the binaries are attached.
 
 | Prerequisite | State | Why |
 |---|---|---|
@@ -94,6 +97,46 @@ is worth more than a distant expiry date.
    partial release; fix forward rather than deleting assets.
 8. **Verify one artefact end to end.** Download a binary, run `--version` and
    confirm it prints bare, then `self-test`.
+
+## Release notes
+
+`temp/release-notes.md` is the working document — written on the release branch,
+reviewed by a human, prepended to `CHANGELOG.md`, then passed to
+`gh release create` and deleted. `CHANGELOG.md` is the permanent record and the
+release page mirrors it.
+
+It lives under `temp/` (gitignored wholesale, as abs-cli does it) rather than at
+the repository root, because a root copy that the release forgets to delete is
+invisible clutter in the one directory everyone reads. The root path is
+deliberately *not* in `.gitignore`, so a stray copy there shows up in
+`git status` instead of hiding.
+
+The shape is ported from what abs-cli's `CHANGELOG.md` actually does, not from
+its prose: its `docs/releasing.md` says only "auto-grouped from conventional
+commits", which is too thin to reproduce, and the specifics are what keep two
+releases comparable.
+
+1. `## v{version} — YYYY-MM-DD`, then one short paragraph naming the kind of
+   release and its theme — "Patch release. The server version check now runs
+   once a day instead of only at login".
+2. `### Highlights` — three to six bullets, each a **bold lead-in** followed by
+   prose that says *why*, not only what. This is the section a reader actually
+   reads and the only one allowed to explain itself.
+3. `### Changes`, split by conventional-commit type, **one bullet per commit
+   with its prefix kept**, sorted alphabetically inside each group:
+   `Features` (`feat:`), `Fixes` (`fix:`), `Refactors` (`refactor:`),
+   `Tests` (`test:`), `Chores` (`chore:`, `ci:`), `Docs` (`docs:`). Groups with
+   no commits are omitted.
+
+Two rules the changelog demonstrates and the prose never stated:
+
+- **Every commit appears.** The list is a record, not a curation — it answers
+  "what changed under me", which a summarised line cannot. abs-cli's own v1.0.0
+  consolidated related commits and is the exception, not the pattern.
+- **A flat `### Changes` list is the small-release form.** abs-cli collapses the
+  groups when a release has a handful of commits (v1.0.2 through v1.1.0) and
+  groups them when it has dozens (0.3.0, 0.5.0). Group unless the whole list
+  would be shorter than its own headings.
 
 ## Versioning
 
