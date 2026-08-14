@@ -1,18 +1,41 @@
-# Minimal valid add-on for the smoke test. AddonManifest is strict (extra keys
-# are rejected), and needs_a_backend (backend/addons/manifest.py in v1.5.6)
-# requires a 'source' or 'script' block even though this one is never run —
-# install, update, upgrade and uninstall never consult a source, so this is
-# the smallest source+search pair that satisfies validation without doing
-# anything. The metadata-lookup work is what exercises source/search/map.
+# Minimal valid add-on for the smoke test, answering from a catalogue served by
+# the addon-index nginx service on the compose network. cache_ttl 0 keeps every
+# lookup a fresh fetch, so editing catalogue.json takes effect on the next run
+# without a cache to clear.
+#
+# The three mapped fields are chosen so a fetch against Shadowrun 4 DE produces
+# one row of each status: system_family is empty there (the "--family Shadowrun
+# should match 2" assertion depends on it staying empty), description is written
+# by the systems section earlier in the same run, and parent_system is
+# folder-derived and therefore disagrees with the value below. Fetching writes
+# nothing, so mapping a field here cannot disturb an assertion elsewhere.
 id: fixture-source
 name: Fixture Source
 version: 1.0.0
 kind: scraper
 target: game-system
 description: Local fixture for the grimoire-cli smoke test.
+attribution: Fixture data, not a real source.
 source:
-  url: https://example.test/fixture-source-index.json
+  url: http://addon-index/catalogue.json
   format: json
+  cache_ttl: 0
+records:
+  root: "$"
 search:
   fields:
     - field: name
+  identity:
+    from: slug
+  label:
+    from: name
+  url:
+    template: "https://fixture.test/systems/{slug}"
+  identity_pattern: "fixture\\.test/systems/([a-z0-9-]+)$"
+map:
+  system_family:
+    from: family
+  description:
+    from: description
+  parent_system:
+    from: parent

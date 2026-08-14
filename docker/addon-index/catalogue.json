@@ -1,0 +1,16 @@
+[
+  {
+    "slug": "shadowrun-4-de",
+    "name": "Shadowrun 4 DE",
+    "family": "Shadowrun",
+    "parent": "Shadowrun (fixture)",
+    "description": "smoke fixture description"
+  },
+  {
+    "slug": "fixture-explicit-rpg",
+    "name": "Fixture Explicit RPG",
+    "family": "Fixture",
+    "parent": "Fixture (fixture)",
+    "description": "a second record, so search has something to rank against"
+  }
+]
