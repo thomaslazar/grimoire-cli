@@ -26,7 +26,7 @@
 # `./library` and `./data` therefore do not work from inside the devcontainer —
 # set GRIMOIRE_LIBRARY, GRIMOIRE_DATA and GRIMOIRE_ADDON_INDEX to the repo's
 # path as the host sees it. Put them in docker/.env (gitignored); see
-# docker/.env.example.
+# docker/env.example.
 services:
   grimoire:
     # Pinned to the release this CLI targets (v1.5.6) — bump deliberately
