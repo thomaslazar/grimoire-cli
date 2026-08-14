@@ -225,13 +225,6 @@ Create `tests/GrimoireCli.Tests/Commands/AddonsCommandTests.cs`. Its `RenderHelp
 
 ```csharp
     [Fact]
-    public void EveryAddonCommandCarriesTheAdminTag()
-    {
-        foreach (var verb in new[] { "list", "refresh", "install", "update", "upgrade-all", "uninstall", "settings" })
-            Assert.Contains("Role required:\n  admin\n", RenderHelp(["addons", verb], full: false));
-    }
-
-    [Fact]
     public void ListShowsBothAddonShapes()
     {
         var output = RenderHelp(["addons", "list"], full: true);
@@ -257,16 +250,9 @@ Create `tests/GrimoireCli.Tests/Commands/AddonsCommandTests.cs`. Its `RenderHelp
         Assert.Contains("\"count\":", output);
     }
 
-    // No add-on body is written by the caller, so none of the seven documents one.
-    [Fact]
-    public void NoAddonCommandRegistersARequestShape()
-    {
-        foreach (var verb in new[] { "list", "refresh", "install", "update", "upgrade-all", "uninstall", "settings" })
-            Assert.DoesNotContain("Request shape:", RenderHelp(["addons", verb], full: true));
-    }
 ```
 
-The first and last tests cover all seven verbs and will not pass until Task 4 completes. That is intended: they fail now, pass at the end of Task 4, and each intermediate task's own tests prove its own commands.
+These cover only the two commands this task adds. The cross-cutting assertions — every verb carrying the admin tag, and no verb registering a request shape — live in Task 4, because they cannot pass until all seven exist and no task should commit a knowingly-red suite.
 
 - [ ] **Step 2: Run the tests to verify they fail**
 
@@ -341,13 +327,12 @@ In `src/GrimoireCli/Program.cs`, beside the existing group registrations:
 rootCommand.Subcommands.Add(AddonsCommand.Create());
 ```
 
-- [ ] **Step 6: Run the tests, format, commit**
-
-The two all-seven-verb tests still fail — that is expected until Task 4. Confirm the other three pass.
+- [ ] **Step 6: Run the tests, format, run the full suite, commit**
 
 ```bash
-dotnet test tests/GrimoireCli.Tests/GrimoireCli.Tests.csproj --filter "AddonsCommandTests.ListShowsBothAddonShapes|AddonsCommandTests.ListExplainsTheBlockedState|AddonsCommandTests.RefreshShowsItsCount"
+dotnet test tests/GrimoireCli.Tests/GrimoireCli.Tests.csproj --filter AddonsCommandTests
 dotnet format GrimoireCli.sln
+dotnet test tests/GrimoireCli.Tests/GrimoireCli.Tests.csproj
 git add src/GrimoireCli tests/GrimoireCli.Tests
 git commit -m "feat: add addons list and addons refresh"
 ```
@@ -526,9 +511,24 @@ Generated builders: `client.Api.Api.Addons.UpdateAll` (POST, no body) and `clien
 
 - [ ] **Step 1: Write the failing tests**
 
-Add to `AddonsCommandTests.cs`:
+Add to `AddonsCommandTests.cs`. The first two are the cross-cutting assertions deferred from Task 2 — all seven verbs exist only now:
 
 ```csharp
+    [Fact]
+    public void EveryAddonCommandCarriesTheAdminTag()
+    {
+        foreach (var verb in new[] { "list", "refresh", "install", "update", "upgrade-all", "uninstall", "settings" })
+            Assert.Contains("Role required:\n  admin\n", RenderHelp(["addons", verb], full: false));
+    }
+
+    // No add-on body is written by the caller, so none of the seven documents one.
+    [Fact]
+    public void NoAddonCommandRegistersARequestShape()
+    {
+        foreach (var verb in new[] { "list", "refresh", "install", "update", "upgrade-all", "uninstall", "settings" })
+            Assert.DoesNotContain("Request shape:", RenderHelp(["addons", verb], full: true));
+    }
+
     [Fact]
     public void UpgradeAllDocumentsItsPartialFailure()
     {
@@ -618,7 +618,7 @@ The no-flag refusal is a command validator, so it is a parse error (exit 1) befo
 
 - [ ] **Step 5: Run the whole suite, format, commit**
 
-All seven verbs now exist, so Task 2's `EveryAddonCommandCarriesTheAdminTag` and `NoAddonCommandRegistersARequestShape` must pass for the first time.
+All seven verbs now exist, so the two cross-cutting tests added in Step 1 cover the whole group.
 
 ```bash
 dotnet test tests/GrimoireCli.Tests/GrimoireCli.Tests.csproj
@@ -854,4 +854,4 @@ EOF
 
 **Type consistency:** `AddonsService` is created in Task 2 and extended in Tasks 3 and 4; `AddonsCommand.Create()` likewise. `AddonListResponse.Installed`/`.Available`, `AddonInstalled.Enabled`/`.Runnable`/`.BlockedReason`, `RefreshResult.Count`, `UpgradeAllResult.Updated`/`.Failed`, `AddonUpgrade.From`/`.To`, `AddonUpgradeFailure.Error` and `AddonSettings.IndexUrl`/`.AllowScripts` are defined in Task 1 and used with those exact names in Tasks 2-5. `BuildUpdateBody` and `BuildSettingsBody` are defined in Tasks 3 and 4 and asserted by name in the same tasks' service tests.
 
-**Known cross-task dependency:** Task 2 writes two tests covering all seven verbs, which cannot pass until Task 4 lands. This is deliberate and called out in both tasks; a reviewer seeing them red at the end of Task 2 or 3 is seeing the plan working, not a defect.
+**No task commits a red suite.** The two cross-cutting assertions — every verb tagged `admin`, no verb registering a request shape — are written in Task 4 rather than Task 2, because they can only pass once all seven commands exist. Every task therefore ends with the full suite green.
