@@ -64,6 +64,12 @@ IMPLEMENTED = {
     "DELETE /api/addons/{addon_id}": "`addons uninstall` ✅",
     "POST /api/addons/update-all": "`addons upgrade-all` ✅",
     "PATCH /api/addons/settings": "`addons settings` ✅",
+    "GET /api/systems/{system_id}/metadata-sources": "`systems metadata-sources` ✅",
+    "POST /api/systems/{system_id}/metadata-search": "`systems metadata-search` ✅",
+    "POST /api/systems/{system_id}/metadata-fetch": "`systems metadata-fetch` ✅",
+    "GET /api/books/{book_id}/metadata-sources": "`books metadata-sources` ✅",
+    "POST /api/books/{book_id}/metadata-search": "`books metadata-search` ✅",
+    "POST /api/books/{book_id}/metadata-fetch": "`books metadata-fetch` ✅",
 }
 
 ROLE_LABEL = {

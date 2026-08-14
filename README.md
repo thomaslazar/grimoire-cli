@@ -93,6 +93,12 @@ The JWT is valid for 30 days. Grimoire has **no refresh endpoint**, so an expire
 | `books batch-tag {--input <file> \| --stdin}` | Add tags to many books, additively; exit 3 if partial (gm or admin) |
 | `books reindex --id <id> [--ocr-dpi <n>]` | Re-run OCR on one book (gm or admin) |
 | `books rescan --id <id>` | Re-read one book from disk and rebuild its index (gm or admin) |
+| `systems metadata-sources --id <id>` | Add-ons that can supply metadata for this system (gm or admin) |
+| `systems metadata-search --id <id> --source-id <src> [--query]` | Ranked candidates from one add-on (gm or admin) |
+| `systems metadata-fetch --id <id> --source-id <src> {--identity <i> \| --paste <url>} [--query]` | Diff a candidate against the system; writes nothing (gm or admin) |
+| `books metadata-sources --id <id>` | Add-ons that can supply metadata for this book (gm or admin) |
+| `books metadata-search --id <id> --source-id <src> [--query]` | Ranked candidates from one add-on (gm or admin) |
+| `books metadata-fetch --id <id> --source-id <src> {--identity <i> \| --paste <url>} [--query]` | Diff a candidate against the book; writes nothing (gm or admin) |
 | `library rescan [--scope <path>] [--metadata-mode new\|missing\|replace]` | Scan the library for new and changed files; exit 3 if already running (admin) |
 | `library scan-status` | Show the running scan's progress (admin) |
 | `library cancel-scan` | Stop the running scan (admin) |

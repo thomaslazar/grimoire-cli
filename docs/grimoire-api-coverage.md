@@ -16,7 +16,7 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | audio | 0 / 10 |
 | auth | 2 / 10 |
 | bookmarks | 0 / 4 |
-| books | 7 / 16 |
+| books | 10 / 16 |
 | campaigns | 0 / 81 |
 | downloads | 0 / 1 |
 | export | 0 / 1 |
@@ -29,11 +29,11 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | saved-filters | 0 / 4 |
 | search | 0 / 1 |
 | settings | 0 / 5 |
-| systems | 5 / 13 |
+| systems | 8 / 13 |
 | tags | 0 / 6 |
 | tokens | 0 / 10 |
 | users | 0 / 12 |
-| **Total** | **24 / 220** |
+| **Total** | **30 / 220** |
 
 1 operation(s) are internal-only (🔒) and excluded from covered counts.
 
@@ -104,9 +104,9 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | GET | `/api/books/{book_id}` | Get a book |  | `books get` ✅ |
 | PATCH | `/api/books/{book_id}` | Update book metadata | gm or admin | `books update` ✅ |
 | GET | `/api/books/{book_id}/file` | Download book file |  | — |
-| POST | `/api/books/{book_id}/metadata-fetch` | Fetch metadata for review | gm or admin | — |
-| POST | `/api/books/{book_id}/metadata-search` | Search a metadata source | gm or admin | — |
-| GET | `/api/books/{book_id}/metadata-sources` | List metadata sources | gm or admin | — |
+| POST | `/api/books/{book_id}/metadata-fetch` | Fetch metadata for review | gm or admin | `books metadata-fetch` ✅ |
+| POST | `/api/books/{book_id}/metadata-search` | Search a metadata source | gm or admin | `books metadata-search` ✅ |
+| GET | `/api/books/{book_id}/metadata-sources` | List metadata sources | gm or admin | `books metadata-sources` ✅ |
 | GET | `/api/books/{book_id}/page/{page_num}` | Render a PDF page as WebP |  | — |
 | GET | `/api/books/{book_id}/page/{page_num}/text` | Get page text |  | — |
 | GET | `/api/books/{book_id}/page/{page_num}/words` | Get page word bounding boxes |  | — |
@@ -320,9 +320,9 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | GET | `/api/systems/{system_id}/cover` | System cover image |  | — |
 | POST | `/api/systems/{system_id}/cover` | Upload a system cover | gm or admin | — |
 | DELETE | `/api/systems/{system_id}/cover` | Remove an uploaded system cover | gm or admin | — |
-| POST | `/api/systems/{system_id}/metadata-fetch` | Fetch metadata for review | gm or admin | — |
-| POST | `/api/systems/{system_id}/metadata-search` | Search a metadata source | gm or admin | — |
-| GET | `/api/systems/{system_id}/metadata-sources` | List metadata sources | gm or admin | — |
+| POST | `/api/systems/{system_id}/metadata-fetch` | Fetch metadata for review | gm or admin | `systems metadata-fetch` ✅ |
+| POST | `/api/systems/{system_id}/metadata-search` | Search a metadata source | gm or admin | `systems metadata-search` ✅ |
+| GET | `/api/systems/{system_id}/metadata-sources` | List metadata sources | gm or admin | `systems metadata-sources` ✅ |
 
 ## tags
 

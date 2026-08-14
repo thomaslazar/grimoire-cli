@@ -19,6 +19,8 @@ public static class BooksCommand
         command.Subcommands.Add(CreateBatchTagCommand());
         command.Subcommands.Add(CreateReindexCommand());
         command.Subcommands.Add(CreateRescanCommand());
+        foreach (var metadata in MetadataCommands.Create("books"))
+            command.Subcommands.Add(metadata);
         return command;
     }
 

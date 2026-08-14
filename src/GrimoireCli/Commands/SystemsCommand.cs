@@ -19,6 +19,8 @@ public static class SystemsCommand
         command.Subcommands.Add(CreateUpdateCommand());
         command.Subcommands.Add(CreateBatchUpdateCommand());
         command.Subcommands.Add(CreateBatchTagCommand());
+        foreach (var metadata in MetadataCommands.Create("systems"))
+            command.Subcommands.Add(metadata);
         return command;
     }
 

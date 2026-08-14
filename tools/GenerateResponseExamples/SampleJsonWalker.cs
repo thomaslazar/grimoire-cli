@@ -62,6 +62,14 @@ public static class SampleJsonWalker
             writer.WriteStringValue("<string>");
             return;
         }
+        // A JsonElement property is a value whose type is decided per row by the
+        // server (metadata diff rows carry a string, an int, or a list). There is
+        // no single shape to render, so the sample says so.
+        if (type == typeof(JsonElement))
+        {
+            writer.WriteStringValue("<any>");
+            return;
+        }
         if (type == typeof(bool)) { writer.WriteBooleanValue(false); return; }
         if (type == typeof(int) || type == typeof(long) || type == typeof(short) ||
             type == typeof(uint) || type == typeof(ulong) || type == typeof(ushort) ||

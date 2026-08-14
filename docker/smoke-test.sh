@@ -703,6 +703,78 @@ echo "$ADDONLIST_JSON" | jq -e '.available[] | select(.id == "fixture-source" an
 DEFAULT_INDEX_URL=$(echo "$ADDONLIST_JSON" | jq -r .default_index_url)
 ok "addons list shows the fixture under both installed and available"
 
+# --- metadata lookup ------------------------------------------------------
+# Runs here, between install and the disable below: a disabled add-on is not
+# runnable and drops out of metadata-sources. It also depends on the systems
+# section above having written description — that write is what makes the
+# description row "same" rather than "differs".
+SOURCES_JSON=$("$CLI" systems metadata-sources --id "$SR4" 2>"$WORK/cli.err") \
+  || { cat "$WORK/cli.err" >&2; fail "systems metadata-sources exited non-zero"; }
+echo "$SOURCES_JSON" | jq -e '.sources[] | select(.id == "fixture-source" and .supports_paste == true)' >/dev/null \
+  || fail "fixture-source should offer itself with supports_paste true: $SOURCES_JSON"
+ok "systems metadata-sources lists the installed fixture add-on"
+
+# The fixture targets game-system, so an empty list here is target filtering
+# working rather than the endpoint returning nothing.
+BOOKSOURCES_JSON=$("$CLI" books metadata-sources --id "$SR4_BOOK" 2>"$WORK/cli.err") \
+  || { cat "$WORK/cli.err" >&2; fail "books metadata-sources exited non-zero"; }
+[ "$(echo "$BOOKSOURCES_JSON" | jq '.sources | length')" -eq 0 ] \
+  || fail "a game-system add-on must not appear as a book source: $BOOKSOURCES_JSON"
+ok "books metadata-sources excludes a game-system add-on"
+
+SEARCH_JSON=$("$CLI" systems metadata-search --id "$SR4" --source-id fixture-source 2>"$WORK/cli.err") \
+  || { cat "$WORK/cli.err" >&2; fail "systems metadata-search exited non-zero"; }
+[ "$(echo "$SEARCH_JSON" | jq -r .query)" = "Shadowrun 4 DE" ] \
+  || fail "an omitted --query should echo back the system's name: $SEARCH_JSON"
+[ "$(echo "$SEARCH_JSON" | jq -r '.results[0].identity')" = "shadowrun-4-de" ] \
+  || fail "the fixture record should rank first: $SEARCH_JSON"
+ok "systems metadata-search defaults its query to the system name"
+
+FETCH_JSON=$("$CLI" systems metadata-fetch --id "$SR4" --source-id fixture-source \
+  --identity shadowrun-4-de 2>"$WORK/cli.err") \
+  || { cat "$WORK/cli.err" >&2; fail "systems metadata-fetch exited non-zero"; }
+[ "$(echo "$FETCH_JSON" | jq -r '.fields[] | select(.field == "system_family") | .status')" = "only_incoming" ] \
+  || fail "system_family is empty on this fixture, so it must read only_incoming: $FETCH_JSON"
+# same, not differs, only because the systems section wrote this description
+# earlier in this run. A differs here means that write moved or stopped.
+[ "$(echo "$FETCH_JSON" | jq -r '.fields[] | select(.field == "description") | .status')" = "same" ] \
+  || fail "description should match what the systems section wrote; did that write move? $FETCH_JSON"
+# parent_system is folder-derived, so it is populated and disagrees with the
+# catalogue's value. only_incoming here means the fixture tree changed shape.
+[ "$(echo "$FETCH_JSON" | jq -r '.fields[] | select(.field == "parent_system") | .status')" = "differs" ] \
+  || fail "parent_system is folder-derived and should disagree with the fixture: $FETCH_JSON"
+ok "systems metadata-fetch reports one row of each status"
+
+PASTE_JSON=$("$CLI" systems metadata-fetch --id "$SR4" --source-id fixture-source \
+  --paste "https://fixture.test/systems/shadowrun-4-de" 2>"$WORK/cli.err") \
+  || { cat "$WORK/cli.err" >&2; fail "systems metadata-fetch --paste exited non-zero"; }
+[ "$(echo "$PASTE_JSON" | jq -r .identity)" = "shadowrun-4-de" ] \
+  || fail "--paste should resolve to the same identity the search returned: $PASTE_JSON"
+ok "systems metadata-fetch --paste resolves a source URL to an identity"
+
+# Fetching is a read. The field it offered must still be empty afterwards —
+# and the family filter assertion earlier depends on it.
+sysget --id "$SR4"
+[ -z "$(echo "$GET_JSON" | jq -r '.system_family // ""')" ] \
+  || fail "metadata-fetch must not have written system_family: $(echo "$GET_JSON" | jq -r .system_family)"
+ok "metadata-fetch left the system unchanged"
+
+set +e
+"$CLI" systems metadata-fetch --id "$SR4" --source-id fixture-source >/dev/null 2>"$WORK/fetchargs.err"; rc=$?
+set -e
+[ "$rc" -eq 1 ] || fail "metadata-fetch with neither --identity nor --paste should exit 1, got $rc"
+grep -q -- "--identity" "$WORK/fetchargs.err" \
+  || fail "no mention of --identity: $(cat "$WORK/fetchargs.err")"
+set +e
+"$CLI" systems metadata-fetch --id "$SR4" --source-id fixture-source \
+  --identity shadowrun-4-de --paste "https://fixture.test/systems/shadowrun-4-de" \
+  >/dev/null 2>"$WORK/fetchboth.err"; rc=$?
+set -e
+[ "$rc" -eq 1 ] || fail "metadata-fetch with both --identity and --paste should exit 1, got $rc"
+grep -q -- "--identity" "$WORK/fetchboth.err" \
+  || fail "no mention of --identity: $(cat "$WORK/fetchboth.err")"
+ok "metadata-fetch requires exactly one of --identity and --paste"
+
 UPDATE_JSON=$("$CLI" addons update --id fixture-source --enabled false 2>"$WORK/cli.err") \
   || { cat "$WORK/cli.err" >&2; fail "addons update exited non-zero"; }
 [ "$(echo "$UPDATE_JSON" | jq -r .enabled)" = "false" ] \
