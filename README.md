@@ -128,6 +128,38 @@ grimoire-cli systems get --id <system-id>
 grimoire-cli self-test
 ```
 
+## Agent use cases
+
+grimoire-cli is a set of sharp primitives that AI agents compose into workflows. The CLI handles the Grimoire API; the agent makes the decisions.
+
+### Fill in metadata from a source
+
+You point an agent at a system whose metadata is thin. The agent:
+
+1. Checks that a source can answer for it (`grimoire-cli systems metadata-sources --id <id>`) — the list is empty until an add-on is installed, enabled and *runnable*, which `grimoire-cli addons list` diagnoses
+2. Searches it (`grimoire-cli systems metadata-search --id <id> --source-id <src>`), letting the omitted `--query` default to the system's own name
+3. Picks a candidate from the ranked results and fetches its diff (`grimoire-cli systems metadata-fetch --id <id> --source-id <src> --identity <identity>`), passing back the same `--query` the candidate came from
+4. Reads the per-field diff: `only_incoming` is a safe fill-in, `differs` is a decision, `same` is nothing to do — `current` sits beside `incoming`, so nothing is overwritten blind
+5. Applies just the fields it chose (`echo '{"system_family":"Shadowrun"}' | grimoire-cli systems update --id <id> --stdin`)
+
+The fetch never writes, so step 4 can be read, edited, or thrown away — and an agent that already knows the record can skip the search with `--paste <source-url>`. Two quirks to expect: `parent_system` and `edition` are derived from the library's folder layout and silently ignore a PATCH, and `urls` comes back as the union with the existing list rather than a replacement.
+
+### Metadata cleanup on request
+
+You notice a gap across the library and describe it:
+
+> "A lot of books have no description. Work out which, fill in the ones you're confident about, and ask me about the rest."
+
+The agent:
+
+1. Enumerates systems (`grimoire-cli systems list --include-children`)
+2. Reads each one (`grimoire-cli systems get --id <id>`), which embeds the full metadata for that system's books — `books list` is the wrong tool here: it has no metadata filters and its summary omits `description` entirely, so the per-system read is what makes this one call per system instead of one per book
+3. Filters client-side for the gap (`jq '.books[] | select(.description == "" or .description == null)'`)
+4. Fixes what it is sure of, one book (`echo '{"description":"..."}' | grimoire-cli books update --id <id> --stdin`) or many in one transaction (`grimoire-cli books batch-update --stdin`)
+5. Escalates the ambiguous ones back to you
+
+A batch verb is skip-and-continue: it exits 3 on a partial failure and names each rejection in `errors`, so an agent that only checks for a zero exit will believe a half-applied change succeeded.
+
 ## Configuration
 
 Config is stored at `~/.grimoire-cli/config.json`. Values resolve in this order:
