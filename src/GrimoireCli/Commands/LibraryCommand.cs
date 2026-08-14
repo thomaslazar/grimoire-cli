@@ -15,6 +15,7 @@ public static class LibraryCommand
         command.Subcommands.Add(CreateRescanCommand());
         command.Subcommands.Add(CreateScanStatusCommand());
         command.Subcommands.Add(CreateCancelScanCommand());
+        command.Subcommands.Add(CreateCleanupMissingCommand());
         return command;
     }
 
@@ -106,6 +107,44 @@ public static class LibraryCommand
             var service = new LibraryService(client);
             var response = await service.CancelScanAsync();
             ConsoleOutput.WriteRawJson(response);
+            return 0;
+        });
+        return command;
+    }
+
+    private static Command CreateCleanupMissingCommand()
+    {
+        var serverOption = new Option<string?>("--server") { Description = "Server URL override" };
+        var tokenOption = new Option<string?>("--token") { Description = "Token override; not stored" };
+        var command = new Command("cleanup-missing", "Remove DB entries for files no longer on disk")
+        {
+            serverOption, tokenOption
+        };
+        command.AddRoleRequired("admin");
+        command.AddHelpSection("Notes", HelpSectionPosition.Top,
+            "Deletes DB rows for files no longer on disk, each book's search index",
+            "and bookmarks with it, then prunes systems left with no books. Never",
+            "touches files.",
+            "",
+            "Normally a no-op. Run it after restructuring the library on disk.",
+            "",
+            "A library directory that is absent rather than hung reads as wholly",
+            "deleted, and a rescan does not restore hand-entered metadata or",
+            "bookmarks. A hung mount is safe — the server treats a timed-out path",
+            "as present.",
+            "",
+            "409 while a scan is running; commits per row, so a failure part-way",
+            "leaves earlier removals applied.");
+        command.AddExamples("grimoire-cli library cleanup-missing");
+        command.AddResponseExample<CleanupResult>();
+        command.SetAction(async (parseResult, cancellationToken) =>
+        {
+            var (client, _) = CommandHelper.BuildClient(
+                serverOverride: parseResult.GetValue(serverOption),
+                tokenOverride: parseResult.GetValue(tokenOption));
+            var service = new LibraryService(client);
+            var result = await service.CleanupMissingAsync();
+            ConsoleOutput.WriteJson(result, AppJsonContext.Default.CleanupResult);
             return 0;
         });
         return command;

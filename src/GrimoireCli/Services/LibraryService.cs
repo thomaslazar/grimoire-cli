@@ -54,6 +54,19 @@ public class LibraryService
         return await _client.SendAsync(info, permissionHint: "the admin role");
     }
 
+    /// <summary>
+    /// POST /api/maintenance/cleanup-missing. Deletes DB rows whose files are gone,
+    /// committing per row, so a failure part-way leaves earlier removals applied.
+    /// 409 while a scan runs; the server's message names that state, so no hint
+    /// replaces it.
+    /// </summary>
+    public async Task<CleanupResult> CleanupMissingAsync()
+    {
+        var info = _client.Api.Api.Maintenance.CleanupMissing.ToPostRequestInformation();
+        return await _client.SendAsync(
+            info, AppJsonContext.Default.CleanupResult, permissionHint: "the admin role");
+    }
+
     private static Generated.Models.RescanRequest_metadata_mode ParseMetadataMode(string metadataMode) => metadataMode switch
     {
         "new" => Generated.Models.RescanRequest_metadata_mode.New,
