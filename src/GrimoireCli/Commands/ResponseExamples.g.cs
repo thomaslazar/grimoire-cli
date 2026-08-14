@@ -11,6 +11,18 @@ internal static class ResponseExamples
 {
     private static readonly Dictionary<Type, string> Samples = new()
     {
+        { typeof(GrimoireCli.Models.AddonAvailable),
+          "{\n  \"id\": \"<string>\",\n  \"name\": \"<string>\",\n  \"kind\": \"scraper\",\n  \"target\": \"game-system\",\n  \"version\": \"<string>\",\n  \"description\": \"<string>\",\n  \"homepage\": \"<string>\",\n  \"script_sha256\": \"<string>\",\n  \"requires_script\": false,\n  \"installed\": false,\n  \"update_available\": false\n}" },
+        { typeof(GrimoireCli.Models.AddonInstalled),
+          "{\n  \"id\": \"<string>\",\n  \"name\": \"<string>\",\n  \"version\": \"<string>\",\n  \"kind\": \"scraper\",\n  \"target\": \"game-system\",\n  \"description\": \"<string>\",\n  \"homepage\": \"<string>\",\n  \"attribution\": \"<string>\",\n  \"blocked_reason\": \"<string>\",\n  \"source\": \"<string>\",\n  \"available_version\": \"<string>\",\n  \"requires_script\": false,\n  \"script_approved\": false,\n  \"enabled\": false,\n  \"runnable\": false,\n  \"update_available\": false\n}" },
+        { typeof(GrimoireCli.Models.AddonListResponse),
+          "{\n  \"installed\": [\n    {\n      \"id\": \"<string>\",\n      \"name\": \"<string>\",\n      \"version\": \"<string>\",\n      \"kind\": \"scraper\",\n      \"target\": \"game-system\",\n      \"description\": \"<string>\",\n      \"homepage\": \"<string>\",\n      \"attribution\": \"<string>\",\n      \"blocked_reason\": \"<string>\",\n      \"source\": \"<string>\",\n      \"available_version\": \"<string>\",\n      \"requires_script\": false,\n      \"script_approved\": false,\n      \"enabled\": false,\n      \"runnable\": false,\n      \"update_available\": false\n    }\n  ],\n  \"available\": [\n    {\n      \"id\": \"<string>\",\n      \"name\": \"<string>\",\n      \"kind\": \"scraper\",\n      \"target\": \"game-system\",\n      \"version\": \"<string>\",\n      \"description\": \"<string>\",\n      \"homepage\": \"<string>\",\n      \"script_sha256\": \"<string>\",\n      \"requires_script\": false,\n      \"installed\": false,\n      \"update_available\": false\n    }\n  ],\n  \"index_url\": \"<string>\",\n  \"default_index_url\": \"<string>\",\n  \"allow_scripts\": false,\n  \"index_generated\": \"<string>\"\n}" },
+        { typeof(GrimoireCli.Models.AddonSettings),
+          "{\n  \"index_url\": \"<string>\",\n  \"allow_scripts\": false\n}" },
+        { typeof(GrimoireCli.Models.AddonUpgrade),
+          "{\n  \"id\": \"<string>\",\n  \"from\": \"<string>\",\n  \"to\": \"<string>\"\n}" },
+        { typeof(GrimoireCli.Models.AddonUpgradeFailure),
+          "{\n  \"id\": \"<string>\",\n  \"error\": \"<string>\"\n}" },
         { typeof(GrimoireCli.Models.Book),
           "{\n  \"id\": \"<string>\",\n  \"title\": \"<string>\",\n  \"filename\": \"<string>\",\n  \"category\": \"core\",\n  \"description\": \"<string>\",\n  \"page_count\": 0,\n  \"file_size\": 0,\n  \"mime_type\": \"<string>\",\n  \"authors\": [\n    \"<string>\"\n  ],\n  \"artists\": [\n    \"<string>\"\n  ],\n  \"genres\": [\n    \"<string>\"\n  ],\n  \"publisher\": \"<string>\",\n  \"publisher_url\": \"<string>\",\n  \"urls\": [\n    {\n      \"label\": \"<string>\",\n      \"url\": \"<string>\"\n    }\n  ],\n  \"isbn\": \"<string>\",\n  \"version\": \"<string>\",\n  \"language\": \"<string>\",\n  \"license\": \"<string>\",\n  \"year\": 0,\n  \"month\": 0,\n  \"day\": 0,\n  \"indexed\": false,\n  \"index_failed\": false,\n  \"index_error\": \"<string>\",\n  \"ocr_indexed\": false,\n  \"ocr_dpi\": 0,\n  \"has_thumbnail\": false,\n  \"tags\": [\n    \"<string>\"\n  ],\n  \"is_explicit\": false,\n  \"is_missing\": false,\n  \"relative_path\": \"<string>\"\n}" },
         { typeof(GrimoireCli.Models.BookDetail),
@@ -37,10 +49,14 @@ internal static class ResponseExamples
           "{\n  \"id\": \"<string>\",\n  \"username\": \"<string>\",\n  \"display_name\": \"<string>\",\n  \"email\": \"<string>\",\n  \"role\": \"<string>\",\n  \"allow_explicit\": false,\n  \"campaign_access\": false,\n  \"oidc_linked\": false\n}" },
         { typeof(GrimoireCli.Models.PublisherEntry),
           "{\n  \"name\": \"<string>\",\n  \"url\": \"<string>\"\n}" },
+        { typeof(GrimoireCli.Models.RefreshResult),
+          "{\n  \"status\": \"<string>\",\n  \"count\": 0\n}" },
         { typeof(GrimoireCli.Models.ScanStatus),
           "{\n  \"running\": false,\n  \"phase\": \"scanning\",\n  \"total_books\": 0,\n  \"scanned_books\": 0,\n  \"total_maps\": 0,\n  \"scanned_maps\": 0,\n  \"total_tokens\": 0,\n  \"scanned_tokens\": 0,\n  \"total_audio\": 0,\n  \"scanned_audio\": 0,\n  \"new_books\": 0,\n  \"new_maps\": 0,\n  \"new_tokens\": 0,\n  \"new_audio\": 0,\n  \"updated_books\": 0,\n  \"indexed\": 0,\n  \"to_index\": 0,\n  \"total_ocr\": 0,\n  \"ocr_done\": 0,\n  \"ocr_current\": \"<string>\"\n}" },
         { typeof(GrimoireCli.Models.ScanTriggerResult),
           "{\n  \"status\": \"<string>\"\n}" },
+        { typeof(GrimoireCli.Models.UpgradeAllResult),
+          "{\n  \"status\": \"<string>\",\n  \"updated\": [\n    {\n      \"id\": \"<string>\",\n      \"from\": \"<string>\",\n      \"to\": \"<string>\"\n    }\n  ],\n  \"failed\": [\n    {\n      \"id\": \"<string>\",\n      \"error\": \"<string>\"\n    }\n  ]\n}" },
     };
 
     public static string For(Type type)

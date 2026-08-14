@@ -33,9 +33,10 @@
 - `2` — API failures (HTTP error status from Grimoire, or an unhandled
   exception reaching `Program.cs`'s top-level catch)
 - `3` — the request succeeded (HTTP 200) but did not do what was asked: a bulk
-  call with a non-empty `errors` list (a partial write), or `library rescan`
+  call with a non-empty `errors` list (a partial write), `library rescan`
   reporting `already_running`, where a scan was already in flight and the
-  requested one never started. stdout carries the full response either way.
+  requested one never started, or `addons upgrade-all` with a non-empty
+  `failed` list. stdout carries the full response either way.
 
 See `GrimoireApiClient.EnsureSuccessAsync` for the status-to-message mapping
 (401/403/400/404/422 get specific text; anything else falls back to
@@ -60,12 +61,12 @@ See `GrimoireApiClient.EnsureSuccessAsync` for the status-to-message mapping
 
 ## Input for Updates
 
-No write/update commands exist yet — `systems list` and `systems get` are
-the only two commands, both reads (`src/GrimoireCli/Commands/SystemsCommand.cs`).
-There is currently no `--input` / `--stdin` convention to document, unlike
-abs-cli's `items update` / `batch-update`. When a `PATCH` command lands
-(`systems update`, following `GameSystemUpdate` in the Grimoire spec), this
-section is where its file/stdin input convention belongs.
+Commands whose body is validated free-form JSON (`systems update`/`batch-update`/
+`batch-tag`, `books update`/`batch-update`/`batch-tag`) take `--input <file>` or
+`--stdin`, mutually exclusive and one required (`JsonBodyInput.Read`,
+`src/GrimoireCli/Commands/JsonBodyInput.cs`). `addons update`/`settings` take
+plain flags instead — their bodies are small and fixed-shape, so a file/stdin
+convention buys nothing.
 
 ## Pipeline Support
 

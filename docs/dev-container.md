@@ -31,7 +31,7 @@ most of the friction here:
 1. **Bind-mount paths are resolved by the daemon, so they are host paths.**
    `./library` inside the container is meaningless to it. Set `GRIMOIRE_LIBRARY`
    and `GRIMOIRE_DATA` to the paths *as the host sees them* and keep them in
-   `docker/.env` (gitignored) so you do not retype them. `docker/.env.example`
+   `docker/.env` (gitignored) so you do not retype them. `docker/env.example`
    documents the shape.
    Note the separate `GRIMOIRE_LIBRARY_LOCAL`, which is the path `seed.sh`
    **writes** to from inside the container — the same directory, addressed from

@@ -96,6 +96,13 @@ The JWT is valid for 30 days. Grimoire has **no refresh endpoint**, so an expire
 | `library rescan [--scope <path>] [--metadata-mode new\|missing\|replace]` | Scan the library for new and changed files; exit 3 if already running (admin) |
 | `library scan-status` | Show the running scan's progress (admin) |
 | `library cancel-scan` | Stop the running scan (admin) |
+| `addons list` | List installed and available add-ons (admin) |
+| `addons refresh` | Fetch the add-on index (admin) |
+| `addons install --id <addon-id> [--approve-script]` | Install or upgrade one add-on (admin) |
+| `addons update --id <addon-id> [--enabled true\|false] [--script-approved true\|false]` | Enable, disable, or approve one add-on (admin) |
+| `addons upgrade-all` | Upgrade every installed add-on; exit 3 if partial (admin) |
+| `addons uninstall --id <addon-id>` | Remove one add-on (admin) |
+| `addons settings [--index-url <url>] [--allow-scripts true\|false]` | Set the add-on index URL and script switch (admin) |
 | `self-test` | Verify binary integrity (AOT validation, no network required) |
 
 Every command supports `--help` with examples and caveats.
@@ -138,7 +145,7 @@ docker compose -f docker/docker-compose.yml down && rm -rf docker/data docker/li
 
 The fixture copy is required before the first boot — Grimoire seeds its users from `/data/users.json` at startup, and without it the stack comes up with no users. Seeded logins are `admin/admin`, `gm/gm`, `player/player`; throwaway dev credentials for a throwaway stack. `docker/seed.sh` then populates the library with fixture books — `smoke-test.sh` asserts on that fixture set and fails without it.
 
-From inside the dev container the daemon runs on the host, so reach the stack at `http://host.docker.internal:9481` rather than `localhost`, and set `GRIMOIRE_LIBRARY` / `GRIMOIRE_DATA` to host paths — see `docker/.env.example`. `docker/seed.sh` writes fixtures itself rather than through the daemon, so it reads a third var, `GRIMOIRE_LIBRARY_LOCAL` — the same directory's *container*-side path, defaulting to `docker/library`.
+From inside the dev container the daemon runs on the host, so reach the stack at `http://host.docker.internal:9481` rather than `localhost`, and set `GRIMOIRE_LIBRARY` / `GRIMOIRE_DATA` to host paths — see `docker/env.example`. `docker/seed.sh` writes fixtures itself rather than through the daemon, so it reads a third var, `GRIMOIRE_LIBRARY_LOCAL` — the same directory's *container*-side path, defaulting to `docker/library`.
 
 ### Project structure
 

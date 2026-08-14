@@ -148,7 +148,7 @@ container, which affects three variables differently:
   setting `GRIMOIRE_LIBRARY_LOCAL`, and fixtures land in `docker/library`
   while the server scans an empty tree.
 
-See `docker/.env.example` for all three.
+See `docker/env.example` for all three.
 
 ## CI Pipeline
 

@@ -24,8 +24,9 @@
 # IMPORTANT under docker-outside-of-docker: the daemon runs on the HOST, so bind
 # mount paths resolve against the HOST filesystem, not the container's.
 # `./library` and `./data` therefore do not work from inside the devcontainer —
-# set GRIMOIRE_LIBRARY and GRIMOIRE_DATA to the repo's path as the host sees it.
-# Put them in docker/.env (gitignored); see docker/.env.example.
+# set GRIMOIRE_LIBRARY, GRIMOIRE_DATA and GRIMOIRE_ADDON_INDEX to the repo's
+# path as the host sees it. Put them in docker/.env (gitignored); see
+# docker/env.example.
 services:
   grimoire:
     # Pinned to the release this CLI targets (v1.5.6) — bump deliberately
@@ -62,6 +63,18 @@ services:
       timeout: 5s
       start_period: 10s
       retries: 12
+
+  # Serves docker/addon-index/ (fixture manifest + generated index.json) so
+  # the smoke test can install a real add-on without depending on the
+  # published community index or a third-party host. Fetched by the grimoire
+  # container as http://addon-index/index.json — a compose service name the
+  # devcontainer itself cannot resolve and does not need to.
+  addon-index:
+    image: nginx:alpine
+    volumes:
+      - ${GRIMOIRE_ADDON_INDEX:-./addon-index}:/usr/share/nginx/html:ro
+    networks:
+      - grimoire-cli-dev
 
 # Named explicitly because the default would be derived from this file's parent
 # directory: every project whose compose file lives in docker/ would share one

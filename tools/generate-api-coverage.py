@@ -57,6 +57,13 @@ IMPLEMENTED = {
     "POST /api/rescan": "`library rescan` ✅",
     "GET /api/scan-status": "`library scan-status` ✅",
     "POST /api/cancel-scan": "`library cancel-scan` ✅",
+    "GET /api/addons": "`addons list` ✅",
+    "POST /api/addons/refresh": "`addons refresh` ✅",
+    "POST /api/addons/{addon_id}/install": "`addons install` ✅",
+    "PATCH /api/addons/{addon_id}": "`addons update` ✅",
+    "DELETE /api/addons/{addon_id}": "`addons uninstall` ✅",
+    "POST /api/addons/update-all": "`addons upgrade-all` ✅",
+    "PATCH /api/addons/settings": "`addons settings` ✅",
 }
 
 ROLE_LABEL = {

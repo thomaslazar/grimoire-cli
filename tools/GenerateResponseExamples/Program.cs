@@ -89,6 +89,10 @@ internal static class Program
         o.StringValues[(typeof(GameSystemRef), nameof(GameSystemRef.Name))] = "Shadowrun 6 DE";
         o.StringValues[(typeof(GameSystemRef), nameof(GameSystemRef.Slug))] = "shadowrun-6-de";
         o.StringValues[(typeof(ScanStatus), nameof(ScanStatus.Phase))] = "scanning";
+        o.StringValues[(typeof(AddonInstalled), nameof(AddonInstalled.Kind))] = "scraper";
+        o.StringValues[(typeof(AddonInstalled), nameof(AddonInstalled.Target))] = "game-system";
+        o.StringValues[(typeof(AddonAvailable), nameof(AddonAvailable.Kind))] = "scraper";
+        o.StringValues[(typeof(AddonAvailable), nameof(AddonAvailable.Target))] = "game-system";
 
         return o;
     }
