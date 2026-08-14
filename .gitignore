@@ -34,8 +34,10 @@ node_modules/
 # Claude Code (machine-specific settings)
 .claude/settings.local.json
 
-# Release artifacts
-release-notes.md
+# Release artifacts. The working release notes live at temp/release-notes.md,
+# already covered by the temp entry below — a root release-notes.md is
+# deliberately not ignored, so a copy the release forgot to delete shows up in
+# git status rather than lingering unseen.
 release-artifacts/
 
 # Reference material — see CLAUDE.md for how to repopulate
