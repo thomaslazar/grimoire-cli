@@ -140,7 +140,8 @@ You point an agent at a system whose metadata is thin. The agent:
 2. Searches it (`grimoire-cli systems metadata-search --id <id> --source-id <src>`), letting the omitted `--query` default to the system's own name
 3. Picks a candidate from the ranked results and fetches its diff (`grimoire-cli systems metadata-fetch --id <id> --source-id <src> --identity <identity>`), passing back the same `--query` the candidate came from
 4. Reads the per-field diff: `only_incoming` is a safe fill-in, `differs` is a decision, `same` is nothing to do — `current` sits beside `incoming`, so nothing is overwritten blind
-5. Applies just the fields it chose (`echo '{"system_family":"Shadowrun"}' | grimoire-cli systems update --id <id> --stdin`)
+5. **Stops and shows you what it proposes**, with `current` against `incoming` for every row it wants to change. You approve, trim, or reject it — nothing is written until you do
+6. Applies only the approved fields (`echo '{"system_family":"Shadowrun"}' | grimoire-cli systems update --id <id> --stdin`)
 
 The fetch never writes, so step 4 can be read, edited, or thrown away — and an agent that already knows the record can skip the search with `--paste <source-url>`. Two quirks to expect: `parent_system` and `edition` are derived from the library's folder layout and silently ignore a PATCH, and `urls` comes back as the union with the existing list rather than a replacement.
 
