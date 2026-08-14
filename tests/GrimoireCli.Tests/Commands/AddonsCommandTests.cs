@@ -32,4 +32,37 @@ public class AddonsCommandTests
         var output = RenderHelp(["addons", "refresh"], full: true);
         Assert.Contains("\"count\":", output);
     }
+
+    [Fact]
+    public void InstallDocumentsTheDigestAndTheScriptConsent()
+    {
+        var output = RenderHelp(["addons", "install"], full: false);
+        Assert.Contains("verified against the index's digest", output);
+        Assert.Contains("drops back to unapproved", output);
+    }
+
+    [Fact]
+    public void UpdateSaysItDoesNotChangeVersion()
+    {
+        var output = RenderHelp(["addons", "update"], full: false);
+        Assert.Contains("never version", output);
+    }
+
+    // Both are tri-state: omitted must leave the field alone, so a plain switch
+    // could set but never clear.
+    [Fact]
+    public void UpdateTakesTriStateBooleans()
+    {
+        var output = RenderHelp(["addons", "update"], full: false);
+        Assert.Contains("--enabled", output);
+        Assert.Contains("--script-approved", output);
+        Assert.Contains("true|false", output.Replace(" ", ""));
+    }
+
+    [Fact]
+    public void UninstallRegistersNoResponseShape()
+    {
+        Assert.DoesNotContain("Response shape:", RenderHelp(["addons", "uninstall"], full: true));
+        Assert.Contains("{\"status\": \"ok\"}", RenderHelp(["addons", "uninstall"], full: false));
+    }
 }
