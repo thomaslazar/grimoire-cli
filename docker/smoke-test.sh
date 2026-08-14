@@ -656,6 +656,31 @@ echo "$CANCEL_JSON" | jq -e '.status == "not_running"' >/dev/null \
   || fail "cancel-scan after the wait loop above should report not_running: $CANCEL_JSON"
 ok "library cancel-scan exits 0 and reports not_running"
 
+# --- cleanup-missing ------------------------------------------------------
+# Placed after the scan section so nothing is running (the endpoint answers 409
+# while a scan is) and after the EXPECTED_BOOKS assertions above, so a cleanup
+# that removes stale is_missing rows cannot invalidate a count asserted earlier
+# in the same run.
+#
+# The fixture library is fully present, so the honest assertion is the contract
+# rather than the first call's numbers: whatever the first call removes, the
+# second must find nothing left to remove. Asserting zero on the first call
+# would be asserting this stack's history — a database-only reset leaves stale
+# is_missing rows behind (see CLAUDE.md).
+CLEANUP_JSON=$("$CLI" library cleanup-missing 2>"$WORK/cli.err") \
+  || { cat "$WORK/cli.err" >&2; fail "library cleanup-missing exited non-zero"; }
+for key in books maps tokens audio systems; do
+  echo "$CLEANUP_JSON" | jq -e --arg k "$key" '.removed[$k] | type == "number"' >/dev/null \
+    || fail "removed.$key should be a number: $CLEANUP_JSON"
+done
+ok "library cleanup-missing reports a count for every resource"
+
+CLEANUP_JSON=$("$CLI" library cleanup-missing 2>"$WORK/cli.err") \
+  || { cat "$WORK/cli.err" >&2; fail "library cleanup-missing exited non-zero on the second call"; }
+echo "$CLEANUP_JSON" | jq -e '[.removed[]] | add == 0' >/dev/null \
+  || fail "a second cleanup should find nothing left to remove: $CLEANUP_JSON"
+ok "a second library cleanup-missing removes nothing"
+
 # --- addons ---------------------------------------------------------------
 # Installs from a local fixture index rather than the published community one:
 # pointing the smoke test at the real index would make every PR build depend
