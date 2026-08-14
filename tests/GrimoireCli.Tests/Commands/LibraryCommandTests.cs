@@ -7,9 +7,9 @@ public class LibraryCommandTests
     private static string RenderHelp(string[] path, bool full) => HelpRenderer.Render(LibraryCommand.Create(), path, full);
 
     [Fact]
-    public void AllThreeCarryTheAdminTag()
+    public void EveryCommandCarriesTheAdminTag()
     {
-        foreach (var verb in new[] { "rescan", "scan-status", "cancel-scan" })
+        foreach (var verb in new[] { "rescan", "scan-status", "cancel-scan", "cleanup-missing" })
         {
             var output = RenderHelp(["library", verb], full: false);
             Assert.Contains("Role required:", output);
@@ -58,5 +58,35 @@ public class LibraryCommandTests
     {
         Assert.Contains("whether or not one was running",
             RenderHelp(["library", "cancel-scan"], full: false));
+    }
+
+    // The two facts this command exists to warn about. A help block that loses
+    // either has lost the point of the command.
+    [Fact]
+    public void CleanupMissingWarnsAboutBookmarksAndAbsentMounts()
+    {
+        var output = RenderHelp(["library", "cleanup-missing"], full: false);
+        Assert.Contains("bookmarks", output);
+        Assert.Contains("absent rather than hung", output);
+    }
+
+    [Fact]
+    public void CleanupMissingSaysItLeavesFilesAlone()
+    {
+        Assert.Contains("touches files", RenderHelp(["library", "cleanup-missing"], full: false));
+    }
+
+    [Fact]
+    public void CleanupMissingNamesTheScanConflict()
+    {
+        Assert.Contains("409", RenderHelp(["library", "cleanup-missing"], full: false));
+    }
+
+    [Fact]
+    public void CleanupMissingRendersItsCounts()
+    {
+        var output = RenderHelp(["library", "cleanup-missing"], full: true);
+        Assert.Contains("\"removed\":", output);
+        Assert.Contains("\"systems\":", output);
     }
 }

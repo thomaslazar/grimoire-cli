@@ -328,6 +328,44 @@ fixture add-on (`docker/addon-index/fixture-source.yml`) and via
   installed"}`. No 502 was produced in these live runs — the fixture add-on
   never fails, so that path is unverified live.
 
+## Cleanup of missing files
+
+Verified against v1.5.6 by reading `backend/routers/maintenance/`, backing
+`library cleanup-missing`.
+
+- **An absent path deletes; a hung one does not.** `_path_exists`
+  (`_helpers.py:13-30`) runs `os.path.exists` on a daemon thread with a
+  5-second join and **returns True if the thread is still alive**, so a stalled
+  mount is treated as present and skipped. A directory that is simply gone
+  returns False promptly and every row beneath it is removed. The asymmetry is
+  deliberate and is the difference between a storage hiccup and data loss.
+- **It commits per row** (`_helpers.py:127`, and per pruned system at `:99`), so
+  a failure part-way through leaves earlier removals applied; the handler's
+  `except` rolls back only the uncommitted remainder. The docstring at
+  `:110-111` gives the reason: releasing the write lock between rows so a
+  concurrent scanner session is not blocked.
+- **A book takes its search index and bookmarks with it**
+  (`_helpers.py:122-126`): `DELETE FROM book_search`, then every `Bookmark`
+  pointing at the book, then the book. Bookmarks are user data and a rescan
+  does not restore them, nor any hand-entered metadata.
+- **Container folders are protected from the orphan sweep.**
+  `_prune_orphaned_systems` (`_helpers.py:33`) keeps a system alive if it has
+  books, a campaign references it, **or it has a surviving child** — the last
+  rule phrased over `parent_id` rather than `container_kind`, so container kinds
+  added later are covered without changing the function. Without it a container
+  (which holds no books of its own) read as an orphan and the
+  `GameSystem.children` `delete-orphan` cascade took its editions and their
+  books: upstream issue #309, fixed by the release this CLI targets. Systems are
+  walked deepest-first so a container emptied earlier in the same pass is still
+  collected.
+- **A running scan is a 409**, not a queue: `"A library scan is already running;
+  retry after it completes."` (`core.py`). `library scan-status` reports the
+  state it refers to.
+- **Live, against the seeded fixture stack:** two consecutive calls each
+  answered `{"removed": {"books": 0, "maps": 0, "tokens": 0, "audio": 0,
+  "systems": 0}}` with exit 0. The destructive path is not exercised there —
+  every fixture file is present — so the removal counts are unverified live.
+
 ## First-run users
 
 - Grimoire seeds users from `{DATA_PATH}/users.json` at startup

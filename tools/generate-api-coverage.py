@@ -57,6 +57,7 @@ IMPLEMENTED = {
     "POST /api/rescan": "`library rescan` ✅",
     "GET /api/scan-status": "`library scan-status` ✅",
     "POST /api/cancel-scan": "`library cancel-scan` ✅",
+    "POST /api/maintenance/cleanup-missing": "`library cleanup-missing` ✅",
     "GET /api/addons": "`addons list` ✅",
     "POST /api/addons/refresh": "`addons refresh` ✅",
     "POST /api/addons/{addon_id}/install": "`addons install` ✅",
