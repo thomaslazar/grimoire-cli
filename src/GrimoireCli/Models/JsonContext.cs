@@ -32,5 +32,11 @@ namespace GrimoireCli.Models;
 [JsonSerializable(typeof(UpgradeAllResult))]
 [JsonSerializable(typeof(AddonUpgrade))]
 [JsonSerializable(typeof(AddonUpgradeFailure))]
+[JsonSerializable(typeof(MetadataSource))]
+[JsonSerializable(typeof(MetadataSourceList))]
+[JsonSerializable(typeof(MetadataCandidate))]
+[JsonSerializable(typeof(MetadataSearchResult))]
+[JsonSerializable(typeof(MetadataFieldDiff))]
+[JsonSerializable(typeof(MetadataFetchResult))]
 [JsonSourceGenerationOptions(WriteIndented = true)]
 public partial class AppJsonContext : JsonSerializerContext;
