@@ -33,9 +33,10 @@
 - `2` — API failures (HTTP error status from Grimoire, or an unhandled
   exception reaching `Program.cs`'s top-level catch)
 - `3` — the request succeeded (HTTP 200) but did not do what was asked: a bulk
-  call with a non-empty `errors` list (a partial write), or `library rescan`
+  call with a non-empty `errors` list (a partial write), `library rescan`
   reporting `already_running`, where a scan was already in flight and the
-  requested one never started. stdout carries the full response either way.
+  requested one never started, or `addons upgrade-all` with a non-empty
+  `failed` list. stdout carries the full response either way.
 
 See `GrimoireApiClient.EnsureSuccessAsync` for the status-to-message mapping
 (401/403/400/404/422 get specific text; anything else falls back to

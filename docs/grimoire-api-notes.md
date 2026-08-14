@@ -277,6 +277,25 @@ includes `language`. It exists only on books (`BookUpdate.language`), and
 expressed only through its name (the `Shadowrun 6 DE` convention), a tag, or
 per-book metadata.
 
+## Add-ons
+
+Verified against v1.5.6, backing the seven `addons` commands.
+
+- **A fresh instance has never fetched the add-on index.** `available()`
+  (`backend/addons/install.py:99`) reads the index straight off
+  `get_cached_index` (`backend/addons/registry.py:114-115`), which stays empty
+  until `refresh_index` first saves one (`backend/addons/install.py:60-77`) —
+  nothing ships bundled with the server. Verified live: `addons list` reports
+  `available: []` and a system's `metadata-sources` reports no source until
+  `addons refresh` has run at least once.
+- **`fetch_json` carries no host allow-list** (`backend/addons/fetch.py:92-133`)
+  — it is plain httpx, restricted only by the `http(s)://` scheme check in
+  `refresh_index` (`backend/addons/install.py:63-64`), not by destination.
+  A URL on the docker-compose network works exactly like the published index,
+  which is what lets `docker/smoke-test.sh` point `addons settings
+  --index-url` at the internal `addon-index` service instead of the real
+  `raw.githubusercontent.com` catalogue.
+
 ## First-run users
 
 - Grimoire seeds users from `{DATA_PATH}/users.json` at startup

@@ -96,6 +96,13 @@ The JWT is valid for 30 days. Grimoire has **no refresh endpoint**, so an expire
 | `library rescan [--scope <path>] [--metadata-mode new\|missing\|replace]` | Scan the library for new and changed files; exit 3 if already running (admin) |
 | `library scan-status` | Show the running scan's progress (admin) |
 | `library cancel-scan` | Stop the running scan (admin) |
+| `addons list` | List installed and available add-ons (admin) |
+| `addons refresh` | Fetch the add-on index (admin) |
+| `addons install --id <addon-id> [--approve-script]` | Install or upgrade one add-on (admin) |
+| `addons update --id <addon-id> [--enabled true\|false] [--script-approved true\|false]` | Enable, disable, or approve one add-on (admin) |
+| `addons upgrade-all` | Upgrade every installed add-on; exit 3 if partial (admin) |
+| `addons uninstall --id <addon-id>` | Remove one add-on (admin) |
+| `addons settings [--index-url <url>] [--allow-scripts true\|false]` | Set the add-on index URL and script switch (admin) |
 | `self-test` | Verify binary integrity (AOT validation, no network required) |
 
 Every command supports `--help` with examples and caveats.
