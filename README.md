@@ -86,6 +86,16 @@ The JWT is valid for 30 days. Grimoire has **no refresh endpoint**, so an expire
 | `systems update --id <id> {--input <file> \| --stdin}` | Update one system's metadata (gm or admin) |
 | `systems batch-update {--input <file> \| --stdin}` | Update many systems in one transaction; exit 3 if partial (gm or admin) |
 | `systems batch-tag {--input <file> \| --stdin}` | Add tags to many systems, additively; exit 3 if partial (gm or admin) |
+| `books list [--system-id <id>] [--category <c>] [--limit <n>] [--offset <n>]` | List books (defaults to 100 results) |
+| `books get --id <id>` | Get one book |
+| `books update --id <id> {--input <file> \| --stdin}` | Update one book's metadata (gm or admin) |
+| `books batch-update {--input <file> \| --stdin}` | Update many books in one transaction; exit 3 if partial (gm or admin) |
+| `books batch-tag {--input <file> \| --stdin}` | Add tags to many books, additively; exit 3 if partial (gm or admin) |
+| `books reindex --id <id> [--ocr-dpi <n>]` | Re-run OCR on one book (gm or admin) |
+| `books rescan --id <id>` | Re-read one book from disk and rebuild its index (gm or admin) |
+| `library rescan [--scope <path>] [--metadata-mode new\|missing\|replace]` | Scan the library for new and changed files; exit 3 if already running (admin) |
+| `library scan-status` | Show the running scan's progress (admin) |
+| `library cancel-scan` | Stop the running scan (admin) |
 | `self-test` | Verify binary integrity (AOT validation, no network required) |
 
 Every command supports `--help` with examples and caveats.

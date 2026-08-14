@@ -30,6 +30,17 @@ public class SystemsCommandTests
         Assert.Contains("Must be one of: name, book_count, page_count, year", result.Errors[0].Message);
     }
 
+    // OptionHelpers.Choice relies on System.CommandLine rendering an option's own
+    // value set in its help line, so the CLI's description text does not repeat it
+    // (see CLAUDE.md). Pin the rendered form so an upgrade that changes it fails
+    // here instead of silently invalidating that convention.
+    [Fact]
+    public void SortOptionRendersItsValueSetInHelp()
+    {
+        var output = RenderHelp(["systems", "list"], full: false);
+        Assert.Contains("--sort <book_count|name|page_count|year>", output);
+    }
+
     [Fact]
     public void RejectsAnUnknownBookSortKey()
     {
@@ -125,15 +136,8 @@ public class SystemsCommandTests
         Assert.NotEmpty(Root().Parse(input).Errors);
     }
 
-    private static string RenderHelp(string[] path, bool full)
-    {
-        var root = new RootCommand("test") { SystemsCommand.Create() };
-        root.UseCustomHelpSections();
-        var output = new StringWriter();
-        root.Parse([.. path, full ? "--help-full" : "--help"])
-            .Invoke(new InvocationConfiguration { Output = output });
-        return output.ToString();
-    }
+    private static string RenderHelp(string[] path, bool full) =>
+        HelpRenderer.Render(SystemsCommand.Create(), path, full);
 
     // The block is rendered from the generated model, so this is also the guard on
     // that: a regeneration that dropped a model's properties (microsoft/kiota#2338)

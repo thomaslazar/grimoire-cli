@@ -1,3 +1,4 @@
+using System.CommandLine;
 using System.Text;
 using System.Text.Json;
 using Microsoft.Kiota.Abstractions.Serialization;
@@ -20,8 +21,8 @@ public static class JsonBodyInput
 {
     private static readonly NLog.Logger _logger = NLog.LogManager.GetCurrentClassLogger();
 
-    // Shared with SystemsCommand.RequireExactlyOneBodySource, which enforces the
-    // same both/neither rule as a parse validator so the CLI's own refusal fires
+    // Shared with RequireExactlyOneSource below, which enforces the same
+    // both/neither rule as a parse validator so the CLI's own refusal fires
     // first. This copy stays reachable only through direct unit tests.
     internal const string BothSourcesMessage = "Provide --input or --stdin, not both.";
     internal const string NeitherSourceMessage = "A request body is required. Provide --input <file> or --stdin.";
@@ -58,6 +59,25 @@ public static class JsonBodyInput
                 throw new BodyInputException($"The request body in {inputPath} is empty.");
         }
         return body;
+    }
+
+    /// <summary>
+    /// Declares --input / --stdin as mutually exclusive and exactly one required,
+    /// as a command validator so the refusal is a parse error (exit 1) before any
+    /// client is built.
+    /// </summary>
+    public static void RequireExactlyOneSource(
+        Command command, Option<string?> inputOption, Option<bool> stdinOption)
+    {
+        command.Validators.Add(result =>
+        {
+            var hasInput = result.GetValue(inputOption) != null;
+            var hasStdin = result.GetValue(stdinOption);
+            if (hasInput && hasStdin)
+                result.AddError(BothSourcesMessage);
+            else if (!hasInput && !hasStdin)
+                result.AddError(NeitherSourceMessage);
+        });
     }
 
     /// <summary>

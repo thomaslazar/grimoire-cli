@@ -126,6 +126,26 @@ Verified against v1.5.6, backing `systems update`, `systems batch-update`,
 - **`POST /api/rescan`** takes `metadata_mode: new | missing | replace` and a
   `scope` (e.g. `books/<system>/supplements`). `missing` reapplies OPF sidecars
   while treating any populated field as user-protected. Poll `GET /api/scan-status`.
+- **A `scope` that resolves to no real directory still answers `scan_started`.**
+  `resolve_scope` (`indexer/metadata.py:257-286`) validates only that the path
+  begins with a known collection (`books`/`maps`/`tokens`/`audio`) and does not
+  escape the library root — it never checks the target exists. A scope typo'd
+  or naming a non-existent subtree walks nothing and completes instantly with
+  no error, so `scan_started` alone confirms the request was well-formed, not
+  that anything was scanned.
+- **`books rescan` and `library rescan` share one `running` flag.**
+  `rescan_single_book` (`backend/routers/library/_helpers.py:291-306`, backing
+  `POST /api/books/{id}/rescan`) and `run_rescan_sync`
+  (`backend/routers/library/_helpers.py:337-353`, backing `POST /api/rescan`)
+  both guard on and set the same status flag. If a `books rescan` is still
+  running in the background, a `library rescan` fired right after it sees the
+  flag set and answers `already_running` (CLI exit 3) instead of
+  `scan_started`. The reverse guard runs the other way: a `books rescan`
+  fired while a `library rescan` is in progress sees the flag already set and
+  silently skips the single-book re-read rather than racing the full scan —
+  it still answers `rescan_queued`. Verified live: calling the two back to
+  back without waiting for `GET /api/scan-status`'s `running` to clear
+  reproduces both directions.
 - **Editions and language are metadata, not folders.** A new *flat* (non-container)
   folder under `books/` creates a system row with only `name` set; `parent_system`
   / `edition` / `system_family` stay empty until a `PATCH /api/systems/{id}`.

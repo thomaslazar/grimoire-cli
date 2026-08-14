@@ -16,12 +16,12 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | audio | 0 / 10 |
 | auth | 2 / 10 |
 | bookmarks | 0 / 4 |
-| books | 0 / 16 |
+| books | 7 / 16 |
 | campaigns | 0 / 81 |
 | downloads | 0 / 1 |
 | export | 0 / 1 |
 | favorites | 0 / 3 |
-| library | 0 / 6 |
+| library | 3 / 6 |
 | logs | 0 / 1 |
 | lookups | 0 / 15 |
 | maintenance | 0 / 2 |
@@ -33,7 +33,7 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | tags | 0 / 6 |
 | tokens | 0 / 10 |
 | users | 0 / 12 |
-| **Total** | **7 / 220** |
+| **Total** | **17 / 220** |
 
 1 operation(s) are internal-only (🔒) and excluded from covered counts.
 
@@ -98,11 +98,11 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 
 | Method | Path | Description | Perm | CLI |
 |--------|------|-------------|------|-----|
-| GET | `/api/books` | List books | not guest | — |
-| POST | `/api/books/bulk` | Bulk update books | gm or admin | — |
-| POST | `/api/books/bulk/tags` | Bulk add tags to books | gm or admin | — |
-| GET | `/api/books/{book_id}` | Get a book |  | — |
-| PATCH | `/api/books/{book_id}` | Update book metadata | gm or admin | — |
+| GET | `/api/books` | List books | not guest | `books list` ✅ |
+| POST | `/api/books/bulk` | Bulk update books | gm or admin | `books batch-update` ✅ |
+| POST | `/api/books/bulk/tags` | Bulk add tags to books | gm or admin | `books batch-tag` ✅ |
+| GET | `/api/books/{book_id}` | Get a book |  | `books get` ✅ |
+| PATCH | `/api/books/{book_id}` | Update book metadata | gm or admin | `books update` ✅ |
 | GET | `/api/books/{book_id}/file` | Download book file |  | — |
 | POST | `/api/books/{book_id}/metadata-fetch` | Fetch metadata for review | gm or admin | — |
 | POST | `/api/books/{book_id}/metadata-search` | Search a metadata source | gm or admin | — |
@@ -110,8 +110,8 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | GET | `/api/books/{book_id}/page/{page_num}` | Render a PDF page as WebP |  | — |
 | GET | `/api/books/{book_id}/page/{page_num}/text` | Get page text |  | — |
 | GET | `/api/books/{book_id}/page/{page_num}/words` | Get page word bounding boxes |  | — |
-| POST | `/api/books/{book_id}/reindex` | Re-run OCR on a book (optional DPI override) | gm or admin | — |
-| POST | `/api/books/{book_id}/rescan` | Re-read a book from disk and rebuild its search index | gm or admin | — |
+| POST | `/api/books/{book_id}/reindex` | Re-run OCR on a book (optional DPI override) | gm or admin | `books reindex` ✅ |
+| POST | `/api/books/{book_id}/rescan` | Re-read a book from disk and rebuild its search index | gm or admin | `books rescan` ✅ |
 | GET | `/api/books/{book_id}/thumbnail` | Book cover thumbnail |  | — |
 | GET | `/api/books/{book_id}/toc` | PDF table of contents |  | — |
 
@@ -226,10 +226,10 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | Method | Path | Description | Perm | CLI |
 |--------|------|-------------|------|-----|
 | GET | `/api/about` | Build information |  | 🔒 24-hour version check (all commands), forced at login |
-| POST | `/api/cancel-scan` | Cancel running scan | admin | — |
+| POST | `/api/cancel-scan` | Cancel running scan | admin | `library cancel-scan` ✅ |
 | GET | `/api/latest-release` | Latest published release |  | — |
-| POST | `/api/rescan` | Rescan and reindex library | admin | — |
-| GET | `/api/scan-status` | Scan status | admin | — |
+| POST | `/api/rescan` | Rescan and reindex library | admin | `library rescan` ✅ |
+| GET | `/api/scan-status` | Scan status | admin | `library scan-status` ✅ |
 | GET | `/api/stats` | Library statistics |  | — |
 
 ## logs

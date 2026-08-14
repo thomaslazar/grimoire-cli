@@ -84,6 +84,11 @@ internal static class Program
         o.StringValues[(typeof(Book), nameof(Book.Category))] = "core";
         o.IntValues[(typeof(GameSystemSummary), nameof(GameSystemSummary.BookCount))] = 227;
         o.IntValues[(typeof(GameSystemSummary), nameof(GameSystemSummary.TotalPageCount))] = 6002;
+        o.StringValues[(typeof(BookSummary), nameof(BookSummary.Category))] = "core";
+        o.StringValues[(typeof(BookDetail), nameof(BookDetail.Category))] = "core";
+        o.StringValues[(typeof(GameSystemRef), nameof(GameSystemRef.Name))] = "Shadowrun 6 DE";
+        o.StringValues[(typeof(GameSystemRef), nameof(GameSystemRef.Slug))] = "shadowrun-6-de";
+        o.StringValues[(typeof(ScanStatus), nameof(ScanStatus.Phase))] = "scanning";
 
         return o;
     }
