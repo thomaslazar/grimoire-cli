@@ -53,20 +53,29 @@ rejects empty bodies; and runs `PIL.Image.verify()` so a disguised file is a 400
 even when the type is right. It replaces any existing upload and answers
 `{"cover_image": "<system-id><ext>"}`. `DELETE` answers `{"status": "ok"}`.
 
-### Book folders are a second, invisible tagging layer
+### Book folders are a second, invisible tagging layer — and not enumerable
 
-A book folder is a subcategory folder *inside* a system —
-`{system_id}/{category}/{subfolder…}` — and the model
+A book folder's path takes the form `{system_id}/{category}/{subfolder…}`,
+naming a subcategory folder inside a system, and the model
 (`models/library.py:167`) has three columns: `id`, `path`, `tags`. Tagging one
 covers every book at or below that path, computed on read by
 `_book_folder_ancestor_paths` (`tag_service.py:63`). A book sitting directly in
 the category dir belongs to no folder.
 
+**A `BookFolder` row is created only by tagging.** `upsert_folder_tags`
+(`routers/systems/core.py:284`) is the only site that inserts one; nothing in
+the scanner or indexer ever does. So `list_book_folders` (`core.py:261`)
+answers with folders that have been tagged, not every subcategory folder that
+exists on disk — a system with real subcategory folders but no tags on them
+answers `{"folders": []}`.
+
 **The inheritance never reaches a book's own `tags`.** `tags_for_resource`
 (`tag_service.py:379`) reads only the `ResourceTag` join table; folder
 inheritance is resolved separately in `folder_tags_in_use` (`:509`), which
 serves the tag catalogue. So `books get` and `systems get` do not show inherited
-tags, and `book-folders list` is the only way to see that the layer exists.
+tags. Within this CLI, `book-folders list` is the only way to see them;
+server-side, `folder_tags_in_use` also feeds `GET /api/tags`
+(`routers/tags/core.py:35`).
 
 Three behaviours to surface, all in `systems/core.py:261-288`:
 
@@ -227,9 +236,10 @@ Responds {"status": "ok"}.
 **`systems book-folders list`**
 
 ```
-Subcategory folder paths under this system and their tags. A folder's
-tags are inherited by every book at or below its path, but never appear
-in a book's own tags — this is the only place they are visible.
+Folders that have been tagged, not every subcategory folder on disk —
+a folder record is created only by book-folders set; scanning never
+creates one. A tagged folder's tags are inherited by every book at or
+below its path, but never appear in a book's own tags.
 
 Books sitting directly in a category directory belong to no folder.
 ```
@@ -240,9 +250,11 @@ Books sitting directly in a category directory belong to no folder.
 Replaces the folder's tag list; batch-tag adds. An empty tags array
 clears it. Creates the folder record if the path has none.
 
-path is {system-id}/{category}/{subfolder}, from book-folders list. The
-server ignores the --id in the URL and writes whatever path the body
-names, without checking that it belongs to this system or exists.
+path is {system-id}/{category}/{subfolder}: subfolder is the segments
+of a book's relative_path between the category directory and the
+filename. The server ignores the --id in the URL and writes whatever
+path the body names, without checking that it belongs to this system
+or exists.
 
 Tags echo back as internal keys; book-folders list shows display casing.
 ```

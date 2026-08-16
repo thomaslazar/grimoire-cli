@@ -174,18 +174,28 @@ the two-arg `_http.SendAsync(request, cts.Token)` defaults to
 server has finished sending. That's fine for thumbnails and the 10 MB cover
 cap this convention was built for. Book files and page images are expected to
 reuse this same path (see `docs/roadmap.md`) — for those, buffering a large
-PDF in memory is not fine, and the fix is passing
-`HttpCompletionOption.ResponseHeadersRead` to `SendAsync` so the body streams
-instead.
+PDF in memory is not fine, and the fix is three changes together, not one:
+
+- `HttpCompletionOption.ResponseHeadersRead` on the `_http.SendAsync` call, so
+  the body streams instead of buffering.
+- The `CancellationTokenSource` moved out of its `using` and disposed only
+  when the caller is done with the stream. `SendStreamAsync` returns the
+  stream to the caller while `using var cts` is still in scope today; under
+  `ResponseHeadersRead` that would dispose the CTS while the caller is still
+  reading a live body.
+- A timeout that covers the whole download, not the fixed 100 s
+  `DefaultRequestTimeout` — which, left as is, would stay armed across an
+  entire book-file download and cancel a slow-but-healthy transfer partway
+  through.
 
 ## Role tagging
 
 Commands whose endpoint requires a non-default role call
 `command.AddRoleRequired("<role>")`, rendering a "Role required" section
 above the Notes section. `systems list`/`systems get` carry no tag — reads
-need only a non-guest account. No write command exists yet to exercise the
-`gm`/`admin` tags; when one lands, the tag string must match the
-`permissionHint` passed into the corresponding `GrimoireApiClient` call so
+need only a non-guest account. `systems cover upload`, `systems cover delete`
+and `systems book-folders set` carry `gm or admin`; the tag string must match
+the `permissionHint` passed into the corresponding `GrimoireApiClient` call so
 the 403 message and the help text agree.
 
 ## Self-Test

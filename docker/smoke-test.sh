@@ -605,7 +605,7 @@ ok "books get returns the detail shape with game_system populated"
 # Whether a fixture PDF gets a scan-generated thumbnail is the server's call,
 # not the CLI's — assert on has_thumbnail first and only download when true.
 if [ "$(echo "$GET_JSON" | jq -r .has_thumbnail)" = "true" ]; then
-  THUMB_JSON=$("$CLI" books thumbnail --id "$SR4_BOOK" --output "$WORK/thumb.jpg" 2>"$WORK/cli.err") \
+  THUMB_JSON=$("$CLI" books thumbnail --id "$SR4_BOOK" --output "$WORK/thumb.webp" 2>"$WORK/cli.err") \
     || { cat "$WORK/cli.err" >&2; fail "books thumbnail exited non-zero"; }
   [ "$(echo "$THUMB_JSON" | jq -r .bytes)" -gt 0 ] || fail "thumbnail should have bytes: $THUMB_JSON"
   ok "books thumbnail downloads the scan-generated image"

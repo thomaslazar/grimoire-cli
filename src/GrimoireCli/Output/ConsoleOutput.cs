@@ -1,5 +1,6 @@
 using System.Text.Json;
 using System.Text.Json.Serialization.Metadata;
+using GrimoireCli.Commands;
 using GrimoireCli.Models;
 
 namespace GrimoireCli.Output;
@@ -27,18 +28,35 @@ public static class ConsoleOutput
     /// Writes a binary body. "-" sends the bytes to stdout and prints nothing
     /// else; any other value is a file path, written and then reported as JSON so
     /// stdout stays parseable in the default case. The stdout parameter exists so
-    /// the "-" branch is testable.
+    /// the "-" branch is testable; when supplied, the caller owns it and it is not
+    /// disposed here.
     /// </summary>
     public static async Task WriteStreamAsync(Stream source, string output, Stream? stdout = null)
     {
         if (output == "-")
         {
-            await using var target = stdout ?? Console.OpenStandardOutput();
-            await source.CopyToAsync(target);
+            var target = stdout ?? Console.OpenStandardOutput();
+            try
+            {
+                await source.CopyToAsync(target);
+            }
+            finally
+            {
+                if (stdout is null) await target.DisposeAsync();
+            }
             return;
         }
+        FileStream file;
+        try
+        {
+            file = new FileStream(output, FileMode.Create, FileAccess.Write);
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or ArgumentException or NotSupportedException)
+        {
+            throw new BodyInputException($"Could not write {output}: {ex.Message}");
+        }
         long bytes;
-        await using (var file = new FileStream(output, FileMode.Create, FileAccess.Write))
+        await using (file)
         {
             await source.CopyToAsync(file);
             bytes = file.Length;

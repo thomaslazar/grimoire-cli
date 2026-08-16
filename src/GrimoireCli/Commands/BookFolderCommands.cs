@@ -27,9 +27,10 @@ public static class BookFolderCommands
             idOption, serverOption, tokenOption
         };
         command.AddHelpSection("Notes", HelpSectionPosition.Top,
-            "Subcategory folder paths under this system and their tags. A folder's",
-            "tags are inherited by every book at or below its path, but never appear",
-            "in a book's own tags — this is the only place they are visible.",
+            "Folders that have been tagged, not every subcategory folder on disk —",
+            "a folder record is created only by book-folders set; scanning never",
+            "creates one. A tagged folder's tags are inherited by every book at or",
+            "below its path, but never appear in a book's own tags.",
             "",
             "Books sitting directly in a category directory belong to no folder.");
         command.AddExamples("grimoire-cli systems book-folders list --id <system-id>");
@@ -64,9 +65,11 @@ public static class BookFolderCommands
             "Replaces the folder's tag list; batch-tag adds. An empty tags array",
             "clears it. Creates the folder record if the path has none.",
             "",
-            "path is {system-id}/{category}/{subfolder}, from book-folders list. The",
-            "server ignores the --id in the URL and writes whatever path the body",
-            "names, without checking that it belongs to this system or exists.",
+            "path is {system-id}/{category}/{subfolder}: subfolder is the segments",
+            "of a book's relative_path between the category directory and the",
+            "filename. The server ignores the --id in the URL and writes whatever",
+            "path the body names, without checking that it belongs to this system",
+            "or exists.",
             "",
             "Tags echo back as internal keys; book-folders list shows display casing.");
         command.AddExamples(
@@ -81,7 +84,7 @@ public static class BookFolderCommands
             {
                 body = JsonBodyInput.Read(parseResult.GetValue(inputOption), parseResult.GetValue(stdinOption));
                 JsonBodyInput.Validate(body, Generated.Models.BookFolderUpdate.CreateFromDiscriminatorValue,
-                    "pass it with --id");
+                    "the folder is addressed by path; --id in the URL is ignored");
             }
             catch (BodyInputException ex)
             {

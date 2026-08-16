@@ -7,6 +7,8 @@ namespace GrimoireCli.Commands;
 
 public static class CoverCommands
 {
+    private static readonly NLog.Logger _logger = NLog.LogManager.GetCurrentClassLogger();
+
     public static Command Create()
     {
         var command = new Command("cover", "The system's cover image");
@@ -48,7 +50,15 @@ public static class CoverCommands
                 tokenOverride: parseResult.GetValue(tokenOption));
             var service = new SystemsService(client);
             await using var stream = await service.CoverAsync(parseResult.GetValue(idOption)!);
-            await ConsoleOutput.WriteStreamAsync(stream, parseResult.GetValue(outputOption)!);
+            try
+            {
+                await ConsoleOutput.WriteStreamAsync(stream, parseResult.GetValue(outputOption)!);
+            }
+            catch (BodyInputException ex)
+            {
+                _logger.Error(ex.Message);
+                return 1;
+            }
             return 0;
         });
         return command;
@@ -79,7 +89,16 @@ public static class CoverCommands
                 serverOverride: parseResult.GetValue(serverOption),
                 tokenOverride: parseResult.GetValue(tokenOption));
             var service = new SystemsService(client);
-            var result = await service.UploadCoverAsync(parseResult.GetValue(idOption)!, parseResult.GetValue(fileOption)!);
+            CoverUploadResult result;
+            try
+            {
+                result = await service.UploadCoverAsync(parseResult.GetValue(idOption)!, parseResult.GetValue(fileOption)!);
+            }
+            catch (BodyInputException ex)
+            {
+                _logger.Error(ex.Message);
+                return 1;
+            }
             ConsoleOutput.WriteJson(result, AppJsonContext.Default.CoverUploadResult);
             return 0;
         });

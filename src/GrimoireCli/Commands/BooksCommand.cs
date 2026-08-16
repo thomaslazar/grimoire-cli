@@ -337,8 +337,8 @@ public static class BooksCommand
             "--output - writes the image to stdout; a path writes the file and",
             "prints {path, bytes}.");
         command.AddExamples(
-            "grimoire-cli books thumbnail --id <id> --output cover.jpg",
-            "grimoire-cli books thumbnail --id <id> --output - > cover.jpg");
+            "grimoire-cli books thumbnail --id <id> --output cover.webp",
+            "grimoire-cli books thumbnail --id <id> --output - > cover.webp");
         command.AddResponseExample<SavedFile>();
         command.SetAction(async (parseResult, cancellationToken) =>
         {
@@ -347,7 +347,15 @@ public static class BooksCommand
                 tokenOverride: parseResult.GetValue(tokenOption));
             var service = new BooksService(client);
             await using var stream = await service.ThumbnailAsync(parseResult.GetValue(idOption)!);
-            await ConsoleOutput.WriteStreamAsync(stream, parseResult.GetValue(outputOption)!);
+            try
+            {
+                await ConsoleOutput.WriteStreamAsync(stream, parseResult.GetValue(outputOption)!);
+            }
+            catch (BodyInputException ex)
+            {
+                _logger.Error(ex.Message);
+                return 1;
+            }
             return 0;
         });
         return command;

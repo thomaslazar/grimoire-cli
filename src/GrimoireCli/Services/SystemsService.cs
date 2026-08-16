@@ -1,5 +1,6 @@
 using System.Text;
 using GrimoireCli.Api;
+using GrimoireCli.Commands;
 using GrimoireCli.Models;
 
 namespace GrimoireCli.Services;
@@ -113,8 +114,17 @@ public class SystemsService
     /// </summary>
     public async Task<CoverUploadResult> UploadCoverAsync(string id, string filePath)
     {
+        byte[] bytes;
+        try
+        {
+            bytes = await File.ReadAllBytesAsync(filePath);
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or ArgumentException or NotSupportedException)
+        {
+            throw new BodyInputException($"Could not read {filePath}: {ex.Message}");
+        }
         var body = new Microsoft.Kiota.Abstractions.MultipartBody();
-        body.AddOrReplacePart("file", MimeForExtension(filePath), await File.ReadAllBytesAsync(filePath), Path.GetFileName(filePath));
+        body.AddOrReplacePart("file", MimeForExtension(filePath), bytes, Path.GetFileName(filePath));
         var info = _client.Api.Api.Systems[id].Cover.ToPostRequestInformation(body);
         return await _client.SendAsync(info, AppJsonContext.Default.CoverUploadResult, permissionHint: "the gm or admin role");
     }

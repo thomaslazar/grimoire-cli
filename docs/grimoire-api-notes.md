@@ -360,17 +360,26 @@ Verified against v1.5.6 by reading `backend/routers/systems/core.py:261-288`,
 `backend/models/library.py:167` and `backend/services/tag_service.py`, backing
 `systems book-folders list|set`.
 
-- **A book folder is a second, invisible tagging layer.** It is a subcategory
-  folder inside a system (`{system_id}/{category}/{subfolder…}`); the model
-  has three columns, `id`, `path`, `tags`. Tagging one folder covers every
-  book at or below that path, resolved on read by
-  `_book_folder_ancestor_paths` (`tag_service.py:63`). A book directly in the
-  category directory (no subfolder) belongs to no folder.
+- **A book folder is a second, invisible tagging layer, addressed by path
+  rather than enumerated.** Its path takes the form
+  `{system_id}/{category}/{subfolder…}`; the model has three columns, `id`,
+  `path`, `tags`. Tagging one folder covers every book at or below that path,
+  resolved on read by `_book_folder_ancestor_paths` (`tag_service.py:63`). A
+  book directly in the category directory (no subfolder) belongs to no
+  folder.
+- **A `BookFolder` row exists only once a path has been tagged.** The call to
+  `upsert_folder_tags` (`routers/systems/core.py:284`) is the only site that
+  inserts one; the scanner and indexer never do. So `list_book_folders`
+  (`core.py:261`) returns folders that have been tagged, not every
+  subcategory folder present on disk — a real, untagged subfolder has no row
+  and does not appear.
 - **The inheritance never reaches a book's own `tags`.** `tags_for_resource`
   (`tag_service.py:379`) reads only the `ResourceTag` join table; folder
   inheritance is resolved separately in `folder_tags_in_use` (`:509`), which
   serves the tag catalogue instead. `books get` and `systems get` do not show
-  inherited tags — `book-folders list` is the only place they're visible.
+  inherited tags. Within this CLI, `book-folders list` is the only way to see
+  them; server-side, `folder_tags_in_use` also feeds `GET /api/tags`
+  (`routers/tags/core.py:35`).
 - **`PATCH` replaces the tag list**, unlike `books batch-tag` /
   `systems batch-tag`, which are additive. An empty `tags` clears the folder.
 - **The `{system_id}` in the PATCH URL is ignored by the write.**

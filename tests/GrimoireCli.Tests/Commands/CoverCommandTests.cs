@@ -66,4 +66,17 @@ public class CoverCommandTests
     [InlineData("art", "application/octet-stream")]
     public void MimeComesFromTheExtension(string file, string expected) =>
         Assert.Equal(expected, SystemsService.MimeForExtension(file));
+
+    // Reproduces the unguarded File.ReadAllBytesAsync: a missing --file must
+    // report BodyInputException the same way JsonBodyInput.Read does, not throw
+    // raw and crash the process before any client call is made.
+    [Fact]
+    public async Task UploadReportsAMissingFileInsteadOfThrowingRaw()
+    {
+        var missing = Path.Combine(Path.GetTempPath(), $"cover-missing-{Guid.NewGuid():N}.png");
+        var service = new SystemsService(null!);
+        var ex = await Assert.ThrowsAsync<BodyInputException>(() => service.UploadCoverAsync("sys", missing));
+        Assert.Contains("Could not read", ex.Message);
+        Assert.Contains(missing, ex.Message);
+    }
 }
