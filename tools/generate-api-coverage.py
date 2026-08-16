@@ -74,8 +74,6 @@ IMPLEMENTED = {
     "GET /api/systems/{system_id}/cover": "`systems cover get` ✅",
     "POST /api/systems/{system_id}/cover": "`systems cover upload` ✅",
     "DELETE /api/systems/{system_id}/cover": "`systems cover delete` ✅",
-    "GET /api/systems/{system_id}/book-folders": "`systems book-folders list` ✅",
-    "PATCH /api/systems/{system_id}/book-folders": "`systems book-folders set` ✅",
     "GET /api/books/{book_id}/thumbnail": "`books thumbnail` ✅",
 }
 

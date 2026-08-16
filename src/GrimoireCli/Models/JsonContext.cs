@@ -42,8 +42,5 @@ namespace GrimoireCli.Models;
 [JsonSerializable(typeof(CleanupResult))]
 [JsonSerializable(typeof(SavedFile))]
 [JsonSerializable(typeof(CoverUploadResult))]
-[JsonSerializable(typeof(BookFolder))]
-[JsonSerializable(typeof(BookFolderList))]
-[JsonSerializable(typeof(BookFolderUpdated))]
 [JsonSourceGenerationOptions(WriteIndented = true)]
 public partial class AppJsonContext : JsonSerializerContext;

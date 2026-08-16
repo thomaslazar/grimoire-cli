@@ -151,25 +151,4 @@ public class SystemsService
         return await _client.SendAsync(info, permissionHint: "the gm or admin role");
     }
 
-    /// <summary>GET /api/systems/{id}/book-folders. Tags come back in display casing.</summary>
-    public async Task<BookFolderList> BookFoldersAsync(string id)
-    {
-        var info = _client.Api.Api.Systems[id].BookFolders.ToGetRequestInformation();
-        return await _client.SendAsync(info, AppJsonContext.Default.BookFolderList,
-            notFoundHint: "No system with that ID. List them with: grimoire-cli systems list");
-    }
-
-    /// <summary>
-    /// PATCH /api/systems/{id}/book-folders. Replaces the folder's tags. The
-    /// server ignores the id in the URL and writes whatever path the body names;
-    /// the validated raw body reaches it byte-for-byte, as the update commands do.
-    /// </summary>
-    public async Task<BookFolderUpdated> SetBookFolderAsync(string id, string rawBody)
-    {
-        var info = _client.Api.Api.Systems[id].BookFolders.ToPatchRequestInformation(
-            new Generated.Models.BookFolderUpdate());
-        info.SetStreamContent(new MemoryStream(Encoding.UTF8.GetBytes(rawBody)), "application/json");
-        return await _client.SendAsync(info, AppJsonContext.Default.BookFolderUpdated,
-            permissionHint: "the gm or admin role");
-    }
 }

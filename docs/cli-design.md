@@ -145,10 +145,13 @@ Run --help-full to see the request and response shapes.
 
 **Several HTTP methods on one path become a nested subgroup; distinct sibling
 paths stay flat, with leaf names mirroring the path segment.** `/systems/{id}/cover`
-is GET/POST/DELETE → `systems cover get|upload|delete`. `/systems/{id}/book-folders`
-is GET/PATCH → `systems book-folders list|set`. `/books/{id}/thumbnail` is a
+is GET/POST/DELETE → `systems cover get|upload|delete`. `/books/{id}/thumbnail` is a
 single GET with no verb set to host → the flat `books thumbnail`, never a
 one-verb group.
+
+(`/systems/{id}/book-folders` is GET/PATCH and would nest the same way as
+`cover`, but no command ships for it today — see
+[docs/roadmap.md](roadmap.md).)
 
 This corrects an earlier rule: `systems metadata-sources` /
 `metadata-search` / `metadata-fetch` were justified by "every command here is
@@ -193,10 +196,10 @@ PDF in memory is not fine, and the fix is three changes together, not one:
 Commands whose endpoint requires a non-default role call
 `command.AddRoleRequired("<role>")`, rendering a "Role required" section
 above the Notes section. `systems list`/`systems get` carry no tag — reads
-need only a non-guest account. `systems cover upload`, `systems cover delete`
-and `systems book-folders set` carry `gm or admin`; the tag string must match
-the `permissionHint` passed into the corresponding `GrimoireApiClient` call so
-the 403 message and the help text agree.
+need only a non-guest account. `systems cover upload` and `systems cover
+delete` carry `gm or admin`; the tag string must match the `permissionHint`
+passed into the corresponding `GrimoireApiClient` call so the 403 message and
+the help text agree.
 
 ## Self-Test
 

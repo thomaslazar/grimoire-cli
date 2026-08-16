@@ -543,6 +543,10 @@ git commit -m "feat: add systems cover get, upload and delete"
 
 ### Task 4: `systems book-folders list|set`
 
+> Implemented as planned, then cut before merge: the server's two readers of
+> a folder path disagree for a container child, so no path is correct for
+> both. See [hunter-read/grimoire#357](https://github.com/hunter-read/grimoire/issues/357).
+
 **Files:**
 - Create: `src/GrimoireCli/Models/BookFolder.cs`, `src/GrimoireCli/Models/BookFolderList.cs`, `src/GrimoireCli/Models/BookFolderUpdated.cs`, `src/GrimoireCli/Commands/BookFolderCommands.cs`
 - Modify: `src/GrimoireCli/Services/SystemsService.cs`, `src/GrimoireCli/Commands/SystemsCommand.cs`, `src/GrimoireCli/Models/JsonContext.cs`

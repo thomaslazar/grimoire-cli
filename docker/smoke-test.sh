@@ -528,22 +528,6 @@ grep -qi "not found" "$WORK/cover-gone.err" \
   || fail "no not-found hint: $(cat "$WORK/cover-gone.err")"
 ok "systems cover delete removes the upload"
 
-# --- book folders -----------------------------------------------------------
-# Fixed path and fixed tags, so a second run converges.
-FOLDER_PATH="$SR4/core/smoke-fixture-folder"
-SET_JSON=$(printf '{"path":"%s","tags":["smoke"]}' "$FOLDER_PATH" \
-  | "$CLI" systems book-folders set --id "$SR4" --stdin 2>"$WORK/cli.err") \
-  || { cat "$WORK/cli.err" >&2; fail "book-folders set exited non-zero"; }
-[ "$(echo "$SET_JSON" | jq -r .path)" = "$FOLDER_PATH" ] \
-  || fail "set should echo the path it wrote: $SET_JSON"
-ok "systems book-folders set writes a folder's tags"
-
-FOLDERS_JSON=$("$CLI" systems book-folders list --id "$SR4" 2>"$WORK/cli.err") \
-  || { cat "$WORK/cli.err" >&2; fail "book-folders list exited non-zero"; }
-echo "$FOLDERS_JSON" | jq -e --arg p "$FOLDER_PATH" '.folders[] | select(.path == $p)' >/dev/null \
-  || fail "the folder just written should be listed: $FOLDERS_JSON"
-ok "systems book-folders list shows the written folder"
-
 # --- books --------------------------------------------------------------------
 # Requires docker/seed.sh to have run. EXPECTED_BOOKS mirrors the fixture count
 # there; changing a fixture must change this number. Shadowrun 4 DE additionally

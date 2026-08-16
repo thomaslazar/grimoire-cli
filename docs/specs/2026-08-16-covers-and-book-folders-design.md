@@ -55,6 +55,14 @@ even when the type is right. It replaces any existing upload and answers
 
 ### Book folders are a second, invisible tagging layer — and not enumerable
 
+> **Status: cut before merge.** `systems book-folders list|set` were built,
+> tested and reviewed, then removed before this branch merged: the server's
+> two readers of a folder path disagree by one segment for a container
+> child (see [docs/grimoire-api-notes.md](../grimoire-api-notes.md)), so no
+> path the CLI sends can be correct for both. Tracked upstream as
+> [hunter-read/grimoire#357](https://github.com/hunter-read/grimoire/issues/357);
+> this section stays as the grounding research and returns when that is fixed.
+
 A book folder's path takes the form `{system_id}/{category}/{subfolder…}`,
 naming a subcategory folder inside a system, and the model
 (`models/library.py:167`) has three columns: `id`, `path`, `tags`. Tagging one
@@ -232,6 +240,9 @@ survives. Exits 0 whether or not one was uploaded.
 
 Responds {"status": "ok"}.
 ```
+
+> **Status: cut before merge**, see the note above — kept as the help text
+> that was shipped, then removed.
 
 **`systems book-folders list`**
 

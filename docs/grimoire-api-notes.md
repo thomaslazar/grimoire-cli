@@ -357,8 +357,10 @@ and `books thumbnail`.
 ## Book folders
 
 Verified against v1.5.6 by reading `backend/routers/systems/core.py:261-288`,
-`backend/models/library.py:167` and `backend/services/tag_service.py`, backing
-`systems book-folders list|set`.
+`backend/models/library.py:167` and `backend/services/tag_service.py`. No CLI
+command currently exposes this endpoint — `systems book-folders list|set`
+were built and then cut before merge; see the depth mismatch below and
+[hunter-read/grimoire#357](https://github.com/hunter-read/grimoire/issues/357).
 
 - **A book folder is a second, invisible tagging layer, addressed by path
   rather than enumerated.** Its path takes the form
@@ -392,6 +394,18 @@ Verified against v1.5.6 by reading `backend/routers/systems/core.py:261-288`,
   keys to display casing via `folder_display_tags`; `PATCH` echoes the
   internal keys straight from `upsert_folder_tags`. A round trip need not
   match byte-for-byte.
+- **The frontend and backend derive a folder's subfolder segments at
+  different depths for a container child, so no path is correct for both
+  readers.** The frontend computes `parts.slice(categoryDepth + 1, -1)` where
+  `categoryDepth` is 3 when the system has `parent_id` set
+  (`frontend/src/components/system/folderTree.js:16-30`); the backend's
+  `tag_service.py:51-60` uses a hardcoded `parts[3:-1]` regardless of whether
+  the system is a container child. For a container child these differ by one
+  segment. Measured live: a folder tag written at the path one reader expects
+  renders correctly in the UI tree but does not resolve via
+  `GET /api/tags/{internal}/items`, or vice versa — never both. Reported
+  upstream as
+  [hunter-read/grimoire#357](https://github.com/hunter-read/grimoire/issues/357).
 
 ## Cleanup of missing files
 
