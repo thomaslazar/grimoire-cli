@@ -6,6 +6,11 @@
 |---|---|---|
 | 0.1.x | 1.5.6 | initial support |
 
+Grimoire 1.6.0 is unreleased and needs more than a version bump — it shortens the
+access token from 30 days to 30 minutes and types every response in the spec. See
+[grimoire-1.6.0-migration.md](grimoire-1.6.0-migration.md); the work is parked on
+`epic/grimoire-1.6.0`.
+
 ## Runtime check
 
 `src/GrimoireCli/Api/GrimoireApiClient.cs` defines `MinSupportedVersion` and
