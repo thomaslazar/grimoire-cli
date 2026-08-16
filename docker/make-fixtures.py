@@ -6,6 +6,7 @@ here is parseable by the indexer. Install with: sudo apt-get install -y python3-
 (the devcontainer image does this; rebuild the container if the import fails).
 
 Usage: make-fixtures.py <path> <pages>
+       make-fixtures.py --png <path>
 """
 import sys
 

@@ -17,14 +17,17 @@ public class WriteStreamTests
         {
             using var source = new MemoryStream(payload);
             await ConsoleOutput.WriteStreamAsync(source, path);
-        }
-        finally { Console.SetOut(original); }
 
-        Assert.Equal(payload, await File.ReadAllBytesAsync(path));
-        var receipt = stdout.ToString();
-        Assert.Contains("\"bytes\": 5", receipt);
-        Assert.Contains(path, receipt);
-        File.Delete(path);
+            Assert.Equal(payload, await File.ReadAllBytesAsync(path));
+            var receipt = stdout.ToString();
+            Assert.Contains("\"bytes\": 5", receipt);
+            Assert.Contains(path, receipt);
+        }
+        finally
+        {
+            Console.SetOut(original);
+            File.Delete(path);
+        }
     }
 
     // "-" is the documented escape hatch: raw bytes, and no JSON at all, so the
@@ -34,14 +37,17 @@ public class WriteStreamTests
     {
         var path = Path.Combine(Path.GetTempPath(), $"grimoire-dash-{Guid.NewGuid():N}.bin");
         var payload = Encoding.UTF8.GetBytes("not json");
-        await using (var captured = File.Create(path))
+        try
         {
-            var original = Console.OpenStandardOutput();
-            // Redirect the process stdout handle so the helper's own write lands in the file.
-            using var source = new MemoryStream(payload);
-            await ConsoleOutput.WriteStreamAsync(source, "-", captured);
+            await using (var captured = File.Create(path))
+            {
+                // The explicit stdout argument, not a redirected Console.Out, is what
+                // routes the helper's write into the file.
+                using var source = new MemoryStream(payload);
+                await ConsoleOutput.WriteStreamAsync(source, "-", captured);
+            }
+            Assert.Equal(payload, await File.ReadAllBytesAsync(path));
         }
-        Assert.Equal(payload, await File.ReadAllBytesAsync(path));
-        File.Delete(path);
+        finally { File.Delete(path); }
     }
 }

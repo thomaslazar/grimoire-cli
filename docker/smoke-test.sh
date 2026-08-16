@@ -495,6 +495,8 @@ set +e
 "$CLI" systems cover get --id "$COVER_SYS" --output "$WORK/none.png" >/dev/null 2>"$WORK/cover404.err"; rc=$?
 set -e
 [ "$rc" -eq 2 ] || fail "cover get on a system with no cover should exit 2, got $rc: $(cat "$WORK/cover404.err")"
+grep -qi "not found" "$WORK/cover404.err" \
+  || fail "no not-found hint: $(cat "$WORK/cover404.err")"
 ok "systems cover get 404s when the system has no cover"
 
 UPLOAD_JSON=$("$CLI" systems cover upload --id "$COVER_SYS" --file docker/fixture-cover.png 2>"$WORK/cli.err") \
@@ -522,6 +524,8 @@ set +e
 "$CLI" systems cover get --id "$COVER_SYS" --output "$WORK/gone.png" >/dev/null 2>"$WORK/cover-gone.err"; rc=$?
 set -e
 [ "$rc" -eq 2 ] || fail "cover get after delete should exit 2 again, got $rc: $(cat "$WORK/cover-gone.err")"
+grep -qi "not found" "$WORK/cover-gone.err" \
+  || fail "no not-found hint: $(cat "$WORK/cover-gone.err")"
 ok "systems cover delete removes the upload"
 
 # --- book folders -----------------------------------------------------------

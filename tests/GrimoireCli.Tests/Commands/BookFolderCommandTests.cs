@@ -25,6 +25,13 @@ public class BookFolderCommandTests
         Assert.NotEmpty(SystemsCommand.Create().Parse(["book-folders", "set", "--id", "1"]).Errors);
 
     [Fact]
+    public void IdIsRequiredOnListAndSet()
+    {
+        Assert.NotEmpty(SystemsCommand.Create().Parse(["book-folders", "list"]).Errors);
+        Assert.NotEmpty(SystemsCommand.Create().Parse(["book-folders", "set", "--stdin"]).Errors);
+    }
+
+    [Fact]
     public void SetWarnsThatItReplacesTags()
     {
         Assert.Contains("Replaces the folder's tag list", Help("set", full: false));
