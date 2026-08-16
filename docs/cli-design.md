@@ -141,6 +141,43 @@ Examples:
 Run --help-full to see the request and response shapes.
 ```
 
+## Nesting: when a resource gets a subgroup
+
+**Several HTTP methods on one path become a nested subgroup; distinct sibling
+paths stay flat, with leaf names mirroring the path segment.** `/systems/{id}/cover`
+is GET/POST/DELETE → `systems cover get|upload|delete`. `/systems/{id}/book-folders`
+is GET/PATCH → `systems book-folders list|set`. `/books/{id}/thumbnail` is a
+single GET with no verb set to host → the flat `books thumbnail`, never a
+one-verb group.
+
+This corrects an earlier rule: `systems metadata-sources` /
+`metadata-search` / `metadata-fetch` were justified by "every command here is
+two levels deep," which was the wrong generalization — those three are
+distinct sibling paths under `systems`, flat for the same reason
+`books thumbnail` is, not because of a depth cap. They stay as shipped; the
+rule above is the one to apply to the next resource.
+
+## Binary output
+
+`--output` is required on a command whose response is bytes, not JSON:
+`"Output file path, or '-' for binary to stdout"`. `-` copies the bytes to
+stdout and prints nothing else; any other value writes the file, then prints
+a `SavedFile` receipt (`{path, bytes}`) so stdout stays valid JSON in the
+default case. Both commands share one helper, `ConsoleOutput.WriteStreamAsync`,
+rather than repeating the branch per command.
+
+`GrimoireApiClient.SendStreamAsync` is `SendAsync` with `ReadAsStreamAsync` in
+place of `ReadAsStringAsync` — same preflight version check, permission hints
+and error handling. **It still buffers the whole response body in memory**:
+the two-arg `_http.SendAsync(request, cts.Token)` defaults to
+`HttpCompletionOption.ResponseContentRead`, so nothing streams until the
+server has finished sending. That's fine for thumbnails and the 10 MB cover
+cap this convention was built for. Book files and page images are expected to
+reuse this same path (see `docs/roadmap.md`) — for those, buffering a large
+PDF in memory is not fine, and the fix is passing
+`HttpCompletionOption.ResponseHeadersRead` to `SendAsync` so the body streams
+instead.
+
 ## Role tagging
 
 Commands whose endpoint requires a non-default role call
@@ -181,6 +218,7 @@ per that section's own instruction to record deviations where they're found:
   `--page`; `GET /api/systems` returns a bare array with no pagination
   envelope, so `systems list` has none either. This will need revisiting if
   a paginated list endpoint is implemented.
-- **No upload/cover/image commands.** Grimoire's library is mounted
-  read-only; there is no upload API. Content arrives on disk, then
-  `POST /api/rescan` — not modeled as a CLI command yet.
+- **No library-content upload.** Grimoire's library is mounted read-only;
+  book/map/token files arrive on disk, then `POST /api/rescan` — not modeled
+  as a CLI command yet. `systems cover upload` is a narrow exception: a cover
+  image is stored separately from the library tree, on its own endpoint.

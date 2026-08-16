@@ -197,6 +197,12 @@ The JWT is valid for 30 days. Grimoire has **no refresh endpoint**, so an expire
 | `books batch-tag {--input <file> \| --stdin}` | Add tags to many books, additively; exit 3 if partial (gm or admin) |
 | `books reindex --id <id> [--ocr-dpi <n>]` | Re-run OCR on one book (gm or admin) |
 | `books rescan --id <id>` | Re-read one book from disk and rebuild its index (gm or admin) |
+| `books thumbnail --id <id> --output <path\|->` | Download a book's scan-generated cover thumbnail |
+| `systems cover get --id <id> --output <path\|->` | Download a system's cover image |
+| `systems cover upload --id <id> --file <path>` | Upload a system's cover image (gm or admin) |
+| `systems cover delete --id <id>` | Delete a system's uploaded cover image (gm or admin) |
+| `systems book-folders list --id <id>` | List a system's subcategory folders and their tags |
+| `systems book-folders set --id <id> {--input <file> \| --stdin}` | Set a subcategory folder's tags (gm or admin) |
 | `systems metadata-sources --id <id>` | Add-ons that can supply metadata for this system (gm or admin) |
 | `systems metadata-search --id <id> --source-id <src> [--query]` | Ranked candidates from one add-on (gm or admin) |
 | `systems metadata-fetch --id <id> --source-id <src> {--identity <i> \| --paste <url>} [--query]` | Diff a candidate against the system; writes nothing (gm or admin) |

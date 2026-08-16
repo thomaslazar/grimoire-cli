@@ -328,6 +328,62 @@ fixture add-on (`docker/addon-index/fixture-source.yml`) and via
   installed"}`. No 502 was produced in these live runs — the fixture add-on
   never fails, so that path is unverified live.
 
+## System covers
+
+Verified against v1.5.6 by reading `backend/routers/systems/covers.py` and
+`backend/routers/systems/__init__.py`, backing `systems cover get|upload|delete`
+and `books thumbnail`.
+
+- **Three sources of system cover art, in precedence order**
+  (`systems/__init__.py:96`): a `cover.*`/`folder.*` image in the system's
+  library folder (library-managed, not reachable through the API), then an
+  uploaded cover (`system.cover_image`, under `SYSTEM_COVER_DIR`), then
+  neither — `GET` 404s and a client is expected to fall back to
+  `cover_book_id`, served by `GET /api/books/{id}/thumbnail`.
+- **An upload can succeed and change nothing about what `GET` returns.**
+  Folder art always wins over an upload, and `DELETE` never touches folder
+  art — it only removes the upload.
+- **`POST` is `multipart/form-data`** with the part named `file`
+  (`covers.py:122-153`), FastAPI binding `file: UploadFile = File(...)`. It
+  checks `file.content_type` against `image/png`, `image/jpeg`, `image/webp`,
+  `image/gif`; caps at 10 MB (413); rejects an empty body; and runs
+  `PIL.Image.verify()`, so a disguised file is a 400 even when the declared
+  type is right. It replaces any existing upload and answers
+  `{"cover_image": "<system-id><ext>"}`. `DELETE` answers `{"status": "ok"}`.
+- **Books have no cover endpoint of their own.** `GET /api/books/{id}/thumbnail`
+  is scan-derived from the book file, not an uploaded image, and there is no
+  corresponding upload or delete for it.
+
+## Book folders
+
+Verified against v1.5.6 by reading `backend/routers/systems/core.py:261-288`,
+`backend/models/library.py:167` and `backend/services/tag_service.py`, backing
+`systems book-folders list|set`.
+
+- **A book folder is a second, invisible tagging layer.** It is a subcategory
+  folder inside a system (`{system_id}/{category}/{subfolder…}`); the model
+  has three columns, `id`, `path`, `tags`. Tagging one folder covers every
+  book at or below that path, resolved on read by
+  `_book_folder_ancestor_paths` (`tag_service.py:63`). A book directly in the
+  category directory (no subfolder) belongs to no folder.
+- **The inheritance never reaches a book's own `tags`.** `tags_for_resource`
+  (`tag_service.py:379`) reads only the `ResourceTag` join table; folder
+  inheritance is resolved separately in `folder_tags_in_use` (`:509`), which
+  serves the tag catalogue instead. `books get` and `systems get` do not show
+  inherited tags — `book-folders list` is the only place they're visible.
+- **`PATCH` replaces the tag list**, unlike `books batch-tag` /
+  `systems batch-tag`, which are additive. An empty `tags` clears the folder.
+- **The `{system_id}` in the PATCH URL is ignored by the write.**
+  `update_book_folder` takes it as a path parameter and never reads it —
+  `data.path` alone decides which row is written, with nothing validating that
+  the path belongs to that system or exists on disk. `GET` *does* filter by
+  `path.like(f"{system_id}/%")`, so read and write disagree about what the URL
+  means. A caller can write another system's folder through any system's URL.
+- **Read and write return tags differently.** `GET` resolves stored internal
+  keys to display casing via `folder_display_tags`; `PATCH` echoes the
+  internal keys straight from `upsert_folder_tags`. A round trip need not
+  match byte-for-byte.
+
 ## Cleanup of missing files
 
 Verified against v1.5.6 by reading `backend/routers/maintenance/`, backing

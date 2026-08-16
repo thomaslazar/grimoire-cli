@@ -9,10 +9,8 @@ when it ships.
 
 ## Next
 
-1. **The remaining systems endpoints.** Cover (get/upload/delete) and
-   book-folders (list/update).
-2. **Book text extraction.** `toc`, `page/{n}/text`, `page/{n}/words` — all JSON,
+1. **Book text extraction.** `toc`, `page/{n}/text`, `page/{n}/words` — all JSON,
    and what an agent needs to read a rulebook rather than catalogue it.
-3. **Binary endpoints.** `books/{id}/file`, `/thumbnail`, `/page/{n}`, and systems
-   cover images. These return bytes, not JSON, so the first of them settles an
-   output convention the CLI has not needed until now.
+2. **The remaining binary endpoints.** `books/{id}/file`, `/page/{n}`, and
+   map/token thumbnails. The output convention is settled (`--output`, `-` for
+   stdout, a `SavedFile` receipt otherwise); what remains is applying it here.
