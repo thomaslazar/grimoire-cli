@@ -95,4 +95,49 @@ public class SystemsService
             AppJsonContext.Default.BulkTagResult,
             permissionHint: "the gm or admin role");
     }
+
+    /// <summary>GET /api/systems/{id}/cover. Bytes: folder art if the library has
+    /// any, otherwise the uploaded cover; 404 when it has neither.</summary>
+    public async Task<Stream> CoverAsync(string id)
+    {
+        var info = _client.Api.Api.Systems[id].Cover.ToGetRequestInformation();
+        return await _client.SendStreamAsync(info);
+    }
+
+    /// <summary>
+    /// POST /api/systems/{id}/cover. The CLI's only multipart body: a
+    /// <see cref="Microsoft.Kiota.Abstractions.MultipartBody"/> with one part named
+    /// "file" — the name FastAPI binds — built with the generated builder's own
+    /// <c>ToPostRequestInformation</c>. An empty <c>MultipartBody</c> throws ("No
+    /// parts to serialize"), so the part must be added before that call.
+    /// </summary>
+    public async Task<CoverUploadResult> UploadCoverAsync(string id, string filePath)
+    {
+        var body = new Microsoft.Kiota.Abstractions.MultipartBody();
+        body.AddOrReplacePart("file", MimeForExtension(filePath), await File.ReadAllBytesAsync(filePath), Path.GetFileName(filePath));
+        var info = _client.Api.Api.Systems[id].Cover.ToPostRequestInformation(body);
+        return await _client.SendAsync(info, AppJsonContext.Default.CoverUploadResult, permissionHint: "the gm or admin role");
+    }
+
+    /// <summary>
+    /// The content type the server checks `file.content_type` against. Unknown
+    /// extensions send octet-stream and let the server refuse — which types are
+    /// acceptable is its policy, not ours. Internal so a test can pin the map.
+    /// </summary>
+    internal static string MimeForExtension(string path) => Path.GetExtension(path).ToLowerInvariant() switch
+    {
+        ".png" => "image/png",
+        ".jpg" or ".jpeg" => "image/jpeg",
+        ".webp" => "image/webp",
+        ".gif" => "image/gif",
+        _ => "application/octet-stream",
+    };
+
+    /// <summary>DELETE /api/systems/{id}/cover. Removes the upload only; folder
+    /// art is library-managed. Raw {"status":"ok"}.</summary>
+    public async Task<string> DeleteCoverAsync(string id)
+    {
+        var info = _client.Api.Api.Systems[id].Cover.ToDeleteRequestInformation();
+        return await _client.SendAsync(info, permissionHint: "the gm or admin role");
+    }
 }
