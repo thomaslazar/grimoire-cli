@@ -67,6 +67,8 @@ internal static class ResponseExamples
           "{\n  \"name\": \"<string>\",\n  \"url\": \"<string>\"\n}" },
         { typeof(GrimoireCli.Models.RefreshResult),
           "{\n  \"status\": \"<string>\",\n  \"count\": 0\n}" },
+        { typeof(GrimoireCli.Models.SavedFile),
+          "{\n  \"path\": \"<string>\",\n  \"bytes\": 0\n}" },
         { typeof(GrimoireCli.Models.ScanStatus),
           "{\n  \"running\": false,\n  \"phase\": \"scanning\",\n  \"total_books\": 0,\n  \"scanned_books\": 0,\n  \"total_maps\": 0,\n  \"scanned_maps\": 0,\n  \"total_tokens\": 0,\n  \"scanned_tokens\": 0,\n  \"total_audio\": 0,\n  \"scanned_audio\": 0,\n  \"new_books\": 0,\n  \"new_maps\": 0,\n  \"new_tokens\": 0,\n  \"new_audio\": 0,\n  \"updated_books\": 0,\n  \"indexed\": 0,\n  \"to_index\": 0,\n  \"total_ocr\": 0,\n  \"ocr_done\": 0,\n  \"ocr_current\": \"<string>\"\n}" },
         { typeof(GrimoireCli.Models.ScanTriggerResult),
