@@ -19,6 +19,7 @@ public static class BooksCommand
         command.Subcommands.Add(CreateBatchTagCommand());
         command.Subcommands.Add(CreateReindexCommand());
         command.Subcommands.Add(CreateRescanCommand());
+        command.Subcommands.Add(CreateThumbnailCommand());
         foreach (var metadata in MetadataCommands.Create("books"))
             command.Subcommands.Add(metadata);
         return command;
@@ -310,6 +311,51 @@ public static class BooksCommand
             var service = new BooksService(client);
             var response = await service.RescanAsync(parseResult.GetValue(idOption)!);
             ConsoleOutput.WriteRawJson(response);
+            return 0;
+        });
+        return command;
+    }
+
+    private static Command CreateThumbnailCommand()
+    {
+        var idOption = new Option<string>("--id") { Description = "Book ID", Required = true };
+        var outputOption = new Option<string>("--output")
+        {
+            Description = "Output file path, or '-' for binary to stdout",
+            Required = true,
+        };
+        var serverOption = new Option<string?>("--server") { Description = "Server URL override" };
+        var tokenOption = new Option<string?>("--token") { Description = "Token override; not stored" };
+        var command = new Command("thumbnail", "Download the book's cover thumbnail")
+        {
+            idOption, outputOption, serverOption, tokenOption
+        };
+        command.AddHelpSection("Notes", HelpSectionPosition.Top,
+            "The cover thumbnail generated from the file during a scan, not an",
+            "uploaded image. 404 when has_thumbnail is false in books list.",
+            "",
+            "--output - writes the image to stdout; a path writes the file and",
+            "prints {path, bytes}.");
+        command.AddExamples(
+            "grimoire-cli books thumbnail --id <id> --output cover.webp",
+            "grimoire-cli books thumbnail --id <id> --output - > cover.webp");
+        command.AddResponseExample<SavedFile>();
+        command.SetAction(async (parseResult, cancellationToken) =>
+        {
+            var (client, _) = CommandHelper.BuildClient(
+                serverOverride: parseResult.GetValue(serverOption),
+                tokenOverride: parseResult.GetValue(tokenOption));
+            var service = new BooksService(client);
+            await using var stream = await service.ThumbnailAsync(parseResult.GetValue(idOption)!);
+            try
+            {
+                await ConsoleOutput.WriteStreamAsync(stream, parseResult.GetValue(outputOption)!);
+            }
+            catch (BodyInputException ex)
+            {
+                _logger.Error(ex.Message);
+                return 1;
+            }
             return 0;
         });
         return command;

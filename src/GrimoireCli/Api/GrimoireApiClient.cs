@@ -150,6 +150,22 @@ public class GrimoireApiClient
         return Deserialize(json, typeInfo, info.URI.PathAndQuery);
     }
 
+    /// <summary>
+    /// A response whose body is bytes rather than JSON. Identical to SendAsync
+    /// through preflight, permission hints and error handling; only the read
+    /// differs. The caller owns the returned stream.
+    /// </summary>
+    public async Task<Stream> SendStreamAsync(RequestInformation info, string? permissionHint = null, string? notFoundHint = null, TimeSpan? timeout = null)
+    {
+        await PreflightAsync();
+        using var cts = new CancellationTokenSource(timeout ?? DefaultRequestTimeout);
+        var request = await _adapter.ConvertToNativeRequestAsync<HttpRequestMessage>(info, cts.Token)
+            ?? throw new InvalidOperationException($"Failed to build request for {info.URI.AbsolutePath}");
+        var response = await _http.SendAsync(request, cts.Token);
+        await EnsureSuccessAsync(response, permissionHint, notFoundHint);
+        return await response.Content.ReadAsStreamAsync(cts.Token);
+    }
+
     // Shared by every typed overload above. Grimoire's SPA catch-all answers an
     // unroutable request (an empty, ".", or otherwise mis-encoded id) with an
     // HTML 200, not an API error — so deserialization is where that case must be

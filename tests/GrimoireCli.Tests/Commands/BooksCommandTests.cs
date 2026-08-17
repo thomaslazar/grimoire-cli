@@ -129,4 +129,27 @@ public class BooksCommandTests
         foreach (var verb in new[] { "reindex", "rescan" })
             Assert.DoesNotContain("Response shape:", RenderHelp(["books", verb], full: true));
     }
+
+    [Fact]
+    public void ThumbnailRequiresAnOutput()
+    {
+        var result = BooksCommand.Create().Parse(["thumbnail", "--id", "1"]);
+        Assert.NotEmpty(result.Errors);
+    }
+
+    [Fact]
+    public void ThumbnailDocumentsTheDashAndTheScanOrigin()
+    {
+        var output = RenderHelp(["books", "thumbnail"], full: false);
+        Assert.Contains("generated from the file during a scan", output);
+        Assert.Contains("has_thumbnail", output);
+        Assert.Contains("--output -", output);
+    }
+
+    // No role tag: the endpoint is require_not_guest, the router default.
+    [Fact]
+    public void ThumbnailCarriesNoRoleTag()
+    {
+        Assert.DoesNotContain("Role required:", RenderHelp(["books", "thumbnail"], full: false));
+    }
 }

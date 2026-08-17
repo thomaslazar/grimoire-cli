@@ -482,6 +482,52 @@ set -e
 grep -q "licence" "$WORK/batchtypo.err" || fail "no offending field named: $(cat "$WORK/batchtypo.err")"
 ok "an unknown field inside a batch item exits 1"
 
+# --- system covers --------------------------------------------------------
+# A different system from Shadowrun 4 DE on purpose: that one already carries
+# the description write above and the metadata diff assertions below, and a
+# cover write would couple a third assertion to the same fixture.
+syslist --include-children
+COVER_SYS=$(echo "$LIST_JSON" | jq -r '.[] | select(.name == "Fixture Explicit RPG") | .id')
+[ -n "$COVER_SYS" ] || fail "no Fixture Explicit RPG to attach a cover to"
+
+# 404 first: this system has neither folder art nor an upload.
+set +e
+"$CLI" systems cover get --id "$COVER_SYS" --output "$WORK/none.png" >/dev/null 2>"$WORK/cover404.err"; rc=$?
+set -e
+[ "$rc" -eq 2 ] || fail "cover get on a system with no cover should exit 2, got $rc: $(cat "$WORK/cover404.err")"
+grep -qi "not found" "$WORK/cover404.err" \
+  || fail "no not-found hint: $(cat "$WORK/cover404.err")"
+ok "systems cover get 404s when the system has no cover"
+
+UPLOAD_JSON=$("$CLI" systems cover upload --id "$COVER_SYS" --file docker/fixture-cover.png 2>"$WORK/cli.err") \
+  || { cat "$WORK/cli.err" >&2; fail "systems cover upload exited non-zero"; }
+echo "$UPLOAD_JSON" | jq -e '.cover_image | endswith(".png")' >/dev/null \
+  || fail "upload should report a .png cover_image: $UPLOAD_JSON"
+ok "systems cover upload stores a png"
+
+GET_JSON=$("$CLI" systems cover get --id "$COVER_SYS" --output "$WORK/cover.png" 2>"$WORK/cli.err") \
+  || { cat "$WORK/cli.err" >&2; fail "systems cover get exited non-zero"; }
+[ "$(echo "$GET_JSON" | jq -r .bytes)" -eq "$(wc -c < "$WORK/cover.png")" ] \
+  || fail "the receipt's byte count should match the file: $GET_JSON"
+ok "systems cover get writes the file and reports its size"
+
+"$CLI" systems cover get --id "$COVER_SYS" --output - > "$WORK/cover-dash.png" 2>"$WORK/cli.err" \
+  || { cat "$WORK/cli.err" >&2; fail "systems cover get --output - exited non-zero"; }
+cmp -s "$WORK/cover.png" "$WORK/cover-dash.png" \
+  || fail "--output - and --output <file> should produce identical bytes"
+ok "systems cover get --output - streams the same bytes to stdout"
+
+DEL_JSON=$("$CLI" systems cover delete --id "$COVER_SYS" 2>"$WORK/cli.err") \
+  || { cat "$WORK/cli.err" >&2; fail "systems cover delete exited non-zero"; }
+[ "$(echo "$DEL_JSON" | jq -r .status)" = "ok" ] || fail "delete should answer ok: $DEL_JSON"
+set +e
+"$CLI" systems cover get --id "$COVER_SYS" --output "$WORK/gone.png" >/dev/null 2>"$WORK/cover-gone.err"; rc=$?
+set -e
+[ "$rc" -eq 2 ] || fail "cover get after delete should exit 2 again, got $rc: $(cat "$WORK/cover-gone.err")"
+grep -qi "not found" "$WORK/cover-gone.err" \
+  || fail "no not-found hint: $(cat "$WORK/cover-gone.err")"
+ok "systems cover delete removes the upload"
+
 # --- books --------------------------------------------------------------------
 # Requires docker/seed.sh to have run. EXPECTED_BOOKS mirrors the fixture count
 # there; changing a fixture must change this number. Shadowrun 4 DE additionally
@@ -539,6 +585,17 @@ bookget --id "$SR4_BOOK"
 [ "$(echo "$GET_JSON" | jq -r '.game_system.id')" = "$SR4" ] \
   || fail "books get should populate game_system: $(echo "$GET_JSON" | jq -c .game_system)"
 ok "books get returns the detail shape with game_system populated"
+
+# Whether a fixture PDF gets a scan-generated thumbnail is the server's call,
+# not the CLI's — assert on has_thumbnail first and only download when true.
+if [ "$(echo "$GET_JSON" | jq -r .has_thumbnail)" = "true" ]; then
+  THUMB_JSON=$("$CLI" books thumbnail --id "$SR4_BOOK" --output "$WORK/thumb.webp" 2>"$WORK/cli.err") \
+    || { cat "$WORK/cli.err" >&2; fail "books thumbnail exited non-zero"; }
+  [ "$(echo "$THUMB_JSON" | jq -r .bytes)" -gt 0 ] || fail "thumbnail should have bytes: $THUMB_JSON"
+  ok "books thumbnail downloads the scan-generated image"
+else
+  ok "books thumbnail skipped — the server generated no thumbnail for this fixture"
+fi
 
 # The first book write. Shadowrun 4 DE is seeded raw for exactly this, same as
 # the systems section above. description is used for the same reason: nothing

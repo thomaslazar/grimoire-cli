@@ -16,7 +16,7 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | audio | 0 / 10 |
 | auth | 2 / 10 |
 | bookmarks | 0 / 4 |
-| books | 10 / 16 |
+| books | 11 / 16 |
 | campaigns | 0 / 81 |
 | downloads | 0 / 1 |
 | export | 0 / 1 |
@@ -29,11 +29,11 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | saved-filters | 0 / 4 |
 | search | 0 / 1 |
 | settings | 0 / 5 |
-| systems | 8 / 13 |
+| systems | 11 / 13 |
 | tags | 0 / 6 |
 | tokens | 0 / 10 |
 | users | 0 / 12 |
-| **Total** | **31 / 220** |
+| **Total** | **35 / 220** |
 
 1 operation(s) are internal-only (🔒) and excluded from covered counts.
 
@@ -112,7 +112,7 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | GET | `/api/books/{book_id}/page/{page_num}/words` | Get page word bounding boxes |  | — |
 | POST | `/api/books/{book_id}/reindex` | Re-run OCR on a book (optional DPI override) | gm or admin | `books reindex` ✅ |
 | POST | `/api/books/{book_id}/rescan` | Re-read a book from disk and rebuild its search index | gm or admin | `books rescan` ✅ |
-| GET | `/api/books/{book_id}/thumbnail` | Book cover thumbnail |  | — |
+| GET | `/api/books/{book_id}/thumbnail` | Book cover thumbnail |  | `books thumbnail` ✅ |
 | GET | `/api/books/{book_id}/toc` | PDF table of contents |  | — |
 
 ## campaigns
@@ -317,9 +317,9 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | PATCH | `/api/systems/{system_id}` | Update game system metadata | gm or admin | `systems update` ✅ |
 | GET | `/api/systems/{system_id}/book-folders` | List book folders |  | — |
 | PATCH | `/api/systems/{system_id}/book-folders` | Set tags on a book folder | gm or admin | — |
-| GET | `/api/systems/{system_id}/cover` | System cover image |  | — |
-| POST | `/api/systems/{system_id}/cover` | Upload a system cover | gm or admin | — |
-| DELETE | `/api/systems/{system_id}/cover` | Remove an uploaded system cover | gm or admin | — |
+| GET | `/api/systems/{system_id}/cover` | System cover image |  | `systems cover get` ✅ |
+| POST | `/api/systems/{system_id}/cover` | Upload a system cover | gm or admin | `systems cover upload` ✅ |
+| DELETE | `/api/systems/{system_id}/cover` | Remove an uploaded system cover | gm or admin | `systems cover delete` ✅ |
 | POST | `/api/systems/{system_id}/metadata-fetch` | Fetch metadata for review | gm or admin | `systems metadata-fetch` ✅ |
 | POST | `/api/systems/{system_id}/metadata-search` | Search a metadata source | gm or admin | `systems metadata-search` ✅ |
 | GET | `/api/systems/{system_id}/metadata-sources` | List metadata sources | gm or admin | `systems metadata-sources` ✅ |

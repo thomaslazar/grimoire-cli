@@ -101,6 +101,12 @@ python3 "$HERE/make-fixtures.py" "$LIBRARY/books/one-page-rpgs/Honey Heist.pdf" 
 EXPECTED_BOOKS=17
 say "wrote $EXPECTED_BOOKS fixture books"
 
+# Fixture cover image for the smoke test's cover-upload section. Generated
+# here rather than checked in, matching docker/library: both are rebuilt by
+# this script and gitignored rather than tracked as binary fixtures.
+python3 "$HERE/make-fixtures.py" --png "$HERE/fixture-cover.png"
+say "wrote fixture cover image"
+
 # 4. Rescan, then wait for completion. `running` reads false before the scan
 #    starts too, so completion is tested with scanned_books.
 curl -sf -X POST "$SERVER/api/rescan" -H "$AUTH" \

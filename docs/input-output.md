@@ -24,6 +24,12 @@
 - List endpoints that return a bare JSON array (e.g. `GET /api/systems`) are
   re-serialized as a bare array, not wrapped in an envelope — there's no
   pagination envelope in Grimoire's `systems` responses today.
+- **Binary responses are the one exception to "stdout is JSON."** `systems
+  cover get` and `books thumbnail` require `--output <path|->`: `-` copies the
+  raw bytes to stdout and prints nothing else; a path writes the file and
+  prints a `SavedFile` receipt (`{path, bytes}`) instead. `--output -` is the
+  only way bytes reach stdout — every other command's stdout is always valid
+  JSON.
 
 ## Exit Codes
 

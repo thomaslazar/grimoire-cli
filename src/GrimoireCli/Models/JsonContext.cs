@@ -40,5 +40,7 @@ namespace GrimoireCli.Models;
 [JsonSerializable(typeof(MetadataFetchResult))]
 [JsonSerializable(typeof(CleanupCounts))]
 [JsonSerializable(typeof(CleanupResult))]
+[JsonSerializable(typeof(SavedFile))]
+[JsonSerializable(typeof(CoverUploadResult))]
 [JsonSourceGenerationOptions(WriteIndented = true)]
 public partial class AppJsonContext : JsonSerializerContext;

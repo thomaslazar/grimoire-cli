@@ -328,6 +328,85 @@ fixture add-on (`docker/addon-index/fixture-source.yml`) and via
   installed"}`. No 502 was produced in these live runs — the fixture add-on
   never fails, so that path is unverified live.
 
+## System covers
+
+Verified against v1.5.6 by reading `backend/routers/systems/covers.py` and
+`backend/routers/systems/__init__.py`, backing `systems cover get|upload|delete`
+and `books thumbnail`.
+
+- **Three sources of system cover art, in precedence order**
+  (`systems/__init__.py:96`): a `cover.*`/`folder.*` image in the system's
+  library folder (library-managed, not reachable through the API), then an
+  uploaded cover (`system.cover_image`, under `SYSTEM_COVER_DIR`), then
+  neither — `GET` 404s and a client is expected to fall back to
+  `cover_book_id`, served by `GET /api/books/{id}/thumbnail`.
+- **An upload can succeed and change nothing about what `GET` returns.**
+  Folder art always wins over an upload, and `DELETE` never touches folder
+  art — it only removes the upload.
+- **`POST` is `multipart/form-data`** with the part named `file`
+  (`covers.py:122-153`), FastAPI binding `file: UploadFile = File(...)`. It
+  checks `file.content_type` against `image/png`, `image/jpeg`, `image/webp`,
+  `image/gif`; caps at 10 MB (413); rejects an empty body; and runs
+  `PIL.Image.verify()`, so a disguised file is a 400 even when the declared
+  type is right. It replaces any existing upload and answers
+  `{"cover_image": "<system-id><ext>"}`. `DELETE` answers `{"status": "ok"}`.
+- **Books have no cover endpoint of their own.** `GET /api/books/{id}/thumbnail`
+  is scan-derived from the book file, not an uploaded image, and there is no
+  corresponding upload or delete for it.
+
+## Book folders
+
+Verified against v1.5.6 by reading `backend/routers/systems/core.py:261-288`,
+`backend/models/library.py:167` and `backend/services/tag_service.py`. No CLI
+command currently exposes this endpoint — `systems book-folders list|set`
+were built and then cut before merge; see the depth mismatch below and
+[hunter-read/grimoire#357](https://github.com/hunter-read/grimoire/issues/357).
+
+- **A book folder is a second, invisible tagging layer, addressed by path
+  rather than enumerated.** Its path takes the form
+  `{system_id}/{category}/{subfolder…}`; the model has three columns, `id`,
+  `path`, `tags`. Tagging one folder covers every book at or below that path,
+  resolved on read by `_book_folder_ancestor_paths` (`tag_service.py:63`). A
+  book directly in the category directory (no subfolder) belongs to no
+  folder.
+- **A `BookFolder` row exists only once a path has been tagged.** The call to
+  `upsert_folder_tags` (`routers/systems/core.py:284`) is the only site that
+  inserts one; the scanner and indexer never do. So `list_book_folders`
+  (`core.py:261`) returns folders that have been tagged, not every
+  subcategory folder present on disk — a real, untagged subfolder has no row
+  and does not appear.
+- **The inheritance never reaches a book's own `tags`.** `tags_for_resource`
+  (`tag_service.py:379`) reads only the `ResourceTag` join table; folder
+  inheritance is resolved separately in `folder_tags_in_use` (`:509`), which
+  serves the tag catalogue instead. `books get` and `systems get` do not show
+  inherited tags. Within this CLI, `book-folders list` is the only way to see
+  them; server-side, `folder_tags_in_use` also feeds `GET /api/tags`
+  (`routers/tags/core.py:35`).
+- **`PATCH` replaces the tag list**, unlike `books batch-tag` /
+  `systems batch-tag`, which are additive. An empty `tags` clears the folder.
+- **The `{system_id}` in the PATCH URL is ignored by the write.**
+  `update_book_folder` takes it as a path parameter and never reads it —
+  `data.path` alone decides which row is written, with nothing validating that
+  the path belongs to that system or exists on disk. `GET` *does* filter by
+  `path.like(f"{system_id}/%")`, so read and write disagree about what the URL
+  means. A caller can write another system's folder through any system's URL.
+- **Read and write return tags differently.** `GET` resolves stored internal
+  keys to display casing via `folder_display_tags`; `PATCH` echoes the
+  internal keys straight from `upsert_folder_tags`. A round trip need not
+  match byte-for-byte.
+- **The frontend and backend derive a folder's subfolder segments at
+  different depths for a container child, so no path is correct for both
+  readers.** The frontend computes `parts.slice(categoryDepth + 1, -1)` where
+  `categoryDepth` is 3 when the system has `parent_id` set
+  (`frontend/src/components/system/folderTree.js:16-30`); the backend's
+  `tag_service.py:51-60` uses a hardcoded `parts[3:-1]` regardless of whether
+  the system is a container child. For a container child these differ by one
+  segment. Measured live: a folder tag written at the path one reader expects
+  renders correctly in the UI tree but does not resolve via
+  `GET /api/tags/{internal}/items`, or vice versa — never both. Reported
+  upstream as
+  [hunter-read/grimoire#357](https://github.com/hunter-read/grimoire/issues/357).
+
 ## Cleanup of missing files
 
 Verified against v1.5.6 by reading `backend/routers/maintenance/`, backing

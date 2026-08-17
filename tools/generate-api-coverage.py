@@ -71,6 +71,10 @@ IMPLEMENTED = {
     "GET /api/books/{book_id}/metadata-sources": "`books metadata-sources` ✅",
     "POST /api/books/{book_id}/metadata-search": "`books metadata-search` ✅",
     "POST /api/books/{book_id}/metadata-fetch": "`books metadata-fetch` ✅",
+    "GET /api/systems/{system_id}/cover": "`systems cover get` ✅",
+    "POST /api/systems/{system_id}/cover": "`systems cover upload` ✅",
+    "DELETE /api/systems/{system_id}/cover": "`systems cover delete` ✅",
+    "GET /api/books/{book_id}/thumbnail": "`books thumbnail` ✅",
 }
 
 ROLE_LABEL = {

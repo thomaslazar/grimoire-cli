@@ -102,4 +102,14 @@ public class BooksService
         var info = _client.Api.Api.Books[id].Rescan.ToPostRequestInformation();
         return await _client.SendAsync(info, permissionHint: "the gm or admin role");
     }
+
+    /// <summary>
+    /// GET /api/books/{id}/thumbnail. Bytes, not JSON: the thumbnail generated
+    /// from the file during a scan. 404 when the book has none.
+    /// </summary>
+    public async Task<Stream> ThumbnailAsync(string id)
+    {
+        var info = _client.Api.Api.Books[id].Thumbnail.ToGetRequestInformation();
+        return await _client.SendStreamAsync(info);
+    }
 }
