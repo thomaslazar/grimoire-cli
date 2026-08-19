@@ -4,18 +4,31 @@ The working reference for this migration. Everything needed to resume is here;
 [the assessment](specs/research/2026-08-14-grimoire-1.6.0-assessment.md) is the
 dated record of how the numbers were measured and is not kept current.
 
-**Status: blocked, deliberately.** 1.6.0 is unreleased. Work happens on
+**Status: waiting on a tag, not on upstream answers.** 1.6.0 is still
+unreleased — no `v1.6.0` tag existed upstream as of 2026-08-19. Work happens on
 `epic/grimoire-1.6.0` and merges only once upstream tags 1.6.0.
+
+Numbers below are re-measured against `hunterreadca/grimoire:edge` built
+2026-08-17 (spec `info.version` `1.5.6-tjxlea`), which reports 302 schemas and
+252 operations against the 2026-08-14 build's 281 and 233. Both #356 and #357 —
+the two blockers this document was written around — are fixed in that build.
 
 ## Why this is a migration and not a version bump
 
-Three upstream commits, all landed 2026-08-14 and all in `edge`/`nightly`:
+Three upstream commits, all landed 2026-08-14 and all in `edge`/`nightly`, are
+what make this a migration:
 
 | Commit | What it does | Cost to us |
 |---|---|---|
 | `a12b3c0` (#347) | OpenAPI response models on every endpoint | Opportunity: response DTOs become generated |
 | `da55c9d` (#346) | Refresh tokens and revocable sessions | **Breaking**: the access token drops from 30 days to 30 minutes |
 | `b16d112` (#345) | Fail closed on the default `SECRET_KEY` | None — our compose sets a non-default key |
+
+`edge` kept moving afterwards: by 2026-08-17 it had also fixed #356 and #357 and
+added 19 operations. Those change the plan's cost, not its shape — see
+[workstream B](#workstream-b--generated-response-models-unblocked),
+[workstream D](#workstream-d--systems-book-folders-returns) and
+[new surface](#new-surface-since-the-2026-08-14-assessment).
 
 ## Version strategy
 
@@ -27,6 +40,38 @@ refresh is implemented unconditionally rather than behind a gate.
 When 1.6.0 releases, `MinSupportedVersion` and `MaxTestedVersion` move to 1.6.0
 **together**, and [grimoire-compatibility.md](grimoire-compatibility.md) gains a
 matrix row.
+
+## Sequence
+
+`main` is feature-frozen at 1.5.6, so nothing here is ordered around avoiding
+conflicts with it. The order is dependency and value, in two tracks that do not
+block each other.
+
+**Track 1 — no edge stack needed; verifiable against the pinned 1.5.6 stack.**
+
+1. **Byte-passthrough output** ([workstream B](#workstream-b--generated-response-models-unblocked)).
+   First, not last: it is the largest deletion and it decides what step 2 is.
+   Correct on 1.5.6 on its own merits, so `docker/smoke-test.sh` verifies it today.
+2. **Consolidate the example generators.** After step 1 this is a deletion of
+   `tools/GenerateResponseExamples` and its walker rather than a merge of two
+   tools — no response DTOs are left to describe.
+
+**Track 2 — needs an edge stack.**
+
+3. **An edge stack and a spec-diff tool** (see
+   [reproducing the environment](#reproducing-the-environment)). Only this track
+   depends on it.
+4. **Refresh plumbing** ([workstream A](#workstream-a--authentication-breaking-do-first)).
+   The one piece of code that is genuinely 1.6.0-only.
+
+**On the tag** — [workstream C](#workstream-c--version-gate-and-docs) and
+[workstream D](#workstream-d--systems-book-folders-returns): move the version
+gate, regenerate the client, revert the book-folders cut, update the docs.
+Mechanical once the rest is done.
+
+Byte-passthrough changes stdout formatting, so it wants a version boundary. If
+`0.1.0` ships from `main` as it stands, the change arrives with the 1.6.0 release
+rather than retroactively — the desired outcome, not a compromise.
 
 ## Workstream A — authentication (breaking, do first)
 
@@ -54,29 +99,43 @@ What this requires:
 - **Decide whether to expose sessions** as commands (`auth sessions`,
   revocation). New surface, not required by the migration.
 
-Also: `GET /api/about` now declares `HTTPBearer`. The daily version check sends a
-token so it should be unaffected, but the pre-login path needs checking.
+Also: `GET /api/about` now declares `HTTPBearer` and **enforces it** — an
+unauthenticated `GET /api/about` against edge returns
+`{"detail":"Not authenticated"}`, verified live. The daily version check sends a
+token so it is unaffected, but `login` forces a check and builds its own client;
+that path runs before a token exists and needs re-checking.
 
-## Workstream B — generated response models (blocked on upstream)
+The expiry constants and the cookie name are unchanged in the 2026-08-17 build:
+`ACCESS_TOKEN_EXPIRE_MINUTES` 30, `REFRESH_TOKEN_EXPIRE_DAYS` 30,
+`REFRESH_COOKIE_NAME` `grimoire_refresh` (`backend/sessions.py`).
 
-**Blocked on [hunter-read/grimoire#356](https://github.com/hunter-read/grimoire/issues/356)**
-until the dev answers. It decides whether generated models are better or worse
-than what they replace, which is the premise of the whole workstream.
+## Workstream B — generated response models (unblocked)
+
+[hunter-read/grimoire#356](https://github.com/hunter-read/grimoire/issues/356) is
+fixed in the 2026-08-17 edge build, which was the premise the workstream was
+waiting on. See [the blocker, resolved](#the-blocker-resolved).
 
 ### What the spec now gives us
 
-| | 1.5.6 | edge |
+| | 1.5.6 | edge (2026-08-17) |
 |---|---|---|
-| Component schemas | 86 | 281 |
-| Operations | 207 | 233 |
-| Success responses | 192 typed as `{}` | 195 of 233 typed |
+| Component schemas | 86 | 302 |
+| Operations | 207 | 252 |
+| Success responses | 192 typed as `{}` | 211 of 252 typed |
 
-The 38 untyped are 16 `204`s plus 22 binary/redirect endpoints, which cannot
-carry a JSON schema. Every JSON success response is typed.
+The 41 untyped are 19 `204`s plus 22 binary, redirect and `.ics` endpoints, which
+cannot carry a JSON schema. Every JSON success response is typed.
 
-**All 31 hand-written DTOs match a new schema field-for-field** — `GameSystemSummary`
-↔ `SystemSummary`, `Book` ↔ `BookOut`, `MetadataFieldDiff` ↔ `MetadataDiffField`,
-and so on. No command's output shape changes.
+**32 of the 33 hand-written DTOs match a schema field-for-field** —
+`GameSystemSummary` ↔ `SystemSummary`, `Book` ↔ `BookOut`, `MetadataFieldDiff` ↔
+`MetadataDiffField`, `CoverUploadResult` ↔ `SystemCoverResponse`, and so on. Three
+(`BookDetail`, `GameSystemDetail`, `GameSystemSummary`) declare a subset of their
+schema's fields, so the generated model is a superset. No command's output shape
+changes.
+
+`SavedFile` is the exception and has no counterpart: it is the CLI's own
+`--output` receipt, not a server shape. It joins `AppConfig` as a model that stays
+hand-written.
 
 ### What the trial proved (measured, not predicted)
 
@@ -90,24 +149,32 @@ and so on. No command's output shape changes.
   flat, nested, `UntypedNode`-bearing and deep (`SystemDetail`, 2602 characters).
   It needs one `UntypedNode` case emitting `"<any>"`; today it renders `{}`.
 
-### The blocker
+### The blocker, resolved
 
-18 array properties across 4 schemas declare `items: {}`, so Kiota generates
-`UntypedNode?` where our DTOs declare `List<string>?` / `List<LinkEntry>?`:
+**#356 is fixed.** The 2026-08-17 edge spec has **zero** array properties
+declaring `items: {}` — down from 18 across 4 schemas. `genres`, `dice_materials`,
+`authors`, `artists` and `tags` are `list[str]`; `urls` and
+`character_builder_urls` reference a `LinkEntry` schema; and `publishers`
+references a new `PublisherRef` (`name`, `url`), which matches our
+`PublisherEntry` exactly.
 
-| Schema | Untyped arrays |
-|---|---|
-| `SystemSummary`, `SystemDetail` (inherited) | `publishers`, `character_builder_urls`, `urls`, `genres`, `dice_materials` |
-| `BookOut`, `BookDetail` | `authors`, `artists`, `genres`, `urls` |
+The normalised copy our generator consumes reports zero as well, so the two counts
+no longer disagree the way they did on 2026-08-14.
 
-Upstream declares these `list[Any]` while `tags: list[str]` beside them is
-correct — reported as #356. If it is fixed, generated models are strictly better
-than the hand-written ones. If it stands, the options are keeping hand-written
-DTOs for those four schemas, or accepting the loss.
+Generated models are therefore strictly better than the hand-written ones, which
+was the premise workstream B was waiting on. Nothing gates it now but a 1.6.0 tag.
 
-Count numbers carefully: **18 across 4** is the raw spec, which is what upstream
-sees. The normalised copy our generator consumes reports 21 across 7, because
-collapsing `anyOf: [array, null]` wrappers exposes three more.
+### One naming wrinkle to expect
+
+29 schema names arrive fully qualified because FastAPI disambiguates collisions by
+module path — `backend__routers__systems___schemas__StatusResponse`,
+`backend__routers__books___schemas__LinkEntry`,
+`backend__routers__auth___schemas__OkResponse` and so on, plus nine
+`Body_<operation>_<path>_<method>` multipart bodies. Kiota generates those names
+verbatim. Our single `LinkEntry` covers both the books and systems variants and
+our single `ScanTriggerResult` covers nine identical `StatusResponse` schemas, so
+the switch trades 2 readable types for 11 unreadable ones on those shapes. Cosmetic
+in code the CLI does not print, but budget for it when reviewing the diff.
 
 ### The plan, once unblocked
 
@@ -125,9 +192,12 @@ collapsing `anyOf: [array, null]` wrappers exposes three more.
      into one drift test and one validity test.
    - Add the `UntypedNode` → `"<any>"` case; the `JsonElement` case goes with the
      deleted walker.
-2. **Move ~34 call sites and 5 services** off `AppJsonContext.Default.<Dto>`.
-3. **Delete `src/GrimoireCli/Models/`** except `AppConfig`, which is local config,
-   and drop the response registrations from `AppJsonContext`.
+2. **Move the call sites off `AppJsonContext.Default.<Dto>`** — 57 references
+   today, 51 excluding `AppConfig` and `DictionaryStringString`, spread across
+   6 services and their commands.
+3. **Delete `src/GrimoireCli/Models/`** except `AppConfig` (local config) and
+   `SavedFile` (the CLI's own `--output` receipt), and drop the response
+   registrations from `AppJsonContext`.
 4. **Decide the output contract** — see below.
 5. **Recheck [kiota#2338](https://github.com/microsoft/kiota/issues/2338)** and
    `tools/normalize-spec.py`. It collapsed 40 `anyOf`-nullable arrays in the edge
@@ -156,6 +226,49 @@ Note that standalone serialisation needs the writer factory registered
 the generated client does this in its constructor, so the CLI already has it, but
 a test or generator that serialises outside the client does not.
 
+## Workstream D — `systems book-folders` returns
+
+**[hunter-read/grimoire#357](https://github.com/hunter-read/grimoire/issues/357) is
+fixed** in the 2026-08-17 edge build, and fixed more broadly than reported:
+`tag_service.system_category_depth` walks the whole container chain
+(`2 + <ancestor count>`) rather than special-casing one level of `parent_id`, so
+arbitrarily nested containers resolve too. `system_category_depths` gives every
+system's depth in one query for the bulk resolvers.
+
+`systems book-folders list|set` were built and cut on `main`
+(`5c566b4`) with the commands returning once #357 was fixed, so this is a revert
+plus the new endpoint:
+
+- **Restore `BookFolderCommands.cs`** and its smoke-test coverage from `5c566b4^`.
+  `PATCH` still takes `BookFolderUpdate` (`path`, `tags`) and `GET` still returns
+  `BookFolderOut` (`path`, `tags`), so the command surface is unchanged.
+- **Add `DELETE /api/systems/{system_id}/book-folders`** — new in edge, takes the
+  folder path as a **query** parameter rather than a body, and returns
+  `StatusResponse`. Needs a `book-folders delete`.
+- **Rewrite the depth-mismatch caveat** in
+  [grimoire-api-notes.md](grimoire-api-notes.md), which currently records the bug
+  and the cut as verified 1.5.6 behaviour. Re-verify the round trip live before
+  rewriting it — the fix is read from source, not yet measured.
+- `docs/roadmap.md` item 3 is what this closes.
+
+## New surface since the 2026-08-14 assessment
+
+19 operations arrived between the two edge builds. None are required by the
+migration; they are listed so the epic's coverage regeneration is not a surprise.
+
+- **A file-management API** — `GET /api/files/browse`, `POST /api/files/upload`,
+  `POST|DELETE /api/files/folder`, `POST /api/files/folder/scaffold`,
+  `PUT /api/files/folder/markers`, `POST /api/files/move`,
+  `POST /api/files/rename`.
+- **Campaign calendars** — `GET|POST|DELETE /api/campaigns/calendar/subscription`
+  plus three `.ics` feeds, which are the new untyped-but-not-JSON responses.
+- **Sidecars** — `GET|PUT /api/maintenance/sidecars/settings`,
+  `POST /api/maintenance/sidecars/export`.
+- **`POST /api/users/{user_id}/merge`** (guest merge) and
+  **`DELETE /api/systems/{system_id}/book-folders`** (workstream D).
+
+Nothing was removed: every 1.5.6 operation and schema is still present.
+
 ## Workstream C — version gate and docs
 
 Only once a 1.6.0 tag exists upstream. Never against `edge`: `CLAUDE.md` pins the
@@ -173,28 +286,26 @@ reference to a released version because `main` carries work no instance runs.
 
 ## Living alongside `main`
 
-`main` keeps shipping 1.5.6-era commands while this waits, so drift is the
-standing cost.
+**`main` is feature-frozen at 1.5.6** — bug fixes only until 1.6.0 releases. New
+commands are not arriving with hand-written DTOs and `AppJsonContext`
+registrations for workstream B to undo, so the drift this section used to plan
+around does not accumulate. Rebase on `main` when a fix lands; otherwise the epic
+stands alone.
 
-- **Merge `main` into the epic regularly**, not once at the end. Every new
-  command on `main` arrives with hand-written DTOs and `AppJsonContext`
-  registrations — exactly what workstream B deletes — so a late merge means
-  resolving the same conflict repeatedly.
-- **A command added to `main` after workstream B lands needs doing twice**: the
-  1.5.6 way on `main`, the generated way here. Cheaper than freezing `main`, but
-  worth knowing before starting B rather than after.
-- **Epic CI cannot pin a released server.** `docker/docker-compose.yml` pins
-  1.5.6; this branch must point at `edge` or `nightly`, which move underneath it.
-  A red smoke test here may mean upstream changed rather than the branch broke —
-  treat epic CI as a signal, not a gate, until a 1.6.0 tag exists.
+**Epic CI cannot pin a released server.** `docker/docker-compose.yml` pins 1.5.6
+and stays that way; the edge stack is a separate override. A red smoke test
+against edge may mean upstream changed rather than the branch broke — treat it as
+a signal, not a gate, until a 1.6.0 tag exists. Track 1 does not have this
+problem: it is verifiable against the pinned 1.5.6 stack.
 
 ## Open questions
 
-1. **#356** — does upstream type those 18 array fields? Gates workstream B.
-2. **Can `authors` / `genres` / `urls` hold heterogeneous values in practice?**
-   If yes, `list[Any]` is correct and today's `List<string>?` DTOs are the bug —
-   a row with an object in `authors` would already fail to deserialise. Worth a
-   probe against a real library.
+1. ~~**#356** — does upstream type those 18 array fields?~~ Fixed in the
+   2026-08-17 edge build; workstream B is unblocked.
+2. ~~**Can `authors` / `genres` / `urls` hold heterogeneous values in practice?**~~
+   Answered by the fix: they are `list[str]`, `urls` is a `LinkEntry` array and
+   `publishers` a `PublisherRef` array. `list[Any]` was the bug, not the contract,
+   and today's DTOs were right.
 3. **Output contract** — re-serialise through Kiota, or pass the server's bytes
    through verbatim?
 4. **Session commands** — expose `auth sessions` and revocation, or stop at
@@ -202,7 +313,27 @@ standing cost.
 
 ## Reproducing the environment
 
+`edge` moves. Pull before measuring anything, and record the build date the
+numbers came from — the two measurements in this document are five days apart and
+disagree on every count.
+
+**A seeded edge stack is an image-tag override away, not a new seeding story.**
+`backend/seed_users.py` is byte-identical between 1.5.6 and the 2026-08-17 edge
+build and still reads `{DATA_PATH}/users.json` in the shape
+`docker/users.json.example` already has, so `docker/seed.sh` works against edge
+unchanged. Track 2's first step is therefore a `docker/docker-compose.edge.yml`
+override — the `edge` tag, its own project name, its own port and data dir so it
+coexists with the pinned 1.5.6 stack — and not the hand-rolled `docker run` plus
+`POST /api/auth/setup` below. Keep the raw recipe for one-off spec measurements.
+
+Pair the override with a spec-diff tool that pulls edge, records the build date
+and the counts, and diffs against the last recorded snapshot. Every number in this
+document was derived by hand-writing that script; the third time is what makes it
+worth committing.
+
 ```bash
+docker pull hunterreadca/grimoire:edge
+docker rm -f grimoire-edge 2>/dev/null
 docker run -d --name grimoire-edge -p 9482:9481 \
   -e SECRET_KEY=edge-eval-only-not-a-real-secret \
   -v grimoire-edge-data:/data -v grimoire-edge-lib:/library \
@@ -211,6 +342,9 @@ docker run -d --name grimoire-edge -p 9482:9481 \
 # docker-outside-of-docker; use the container's bridge address:
 EDGE=$(docker inspect grimoire-edge --format '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}')
 curl -s "http://${EDGE}:9481/api/openapi.json" -o spec.json
+
+# The image ships its own backend source, so behaviour questions need no clone:
+docker exec grimoire-edge grep -n EXPIRE backend/sessions.py
 
 # Generate a throwaway client (never into src/GrimoireCli/Generated on this branch
 # until the switch is actually being done):
@@ -221,4 +355,5 @@ cd temp/kiota-trial && kiota generate --openapi spec.json --language CSharp \
 
 `temp/` is gitignored, so the trial tree and the 1.5.6 source pin in
 `temp/grimoire/` are local-only. The 1.5.6 pin is deliberately untouched by this
-branch — `main` still depends on it.
+branch — `main` still depends on it, and edge behaviour is read out of the running
+container instead.
