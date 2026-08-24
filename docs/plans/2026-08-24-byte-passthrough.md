@@ -826,6 +826,24 @@ raw-JSON readers the second, and the generated models the third."
 round-trips did that; they went with the DTOs, so the checks follow what crosses it
 now.
 
+- [ ] **Step 0: Take over the two minors Task 5 left here**
+
+Task 5 could not compile without gutting this file's DTO round-trips, so part of
+this task's subject already moved. Two consequences to settle first:
+
+1. Task 5 added a `SavedFile` round-trip check in place of the deleted ones. That
+   was slightly more than the compile-only trim it was asked for. **Keep it if it
+   belongs in the design below; fold it into the new structure rather than leaving
+   it as a stray.** Do not simply delete it — `SavedFile` still crosses the JSON
+   boundary and still deserves coverage.
+2. **Rename `tests/GrimoireCli.Tests/Api/DeserializeTests.cs`** to
+   `ResponseParsingTests.cs`, renaming the class to match. No `Deserialize` method
+   exists any more — it covers `TruncateForLogging`, `HasItems` and
+   `IsJsonOrEmpty`. Use `git mv` so the rename is recorded. This is the file whose
+   `IsJsonOrEmpty` theory now carries the HTML-catch-all and truncated-body
+   coverage the deleted `Deserialize` tests used to provide, so its name matters
+   for anyone looking for that protection.
+
 - [ ] **Step 1: Remove the DTO round-trips**
 
 Delete the eight blocks adding `"… JSON round-trip failed"` for response DTOs.
