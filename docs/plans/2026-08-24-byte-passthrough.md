@@ -753,8 +753,29 @@ git rm tests/GrimoireCli.Tests/Models/AddonDtoTests.cs \
 git mv tests/GrimoireCli.Tests/Models/SavedFileTests.cs tests/GrimoireCli.Tests/Output/SavedFileTests.cs
 ```
 
-`BulkResultTests.cs` tests `BulkExit`, not a DTO — move it to
-`tests/GrimoireCli.Tests/Commands/` and rewrite it against the boolean overload.
+`BulkResultTests.cs` is a **DTO** test — it deserializes through
+`AppJsonContext.Default.BulkUpdateResult` — so it goes with the other DTO tests:
+
+```bash
+git rm tests/GrimoireCli.Tests/Models/BulkResultTests.cs
+```
+
+The exit-code tests live in `tests/GrimoireCli.Tests/Commands/BulkExitTests.cs`,
+which currently covers only the `List<>` overloads this step deletes. **Rewrite it
+against the `bool` overload**, which is what production calls and what nothing
+currently tests — a gap Task 2's review raised as a Minor and this is where it
+closes. Cover both branches:
+
+```csharp
+    [Theory]
+    [InlineData(true, 3)]
+    [InlineData(false, 0)]
+    public void CodeForReportsThreeOnlyWhenThereAreFailures(bool hasFailures, int expected)
+        => Assert.Equal(expected, BulkExit.CodeFor(hasFailures));
+```
+
+Do the same for `ScanExitTests.cs` against the `string?` overload, including the
+`null` case, which is what an absent `status` field now yields and must mean 0.
 
 - [ ] **Step 6: Format, build, test**
 
