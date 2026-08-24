@@ -10,7 +10,7 @@ namespace GrimoireCli.Tests.Commands;
 /// </summary>
 public class RootHelpTests
 {
-    private static RootCommand BuildRoot(out Option<bool> debugOption, out Option<bool> logJsonOption)
+    private static RootCommand BuildRoot(out Option<bool> debugOption, out Option<bool> logJsonOption, out Option<bool> prettyOption)
     {
         var rootCommand = new RootCommand("grimoire-cli — Grimoire TTRPG library CLI");
         debugOption = new Option<bool>("--debug")
@@ -23,8 +23,14 @@ public class RootHelpTests
             Description = "Emit stderr log lines as single-line JSON instead of text.",
             Recursive = true
         };
+        prettyOption = new Option<bool>("--pretty")
+        {
+            Description = "Indent JSON output. Off by default — responses are the server's bytes, unmodified.",
+            Recursive = true
+        };
         rootCommand.Options.Add(debugOption);
         rootCommand.Options.Add(logJsonOption);
+        rootCommand.Options.Add(prettyOption);
         rootCommand.Subcommands.Add(LoginCommand.Create());
         rootCommand.Subcommands.Add(ConfigCommand.Create());
         rootCommand.Subcommands.Add(SystemsCommand.Create());
@@ -39,7 +45,7 @@ public class RootHelpTests
 
     private static string RenderHelp(params string[] args)
     {
-        var rootCommand = BuildRoot(out _, out _);
+        var rootCommand = BuildRoot(out _, out _, out _);
         var output = new StringWriter();
         var config = new InvocationConfiguration { Output = output };
         var actualArgs = args.Concat(new[] { "--help" }).ToArray();
@@ -64,7 +70,7 @@ public class RootHelpTests
     [InlineData("config", "--debug", "get")]
     public void DebugOption_IsAccepted_InAnyPosition(params string[] args)
     {
-        var root = BuildRoot(out var debugOption, out _);
+        var root = BuildRoot(out var debugOption, out _, out _);
         var parsed = root.Parse(args);
         Assert.Empty(parsed.Errors);
         Assert.True(parsed.GetValue(debugOption));
@@ -75,10 +81,21 @@ public class RootHelpTests
     [InlineData("config", "get", "--log-json")]
     public void LogJsonOption_IsAccepted_InAnyPosition(params string[] args)
     {
-        var root = BuildRoot(out _, out var logJsonOption);
+        var root = BuildRoot(out _, out var logJsonOption, out _);
         var parsed = root.Parse(args);
         Assert.Empty(parsed.Errors);
         Assert.True(parsed.GetValue(logJsonOption));
+    }
+
+    [Theory]
+    [InlineData("--pretty", "config", "get")]
+    [InlineData("config", "get", "--pretty")]
+    public void PrettyOption_IsAccepted_InAnyPosition(params string[] args)
+    {
+        var root = BuildRoot(out _, out _, out var prettyOption);
+        var parsed = root.Parse(args);
+        Assert.Empty(parsed.Errors);
+        Assert.True(parsed.GetValue(prettyOption));
     }
 
     [Fact]

@@ -128,6 +128,60 @@ public class GrimoireApiClient
     }
 
     /// <summary>
+    /// Whether a top-level array property has at least one element. The bulk
+    /// endpoints report per-item failures this way, and the exit code turns on
+    /// nothing else about them.
+    /// </summary>
+    internal static bool HasItems(string json, string property)
+    {
+        try
+        {
+            using var doc = JsonDocument.Parse(json);
+            return doc.RootElement.TryGetProperty(property, out var el)
+                   && el.ValueKind == JsonValueKind.Array
+                   && el.GetArrayLength() > 0;
+        }
+        catch (JsonException)
+        {
+            return false;
+        }
+    }
+
+    /// <summary>
+    /// Whether a body is JSON, or empty. A 204 or other bodiless success is
+    /// legitimate and parses as nothing. Pure so both branches are testable —
+    /// <see cref="EnsureJson"/> cannot be, because it exits.
+    /// </summary>
+    internal static bool IsJsonOrEmpty(string json)
+    {
+        if (string.IsNullOrWhiteSpace(json)) return true;
+        try
+        {
+            using var doc = JsonDocument.Parse(json);
+            return true;
+        }
+        catch (JsonException)
+        {
+            return false;
+        }
+    }
+
+    /// <summary>
+    /// Fails a response body that is not JSON, taking over the check the response
+    /// DTOs used to provide as a side effect of deserializing. Grimoire's SPA
+    /// catch-all answers an unroutable request (an empty, ".", or otherwise
+    /// mis-encoded id) with an HTML 200, and without this that page would reach
+    /// stdout as though it were the API's answer.
+    /// </summary>
+    internal static void EnsureJson(string json, string endpoint)
+    {
+        if (IsJsonOrEmpty(json)) return;
+        _logger.Debug($"unparseable body from {endpoint}: {TruncateForLogging(json)}");
+        _logger.Error($"Response from {endpoint} could not be parsed as JSON. Run with --debug to see the response body.");
+        Environment.Exit(2);
+    }
+
+    /// <summary>
     /// Sends a request built by a generated builder. Converting to a native
     /// HttpRequestMessage and sending it here — rather than through Kiota's
     /// SendPrimitiveAsync — keeps the response body on failures, which the error
@@ -141,7 +195,9 @@ public class GrimoireApiClient
             ?? throw new InvalidOperationException($"Failed to build request for {info.URI.AbsolutePath}");
         var response = await _http.SendAsync(request, cts.Token);
         await EnsureSuccessAsync(response, permissionHint, notFoundHint);
-        return await response.Content.ReadAsStringAsync(cts.Token);
+        var body = await response.Content.ReadAsStringAsync(cts.Token);
+        EnsureJson(body, info.URI.PathAndQuery);
+        return body;
     }
 
     public async Task<T> SendAsync<T>(RequestInformation info, JsonTypeInfo<T> typeInfo, string? permissionHint = null, string? notFoundHint = null, TimeSpan? timeout = null)

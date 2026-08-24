@@ -19,8 +19,14 @@ var logJsonOption = new Option<bool>("--log-json")
     Description = "Emit stderr log lines as single-line JSON instead of text.",
     Recursive = true
 };
+var prettyOption = new Option<bool>("--pretty")
+{
+    Description = "Indent JSON output. Off by default — responses are the server's bytes, unmodified.",
+    Recursive = true
+};
 rootCommand.Options.Add(debugOption);
 rootCommand.Options.Add(logJsonOption);
+rootCommand.Options.Add(prettyOption);
 
 rootCommand.Subcommands.Add(LoginCommand.Create());
 rootCommand.Subcommands.Add(MeCommand.Create());
@@ -43,6 +49,7 @@ var debugEnabled = parseResult.GetValue(debugOption)
                    || Environment.GetEnvironmentVariable("GRIMOIRE_DEBUG") == "1";
 var logJson = parseResult.GetValue(logJsonOption);
 LogSetup.Configure(debugEnabled, logJson);
+ConsoleOutput.Pretty = parseResult.GetValue(prettyOption);
 
 try
 {

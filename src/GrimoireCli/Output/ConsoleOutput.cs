@@ -19,9 +19,42 @@ public static class ConsoleOutput
         Console.Out.WriteLine(json);
     }
 
+    /// <summary>
+    /// Set from the root --pretty option. Off means the server's bytes reach
+    /// stdout unchanged, which keeps undeclared fields, explicit nulls and the
+    /// server's key order.
+    /// </summary>
+    public static bool Pretty { get; set; }
+
+    /// <summary>
+    /// Writes a response body. Verbatim by default; re-indented under --pretty,
+    /// which costs a parse and re-serialize, so the bytes are no longer the
+    /// server's. A body that does not parse is passed through untouched rather
+    /// than swallowed — GrimoireApiClient.EnsureJson is what rejects those, and
+    /// this must not become a second, quieter place that decides.
+    /// </summary>
     public static void WriteRawJson(string json)
     {
-        Console.Out.WriteLine(json);
+        if (!Pretty)
+        {
+            Console.Out.WriteLine(json);
+            return;
+        }
+        try
+        {
+            using var doc = JsonDocument.Parse(json);
+            // JsonElement.WriteTo needs no reflection, unlike JsonSerializer.Serialize(JsonElement),
+            // which is unconditionally annotated RequiresUnreferencedCode/RequiresDynamicCode even
+            // though JsonElement itself needs neither — this keeps --pretty AOT-warning-free.
+            using var stream = new MemoryStream();
+            using (var writer = new Utf8JsonWriter(stream, new JsonWriterOptions { Indented = true }))
+                doc.RootElement.WriteTo(writer);
+            Console.Out.WriteLine(System.Text.Encoding.UTF8.GetString(stream.ToArray()));
+        }
+        catch (JsonException)
+        {
+            Console.Out.WriteLine(json);
+        }
     }
 
     /// <summary>
