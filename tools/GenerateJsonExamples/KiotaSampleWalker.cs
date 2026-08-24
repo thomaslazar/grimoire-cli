@@ -5,7 +5,7 @@ using System.Text.Encodings.Web;
 using System.Text.Json;
 using Microsoft.Kiota.Abstractions.Serialization;
 
-namespace GrimoireCli.Tools.GenerateRequestExamples;
+namespace GrimoireCli.Tools.GenerateJsonExamples;
 
 /// <summary>
 /// Renders a Kiota request model as a pretty-printed JSON body template.

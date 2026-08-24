@@ -54,7 +54,7 @@ public static class BooksCommand
             "grimoire-cli books list",
             "grimoire-cli books list --system-id <system-id> --category core",
             "grimoire-cli books list --limit 500 --offset 500");
-        command.AddResponseExample<BookListResponse>();
+        command.AddResponseExample<Generated.Models.BookListResponse>();
         command.SetAction(async (parseResult, cancellationToken) =>
         {
             var server = parseResult.GetValue(serverOption);
@@ -84,7 +84,7 @@ public static class BooksCommand
         command.AddHelpSection("Notes", HelpSectionPosition.Top,
             "403 if the book is explicit and the account disallows explicit content.");
         command.AddExamples("grimoire-cli books get --id <book-id>");
-        command.AddResponseExample<BookDetail>();
+        command.AddResponseExample<Generated.Models.BookDetail>();
         command.SetAction(async (parseResult, cancellationToken) =>
         {
             var server = parseResult.GetValue(serverOption);
@@ -175,7 +175,7 @@ public static class BooksCommand
             "grimoire-cli books batch-update --input items.json",
             "jq -c '{items: .}' edits.json | grimoire-cli books batch-update --stdin");
         command.AddRequestShape<Generated.Models.BookBulkUpdate>();
-        command.AddResponseExample<BulkUpdateResult>();
+        command.AddResponseExample<Generated.Models.BulkResult>();
         command.SetAction(async (parseResult, cancellationToken) =>
         {
             string body;
@@ -224,7 +224,7 @@ public static class BooksCommand
             "grimoire-cli books batch-tag --input tags.json",
             "echo '{\"ids\":[\"<id>\"],\"tags\":[\"cyberpunk\"]}' | grimoire-cli books batch-tag --stdin");
         command.AddRequestShape<Generated.Models.BulkAddTags>();
-        command.AddResponseExample<BulkTagResult>();
+        command.AddResponseExample<Generated.Models.TagsResponse>();
         command.SetAction(async (parseResult, cancellationToken) =>
         {
             string body;

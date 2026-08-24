@@ -65,7 +65,7 @@ public class HelpOutputTests
     {
         var output = RenderHelp(helpFull: true, "systems", "list");
         Assert.Contains("Response shape:\n  [", output);
-        Assert.Contains("\"book_count\": 227", output);
+        Assert.Contains("\"book_count\": 0", output);
         Assert.DoesNotContain("Run --help-full", output);
     }
 

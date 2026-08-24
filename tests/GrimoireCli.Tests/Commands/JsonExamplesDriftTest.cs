@@ -2,19 +2,19 @@ using System.Diagnostics;
 
 namespace GrimoireCli.Tests.Commands;
 
-public class ResponseExamplesDriftTest
+public class JsonExamplesDriftTest
 {
     [Fact]
     public void CheckedInFileMatchesFreshGeneration()
     {
         var repoRoot = RepoRoot();
-        var checkedInPath = Path.Combine(repoRoot, "src", "GrimoireCli", "Commands", "ResponseExamples.g.cs");
+        var checkedInPath = Path.Combine(repoRoot, "src", "GrimoireCli", "Commands", "JsonExamples.g.cs");
         Assert.True(File.Exists(checkedInPath), $"Missing generated file: {checkedInPath}");
 
-        var tempPath = Path.Combine(Path.GetTempPath(), $"response-examples-{Guid.NewGuid():N}.g.cs");
+        var tempPath = Path.Combine(Path.GetTempPath(), $"json-examples-{Guid.NewGuid():N}.g.cs");
         try
         {
-            var toolProject = Path.Combine(repoRoot, "tools", "GenerateResponseExamples", "GenerateResponseExamples.csproj");
+            var toolProject = Path.Combine(repoRoot, "tools", "GenerateJsonExamples", "GenerateJsonExamples.csproj");
             var psi = new ProcessStartInfo
             {
                 FileName = "dotnet",
@@ -30,8 +30,8 @@ public class ResponseExamplesDriftTest
             var expected = File.ReadAllText(checkedInPath).Replace("\r\n", "\n");
             var actual = File.ReadAllText(tempPath).Replace("\r\n", "\n");
             Assert.True(expected == actual,
-                "ResponseExamples.g.cs is stale. Regenerate with: " +
-                "dotnet run --project tools/GenerateResponseExamples -- src/GrimoireCli/Commands/ResponseExamples.g.cs");
+                "JsonExamples.g.cs is stale. Regenerate with: " +
+                "dotnet run --project tools/GenerateJsonExamples -- src/GrimoireCli/Commands/JsonExamples.g.cs");
         }
         finally
         {

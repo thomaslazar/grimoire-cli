@@ -1,6 +1,5 @@
 using System.CommandLine;
 using GrimoireCli.Api;
-using GrimoireCli.Models;
 using GrimoireCli.Output;
 using GrimoireCli.Services;
 
@@ -74,7 +73,7 @@ public static class LibraryCommand
             "A loose file directly under books/ counts toward total_books but is",
             "never scanned, so scanned_books >= total_books never becomes true. Poll",
             "running instead.");
-        command.AddResponseExample<ScanStatus>();
+        command.AddResponseExample<Generated.Models.ScanStatusResponse>();
         command.SetAction(async (parseResult, cancellationToken) =>
         {
             var (client, _) = CommandHelper.BuildClient(
@@ -137,7 +136,7 @@ public static class LibraryCommand
             "409 while a scan is running; commits per row, so a failure part-way",
             "leaves earlier removals applied.");
         command.AddExamples("grimoire-cli library cleanup-missing");
-        command.AddResponseExample<CleanupResult>();
+        command.AddResponseExample<Generated.Models.CleanupResponse>();
         command.SetAction(async (parseResult, cancellationToken) =>
         {
             var (client, _) = CommandHelper.BuildClient(

@@ -1,6 +1,5 @@
 using System.CommandLine;
 using GrimoireCli.Commands;
-using GrimoireCli.Models;
 
 namespace GrimoireCli.Tests.Commands;
 
@@ -69,20 +68,20 @@ public class HelpExtensionsTests
     public void AddResponseExample_RendersResponseShapeSection_AsObject()
     {
         var cmd = new Command("demo", "Demo");
-        cmd.AddResponseExample<GameSystemSummary>();
+        cmd.AddResponseExample<Generated.Models.SystemSummary>();
         var output = RenderHelpFull(cmd);
         Assert.Contains("Response shape:\n  {", output);
-        Assert.Contains("\"book_count\": 227", output);
+        Assert.Contains("\"book_count\": 0", output);
     }
 
     [Fact]
     public void AddResponseExampleArray_WrapsSampleInBrackets()
     {
         var cmd = new Command("demo", "Demo");
-        cmd.AddResponseExampleArray<GameSystemSummary>();
+        cmd.AddResponseExampleArray<Generated.Models.SystemSummary>();
         var output = RenderHelpFull(cmd);
         Assert.Contains("Response shape:\n  [", output);
-        Assert.Contains("\"book_count\": 227", output);
+        Assert.Contains("\"book_count\": 0", output);
         var openIdx = output.IndexOf("Response shape:\n  [", StringComparison.Ordinal);
         var closeIdx = output.IndexOf("\n  ]", StringComparison.Ordinal);
         Assert.True(closeIdx > openIdx, "Array wrapper must close after it opens");
@@ -92,7 +91,7 @@ public class HelpExtensionsTests
     public void PlainHelp_HidesShapeSection_AndShowsHint()
     {
         var cmd = new Command("demo", "Demo");
-        cmd.AddResponseExample<GameSystemSummary>();
+        cmd.AddResponseExample<Generated.Models.SystemSummary>();
         var output = RenderHelp(cmd);
         Assert.DoesNotContain("Response shape:", output);
         Assert.Contains("Run --help-full to see the request and response shapes.", output);
@@ -102,7 +101,7 @@ public class HelpExtensionsTests
     public void HelpFull_ShowsShape_AndOmitsHint()
     {
         var cmd = new Command("demo", "Demo");
-        cmd.AddResponseExample<GameSystemSummary>();
+        cmd.AddResponseExample<Generated.Models.SystemSummary>();
         var output = RenderHelpFull(cmd);
         Assert.Contains("Response shape:", output);
         Assert.DoesNotContain("Run --help-full", output);

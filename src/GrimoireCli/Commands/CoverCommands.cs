@@ -82,7 +82,7 @@ public static class CoverCommands
             "Folder cover art still wins, so cover get may keep returning the library",
             "image. 400 if the bytes are not a decodable image of the declared type.");
         command.AddExamples("grimoire-cli systems cover upload --id <system-id> --file cover.png");
-        command.AddResponseExample<CoverUploadResult>();
+        command.AddResponseExample<Generated.Models.SystemCoverResponse>();
         command.SetAction(async (parseResult, cancellationToken) =>
         {
             var (client, _) = CommandHelper.BuildClient(

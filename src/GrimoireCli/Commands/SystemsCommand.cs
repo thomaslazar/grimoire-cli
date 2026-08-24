@@ -1,6 +1,5 @@
 using System.CommandLine;
 using GrimoireCli.Api;
-using GrimoireCli.Models;
 using GrimoireCli.Output;
 using GrimoireCli.Services;
 
@@ -61,7 +60,7 @@ public static class SystemsCommand
             "grimoire-cli systems list --include-children --family Shadowrun",
             "grimoire-cli systems list --parent-id <container-id>",
             "grimoire-cli systems list --explicit false");
-        command.AddResponseExampleArray<GameSystemSummary>();
+        command.AddResponseExampleArray<Generated.Models.SystemSummary>();
         command.SetAction(async (parseResult, cancellationToken) =>
         {
             var server = parseResult.GetValue(serverOption);
@@ -115,7 +114,7 @@ public static class SystemsCommand
             "grimoire-cli systems get --id <system-id>",
             "grimoire-cli systems get --id <system-id> --category core",
             "grimoire-cli systems get --id <system-id> --book-sort page_count --book-desc");
-        command.AddResponseExample<GameSystemDetail>();
+        command.AddResponseExample<Generated.Models.SystemDetail>();
         command.SetAction(async (parseResult, cancellationToken) =>
         {
             var server = parseResult.GetValue(serverOption);
@@ -213,7 +212,7 @@ public static class SystemsCommand
             "grimoire-cli systems batch-update --input items.json",
             "jq -c '{items: .}' edits.json | grimoire-cli systems batch-update --stdin");
         command.AddRequestShape<Generated.Models.GameSystemBulkUpdate>();
-        command.AddResponseExample<BulkUpdateResult>();
+        command.AddResponseExample<Generated.Models.BulkResult>();
         command.SetAction(async (parseResult, cancellationToken) =>
         {
             string body;
@@ -262,7 +261,7 @@ public static class SystemsCommand
             "grimoire-cli systems batch-tag --input tags.json",
             "echo '{\"ids\":[\"<id>\"],\"tags\":[\"cyberpunk\"]}' | grimoire-cli systems batch-tag --stdin");
         command.AddRequestShape<Generated.Models.BulkAddTags>();
-        command.AddResponseExample<BulkTagResult>();
+        command.AddResponseExample<Generated.Models.TagsResponse>();
         command.SetAction(async (parseResult, cancellationToken) =>
         {
             string body;

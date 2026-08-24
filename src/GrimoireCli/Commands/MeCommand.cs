@@ -1,5 +1,4 @@
 using System.CommandLine;
-using GrimoireCli.Models;
 using GrimoireCli.Output;
 using GrimoireCli.Services;
 
@@ -23,7 +22,7 @@ public static class MeCommand
         command.AddExamples(
             "grimoire-cli me",
             "grimoire-cli me | jq -r .role");
-        command.AddResponseExample<MeResponse>();
+        command.AddResponseExample<Generated.Models.AuthMeResponse>();
         command.SetAction(async (parseResult, cancellationToken) =>
         {
             var (client, _) = CommandHelper.BuildClient(

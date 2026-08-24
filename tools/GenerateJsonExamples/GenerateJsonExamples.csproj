@@ -4,8 +4,8 @@
     <TargetFramework>net10.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <RootNamespace>GrimoireCli.Tools.GenerateResponseExamples</RootNamespace>
-    <AssemblyName>GenerateResponseExamples</AssemblyName>
+    <RootNamespace>GrimoireCli.Tools.GenerateJsonExamples</RootNamespace>
+    <AssemblyName>GenerateJsonExamples</AssemblyName>
     <IsPackable>false</IsPackable>
     <IsPublishable>false</IsPublishable>
   </PropertyGroup>
