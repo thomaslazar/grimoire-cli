@@ -50,7 +50,7 @@ public static class MetadataCommands
                 tokenOverride: parseResult.GetValue(tokenOption));
             var service = new MetadataService(client, resource);
             var result = await service.SourcesAsync(parseResult.GetValue(idOption)!);
-            ConsoleOutput.WriteJson(result, AppJsonContext.Default.MetadataSourceList);
+            ConsoleOutput.WriteRawJson(result);
             return 0;
         });
         return command;
@@ -94,7 +94,7 @@ public static class MetadataCommands
                 parseResult.GetValue(idOption)!,
                 parseResult.GetValue(sourceIdOption)!,
                 parseResult.GetValue(queryOption));
-            ConsoleOutput.WriteJson(result, AppJsonContext.Default.MetadataSearchResult);
+            ConsoleOutput.WriteRawJson(result);
             return 0;
         });
         return command;
@@ -153,7 +153,7 @@ public static class MetadataCommands
                 parseResult.GetValue(identityOption),
                 parseResult.GetValue(queryOption),
                 parseResult.GetValue(pasteOption));
-            ConsoleOutput.WriteJson(result, AppJsonContext.Default.MetadataFetchResult);
+            ConsoleOutput.WriteRawJson(result);
             return 0;
         });
         return command;

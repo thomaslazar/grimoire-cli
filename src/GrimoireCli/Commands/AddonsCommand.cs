@@ -1,4 +1,5 @@
 using System.CommandLine;
+using GrimoireCli.Api;
 using GrimoireCli.Models;
 using GrimoireCli.Output;
 using GrimoireCli.Services;
@@ -46,7 +47,7 @@ public static class AddonsCommand
                 tokenOverride: parseResult.GetValue(tokenOption));
             var service = new AddonsService(client);
             var result = await service.ListAsync();
-            ConsoleOutput.WriteJson(result, AppJsonContext.Default.AddonListResponse);
+            ConsoleOutput.WriteRawJson(result);
             return 0;
         });
         return command;
@@ -74,7 +75,7 @@ public static class AddonsCommand
                 tokenOverride: parseResult.GetValue(tokenOption));
             var service = new AddonsService(client);
             var result = await service.RefreshAsync();
-            ConsoleOutput.WriteJson(result, AppJsonContext.Default.RefreshResult);
+            ConsoleOutput.WriteRawJson(result);
             return 0;
         });
         return command;
@@ -113,7 +114,7 @@ public static class AddonsCommand
             var service = new AddonsService(client);
             var result = await service.InstallAsync(
                 parseResult.GetValue(idOption)!, parseResult.GetValue(approveOption));
-            ConsoleOutput.WriteJson(result, AppJsonContext.Default.AddonInstalled);
+            ConsoleOutput.WriteRawJson(result);
             return 0;
         });
         return command;
@@ -148,7 +149,7 @@ public static class AddonsCommand
                 parseResult.GetValue(idOption)!,
                 parseResult.GetValue(enabledOption),
                 parseResult.GetValue(scriptApprovedOption));
-            ConsoleOutput.WriteJson(result, AppJsonContext.Default.AddonInstalled);
+            ConsoleOutput.WriteRawJson(result);
             return 0;
         });
         return command;
@@ -210,8 +211,8 @@ public static class AddonsCommand
                 tokenOverride: parseResult.GetValue(tokenOption));
             var service = new AddonsService(client);
             var result = await service.UpgradeAllAsync();
-            ConsoleOutput.WriteJson(result, AppJsonContext.Default.UpgradeAllResult);
-            return BulkExit.CodeFor(result.Failed);
+            ConsoleOutput.WriteRawJson(result);
+            return BulkExit.CodeFor(GrimoireApiClient.HasItems(result, "failed"));
         });
         return command;
     }
@@ -250,7 +251,7 @@ public static class AddonsCommand
             var service = new AddonsService(client);
             var result = await service.SettingsAsync(
                 parseResult.GetValue(indexUrlOption), parseResult.GetValue(allowScriptsOption));
-            ConsoleOutput.WriteJson(result, AppJsonContext.Default.AddonSettings);
+            ConsoleOutput.WriteRawJson(result);
             return 0;
         });
         return command;

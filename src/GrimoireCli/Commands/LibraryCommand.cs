@@ -1,4 +1,5 @@
 using System.CommandLine;
+using GrimoireCli.Api;
 using GrimoireCli.Models;
 using GrimoireCli.Output;
 using GrimoireCli.Services;
@@ -51,8 +52,8 @@ public static class LibraryCommand
             var service = new LibraryService(client);
             var result = await service.RescanAsync(
                 parseResult.GetValue(scopeOption), parseResult.GetValue(metadataModeOption));
-            ConsoleOutput.WriteJson(result, AppJsonContext.Default.ScanTriggerResult);
-            return ScanExit.CodeFor(result);
+            ConsoleOutput.WriteRawJson(result);
+            return ScanExit.CodeFor(GrimoireApiClient.ReadStringProperty(result, "status"));
         });
         return command;
     }
@@ -81,7 +82,7 @@ public static class LibraryCommand
                 tokenOverride: parseResult.GetValue(tokenOption));
             var service = new LibraryService(client);
             var result = await service.ScanStatusAsync();
-            ConsoleOutput.WriteJson(result, AppJsonContext.Default.ScanStatus);
+            ConsoleOutput.WriteRawJson(result);
             return 0;
         });
         return command;
@@ -144,7 +145,7 @@ public static class LibraryCommand
                 tokenOverride: parseResult.GetValue(tokenOption));
             var service = new LibraryService(client);
             var result = await service.CleanupMissingAsync();
-            ConsoleOutput.WriteJson(result, AppJsonContext.Default.CleanupResult);
+            ConsoleOutput.WriteRawJson(result);
             return 0;
         });
         return command;

@@ -1,5 +1,4 @@
 using GrimoireCli.Api;
-using GrimoireCli.Models;
 
 namespace GrimoireCli.Services;
 
@@ -32,19 +31,18 @@ public class MetadataService
         ? "No system with that ID. List them with: grimoire-cli systems list"
         : "No book with that ID. List them with: grimoire-cli books list";
 
-    public async Task<MetadataSourceList> SourcesAsync(string id)
+    public async Task<string> SourcesAsync(string id)
     {
         var info = _resource == Systems
             ? _client.Api.Api.Systems[id].MetadataSources.ToGetRequestInformation()
             : _client.Api.Api.Books[id].MetadataSources.ToGetRequestInformation();
         return await _client.SendAsync(
             info,
-            AppJsonContext.Default.MetadataSourceList,
             permissionHint: "the gm or admin role",
             notFoundHint: NotFoundHint);
     }
 
-    public async Task<MetadataSearchResult> SearchAsync(string id, string sourceId, string? query)
+    public async Task<string> SearchAsync(string id, string sourceId, string? query)
     {
         var info = _resource == Systems
             ? _client.Api.Api.Systems[id].MetadataSearch.ToPostRequestInformation(
@@ -61,12 +59,11 @@ public class MetadataService
                 });
         return await _client.SendAsync(
             info,
-            AppJsonContext.Default.MetadataSearchResult,
             permissionHint: "the gm or admin role",
             notFoundHint: NotFoundHint);
     }
 
-    public async Task<MetadataFetchResult> FetchAsync(
+    public async Task<string> FetchAsync(
         string id, string sourceId, string? identity, string? query, string? paste)
     {
         var body = BuildFetchBody(sourceId, identity, query, paste);
@@ -75,7 +72,6 @@ public class MetadataService
             : _client.Api.Api.Books[id].MetadataFetch.ToPostRequestInformation(body);
         return await _client.SendAsync(
             info,
-            AppJsonContext.Default.MetadataFetchResult,
             permissionHint: "the gm or admin role",
             notFoundHint: NotFoundHint);
     }

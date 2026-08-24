@@ -30,7 +30,7 @@ public static class MeCommand
                 serverOverride: parseResult.GetValue(serverOption),
                 tokenOverride: parseResult.GetValue(tokenOption));
             var result = await new AuthService(client).MeAsync();
-            ConsoleOutput.WriteJson(result, AppJsonContext.Default.MeResponse);
+            ConsoleOutput.WriteRawJson(result);
             return 0;
         });
         return command;
