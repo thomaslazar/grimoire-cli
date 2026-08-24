@@ -48,43 +48,11 @@ public static class SelfTestCommand
             if (!dict.Contains("\"k\""))
                 failures.Add("Dictionary<string,string> JSON round-trip failed");
 
-            // Response DTOs: these cross the JSON boundary on every command that talks
-            // to the API, not just login, so they need the same AOT coverage.
-            var link = new LinkEntry { Label = "wiki", Url = "https://example.invalid/wiki" };
-            var linkBack = JsonSerializer.Deserialize(
-                JsonSerializer.Serialize(link, AppJsonContext.Default.LinkEntry), AppJsonContext.Default.LinkEntry);
-            if (linkBack?.Label != link.Label || linkBack.Url != link.Url)
-                failures.Add("LinkEntry JSON round-trip failed");
-
-            var publisher = new PublisherEntry { Name = "Pegasus", Url = "https://example.invalid/pegasus" };
-            var publisherBack = JsonSerializer.Deserialize(
-                JsonSerializer.Serialize(publisher, AppJsonContext.Default.PublisherEntry), AppJsonContext.Default.PublisherEntry);
-            if (publisherBack?.Name != publisher.Name || publisherBack.Url != publisher.Url)
-                failures.Add("PublisherEntry JSON round-trip failed");
-
-            var book = new Book { Id = "b1", Title = "Shadowrun 6 DE", PageCount = 42 };
-            var bookBack = JsonSerializer.Deserialize(
-                JsonSerializer.Serialize(book, AppJsonContext.Default.Book), AppJsonContext.Default.Book);
-            if (bookBack?.Id != book.Id || bookBack.Title != book.Title || bookBack.PageCount != book.PageCount)
-                failures.Add("Book JSON round-trip failed");
-
-            var summary = new GameSystemSummary { Id = "s1", Name = "Shadowrun 6 DE", BookCount = 227 };
-            var summaryBack = JsonSerializer.Deserialize(
-                JsonSerializer.Serialize(summary, AppJsonContext.Default.GameSystemSummary), AppJsonContext.Default.GameSystemSummary);
-            if (summaryBack?.Id != summary.Id || summaryBack.Name != summary.Name || summaryBack.BookCount != summary.BookCount)
-                failures.Add("GameSystemSummary JSON round-trip failed");
-
-            var detail = new GameSystemDetail { Id = "s1", Name = "Shadowrun 6 DE", Books = [book] };
-            var detailBack = JsonSerializer.Deserialize(
-                JsonSerializer.Serialize(detail, AppJsonContext.Default.GameSystemDetail), AppJsonContext.Default.GameSystemDetail);
-            if (detailBack?.Id != detail.Id || detailBack.Books?.Count != 1 || detailBack.Books[0].Title != book.Title)
-                failures.Add("GameSystemDetail JSON round-trip failed");
-
-            var summaryList = new List<GameSystemSummary> { summary };
-            var summaryListBack = JsonSerializer.Deserialize(
-                JsonSerializer.Serialize(summaryList, AppJsonContext.Default.ListGameSystemSummary), AppJsonContext.Default.ListGameSystemSummary);
-            if (summaryListBack?.Count != 1 || summaryListBack[0].Id != summary.Id)
-                failures.Add("List<GameSystemSummary> JSON round-trip failed");
+            var saved = new SavedFile { Path = "book.pdf", Bytes = 42 };
+            var savedBack = JsonSerializer.Deserialize(
+                JsonSerializer.Serialize(saved, AppJsonContext.Default.SavedFile), AppJsonContext.Default.SavedFile);
+            if (savedBack?.Path != saved.Path || savedBack.Bytes != saved.Bytes)
+                failures.Add("SavedFile JSON round-trip failed");
 
             // Token parsing: base64url payload {"exp":4102444800} = 2100-01-01.
             const string token = "eyJhbGciOiJIUzI1NiJ9.eyJleHAiOjQxMDI0NDQ4MDB9.sig";

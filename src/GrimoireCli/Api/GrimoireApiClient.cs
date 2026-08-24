@@ -1,9 +1,7 @@
 using System.Net.Http.Headers;
 using System.Reflection;
 using System.Text.Json;
-using System.Text.Json.Serialization.Metadata;
 using GrimoireCli.Configuration;
-using GrimoireCli.Models;
 using Microsoft.Kiota.Abstractions;
 using Microsoft.Kiota.Abstractions.Authentication;
 using Microsoft.Kiota.Http.HttpClientLibrary;
@@ -200,12 +198,6 @@ public class GrimoireApiClient
         return body;
     }
 
-    public async Task<T> SendAsync<T>(RequestInformation info, JsonTypeInfo<T> typeInfo, string? permissionHint = null, string? notFoundHint = null, TimeSpan? timeout = null)
-    {
-        var json = await SendAsync(info, permissionHint, notFoundHint, timeout);
-        return Deserialize(json, typeInfo, info.URI.PathAndQuery);
-    }
-
     /// <summary>
     /// A response whose body is bytes rather than JSON. Identical to SendAsync
     /// through preflight, permission hints and error handling; only the read
@@ -220,34 +212,6 @@ public class GrimoireApiClient
         var response = await _http.SendAsync(request, cts.Token);
         await EnsureSuccessAsync(response, permissionHint, notFoundHint);
         return await response.Content.ReadAsStreamAsync(cts.Token);
-    }
-
-    // Shared by every typed overload above. Grimoire's SPA catch-all answers an
-    // unroutable request (an empty, ".", or otherwise mis-encoded id) with an
-    // HTML 200, not an API error — so deserialization is where that case must be
-    // caught. Routes it through the same log-and-exit(2) mechanism as
-    // EnsureSuccessAsync rather than letting JsonException surface as a raw
-    // stack trace.
-    internal static T Deserialize<T>(string json, JsonTypeInfo<T> typeInfo, string endpoint)
-    {
-        try
-        {
-            return JsonSerializer.Deserialize(json, typeInfo)
-                ?? throw new InvalidOperationException($"Failed to deserialize response from {endpoint}");
-        }
-        catch (JsonException ex)
-        {
-            // The body itself is the diagnostic that distinguishes an HTML SPA
-            // catch-all from a truncated-but-otherwise-valid JSON response, and
-            // ex.Message carries the line/byte position — but a full HTML page
-            // or huge payload on stderr would flood the terminal, so it's
-            // truncated and gated behind --debug rather than always shown.
-            _logger.Debug($"unparseable body from {endpoint}: {TruncateForLogging(json)}");
-            _logger.Debug($"JsonException: {ex.Message}");
-            _logger.Error($"Response from {endpoint} could not be parsed as JSON. Run with --debug to see the response body and parse error.");
-            Environment.Exit(2);
-            throw;
-        }
     }
 
     internal static string TruncateForLogging(string body, int maxChars = 500)
