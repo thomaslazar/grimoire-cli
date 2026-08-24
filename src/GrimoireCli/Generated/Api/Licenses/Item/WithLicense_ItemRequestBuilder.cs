@@ -36,17 +36,17 @@ namespace GrimoireCli.Generated.Api.Licenses.Item
         /// <summary>
         /// Delete a license (admin; blocked if in use unless force=true)
         /// </summary>
-        /// <returns>A <see cref="UntypedNode"/></returns>
+        /// <returns>A <see cref="global::GrimoireCli.Generated.Models.LookupDeleteResponse"/></returns>
         /// <param name="cancellationToken">Cancellation token to use when cancelling requests</param>
         /// <param name="requestConfiguration">Configuration for the request such as headers, query parameters, and middleware options.</param>
         /// <exception cref="global::GrimoireCli.Generated.Models.HTTPValidationError">When receiving a 422 status code</exception>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
-        public async Task<UntypedNode?> DeleteAsync(Action<RequestConfiguration<global::GrimoireCli.Generated.Api.Licenses.Item.WithLicense_ItemRequestBuilder.WithLicense_ItemRequestBuilderDeleteQueryParameters>>? requestConfiguration = default, CancellationToken cancellationToken = default)
+        public async Task<global::GrimoireCli.Generated.Models.LookupDeleteResponse?> DeleteAsLookupDeleteResponseAsync(Action<RequestConfiguration<global::GrimoireCli.Generated.Api.Licenses.Item.WithLicense_ItemRequestBuilder.WithLicense_ItemRequestBuilderDeleteQueryParameters>>? requestConfiguration = default, CancellationToken cancellationToken = default)
         {
 #nullable restore
 #else
-        public async Task<UntypedNode> DeleteAsync(Action<RequestConfiguration<global::GrimoireCli.Generated.Api.Licenses.Item.WithLicense_ItemRequestBuilder.WithLicense_ItemRequestBuilderDeleteQueryParameters>> requestConfiguration = default, CancellationToken cancellationToken = default)
+        public async Task<global::GrimoireCli.Generated.Models.LookupDeleteResponse> DeleteAsLookupDeleteResponseAsync(Action<RequestConfiguration<global::GrimoireCli.Generated.Api.Licenses.Item.WithLicense_ItemRequestBuilder.WithLicense_ItemRequestBuilderDeleteQueryParameters>> requestConfiguration = default, CancellationToken cancellationToken = default)
         {
 #endif
             var requestInfo = ToDeleteRequestInformation(requestConfiguration);
@@ -54,7 +54,31 @@ namespace GrimoireCli.Generated.Api.Licenses.Item
             {
                 { "422", global::GrimoireCli.Generated.Models.HTTPValidationError.CreateFromDiscriminatorValue },
             };
-            return await RequestAdapter.SendAsync<UntypedNode>(requestInfo, UntypedNode.CreateFromDiscriminatorValue, errorMapping, cancellationToken).ConfigureAwait(false);
+            return await RequestAdapter.SendAsync<global::GrimoireCli.Generated.Models.LookupDeleteResponse>(requestInfo, global::GrimoireCli.Generated.Models.LookupDeleteResponse.CreateFromDiscriminatorValue, errorMapping, cancellationToken).ConfigureAwait(false);
+        }
+        /// <summary>
+        /// Delete a license (admin; blocked if in use unless force=true)
+        /// </summary>
+        /// <returns>A <see cref="global::GrimoireCli.Generated.Models.LookupResponse"/></returns>
+        /// <param name="cancellationToken">Cancellation token to use when cancelling requests</param>
+        /// <param name="requestConfiguration">Configuration for the request such as headers, query parameters, and middleware options.</param>
+        /// <exception cref="global::GrimoireCli.Generated.Models.HTTPValidationError">When receiving a 422 status code</exception>
+        [Obsolete("This method is obsolete. Use DeleteAsLookupDeleteResponseAsync instead.")]
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public async Task<global::GrimoireCli.Generated.Models.LookupResponse?> DeleteAsync(Action<RequestConfiguration<global::GrimoireCli.Generated.Api.Licenses.Item.WithLicense_ItemRequestBuilder.WithLicense_ItemRequestBuilderDeleteQueryParameters>>? requestConfiguration = default, CancellationToken cancellationToken = default)
+        {
+#nullable restore
+#else
+        public async Task<global::GrimoireCli.Generated.Models.LookupResponse> DeleteAsync(Action<RequestConfiguration<global::GrimoireCli.Generated.Api.Licenses.Item.WithLicense_ItemRequestBuilder.WithLicense_ItemRequestBuilderDeleteQueryParameters>> requestConfiguration = default, CancellationToken cancellationToken = default)
+        {
+#endif
+            var requestInfo = ToDeleteRequestInformation(requestConfiguration);
+            var errorMapping = new Dictionary<string, ParsableFactory<IParsable>>
+            {
+                { "422", global::GrimoireCli.Generated.Models.HTTPValidationError.CreateFromDiscriminatorValue },
+            };
+            return await RequestAdapter.SendAsync<global::GrimoireCli.Generated.Models.LookupResponse>(requestInfo, global::GrimoireCli.Generated.Models.LookupResponse.CreateFromDiscriminatorValue, errorMapping, cancellationToken).ConfigureAwait(false);
         }
         /// <summary>
         /// Delete a license (admin; blocked if in use unless force=true)

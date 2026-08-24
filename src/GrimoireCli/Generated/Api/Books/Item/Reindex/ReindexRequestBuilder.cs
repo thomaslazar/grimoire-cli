@@ -36,17 +36,17 @@ namespace GrimoireCli.Generated.Api.Books.Item.Reindex
         /// <summary>
         /// Re-run OCR on a single scanned book, optionally at a higher DPI.Clears the book&apos;s existing search index and re-queues it for OCR from page 1.A higher ``ocr_dpi`` re-reads a specific book more sharply than the librarydefault, without re-OCRing the whole library. Only applies to OCR-sourced(image-only) PDFs; books with a real text layer have nothing to re-OCR.The OCR itself runs in the background; poll ``GET /api/scan-status`` (phase``ocr``) for progress.
         /// </summary>
-        /// <returns>A <see cref="UntypedNode"/></returns>
+        /// <returns>A <see cref="global::GrimoireCli.Generated.Models.ReindexResponse"/></returns>
         /// <param name="cancellationToken">Cancellation token to use when cancelling requests</param>
         /// <param name="requestConfiguration">Configuration for the request such as headers, query parameters, and middleware options.</param>
         /// <exception cref="global::GrimoireCli.Generated.Models.HTTPValidationError">When receiving a 422 status code</exception>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
-        public async Task<UntypedNode?> PostAsync(Action<RequestConfiguration<global::GrimoireCli.Generated.Api.Books.Item.Reindex.ReindexRequestBuilder.ReindexRequestBuilderPostQueryParameters>>? requestConfiguration = default, CancellationToken cancellationToken = default)
+        public async Task<global::GrimoireCli.Generated.Models.ReindexResponse?> PostAsync(Action<RequestConfiguration<global::GrimoireCli.Generated.Api.Books.Item.Reindex.ReindexRequestBuilder.ReindexRequestBuilderPostQueryParameters>>? requestConfiguration = default, CancellationToken cancellationToken = default)
         {
 #nullable restore
 #else
-        public async Task<UntypedNode> PostAsync(Action<RequestConfiguration<global::GrimoireCli.Generated.Api.Books.Item.Reindex.ReindexRequestBuilder.ReindexRequestBuilderPostQueryParameters>> requestConfiguration = default, CancellationToken cancellationToken = default)
+        public async Task<global::GrimoireCli.Generated.Models.ReindexResponse> PostAsync(Action<RequestConfiguration<global::GrimoireCli.Generated.Api.Books.Item.Reindex.ReindexRequestBuilder.ReindexRequestBuilderPostQueryParameters>> requestConfiguration = default, CancellationToken cancellationToken = default)
         {
 #endif
             var requestInfo = ToPostRequestInformation(requestConfiguration);
@@ -54,7 +54,7 @@ namespace GrimoireCli.Generated.Api.Books.Item.Reindex
             {
                 { "422", global::GrimoireCli.Generated.Models.HTTPValidationError.CreateFromDiscriminatorValue },
             };
-            return await RequestAdapter.SendAsync<UntypedNode>(requestInfo, UntypedNode.CreateFromDiscriminatorValue, errorMapping, cancellationToken).ConfigureAwait(false);
+            return await RequestAdapter.SendAsync<global::GrimoireCli.Generated.Models.ReindexResponse>(requestInfo, global::GrimoireCli.Generated.Models.ReindexResponse.CreateFromDiscriminatorValue, errorMapping, cancellationToken).ConfigureAwait(false);
         }
         /// <summary>
         /// Re-run OCR on a single scanned book, optionally at a higher DPI.Clears the book&apos;s existing search index and re-queues it for OCR from page 1.A higher ``ocr_dpi`` re-reads a specific book more sharply than the librarydefault, without re-OCRing the whole library. Only applies to OCR-sourced(image-only) PDFs; books with a real text layer have nothing to re-OCR.The OCR itself runs in the background; poll ``GET /api/scan-status`` (phase``ocr``) for progress.

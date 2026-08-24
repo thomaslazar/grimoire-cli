@@ -34,7 +34,7 @@ namespace GrimoireCli.Generated.Api.Audio.Item.Artwork
         {
         }
         /// <summary>
-        /// Returns folder cover art or embedded album art for a track. 404 if none.
+        /// Returns a track&apos;s artwork, resolving a cover set through the UI first, then folder cover art, then embedded album art. 404 if none.
         /// </summary>
         /// <returns>A <see cref="UntypedNode"/></returns>
         /// <param name="cancellationToken">Cancellation token to use when cancelling requests</param>
@@ -57,7 +57,7 @@ namespace GrimoireCli.Generated.Api.Audio.Item.Artwork
             return await RequestAdapter.SendAsync<UntypedNode>(requestInfo, UntypedNode.CreateFromDiscriminatorValue, errorMapping, cancellationToken).ConfigureAwait(false);
         }
         /// <summary>
-        /// Returns folder cover art or embedded album art for a track. 404 if none.
+        /// Returns a track&apos;s artwork, resolving a cover set through the UI first, then folder cover art, then embedded album art. 404 if none.
         /// </summary>
         /// <returns>A <see cref="RequestInformation"/></returns>
         /// <param name="requestConfiguration">Configuration for the request such as headers, query parameters, and middleware options.</param>
@@ -85,7 +85,7 @@ namespace GrimoireCli.Generated.Api.Audio.Item.Artwork
             return new global::GrimoireCli.Generated.Api.Audio.Item.Artwork.ArtworkRequestBuilder(rawUrl, RequestAdapter);
         }
         /// <summary>
-        /// Returns folder cover art or embedded album art for a track. 404 if none.
+        /// Returns a track&apos;s artwork, resolving a cover set through the UI first, then folder cover art, then embedded album art. 404 if none.
         /// </summary>
         [global::System.CodeDom.Compiler.GeneratedCode("Kiota", "1.0.0")]
         public partial class ArtworkRequestBuilderGetQueryParameters 

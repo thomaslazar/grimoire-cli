@@ -70,6 +70,14 @@ namespace GrimoireCli.Generated.Models
 #else
         public List<string> SharedUserIds { get; set; }
 #endif
+        /// <summary>The shared_write_user_ids property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public List<string>? SharedWriteUserIds { get; set; }
+#nullable restore
+#else
+        public List<string> SharedWriteUserIds { get; set; }
+#endif
         /// <summary>The title property</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
@@ -120,6 +128,7 @@ namespace GrimoireCli.Generated.Models
                 { "parent_id", n => { ParentId = n.GetObjectValue<global::GrimoireCli.Generated.Models.WikiPageCreate.WikiPageCreate_parent_id>(global::GrimoireCli.Generated.Models.WikiPageCreate.WikiPageCreate_parent_id.CreateFromDiscriminatorValue); } },
                 { "session_date", n => { SessionDate = n.GetObjectValue<global::GrimoireCli.Generated.Models.WikiPageCreate.WikiPageCreate_session_date>(global::GrimoireCli.Generated.Models.WikiPageCreate.WikiPageCreate_session_date.CreateFromDiscriminatorValue); } },
                 { "shared_user_ids", n => { SharedUserIds = n.GetCollectionOfPrimitiveValues<string>()?.AsList(); } },
+                { "shared_write_user_ids", n => { SharedWriteUserIds = n.GetCollectionOfPrimitiveValues<string>()?.AsList(); } },
                 { "title", n => { Title = n.GetStringValue(); } },
                 { "visibility", n => { Visibility = n.GetStringValue(); } },
             };
@@ -138,6 +147,7 @@ namespace GrimoireCli.Generated.Models
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.WikiPageCreate.WikiPageCreate_parent_id>("parent_id", ParentId);
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.WikiPageCreate.WikiPageCreate_session_date>("session_date", SessionDate);
             writer.WriteCollectionOfPrimitiveValues<string>("shared_user_ids", SharedUserIds);
+            writer.WriteCollectionOfPrimitiveValues<string>("shared_write_user_ids", SharedWriteUserIds);
             writer.WriteStringValue("title", Title);
             writer.WriteStringValue("visibility", Visibility);
             writer.WriteAdditionalData(AdditionalData);

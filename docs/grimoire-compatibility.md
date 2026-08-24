@@ -4,7 +4,17 @@
 
 | grimoire-cli | Grimoire | Status |
 |---|---|---|
-| 0.1.x | 1.5.6 | initial support |
+| 0.1.x | 1.5.6 | initial support, maintained on `support/grimoire-1.5.6` |
+
+**One CLI version targets one server version.** Whoever stays on Grimoire 1.5.6
+stays on grimoire-cli `0.1.x`, which is maintained on `support/grimoire-1.5.6` —
+fixes are made and released there, then cherry-picked forward.
+
+`main` targets Grimoire 1.6.0, which is unreleased and needs more than a version
+bump: it shortens the access token from 30 days to 30 minutes and types every
+response in the spec. Until it tags, `docker/docker-compose.yml` on `main` pins an
+`edge` digest rather than a release. See
+[grimoire-1.6.0-migration.md](grimoire-1.6.0-migration.md).
 
 ## Runtime check
 

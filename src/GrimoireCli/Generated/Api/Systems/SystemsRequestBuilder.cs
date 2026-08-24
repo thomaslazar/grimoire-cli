@@ -55,17 +55,17 @@ namespace GrimoireCli.Generated.Api.Systems
         /// <summary>
         /// Returns all game systems with book counts, tags, genre, and mechanics. Systems nested inside a container folder are omitted by default; pass `parent_id` to list one container&apos;s children, or `include_children=true` for a flat list of everything.
         /// </summary>
-        /// <returns>A <see cref="UntypedNode"/></returns>
+        /// <returns>A List&lt;global::GrimoireCli.Generated.Models.SystemSummary&gt;</returns>
         /// <param name="cancellationToken">Cancellation token to use when cancelling requests</param>
         /// <param name="requestConfiguration">Configuration for the request such as headers, query parameters, and middleware options.</param>
         /// <exception cref="global::GrimoireCli.Generated.Models.HTTPValidationError">When receiving a 422 status code</exception>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
-        public async Task<UntypedNode?> GetAsync(Action<RequestConfiguration<global::GrimoireCli.Generated.Api.Systems.SystemsRequestBuilder.SystemsRequestBuilderGetQueryParameters>>? requestConfiguration = default, CancellationToken cancellationToken = default)
+        public async Task<List<global::GrimoireCli.Generated.Models.SystemSummary>?> GetAsync(Action<RequestConfiguration<global::GrimoireCli.Generated.Api.Systems.SystemsRequestBuilder.SystemsRequestBuilderGetQueryParameters>>? requestConfiguration = default, CancellationToken cancellationToken = default)
         {
 #nullable restore
 #else
-        public async Task<UntypedNode> GetAsync(Action<RequestConfiguration<global::GrimoireCli.Generated.Api.Systems.SystemsRequestBuilder.SystemsRequestBuilderGetQueryParameters>> requestConfiguration = default, CancellationToken cancellationToken = default)
+        public async Task<List<global::GrimoireCli.Generated.Models.SystemSummary>> GetAsync(Action<RequestConfiguration<global::GrimoireCli.Generated.Api.Systems.SystemsRequestBuilder.SystemsRequestBuilderGetQueryParameters>> requestConfiguration = default, CancellationToken cancellationToken = default)
         {
 #endif
             var requestInfo = ToGetRequestInformation(requestConfiguration);
@@ -73,7 +73,8 @@ namespace GrimoireCli.Generated.Api.Systems
             {
                 { "422", global::GrimoireCli.Generated.Models.HTTPValidationError.CreateFromDiscriminatorValue },
             };
-            return await RequestAdapter.SendAsync<UntypedNode>(requestInfo, UntypedNode.CreateFromDiscriminatorValue, errorMapping, cancellationToken).ConfigureAwait(false);
+            var collectionResult = await RequestAdapter.SendCollectionAsync<global::GrimoireCli.Generated.Models.SystemSummary>(requestInfo, global::GrimoireCli.Generated.Models.SystemSummary.CreateFromDiscriminatorValue, errorMapping, cancellationToken).ConfigureAwait(false);
+            return collectionResult?.AsList();
         }
         /// <summary>
         /// Returns all game systems with book counts, tags, genre, and mechanics. Systems nested inside a container folder are omitted by default; pass `parent_id` to list one container&apos;s children, or `include_children=true` for a flat list of everything.

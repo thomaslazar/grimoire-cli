@@ -36,18 +36,18 @@ namespace GrimoireCli.Generated.Api.Addons.Item.Install
         /// <summary>
         /// Downloads an add-on from the cached index, verifies its checksum, and installs it. Script-backed add-ons additionally require `approve_script`. Admin only.
         /// </summary>
-        /// <returns>A <see cref="UntypedNode"/></returns>
+        /// <returns>A <see cref="global::GrimoireCli.Generated.Models.InstalledAddon"/></returns>
         /// <param name="body">Install/update request.``approve_script`` is the operator&apos;s explicit consent to run third-partycode, collected per add-on at install time. It is meaningless for YAML-onlyadd-ons and ignored for them.</param>
         /// <param name="cancellationToken">Cancellation token to use when cancelling requests</param>
         /// <param name="requestConfiguration">Configuration for the request such as headers, query parameters, and middleware options.</param>
         /// <exception cref="global::GrimoireCli.Generated.Models.HTTPValidationError">When receiving a 422 status code</exception>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
-        public async Task<UntypedNode?> PostAsync(global::GrimoireCli.Generated.Models.AddonInstall body, Action<RequestConfiguration<global::GrimoireCli.Generated.Api.Addons.Item.Install.InstallRequestBuilder.InstallRequestBuilderPostQueryParameters>>? requestConfiguration = default, CancellationToken cancellationToken = default)
+        public async Task<global::GrimoireCli.Generated.Models.InstalledAddon?> PostAsync(global::GrimoireCli.Generated.Models.AddonInstall body, Action<RequestConfiguration<global::GrimoireCli.Generated.Api.Addons.Item.Install.InstallRequestBuilder.InstallRequestBuilderPostQueryParameters>>? requestConfiguration = default, CancellationToken cancellationToken = default)
         {
 #nullable restore
 #else
-        public async Task<UntypedNode> PostAsync(global::GrimoireCli.Generated.Models.AddonInstall body, Action<RequestConfiguration<global::GrimoireCli.Generated.Api.Addons.Item.Install.InstallRequestBuilder.InstallRequestBuilderPostQueryParameters>> requestConfiguration = default, CancellationToken cancellationToken = default)
+        public async Task<global::GrimoireCli.Generated.Models.InstalledAddon> PostAsync(global::GrimoireCli.Generated.Models.AddonInstall body, Action<RequestConfiguration<global::GrimoireCli.Generated.Api.Addons.Item.Install.InstallRequestBuilder.InstallRequestBuilderPostQueryParameters>> requestConfiguration = default, CancellationToken cancellationToken = default)
         {
 #endif
             if(ReferenceEquals(body, null)) throw new ArgumentNullException(nameof(body));
@@ -56,7 +56,7 @@ namespace GrimoireCli.Generated.Api.Addons.Item.Install
             {
                 { "422", global::GrimoireCli.Generated.Models.HTTPValidationError.CreateFromDiscriminatorValue },
             };
-            return await RequestAdapter.SendAsync<UntypedNode>(requestInfo, UntypedNode.CreateFromDiscriminatorValue, errorMapping, cancellationToken).ConfigureAwait(false);
+            return await RequestAdapter.SendAsync<global::GrimoireCli.Generated.Models.InstalledAddon>(requestInfo, global::GrimoireCli.Generated.Models.InstalledAddon.CreateFromDiscriminatorValue, errorMapping, cancellationToken).ConfigureAwait(false);
         }
         /// <summary>
         /// Downloads an add-on from the cached index, verifies its checksum, and installs it. Script-backed add-ons additionally require `approve_script`. Admin only.

@@ -36,18 +36,18 @@ namespace GrimoireCli.Generated.Api.Campaigns.Item.Resources.Reorder
         /// <summary>
         /// Apply a new manual order from an ordered list of resource ids.
         /// </summary>
-        /// <returns>A <see cref="UntypedNode"/></returns>
+        /// <returns>A <see cref="global::GrimoireCli.Generated.Models.Backend__routers__campaigns___response_schemas__OkResponse"/></returns>
         /// <param name="body">The request body</param>
         /// <param name="cancellationToken">Cancellation token to use when cancelling requests</param>
         /// <param name="requestConfiguration">Configuration for the request such as headers, query parameters, and middleware options.</param>
         /// <exception cref="global::GrimoireCli.Generated.Models.HTTPValidationError">When receiving a 422 status code</exception>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
-        public async Task<UntypedNode?> PutAsync(global::GrimoireCli.Generated.Models.ResourceReorder body, Action<RequestConfiguration<global::GrimoireCli.Generated.Api.Campaigns.Item.Resources.Reorder.ReorderRequestBuilder.ReorderRequestBuilderPutQueryParameters>>? requestConfiguration = default, CancellationToken cancellationToken = default)
+        public async Task<global::GrimoireCli.Generated.Models.Backend__routers__campaigns___response_schemas__OkResponse?> PutAsync(global::GrimoireCli.Generated.Models.ResourceReorder body, Action<RequestConfiguration<global::GrimoireCli.Generated.Api.Campaigns.Item.Resources.Reorder.ReorderRequestBuilder.ReorderRequestBuilderPutQueryParameters>>? requestConfiguration = default, CancellationToken cancellationToken = default)
         {
 #nullable restore
 #else
-        public async Task<UntypedNode> PutAsync(global::GrimoireCli.Generated.Models.ResourceReorder body, Action<RequestConfiguration<global::GrimoireCli.Generated.Api.Campaigns.Item.Resources.Reorder.ReorderRequestBuilder.ReorderRequestBuilderPutQueryParameters>> requestConfiguration = default, CancellationToken cancellationToken = default)
+        public async Task<global::GrimoireCli.Generated.Models.Backend__routers__campaigns___response_schemas__OkResponse> PutAsync(global::GrimoireCli.Generated.Models.ResourceReorder body, Action<RequestConfiguration<global::GrimoireCli.Generated.Api.Campaigns.Item.Resources.Reorder.ReorderRequestBuilder.ReorderRequestBuilderPutQueryParameters>> requestConfiguration = default, CancellationToken cancellationToken = default)
         {
 #endif
             if(ReferenceEquals(body, null)) throw new ArgumentNullException(nameof(body));
@@ -56,7 +56,7 @@ namespace GrimoireCli.Generated.Api.Campaigns.Item.Resources.Reorder
             {
                 { "422", global::GrimoireCli.Generated.Models.HTTPValidationError.CreateFromDiscriminatorValue },
             };
-            return await RequestAdapter.SendAsync<UntypedNode>(requestInfo, UntypedNode.CreateFromDiscriminatorValue, errorMapping, cancellationToken).ConfigureAwait(false);
+            return await RequestAdapter.SendAsync<global::GrimoireCli.Generated.Models.Backend__routers__campaigns___response_schemas__OkResponse>(requestInfo, global::GrimoireCli.Generated.Models.Backend__routers__campaigns___response_schemas__OkResponse.CreateFromDiscriminatorValue, errorMapping, cancellationToken).ConfigureAwait(false);
         }
         /// <summary>
         /// Apply a new manual order from an ordered list of resource ids.

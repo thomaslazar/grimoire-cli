@@ -36,17 +36,17 @@ namespace GrimoireCli.Generated.Api.Campaigns.Resources.Search
         /// <summary>
         /// Search across books, maps, tokens, and audio for the resource picker.Books match on title and can be narrowed by game system. Maps, tokens, andaudio match on their folder path *first*, then filename, so a folder name like&quot;Abyssal Fall (30x49)&quot; surfaces every item inside it. Folder-path matches areranked above filename-only matches.Matching happens in SQL so the query runs against the whole library. It usedto filter in Python over a ``.limit()``-ed slice, which meant only thealphabetically-first 500 books / 1000 media rows were ever considered andanything past that was invisible even to an exact-name search.``limit`` is applied per resource type, so asking for several types does notmake each one&apos;s share smaller.
         /// </summary>
-        /// <returns>A <see cref="UntypedNode"/></returns>
+        /// <returns>A List&lt;global::GrimoireCli.Generated.Models.ResourceSearchHit&gt;</returns>
         /// <param name="cancellationToken">Cancellation token to use when cancelling requests</param>
         /// <param name="requestConfiguration">Configuration for the request such as headers, query parameters, and middleware options.</param>
         /// <exception cref="global::GrimoireCli.Generated.Models.HTTPValidationError">When receiving a 422 status code</exception>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
-        public async Task<UntypedNode?> GetAsync(Action<RequestConfiguration<global::GrimoireCli.Generated.Api.Campaigns.Resources.Search.SearchRequestBuilder.SearchRequestBuilderGetQueryParameters>>? requestConfiguration = default, CancellationToken cancellationToken = default)
+        public async Task<List<global::GrimoireCli.Generated.Models.ResourceSearchHit>?> GetAsync(Action<RequestConfiguration<global::GrimoireCli.Generated.Api.Campaigns.Resources.Search.SearchRequestBuilder.SearchRequestBuilderGetQueryParameters>>? requestConfiguration = default, CancellationToken cancellationToken = default)
         {
 #nullable restore
 #else
-        public async Task<UntypedNode> GetAsync(Action<RequestConfiguration<global::GrimoireCli.Generated.Api.Campaigns.Resources.Search.SearchRequestBuilder.SearchRequestBuilderGetQueryParameters>> requestConfiguration = default, CancellationToken cancellationToken = default)
+        public async Task<List<global::GrimoireCli.Generated.Models.ResourceSearchHit>> GetAsync(Action<RequestConfiguration<global::GrimoireCli.Generated.Api.Campaigns.Resources.Search.SearchRequestBuilder.SearchRequestBuilderGetQueryParameters>> requestConfiguration = default, CancellationToken cancellationToken = default)
         {
 #endif
             var requestInfo = ToGetRequestInformation(requestConfiguration);
@@ -54,7 +54,8 @@ namespace GrimoireCli.Generated.Api.Campaigns.Resources.Search
             {
                 { "422", global::GrimoireCli.Generated.Models.HTTPValidationError.CreateFromDiscriminatorValue },
             };
-            return await RequestAdapter.SendAsync<UntypedNode>(requestInfo, UntypedNode.CreateFromDiscriminatorValue, errorMapping, cancellationToken).ConfigureAwait(false);
+            var collectionResult = await RequestAdapter.SendCollectionAsync<global::GrimoireCli.Generated.Models.ResourceSearchHit>(requestInfo, global::GrimoireCli.Generated.Models.ResourceSearchHit.CreateFromDiscriminatorValue, errorMapping, cancellationToken).ConfigureAwait(false);
+            return collectionResult?.AsList();
         }
         /// <summary>
         /// Search across books, maps, tokens, and audio for the resource picker.Books match on title and can be narrowed by game system. Maps, tokens, andaudio match on their folder path *first*, then filename, so a folder name like&quot;Abyssal Fall (30x49)&quot; surfaces every item inside it. Folder-path matches areranked above filename-only matches.Matching happens in SQL so the query runs against the whole library. It usedto filter in Python over a ``.limit()``-ed slice, which meant only thealphabetically-first 500 books / 1000 media rows were ever considered andanything past that was invisible even to an exact-name search.``limit`` is applied per resource type, so asking for several types does notmake each one&apos;s share smaller.

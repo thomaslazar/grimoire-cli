@@ -36,17 +36,17 @@ namespace GrimoireCli.Generated.Api.Campaigns.Item.EligibleMembers
         /// <summary>
         /// List users that can be invited
         /// </summary>
-        /// <returns>A <see cref="UntypedNode"/></returns>
+        /// <returns>A List&lt;global::GrimoireCli.Generated.Models.EligibleMemberOut&gt;</returns>
         /// <param name="cancellationToken">Cancellation token to use when cancelling requests</param>
         /// <param name="requestConfiguration">Configuration for the request such as headers, query parameters, and middleware options.</param>
         /// <exception cref="global::GrimoireCli.Generated.Models.HTTPValidationError">When receiving a 422 status code</exception>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
-        public async Task<UntypedNode?> GetAsync(Action<RequestConfiguration<global::GrimoireCli.Generated.Api.Campaigns.Item.EligibleMembers.EligibleMembersRequestBuilder.EligibleMembersRequestBuilderGetQueryParameters>>? requestConfiguration = default, CancellationToken cancellationToken = default)
+        public async Task<List<global::GrimoireCli.Generated.Models.EligibleMemberOut>?> GetAsync(Action<RequestConfiguration<global::GrimoireCli.Generated.Api.Campaigns.Item.EligibleMembers.EligibleMembersRequestBuilder.EligibleMembersRequestBuilderGetQueryParameters>>? requestConfiguration = default, CancellationToken cancellationToken = default)
         {
 #nullable restore
 #else
-        public async Task<UntypedNode> GetAsync(Action<RequestConfiguration<global::GrimoireCli.Generated.Api.Campaigns.Item.EligibleMembers.EligibleMembersRequestBuilder.EligibleMembersRequestBuilderGetQueryParameters>> requestConfiguration = default, CancellationToken cancellationToken = default)
+        public async Task<List<global::GrimoireCli.Generated.Models.EligibleMemberOut>> GetAsync(Action<RequestConfiguration<global::GrimoireCli.Generated.Api.Campaigns.Item.EligibleMembers.EligibleMembersRequestBuilder.EligibleMembersRequestBuilderGetQueryParameters>> requestConfiguration = default, CancellationToken cancellationToken = default)
         {
 #endif
             var requestInfo = ToGetRequestInformation(requestConfiguration);
@@ -54,7 +54,8 @@ namespace GrimoireCli.Generated.Api.Campaigns.Item.EligibleMembers
             {
                 { "422", global::GrimoireCli.Generated.Models.HTTPValidationError.CreateFromDiscriminatorValue },
             };
-            return await RequestAdapter.SendAsync<UntypedNode>(requestInfo, UntypedNode.CreateFromDiscriminatorValue, errorMapping, cancellationToken).ConfigureAwait(false);
+            var collectionResult = await RequestAdapter.SendCollectionAsync<global::GrimoireCli.Generated.Models.EligibleMemberOut>(requestInfo, global::GrimoireCli.Generated.Models.EligibleMemberOut.CreateFromDiscriminatorValue, errorMapping, cancellationToken).ConfigureAwait(false);
+            return collectionResult?.AsList();
         }
         /// <summary>
         /// List users that can be invited

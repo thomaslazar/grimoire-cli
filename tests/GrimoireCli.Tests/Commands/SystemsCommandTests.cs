@@ -148,7 +148,7 @@ public class SystemsCommandTests
         var output = RenderHelp(["systems", "update"], full: true);
         var expected = new GrimoireCli.Generated.Models.GameSystemUpdate()
             .GetFieldDeserializers().Keys;
-        Assert.Equal(17, expected.Count);
+        Assert.Equal(18, expected.Count);
         Assert.Contains("Request shape:", output);
         foreach (var field in expected)
             Assert.Contains($"\"{field}\":", output);

@@ -55,17 +55,17 @@ namespace GrimoireCli.Generated.Api.Campaigns.Item.Categories
         /// <summary>
         /// List categories (optionally filtered by kind)
         /// </summary>
-        /// <returns>A <see cref="UntypedNode"/></returns>
+        /// <returns>A List&lt;global::GrimoireCli.Generated.Models.CampaignCategoryOut&gt;</returns>
         /// <param name="cancellationToken">Cancellation token to use when cancelling requests</param>
         /// <param name="requestConfiguration">Configuration for the request such as headers, query parameters, and middleware options.</param>
         /// <exception cref="global::GrimoireCli.Generated.Models.HTTPValidationError">When receiving a 422 status code</exception>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
-        public async Task<UntypedNode?> GetAsync(Action<RequestConfiguration<global::GrimoireCli.Generated.Api.Campaigns.Item.Categories.CategoriesRequestBuilder.CategoriesRequestBuilderGetQueryParameters>>? requestConfiguration = default, CancellationToken cancellationToken = default)
+        public async Task<List<global::GrimoireCli.Generated.Models.CampaignCategoryOut>?> GetAsync(Action<RequestConfiguration<global::GrimoireCli.Generated.Api.Campaigns.Item.Categories.CategoriesRequestBuilder.CategoriesRequestBuilderGetQueryParameters>>? requestConfiguration = default, CancellationToken cancellationToken = default)
         {
 #nullable restore
 #else
-        public async Task<UntypedNode> GetAsync(Action<RequestConfiguration<global::GrimoireCli.Generated.Api.Campaigns.Item.Categories.CategoriesRequestBuilder.CategoriesRequestBuilderGetQueryParameters>> requestConfiguration = default, CancellationToken cancellationToken = default)
+        public async Task<List<global::GrimoireCli.Generated.Models.CampaignCategoryOut>> GetAsync(Action<RequestConfiguration<global::GrimoireCli.Generated.Api.Campaigns.Item.Categories.CategoriesRequestBuilder.CategoriesRequestBuilderGetQueryParameters>> requestConfiguration = default, CancellationToken cancellationToken = default)
         {
 #endif
             var requestInfo = ToGetRequestInformation(requestConfiguration);
@@ -73,23 +73,24 @@ namespace GrimoireCli.Generated.Api.Campaigns.Item.Categories
             {
                 { "422", global::GrimoireCli.Generated.Models.HTTPValidationError.CreateFromDiscriminatorValue },
             };
-            return await RequestAdapter.SendAsync<UntypedNode>(requestInfo, UntypedNode.CreateFromDiscriminatorValue, errorMapping, cancellationToken).ConfigureAwait(false);
+            var collectionResult = await RequestAdapter.SendCollectionAsync<global::GrimoireCli.Generated.Models.CampaignCategoryOut>(requestInfo, global::GrimoireCli.Generated.Models.CampaignCategoryOut.CreateFromDiscriminatorValue, errorMapping, cancellationToken).ConfigureAwait(false);
+            return collectionResult?.AsList();
         }
         /// <summary>
         /// Create a category
         /// </summary>
-        /// <returns>A <see cref="UntypedNode"/></returns>
+        /// <returns>A <see cref="global::GrimoireCli.Generated.Models.CampaignCategoryOut"/></returns>
         /// <param name="body">The request body</param>
         /// <param name="cancellationToken">Cancellation token to use when cancelling requests</param>
         /// <param name="requestConfiguration">Configuration for the request such as headers, query parameters, and middleware options.</param>
         /// <exception cref="global::GrimoireCli.Generated.Models.HTTPValidationError">When receiving a 422 status code</exception>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
-        public async Task<UntypedNode?> PostAsync(global::GrimoireCli.Generated.Models.CategoryCreate body, Action<RequestConfiguration<global::GrimoireCli.Generated.Api.Campaigns.Item.Categories.CategoriesRequestBuilder.CategoriesRequestBuilderPostQueryParameters>>? requestConfiguration = default, CancellationToken cancellationToken = default)
+        public async Task<global::GrimoireCli.Generated.Models.CampaignCategoryOut?> PostAsync(global::GrimoireCli.Generated.Models.CategoryCreate body, Action<RequestConfiguration<global::GrimoireCli.Generated.Api.Campaigns.Item.Categories.CategoriesRequestBuilder.CategoriesRequestBuilderPostQueryParameters>>? requestConfiguration = default, CancellationToken cancellationToken = default)
         {
 #nullable restore
 #else
-        public async Task<UntypedNode> PostAsync(global::GrimoireCli.Generated.Models.CategoryCreate body, Action<RequestConfiguration<global::GrimoireCli.Generated.Api.Campaigns.Item.Categories.CategoriesRequestBuilder.CategoriesRequestBuilderPostQueryParameters>> requestConfiguration = default, CancellationToken cancellationToken = default)
+        public async Task<global::GrimoireCli.Generated.Models.CampaignCategoryOut> PostAsync(global::GrimoireCli.Generated.Models.CategoryCreate body, Action<RequestConfiguration<global::GrimoireCli.Generated.Api.Campaigns.Item.Categories.CategoriesRequestBuilder.CategoriesRequestBuilderPostQueryParameters>> requestConfiguration = default, CancellationToken cancellationToken = default)
         {
 #endif
             if(ReferenceEquals(body, null)) throw new ArgumentNullException(nameof(body));
@@ -98,7 +99,7 @@ namespace GrimoireCli.Generated.Api.Campaigns.Item.Categories
             {
                 { "422", global::GrimoireCli.Generated.Models.HTTPValidationError.CreateFromDiscriminatorValue },
             };
-            return await RequestAdapter.SendAsync<UntypedNode>(requestInfo, UntypedNode.CreateFromDiscriminatorValue, errorMapping, cancellationToken).ConfigureAwait(false);
+            return await RequestAdapter.SendAsync<global::GrimoireCli.Generated.Models.CampaignCategoryOut>(requestInfo, global::GrimoireCli.Generated.Models.CampaignCategoryOut.CreateFromDiscriminatorValue, errorMapping, cancellationToken).ConfigureAwait(false);
         }
         /// <summary>
         /// List categories (optionally filtered by kind)

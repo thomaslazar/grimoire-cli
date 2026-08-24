@@ -36,18 +36,18 @@ namespace GrimoireCli.Generated.Api.Systems.Bulk.Tags
         /// <summary>
         /// Additively applies tags to many systems in one transaction. Body: {ids: [...], tags: [...]}. GM or admin role required.
         /// </summary>
-        /// <returns>A <see cref="UntypedNode"/></returns>
+        /// <returns>A <see cref="global::GrimoireCli.Generated.Models.BulkTagResult"/></returns>
         /// <param name="body">Additively apply ``tags`` to every id in ``ids``.Backs the bulk action bar&apos;s tag input. Additive by design: it never removestags an item already carries.</param>
         /// <param name="cancellationToken">Cancellation token to use when cancelling requests</param>
         /// <param name="requestConfiguration">Configuration for the request such as headers, query parameters, and middleware options.</param>
         /// <exception cref="global::GrimoireCli.Generated.Models.HTTPValidationError">When receiving a 422 status code</exception>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
-        public async Task<UntypedNode?> PostAsync(global::GrimoireCli.Generated.Models.BulkAddTags body, Action<RequestConfiguration<global::GrimoireCli.Generated.Api.Systems.Bulk.Tags.TagsRequestBuilder.TagsRequestBuilderPostQueryParameters>>? requestConfiguration = default, CancellationToken cancellationToken = default)
+        public async Task<global::GrimoireCli.Generated.Models.BulkTagResult?> PostAsync(global::GrimoireCli.Generated.Models.BulkAddTags body, Action<RequestConfiguration<global::GrimoireCli.Generated.Api.Systems.Bulk.Tags.TagsRequestBuilder.TagsRequestBuilderPostQueryParameters>>? requestConfiguration = default, CancellationToken cancellationToken = default)
         {
 #nullable restore
 #else
-        public async Task<UntypedNode> PostAsync(global::GrimoireCli.Generated.Models.BulkAddTags body, Action<RequestConfiguration<global::GrimoireCli.Generated.Api.Systems.Bulk.Tags.TagsRequestBuilder.TagsRequestBuilderPostQueryParameters>> requestConfiguration = default, CancellationToken cancellationToken = default)
+        public async Task<global::GrimoireCli.Generated.Models.BulkTagResult> PostAsync(global::GrimoireCli.Generated.Models.BulkAddTags body, Action<RequestConfiguration<global::GrimoireCli.Generated.Api.Systems.Bulk.Tags.TagsRequestBuilder.TagsRequestBuilderPostQueryParameters>> requestConfiguration = default, CancellationToken cancellationToken = default)
         {
 #endif
             if(ReferenceEquals(body, null)) throw new ArgumentNullException(nameof(body));
@@ -56,7 +56,7 @@ namespace GrimoireCli.Generated.Api.Systems.Bulk.Tags
             {
                 { "422", global::GrimoireCli.Generated.Models.HTTPValidationError.CreateFromDiscriminatorValue },
             };
-            return await RequestAdapter.SendAsync<UntypedNode>(requestInfo, UntypedNode.CreateFromDiscriminatorValue, errorMapping, cancellationToken).ConfigureAwait(false);
+            return await RequestAdapter.SendAsync<global::GrimoireCli.Generated.Models.BulkTagResult>(requestInfo, global::GrimoireCli.Generated.Models.BulkTagResult.CreateFromDiscriminatorValue, errorMapping, cancellationToken).ConfigureAwait(false);
         }
         /// <summary>
         /// Additively applies tags to many systems in one transaction. Body: {ids: [...], tags: [...]}. GM or admin role required.

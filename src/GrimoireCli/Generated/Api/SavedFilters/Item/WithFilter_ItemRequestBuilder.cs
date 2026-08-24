@@ -36,17 +36,17 @@ namespace GrimoireCli.Generated.Api.SavedFilters.Item
         /// <summary>
         /// Delete one of the current user&apos;s saved filters.
         /// </summary>
-        /// <returns>A <see cref="UntypedNode"/></returns>
+        /// <returns>A <see cref="global::GrimoireCli.Generated.Models.Backend__routers__saved_filters___schemas__StatusResponse"/></returns>
         /// <param name="cancellationToken">Cancellation token to use when cancelling requests</param>
         /// <param name="requestConfiguration">Configuration for the request such as headers, query parameters, and middleware options.</param>
         /// <exception cref="global::GrimoireCli.Generated.Models.HTTPValidationError">When receiving a 422 status code</exception>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
-        public async Task<UntypedNode?> DeleteAsync(Action<RequestConfiguration<global::GrimoireCli.Generated.Api.SavedFilters.Item.WithFilter_ItemRequestBuilder.WithFilter_ItemRequestBuilderDeleteQueryParameters>>? requestConfiguration = default, CancellationToken cancellationToken = default)
+        public async Task<global::GrimoireCli.Generated.Models.Backend__routers__saved_filters___schemas__StatusResponse?> DeleteAsync(Action<RequestConfiguration<global::GrimoireCli.Generated.Api.SavedFilters.Item.WithFilter_ItemRequestBuilder.WithFilter_ItemRequestBuilderDeleteQueryParameters>>? requestConfiguration = default, CancellationToken cancellationToken = default)
         {
 #nullable restore
 #else
-        public async Task<UntypedNode> DeleteAsync(Action<RequestConfiguration<global::GrimoireCli.Generated.Api.SavedFilters.Item.WithFilter_ItemRequestBuilder.WithFilter_ItemRequestBuilderDeleteQueryParameters>> requestConfiguration = default, CancellationToken cancellationToken = default)
+        public async Task<global::GrimoireCli.Generated.Models.Backend__routers__saved_filters___schemas__StatusResponse> DeleteAsync(Action<RequestConfiguration<global::GrimoireCli.Generated.Api.SavedFilters.Item.WithFilter_ItemRequestBuilder.WithFilter_ItemRequestBuilderDeleteQueryParameters>> requestConfiguration = default, CancellationToken cancellationToken = default)
         {
 #endif
             var requestInfo = ToDeleteRequestInformation(requestConfiguration);
@@ -54,23 +54,23 @@ namespace GrimoireCli.Generated.Api.SavedFilters.Item
             {
                 { "422", global::GrimoireCli.Generated.Models.HTTPValidationError.CreateFromDiscriminatorValue },
             };
-            return await RequestAdapter.SendAsync<UntypedNode>(requestInfo, UntypedNode.CreateFromDiscriminatorValue, errorMapping, cancellationToken).ConfigureAwait(false);
+            return await RequestAdapter.SendAsync<global::GrimoireCli.Generated.Models.Backend__routers__saved_filters___schemas__StatusResponse>(requestInfo, global::GrimoireCli.Generated.Models.Backend__routers__saved_filters___schemas__StatusResponse.CreateFromDiscriminatorValue, errorMapping, cancellationToken).ConfigureAwait(false);
         }
         /// <summary>
         /// Rename a preset, replace its state, and/or set it as the scope default.
         /// </summary>
-        /// <returns>A <see cref="UntypedNode"/></returns>
+        /// <returns>A <see cref="global::GrimoireCli.Generated.Models.SavedFilterOut"/></returns>
         /// <param name="body">The request body</param>
         /// <param name="cancellationToken">Cancellation token to use when cancelling requests</param>
         /// <param name="requestConfiguration">Configuration for the request such as headers, query parameters, and middleware options.</param>
         /// <exception cref="global::GrimoireCli.Generated.Models.HTTPValidationError">When receiving a 422 status code</exception>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
-        public async Task<UntypedNode?> PatchAsync(global::GrimoireCli.Generated.Models.SavedFilterUpdate body, Action<RequestConfiguration<global::GrimoireCli.Generated.Api.SavedFilters.Item.WithFilter_ItemRequestBuilder.WithFilter_ItemRequestBuilderPatchQueryParameters>>? requestConfiguration = default, CancellationToken cancellationToken = default)
+        public async Task<global::GrimoireCli.Generated.Models.SavedFilterOut?> PatchAsync(global::GrimoireCli.Generated.Models.SavedFilterUpdate body, Action<RequestConfiguration<global::GrimoireCli.Generated.Api.SavedFilters.Item.WithFilter_ItemRequestBuilder.WithFilter_ItemRequestBuilderPatchQueryParameters>>? requestConfiguration = default, CancellationToken cancellationToken = default)
         {
 #nullable restore
 #else
-        public async Task<UntypedNode> PatchAsync(global::GrimoireCli.Generated.Models.SavedFilterUpdate body, Action<RequestConfiguration<global::GrimoireCli.Generated.Api.SavedFilters.Item.WithFilter_ItemRequestBuilder.WithFilter_ItemRequestBuilderPatchQueryParameters>> requestConfiguration = default, CancellationToken cancellationToken = default)
+        public async Task<global::GrimoireCli.Generated.Models.SavedFilterOut> PatchAsync(global::GrimoireCli.Generated.Models.SavedFilterUpdate body, Action<RequestConfiguration<global::GrimoireCli.Generated.Api.SavedFilters.Item.WithFilter_ItemRequestBuilder.WithFilter_ItemRequestBuilderPatchQueryParameters>> requestConfiguration = default, CancellationToken cancellationToken = default)
         {
 #endif
             if(ReferenceEquals(body, null)) throw new ArgumentNullException(nameof(body));
@@ -79,7 +79,7 @@ namespace GrimoireCli.Generated.Api.SavedFilters.Item
             {
                 { "422", global::GrimoireCli.Generated.Models.HTTPValidationError.CreateFromDiscriminatorValue },
             };
-            return await RequestAdapter.SendAsync<UntypedNode>(requestInfo, UntypedNode.CreateFromDiscriminatorValue, errorMapping, cancellationToken).ConfigureAwait(false);
+            return await RequestAdapter.SendAsync<global::GrimoireCli.Generated.Models.SavedFilterOut>(requestInfo, global::GrimoireCli.Generated.Models.SavedFilterOut.CreateFromDiscriminatorValue, errorMapping, cancellationToken).ConfigureAwait(false);
         }
         /// <summary>
         /// Delete one of the current user&apos;s saved filters.

@@ -36,18 +36,18 @@ namespace GrimoireCli.Generated.Api.Campaigns.Item.Resources.Bulk
         /// <summary>
         /// Link many resources at once. Duplicates and unknown types are skippedsilently so one bad entry doesn&apos;t fail the whole batch. Returns the rowsthat were actually created.
         /// </summary>
-        /// <returns>A <see cref="UntypedNode"/></returns>
+        /// <returns>A List&lt;global::GrimoireCli.Generated.Models.LinkedResourceOut&gt;</returns>
         /// <param name="body">The request body</param>
         /// <param name="cancellationToken">Cancellation token to use when cancelling requests</param>
         /// <param name="requestConfiguration">Configuration for the request such as headers, query parameters, and middleware options.</param>
         /// <exception cref="global::GrimoireCli.Generated.Models.HTTPValidationError">When receiving a 422 status code</exception>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
-        public async Task<UntypedNode?> PostAsync(global::GrimoireCli.Generated.Models.ResourceBulkAdd body, Action<RequestConfiguration<global::GrimoireCli.Generated.Api.Campaigns.Item.Resources.Bulk.BulkRequestBuilder.BulkRequestBuilderPostQueryParameters>>? requestConfiguration = default, CancellationToken cancellationToken = default)
+        public async Task<List<global::GrimoireCli.Generated.Models.LinkedResourceOut>?> PostAsync(global::GrimoireCli.Generated.Models.ResourceBulkAdd body, Action<RequestConfiguration<global::GrimoireCli.Generated.Api.Campaigns.Item.Resources.Bulk.BulkRequestBuilder.BulkRequestBuilderPostQueryParameters>>? requestConfiguration = default, CancellationToken cancellationToken = default)
         {
 #nullable restore
 #else
-        public async Task<UntypedNode> PostAsync(global::GrimoireCli.Generated.Models.ResourceBulkAdd body, Action<RequestConfiguration<global::GrimoireCli.Generated.Api.Campaigns.Item.Resources.Bulk.BulkRequestBuilder.BulkRequestBuilderPostQueryParameters>> requestConfiguration = default, CancellationToken cancellationToken = default)
+        public async Task<List<global::GrimoireCli.Generated.Models.LinkedResourceOut>> PostAsync(global::GrimoireCli.Generated.Models.ResourceBulkAdd body, Action<RequestConfiguration<global::GrimoireCli.Generated.Api.Campaigns.Item.Resources.Bulk.BulkRequestBuilder.BulkRequestBuilderPostQueryParameters>> requestConfiguration = default, CancellationToken cancellationToken = default)
         {
 #endif
             if(ReferenceEquals(body, null)) throw new ArgumentNullException(nameof(body));
@@ -56,7 +56,8 @@ namespace GrimoireCli.Generated.Api.Campaigns.Item.Resources.Bulk
             {
                 { "422", global::GrimoireCli.Generated.Models.HTTPValidationError.CreateFromDiscriminatorValue },
             };
-            return await RequestAdapter.SendAsync<UntypedNode>(requestInfo, UntypedNode.CreateFromDiscriminatorValue, errorMapping, cancellationToken).ConfigureAwait(false);
+            var collectionResult = await RequestAdapter.SendCollectionAsync<global::GrimoireCli.Generated.Models.LinkedResourceOut>(requestInfo, global::GrimoireCli.Generated.Models.LinkedResourceOut.CreateFromDiscriminatorValue, errorMapping, cancellationToken).ConfigureAwait(false);
+            return collectionResult?.AsList();
         }
         /// <summary>
         /// Link many resources at once. Duplicates and unknown types are skippedsilently so one bad entry doesn&apos;t fail the whole batch. Returns the rowsthat were actually created.

@@ -71,7 +71,7 @@ namespace GrimoireCli.Generated.Api.Campaigns.Item.Wiki
         /// </summary>
         /// <param name="pathParameters">Path parameters for the request</param>
         /// <param name="requestAdapter">The request adapter to use to execute the requests.</param>
-        public WikiRequestBuilder(Dictionary<string, object> pathParameters, IRequestAdapter requestAdapter) : base(requestAdapter, "{+baseurl}/api/campaigns/{campaign_id}/wiki{?token*}", pathParameters)
+        public WikiRequestBuilder(Dictionary<string, object> pathParameters, IRequestAdapter requestAdapter) : base(requestAdapter, "{+baseurl}/api/campaigns/{campaign_id}/wiki{?include_hidden*,mine*,token*}", pathParameters)
         {
         }
         /// <summary>
@@ -79,23 +79,23 @@ namespace GrimoireCli.Generated.Api.Campaigns.Item.Wiki
         /// </summary>
         /// <param name="rawUrl">The raw URL to use for the request builder.</param>
         /// <param name="requestAdapter">The request adapter to use to execute the requests.</param>
-        public WikiRequestBuilder(string rawUrl, IRequestAdapter requestAdapter) : base(requestAdapter, "{+baseurl}/api/campaigns/{campaign_id}/wiki{?token*}", rawUrl)
+        public WikiRequestBuilder(string rawUrl, IRequestAdapter requestAdapter) : base(requestAdapter, "{+baseurl}/api/campaigns/{campaign_id}/wiki{?include_hidden*,mine*,token*}", rawUrl)
         {
         }
         /// <summary>
         /// List visible wiki pages
         /// </summary>
-        /// <returns>A <see cref="UntypedNode"/></returns>
+        /// <returns>A List&lt;global::GrimoireCli.Generated.Models.WikiPageListItem&gt;</returns>
         /// <param name="cancellationToken">Cancellation token to use when cancelling requests</param>
         /// <param name="requestConfiguration">Configuration for the request such as headers, query parameters, and middleware options.</param>
         /// <exception cref="global::GrimoireCli.Generated.Models.HTTPValidationError">When receiving a 422 status code</exception>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
-        public async Task<UntypedNode?> GetAsync(Action<RequestConfiguration<global::GrimoireCli.Generated.Api.Campaigns.Item.Wiki.WikiRequestBuilder.WikiRequestBuilderGetQueryParameters>>? requestConfiguration = default, CancellationToken cancellationToken = default)
+        public async Task<List<global::GrimoireCli.Generated.Models.WikiPageListItem>?> GetAsync(Action<RequestConfiguration<global::GrimoireCli.Generated.Api.Campaigns.Item.Wiki.WikiRequestBuilder.WikiRequestBuilderGetQueryParameters>>? requestConfiguration = default, CancellationToken cancellationToken = default)
         {
 #nullable restore
 #else
-        public async Task<UntypedNode> GetAsync(Action<RequestConfiguration<global::GrimoireCli.Generated.Api.Campaigns.Item.Wiki.WikiRequestBuilder.WikiRequestBuilderGetQueryParameters>> requestConfiguration = default, CancellationToken cancellationToken = default)
+        public async Task<List<global::GrimoireCli.Generated.Models.WikiPageListItem>> GetAsync(Action<RequestConfiguration<global::GrimoireCli.Generated.Api.Campaigns.Item.Wiki.WikiRequestBuilder.WikiRequestBuilderGetQueryParameters>> requestConfiguration = default, CancellationToken cancellationToken = default)
         {
 #endif
             var requestInfo = ToGetRequestInformation(requestConfiguration);
@@ -103,23 +103,24 @@ namespace GrimoireCli.Generated.Api.Campaigns.Item.Wiki
             {
                 { "422", global::GrimoireCli.Generated.Models.HTTPValidationError.CreateFromDiscriminatorValue },
             };
-            return await RequestAdapter.SendAsync<UntypedNode>(requestInfo, UntypedNode.CreateFromDiscriminatorValue, errorMapping, cancellationToken).ConfigureAwait(false);
+            var collectionResult = await RequestAdapter.SendCollectionAsync<global::GrimoireCli.Generated.Models.WikiPageListItem>(requestInfo, global::GrimoireCli.Generated.Models.WikiPageListItem.CreateFromDiscriminatorValue, errorMapping, cancellationToken).ConfigureAwait(false);
+            return collectionResult?.AsList();
         }
         /// <summary>
         /// Create a wiki page
         /// </summary>
-        /// <returns>A <see cref="UntypedNode"/></returns>
+        /// <returns>A <see cref="global::GrimoireCli.Generated.Models.WikiPageSummaryOut"/></returns>
         /// <param name="body">The request body</param>
         /// <param name="cancellationToken">Cancellation token to use when cancelling requests</param>
         /// <param name="requestConfiguration">Configuration for the request such as headers, query parameters, and middleware options.</param>
         /// <exception cref="global::GrimoireCli.Generated.Models.HTTPValidationError">When receiving a 422 status code</exception>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
-        public async Task<UntypedNode?> PostAsync(global::GrimoireCli.Generated.Models.WikiPageCreate body, Action<RequestConfiguration<global::GrimoireCli.Generated.Api.Campaigns.Item.Wiki.WikiRequestBuilder.WikiRequestBuilderPostQueryParameters>>? requestConfiguration = default, CancellationToken cancellationToken = default)
+        public async Task<global::GrimoireCli.Generated.Models.WikiPageSummaryOut?> PostAsync(global::GrimoireCli.Generated.Models.WikiPageCreate body, Action<RequestConfiguration<global::GrimoireCli.Generated.Api.Campaigns.Item.Wiki.WikiRequestBuilder.WikiRequestBuilderPostQueryParameters>>? requestConfiguration = default, CancellationToken cancellationToken = default)
         {
 #nullable restore
 #else
-        public async Task<UntypedNode> PostAsync(global::GrimoireCli.Generated.Models.WikiPageCreate body, Action<RequestConfiguration<global::GrimoireCli.Generated.Api.Campaigns.Item.Wiki.WikiRequestBuilder.WikiRequestBuilderPostQueryParameters>> requestConfiguration = default, CancellationToken cancellationToken = default)
+        public async Task<global::GrimoireCli.Generated.Models.WikiPageSummaryOut> PostAsync(global::GrimoireCli.Generated.Models.WikiPageCreate body, Action<RequestConfiguration<global::GrimoireCli.Generated.Api.Campaigns.Item.Wiki.WikiRequestBuilder.WikiRequestBuilderPostQueryParameters>> requestConfiguration = default, CancellationToken cancellationToken = default)
         {
 #endif
             if(ReferenceEquals(body, null)) throw new ArgumentNullException(nameof(body));
@@ -128,7 +129,7 @@ namespace GrimoireCli.Generated.Api.Campaigns.Item.Wiki
             {
                 { "422", global::GrimoireCli.Generated.Models.HTTPValidationError.CreateFromDiscriminatorValue },
             };
-            return await RequestAdapter.SendAsync<UntypedNode>(requestInfo, UntypedNode.CreateFromDiscriminatorValue, errorMapping, cancellationToken).ConfigureAwait(false);
+            return await RequestAdapter.SendAsync<global::GrimoireCli.Generated.Models.WikiPageSummaryOut>(requestInfo, global::GrimoireCli.Generated.Models.WikiPageSummaryOut.CreateFromDiscriminatorValue, errorMapping, cancellationToken).ConfigureAwait(false);
         }
         /// <summary>
         /// List visible wiki pages
@@ -186,6 +187,12 @@ namespace GrimoireCli.Generated.Api.Campaigns.Item.Wiki
         [global::System.CodeDom.Compiler.GeneratedCode("Kiota", "1.0.0")]
         public partial class WikiRequestBuilderGetQueryParameters 
         {
+            /// <summary>Include pages this user hid</summary>
+            [QueryParameter("include_hidden")]
+            public bool? IncludeHidden { get; set; }
+            /// <summary>Only pages this user authored</summary>
+            [QueryParameter("mine")]
+            public bool? Mine { get; set; }
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
             [QueryParameter("token")]
