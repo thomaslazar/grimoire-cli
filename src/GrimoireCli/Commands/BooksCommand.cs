@@ -1,4 +1,5 @@
 using System.CommandLine;
+using GrimoireCli.Api;
 using GrimoireCli.Models;
 using GrimoireCli.Output;
 using GrimoireCli.Services;
@@ -65,7 +66,7 @@ public static class BooksCommand
                 parseResult.GetValue(categoryOption),
                 parseResult.GetValue(limitOption),
                 parseResult.GetValue(offsetOption));
-            ConsoleOutput.WriteJson(result, AppJsonContext.Default.BookListResponse);
+            ConsoleOutput.WriteRawJson(result);
             return 0;
         });
         return command;
@@ -91,7 +92,7 @@ public static class BooksCommand
             var (client, _) = CommandHelper.BuildClient(serverOverride: server, tokenOverride: token);
             var service = new BooksService(client);
             var result = await service.GetAsync(parseResult.GetValue(idOption)!);
-            ConsoleOutput.WriteJson(result, AppJsonContext.Default.BookDetail);
+            ConsoleOutput.WriteRawJson(result);
             return 0;
         });
         return command;
@@ -193,8 +194,8 @@ public static class BooksCommand
                 serverOverride: parseResult.GetValue(serverOption),
                 tokenOverride: parseResult.GetValue(tokenOption));
             var result = await new BooksService(client).BatchUpdateAsync(body);
-            ConsoleOutput.WriteJson(result, AppJsonContext.Default.BulkUpdateResult);
-            return BulkExit.CodeFor(result.Errors);
+            ConsoleOutput.WriteRawJson(result);
+            return BulkExit.CodeFor(GrimoireApiClient.HasItems(result, "errors"));
         });
         return command;
     }
@@ -242,8 +243,8 @@ public static class BooksCommand
                 serverOverride: parseResult.GetValue(serverOption),
                 tokenOverride: parseResult.GetValue(tokenOption));
             var result = await new BooksService(client).BatchTagAsync(body);
-            ConsoleOutput.WriteJson(result, AppJsonContext.Default.BulkTagResult);
-            return BulkExit.CodeFor(result.Errors);
+            ConsoleOutput.WriteRawJson(result);
+            return BulkExit.CodeFor(GrimoireApiClient.HasItems(result, "errors"));
         });
         return command;
     }

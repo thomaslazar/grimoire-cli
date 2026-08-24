@@ -89,7 +89,7 @@ public static class CoverCommands
                 serverOverride: parseResult.GetValue(serverOption),
                 tokenOverride: parseResult.GetValue(tokenOption));
             var service = new SystemsService(client);
-            CoverUploadResult result;
+            string result;
             try
             {
                 result = await service.UploadCoverAsync(parseResult.GetValue(idOption)!, parseResult.GetValue(fileOption)!);
@@ -99,7 +99,7 @@ public static class CoverCommands
                 _logger.Error(ex.Message);
                 return 1;
             }
-            ConsoleOutput.WriteJson(result, AppJsonContext.Default.CoverUploadResult);
+            ConsoleOutput.WriteRawJson(result);
             return 0;
         });
         return command;

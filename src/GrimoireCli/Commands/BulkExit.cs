@@ -18,4 +18,6 @@ public static class BulkExit
     public static int CodeFor(List<BulkError>? errors) => errors is { Count: > 0 } ? 3 : 0;
 
     public static int CodeFor<T>(List<T>? failures) => failures is { Count: > 0 } ? 3 : 0;
+
+    public static int CodeFor(bool hasFailures) => hasFailures ? 3 : 0;
 }

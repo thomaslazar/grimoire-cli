@@ -1,4 +1,5 @@
 using System.CommandLine;
+using GrimoireCli.Api;
 using GrimoireCli.Models;
 using GrimoireCli.Output;
 using GrimoireCli.Services;
@@ -78,7 +79,7 @@ public static class SystemsCommand
                 parseResult.GetValue(explicitOption),
                 parseResult.GetValue(parentIdOption),
                 parseResult.GetValue(includeChildrenOption));
-            ConsoleOutput.WriteJson(result, AppJsonContext.Default.ListGameSystemSummary);
+            ConsoleOutput.WriteRawJson(result);
             return 0;
         });
         return command;
@@ -128,7 +129,7 @@ public static class SystemsCommand
                 parseResult.GetValue(genreOption),
                 parseResult.GetValue(categoryOption),
                 parseResult.GetValue(explicitOption));
-            ConsoleOutput.WriteJson(result, AppJsonContext.Default.GameSystemDetail);
+            ConsoleOutput.WriteRawJson(result);
             return 0;
         });
         return command;
@@ -231,8 +232,8 @@ public static class SystemsCommand
                 serverOverride: parseResult.GetValue(serverOption),
                 tokenOverride: parseResult.GetValue(tokenOption));
             var result = await new SystemsService(client).BatchUpdateAsync(body);
-            ConsoleOutput.WriteJson(result, AppJsonContext.Default.BulkUpdateResult);
-            return BulkExit.CodeFor(result.Errors);
+            ConsoleOutput.WriteRawJson(result);
+            return BulkExit.CodeFor(GrimoireApiClient.HasItems(result, "errors"));
         });
         return command;
     }
@@ -280,8 +281,8 @@ public static class SystemsCommand
                 serverOverride: parseResult.GetValue(serverOption),
                 tokenOverride: parseResult.GetValue(tokenOption));
             var result = await new SystemsService(client).BatchTagAsync(body);
-            ConsoleOutput.WriteJson(result, AppJsonContext.Default.BulkTagResult);
-            return BulkExit.CodeFor(result.Errors);
+            ConsoleOutput.WriteRawJson(result);
+            return BulkExit.CodeFor(GrimoireApiClient.HasItems(result, "errors"));
         });
         return command;
     }
