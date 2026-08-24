@@ -44,34 +44,31 @@ matrix row.
 ## Sequence
 
 `main` is feature-frozen at 1.5.6, so nothing here is ordered around avoiding
-conflicts with it. The order is dependency and value, in two tracks that do not
-block each other.
+conflicts with it. The edge stack comes first because everything else is built
+from the client generated against it — see
+[the design](specs/2026-08-19-edge-client-and-byte-passthrough-design.md).
 
-**Track 1 — no edge stack needed; verifiable against the pinned 1.5.6 stack.**
-
-1. **Byte-passthrough output** ([workstream B](#workstream-b--generated-response-models-unblocked)).
-   First, not last: it is the largest deletion and it decides what step 2 is.
-   Correct on 1.5.6 on its own merits, so `docker/smoke-test.sh` verifies it today.
-2. **Consolidate the example generators.** After step 1 this is a deletion of
-   `tools/GenerateResponseExamples` and its walker rather than a merge of two
-   tools — no response DTOs are left to describe.
-
-**Track 2 — needs an edge stack.**
-
-3. **An edge stack and a spec-diff tool** (see
-   [reproducing the environment](#reproducing-the-environment)). Only this track
-   depends on it.
-4. **Refresh plumbing** ([workstream A](#workstream-a--authentication-breaking-do-first)).
-   The one piece of code that is genuinely 1.6.0-only.
+1. **An edge stack and a client generated from it.** A
+   `docker/docker-compose.edge.yml` override runs `edge` beside the pinned 1.5.6
+   stack; `src/GrimoireCli/Generated/` is regenerated from its spec. No behaviour
+   change, so the review is a read of the generated diff. Safe for the pinned
+   stack: across all 207 operations shared between 1.5.6 and the 2026-08-17 edge
+   spec, no parameter or body field was removed or became newly required.
+2. **Byte-passthrough output.** Services return the response bytes, commands print
+   them; compact by default with `--pretty` to re-indent. `src/GrimoireCli/Models/`
+   is deleted outright, because step 1 gives `--help` a generated model to draw its
+   response samples from — which is what the ordering is for. The example
+   generators consolidate here, since this is where the sample source changes.
+3. **Refresh plumbing** ([workstream A](#workstream-a--authentication-breaking-do-first)).
 
 **On the tag** — [workstream C](#workstream-c--version-gate-and-docs) and
 [workstream D](#workstream-d--systems-book-folders-returns): move the version
-gate, regenerate the client, revert the book-folders cut, update the docs.
-Mechanical once the rest is done.
+gate, revert the book-folders cut, update the docs. Mechanical once the rest is
+done.
 
-Byte-passthrough changes stdout formatting, so it wants a version boundary. If
-`0.1.0` ships from `main` as it stands, the change arrives with the 1.6.0 release
-rather than retroactively — the desired outcome, not a compromise.
+Byte-passthrough changes stdout, so it wants a version boundary. If `0.1.0` ships
+from `main` as it stands, the change arrives with the 1.6.0 release rather than
+retroactively.
 
 ## Workstream A — authentication (breaking, do first)
 
@@ -295,8 +292,9 @@ stands alone.
 **Epic CI cannot pin a released server.** `docker/docker-compose.yml` pins 1.5.6
 and stays that way; the edge stack is a separate override. A red smoke test
 against edge may mean upstream changed rather than the branch broke — treat it as
-a signal, not a gate, until a 1.6.0 tag exists. Track 1 does not have this
-problem: it is verifiable against the pinned 1.5.6 stack.
+a signal, not a gate, until a 1.6.0 tag exists. The gating run stays on the
+pinned stack, which is why the edge stack is added beside it rather than instead
+of it.
 
 ## Open questions
 
@@ -321,9 +319,9 @@ disagree on every count.
 `backend/seed_users.py` is byte-identical between 1.5.6 and the 2026-08-17 edge
 build and still reads `{DATA_PATH}/users.json` in the shape
 `docker/users.json.example` already has, so `docker/seed.sh` works against edge
-unchanged. Track 2's first step is therefore a `docker/docker-compose.edge.yml`
-override — the `edge` tag, its own project name, its own port and data dir so it
-coexists with the pinned 1.5.6 stack — and not the hand-rolled `docker run` plus
+unchanged. Step 1 is therefore a `docker/docker-compose.edge.yml` override — the
+`edge` tag, its own project name, its own port and data dir so it coexists with
+the pinned 1.5.6 stack — and not the hand-rolled `docker run` plus
 `POST /api/auth/setup` below. Keep the raw recipe for one-off spec measurements.
 
 Pair the override with a spec-diff tool that pulls edge, records the build date
