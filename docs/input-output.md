@@ -2,25 +2,28 @@
 
 ## Output
 
-- All commands write JSON to stdout via `ConsoleOutput.WriteJson` (`src/GrimoireCli/Output/ConsoleOutput.cs`).
+- Server responses write to stdout via `ConsoleOutput.WriteRawJson`
+  (`src/GrimoireCli/Output/ConsoleOutput.cs`); `config get` and the built-in
+  help/self-test paths are the exception, writing a hand-built
+  `Dictionary<string,string>` via `ConsoleOutput.WriteJson`, not a server
+  response.
 - Every log line and human-facing message goes to stderr — prompts (`login`),
   `Set <key> = <value>` confirmations (`config set`), warnings, and errors.
-- **Not a raw passthrough.** Responses deserialize into typed DTOs
-  (`GameSystemSummary`, `GameSystemDetail`, `Book`, …, registered on
-  `AppJsonContext` for Native AOT source-generated serialization) and are
-  re-serialized on the way out. `stdout` is therefore the DTO's shape, not
-  necessarily the server's raw JSON byte-for-byte.
-- **No `[JsonExtensionData]`.** An unmodelled field the server adds is
-  silently dropped rather than passed through. This is deliberate: a dropped
-  field is meant to be *noticed* — `tests/GrimoireCli.Tests/Commands/ResponseExamplesDriftTest.cs`
-  and `ResponseExamplesJsonValidTest.cs` guard the generated examples on the
-  response side, `RequestExamplesDriftTest.cs` on the request side, and a
-  real server response gaining a field the DTOs don't know about is a signal
-  to update the DTOs per the version-bump procedure in
-  [grimoire-compatibility.md](grimoire-compatibility.md), not something to
-  paper over with an extension-data bag.
-- `config get` and the built-in help/self-test paths are the exception:
-  they write a hand-built `Dictionary<string,string>`, not a server response.
+- **A byte passthrough.** A response is not deserialized into a typed model
+  and re-serialized; the server's bytes reach stdout unmodified. Undeclared
+  fields, explicit `null`s and key order are all the server's, not a DTO's —
+  there is no `[JsonExtensionData]` gap to drop a field into, because there is
+  no typed model in the way to drop it. `GrimoireApiClient.EnsureJson`
+  (inside the string-returning `SendAsync`) still enforces that the body
+  parses as JSON before it reaches stdout — see Exit Codes below.
+- **`--pretty` re-indents.** Off by default (compact, one line); with it,
+  `ConsoleOutput.WriteRawJson` parses the body and re-serializes it indented,
+  which costs the byte-exactness above — the fields, nulls and key order
+  still all survive, but the bytes are no longer the server's own. A body
+  that fails to parse under `--pretty` is printed as received rather than
+  swallowed; `EnsureJson` is the only place that rejects an unparseable body.
+  It is a recursive root option like `--debug` and `--log-json`, so it works
+  before or after the subcommand.
 - List endpoints that return a bare JSON array (e.g. `GET /api/systems`) are
   re-serialized as a bare array, not wrapped in an envelope — there's no
   pagination envelope in Grimoire's `systems` responses today.
@@ -37,7 +40,11 @@
 - `1` — usage or configuration errors (missing server/token, unknown config
   key, missing required argument)
 - `2` — API failures (HTTP error status from Grimoire, or an unhandled
-  exception reaching `Program.cs`'s top-level catch)
+  exception reaching `Program.cs`'s top-level catch). Also covers a body that
+  fails to parse as JSON — Grimoire's SPA answers an unroutable request (an
+  empty, `.`, or otherwise mis-encoded id) with an HTML 200 rather than a JSON
+  error, and `GrimoireApiClient.EnsureJson` exits 2 there instead of letting
+  the page reach stdout.
 - `3` — the request succeeded (HTTP 200) but did not do what was asked: a bulk
   call with a non-empty `errors` list (a partial write), `library rescan`
   reporting `already_running`, where a scan was already in flight and the

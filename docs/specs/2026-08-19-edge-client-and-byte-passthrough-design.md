@@ -193,9 +193,14 @@ Designed here because the decisions are interlocked with PR 1; built separately.
 
 ### Size
 
-22 typed `WriteJson(..., AppJsonContext.Default.X)` call sites across 7 command
-files, and 51 `AppJsonContext.Default` references once `AppConfig` and
-`DictionaryStringString` are excluded, spread over 6 services and their commands.
+Measured against what shipped, not the pre-work estimate: `ConsoleOutput.WriteRawJson`
+is now called from 30 sites across 8 command files (`SystemsCommand`,
+`BooksCommand`, `CoverCommands`, `MetadataCommands`, `LibraryCommand`,
+`AddonsCommand`, `MeCommand`, `SelfTestCommand`). `AppJsonContext.Default` is
+down to 9 references, all `AppConfig`, `DictionaryStringString` or
+`SavedFile` — the three types this design excluded from the count going in.
+Zero typed response call sites remain; `src/GrimoireCli/Models/` (32 response
+DTOs) is deleted in full.
 
 ### Data flow
 

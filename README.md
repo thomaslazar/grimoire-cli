@@ -231,7 +231,7 @@ Warnings and errors go to stderr with a timestamp + level prefix:
 2026-08-07T14:23:45.123Z ERROR Not authenticated, or the token has expired. Run: grimoire-cli login
 ```
 
-`--debug` (or `GRIMOIRE_DEBUG=1`) adds one line per HTTP call, plus token-expiry and version-check decisions; `--log-json` switches stderr to single-line JSON. Both work before or after the subcommand. The bearer token is never logged.
+`--debug` (or `GRIMOIRE_DEBUG=1`) adds one line per HTTP call, plus token-expiry and version-check decisions; `--log-json` switches stderr to single-line JSON. `--pretty` re-indents stdout (compact by default). All three work before or after the subcommand. The bearer token is never logged.
 
 ## Development
 
@@ -269,8 +269,7 @@ src/GrimoireCli/
   Commands/       # CLI command definitions (System.CommandLine)
   Api/            # HTTP client, token helper, debug handler
   Generated/      # Kiota client, generated from the OpenAPI spec — never hand-edit
-  Models/         # JsonContext — every type crossing the JSON boundary, for AOT
-  Configuration/  # Config file, env var, flag resolution
+  Configuration/  # Config file, env var, flag resolution, JsonContext for AOT
   Output/         # JSON stdout, stderr logging setup
 tests/GrimoireCli.Tests/   # unit tests
 docker/

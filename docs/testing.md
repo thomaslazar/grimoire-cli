@@ -10,40 +10,38 @@ reflection-based serialization — bugs only surface in the real binary.
 
 ### 1. Unit Tests (xUnit v3)
 
-218 tests covering pure logic, help-output assertions, and JSON-shape drift
+314 tests covering pure logic, help-output assertions, and JSON-shape drift
 guards with no network or binary dependency:
 
-- `Api/` — `CompareVersionsTests`, `ExtractTokenTests`, `GeneratedClientTests`
-- `Commands/` — `ReadPasswordFromStdinTests`, `RequestExamplesDriftTest`,
-  `RequestExamplesTests`, `ResponseExamplesDriftTest`,
-  `ResponseExamplesJsonValidTest`, `SystemsCommandTests`
+- `Api/` — `CompareVersionsTests`, `ExtractTokenTests`, `GeneratedClientTests`,
+  `ResponseParsingTests` (`IsJsonOrEmpty`/`HasItems`, the logic behind
+  `EnsureJson`)
+- `Commands/` — `ReadPasswordFromStdinTests`, `JsonExamplesDriftTest`,
+  `JsonExamplesTests`, `SystemsCommandTests`, `BulkExitTests`, `ScanExitTests`
 - `Configuration/` — `ConfigManagerTests`
-- `Models/` — `GameSystemDtoTests`
+- `Output/` — `ConsoleOutputTests` (raw vs. `--pretty` output), `SavedFileTests`
+- `Services/` — `AddonsServiceTests`, `LibraryServiceTests`, `MetadataServiceTests`
 
 ```bash
 dotnet test tests/GrimoireCli.Tests/GrimoireCli.Tests.csproj
 ```
 
-Three of these are generated-artifact guards rather than ordinary logic tests:
-
-- `ResponseExamplesDriftTest` reruns `tools/GenerateResponseExamples` into a
-  temp file and diffs it byte-for-byte against the checked-in
-  `src/GrimoireCli/Commands/ResponseExamples.g.cs`. A stale generated file
-  fails CI instead of silently drifting from its source.
-- `ResponseExamplesJsonValidTest` parses every sample in `ResponseExamples.All`
-  as JSON, catching a hand-edited example that no longer round-trips.
-- `RequestExamplesDriftTest` reruns `tools/GenerateRequestExamples` the same way
-  against `src/GrimoireCli/Commands/RequestExamples.g.cs`. `RequestExamplesTests`
-  additionally asserts that each sample's root keys are exactly the wire fields
-  its model deserializes — the set `JsonBodyInput.Validate` accepts — so help
-  text cannot advertise a body the CLI would refuse.
+`JsonExamplesDriftTest` is a generated-artifact guard rather than an ordinary
+logic test: it reruns `tools/GenerateJsonExamples` into a temp file and diffs
+it byte-for-byte against the checked-in `src/GrimoireCli/Commands/JsonExamples.g.cs`.
+A stale generated file fails CI instead of silently drifting from its source.
+`JsonExamplesTests` additionally asserts that a request sample's root keys are
+exactly the wire fields its model deserializes — the set `JsonBodyInput.Validate`
+accepts — so help text cannot advertise a body the CLI would refuse.
 
 ### 2. Self-Test (built-in command)
 
 Offline integrity check exercising the AOT-sensitive code paths without
-network access — source-generated JSON round-trips for `AppConfig` and
-`Dictionary<string,string>`, the generated `LoginRequest` serializing the way
-`GrimoireApiClient.LoginAsync` actually sends it, JWT expiry parsing, version
+network access — source-generated JSON round-trips for `AppConfig`,
+`Dictionary<string,string>` and `SavedFile`, the generated `LoginRequest`
+serializing the way `GrimoireApiClient.LoginAsync` actually sends it, the raw
+JSON path (`JsonDocument.Parse`, `ReadStringProperty`, `HasItems`, and the
+`--pretty` `Utf8JsonWriter` pretty-printer), JWT expiry parsing, version
 comparison, informational-version resolution, and login-response token
 extraction:
 

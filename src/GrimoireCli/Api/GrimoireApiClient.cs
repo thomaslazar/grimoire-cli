@@ -183,7 +183,10 @@ public class GrimoireApiClient
     /// Sends a request built by a generated builder. Converting to a native
     /// HttpRequestMessage and sending it here — rather than through Kiota's
     /// SendPrimitiveAsync — keeps the response body on failures, which the error
-    /// messages include, and leaves EnsureSuccessAsync unchanged.
+    /// messages include, and leaves EnsureSuccessAsync unchanged. Every response
+    /// is passed through <see cref="EnsureJson"/> before it is returned, so a
+    /// non-JSON body (Grimoire's SPA catch-all) exits 2 here rather than
+    /// reaching a caller that will print it verbatim.
     /// </summary>
     public async Task<string> SendAsync(RequestInformation info, string? permissionHint = null, string? notFoundHint = null, TimeSpan? timeout = null)
     {
