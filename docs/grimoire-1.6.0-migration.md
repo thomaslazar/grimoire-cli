@@ -51,12 +51,11 @@ conflicts with it. The edge stack comes first because everything else is built
 from the client generated against it — see
 [the design](specs/2026-08-19-edge-client-and-byte-passthrough-design.md).
 
-1. **An edge stack and a client generated from it.** A
-   `docker/docker-compose.edge.yml` override runs `edge` beside the pinned 1.5.6
-   stack; `src/GrimoireCli/Generated/` is regenerated from its spec. The review is
-   a read of the generated diff. The gate is the smoke test against edge, which is
-   what this branch targets; the pinned 1.5.6 stack is a bonus signal only, since
-   one CLI version targets one server version.
+1. **A client generated from edge.** `docker/docker-compose.yml` pins an `edge`
+   digest and `src/GrimoireCli/Generated/` is regenerated from its spec. The review
+   is a read of the generated diff, and the gate is the smoke test against that
+   pinned stack — one CLI version targets one server version, so there is one stack
+   and it is the one being targeted.
 2. **Byte-passthrough output.** Services return the response bytes, commands print
    them; compact by default with `--pretty` to re-indent. `src/GrimoireCli/Models/`
    is deleted outright, because step 1 gives `--help` a generated model to draw its
@@ -276,11 +275,21 @@ Nothing was removed: every 1.5.6 operation and schema is still present.
 Only once a 1.6.0 tag exists upstream. Never against `edge`: `CLAUDE.md` pins the
 reference to a released version because `main` carries work no instance runs.
 
+- **`docker/docker-compose.yml` — repin the image to the release tag,
+  `hunterreadca/grimoire:1.6.0`, and regenerate the client from it in the same
+  commit.** The digest pin is a deliberate, temporary exception taken only because
+  the CLI is being built alongside active server development; a released target
+  gets a release tag like every other version has. Retiring it is what closes this
+  workstream, so do it first — the rest of this list is downstream of the spec that
+  regeneration produces.
 - `MinSupportedVersion` and `MaxTestedVersion` → 1.6.0.
-- `docs/grimoire-compatibility.md` — new matrix row.
+- `docs/grimoire-compatibility.md` — new matrix row, and drop the note about the
+  pin being a digest.
 - `README.md` — the "Tested against Grimoire" line.
-- `temp/grimoire/` — repin the clone to `v1.6.0`.
-- `docker/docker-compose.yml` — repin the image.
+- `temp/grimoire/` — repin the clone to `v1.6.0`. Until then there is no tag to
+  pin, which is why behaviour is read out of the running container instead.
+- `CLAUDE.md` — the digest-pin exception under "API client generation" goes away
+  with it.
 - `docs/authentication.md` — rewrite for refresh (workstream A).
 - `CLAUDE.md` — the "API client generation" section states that no success
   response carries a schema and that response DTOs are therefore hand-written.
@@ -304,9 +313,18 @@ apply against.
 the choice was a release tag or a floating one. `docker/docker-compose.yml` on
 `main` pins an `edge` **digest**, which is as reproducible as a release tag, so the
 smoke test against the server this branch targets is a real gate rather than a
-signal. Moving the pin is a deliberate commit that regenerates the client with it;
-`docker/docker-compose.edge.yml` brings up the floating tag beside it to reveal
-when the pin has gone stale.
+signal. Moving the pin is a deliberate commit that regenerates the client with it.
+
+**That pin is an exception with an expiry.** It exists only because the CLI is being
+built alongside active server development, and [workstream
+C](#workstream-c--version-gate-and-docs) retires it: when 1.6.0 releases the local
+stack goes back to a release tag. Whether the pin has gone stale is two commands,
+which is why there is no second compose file for it:
+
+```bash
+docker pull hunterreadca/grimoire:edge
+docker inspect hunterreadca/grimoire:edge --format '{{index .RepoDigests 0}}'
+```
 
 ## Open questions
 
@@ -331,10 +349,10 @@ disagree on every count.
 `backend/seed_users.py` is byte-identical between 1.5.6 and the 2026-08-17 edge
 build and still reads `{DATA_PATH}/users.json` in the shape
 `docker/users.json.example` already has, so `docker/seed.sh` works against edge
-unchanged. Step 1 is therefore a `docker/docker-compose.edge.yml` override — the
-`edge` tag, its own project name, its own port and data dir so it coexists with
-the pinned 1.5.6 stack — and not the hand-rolled `docker run` plus
-`POST /api/auth/setup` below. Keep the raw recipe for one-off spec measurements.
+unchanged, so `docker/docker-compose.yml` with its digest pin is the whole of the
+setup — no second compose file, and not the hand-rolled `docker run` plus
+`POST /api/auth/setup` below either. Keep the raw recipe for one-off spec
+measurements against a build the pin does not point at.
 
 Pair the override with a spec-diff tool that pulls edge, records the build date
 and the counts, and diffs against the last recorded snapshot. Every number in this

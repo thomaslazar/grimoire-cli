@@ -1,6 +1,6 @@
 {
   "descriptionHash": "55509796DEFCFC3125961CD8E2E6D79DE9EA1270D6E1DB681311B9F0360A1CCBBE663BFCC2092557874882A84256521CCD65784AB96BF6CD07C123CD28E6C407",
-  "descriptionLocation": "http://host.docker.internal:9482/api/openapi.json",
+  "descriptionLocation": "http://host.docker.internal:9481/api/openapi.json",
   "lockFileVersion": "1.0.0",
   "kiotaVersion": "1.34.1",
   "clientClassName": "GrimoireApiClient",

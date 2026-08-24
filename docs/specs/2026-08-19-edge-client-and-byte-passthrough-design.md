@@ -36,42 +36,32 @@ No behaviour change. The review is a read of the generated diff, which
 [CLAUDE.md](../../CLAUDE.md) already calls the authoritative list of what changed
 in the API surface.
 
-### `docker/docker-compose.edge.yml`
+### The local stack is pinned to an edge digest
 
-An override that runs the `edge` image alongside the pinned 1.5.6 stack rather
-than instead of it:
+`docker/docker-compose.yml` pins `hunterreadca/grimoire@sha256:f274522b…` — the
+`edge` build of 2026-08-23, which is exactly what the client is generated from.
+There is one stack, and it is the one the branch targets.
 
-- **own project name and port** — 9482, so both stacks run at once
-- **own data dir** — `docker/data-edge`, because a shared database would be
-  indexed by two server versions
-- **shared fixture library** — the same read-only mount; the fixtures are not
-  version-specific
-- **same `SECRET_KEY` and env shape** as the pinned stack
+An earlier draft of this design added a second compose file so `edge` could run
+beside a pinned 1.5.6 stack. That was dropped: with released support moved to
+`support/grimoire-1.5.6`, nothing needs two servers at once, and a second stack
+cost a second port, a second data directory, an env var, a `.gitignore` entry and
+a devcontainer addressing footgun — all to answer "has the digest moved?", which
+is two commands. Recorded because the footgun is worth knowing if a second stack
+is ever reintroduced: **a published port is not reachable from this devcontainer
+unless it happens to be forwarded.** 9481 is; 9482 was not, though it was open
+from every other container. Use the container's bridge address, as
+[grimoire-api-notes.md](../grimoire-api-notes.md) and the migration document
+already said — being a compose stack rather than a bare `docker run` makes no
+difference, which is what this design got wrong.
 
-**Compose does not fix addressing** — this was expected to and does not, measured
-during execution. The edge stack publishes 9482 on the host and it is reachable
-from other containers, but not from this devcontainer, which carries a forward for
-9481 (established when that stack first came up) and none for 9482. Being a
-compose stack is irrelevant; the migration document's existing note — use the
-container's bridge address from the devcontainer — was correct and stands.
-
-So from the devcontainer the edge stack is reached at its bridge address:
-
-```bash
-EDGE=$(docker inspect grimoire-cli-edge-grimoire-1 \
-  --format '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}')
-curl -sf "http://${EDGE}:9481/api/health"
-```
-
-`kiota-lock.json` still records `host.docker.internal:9482`, which is the stack's
-real address and stable across container recreation. A bridge IP is neither.
-
-No script changes are needed. `docker/seed.sh` and `tools/generate-api-client.sh`
-both already read `GRIMOIRE_SERVER`:
+No script changes are needed. Both scripts default to
+`http://host.docker.internal:9481`, which is the pinned stack, so neither needs an
+override:
 
 ```bash
-GRIMOIRE_SERVER=http://host.docker.internal:9482 bash docker/seed.sh
-GRIMOIRE_SERVER=http://host.docker.internal:9482 bash tools/generate-api-client.sh
+bash docker/seed.sh
+bash tools/generate-api-client.sh
 ```
 
 Seeding works unchanged because `backend/seed_users.py` is byte-identical between
@@ -83,9 +73,9 @@ shape `docker/users.json.example` already has.
 `tools/generate-api-client.sh` is the only supported path and stays so. Two
 details:
 
-- **`kiota-lock.json`'s `descriptionLocation`** is written from `$SERVER`. Point it
-  at `host.docker.internal:9482`, never a container IP, or the committed lock
-  carries an ephemeral address.
+- **`kiota-lock.json`'s `descriptionLocation`** is written from `$SERVER`, so it
+  must end up as `host.docker.internal:9481` — never a container IP, or the
+  committed lock carries an address that dies with the container.
 - **`tools/normalize-spec.py` is still required.** Re-measured against the
   2026-08-23 edge spec: it still collapses 40 `anyOf`-nullable arrays, so
   [kiota#2338](https://github.com/microsoft/kiota/issues/2338) has not been fixed
@@ -137,10 +127,13 @@ the gate. A digest is as reproducible as a release tag, which is what makes it a
 gate rather than a signal — the earlier worry that CI could not pin a prerelease
 assumed the only options were a release tag or a floating one.
 
-`docker/docker-compose.edge.yml` now brings up the *floating* `edge` tag beside the
-pinned digest, which is how the pin is discovered to be stale. Released 1.5.6
-support moved to `support/grimoire-1.5.6`, so nothing here needs to keep working
-against 1.5.6.
+Released 1.5.6 support moved to `support/grimoire-1.5.6`, so nothing here needs to
+keep working against 1.5.6.
+
+The digest is an exception with an expiry: workstream C repins to
+`hunterreadca/grimoire:1.6.0` once that releases. Checking whether the pin has gone
+stale is `docker pull hunterreadca/grimoire:edge` plus a `docker inspect` of its
+digest, which is why no second compose file survives for it.
 
 ### Compatibility with 1.5.6, as reassurance only
 

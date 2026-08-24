@@ -131,7 +131,11 @@ These rules exist because help text sits on the hot path for the agents driving 
   docker compose -f docker/docker-compose.yml up -d --wait
   # then generate straight from http://host.docker.internal:9481/api/openapi.json
   ```
-- **On `main` that pin is a digest, not a tag**, because `main` targets 1.6.0 and 1.6.0 is unreleased. `edge` moves, and a floating tag would make a red CI run indistinguishable from upstream changing; a digest is as reproducible as a release tag. Move it deliberately and regenerate in the same commit. `docker/docker-compose.edge.yml` brings up the floating tag beside it, which is how you find out the pin has gone stale.
+- **A digest pin is a temporary exception, not the convention.** The pin is normally a release tag. It is a digest only while the targeted server version is unreleased — right now, because the CLI is being built alongside active server development. `edge` moves, and a floating tag would make a red CI run indistinguishable from upstream changing, whereas a digest is as reproducible as a release tag. **When 1.6.0 releases, the pin goes back to a release tag** (`hunterreadca/grimoire:1.6.0`); see workstream C in [docs/grimoire-1.6.0-migration.md](docs/grimoire-1.6.0-migration.md). Until then, move it deliberately and regenerate the client in the same commit, and check whether it has gone stale with:
+  ```bash
+  docker pull hunterreadca/grimoire:edge
+  docker inspect hunterreadca/grimoire:edge --format '{{index .RepoDigests 0}}'
+  ```
 - **Released-version support lives on `support/grimoire-1.5.6`**, where the pin is the `1.5.6` tag. Fixes for 1.5.6 are made there and released from there, then cherry-picked forward — not merged, since `main` no longer has the DTO layer they were written against.
 - **Generate with a .NET-native generator** — Kiota is the fit: a `dotnet tool`, handles the spec's OpenAPI 3.1, emits C#. No node or java is available in the devcontainer.
 - **What the spec gives you and what it does not.** 84 of the 86 component schemas are request bodies (the other 2, `HTTPValidationError` and `ValidationError`, are response-only), so request bodies, paths, methods and query parameters come from the generator and are trustworthy. Of 207 operations' 410 responses, 192 success responses type as `{}` and the rest are 204s or `HTTPValidationError` 422s — **no success response carries a schema** (FastAPI without `response_model`), so response DTOs are the documented gap — those are hand-written from `temp/grimoire/`'s serializers and stay hand-written.

@@ -114,6 +114,15 @@ being staged around a help-sample source that had no replacement."
 
 ### Task 2: Edge stack override
 
+> **Superseded after execution.** This task built
+> `docker/docker-compose.edge.yml` so `edge` could run beside a pinned 1.5.6
+> stack. That file was removed in the same PR once `main` became the 1.6.0 line:
+> `docker/docker-compose.yml` pins the `edge` digest directly, and with released
+> support on `support/grimoire-1.5.6` nothing needs two servers at once. The steps
+> below are kept as the record of what was done and what was measured — notably
+> the `ports` concatenation and the devcontainer addressing findings, which still
+> apply to anyone reintroducing a second stack.
+
 **Files:**
 - Create: `docker/docker-compose.edge.yml`
 - Modify: `docker/env.example` — add `GRIMOIRE_DATA_EDGE`

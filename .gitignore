@@ -47,7 +47,6 @@ temp
 # Local stack state. /data holds the Grimoire database plus the seeded
 # users.json, which Grimoire renames to users.json.imported on first boot.
 docker/data/
-docker/data-edge/
 docker/.env
 # The committed template is docker/env.example, with no leading dot: the .env.*
 # rule above matches at any depth, and a dotted name also trips the managed
