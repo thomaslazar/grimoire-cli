@@ -98,7 +98,8 @@ terseness rules. Two mechanics worth calling out here:
   attach a "Notes" section (non-obvious caveats, positioned above the
   auto-generated Options block) and an "Examples" section (positioned below)
   to any command.
-- **`--help-full`** is a recursive root option that additionally prints two
+- **`--help-full`** is a recursive root option, as `--debug` and `--log-json`
+  also are, that additionally prints two
   generated blocks per command: a "Response shape" block — a JSON sample
   derived from the response DTO via `AddResponseExample<T>()` /
   `AddResponseExampleArray<T>()`, sourced from `Commands/ResponseExamples.g.cs`

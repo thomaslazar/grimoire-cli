@@ -231,7 +231,7 @@ Warnings and errors go to stderr with a timestamp + level prefix:
 2026-08-07T14:23:45.123Z ERROR Not authenticated, or the token has expired. Run: grimoire-cli login
 ```
 
-`--debug` and `--log-json` are root options, so they go **before** the subcommand — `grimoire-cli --debug systems list`, not `systems list --debug`. `--debug` (or `GRIMOIRE_DEBUG=1`) adds one line per HTTP call, plus token-expiry and version-check decisions; `--log-json` switches stderr to single-line JSON. The bearer token is never logged.
+`--debug` (or `GRIMOIRE_DEBUG=1`) adds one line per HTTP call, plus token-expiry and version-check decisions; `--log-json` switches stderr to single-line JSON. Both work before or after the subcommand. The bearer token is never logged.
 
 ## Development
 

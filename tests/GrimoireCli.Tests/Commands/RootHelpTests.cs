@@ -10,16 +10,18 @@ namespace GrimoireCli.Tests.Commands;
 /// </summary>
 public class RootHelpTests
 {
-    private static string RenderHelp(params string[] args)
+    private static RootCommand BuildRoot(out Option<bool> debugOption, out Option<bool> logJsonOption)
     {
         var rootCommand = new RootCommand("grimoire-cli — Grimoire TTRPG library CLI");
-        var debugOption = new Option<bool>("--debug")
+        debugOption = new Option<bool>("--debug")
         {
-            Description = "Enable debug-level logging (HTTP requests, token expiry, version check) to stderr."
+            Description = "Enable debug-level logging (HTTP requests, token expiry, version check) to stderr.",
+            Recursive = true
         };
-        var logJsonOption = new Option<bool>("--log-json")
+        logJsonOption = new Option<bool>("--log-json")
         {
-            Description = "Emit stderr log lines as single-line JSON instead of text."
+            Description = "Emit stderr log lines as single-line JSON instead of text.",
+            Recursive = true
         };
         rootCommand.Options.Add(debugOption);
         rootCommand.Options.Add(logJsonOption);
@@ -32,7 +34,12 @@ public class RootHelpTests
             "GRIMOIRE_TOKEN    JWT, overriding the config file.",
             "GRIMOIRE_DEBUG=1  Same as --debug. Enables debug-level logging to stderr.");
         rootCommand.UseCustomHelpSections();
+        return rootCommand;
+    }
 
+    private static string RenderHelp(params string[] args)
+    {
+        var rootCommand = BuildRoot(out _, out _);
         var output = new StringWriter();
         var config = new InvocationConfiguration { Output = output };
         var actualArgs = args.Concat(new[] { "--help" }).ToArray();
@@ -46,6 +53,32 @@ public class RootHelpTests
         var output = RenderHelp();
         Assert.Contains("--debug", output);
         Assert.Contains("Enable debug-level logging", output);
+    }
+
+    // Both flags are Recursive in Program.cs, so a caller may write them after the
+    // subcommand. Without that they parse as an unmatched token: the command prints
+    // usage, drops the flag, and reads as broken rather than misplaced.
+    [Theory]
+    [InlineData("--debug", "config", "get")]
+    [InlineData("config", "get", "--debug")]
+    [InlineData("config", "--debug", "get")]
+    public void DebugOption_IsAccepted_InAnyPosition(params string[] args)
+    {
+        var root = BuildRoot(out var debugOption, out _);
+        var parsed = root.Parse(args);
+        Assert.Empty(parsed.Errors);
+        Assert.True(parsed.GetValue(debugOption));
+    }
+
+    [Theory]
+    [InlineData("--log-json", "config", "get")]
+    [InlineData("config", "get", "--log-json")]
+    public void LogJsonOption_IsAccepted_InAnyPosition(params string[] args)
+    {
+        var root = BuildRoot(out _, out var logJsonOption);
+        var parsed = root.Parse(args);
+        Assert.Empty(parsed.Errors);
+        Assert.True(parsed.GetValue(logJsonOption));
     }
 
     [Fact]
