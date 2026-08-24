@@ -1,7 +1,7 @@
 # Edge client and byte-passthrough output
 
 Workstream B of [the 1.6.0 migration](../grimoire-1.6.0-migration.md), designed as
-two PRs back to `epic/grimoire-1.6.0`.
+two PRs into `main`, which is the 1.6.0 line.
 
 The migration document parked workstream B behind a released 1.6.0 tag on the
 grounds that generated response models did not exist yet. That was wrong: they
@@ -129,15 +129,18 @@ the generator, which walks every model regardless.
 **This branch targets 1.6.0 and nothing else.** The migration document's version
 strategy is explicit — one CLI version targets one server version, and whoever
 stays on 1.5.6 stays on `0.1.x` — so a gate on 1.5.6 would test the dual-version
-compatibility that strategy rules out. `docker/smoke-test.sh` against the **edge**
-stack is the gate here.
+compatibility that strategy rules out.
 
-That gate moves, and the migration document already says to expect it: a red run
-against `edge` may mean upstream changed rather than the branch broke. The answer
-is to re-pull and re-measure, not to gate on a server the branch does not target.
+So there is one stack, not two: `docker/docker-compose.yml` pins the `edge`
+**digest** this client was generated from, and `docker/smoke-test.sh` against it is
+the gate. A digest is as reproducible as a release tag, which is what makes it a
+gate rather than a signal — the earlier worry that CI could not pin a prerelease
+assumed the only options were a release tag or a floating one.
 
-The pinned 1.5.6 stack stays in the repo because `main` still needs it, and it is
-worth running as a bonus signal, but it decides nothing on this branch.
+`docker/docker-compose.edge.yml` now brings up the *floating* `edge` tag beside the
+pinned digest, which is how the pin is discovered to be stale. Released 1.5.6
+support moved to `support/grimoire-1.5.6`, so nothing here needs to keep working
+against 1.5.6.
 
 ### Compatibility with 1.5.6, as reassurance only
 

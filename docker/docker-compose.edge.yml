@@ -1,7 +1,10 @@
-# The unreleased `edge` image, run BESIDE the pinned 1.5.6 stack rather than
-# instead of it. Merged over docker-compose.yml, so everything not named here —
-# env, healthcheck, the add-on index service, the read-only library mount — is
-# inherited:
+# The FLOATING `edge` tag, run beside the digest-pinned stack rather than instead
+# of it. docker-compose.yml pins a specific edge digest so CI is reproducible;
+# this override brings up whatever `edge` is right now, which is how you check
+# whether upstream has moved past that pin and what changed if it has.
+#
+# Merged over docker-compose.yml, so everything not named here — env, healthcheck,
+# the add-on index service, the read-only library mount — is inherited:
 #
 #   docker compose -f docker/docker-compose.yml -f docker/docker-compose.edge.yml \
 #     -p grimoire-cli-edge up -d --wait
@@ -17,10 +20,13 @@
 # The project name is required, not cosmetic: without -p both files' services
 # share one project and the edge image would replace the pinned container.
 #
-# `edge` moves under you. It is not a release and nothing pins it — re-pull
-# deliberately and record what you measured against:
+# To find out whether the digest in docker-compose.yml is stale:
 #
 #   docker pull hunterreadca/grimoire:edge
+#   docker inspect hunterreadca/grimoire:edge --format '{{index .RepoDigests 0}}'
+#
+# A different digest means upstream moved. Bring this override up, diff its
+# /api/openapi.json against the pinned stack's, and move the pin deliberately.
 #
 # Reset:  docker compose -f docker/docker-compose.yml -f docker/docker-compose.edge.yml \
 #           -p grimoire-cli-edge down && rm -rf docker/data-edge

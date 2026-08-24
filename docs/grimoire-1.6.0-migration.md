@@ -4,9 +4,10 @@ The working reference for this migration. Everything needed to resume is here;
 [the assessment](specs/research/2026-08-14-grimoire-1.6.0-assessment.md) is the
 dated record of how the numbers were measured and is not kept current.
 
-**Status: waiting on a tag, not on upstream answers.** 1.6.0 is still
-unreleased — no `v1.6.0` tag existed upstream as of 2026-08-19. Work happens on
-`epic/grimoire-1.6.0` and merges only once upstream tags 1.6.0.
+**Status: waiting on a tag, not on upstream answers.** 1.6.0 is still unreleased —
+no `v1.6.0` tag existed upstream as of 2026-08-24. Work happens on `main`, which is
+the 1.6.0 line; released 1.5.6 support is maintained on `support/grimoire-1.5.6`.
+See [where this work happens](#where-this-work-happens).
 
 Numbers below are re-measured against `hunterreadca/grimoire:edge` built
 2026-08-23 (spec `info.version` `1.5.6-tk8i6j`), which reports 342 schemas and
@@ -285,20 +286,27 @@ reference to a released version because `main` carries work no instance runs.
   response carries a schema and that response DTOs are therefore hand-written.
   Both become false; the rule they justify goes with them.
 
-## Living alongside `main`
+## Where this work happens
 
-**`main` is feature-frozen at 1.5.6** — bug fixes only until 1.6.0 releases. New
-commands are not arriving with hand-written DTOs and `AppJsonContext`
-registrations for workstream B to undo, so the drift this section used to plan
-around does not accumulate. Rebase on `main` when a fix lands; otherwise the epic
-stands alone.
+**`main` is the 1.6.0 line.** There is no epic branch: keeping one alive for months
+meant carrying drift and getting no CI, since the workflow only runs on pull
+requests into `main`. The work happens on ordinary feature branches off `main`,
+reviewed and gated like anything else.
 
-**Epic CI cannot pin a released server.** `docker/docker-compose.yml` pins 1.5.6
-and stays that way; the edge stack is a separate override. A red smoke test
-against edge may mean upstream changed rather than the branch broke — treat it as
-a signal, not a gate, until a 1.6.0 tag exists. The gating run stays on the
-pinned stack, which is why the edge stack is added beside it rather than instead
-of it.
+**Released support lives on `support/grimoire-1.5.6`**, cut from `main` at
+`618c4bf`. It carries v0.1.0 plus the finished 1.5.6-era work that was never
+released — covers, `books thumbnail`, binary output — so a 1.5.6 user can still
+get a release. Fixes are made and released there, then **cherry-picked** forward,
+not merged: once workstream B lands, `main` has no `Models/` for a DTO-era fix to
+apply against.
+
+**CI can pin a prerelease after all.** The earlier claim that it could not assumed
+the choice was a release tag or a floating one. `docker/docker-compose.yml` on
+`main` pins an `edge` **digest**, which is as reproducible as a release tag, so the
+smoke test against the server this branch targets is a real gate rather than a
+signal. Moving the pin is a deliberate commit that regenerates the client with it;
+`docker/docker-compose.edge.yml` brings up the floating tag beside it to reveal
+when the pin has gone stale.
 
 ## Open questions
 

@@ -10,7 +10,7 @@
 
 ## Global Constraints
 
-- **Branch:** `feat/edge-client`, off `epic/grimoire-1.6.0`. PRs target the epic, never `main`.
+- **Branch:** `feat/edge-client`. Cut off `epic/grimoire-1.6.0`, but **retargeted at `main`** after execution: the epic was retired in favour of `main` as the 1.6.0 line, with released support on `support/grimoire-1.5.6`. Later plans branch from `main`.
 - **No behaviour change in this PR.** The CLI's stdout, flags and commands are identical before and after. Anything that changes them belongs to PR 2.
 - **Never hand-edit `src/GrimoireCli/Generated/`.** `bash tools/generate-api-client.sh` is the only supported path, and `kiota update` is forbidden — it refetches the raw spec and would skip `tools/normalize-spec.py`.
 - **Kiota must be exactly 1.34.1**, matching `.kiotaVersion` in `src/GrimoireCli/Generated/kiota-lock.json`. The generator script enforces this and exits rather than mixing generator churn into an API diff.
