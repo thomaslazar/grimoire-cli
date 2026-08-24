@@ -49,17 +49,17 @@ namespace GrimoireCli.Generated.Api.SavedFilters
         /// <summary>
         /// List the current user&apos;s saved filters, optionally limited to one scope.
         /// </summary>
-        /// <returns>A <see cref="UntypedNode"/></returns>
+        /// <returns>A <see cref="global::GrimoireCli.Generated.Models.SavedFiltersResponse"/></returns>
         /// <param name="cancellationToken">Cancellation token to use when cancelling requests</param>
         /// <param name="requestConfiguration">Configuration for the request such as headers, query parameters, and middleware options.</param>
         /// <exception cref="global::GrimoireCli.Generated.Models.HTTPValidationError">When receiving a 422 status code</exception>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
-        public async Task<UntypedNode?> GetAsync(Action<RequestConfiguration<global::GrimoireCli.Generated.Api.SavedFilters.SavedFiltersRequestBuilder.SavedFiltersRequestBuilderGetQueryParameters>>? requestConfiguration = default, CancellationToken cancellationToken = default)
+        public async Task<global::GrimoireCli.Generated.Models.SavedFiltersResponse?> GetAsync(Action<RequestConfiguration<global::GrimoireCli.Generated.Api.SavedFilters.SavedFiltersRequestBuilder.SavedFiltersRequestBuilderGetQueryParameters>>? requestConfiguration = default, CancellationToken cancellationToken = default)
         {
 #nullable restore
 #else
-        public async Task<UntypedNode> GetAsync(Action<RequestConfiguration<global::GrimoireCli.Generated.Api.SavedFilters.SavedFiltersRequestBuilder.SavedFiltersRequestBuilderGetQueryParameters>> requestConfiguration = default, CancellationToken cancellationToken = default)
+        public async Task<global::GrimoireCli.Generated.Models.SavedFiltersResponse> GetAsync(Action<RequestConfiguration<global::GrimoireCli.Generated.Api.SavedFilters.SavedFiltersRequestBuilder.SavedFiltersRequestBuilderGetQueryParameters>> requestConfiguration = default, CancellationToken cancellationToken = default)
         {
 #endif
             var requestInfo = ToGetRequestInformation(requestConfiguration);
@@ -67,23 +67,23 @@ namespace GrimoireCli.Generated.Api.SavedFilters
             {
                 { "422", global::GrimoireCli.Generated.Models.HTTPValidationError.CreateFromDiscriminatorValue },
             };
-            return await RequestAdapter.SendAsync<UntypedNode>(requestInfo, UntypedNode.CreateFromDiscriminatorValue, errorMapping, cancellationToken).ConfigureAwait(false);
+            return await RequestAdapter.SendAsync<global::GrimoireCli.Generated.Models.SavedFiltersResponse>(requestInfo, global::GrimoireCli.Generated.Models.SavedFiltersResponse.CreateFromDiscriminatorValue, errorMapping, cancellationToken).ConfigureAwait(false);
         }
         /// <summary>
         /// Create a preset. Re-saving an existing (scope, name) overwrites its state.
         /// </summary>
-        /// <returns>A <see cref="UntypedNode"/></returns>
+        /// <returns>A <see cref="global::GrimoireCli.Generated.Models.SavedFilterOut"/></returns>
         /// <param name="body">The request body</param>
         /// <param name="cancellationToken">Cancellation token to use when cancelling requests</param>
         /// <param name="requestConfiguration">Configuration for the request such as headers, query parameters, and middleware options.</param>
         /// <exception cref="global::GrimoireCli.Generated.Models.HTTPValidationError">When receiving a 422 status code</exception>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
-        public async Task<UntypedNode?> PostAsync(global::GrimoireCli.Generated.Models.SavedFilterCreate body, Action<RequestConfiguration<global::GrimoireCli.Generated.Api.SavedFilters.SavedFiltersRequestBuilder.SavedFiltersRequestBuilderPostQueryParameters>>? requestConfiguration = default, CancellationToken cancellationToken = default)
+        public async Task<global::GrimoireCli.Generated.Models.SavedFilterOut?> PostAsync(global::GrimoireCli.Generated.Models.SavedFilterCreate body, Action<RequestConfiguration<global::GrimoireCli.Generated.Api.SavedFilters.SavedFiltersRequestBuilder.SavedFiltersRequestBuilderPostQueryParameters>>? requestConfiguration = default, CancellationToken cancellationToken = default)
         {
 #nullable restore
 #else
-        public async Task<UntypedNode> PostAsync(global::GrimoireCli.Generated.Models.SavedFilterCreate body, Action<RequestConfiguration<global::GrimoireCli.Generated.Api.SavedFilters.SavedFiltersRequestBuilder.SavedFiltersRequestBuilderPostQueryParameters>> requestConfiguration = default, CancellationToken cancellationToken = default)
+        public async Task<global::GrimoireCli.Generated.Models.SavedFilterOut> PostAsync(global::GrimoireCli.Generated.Models.SavedFilterCreate body, Action<RequestConfiguration<global::GrimoireCli.Generated.Api.SavedFilters.SavedFiltersRequestBuilder.SavedFiltersRequestBuilderPostQueryParameters>> requestConfiguration = default, CancellationToken cancellationToken = default)
         {
 #endif
             if(ReferenceEquals(body, null)) throw new ArgumentNullException(nameof(body));
@@ -92,7 +92,7 @@ namespace GrimoireCli.Generated.Api.SavedFilters
             {
                 { "422", global::GrimoireCli.Generated.Models.HTTPValidationError.CreateFromDiscriminatorValue },
             };
-            return await RequestAdapter.SendAsync<UntypedNode>(requestInfo, UntypedNode.CreateFromDiscriminatorValue, errorMapping, cancellationToken).ConfigureAwait(false);
+            return await RequestAdapter.SendAsync<global::GrimoireCli.Generated.Models.SavedFilterOut>(requestInfo, global::GrimoireCli.Generated.Models.SavedFilterOut.CreateFromDiscriminatorValue, errorMapping, cancellationToken).ConfigureAwait(false);
         }
         /// <summary>
         /// List the current user&apos;s saved filters, optionally limited to one scope.

@@ -42,17 +42,17 @@ namespace GrimoireCli.Generated.Api.Settings.ApiKey
         /// <summary>
         /// Revoke the stats API key
         /// </summary>
-        /// <returns>A <see cref="UntypedNode"/></returns>
+        /// <returns>A <see cref="global::GrimoireCli.Generated.Models.ApiKeyResponse"/></returns>
         /// <param name="cancellationToken">Cancellation token to use when cancelling requests</param>
         /// <param name="requestConfiguration">Configuration for the request such as headers, query parameters, and middleware options.</param>
         /// <exception cref="global::GrimoireCli.Generated.Models.HTTPValidationError">When receiving a 422 status code</exception>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
-        public async Task<UntypedNode?> DeleteAsync(Action<RequestConfiguration<global::GrimoireCli.Generated.Api.Settings.ApiKey.ApiKeyRequestBuilder.ApiKeyRequestBuilderDeleteQueryParameters>>? requestConfiguration = default, CancellationToken cancellationToken = default)
+        public async Task<global::GrimoireCli.Generated.Models.ApiKeyResponse?> DeleteAsync(Action<RequestConfiguration<global::GrimoireCli.Generated.Api.Settings.ApiKey.ApiKeyRequestBuilder.ApiKeyRequestBuilderDeleteQueryParameters>>? requestConfiguration = default, CancellationToken cancellationToken = default)
         {
 #nullable restore
 #else
-        public async Task<UntypedNode> DeleteAsync(Action<RequestConfiguration<global::GrimoireCli.Generated.Api.Settings.ApiKey.ApiKeyRequestBuilder.ApiKeyRequestBuilderDeleteQueryParameters>> requestConfiguration = default, CancellationToken cancellationToken = default)
+        public async Task<global::GrimoireCli.Generated.Models.ApiKeyResponse> DeleteAsync(Action<RequestConfiguration<global::GrimoireCli.Generated.Api.Settings.ApiKey.ApiKeyRequestBuilder.ApiKeyRequestBuilderDeleteQueryParameters>> requestConfiguration = default, CancellationToken cancellationToken = default)
         {
 #endif
             var requestInfo = ToDeleteRequestInformation(requestConfiguration);
@@ -60,7 +60,7 @@ namespace GrimoireCli.Generated.Api.Settings.ApiKey
             {
                 { "422", global::GrimoireCli.Generated.Models.HTTPValidationError.CreateFromDiscriminatorValue },
             };
-            return await RequestAdapter.SendAsync<UntypedNode>(requestInfo, UntypedNode.CreateFromDiscriminatorValue, errorMapping, cancellationToken).ConfigureAwait(false);
+            return await RequestAdapter.SendAsync<global::GrimoireCli.Generated.Models.ApiKeyResponse>(requestInfo, global::GrimoireCli.Generated.Models.ApiKeyResponse.CreateFromDiscriminatorValue, errorMapping, cancellationToken).ConfigureAwait(false);
         }
         /// <summary>
         /// Revoke the stats API key

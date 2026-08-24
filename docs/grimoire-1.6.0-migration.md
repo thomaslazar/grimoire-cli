@@ -9,9 +9,11 @@ unreleased — no `v1.6.0` tag existed upstream as of 2026-08-19. Work happens o
 `epic/grimoire-1.6.0` and merges only once upstream tags 1.6.0.
 
 Numbers below are re-measured against `hunterreadca/grimoire:edge` built
-2026-08-17 (spec `info.version` `1.5.6-tjxlea`), which reports 302 schemas and
-252 operations against the 2026-08-14 build's 281 and 233. Both #356 and #357 —
-the two blockers this document was written around — are fixed in that build.
+2026-08-23 (spec `info.version` `1.5.6-tk8i6j`), which reports 342 schemas and
+282 operations. Both #356 and #357 — the two blockers this document was written
+around — are fixed. **`edge` moves fast:** the three builds measured while writing
+this document reported 281/233, 302/252 and 342/282 schemas/operations over nine
+days, so re-measure rather than trusting any number here.
 
 ## Why this is a migration and not a version bump
 
@@ -50,10 +52,10 @@ from the client generated against it — see
 
 1. **An edge stack and a client generated from it.** A
    `docker/docker-compose.edge.yml` override runs `edge` beside the pinned 1.5.6
-   stack; `src/GrimoireCli/Generated/` is regenerated from its spec. No behaviour
-   change, so the review is a read of the generated diff. Safe for the pinned
-   stack: across all 207 operations shared between 1.5.6 and the 2026-08-17 edge
-   spec, no parameter or body field was removed or became newly required.
+   stack; `src/GrimoireCli/Generated/` is regenerated from its spec. The review is
+   a read of the generated diff. Safe for the pinned stack: across all 206
+   operations shared between 1.5.6 and the 2026-08-23 edge spec, no parameter or
+   body field was removed or became newly required.
 2. **Byte-passthrough output.** Services return the response bytes, commands print
    them; compact by default with `--pretty` to re-indent. `src/GrimoireCli/Models/`
    is deleted outright, because step 1 gives `--help` a generated model to draw its
@@ -114,14 +116,14 @@ waiting on. See [the blocker, resolved](#the-blocker-resolved).
 
 ### What the spec now gives us
 
-| | 1.5.6 | edge (2026-08-17) |
+| | 1.5.6 | edge (2026-08-23) |
 |---|---|---|
-| Component schemas | 86 | 302 |
-| Operations | 207 | 252 |
-| Success responses | 192 typed as `{}` | 211 of 252 typed |
+| Component schemas | 86 | 342 |
+| Operations | 207 | 282 |
+| Success responses | 192 typed as `{}` | 238 of 282 typed |
 
-The 41 untyped are 19 `204`s plus 22 binary, redirect and `.ics` endpoints, which
-cannot carry a JSON schema. Every JSON success response is typed.
+The 44 untyped are `204`s plus binary, redirect and `.ics` endpoints, which cannot
+carry a JSON schema. Every JSON success response is typed.
 
 **32 of the 33 hand-written DTOs match a schema field-for-field** —
 `GameSystemSummary` ↔ `SystemSummary`, `Book` ↔ `BookOut`, `MetadataFieldDiff` ↔
@@ -142,13 +144,15 @@ hand-written.
 - **`current` / `incoming` generate as `UntypedNode?`** and resolve on parse to
   `UntypedString` / `UntypedInteger` / `UntypedArray` / `UntypedObject`, with
   absent staying null. The polymorphism survives.
-- **The existing `KiotaSampleWalker` handles response models unmodified** —
-  flat, nested, `UntypedNode`-bearing and deep (`SystemDetail`, 2602 characters).
-  It needs one `UntypedNode` case emitting `"<any>"`; today it renders `{}`.
+- **The existing `KiotaSampleWalker` handled the sampled response models
+  unmodified** — flat, nested, `UntypedNode`-bearing and deep (`SystemDetail`,
+  2602 characters). This did **not** generalise: walking all 883 models needed
+  rules for `DateTimeOffset`, genuine multi-branch unions and recursive models.
+  See [the design](specs/2026-08-19-edge-client-and-byte-passthrough-design.md).
 
 ### The blocker, resolved
 
-**#356 is fixed.** The 2026-08-17 edge spec has **zero** array properties
+**#356 is fixed.** The 2026-08-23 edge spec has **zero** array properties
 declaring `items: {}` — down from 18 across 4 schemas. `genres`, `dice_materials`,
 `authors`, `artists` and `tags` are `list[str]`; `urls` and
 `character_builder_urls` reference a `LinkEntry` schema; and `publishers`

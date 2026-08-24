@@ -36,17 +36,17 @@ namespace GrimoireCli.Generated.Api.Systems.Item.MetadataSources
         /// <summary>
         /// Returns installed, enabled add-ons that can supply game system metadata. GM or admin role required.
         /// </summary>
-        /// <returns>A <see cref="UntypedNode"/></returns>
+        /// <returns>A <see cref="global::GrimoireCli.Generated.Models.MetadataSourcesResponse"/></returns>
         /// <param name="cancellationToken">Cancellation token to use when cancelling requests</param>
         /// <param name="requestConfiguration">Configuration for the request such as headers, query parameters, and middleware options.</param>
         /// <exception cref="global::GrimoireCli.Generated.Models.HTTPValidationError">When receiving a 422 status code</exception>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
-        public async Task<UntypedNode?> GetAsync(Action<RequestConfiguration<global::GrimoireCli.Generated.Api.Systems.Item.MetadataSources.MetadataSourcesRequestBuilder.MetadataSourcesRequestBuilderGetQueryParameters>>? requestConfiguration = default, CancellationToken cancellationToken = default)
+        public async Task<global::GrimoireCli.Generated.Models.MetadataSourcesResponse?> GetAsync(Action<RequestConfiguration<global::GrimoireCli.Generated.Api.Systems.Item.MetadataSources.MetadataSourcesRequestBuilder.MetadataSourcesRequestBuilderGetQueryParameters>>? requestConfiguration = default, CancellationToken cancellationToken = default)
         {
 #nullable restore
 #else
-        public async Task<UntypedNode> GetAsync(Action<RequestConfiguration<global::GrimoireCli.Generated.Api.Systems.Item.MetadataSources.MetadataSourcesRequestBuilder.MetadataSourcesRequestBuilderGetQueryParameters>> requestConfiguration = default, CancellationToken cancellationToken = default)
+        public async Task<global::GrimoireCli.Generated.Models.MetadataSourcesResponse> GetAsync(Action<RequestConfiguration<global::GrimoireCli.Generated.Api.Systems.Item.MetadataSources.MetadataSourcesRequestBuilder.MetadataSourcesRequestBuilderGetQueryParameters>> requestConfiguration = default, CancellationToken cancellationToken = default)
         {
 #endif
             var requestInfo = ToGetRequestInformation(requestConfiguration);
@@ -54,7 +54,7 @@ namespace GrimoireCli.Generated.Api.Systems.Item.MetadataSources
             {
                 { "422", global::GrimoireCli.Generated.Models.HTTPValidationError.CreateFromDiscriminatorValue },
             };
-            return await RequestAdapter.SendAsync<UntypedNode>(requestInfo, UntypedNode.CreateFromDiscriminatorValue, errorMapping, cancellationToken).ConfigureAwait(false);
+            return await RequestAdapter.SendAsync<global::GrimoireCli.Generated.Models.MetadataSourcesResponse>(requestInfo, global::GrimoireCli.Generated.Models.MetadataSourcesResponse.CreateFromDiscriminatorValue, errorMapping, cancellationToken).ConfigureAwait(false);
         }
         /// <summary>
         /// Returns installed, enabled add-ons that can supply game system metadata. GM or admin role required.

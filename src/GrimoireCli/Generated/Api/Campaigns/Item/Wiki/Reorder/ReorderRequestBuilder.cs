@@ -34,20 +34,20 @@ namespace GrimoireCli.Generated.Api.Campaigns.Item.Wiki.Reorder
         {
         }
         /// <summary>
-        /// Apply a new manual order from an ordered list of page ids (owner only).
+        /// Apply a new manual order, expressed relative to what this user can see.``sort_order`` is global but a user only ever sees a subset of the campaign&apos;spages, so their submitted list cannot be written as absolute positions —doing that would renumber pages they can&apos;t see and shuffle the wiki foreveryone else. Instead we treat the submission as an ordering *of the slotsthe movable pages already occupy*: collect those pages&apos; current sort_ordervalues, then redeal them in the requested order. Every other page — invisibleto this user, or visible but not writable by them — keeps the exactsort_order it had, so its position relative to the untouched pages ispreserved.A user needs write access to move a page (issue #232): a page they may readbut not edit is skipped and holds its slot.
         /// </summary>
-        /// <returns>A <see cref="UntypedNode"/></returns>
+        /// <returns>A <see cref="global::GrimoireCli.Generated.Models.Backend__routers__campaigns___response_schemas__OkResponse"/></returns>
         /// <param name="body">The request body</param>
         /// <param name="cancellationToken">Cancellation token to use when cancelling requests</param>
         /// <param name="requestConfiguration">Configuration for the request such as headers, query parameters, and middleware options.</param>
         /// <exception cref="global::GrimoireCli.Generated.Models.HTTPValidationError">When receiving a 422 status code</exception>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
-        public async Task<UntypedNode?> PutAsync(global::GrimoireCli.Generated.Models.WikiReorder body, Action<RequestConfiguration<global::GrimoireCli.Generated.Api.Campaigns.Item.Wiki.Reorder.ReorderRequestBuilder.ReorderRequestBuilderPutQueryParameters>>? requestConfiguration = default, CancellationToken cancellationToken = default)
+        public async Task<global::GrimoireCli.Generated.Models.Backend__routers__campaigns___response_schemas__OkResponse?> PutAsync(global::GrimoireCli.Generated.Models.WikiReorder body, Action<RequestConfiguration<global::GrimoireCli.Generated.Api.Campaigns.Item.Wiki.Reorder.ReorderRequestBuilder.ReorderRequestBuilderPutQueryParameters>>? requestConfiguration = default, CancellationToken cancellationToken = default)
         {
 #nullable restore
 #else
-        public async Task<UntypedNode> PutAsync(global::GrimoireCli.Generated.Models.WikiReorder body, Action<RequestConfiguration<global::GrimoireCli.Generated.Api.Campaigns.Item.Wiki.Reorder.ReorderRequestBuilder.ReorderRequestBuilderPutQueryParameters>> requestConfiguration = default, CancellationToken cancellationToken = default)
+        public async Task<global::GrimoireCli.Generated.Models.Backend__routers__campaigns___response_schemas__OkResponse> PutAsync(global::GrimoireCli.Generated.Models.WikiReorder body, Action<RequestConfiguration<global::GrimoireCli.Generated.Api.Campaigns.Item.Wiki.Reorder.ReorderRequestBuilder.ReorderRequestBuilderPutQueryParameters>> requestConfiguration = default, CancellationToken cancellationToken = default)
         {
 #endif
             if(ReferenceEquals(body, null)) throw new ArgumentNullException(nameof(body));
@@ -56,10 +56,10 @@ namespace GrimoireCli.Generated.Api.Campaigns.Item.Wiki.Reorder
             {
                 { "422", global::GrimoireCli.Generated.Models.HTTPValidationError.CreateFromDiscriminatorValue },
             };
-            return await RequestAdapter.SendAsync<UntypedNode>(requestInfo, UntypedNode.CreateFromDiscriminatorValue, errorMapping, cancellationToken).ConfigureAwait(false);
+            return await RequestAdapter.SendAsync<global::GrimoireCli.Generated.Models.Backend__routers__campaigns___response_schemas__OkResponse>(requestInfo, global::GrimoireCli.Generated.Models.Backend__routers__campaigns___response_schemas__OkResponse.CreateFromDiscriminatorValue, errorMapping, cancellationToken).ConfigureAwait(false);
         }
         /// <summary>
-        /// Apply a new manual order from an ordered list of page ids (owner only).
+        /// Apply a new manual order, expressed relative to what this user can see.``sort_order`` is global but a user only ever sees a subset of the campaign&apos;spages, so their submitted list cannot be written as absolute positions —doing that would renumber pages they can&apos;t see and shuffle the wiki foreveryone else. Instead we treat the submission as an ordering *of the slotsthe movable pages already occupy*: collect those pages&apos; current sort_ordervalues, then redeal them in the requested order. Every other page — invisibleto this user, or visible but not writable by them — keeps the exactsort_order it had, so its position relative to the untouched pages ispreserved.A user needs write access to move a page (issue #232): a page they may readbut not edit is skipped and holds its slot.
         /// </summary>
         /// <returns>A <see cref="RequestInformation"/></returns>
         /// <param name="body">The request body</param>
@@ -90,7 +90,7 @@ namespace GrimoireCli.Generated.Api.Campaigns.Item.Wiki.Reorder
             return new global::GrimoireCli.Generated.Api.Campaigns.Item.Wiki.Reorder.ReorderRequestBuilder(rawUrl, RequestAdapter);
         }
         /// <summary>
-        /// Apply a new manual order from an ordered list of page ids (owner only).
+        /// Apply a new manual order, expressed relative to what this user can see.``sort_order`` is global but a user only ever sees a subset of the campaign&apos;spages, so their submitted list cannot be written as absolute positions —doing that would renumber pages they can&apos;t see and shuffle the wiki foreveryone else. Instead we treat the submission as an ordering *of the slotsthe movable pages already occupy*: collect those pages&apos; current sort_ordervalues, then redeal them in the requested order. Every other page — invisibleto this user, or visible but not writable by them — keeps the exactsort_order it had, so its position relative to the untouched pages ispreserved.A user needs write access to move a page (issue #232): a page they may readbut not edit is skipped and holds its slot.
         /// </summary>
         [global::System.CodeDom.Compiler.GeneratedCode("Kiota", "1.0.0")]
         public partial class ReorderRequestBuilderPutQueryParameters 

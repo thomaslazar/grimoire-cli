@@ -48,17 +48,17 @@ namespace GrimoireCli.Generated.Api.Tokens.Item
         /// <summary>
         /// Returns full token metadata including folder tags.
         /// </summary>
-        /// <returns>A <see cref="UntypedNode"/></returns>
+        /// <returns>A <see cref="global::GrimoireCli.Generated.Models.TokenDetailResponse"/></returns>
         /// <param name="cancellationToken">Cancellation token to use when cancelling requests</param>
         /// <param name="requestConfiguration">Configuration for the request such as headers, query parameters, and middleware options.</param>
         /// <exception cref="global::GrimoireCli.Generated.Models.HTTPValidationError">When receiving a 422 status code</exception>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
-        public async Task<UntypedNode?> GetAsync(Action<RequestConfiguration<global::GrimoireCli.Generated.Api.Tokens.Item.WithToken_ItemRequestBuilder.WithToken_ItemRequestBuilderGetQueryParameters>>? requestConfiguration = default, CancellationToken cancellationToken = default)
+        public async Task<global::GrimoireCli.Generated.Models.TokenDetailResponse?> GetAsync(Action<RequestConfiguration<global::GrimoireCli.Generated.Api.Tokens.Item.WithToken_ItemRequestBuilder.WithToken_ItemRequestBuilderGetQueryParameters>>? requestConfiguration = default, CancellationToken cancellationToken = default)
         {
 #nullable restore
 #else
-        public async Task<UntypedNode> GetAsync(Action<RequestConfiguration<global::GrimoireCli.Generated.Api.Tokens.Item.WithToken_ItemRequestBuilder.WithToken_ItemRequestBuilderGetQueryParameters>> requestConfiguration = default, CancellationToken cancellationToken = default)
+        public async Task<global::GrimoireCli.Generated.Models.TokenDetailResponse> GetAsync(Action<RequestConfiguration<global::GrimoireCli.Generated.Api.Tokens.Item.WithToken_ItemRequestBuilder.WithToken_ItemRequestBuilderGetQueryParameters>> requestConfiguration = default, CancellationToken cancellationToken = default)
         {
 #endif
             var requestInfo = ToGetRequestInformation(requestConfiguration);
@@ -66,23 +66,23 @@ namespace GrimoireCli.Generated.Api.Tokens.Item
             {
                 { "422", global::GrimoireCli.Generated.Models.HTTPValidationError.CreateFromDiscriminatorValue },
             };
-            return await RequestAdapter.SendAsync<UntypedNode>(requestInfo, UntypedNode.CreateFromDiscriminatorValue, errorMapping, cancellationToken).ConfigureAwait(false);
+            return await RequestAdapter.SendAsync<global::GrimoireCli.Generated.Models.TokenDetailResponse>(requestInfo, global::GrimoireCli.Generated.Models.TokenDetailResponse.CreateFromDiscriminatorValue, errorMapping, cancellationToken).ConfigureAwait(false);
         }
         /// <summary>
         /// Updates editable fields on a token (description, tags). GM or admin role required.
         /// </summary>
-        /// <returns>A <see cref="UntypedNode"/></returns>
+        /// <returns>A <see cref="global::GrimoireCli.Generated.Models.Backend__routers__tokens___schemas__StatusResponse"/></returns>
         /// <param name="body">The request body</param>
         /// <param name="cancellationToken">Cancellation token to use when cancelling requests</param>
         /// <param name="requestConfiguration">Configuration for the request such as headers, query parameters, and middleware options.</param>
         /// <exception cref="global::GrimoireCli.Generated.Models.HTTPValidationError">When receiving a 422 status code</exception>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
-        public async Task<UntypedNode?> PatchAsync(global::GrimoireCli.Generated.Models.TokenUpdate body, Action<RequestConfiguration<global::GrimoireCli.Generated.Api.Tokens.Item.WithToken_ItemRequestBuilder.WithToken_ItemRequestBuilderPatchQueryParameters>>? requestConfiguration = default, CancellationToken cancellationToken = default)
+        public async Task<global::GrimoireCli.Generated.Models.Backend__routers__tokens___schemas__StatusResponse?> PatchAsync(global::GrimoireCli.Generated.Models.TokenUpdate body, Action<RequestConfiguration<global::GrimoireCli.Generated.Api.Tokens.Item.WithToken_ItemRequestBuilder.WithToken_ItemRequestBuilderPatchQueryParameters>>? requestConfiguration = default, CancellationToken cancellationToken = default)
         {
 #nullable restore
 #else
-        public async Task<UntypedNode> PatchAsync(global::GrimoireCli.Generated.Models.TokenUpdate body, Action<RequestConfiguration<global::GrimoireCli.Generated.Api.Tokens.Item.WithToken_ItemRequestBuilder.WithToken_ItemRequestBuilderPatchQueryParameters>> requestConfiguration = default, CancellationToken cancellationToken = default)
+        public async Task<global::GrimoireCli.Generated.Models.Backend__routers__tokens___schemas__StatusResponse> PatchAsync(global::GrimoireCli.Generated.Models.TokenUpdate body, Action<RequestConfiguration<global::GrimoireCli.Generated.Api.Tokens.Item.WithToken_ItemRequestBuilder.WithToken_ItemRequestBuilderPatchQueryParameters>> requestConfiguration = default, CancellationToken cancellationToken = default)
         {
 #endif
             if(ReferenceEquals(body, null)) throw new ArgumentNullException(nameof(body));
@@ -91,7 +91,7 @@ namespace GrimoireCli.Generated.Api.Tokens.Item
             {
                 { "422", global::GrimoireCli.Generated.Models.HTTPValidationError.CreateFromDiscriminatorValue },
             };
-            return await RequestAdapter.SendAsync<UntypedNode>(requestInfo, UntypedNode.CreateFromDiscriminatorValue, errorMapping, cancellationToken).ConfigureAwait(false);
+            return await RequestAdapter.SendAsync<global::GrimoireCli.Generated.Models.Backend__routers__tokens___schemas__StatusResponse>(requestInfo, global::GrimoireCli.Generated.Models.Backend__routers__tokens___schemas__StatusResponse.CreateFromDiscriminatorValue, errorMapping, cancellationToken).ConfigureAwait(false);
         }
         /// <summary>
         /// Returns full token metadata including folder tags.

@@ -36,17 +36,17 @@ namespace GrimoireCli.Generated.Api.Campaigns.Item.Wiki.Templates.Download.Item
         /// <summary>
         /// Copy a community template into this campaign (owner only).Downloading the same template twice is allowed and makes a second copy —templates are per-campaign working copies, and a GM may well want a tweakedvariant alongside the original.
         /// </summary>
-        /// <returns>A <see cref="UntypedNode"/></returns>
+        /// <returns>A <see cref="global::GrimoireCli.Generated.Models.WikiTemplateDetailOut"/></returns>
         /// <param name="cancellationToken">Cancellation token to use when cancelling requests</param>
         /// <param name="requestConfiguration">Configuration for the request such as headers, query parameters, and middleware options.</param>
         /// <exception cref="global::GrimoireCli.Generated.Models.HTTPValidationError">When receiving a 422 status code</exception>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
-        public async Task<UntypedNode?> PostAsync(Action<RequestConfiguration<global::GrimoireCli.Generated.Api.Campaigns.Item.Wiki.Templates.Download.Item.WithTemplate_ItemRequestBuilder.WithTemplate_ItemRequestBuilderPostQueryParameters>>? requestConfiguration = default, CancellationToken cancellationToken = default)
+        public async Task<global::GrimoireCli.Generated.Models.WikiTemplateDetailOut?> PostAsync(Action<RequestConfiguration<global::GrimoireCli.Generated.Api.Campaigns.Item.Wiki.Templates.Download.Item.WithTemplate_ItemRequestBuilder.WithTemplate_ItemRequestBuilderPostQueryParameters>>? requestConfiguration = default, CancellationToken cancellationToken = default)
         {
 #nullable restore
 #else
-        public async Task<UntypedNode> PostAsync(Action<RequestConfiguration<global::GrimoireCli.Generated.Api.Campaigns.Item.Wiki.Templates.Download.Item.WithTemplate_ItemRequestBuilder.WithTemplate_ItemRequestBuilderPostQueryParameters>> requestConfiguration = default, CancellationToken cancellationToken = default)
+        public async Task<global::GrimoireCli.Generated.Models.WikiTemplateDetailOut> PostAsync(Action<RequestConfiguration<global::GrimoireCli.Generated.Api.Campaigns.Item.Wiki.Templates.Download.Item.WithTemplate_ItemRequestBuilder.WithTemplate_ItemRequestBuilderPostQueryParameters>> requestConfiguration = default, CancellationToken cancellationToken = default)
         {
 #endif
             var requestInfo = ToPostRequestInformation(requestConfiguration);
@@ -54,7 +54,7 @@ namespace GrimoireCli.Generated.Api.Campaigns.Item.Wiki.Templates.Download.Item
             {
                 { "422", global::GrimoireCli.Generated.Models.HTTPValidationError.CreateFromDiscriminatorValue },
             };
-            return await RequestAdapter.SendAsync<UntypedNode>(requestInfo, UntypedNode.CreateFromDiscriminatorValue, errorMapping, cancellationToken).ConfigureAwait(false);
+            return await RequestAdapter.SendAsync<global::GrimoireCli.Generated.Models.WikiTemplateDetailOut>(requestInfo, global::GrimoireCli.Generated.Models.WikiTemplateDetailOut.CreateFromDiscriminatorValue, errorMapping, cancellationToken).ConfigureAwait(false);
         }
         /// <summary>
         /// Copy a community template into this campaign (owner only).Downloading the same template twice is allowed and makes a second copy —templates are per-campaign working copies, and a GM may well want a tweakedvariant alongside the original.

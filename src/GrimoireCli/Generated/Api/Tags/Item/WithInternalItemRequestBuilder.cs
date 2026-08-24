@@ -70,18 +70,18 @@ namespace GrimoireCli.Generated.Api.Tags.Item
         /// <summary>
         /// Rename a tag. Its ``internal`` match key follows the new display when thenormalized form changes (so a typo fix like ``freinds`` → ``friends`` alsofixes search-by-internal); if that key already exists, the tags are merged.
         /// </summary>
-        /// <returns>A <see cref="UntypedNode"/></returns>
+        /// <returns>A <see cref="global::GrimoireCli.Generated.Models.TagRenamedResponse"/></returns>
         /// <param name="body">Rename a tag&apos;s human-facing display value (internal key is immutable).</param>
         /// <param name="cancellationToken">Cancellation token to use when cancelling requests</param>
         /// <param name="requestConfiguration">Configuration for the request such as headers, query parameters, and middleware options.</param>
         /// <exception cref="global::GrimoireCli.Generated.Models.HTTPValidationError">When receiving a 422 status code</exception>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
-        public async Task<UntypedNode?> PatchAsync(global::GrimoireCli.Generated.Models.TagDisplayUpdate body, Action<RequestConfiguration<global::GrimoireCli.Generated.Api.Tags.Item.WithInternalItemRequestBuilder.WithInternalItemRequestBuilderPatchQueryParameters>>? requestConfiguration = default, CancellationToken cancellationToken = default)
+        public async Task<global::GrimoireCli.Generated.Models.TagRenamedResponse?> PatchAsync(global::GrimoireCli.Generated.Models.TagDisplayUpdate body, Action<RequestConfiguration<global::GrimoireCli.Generated.Api.Tags.Item.WithInternalItemRequestBuilder.WithInternalItemRequestBuilderPatchQueryParameters>>? requestConfiguration = default, CancellationToken cancellationToken = default)
         {
 #nullable restore
 #else
-        public async Task<UntypedNode> PatchAsync(global::GrimoireCli.Generated.Models.TagDisplayUpdate body, Action<RequestConfiguration<global::GrimoireCli.Generated.Api.Tags.Item.WithInternalItemRequestBuilder.WithInternalItemRequestBuilderPatchQueryParameters>> requestConfiguration = default, CancellationToken cancellationToken = default)
+        public async Task<global::GrimoireCli.Generated.Models.TagRenamedResponse> PatchAsync(global::GrimoireCli.Generated.Models.TagDisplayUpdate body, Action<RequestConfiguration<global::GrimoireCli.Generated.Api.Tags.Item.WithInternalItemRequestBuilder.WithInternalItemRequestBuilderPatchQueryParameters>> requestConfiguration = default, CancellationToken cancellationToken = default)
         {
 #endif
             if(ReferenceEquals(body, null)) throw new ArgumentNullException(nameof(body));
@@ -90,7 +90,7 @@ namespace GrimoireCli.Generated.Api.Tags.Item
             {
                 { "422", global::GrimoireCli.Generated.Models.HTTPValidationError.CreateFromDiscriminatorValue },
             };
-            return await RequestAdapter.SendAsync<UntypedNode>(requestInfo, UntypedNode.CreateFromDiscriminatorValue, errorMapping, cancellationToken).ConfigureAwait(false);
+            return await RequestAdapter.SendAsync<global::GrimoireCli.Generated.Models.TagRenamedResponse>(requestInfo, global::GrimoireCli.Generated.Models.TagRenamedResponse.CreateFromDiscriminatorValue, errorMapping, cancellationToken).ConfigureAwait(false);
         }
         /// <summary>
         /// Delete a tag: unlink it from every resource and strip it from any foldertags. Folder-derived tags (no shared-tag row) are still handled — their folderassociations are removed (a rescan may reapply them from ``tags.json``).

@@ -36,17 +36,17 @@ namespace GrimoireCli.Generated.Api.Campaigns.Item.Wiki.Templates.Item.Use
         /// <summary>
         /// Create a wiki page from one of this campaign&apos;s templates (owner only).
         /// </summary>
-        /// <returns>A <see cref="UntypedNode"/></returns>
+        /// <returns>A <see cref="global::GrimoireCli.Generated.Models.WikiTemplateUseOut"/></returns>
         /// <param name="cancellationToken">Cancellation token to use when cancelling requests</param>
         /// <param name="requestConfiguration">Configuration for the request such as headers, query parameters, and middleware options.</param>
         /// <exception cref="global::GrimoireCli.Generated.Models.HTTPValidationError">When receiving a 422 status code</exception>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
-        public async Task<UntypedNode?> PostAsync(Action<RequestConfiguration<global::GrimoireCli.Generated.Api.Campaigns.Item.Wiki.Templates.Item.Use.UseRequestBuilder.UseRequestBuilderPostQueryParameters>>? requestConfiguration = default, CancellationToken cancellationToken = default)
+        public async Task<global::GrimoireCli.Generated.Models.WikiTemplateUseOut?> PostAsync(Action<RequestConfiguration<global::GrimoireCli.Generated.Api.Campaigns.Item.Wiki.Templates.Item.Use.UseRequestBuilder.UseRequestBuilderPostQueryParameters>>? requestConfiguration = default, CancellationToken cancellationToken = default)
         {
 #nullable restore
 #else
-        public async Task<UntypedNode> PostAsync(Action<RequestConfiguration<global::GrimoireCli.Generated.Api.Campaigns.Item.Wiki.Templates.Item.Use.UseRequestBuilder.UseRequestBuilderPostQueryParameters>> requestConfiguration = default, CancellationToken cancellationToken = default)
+        public async Task<global::GrimoireCli.Generated.Models.WikiTemplateUseOut> PostAsync(Action<RequestConfiguration<global::GrimoireCli.Generated.Api.Campaigns.Item.Wiki.Templates.Item.Use.UseRequestBuilder.UseRequestBuilderPostQueryParameters>> requestConfiguration = default, CancellationToken cancellationToken = default)
         {
 #endif
             var requestInfo = ToPostRequestInformation(requestConfiguration);
@@ -54,7 +54,7 @@ namespace GrimoireCli.Generated.Api.Campaigns.Item.Wiki.Templates.Item.Use
             {
                 { "422", global::GrimoireCli.Generated.Models.HTTPValidationError.CreateFromDiscriminatorValue },
             };
-            return await RequestAdapter.SendAsync<UntypedNode>(requestInfo, UntypedNode.CreateFromDiscriminatorValue, errorMapping, cancellationToken).ConfigureAwait(false);
+            return await RequestAdapter.SendAsync<global::GrimoireCli.Generated.Models.WikiTemplateUseOut>(requestInfo, global::GrimoireCli.Generated.Models.WikiTemplateUseOut.CreateFromDiscriminatorValue, errorMapping, cancellationToken).ConfigureAwait(false);
         }
         /// <summary>
         /// Create a wiki page from one of this campaign&apos;s templates (owner only).

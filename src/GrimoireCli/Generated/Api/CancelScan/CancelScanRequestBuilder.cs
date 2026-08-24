@@ -36,17 +36,17 @@ namespace GrimoireCli.Generated.Api.CancelScan
         /// <summary>
         /// Requests a graceful stop of the currently running library scan or indexing job. Admin role required.
         /// </summary>
-        /// <returns>A <see cref="UntypedNode"/></returns>
+        /// <returns>A <see cref="global::GrimoireCli.Generated.Models.Backend__routers__library___schemas__StatusResponse"/></returns>
         /// <param name="cancellationToken">Cancellation token to use when cancelling requests</param>
         /// <param name="requestConfiguration">Configuration for the request such as headers, query parameters, and middleware options.</param>
         /// <exception cref="global::GrimoireCli.Generated.Models.HTTPValidationError">When receiving a 422 status code</exception>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
-        public async Task<UntypedNode?> PostAsync(Action<RequestConfiguration<global::GrimoireCli.Generated.Api.CancelScan.CancelScanRequestBuilder.CancelScanRequestBuilderPostQueryParameters>>? requestConfiguration = default, CancellationToken cancellationToken = default)
+        public async Task<global::GrimoireCli.Generated.Models.Backend__routers__library___schemas__StatusResponse?> PostAsync(Action<RequestConfiguration<global::GrimoireCli.Generated.Api.CancelScan.CancelScanRequestBuilder.CancelScanRequestBuilderPostQueryParameters>>? requestConfiguration = default, CancellationToken cancellationToken = default)
         {
 #nullable restore
 #else
-        public async Task<UntypedNode> PostAsync(Action<RequestConfiguration<global::GrimoireCli.Generated.Api.CancelScan.CancelScanRequestBuilder.CancelScanRequestBuilderPostQueryParameters>> requestConfiguration = default, CancellationToken cancellationToken = default)
+        public async Task<global::GrimoireCli.Generated.Models.Backend__routers__library___schemas__StatusResponse> PostAsync(Action<RequestConfiguration<global::GrimoireCli.Generated.Api.CancelScan.CancelScanRequestBuilder.CancelScanRequestBuilderPostQueryParameters>> requestConfiguration = default, CancellationToken cancellationToken = default)
         {
 #endif
             var requestInfo = ToPostRequestInformation(requestConfiguration);
@@ -54,7 +54,7 @@ namespace GrimoireCli.Generated.Api.CancelScan
             {
                 { "422", global::GrimoireCli.Generated.Models.HTTPValidationError.CreateFromDiscriminatorValue },
             };
-            return await RequestAdapter.SendAsync<UntypedNode>(requestInfo, UntypedNode.CreateFromDiscriminatorValue, errorMapping, cancellationToken).ConfigureAwait(false);
+            return await RequestAdapter.SendAsync<global::GrimoireCli.Generated.Models.Backend__routers__library___schemas__StatusResponse>(requestInfo, global::GrimoireCli.Generated.Models.Backend__routers__library___schemas__StatusResponse.CreateFromDiscriminatorValue, errorMapping, cancellationToken).ConfigureAwait(false);
         }
         /// <summary>
         /// Requests a graceful stop of the currently running library scan or indexing job. Admin role required.

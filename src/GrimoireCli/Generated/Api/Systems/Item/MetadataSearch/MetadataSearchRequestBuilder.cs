@@ -36,18 +36,18 @@ namespace GrimoireCli.Generated.Api.Systems.Item.MetadataSearch
         /// <summary>
         /// Returns ranked candidate matches for this system from one add-on. An empty query defaults to the system&apos;s name. GM or admin role required.
         /// </summary>
-        /// <returns>A <see cref="UntypedNode"/></returns>
+        /// <returns>A <see cref="global::GrimoireCli.Generated.Models.MetadataSearchResponse"/></returns>
         /// <param name="body">Search an installed add-on for candidates matching this system.</param>
         /// <param name="cancellationToken">Cancellation token to use when cancelling requests</param>
         /// <param name="requestConfiguration">Configuration for the request such as headers, query parameters, and middleware options.</param>
         /// <exception cref="global::GrimoireCli.Generated.Models.HTTPValidationError">When receiving a 422 status code</exception>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
-        public async Task<UntypedNode?> PostAsync(global::GrimoireCli.Generated.Models.Backend__routers__systems___schemas__MetadataSearch body, Action<RequestConfiguration<global::GrimoireCli.Generated.Api.Systems.Item.MetadataSearch.MetadataSearchRequestBuilder.MetadataSearchRequestBuilderPostQueryParameters>>? requestConfiguration = default, CancellationToken cancellationToken = default)
+        public async Task<global::GrimoireCli.Generated.Models.MetadataSearchResponse?> PostAsync(global::GrimoireCli.Generated.Models.Backend__routers__systems___schemas__MetadataSearch body, Action<RequestConfiguration<global::GrimoireCli.Generated.Api.Systems.Item.MetadataSearch.MetadataSearchRequestBuilder.MetadataSearchRequestBuilderPostQueryParameters>>? requestConfiguration = default, CancellationToken cancellationToken = default)
         {
 #nullable restore
 #else
-        public async Task<UntypedNode> PostAsync(global::GrimoireCli.Generated.Models.Backend__routers__systems___schemas__MetadataSearch body, Action<RequestConfiguration<global::GrimoireCli.Generated.Api.Systems.Item.MetadataSearch.MetadataSearchRequestBuilder.MetadataSearchRequestBuilderPostQueryParameters>> requestConfiguration = default, CancellationToken cancellationToken = default)
+        public async Task<global::GrimoireCli.Generated.Models.MetadataSearchResponse> PostAsync(global::GrimoireCli.Generated.Models.Backend__routers__systems___schemas__MetadataSearch body, Action<RequestConfiguration<global::GrimoireCli.Generated.Api.Systems.Item.MetadataSearch.MetadataSearchRequestBuilder.MetadataSearchRequestBuilderPostQueryParameters>> requestConfiguration = default, CancellationToken cancellationToken = default)
         {
 #endif
             if(ReferenceEquals(body, null)) throw new ArgumentNullException(nameof(body));
@@ -56,7 +56,7 @@ namespace GrimoireCli.Generated.Api.Systems.Item.MetadataSearch
             {
                 { "422", global::GrimoireCli.Generated.Models.HTTPValidationError.CreateFromDiscriminatorValue },
             };
-            return await RequestAdapter.SendAsync<UntypedNode>(requestInfo, UntypedNode.CreateFromDiscriminatorValue, errorMapping, cancellationToken).ConfigureAwait(false);
+            return await RequestAdapter.SendAsync<global::GrimoireCli.Generated.Models.MetadataSearchResponse>(requestInfo, global::GrimoireCli.Generated.Models.MetadataSearchResponse.CreateFromDiscriminatorValue, errorMapping, cancellationToken).ConfigureAwait(false);
         }
         /// <summary>
         /// Returns ranked candidate matches for this system from one add-on. An empty query defaults to the system&apos;s name. GM or admin role required.

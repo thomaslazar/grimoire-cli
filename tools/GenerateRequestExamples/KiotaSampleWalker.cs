@@ -15,9 +15,10 @@ namespace GrimoireCli.Tools.GenerateRequestExamples;
 /// </summary>
 public static class KiotaSampleWalker
 {
-    // A model nested this deep is a recursive reference the placeholder scheme
-    // has no answer for; nothing in the tree reaches it today.
-    private const int MaxDepth = 5;
+    // A backstop for models that nest deeply without recursing. Recursion itself
+    // is detected by the ancestor path and rendered as a placeholder, so hitting
+    // this means a genuinely deep model, not a cycle.
+    private const int MaxDepth = 8;
 
     // UnsafeRelaxedJsonEscaping keeps '<' and '>' unescaped so "<string>"
     // renders literally in help output.
@@ -32,18 +33,26 @@ public static class KiotaSampleWalker
         using var stream = new MemoryStream();
         using (var writer = new Utf8JsonWriter(stream, WriterOptions))
         {
-            WriteModel(writer, type, depth: 0);
+            WriteModel(writer, type, depth: 0, path: new HashSet<Type>());
         }
         // Utf8JsonWriter indents with Environment.NewLine, so normalise to LF or
         // raw \r bytes leak into the generated string literals on Windows.
         return Encoding.UTF8.GetString(stream.ToArray()).Replace("\r\n", "\n");
     }
 
-    private static void WriteModel(Utf8JsonWriter writer, Type type, int depth)
+    private static void WriteModel(Utf8JsonWriter writer, Type type, int depth, HashSet<Type> path)
     {
+        // A model that contains itself — a tree node, say — cannot be expanded to
+        // a finite sample, so the repeat renders as a placeholder naming the type.
+        if (!path.Add(type))
+        {
+            writer.WriteStringValue($"<{type.Name}>");
+            return;
+        }
         if (depth > MaxDepth)
             throw new InvalidOperationException(
-                $"Model nesting passed {MaxDepth} levels at '{type.Name}'. A recursive model needs an explicit placeholder.");
+                $"Model nesting passed {MaxDepth} levels at '{type.Name}' without recursing. " +
+                "Raise MaxDepth if the model is genuinely that deep.");
         var instance = (IParsable)Activator.CreateInstance(type)!;
         var properties = type.GetProperties(BindingFlags.Public | BindingFlags.Instance);
         writer.WriteStartObject();
@@ -54,9 +63,10 @@ public static class KiotaSampleWalker
                     $"'{type.Name}' deserializes the wire field '{wireName}' but exposes no matching property, " +
                     "so the help text and JsonBodyInput.Validate would disagree about it.");
             writer.WritePropertyName(wireName);
-            WriteValue(writer, property.PropertyType, depth);
+            WriteValue(writer, property.PropertyType, depth, path);
         }
         writer.WriteEndObject();
+        path.Remove(type);
     }
 
     /// <summary>Maps a snake_case wire name onto Kiota's PascalCase property.</summary>
@@ -66,16 +76,20 @@ public static class KiotaSampleWalker
         return properties.FirstOrDefault(p => string.Equals(p.Name, target, StringComparison.OrdinalIgnoreCase));
     }
 
-    private static void WriteValue(Utf8JsonWriter writer, Type type, int depth)
+    private static void WriteValue(Utf8JsonWriter writer, Type type, int depth, HashSet<Type> path)
     {
         var underlying = Nullable.GetUnderlyingType(type);
         if (underlying != null)
         {
-            WriteValue(writer, underlying, depth);
+            WriteValue(writer, underlying, depth, path);
             return;
         }
         if (type == typeof(string)) { writer.WriteStringValue("<string>"); return; }
         if (type == typeof(bool)) { writer.WriteBooleanValue(false); return; }
+        // Kiota maps `format: date-time` to DateTimeOffset. The placeholder names
+        // the wire format rather than a date, because a real timestamp would read
+        // as a value to copy.
+        if (type == typeof(DateTimeOffset)) { writer.WriteStringValue("<iso8601>"); return; }
         if (type == typeof(int) || type == typeof(long) || type == typeof(short) ||
             type == typeof(double) || type == typeof(float) || type == typeof(decimal))
         {
@@ -105,18 +119,28 @@ public static class KiotaSampleWalker
         if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(List<>))
         {
             writer.WriteStartArray();
-            WriteValue(writer, type.GetGenericArguments()[0], depth);
+            WriteValue(writer, type.GetGenericArguments()[0], depth, path);
             writer.WriteEndArray();
             return;
         }
         if (typeof(IComposedTypeWrapper).IsAssignableFrom(type))
         {
-            WriteValue(writer, ValueBranch(type), depth);
+            var branches = ValueBranches(type);
+            // A genuine union — a heterogeneous item list, not FastAPI's
+            // anyOf: [T, null]. No branch is canonical, so naming them all beats
+            // promoting one arbitrarily, and the enum rule's "<a|b|c>" is already
+            // the convention for "one of these goes here".
+            if (branches.Count > 1)
+            {
+                writer.WriteStringValue($"<{string.Join('|', branches.Select(b => b.Name))}>");
+                return;
+            }
+            WriteValue(writer, branches[0], depth, path);
             return;
         }
         if (typeof(IParsable).IsAssignableFrom(type))
         {
-            WriteModel(writer, type, depth + 1);
+            WriteModel(writer, type, depth + 1, path);
             return;
         }
         throw new NotSupportedException(
@@ -124,11 +148,12 @@ public static class KiotaSampleWalker
     }
 
     /// <summary>
-    /// Picks the value branch out of a composed type. FastAPI declares optional
+    /// Picks the value branches out of a composed type. FastAPI declares optional
     /// fields as <c>anyOf: [T, null]</c>, which Kiota emits as a wrapper holding
-    /// T beside an empty <c>…Member1</c> model standing for the null branch.
+    /// T beside an empty <c>…Member1</c> model standing for the null branch — so
+    /// one branch is the common case. More than one is a real union.
     /// </summary>
-    private static Type ValueBranch(Type wrapper)
+    private static List<Type> ValueBranches(Type wrapper)
     {
         var properties = wrapper.GetProperties(BindingFlags.Public | BindingFlags.Instance)
             .Where(p => p.Name != "AdditionalData")
@@ -143,10 +168,11 @@ public static class KiotaSampleWalker
         }
         var branches = properties
             .Where(p => !p.Name.EndsWith("Member1", StringComparison.Ordinal))
+            .Select(p => p.PropertyType)
             .ToList();
-        if (branches.Count != 1)
+        if (branches.Count == 0)
             throw new NotSupportedException(
-                $"Composed type '{wrapper.Name}' has {branches.Count} value branches; the unwrap rule assumes exactly one.");
-        return branches[0].PropertyType;
+                $"Composed type '{wrapper.Name}' has no value branch; the unwrap rule assumes at least one.");
+        return branches;
     }
 }

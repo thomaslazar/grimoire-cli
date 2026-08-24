@@ -36,18 +36,18 @@ namespace GrimoireCli.Generated.Api.Campaigns.Item.Wiki.Templates.Upload
         /// <summary>
         /// Add a template from an uploaded ``.md`` or ``.zip`` (owner only).Two shapes are accepted:  * A bare markdown file — the frontmatter names the template, falling back    to the filename.  * A `.zip` in the community repo&apos;s folder layout (`&lt;id&gt;/&lt;id&gt;.yml` plus    `&lt;id&gt;/&lt;id&gt;.md`), which is exactly what *export* produces. The manifest    supplies name/category/description, so a template survives an    export/import round trip with its metadata intact.Deliberately available even when downloading is disabled: that is how a GMon a locked-down server uses a community template — copy the files acrossand upload them.
         /// </summary>
-        /// <returns>A <see cref="UntypedNode"/></returns>
+        /// <returns>A <see cref="global::GrimoireCli.Generated.Models.WikiTemplateDetailOut"/></returns>
         /// <param name="body">The request body</param>
         /// <param name="cancellationToken">Cancellation token to use when cancelling requests</param>
         /// <param name="requestConfiguration">Configuration for the request such as headers, query parameters, and middleware options.</param>
         /// <exception cref="global::GrimoireCli.Generated.Models.HTTPValidationError">When receiving a 422 status code</exception>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
-        public async Task<UntypedNode?> PostAsync(MultipartBody body, Action<RequestConfiguration<global::GrimoireCli.Generated.Api.Campaigns.Item.Wiki.Templates.Upload.UploadRequestBuilder.UploadRequestBuilderPostQueryParameters>>? requestConfiguration = default, CancellationToken cancellationToken = default)
+        public async Task<global::GrimoireCli.Generated.Models.WikiTemplateDetailOut?> PostAsync(MultipartBody body, Action<RequestConfiguration<global::GrimoireCli.Generated.Api.Campaigns.Item.Wiki.Templates.Upload.UploadRequestBuilder.UploadRequestBuilderPostQueryParameters>>? requestConfiguration = default, CancellationToken cancellationToken = default)
         {
 #nullable restore
 #else
-        public async Task<UntypedNode> PostAsync(MultipartBody body, Action<RequestConfiguration<global::GrimoireCli.Generated.Api.Campaigns.Item.Wiki.Templates.Upload.UploadRequestBuilder.UploadRequestBuilderPostQueryParameters>> requestConfiguration = default, CancellationToken cancellationToken = default)
+        public async Task<global::GrimoireCli.Generated.Models.WikiTemplateDetailOut> PostAsync(MultipartBody body, Action<RequestConfiguration<global::GrimoireCli.Generated.Api.Campaigns.Item.Wiki.Templates.Upload.UploadRequestBuilder.UploadRequestBuilderPostQueryParameters>> requestConfiguration = default, CancellationToken cancellationToken = default)
         {
 #endif
             if(ReferenceEquals(body, null)) throw new ArgumentNullException(nameof(body));
@@ -56,7 +56,7 @@ namespace GrimoireCli.Generated.Api.Campaigns.Item.Wiki.Templates.Upload
             {
                 { "422", global::GrimoireCli.Generated.Models.HTTPValidationError.CreateFromDiscriminatorValue },
             };
-            return await RequestAdapter.SendAsync<UntypedNode>(requestInfo, UntypedNode.CreateFromDiscriminatorValue, errorMapping, cancellationToken).ConfigureAwait(false);
+            return await RequestAdapter.SendAsync<global::GrimoireCli.Generated.Models.WikiTemplateDetailOut>(requestInfo, global::GrimoireCli.Generated.Models.WikiTemplateDetailOut.CreateFromDiscriminatorValue, errorMapping, cancellationToken).ConfigureAwait(false);
         }
         /// <summary>
         /// Add a template from an uploaded ``.md`` or ``.zip`` (owner only).Two shapes are accepted:  * A bare markdown file — the frontmatter names the template, falling back    to the filename.  * A `.zip` in the community repo&apos;s folder layout (`&lt;id&gt;/&lt;id&gt;.yml` plus    `&lt;id&gt;/&lt;id&gt;.md`), which is exactly what *export* produces. The manifest    supplies name/category/description, so a template survives an    export/import round trip with its metadata intact.Deliberately available even when downloading is disabled: that is how a GMon a locked-down server uses a community template — copy the files acrossand upload them.

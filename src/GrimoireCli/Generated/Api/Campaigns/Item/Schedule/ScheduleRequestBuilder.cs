@@ -58,17 +58,17 @@ namespace GrimoireCli.Generated.Api.Campaigns.Item.Schedule
         /// <summary>
         /// Get campaign schedule and next sessions
         /// </summary>
-        /// <returns>A <see cref="UntypedNode"/></returns>
+        /// <returns>A <see cref="global::GrimoireCli.Generated.Models.ScheduleOut"/></returns>
         /// <param name="cancellationToken">Cancellation token to use when cancelling requests</param>
         /// <param name="requestConfiguration">Configuration for the request such as headers, query parameters, and middleware options.</param>
         /// <exception cref="global::GrimoireCli.Generated.Models.HTTPValidationError">When receiving a 422 status code</exception>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
-        public async Task<UntypedNode?> GetAsync(Action<RequestConfiguration<global::GrimoireCli.Generated.Api.Campaigns.Item.Schedule.ScheduleRequestBuilder.ScheduleRequestBuilderGetQueryParameters>>? requestConfiguration = default, CancellationToken cancellationToken = default)
+        public async Task<global::GrimoireCli.Generated.Models.ScheduleOut?> GetAsync(Action<RequestConfiguration<global::GrimoireCli.Generated.Api.Campaigns.Item.Schedule.ScheduleRequestBuilder.ScheduleRequestBuilderGetQueryParameters>>? requestConfiguration = default, CancellationToken cancellationToken = default)
         {
 #nullable restore
 #else
-        public async Task<UntypedNode> GetAsync(Action<RequestConfiguration<global::GrimoireCli.Generated.Api.Campaigns.Item.Schedule.ScheduleRequestBuilder.ScheduleRequestBuilderGetQueryParameters>> requestConfiguration = default, CancellationToken cancellationToken = default)
+        public async Task<global::GrimoireCli.Generated.Models.ScheduleOut> GetAsync(Action<RequestConfiguration<global::GrimoireCli.Generated.Api.Campaigns.Item.Schedule.ScheduleRequestBuilder.ScheduleRequestBuilderGetQueryParameters>> requestConfiguration = default, CancellationToken cancellationToken = default)
         {
 #endif
             var requestInfo = ToGetRequestInformation(requestConfiguration);
@@ -76,23 +76,23 @@ namespace GrimoireCli.Generated.Api.Campaigns.Item.Schedule
             {
                 { "422", global::GrimoireCli.Generated.Models.HTTPValidationError.CreateFromDiscriminatorValue },
             };
-            return await RequestAdapter.SendAsync<UntypedNode>(requestInfo, UntypedNode.CreateFromDiscriminatorValue, errorMapping, cancellationToken).ConfigureAwait(false);
+            return await RequestAdapter.SendAsync<global::GrimoireCli.Generated.Models.ScheduleOut>(requestInfo, global::GrimoireCli.Generated.Models.ScheduleOut.CreateFromDiscriminatorValue, errorMapping, cancellationToken).ConfigureAwait(false);
         }
         /// <summary>
         /// Create or update campaign schedule
         /// </summary>
-        /// <returns>A <see cref="UntypedNode"/></returns>
+        /// <returns>A <see cref="global::GrimoireCli.Generated.Models.ScheduleOut"/></returns>
         /// <param name="body">The request body</param>
         /// <param name="cancellationToken">Cancellation token to use when cancelling requests</param>
         /// <param name="requestConfiguration">Configuration for the request such as headers, query parameters, and middleware options.</param>
         /// <exception cref="global::GrimoireCli.Generated.Models.HTTPValidationError">When receiving a 422 status code</exception>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
-        public async Task<UntypedNode?> PutAsync(global::GrimoireCli.Generated.Models.ScheduleUpsert body, Action<RequestConfiguration<global::GrimoireCli.Generated.Api.Campaigns.Item.Schedule.ScheduleRequestBuilder.ScheduleRequestBuilderPutQueryParameters>>? requestConfiguration = default, CancellationToken cancellationToken = default)
+        public async Task<global::GrimoireCli.Generated.Models.ScheduleOut?> PutAsync(global::GrimoireCli.Generated.Models.ScheduleUpsert body, Action<RequestConfiguration<global::GrimoireCli.Generated.Api.Campaigns.Item.Schedule.ScheduleRequestBuilder.ScheduleRequestBuilderPutQueryParameters>>? requestConfiguration = default, CancellationToken cancellationToken = default)
         {
 #nullable restore
 #else
-        public async Task<UntypedNode> PutAsync(global::GrimoireCli.Generated.Models.ScheduleUpsert body, Action<RequestConfiguration<global::GrimoireCli.Generated.Api.Campaigns.Item.Schedule.ScheduleRequestBuilder.ScheduleRequestBuilderPutQueryParameters>> requestConfiguration = default, CancellationToken cancellationToken = default)
+        public async Task<global::GrimoireCli.Generated.Models.ScheduleOut> PutAsync(global::GrimoireCli.Generated.Models.ScheduleUpsert body, Action<RequestConfiguration<global::GrimoireCli.Generated.Api.Campaigns.Item.Schedule.ScheduleRequestBuilder.ScheduleRequestBuilderPutQueryParameters>> requestConfiguration = default, CancellationToken cancellationToken = default)
         {
 #endif
             if(ReferenceEquals(body, null)) throw new ArgumentNullException(nameof(body));
@@ -101,7 +101,7 @@ namespace GrimoireCli.Generated.Api.Campaigns.Item.Schedule
             {
                 { "422", global::GrimoireCli.Generated.Models.HTTPValidationError.CreateFromDiscriminatorValue },
             };
-            return await RequestAdapter.SendAsync<UntypedNode>(requestInfo, UntypedNode.CreateFromDiscriminatorValue, errorMapping, cancellationToken).ConfigureAwait(false);
+            return await RequestAdapter.SendAsync<global::GrimoireCli.Generated.Models.ScheduleOut>(requestInfo, global::GrimoireCli.Generated.Models.ScheduleOut.CreateFromDiscriminatorValue, errorMapping, cancellationToken).ConfigureAwait(false);
         }
         /// <summary>
         /// Remove campaign schedule

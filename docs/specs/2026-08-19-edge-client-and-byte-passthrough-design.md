@@ -87,7 +87,7 @@ details:
   at `host.docker.internal:9482`, never a container IP, or the committed lock
   carries an ephemeral address.
 - **`tools/normalize-spec.py` is still required.** Re-measured against the
-  2026-08-17 edge spec: it still collapses 40 `anyOf`-nullable arrays, so
+  2026-08-23 edge spec: it still collapses 40 `anyOf`-nullable arrays, so
   [kiota#2338](https://github.com/microsoft/kiota/issues/2338) has not been fixed
   out from under us.
 
@@ -103,13 +103,33 @@ This is harmless and is not suppressed with an exclusion list. `RequestExamples.
 is only ever queried for types passed to `AddRequestShape<T>()`, so the extra
 entries are unread — and PR 2 renames the tool to `GenerateJsonExamples` with
 exactly this whole-namespace rule, so the grown file is that end state minus the
-rename.
+rename. Measured: 84 samples before, 345 after.
+
+**`KiotaSampleWalker` did not handle the response models unmodified**, contrary to
+what the trial recorded. Walking all 883 models rather than a sample needed three
+rules it did not have, each of which it had been throwing on rather than guessing:
+
+- **`DateTimeOffset`** (`BackupItem.created_at`) — rendered `"<iso8601>"`, naming
+  the wire format rather than a date that would read as a value to copy.
+- **Genuine multi-branch unions** — `FavoritesResponse_items`,
+  `TagItemsResponse_items` and `TaggedFolder_items` are `anyOf` over 5–6 real
+  models, not FastAPI's `anyOf: [T, null]` that `ValueBranch` was written for. No
+  branch is canonical, so all are named in the enum rule's existing `<a|b|c>`
+  style rather than one being promoted arbitrarily.
+- **Recursive models** — `TocEntry` contains itself. The depth guard threw on any
+  nesting past 5 levels without distinguishing a cycle from a merely deep model,
+  so recursion is now detected by the ancestor path and rendered `"<TocEntry>"`,
+  leaving the depth limit as a backstop.
+
+None of the three is reachable from a command's help text today; all three block
+the generator, which walks every model regardless.
 
 ### Compatibility with the pinned stack
 
 The CLI must keep working against 1.5.6 for the smoke test, so a client built from
-the edge spec must not change any request it sends. Measured across all **207
-operations shared** between the 1.5.6-era spec and the 2026-08-17 edge spec:
+the edge spec must not change any request it sends. Measured across all **206
+operations shared** between the 1.5.6-era spec and the edge spec built 2026-08-23
+(`1.5.6-tk8i6j`, digest `f274522b`), which is what was generated from:
 
 | Check | Result |
 |---|---|
@@ -118,8 +138,15 @@ operations shared** between the 1.5.6-era spec and the 2026-08-17 edge spec:
 | Request body fields removed | 0 |
 | Request body fields newly required | 0 |
 
-Nothing was removed at the schema level either: every 1.5.6 operation and
-component schema is still present in edge.
+One operation did disappear — `GET /api/export/tags` — which is why 206 are shared
+rather than 207. The CLI never called it; it existed only as an unused generated
+builder, so its removal costs nothing.
+
+Two request models gained a field: `BookUpdate` and `GameSystemUpdate` both take
+`access_level`, matching the new access-grant endpoints in the same build. The
+generated model is what validates a request body, so `books update` and
+`systems update` accept and document one more field. That is the regeneration
+working, not a behaviour change smuggled in.
 
 ### Verification
 

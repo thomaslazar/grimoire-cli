@@ -36,17 +36,17 @@ namespace GrimoireCli.Generated.Api.Campaigns.Resources.Suggested.Item
         /// <summary>
         /// Books belonging to a game system, for the create wizard&apos;s resource step.Core-category books are flagged `suggested` so the wizard can pre-select them;nothing else is suggested. Ordered with suggested (core) books first.
         /// </summary>
-        /// <returns>A <see cref="UntypedNode"/></returns>
+        /// <returns>A List&lt;global::GrimoireCli.Generated.Models.SuggestedResourceOut&gt;</returns>
         /// <param name="cancellationToken">Cancellation token to use when cancelling requests</param>
         /// <param name="requestConfiguration">Configuration for the request such as headers, query parameters, and middleware options.</param>
         /// <exception cref="global::GrimoireCli.Generated.Models.HTTPValidationError">When receiving a 422 status code</exception>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
-        public async Task<UntypedNode?> GetAsync(Action<RequestConfiguration<global::GrimoireCli.Generated.Api.Campaigns.Resources.Suggested.Item.WithSystem_ItemRequestBuilder.WithSystem_ItemRequestBuilderGetQueryParameters>>? requestConfiguration = default, CancellationToken cancellationToken = default)
+        public async Task<List<global::GrimoireCli.Generated.Models.SuggestedResourceOut>?> GetAsync(Action<RequestConfiguration<global::GrimoireCli.Generated.Api.Campaigns.Resources.Suggested.Item.WithSystem_ItemRequestBuilder.WithSystem_ItemRequestBuilderGetQueryParameters>>? requestConfiguration = default, CancellationToken cancellationToken = default)
         {
 #nullable restore
 #else
-        public async Task<UntypedNode> GetAsync(Action<RequestConfiguration<global::GrimoireCli.Generated.Api.Campaigns.Resources.Suggested.Item.WithSystem_ItemRequestBuilder.WithSystem_ItemRequestBuilderGetQueryParameters>> requestConfiguration = default, CancellationToken cancellationToken = default)
+        public async Task<List<global::GrimoireCli.Generated.Models.SuggestedResourceOut>> GetAsync(Action<RequestConfiguration<global::GrimoireCli.Generated.Api.Campaigns.Resources.Suggested.Item.WithSystem_ItemRequestBuilder.WithSystem_ItemRequestBuilderGetQueryParameters>> requestConfiguration = default, CancellationToken cancellationToken = default)
         {
 #endif
             var requestInfo = ToGetRequestInformation(requestConfiguration);
@@ -54,7 +54,8 @@ namespace GrimoireCli.Generated.Api.Campaigns.Resources.Suggested.Item
             {
                 { "422", global::GrimoireCli.Generated.Models.HTTPValidationError.CreateFromDiscriminatorValue },
             };
-            return await RequestAdapter.SendAsync<UntypedNode>(requestInfo, UntypedNode.CreateFromDiscriminatorValue, errorMapping, cancellationToken).ConfigureAwait(false);
+            var collectionResult = await RequestAdapter.SendCollectionAsync<global::GrimoireCli.Generated.Models.SuggestedResourceOut>(requestInfo, global::GrimoireCli.Generated.Models.SuggestedResourceOut.CreateFromDiscriminatorValue, errorMapping, cancellationToken).ConfigureAwait(false);
+            return collectionResult?.AsList();
         }
         /// <summary>
         /// Books belonging to a game system, for the create wizard&apos;s resource step.Core-category books are flagged `suggested` so the wizard can pre-select them;nothing else is suggested. Ordered with suggested (core) books first.

@@ -294,6 +294,14 @@ namespace GrimoireCli.Generated.Models
 #else
         public global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_rescan_schedule_weekday RescanScheduleWeekday { get; set; }
 #endif
+        /// <summary>The restricted_categories property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public UntypedNode? RestrictedCategories { get; set; }
+#nullable restore
+#else
+        public UntypedNode RestrictedCategories { get; set; }
+#endif
         /// <summary>The show_stat_audio property</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
@@ -418,6 +426,7 @@ namespace GrimoireCli.Generated.Models
                 { "rescan_schedule_interval", n => { RescanScheduleInterval = n.GetObjectValue<global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_rescan_schedule_interval>(global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_rescan_schedule_interval.CreateFromDiscriminatorValue); } },
                 { "rescan_schedule_minute", n => { RescanScheduleMinute = n.GetObjectValue<global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_rescan_schedule_minute>(global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_rescan_schedule_minute.CreateFromDiscriminatorValue); } },
                 { "rescan_schedule_weekday", n => { RescanScheduleWeekday = n.GetObjectValue<global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_rescan_schedule_weekday>(global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_rescan_schedule_weekday.CreateFromDiscriminatorValue); } },
+                { "restricted_categories", n => { RestrictedCategories = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
                 { "show_stat_audio", n => { ShowStatAudio = n.GetObjectValue<global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_show_stat_audio>(global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_show_stat_audio.CreateFromDiscriminatorValue); } },
                 { "show_stat_books", n => { ShowStatBooks = n.GetObjectValue<global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_show_stat_books>(global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_show_stat_books.CreateFromDiscriminatorValue); } },
                 { "show_stat_maps", n => { ShowStatMaps = n.GetObjectValue<global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_show_stat_maps>(global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_show_stat_maps.CreateFromDiscriminatorValue); } },
@@ -470,6 +479,7 @@ namespace GrimoireCli.Generated.Models
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_rescan_schedule_interval>("rescan_schedule_interval", RescanScheduleInterval);
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_rescan_schedule_minute>("rescan_schedule_minute", RescanScheduleMinute);
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_rescan_schedule_weekday>("rescan_schedule_weekday", RescanScheduleWeekday);
+            writer.WriteObjectValue<UntypedNode>("restricted_categories", RestrictedCategories);
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_show_stat_audio>("show_stat_audio", ShowStatAudio);
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_show_stat_books>("show_stat_books", ShowStatBooks);
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_show_stat_maps>("show_stat_maps", ShowStatMaps);

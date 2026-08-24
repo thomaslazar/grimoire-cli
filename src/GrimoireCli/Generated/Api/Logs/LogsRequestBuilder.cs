@@ -34,19 +34,19 @@ namespace GrimoireCli.Generated.Api.Logs
         {
         }
         /// <summary>
-        /// Returns recent application log entries from the in-memory ring buffer (up to 20 000 entries). The `level` filter follows standard log hierarchy: `debug` returns all levels, `info` returns info/warning/error/critical, etc. Console output is controlled by the `LOG_LEVEL` environment variable, but this endpoint always has access to DEBUG-level logs regardless of that setting. For live polling, pass `after_seq` set to the `max_seq` value from the previous response — only entries with a higher sequence number are returned, making polling exact regardless of how fast entries arrive. **Admin only.**
+        /// Returns recent application log entries from the in-memory ring buffer (up to 20 000 entries). The `level` filter follows standard log hierarchy: `debug` returns all levels, `info` returns info/warning/error/critical, etc. Console output is controlled by the `LOG_LEVEL` environment variable, but this endpoint always has access to DEBUG-level logs regardless of that setting. For live polling, pass `after_seq` set to the `max_seq` value from the previous response - only entries with a higher sequence number are returned, making polling exact regardless of how fast entries arrive. **Admin only.**
         /// </summary>
-        /// <returns>A <see cref="UntypedNode"/></returns>
+        /// <returns>A <see cref="global::GrimoireCli.Generated.Models.LogsResponse"/></returns>
         /// <param name="cancellationToken">Cancellation token to use when cancelling requests</param>
         /// <param name="requestConfiguration">Configuration for the request such as headers, query parameters, and middleware options.</param>
         /// <exception cref="global::GrimoireCli.Generated.Models.HTTPValidationError">When receiving a 422 status code</exception>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
-        public async Task<UntypedNode?> GetAsync(Action<RequestConfiguration<global::GrimoireCli.Generated.Api.Logs.LogsRequestBuilder.LogsRequestBuilderGetQueryParameters>>? requestConfiguration = default, CancellationToken cancellationToken = default)
+        public async Task<global::GrimoireCli.Generated.Models.LogsResponse?> GetAsync(Action<RequestConfiguration<global::GrimoireCli.Generated.Api.Logs.LogsRequestBuilder.LogsRequestBuilderGetQueryParameters>>? requestConfiguration = default, CancellationToken cancellationToken = default)
         {
 #nullable restore
 #else
-        public async Task<UntypedNode> GetAsync(Action<RequestConfiguration<global::GrimoireCli.Generated.Api.Logs.LogsRequestBuilder.LogsRequestBuilderGetQueryParameters>> requestConfiguration = default, CancellationToken cancellationToken = default)
+        public async Task<global::GrimoireCli.Generated.Models.LogsResponse> GetAsync(Action<RequestConfiguration<global::GrimoireCli.Generated.Api.Logs.LogsRequestBuilder.LogsRequestBuilderGetQueryParameters>> requestConfiguration = default, CancellationToken cancellationToken = default)
         {
 #endif
             var requestInfo = ToGetRequestInformation(requestConfiguration);
@@ -54,10 +54,10 @@ namespace GrimoireCli.Generated.Api.Logs
             {
                 { "422", global::GrimoireCli.Generated.Models.HTTPValidationError.CreateFromDiscriminatorValue },
             };
-            return await RequestAdapter.SendAsync<UntypedNode>(requestInfo, UntypedNode.CreateFromDiscriminatorValue, errorMapping, cancellationToken).ConfigureAwait(false);
+            return await RequestAdapter.SendAsync<global::GrimoireCli.Generated.Models.LogsResponse>(requestInfo, global::GrimoireCli.Generated.Models.LogsResponse.CreateFromDiscriminatorValue, errorMapping, cancellationToken).ConfigureAwait(false);
         }
         /// <summary>
-        /// Returns recent application log entries from the in-memory ring buffer (up to 20 000 entries). The `level` filter follows standard log hierarchy: `debug` returns all levels, `info` returns info/warning/error/critical, etc. Console output is controlled by the `LOG_LEVEL` environment variable, but this endpoint always has access to DEBUG-level logs regardless of that setting. For live polling, pass `after_seq` set to the `max_seq` value from the previous response — only entries with a higher sequence number are returned, making polling exact regardless of how fast entries arrive. **Admin only.**
+        /// Returns recent application log entries from the in-memory ring buffer (up to 20 000 entries). The `level` filter follows standard log hierarchy: `debug` returns all levels, `info` returns info/warning/error/critical, etc. Console output is controlled by the `LOG_LEVEL` environment variable, but this endpoint always has access to DEBUG-level logs regardless of that setting. For live polling, pass `after_seq` set to the `max_seq` value from the previous response - only entries with a higher sequence number are returned, making polling exact regardless of how fast entries arrive. **Admin only.**
         /// </summary>
         /// <returns>A <see cref="RequestInformation"/></returns>
         /// <param name="requestConfiguration">Configuration for the request such as headers, query parameters, and middleware options.</param>
@@ -85,7 +85,7 @@ namespace GrimoireCli.Generated.Api.Logs
             return new global::GrimoireCli.Generated.Api.Logs.LogsRequestBuilder(rawUrl, RequestAdapter);
         }
         /// <summary>
-        /// Returns recent application log entries from the in-memory ring buffer (up to 20 000 entries). The `level` filter follows standard log hierarchy: `debug` returns all levels, `info` returns info/warning/error/critical, etc. Console output is controlled by the `LOG_LEVEL` environment variable, but this endpoint always has access to DEBUG-level logs regardless of that setting. For live polling, pass `after_seq` set to the `max_seq` value from the previous response — only entries with a higher sequence number are returned, making polling exact regardless of how fast entries arrive. **Admin only.**
+        /// Returns recent application log entries from the in-memory ring buffer (up to 20 000 entries). The `level` filter follows standard log hierarchy: `debug` returns all levels, `info` returns info/warning/error/critical, etc. Console output is controlled by the `LOG_LEVEL` environment variable, but this endpoint always has access to DEBUG-level logs regardless of that setting. For live polling, pass `after_seq` set to the `max_seq` value from the previous response - only entries with a higher sequence number are returned, making polling exact regardless of how fast entries arrive. **Admin only.**
         /// </summary>
         [global::System.CodeDom.Compiler.GeneratedCode("Kiota", "1.0.0")]
         public partial class LogsRequestBuilderGetQueryParameters 

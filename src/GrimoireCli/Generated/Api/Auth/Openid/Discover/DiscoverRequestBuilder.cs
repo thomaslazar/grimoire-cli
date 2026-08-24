@@ -36,18 +36,18 @@ namespace GrimoireCli.Generated.Api.Auth.Openid.Discover
         /// <summary>
         /// Admin-only. Fetches `.well-known/openid-configuration` from the issuer URL and returns the relevant endpoint URLs so the admin UI can autofill the form. The server makes the request so the browser does not hit a CORS wall.
         /// </summary>
-        /// <returns>A <see cref="UntypedNode"/></returns>
+        /// <returns>A <see cref="global::GrimoireCli.Generated.Models.DiscoverResponse"/></returns>
         /// <param name="body">The request body</param>
         /// <param name="cancellationToken">Cancellation token to use when cancelling requests</param>
         /// <param name="requestConfiguration">Configuration for the request such as headers, query parameters, and middleware options.</param>
         /// <exception cref="global::GrimoireCli.Generated.Models.HTTPValidationError">When receiving a 422 status code</exception>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
-        public async Task<UntypedNode?> PostAsync(global::GrimoireCli.Generated.Models.DiscoverRequest body, Action<RequestConfiguration<global::GrimoireCli.Generated.Api.Auth.Openid.Discover.DiscoverRequestBuilder.DiscoverRequestBuilderPostQueryParameters>>? requestConfiguration = default, CancellationToken cancellationToken = default)
+        public async Task<global::GrimoireCli.Generated.Models.DiscoverResponse?> PostAsync(global::GrimoireCli.Generated.Models.DiscoverRequest body, Action<RequestConfiguration<global::GrimoireCli.Generated.Api.Auth.Openid.Discover.DiscoverRequestBuilder.DiscoverRequestBuilderPostQueryParameters>>? requestConfiguration = default, CancellationToken cancellationToken = default)
         {
 #nullable restore
 #else
-        public async Task<UntypedNode> PostAsync(global::GrimoireCli.Generated.Models.DiscoverRequest body, Action<RequestConfiguration<global::GrimoireCli.Generated.Api.Auth.Openid.Discover.DiscoverRequestBuilder.DiscoverRequestBuilderPostQueryParameters>> requestConfiguration = default, CancellationToken cancellationToken = default)
+        public async Task<global::GrimoireCli.Generated.Models.DiscoverResponse> PostAsync(global::GrimoireCli.Generated.Models.DiscoverRequest body, Action<RequestConfiguration<global::GrimoireCli.Generated.Api.Auth.Openid.Discover.DiscoverRequestBuilder.DiscoverRequestBuilderPostQueryParameters>> requestConfiguration = default, CancellationToken cancellationToken = default)
         {
 #endif
             if(ReferenceEquals(body, null)) throw new ArgumentNullException(nameof(body));
@@ -56,7 +56,7 @@ namespace GrimoireCli.Generated.Api.Auth.Openid.Discover
             {
                 { "422", global::GrimoireCli.Generated.Models.HTTPValidationError.CreateFromDiscriminatorValue },
             };
-            return await RequestAdapter.SendAsync<UntypedNode>(requestInfo, UntypedNode.CreateFromDiscriminatorValue, errorMapping, cancellationToken).ConfigureAwait(false);
+            return await RequestAdapter.SendAsync<global::GrimoireCli.Generated.Models.DiscoverResponse>(requestInfo, global::GrimoireCli.Generated.Models.DiscoverResponse.CreateFromDiscriminatorValue, errorMapping, cancellationToken).ConfigureAwait(false);
         }
         /// <summary>
         /// Admin-only. Fetches `.well-known/openid-configuration` from the issuer URL and returns the relevant endpoint URLs so the admin UI can autofill the form. The server makes the request so the browser does not hit a CORS wall.

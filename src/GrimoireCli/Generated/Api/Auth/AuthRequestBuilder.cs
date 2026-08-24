@@ -6,6 +6,8 @@ using GrimoireCli.Generated.Api.Auth.Login;
 using GrimoireCli.Generated.Api.Auth.Logout;
 using GrimoireCli.Generated.Api.Auth.Me;
 using GrimoireCli.Generated.Api.Auth.Openid;
+using GrimoireCli.Generated.Api.Auth.Refresh;
+using GrimoireCli.Generated.Api.Auth.Sessions;
 using GrimoireCli.Generated.Api.Auth.Setup;
 using GrimoireCli.Generated.Api.Auth.Status;
 using Microsoft.Kiota.Abstractions.Extensions;
@@ -51,6 +53,16 @@ namespace GrimoireCli.Generated.Api.Auth
         public global::GrimoireCli.Generated.Api.Auth.Openid.OpenidRequestBuilder Openid
         {
             get => new global::GrimoireCli.Generated.Api.Auth.Openid.OpenidRequestBuilder(PathParameters, RequestAdapter);
+        }
+        /// <summary>The refresh property</summary>
+        public global::GrimoireCli.Generated.Api.Auth.Refresh.RefreshRequestBuilder Refresh
+        {
+            get => new global::GrimoireCli.Generated.Api.Auth.Refresh.RefreshRequestBuilder(PathParameters, RequestAdapter);
+        }
+        /// <summary>The sessions property</summary>
+        public global::GrimoireCli.Generated.Api.Auth.Sessions.SessionsRequestBuilder Sessions
+        {
+            get => new global::GrimoireCli.Generated.Api.Auth.Sessions.SessionsRequestBuilder(PathParameters, RequestAdapter);
         }
         /// <summary>The setup property</summary>
         public global::GrimoireCli.Generated.Api.Auth.Setup.SetupRequestBuilder Setup

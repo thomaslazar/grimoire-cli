@@ -5,14 +5,16 @@ using GrimoireCli.Generated.Api.Addons;
 using GrimoireCli.Generated.Api.Audio;
 using GrimoireCli.Generated.Api.AudioFolders;
 using GrimoireCli.Generated.Api.Auth;
+using GrimoireCli.Generated.Api.Backups;
 using GrimoireCli.Generated.Api.Bookmarks;
 using GrimoireCli.Generated.Api.Books;
 using GrimoireCli.Generated.Api.Campaigns;
 using GrimoireCli.Generated.Api.CancelScan;
 using GrimoireCli.Generated.Api.DiceMaterials;
 using GrimoireCli.Generated.Api.Downloads;
-using GrimoireCli.Generated.Api.Export;
+using GrimoireCli.Generated.Api.Duplicates;
 using GrimoireCli.Generated.Api.Favorites;
+using GrimoireCli.Generated.Api.Files;
 using GrimoireCli.Generated.Api.Genres;
 using GrimoireCli.Generated.Api.Health;
 using GrimoireCli.Generated.Api.LatestRelease;
@@ -31,6 +33,7 @@ using GrimoireCli.Generated.Api.Stats;
 using GrimoireCli.Generated.Api.SystemFamilies;
 using GrimoireCli.Generated.Api.Systems;
 using GrimoireCli.Generated.Api.Tags;
+using GrimoireCli.Generated.Api.Themes;
 using GrimoireCli.Generated.Api.TokenFolders;
 using GrimoireCli.Generated.Api.Tokens;
 using GrimoireCli.Generated.Api.Users;
@@ -73,6 +76,11 @@ namespace GrimoireCli.Generated.Api
         {
             get => new global::GrimoireCli.Generated.Api.Auth.AuthRequestBuilder(PathParameters, RequestAdapter);
         }
+        /// <summary>The backups property</summary>
+        public global::GrimoireCli.Generated.Api.Backups.BackupsRequestBuilder Backups
+        {
+            get => new global::GrimoireCli.Generated.Api.Backups.BackupsRequestBuilder(PathParameters, RequestAdapter);
+        }
         /// <summary>The bookmarks property</summary>
         public global::GrimoireCli.Generated.Api.Bookmarks.BookmarksRequestBuilder Bookmarks
         {
@@ -103,15 +111,20 @@ namespace GrimoireCli.Generated.Api
         {
             get => new global::GrimoireCli.Generated.Api.Downloads.DownloadsRequestBuilder(PathParameters, RequestAdapter);
         }
-        /// <summary>The export property</summary>
-        public global::GrimoireCli.Generated.Api.Export.ExportRequestBuilder Export
+        /// <summary>The duplicates property</summary>
+        public global::GrimoireCli.Generated.Api.Duplicates.DuplicatesRequestBuilder Duplicates
         {
-            get => new global::GrimoireCli.Generated.Api.Export.ExportRequestBuilder(PathParameters, RequestAdapter);
+            get => new global::GrimoireCli.Generated.Api.Duplicates.DuplicatesRequestBuilder(PathParameters, RequestAdapter);
         }
         /// <summary>The favorites property</summary>
         public global::GrimoireCli.Generated.Api.Favorites.FavoritesRequestBuilder Favorites
         {
             get => new global::GrimoireCli.Generated.Api.Favorites.FavoritesRequestBuilder(PathParameters, RequestAdapter);
+        }
+        /// <summary>The files property</summary>
+        public global::GrimoireCli.Generated.Api.Files.FilesRequestBuilder Files
+        {
+            get => new global::GrimoireCli.Generated.Api.Files.FilesRequestBuilder(PathParameters, RequestAdapter);
         }
         /// <summary>The genres property</summary>
         public global::GrimoireCli.Generated.Api.Genres.GenresRequestBuilder Genres
@@ -202,6 +215,11 @@ namespace GrimoireCli.Generated.Api
         public global::GrimoireCli.Generated.Api.Tags.TagsRequestBuilder Tags
         {
             get => new global::GrimoireCli.Generated.Api.Tags.TagsRequestBuilder(PathParameters, RequestAdapter);
+        }
+        /// <summary>The themes property</summary>
+        public global::GrimoireCli.Generated.Api.Themes.ThemesRequestBuilder Themes
+        {
+            get => new global::GrimoireCli.Generated.Api.Themes.ThemesRequestBuilder(PathParameters, RequestAdapter);
         }
         /// <summary>The tokenFolders property</summary>
         public global::GrimoireCli.Generated.Api.TokenFolders.TokenFoldersRequestBuilder TokenFolders

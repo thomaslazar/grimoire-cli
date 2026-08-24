@@ -36,18 +36,18 @@ namespace GrimoireCli.Generated.Api.Systems.Item.MetadataFetch
         /// <summary>
         /// Fetches one candidate&apos;s fields and diffs them against the system&apos;s current values. Writes nothing. GM or admin role required.
         /// </summary>
-        /// <returns>A <see cref="UntypedNode"/></returns>
+        /// <returns>A <see cref="global::GrimoireCli.Generated.Models.MetadataFetchResponse"/></returns>
         /// <param name="body">Fetch one candidate&apos;s fields for review.</param>
         /// <param name="cancellationToken">Cancellation token to use when cancelling requests</param>
         /// <param name="requestConfiguration">Configuration for the request such as headers, query parameters, and middleware options.</param>
         /// <exception cref="global::GrimoireCli.Generated.Models.HTTPValidationError">When receiving a 422 status code</exception>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
-        public async Task<UntypedNode?> PostAsync(global::GrimoireCli.Generated.Models.MetadataFetch body, Action<RequestConfiguration<global::GrimoireCli.Generated.Api.Systems.Item.MetadataFetch.MetadataFetchRequestBuilder.MetadataFetchRequestBuilderPostQueryParameters>>? requestConfiguration = default, CancellationToken cancellationToken = default)
+        public async Task<global::GrimoireCli.Generated.Models.MetadataFetchResponse?> PostAsync(global::GrimoireCli.Generated.Models.MetadataFetch body, Action<RequestConfiguration<global::GrimoireCli.Generated.Api.Systems.Item.MetadataFetch.MetadataFetchRequestBuilder.MetadataFetchRequestBuilderPostQueryParameters>>? requestConfiguration = default, CancellationToken cancellationToken = default)
         {
 #nullable restore
 #else
-        public async Task<UntypedNode> PostAsync(global::GrimoireCli.Generated.Models.MetadataFetch body, Action<RequestConfiguration<global::GrimoireCli.Generated.Api.Systems.Item.MetadataFetch.MetadataFetchRequestBuilder.MetadataFetchRequestBuilderPostQueryParameters>> requestConfiguration = default, CancellationToken cancellationToken = default)
+        public async Task<global::GrimoireCli.Generated.Models.MetadataFetchResponse> PostAsync(global::GrimoireCli.Generated.Models.MetadataFetch body, Action<RequestConfiguration<global::GrimoireCli.Generated.Api.Systems.Item.MetadataFetch.MetadataFetchRequestBuilder.MetadataFetchRequestBuilderPostQueryParameters>> requestConfiguration = default, CancellationToken cancellationToken = default)
         {
 #endif
             if(ReferenceEquals(body, null)) throw new ArgumentNullException(nameof(body));
@@ -56,7 +56,7 @@ namespace GrimoireCli.Generated.Api.Systems.Item.MetadataFetch
             {
                 { "422", global::GrimoireCli.Generated.Models.HTTPValidationError.CreateFromDiscriminatorValue },
             };
-            return await RequestAdapter.SendAsync<UntypedNode>(requestInfo, UntypedNode.CreateFromDiscriminatorValue, errorMapping, cancellationToken).ConfigureAwait(false);
+            return await RequestAdapter.SendAsync<global::GrimoireCli.Generated.Models.MetadataFetchResponse>(requestInfo, global::GrimoireCli.Generated.Models.MetadataFetchResponse.CreateFromDiscriminatorValue, errorMapping, cancellationToken).ConfigureAwait(false);
         }
         /// <summary>
         /// Fetches one candidate&apos;s fields and diffs them against the system&apos;s current values. Writes nothing. GM or admin role required.

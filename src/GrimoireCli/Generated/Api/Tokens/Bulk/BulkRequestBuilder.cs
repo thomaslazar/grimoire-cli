@@ -42,18 +42,18 @@ namespace GrimoireCli.Generated.Api.Tokens.Bulk
         /// <summary>
         /// Applies per-token edits for many tokens in one transaction. Body: {items: [{id, description?, tags?, is_explicit?}]}. Unknown ids are reported in `errors` and skipped. GM or admin role required.
         /// </summary>
-        /// <returns>A <see cref="UntypedNode"/></returns>
+        /// <returns>A <see cref="global::GrimoireCli.Generated.Models.BulkResult"/></returns>
         /// <param name="body">A batch of Token updates applied in one transaction.</param>
         /// <param name="cancellationToken">Cancellation token to use when cancelling requests</param>
         /// <param name="requestConfiguration">Configuration for the request such as headers, query parameters, and middleware options.</param>
         /// <exception cref="global::GrimoireCli.Generated.Models.HTTPValidationError">When receiving a 422 status code</exception>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
-        public async Task<UntypedNode?> PostAsync(global::GrimoireCli.Generated.Models.TokenBulkUpdate body, Action<RequestConfiguration<global::GrimoireCli.Generated.Api.Tokens.Bulk.BulkRequestBuilder.BulkRequestBuilderPostQueryParameters>>? requestConfiguration = default, CancellationToken cancellationToken = default)
+        public async Task<global::GrimoireCli.Generated.Models.BulkResult?> PostAsync(global::GrimoireCli.Generated.Models.TokenBulkUpdate body, Action<RequestConfiguration<global::GrimoireCli.Generated.Api.Tokens.Bulk.BulkRequestBuilder.BulkRequestBuilderPostQueryParameters>>? requestConfiguration = default, CancellationToken cancellationToken = default)
         {
 #nullable restore
 #else
-        public async Task<UntypedNode> PostAsync(global::GrimoireCli.Generated.Models.TokenBulkUpdate body, Action<RequestConfiguration<global::GrimoireCli.Generated.Api.Tokens.Bulk.BulkRequestBuilder.BulkRequestBuilderPostQueryParameters>> requestConfiguration = default, CancellationToken cancellationToken = default)
+        public async Task<global::GrimoireCli.Generated.Models.BulkResult> PostAsync(global::GrimoireCli.Generated.Models.TokenBulkUpdate body, Action<RequestConfiguration<global::GrimoireCli.Generated.Api.Tokens.Bulk.BulkRequestBuilder.BulkRequestBuilderPostQueryParameters>> requestConfiguration = default, CancellationToken cancellationToken = default)
         {
 #endif
             if(ReferenceEquals(body, null)) throw new ArgumentNullException(nameof(body));
@@ -62,7 +62,7 @@ namespace GrimoireCli.Generated.Api.Tokens.Bulk
             {
                 { "422", global::GrimoireCli.Generated.Models.HTTPValidationError.CreateFromDiscriminatorValue },
             };
-            return await RequestAdapter.SendAsync<UntypedNode>(requestInfo, UntypedNode.CreateFromDiscriminatorValue, errorMapping, cancellationToken).ConfigureAwait(false);
+            return await RequestAdapter.SendAsync<global::GrimoireCli.Generated.Models.BulkResult>(requestInfo, global::GrimoireCli.Generated.Models.BulkResult.CreateFromDiscriminatorValue, errorMapping, cancellationToken).ConfigureAwait(false);
         }
         /// <summary>
         /// Applies per-token edits for many tokens in one transaction. Body: {items: [{id, description?, tags?, is_explicit?}]}. Unknown ids are reported in `errors` and skipped. GM or admin role required.

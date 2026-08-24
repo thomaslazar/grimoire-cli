@@ -36,18 +36,18 @@ namespace GrimoireCli.Generated.Api.Campaigns.Item.ConvertToGroup
         /// <summary>
         /// Promote a personal campaign to a GM-run (group) campaign.Only the owner can convert, and only if they could have created a GM campaignin the first place — otherwise this would be a way around that role check.Nothing is migrated: members, guests, and the schedule are all features apersonal campaign simply never had, so they start empty. Everything alreadyin the campaign (resources, wiki, sessions) carries over untouched.One-way: there is no group -&gt; personal route, because demoting would strandthose rows with nowhere to live.
         /// </summary>
-        /// <returns>A <see cref="UntypedNode"/></returns>
+        /// <returns>A <see cref="global::GrimoireCli.Generated.Models.CampaignOut"/></returns>
         /// <param name="body">Promote a personal campaign to a GM-run (group) one.One-way by design: the reverse would strand members, guests, and theschedule, none of which a personal campaign can hold. ``gm_title`` isoptional and defaults to the campaign&apos;s existing title.</param>
         /// <param name="cancellationToken">Cancellation token to use when cancelling requests</param>
         /// <param name="requestConfiguration">Configuration for the request such as headers, query parameters, and middleware options.</param>
         /// <exception cref="global::GrimoireCli.Generated.Models.HTTPValidationError">When receiving a 422 status code</exception>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
-        public async Task<UntypedNode?> PostAsync(global::GrimoireCli.Generated.Models.CampaignConvert body, Action<RequestConfiguration<global::GrimoireCli.Generated.Api.Campaigns.Item.ConvertToGroup.ConvertToGroupRequestBuilder.ConvertToGroupRequestBuilderPostQueryParameters>>? requestConfiguration = default, CancellationToken cancellationToken = default)
+        public async Task<global::GrimoireCli.Generated.Models.CampaignOut?> PostAsync(global::GrimoireCli.Generated.Models.CampaignConvert body, Action<RequestConfiguration<global::GrimoireCli.Generated.Api.Campaigns.Item.ConvertToGroup.ConvertToGroupRequestBuilder.ConvertToGroupRequestBuilderPostQueryParameters>>? requestConfiguration = default, CancellationToken cancellationToken = default)
         {
 #nullable restore
 #else
-        public async Task<UntypedNode> PostAsync(global::GrimoireCli.Generated.Models.CampaignConvert body, Action<RequestConfiguration<global::GrimoireCli.Generated.Api.Campaigns.Item.ConvertToGroup.ConvertToGroupRequestBuilder.ConvertToGroupRequestBuilderPostQueryParameters>> requestConfiguration = default, CancellationToken cancellationToken = default)
+        public async Task<global::GrimoireCli.Generated.Models.CampaignOut> PostAsync(global::GrimoireCli.Generated.Models.CampaignConvert body, Action<RequestConfiguration<global::GrimoireCli.Generated.Api.Campaigns.Item.ConvertToGroup.ConvertToGroupRequestBuilder.ConvertToGroupRequestBuilderPostQueryParameters>> requestConfiguration = default, CancellationToken cancellationToken = default)
         {
 #endif
             if(ReferenceEquals(body, null)) throw new ArgumentNullException(nameof(body));
@@ -56,7 +56,7 @@ namespace GrimoireCli.Generated.Api.Campaigns.Item.ConvertToGroup
             {
                 { "422", global::GrimoireCli.Generated.Models.HTTPValidationError.CreateFromDiscriminatorValue },
             };
-            return await RequestAdapter.SendAsync<UntypedNode>(requestInfo, UntypedNode.CreateFromDiscriminatorValue, errorMapping, cancellationToken).ConfigureAwait(false);
+            return await RequestAdapter.SendAsync<global::GrimoireCli.Generated.Models.CampaignOut>(requestInfo, global::GrimoireCli.Generated.Models.CampaignOut.CreateFromDiscriminatorValue, errorMapping, cancellationToken).ConfigureAwait(false);
         }
         /// <summary>
         /// Promote a personal campaign to a GM-run (group) campaign.Only the owner can convert, and only if they could have created a GM campaignin the first place — otherwise this would be a way around that role check.Nothing is migrated: members, guests, and the schedule are all features apersonal campaign simply never had, so they start empty. Everything alreadyin the campaign (resources, wiki, sessions) carries over untouched.One-way: there is no group -&gt; personal route, because demoting would strandthose rows with nowhere to live.

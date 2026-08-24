@@ -13,6 +13,14 @@ namespace GrimoireCli.Generated.Models
     [global::System.CodeDom.Compiler.GeneratedCode("Kiota", "1.0.0")]
     public partial class GameSystemBulkItem : IAdditionalDataHolder, IParsable
     {
+        /// <summary>The access_level property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public global::GrimoireCli.Generated.Models.GameSystemBulkItem.GameSystemBulkItem_access_level? AccessLevel { get; set; }
+#nullable restore
+#else
+        public global::GrimoireCli.Generated.Models.GameSystemBulkItem.GameSystemBulkItem_access_level AccessLevel { get; set; }
+#endif
         /// <summary>Stores additional data not described in the OpenAPI description found when deserializing. Can be used for serialization as well.</summary>
         public IDictionary<string, object> AdditionalData { get; set; }
         /// <summary>The character_builder_url property</summary>
@@ -184,6 +192,7 @@ namespace GrimoireCli.Generated.Models
         {
             return new Dictionary<string, Action<IParseNode>>
             {
+                { "access_level", n => { AccessLevel = n.GetObjectValue<global::GrimoireCli.Generated.Models.GameSystemBulkItem.GameSystemBulkItem_access_level>(global::GrimoireCli.Generated.Models.GameSystemBulkItem.GameSystemBulkItem_access_level.CreateFromDiscriminatorValue); } },
                 { "character_builder_url", n => { CharacterBuilderUrl = n.GetObjectValue<global::GrimoireCli.Generated.Models.GameSystemBulkItem.GameSystemBulkItem_character_builder_url>(global::GrimoireCli.Generated.Models.GameSystemBulkItem.GameSystemBulkItem_character_builder_url.CreateFromDiscriminatorValue); } },
                 { "character_builder_urls", n => { CharacterBuilderUrls = n.GetCollectionOfObjectValues<global::GrimoireCli.Generated.Models.Backend__routers__systems___schemas__LinkEntry>(global::GrimoireCli.Generated.Models.Backend__routers__systems___schemas__LinkEntry.CreateFromDiscriminatorValue)?.AsList(); } },
                 { "cover_book_id", n => { CoverBookId = n.GetObjectValue<global::GrimoireCli.Generated.Models.GameSystemBulkItem.GameSystemBulkItem_cover_book_id>(global::GrimoireCli.Generated.Models.GameSystemBulkItem.GameSystemBulkItem_cover_book_id.CreateFromDiscriminatorValue); } },
@@ -211,6 +220,7 @@ namespace GrimoireCli.Generated.Models
         public virtual void Serialize(ISerializationWriter writer)
         {
             if(ReferenceEquals(writer, null)) throw new ArgumentNullException(nameof(writer));
+            writer.WriteObjectValue<global::GrimoireCli.Generated.Models.GameSystemBulkItem.GameSystemBulkItem_access_level>("access_level", AccessLevel);
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.GameSystemBulkItem.GameSystemBulkItem_character_builder_url>("character_builder_url", CharacterBuilderUrl);
             writer.WriteCollectionOfObjectValues<global::GrimoireCli.Generated.Models.Backend__routers__systems___schemas__LinkEntry>("character_builder_urls", CharacterBuilderUrls);
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.GameSystemBulkItem.GameSystemBulkItem_cover_book_id>("cover_book_id", CoverBookId);
@@ -230,6 +240,74 @@ namespace GrimoireCli.Generated.Models
             writer.WriteCollectionOfObjectValues<global::GrimoireCli.Generated.Models.Backend__routers__systems___schemas__LinkEntry>("urls", Urls);
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.GameSystemBulkItem.GameSystemBulkItem_year>("year", Year);
             writer.WriteAdditionalData(AdditionalData);
+        }
+        /// <summary>
+        /// Composed type wrapper for classes <see cref="global::GrimoireCli.Generated.Models.GameSystemBulkItem_access_levelMember1"/>, <see cref="string"/>
+        /// </summary>
+        [global::System.CodeDom.Compiler.GeneratedCode("Kiota", "1.0.0")]
+        public partial class GameSystemBulkItem_access_level : IComposedTypeWrapper, IParsable
+        {
+            /// <summary>Composed type representation for type <see cref="global::GrimoireCli.Generated.Models.GameSystemBulkItem_access_levelMember1"/></summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+            public global::GrimoireCli.Generated.Models.GameSystemBulkItem_access_levelMember1? GameSystemBulkItemAccessLevelMember1 { get; set; }
+#nullable restore
+#else
+            public global::GrimoireCli.Generated.Models.GameSystemBulkItem_access_levelMember1 GameSystemBulkItemAccessLevelMember1 { get; set; }
+#endif
+            /// <summary>Composed type representation for type <see cref="string"/></summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+            public string? String { get; set; }
+#nullable restore
+#else
+            public string String { get; set; }
+#endif
+            /// <summary>
+            /// Creates a new instance of the appropriate class based on discriminator value
+            /// </summary>
+            /// <returns>A <see cref="global::GrimoireCli.Generated.Models.GameSystemBulkItem.GameSystemBulkItem_access_level"/></returns>
+            /// <param name="parseNode">The parse node to use to read the discriminator value and create the object</param>
+            public static global::GrimoireCli.Generated.Models.GameSystemBulkItem.GameSystemBulkItem_access_level CreateFromDiscriminatorValue(IParseNode parseNode)
+            {
+                if(ReferenceEquals(parseNode, null)) throw new ArgumentNullException(nameof(parseNode));
+                var result = new global::GrimoireCli.Generated.Models.GameSystemBulkItem.GameSystemBulkItem_access_level();
+                if(parseNode.GetStringValue() is string stringValue)
+                {
+                    result.String = stringValue;
+                }
+                else {
+                    result.GameSystemBulkItemAccessLevelMember1 = new global::GrimoireCli.Generated.Models.GameSystemBulkItem_access_levelMember1();
+                }
+                return result;
+            }
+            /// <summary>
+            /// The deserialization information for the current model
+            /// </summary>
+            /// <returns>A IDictionary&lt;string, Action&lt;IParseNode&gt;&gt;</returns>
+            public virtual IDictionary<string, Action<IParseNode>> GetFieldDeserializers()
+            {
+                if(GameSystemBulkItemAccessLevelMember1 != null)
+                {
+                    return ParseNodeHelper.MergeDeserializersForIntersectionWrapper(GameSystemBulkItemAccessLevelMember1);
+                }
+                return new Dictionary<string, Action<IParseNode>>();
+            }
+            /// <summary>
+            /// Serializes information the current object
+            /// </summary>
+            /// <param name="writer">Serialization writer to use to serialize this model</param>
+            public virtual void Serialize(ISerializationWriter writer)
+            {
+                if(ReferenceEquals(writer, null)) throw new ArgumentNullException(nameof(writer));
+                if(String != null)
+                {
+                    writer.WriteStringValue(null, String);
+                }
+                else {
+                    writer.WriteObjectValue<global::GrimoireCli.Generated.Models.GameSystemBulkItem_access_levelMember1>(null, GameSystemBulkItemAccessLevelMember1);
+                }
+            }
         }
         /// <summary>
         /// Composed type wrapper for classes <see cref="global::GrimoireCli.Generated.Models.GameSystemBulkItem_character_builder_urlMember1"/>, <see cref="string"/>

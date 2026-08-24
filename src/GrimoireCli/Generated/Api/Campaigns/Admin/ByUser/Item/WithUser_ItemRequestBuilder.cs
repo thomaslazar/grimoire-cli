@@ -36,17 +36,17 @@ namespace GrimoireCli.Generated.Api.Campaigns.Admin.ByUser.Item
         /// <summary>
         /// Return a minimal read-only view of all campaigns owned by a specific user.Admins can inspect (but not manage or delete) campaigns through the user page.Only the title, game system, and description are exposed.
         /// </summary>
-        /// <returns>A <see cref="UntypedNode"/></returns>
+        /// <returns>A List&lt;global::GrimoireCli.Generated.Models.AdminCampaignOut&gt;</returns>
         /// <param name="cancellationToken">Cancellation token to use when cancelling requests</param>
         /// <param name="requestConfiguration">Configuration for the request such as headers, query parameters, and middleware options.</param>
         /// <exception cref="global::GrimoireCli.Generated.Models.HTTPValidationError">When receiving a 422 status code</exception>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
-        public async Task<UntypedNode?> GetAsync(Action<RequestConfiguration<global::GrimoireCli.Generated.Api.Campaigns.Admin.ByUser.Item.WithUser_ItemRequestBuilder.WithUser_ItemRequestBuilderGetQueryParameters>>? requestConfiguration = default, CancellationToken cancellationToken = default)
+        public async Task<List<global::GrimoireCli.Generated.Models.AdminCampaignOut>?> GetAsync(Action<RequestConfiguration<global::GrimoireCli.Generated.Api.Campaigns.Admin.ByUser.Item.WithUser_ItemRequestBuilder.WithUser_ItemRequestBuilderGetQueryParameters>>? requestConfiguration = default, CancellationToken cancellationToken = default)
         {
 #nullable restore
 #else
-        public async Task<UntypedNode> GetAsync(Action<RequestConfiguration<global::GrimoireCli.Generated.Api.Campaigns.Admin.ByUser.Item.WithUser_ItemRequestBuilder.WithUser_ItemRequestBuilderGetQueryParameters>> requestConfiguration = default, CancellationToken cancellationToken = default)
+        public async Task<List<global::GrimoireCli.Generated.Models.AdminCampaignOut>> GetAsync(Action<RequestConfiguration<global::GrimoireCli.Generated.Api.Campaigns.Admin.ByUser.Item.WithUser_ItemRequestBuilder.WithUser_ItemRequestBuilderGetQueryParameters>> requestConfiguration = default, CancellationToken cancellationToken = default)
         {
 #endif
             var requestInfo = ToGetRequestInformation(requestConfiguration);
@@ -54,7 +54,8 @@ namespace GrimoireCli.Generated.Api.Campaigns.Admin.ByUser.Item
             {
                 { "422", global::GrimoireCli.Generated.Models.HTTPValidationError.CreateFromDiscriminatorValue },
             };
-            return await RequestAdapter.SendAsync<UntypedNode>(requestInfo, UntypedNode.CreateFromDiscriminatorValue, errorMapping, cancellationToken).ConfigureAwait(false);
+            var collectionResult = await RequestAdapter.SendCollectionAsync<global::GrimoireCli.Generated.Models.AdminCampaignOut>(requestInfo, global::GrimoireCli.Generated.Models.AdminCampaignOut.CreateFromDiscriminatorValue, errorMapping, cancellationToken).ConfigureAwait(false);
+            return collectionResult?.AsList();
         }
         /// <summary>
         /// Return a minimal read-only view of all campaigns owned by a specific user.Admins can inspect (but not manage or delete) campaigns through the user page.Only the title, game system, and description are exposed.
