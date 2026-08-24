@@ -333,8 +333,13 @@ In `src/GrimoireCli/Output/ConsoleOutput.cs`, replace `WriteRawJson`:
     private static readonly JsonSerializerOptions PrettyOptions = new() { WriteIndented = true };
 ```
 
-`JsonSerializer.Serialize(JsonElement, JsonSerializerOptions)` is reflection-free
-for `JsonElement`, so this stays AOT-safe; `self-test` covers it in Task 7.
+**Correction, found during implementation:** `JsonSerializer.Serialize(JsonElement,
+JsonSerializerOptions)` is *not* AOT-safe — it is unconditionally annotated
+`RequiresUnreferencedCode`/`RequiresDynamicCode` and raises IL2026/IL3050 on
+publish, even though `JsonElement` itself needs neither. Use
+`JsonElement.WriteTo(Utf8JsonWriter)` over a `MemoryStream` with
+`JsonWriterOptions { Indented = true }`, which is genuinely reflection-free. The
+committed implementation does this; see `ConsoleOutput.WriteRawJson`.
 
 - [ ] **Step 9: Run to verify they pass**
 
@@ -816,12 +821,20 @@ The `--pretty` path serializes a `JsonElement`, which nothing else in `self-test
 exercises:
 
 ```csharp
-            var prettyProbe = JsonSerializer.Serialize(
-                JsonDocument.Parse("{\"a\":1}").RootElement,
-                new JsonSerializerOptions { WriteIndented = true });
-            if (!prettyProbe.Contains('\n'))
-                failures.Add("pretty-print of a JsonElement failed");
+            using (var probeDoc = JsonDocument.Parse("{\"a\":1}"))
+            using (var probeStream = new MemoryStream())
+            {
+                using (var probeWriter = new Utf8JsonWriter(probeStream, new JsonWriterOptions { Indented = true }))
+                    probeDoc.RootElement.WriteTo(probeWriter);
+                if (!Encoding.UTF8.GetString(probeStream.ToArray()).Contains('\n'))
+                    failures.Add("pretty-print of a JsonElement failed");
+            }
 ```
+
+**Do not use `JsonSerializer.Serialize(JsonElement, JsonSerializerOptions)` here.**
+It is annotated `RequiresUnreferencedCode`/`RequiresDynamicCode` and raises
+IL2026/IL3050 on AOT publish — which this very step exists to catch. Mirror
+`ConsoleOutput.WriteRawJson`, which uses `WriteTo` for exactly that reason.
 
 - [ ] **Step 4: Verify it passes as a published AOT binary**
 
