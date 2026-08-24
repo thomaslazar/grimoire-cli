@@ -2,11 +2,11 @@ using GrimoireCli.Api;
 
 namespace GrimoireCli.Tests.Api;
 
-public class DeserializeTests
+public class ResponseParsingTests
 {
     // The one piece of the failure path that IS a pure function reachable
     // without a server or Environment.Exit: the --debug body truncation
-    // Deserialize uses so a huge HTML page doesn't flood stderr.
+    // response parsing uses so a huge HTML page doesn't flood stderr.
     [Fact]
     public void TruncateForLoggingLeavesShortBodiesUntouched()
     {
