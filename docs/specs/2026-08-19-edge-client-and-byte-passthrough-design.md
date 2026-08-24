@@ -48,12 +48,23 @@ than instead of it:
   version-specific
 - **same `SECRET_KEY` and env shape** as the pinned stack
 
-Compose rather than a hand-rolled `docker run` is also what fixes addressing.
-The migration document records that a published port is unreachable from the
-devcontainer under docker-outside-of-docker, but that was measured against a bare
-`docker run`; the pinned stack is reachable at `host.docker.internal:9481`
-precisely because it is a compose stack with a published port. **The plan verifies
-this before anything depends on it.**
+**Compose does not fix addressing** — this was expected to and does not, measured
+during execution. The edge stack publishes 9482 on the host and it is reachable
+from other containers, but not from this devcontainer, which carries a forward for
+9481 (established when that stack first came up) and none for 9482. Being a
+compose stack is irrelevant; the migration document's existing note — use the
+container's bridge address from the devcontainer — was correct and stands.
+
+So from the devcontainer the edge stack is reached at its bridge address:
+
+```bash
+EDGE=$(docker inspect grimoire-cli-edge-grimoire-1 \
+  --format '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}')
+curl -sf "http://${EDGE}:9481/api/health"
+```
+
+`kiota-lock.json` still records `host.docker.internal:9482`, which is the stack's
+real address and stable across container recreation. A bridge IP is neither.
 
 No script changes are needed. `docker/seed.sh` and `tools/generate-api-client.sh`
 both already read `GRIMOIRE_SERVER`:
