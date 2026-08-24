@@ -583,6 +583,7 @@ git commit -m "refactor: pass library, addons, metadata and me responses through
 **Files:**
 - Modify: `src/GrimoireCli/Commands/SystemsCommand.cs`, `BooksCommand.cs`, `LibraryCommand.cs`, `AddonsCommand.cs`, `MetadataCommands.cs`, `MeCommand.cs`, `CoverCommands.cs` — the `AddResponseExample*` type arguments
 - Modify: `src/GrimoireCli/Commands/HelpExtensions.cs` — read one registry, fix the stale doc comment
+- Modify: `tools/GenerateJsonExamples/KiotaSampleWalker.cs` — `UntypedNode` → `"<any>"`
 - Rename: `tools/GenerateRequestExamples` → `tools/GenerateJsonExamples`
 - Delete: `tools/GenerateResponseExamples`, `src/GrimoireCli/Commands/ResponseExamples.g.cs`
 - Modify: `GrimoireCli.sln`
@@ -599,6 +600,22 @@ Use the map in **The DTO-to-generated-model map** above, verbatim. Each
 
 `AddResponseExample<SavedFile>()` does **not** change: `SavedFile` is the CLI's own
 `--output` receipt and has no generated counterpart.
+
+- [ ] **Step 1b: Make `UntypedNode` render `"<any>"`**
+
+`KiotaSampleWalker` writes an empty object for `UntypedNode`. That was defensible
+while the only one in scope was a request body's `SavedFilterUpdate.State`, which is
+an object. It is wrong for responses: `MetadataDiffField.current` and `.incoming`
+carry a string, number, array or object depending on the row, so `{}` asserts a
+shape true of no case — in the help text agents read to decide what to send.
+
+Both [the migration record](../grimoire-1.6.0-migration.md) and
+[this feature's design](../specs/2026-08-19-edge-client-and-byte-passthrough-design.md)
+already require this; it was missing from this plan, not from the decision.
+
+Emit the string `"<any>"`, regenerate, and update
+`JsonExamplesTests.UntypedNodesRenderAsAnEmptyObject` — whose name and assertion
+both become wrong — plus any test asserting the old `{}`.
 
 - [ ] **Step 2: Rename the generator project**
 
@@ -918,6 +935,21 @@ where `--debug` and `--log-json` are described.
 
 `docs/cli-design.md` describes `AddResponseExample<T>()` as sourced from the
 response DTOs via `Commands/ResponseExamples.g.cs`; both are gone.
+
+- [ ] **Step 2b: Fix the living docs that name deleted things**
+
+Three fall outside every task's file list, and the first is a runbook that would
+now mislead someone mid-version-bump:
+
+- **`docs/grimoire-compatibility.md`** tells the version-bump procedure to run
+  `tools/GenerateResponseExamples -- …/ResponseExamples.g.cs`. Neither exists.
+- **`docs/architecture.md`** and **`docs/testing.md`** still describe two
+  generators, two `.g.cs` files and four example tests.
+- **`docs/cli-design.md`** describes `AddResponseExample<T>()` as sourced from the
+  response DTOs via `Commands/ResponseExamples.g.cs`.
+
+Plans and specs under `docs/plans/` and `docs/specs/` are dated records and are
+**not** to be retro-edited. These four are living documentation and are.
 
 - [ ] **Step 3: Refresh the spec's `Size` section**
 
