@@ -10,7 +10,7 @@ reflection-based serialization — bugs only surface in the real binary.
 
 ### 1. Unit Tests (xUnit v3)
 
-314 tests covering pure logic, help-output assertions, and JSON-shape drift
+316 tests covering pure logic, help-output assertions, and JSON-shape drift
 guards with no network or binary dependency:
 
 - `Api/` — `CompareVersionsTests`, `ExtractTokenTests`, `GeneratedClientTests`,
@@ -57,7 +57,7 @@ actual published artifact, on every RID, in CI — see the `build` job below.
 
 ### 3. Smoke Tests (bash, against live Grimoire)
 
-26 assertions running the AOT binary against a real Grimoire Docker instance
+79 assertions running the AOT binary against a real Grimoire Docker instance
 seeded with 7 top-level systems (16 including container children) and 15
 books:
 
@@ -178,8 +178,3 @@ repository secret with Docker Hub credentials would remove that failure mode.
   audio fixtures; grimoire-cli generates PDFs on the fly via
   `docker/make-fixtures.py` so the tooling and the target format are
   verifiably compatible.
-- **No `Output` / `Services` test areas yet.** abs-cli's tests are grouped
-  into `Api` / `Commands` / `Configuration` / `Output` / `Services`.
-  grimoire-cli's add a `Models/` area instead (response DTOs are a distinct
-  surface here — see `CLAUDE.md`) and have not yet grown code under
-  `Output` or `Services` worth a dedicated test folder.

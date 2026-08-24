@@ -112,6 +112,11 @@ terseness rules. Two mechanics worth calling out here:
   required-ness isn't in the models, so it stays hand-written in Notes. Plain
   `--help` prints a one-line hint ("Run --help-full to see the request and
   response shapes.") instead of the blocks, to keep the default help short.
+  Walking the model's own fields and property types means a free-string field
+  renders as a bare `"<string>"` with no vocabulary hint (the old hand-written
+  response generator could say `"category": "core"` or `"phase": "scanning"`);
+  a real enum still renders its own value set via `ChoiceOption`, so that loss
+  is deliberate, not a regression to chase.
 
 ```
 $ grimoire-cli systems get --help
