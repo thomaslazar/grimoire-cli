@@ -25,7 +25,8 @@ public class RootHelpTests
         };
         prettyOption = new Option<bool>("--pretty")
         {
-            Description = "Indent JSON output. Off by default — responses are the server's bytes, unmodified.",
+            Description = "Indent API response bodies. Off by default — responses are the server's bytes, "
+                + "unmodified. config get and --output receipts are always indented, regardless of this flag.",
             Recursive = true
         };
         rootCommand.Options.Add(debugOption);

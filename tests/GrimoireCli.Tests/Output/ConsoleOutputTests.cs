@@ -57,13 +57,33 @@ public class ConsoleOutputTests
         {
             ConsoleOutput.Pretty = true;
             Console.SetOut(stdout);
-            ConsoleOutput.WriteRawJson("");
+            ConsoleOutput.WriteRawJson("<html>");
         }
         finally
         {
             Console.SetOut(original);
             ConsoleOutput.Pretty = previous;
         }
-        Assert.Equal("", stdout.ToString().Trim());
+        Assert.Equal("<html>", stdout.ToString().Trim());
+    }
+
+    [Fact]
+    public void WriteRawJson_LeavesNonAsciiUnescaped_WhenPretty()
+    {
+        var previous = ConsoleOutput.Pretty;
+        var stdout = new StringWriter();
+        var original = Console.Out;
+        try
+        {
+            ConsoleOutput.Pretty = true;
+            Console.SetOut(stdout);
+            ConsoleOutput.WriteRawJson("{\"name\":\"Anf\\u00e4ngerbox <x> & y\"}");
+        }
+        finally
+        {
+            Console.SetOut(original);
+            ConsoleOutput.Pretty = previous;
+        }
+        Assert.Contains("Anfängerbox <x> & y", stdout.ToString());
     }
 }
