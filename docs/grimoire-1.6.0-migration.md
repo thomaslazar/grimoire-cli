@@ -53,9 +53,9 @@ from the client generated against it — see
 1. **An edge stack and a client generated from it.** A
    `docker/docker-compose.edge.yml` override runs `edge` beside the pinned 1.5.6
    stack; `src/GrimoireCli/Generated/` is regenerated from its spec. The review is
-   a read of the generated diff. Safe for the pinned stack: across all 206
-   operations shared between 1.5.6 and the 2026-08-23 edge spec, no parameter or
-   body field was removed or became newly required.
+   a read of the generated diff. The gate is the smoke test against edge, which is
+   what this branch targets; the pinned 1.5.6 stack is a bonus signal only, since
+   one CLI version targets one server version.
 2. **Byte-passthrough output.** Services return the response bytes, commands print
    them; compact by default with `--pretty` to re-indent. `src/GrimoireCli/Models/`
    is deleted outright, because step 1 gives `--help` a generated model to draw its

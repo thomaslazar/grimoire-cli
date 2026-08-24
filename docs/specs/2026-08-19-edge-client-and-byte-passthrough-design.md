@@ -124,12 +124,26 @@ rules it did not have, each of which it had been throwing on rather than guessin
 None of the three is reachable from a command's help text today; all three block
 the generator, which walks every model regardless.
 
-### Compatibility with the pinned stack
+### The gate is edge, not the pinned stack
 
-The CLI must keep working against 1.5.6 for the smoke test, so a client built from
-the edge spec must not change any request it sends. Measured across all **206
-operations shared** between the 1.5.6-era spec and the edge spec built 2026-08-23
-(`1.5.6-tk8i6j`, digest `f274522b`), which is what was generated from:
+**This branch targets 1.6.0 and nothing else.** The migration document's version
+strategy is explicit — one CLI version targets one server version, and whoever
+stays on 1.5.6 stays on `0.1.x` — so a gate on 1.5.6 would test the dual-version
+compatibility that strategy rules out. `docker/smoke-test.sh` against the **edge**
+stack is the gate here.
+
+That gate moves, and the migration document already says to expect it: a red run
+against `edge` may mean upstream changed rather than the branch broke. The answer
+is to re-pull and re-measure, not to gate on a server the branch does not target.
+
+The pinned 1.5.6 stack stays in the repo because `main` still needs it, and it is
+worth running as a bonus signal, but it decides nothing on this branch.
+
+### Compatibility with 1.5.6, as reassurance only
+
+Measured across all **206 operations shared** between the 1.5.6-era spec and the
+edge spec built 2026-08-23 (`1.5.6-tk8i6j`, digest `f274522b`), which is what was
+generated from:
 
 | Check | Result |
 |---|---|
@@ -137,6 +151,10 @@ operations shared** between the 1.5.6-era spec and the edge spec built 2026-08-2
 | Parameters newly required | 0 |
 | Request body fields removed | 0 |
 | Request body fields newly required | 0 |
+
+This says the regeneration introduced no accidental request churn, which is useful
+to know. It is not a compatibility promise: nothing on this branch undertakes to
+keep working against 1.5.6.
 
 One operation did disappear — `GET /api/export/tags` — which is why 206 are shared
 rather than 207. The CLI never called it; it existed only as an unused generated
@@ -153,9 +171,10 @@ working, not a behaviour change smuggled in.
 1. `dotnet format GrimoireCli.sln --verify-no-changes`
 2. `dotnet build GrimoireCli.sln`
 3. `dotnet test tests/GrimoireCli.Tests/GrimoireCli.Tests.csproj`
-4. `bash docker/smoke-test.sh` against the **pinned 1.5.6 stack** — the real gate
-5. the same smoke test against the edge stack — signal, not gate, per the
-   migration document
+4. `bash docker/smoke-test.sh` against the **edge stack** — the gate, because edge
+   is what this branch targets
+5. the same smoke test against the pinned 1.5.6 stack — a bonus signal that the
+   regeneration introduced no accidental request churn, decisive of nothing
 
 ### Docs in PR 1
 

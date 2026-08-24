@@ -15,7 +15,7 @@
 - **Never hand-edit `src/GrimoireCli/Generated/`.** `bash tools/generate-api-client.sh` is the only supported path, and `kiota update` is forbidden — it refetches the raw spec and would skip `tools/normalize-spec.py`.
 - **Kiota must be exactly 1.34.1**, matching `.kiotaVersion` in `src/GrimoireCli/Generated/kiota-lock.json`. The generator script enforces this and exits rather than mixing generator churn into an API diff.
 - **The pinned 1.5.6 stack stays pinned.** `docker/docker-compose.yml` is not edited by this plan; the edge stack is a separate override.
-- **`bash docker/smoke-test.sh` against the 1.5.6 stack is the gate.** The same run against edge is signal only.
+- **`bash docker/smoke-test.sh` against the edge stack is the gate**, because edge is what this branch targets. One CLI version targets one server version, so a gate on 1.5.6 would test dual-version compatibility the migration document rules out. The 1.5.6 run is a bonus signal that the regeneration caused no accidental request churn.
 - **Compose v2.24+ is required** for the `!override` tag the edge file depends on. Verified present: this devcontainer has v5.4.0.
 - **Conventional Commits**, imperative, lowercase, no period, no `Co-Authored-By` and no tool attribution.
 - **`CHANGELOG.md` and `docs/roadmap.md` are not touched.** The changelog belongs to the release process; the roadmap records only maintainer-decided intent.
@@ -55,9 +55,9 @@ from the client generated against it — see
 1. **An edge stack and a client generated from it.** A
    `docker/docker-compose.edge.yml` override runs `edge` beside the pinned 1.5.6
    stack; `src/GrimoireCli/Generated/` is regenerated from its spec. No behaviour
-   change, so the review is a read of the generated diff. Safe for the pinned
-   stack: across all 207 operations shared between 1.5.6 and the 2026-08-17 edge
-   spec, no parameter or body field was removed or became newly required.
+   a read of the generated diff. The gate is the smoke test against edge, which is
+   what this branch targets; the pinned 1.5.6 stack is a bonus signal only, since
+   one CLI version targets one server version.
 2. **Byte-passthrough output.** Services return the response bytes, commands print
    them; compact by default with `--pretty` to re-indent. `src/GrimoireCli/Models/`
    is deleted outright, because step 1 gives `--help` a generated model to draw its
@@ -557,10 +557,10 @@ exist in the edge spec today, and this branch targets 1.6.0 — so the DTO
 deletion in PR 2 becomes one step instead of being staged around a help-sample
 source with no replacement.
 
-**Safe for the pinned stack.** Across all 207 operations shared between the
-1.5.6 spec and the 2026-08-17 edge spec, no parameter or request body field was
-removed or became newly required. `docker/smoke-test.sh` against the pinned
-1.5.6 stack is the gate and passes; the same run against edge is signal only.
+**The gate is edge**, which is what this branch targets, and it passes. The pinned
+1.5.6 stack is a bonus signal — it also passes, and across all 206 shared
+operations no parameter or request body field was removed or became newly
+required, so the regeneration caused no accidental request churn.
 
 **Not in this PR:** byte-passthrough output, the `Models/` deletion, the
 generator consolidation, `--pretty`, and the `CLAUDE.md` response-DTO claims
