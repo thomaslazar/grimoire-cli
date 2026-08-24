@@ -923,7 +923,37 @@ should pass unchanged. **If a `jq` assertion fails, read it before touching it**
 compact output is expected, but a *missing field* would mean passthrough dropped
 something, which is the opposite of the intent.
 
-- [ ] **Step 5: Confirm the behaviour changes are the intended ones**
+- [ ] **Step 5: Close the two minors carried from Task 1's review**
+
+First, the XML doc on the `string`-returning `SendAsync` in
+`src/GrimoireCli/Api/GrimoireApiClient.cs` does not mention that it now enforces
+JSON-or-empty on every response. Add that sentence — the guard is the overload's
+most consequential behaviour and a reader skimming the summary would miss it.
+
+Second, nothing exercises the SPA HTML-catch-all against a command that prints its
+response raw, which is exactly what the guard newly protects. `docker/smoke-test.sh`
+covers it only for `systems get`. Add a case against a raw-passthrough command,
+asserting exit code 2 and that **stdout stays empty** — the failure this prevents is
+an HTML page reaching stdout, so a test that only checks the exit code would pass
+even if the page were printed:
+
+```bash
+say "checking an unroutable id fails without printing HTML"
+set +e
+OUT=$("$CLI" systems update --id "." --stdin <<<'{"license":"x"}' 2>"$WORK/html.err")
+RC=$?
+set -e
+[ "$RC" -eq 2 ] || fail "expected exit 2 for an unroutable id, got $RC"
+[ -z "$OUT" ] || fail "an unroutable id printed to stdout: $OUT"
+ok "an unroutable id exits 2 with empty stdout"
+```
+
+Confirm the chosen command and id actually reach the SPA catch-all on this server
+before asserting on it — if the server returns a normal 404 for that shape, pick an
+id shape that does trigger the catch-all, or drop the case and say so in the report
+rather than asserting something the server does not do.
+
+- [ ] **Step 6: Confirm the behaviour changes are the intended ones**
 
 ```bash
 CLI=/tmp/gp-final/grimoire-cli
@@ -934,7 +964,7 @@ $CLI systems list --pretty | head -5
 Expected: compact single-line JSON without `--pretty`; indented with it. Undeclared
 server fields and explicit nulls should now be visible where the DTOs dropped them.
 
-- [ ] **Step 6: Commit and open the PR**
+- [ ] **Step 7: Commit and open the PR**
 
 ```bash
 git add -A
@@ -961,7 +991,7 @@ Then open the PR with a body covering, each as its own point:
 - **What is unchanged**: which endpoints are called, every command name and flag
   apart from the added `--pretty`, and the binary `--output` path.
 
-- [ ] **Step 7: Watch CI to a terminal state**
+- [ ] **Step 8: Watch CI to a terminal state**
 
 ```bash
 gh pr checks --watch
