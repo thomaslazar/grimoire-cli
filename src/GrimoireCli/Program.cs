@@ -6,13 +6,18 @@ var _logger = NLog.LogManager.GetLogger("GrimoireCli.Program");
 
 var rootCommand = new RootCommand("grimoire-cli — Grimoire TTRPG library CLI");
 
+// Recursive so the flag works where a caller naturally writes it — after the
+// subcommand. Without it the token parses as an unmatched option, the command
+// prints usage and exits, which reads as a broken flag rather than a misplaced one.
 var debugOption = new Option<bool>("--debug")
 {
-    Description = "Enable debug-level logging (HTTP requests, token expiry, version check) to stderr."
+    Description = "Enable debug-level logging (HTTP requests, token expiry, version check) to stderr.",
+    Recursive = true
 };
 var logJsonOption = new Option<bool>("--log-json")
 {
-    Description = "Emit stderr log lines as single-line JSON instead of text."
+    Description = "Emit stderr log lines as single-line JSON instead of text.",
+    Recursive = true
 };
 rootCommand.Options.Add(debugOption);
 rootCommand.Options.Add(logJsonOption);

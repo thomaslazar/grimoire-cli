@@ -50,16 +50,18 @@ See `GrimoireApiClient.EnsureSuccessAsync` for the status-to-message mapping
 
 ## Logging
 
-- `--debug` (root option) or `GRIMOIRE_DEBUG=1` raises the stderr log level
+- `--debug` or `GRIMOIRE_DEBUG=1` raises the stderr log level
   from `Warn` to `Debug` — HTTP requests (via `DebugHttpHandler`), token
   expiry checks, and server-version comparisons all log at `Debug`.
-- `--log-json` (root option) switches the stderr layout from
+- `--log-json` switches the stderr layout from
   `{timestamp} {LEVEL} {message}` to single-line JSON
   (`{"timestamp":...,"level":...,"message":...}`) — see `LogSetup.cs`.
-- **Both are root options and must precede the subcommand**:
-  `grimoire-cli --debug systems list`, not `grimoire-cli systems list --debug`.
-  System.CommandLine parses root options before subcommand tokens, and
-  neither is `Recursive` on the subcommands.
+- **Both are recursive root options**, so either position works:
+  `grimoire-cli --debug systems list` and `grimoire-cli systems list --debug`
+  are equivalent. They were root-position-only until it turned out that was
+  accidental rather than intended — a misplaced token printed usage and dropped
+  the flag, which reads as a broken flag rather than a misplaced one. The cost is
+  that both appear in every subcommand's `--help`, as `--help-full` already did.
 - The bearer token is never logged, at any verbosity — `DebugHttpHandler`
   logs only method, URL, status, and (for 4xx/5xx) a truncated response
   body; it never dumps request headers, so the `Authorization` header is

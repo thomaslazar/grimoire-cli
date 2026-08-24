@@ -100,7 +100,7 @@ production deployment may not — a burst of failed logins there can return
 
 ## Diagnostic logging
 
-Run any command with `--debug` (root option, before the subcommand) or set
+Run any command with `--debug` (before or after the subcommand) or set
 `GRIMOIRE_DEBUG=1` to emit token-expiry checks and server-version comparisons
 to stderr. See [input-output.md](input-output.md) for full logging details.
 The bearer token itself is never logged, at any verbosity.
