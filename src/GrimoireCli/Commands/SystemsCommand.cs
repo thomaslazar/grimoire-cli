@@ -261,7 +261,7 @@ public static class SystemsCommand
             "grimoire-cli systems batch-tag --input tags.json",
             "echo '{\"ids\":[\"<id>\"],\"tags\":[\"cyberpunk\"]}' | grimoire-cli systems batch-tag --stdin");
         command.AddRequestShape<Generated.Models.BulkAddTags>();
-        command.AddResponseExample<Generated.Models.TagsResponse>();
+        command.AddResponseExample<Generated.Models.BulkTagResult>();
         command.SetAction(async (parseResult, cancellationToken) =>
         {
             string body;

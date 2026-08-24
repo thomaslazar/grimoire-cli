@@ -43,6 +43,7 @@ public static class LibraryCommand
             "and this one did not start — a books rescan still running is one",
             "cause.");
         command.AddExamples("grimoire-cli library rescan --scope \"books/Shadowrun/4 DE\"");
+        command.AddResponseExample<Generated.Models.Backend__routers__library___schemas__StatusResponse>();
         command.SetAction(async (parseResult, cancellationToken) =>
         {
             var (client, _) = CommandHelper.BuildClient(

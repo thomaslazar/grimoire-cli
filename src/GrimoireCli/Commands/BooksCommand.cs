@@ -224,7 +224,7 @@ public static class BooksCommand
             "grimoire-cli books batch-tag --input tags.json",
             "echo '{\"ids\":[\"<id>\"],\"tags\":[\"cyberpunk\"]}' | grimoire-cli books batch-tag --stdin");
         command.AddRequestShape<Generated.Models.BulkAddTags>();
-        command.AddResponseExample<Generated.Models.TagsResponse>();
+        command.AddResponseExample<Generated.Models.BulkTagResult>();
         command.SetAction(async (parseResult, cancellationToken) =>
         {
             string body;
