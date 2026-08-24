@@ -1,3 +1,4 @@
+using System.Reflection;
 using System.Text;
 using Microsoft.Kiota.Abstractions.Serialization;
 
@@ -68,8 +69,11 @@ internal static class Program
     /// Every model in the generated client: the top-level IParsable classes of
     /// GrimoireCli.Generated.Models, covering both request bodies and response
     /// payloads. Excluded are the composed types' "…Member1" null-branch
-    /// shells, which carry no fields, and HTTPValidationError /
-    /// ValidationError, the spec's only response-only schemas.
+    /// shells, which carry no fields; HTTPValidationError / ValidationError,
+    /// the spec's only response-only schemas; and types the generator itself
+    /// marks `[Obsolete]` (superseded schemas kept only for spec history) —
+    /// no command references those, and a sample for one would compile with
+    /// a CS0618 warning for no reader.
     /// </summary>
     private static List<Type> DiscoverModelTypes()
     {
@@ -81,6 +85,7 @@ internal static class Program
             .Where(t => typeof(IParsable).IsAssignableFrom(t))
             .Where(t => !t.Name.EndsWith("Member1", StringComparison.Ordinal))
             .Where(t => !excluded.Contains(t.Name))
+            .Where(t => t.GetCustomAttribute<ObsoleteAttribute>() is null)
             .ToList();
     }
 
