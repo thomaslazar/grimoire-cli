@@ -109,7 +109,7 @@ public class MetadataCommandTests
     {
         var output = SystemsHelp("metadata-fetch", full: true);
         Assert.Contains("\"status\":", output);
-        Assert.Contains("\"current\": {}", output);
+        Assert.Contains("\"<any>\"", output);
     }
 
     // Neither flag is a request the server answers with anything but a 400, and
