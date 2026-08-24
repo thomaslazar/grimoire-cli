@@ -91,7 +91,7 @@ pass responses through raw.
 - Test: `tests/GrimoireCli.Tests/Commands/RootHelpTests.cs`
 
 **Interfaces:**
-- Produces: `ConsoleOutput.Pretty` (settable bool), `ConsoleOutput.WriteRawJson(string)` honouring it, `GrimoireApiClient.EnsureJson(string json, string endpoint)`, `GrimoireApiClient.HasItems(string json, string property)`.
+- Produces: `ConsoleOutput.Pretty` (settable bool), `ConsoleOutput.WriteRawJson(string)` honouring it, `GrimoireApiClient.IsJsonOrEmpty(string json)`, `GrimoireApiClient.EnsureJson(string json, string endpoint)`, `GrimoireApiClient.HasItems(string json, string property)`.
 
 - [ ] **Step 1: Write the failing tests for the raw-JSON helpers**
 
@@ -109,20 +109,30 @@ Append to `tests/GrimoireCli.Tests/Api/DeserializeTests.cs`, inside the existing
         => Assert.Equal(expected, GrimoireApiClient.HasItems(json, property));
 
     [Theory]
-    [InlineData("{\"a\":1}")]
-    [InlineData("[1,2,3]")]
-    [InlineData("")]
-    [InlineData("   ")]
-    public void EnsureJson_AcceptsJsonAndEmptyBodies(string json)
-        => GrimoireApiClient.EnsureJson(json, "/api/test");
+    [InlineData("{\"a\":1}", true)]
+    [InlineData("[1,2,3]", true)]
+    [InlineData("", true)]
+    [InlineData("   ", true)]
+    [InlineData("<!doctype html><html><body>Not Found</body></html>", false)]
+    [InlineData("{\"id\":\"sr6\",\"name\":\"trunc", false)]
+    public void IsJsonOrEmpty_AcceptsJsonAndEmptyBodies_RejectsHtmlAndTruncated(string json, bool expected)
+        => Assert.Equal(expected, GrimoireApiClient.IsJsonOrEmpty(json));
 ```
 
 An empty body must pass: a 204 is legitimate and `JsonDocument.Parse("")` throws.
 
+**Why the decision is split from the exit.** `EnsureJson` ends in
+`Environment.Exit(2)`, which tears down the test runner, so its failure branch
+cannot be called from a test — `DeserializeTests` documents that same trap for
+`Deserialize` and covers the exit path in `docker/smoke-test.sh` instead. Putting
+the verdict in a pure `IsJsonOrEmpty` makes **both** branches assertable here, and
+leaves `EnsureJson` as the thin shell that logs and exits. Do not write a test that
+calls `EnsureJson` with a bad body.
+
 - [ ] **Step 2: Run them to verify they fail**
 
-Run: `dotnet test tests/GrimoireCli.Tests/GrimoireCli.Tests.csproj --filter "HasItems|EnsureJson"`
-Expected: compile failure — `EnsureJson` and `HasItems` do not exist.
+Run: `dotnet test tests/GrimoireCli.Tests/GrimoireCli.Tests.csproj --filter "HasItems|IsJsonOrEmpty"`
+Expected: compile failure — `IsJsonOrEmpty` and `HasItems` do not exist.
 
 - [ ] **Step 3: Implement the two helpers**
 
@@ -151,6 +161,25 @@ In `src/GrimoireCli/Api/GrimoireApiClient.cs`, beside the existing
     }
 
     /// <summary>
+    /// Whether a body is JSON, or empty. A 204 or other bodiless success is
+    /// legitimate and parses as nothing. Pure so both branches are testable —
+    /// <see cref="EnsureJson"/> cannot be, because it exits.
+    /// </summary>
+    internal static bool IsJsonOrEmpty(string json)
+    {
+        if (string.IsNullOrWhiteSpace(json)) return true;
+        try
+        {
+            using var doc = JsonDocument.Parse(json);
+            return true;
+        }
+        catch (JsonException)
+        {
+            return false;
+        }
+    }
+
+    /// <summary>
     /// Fails a response body that is not JSON, taking over the check the response
     /// DTOs used to provide as a side effect of deserializing. Grimoire's SPA
     /// catch-all answers an unroutable request (an empty, ".", or otherwise
@@ -159,25 +188,16 @@ In `src/GrimoireCli/Api/GrimoireApiClient.cs`, beside the existing
     /// </summary>
     internal static void EnsureJson(string json, string endpoint)
     {
-        // A 204 or other bodiless success is legitimate and parses as nothing.
-        if (string.IsNullOrWhiteSpace(json)) return;
-        try
-        {
-            using var doc = JsonDocument.Parse(json);
-        }
-        catch (JsonException ex)
-        {
-            _logger.Debug($"unparseable body from {endpoint}: {TruncateForLogging(json)}");
-            _logger.Debug($"JsonException: {ex.Message}");
-            _logger.Error($"Response from {endpoint} could not be parsed as JSON. Run with --debug to see the response body and parse error.");
-            Environment.Exit(2);
-        }
+        if (IsJsonOrEmpty(json)) return;
+        _logger.Debug($"unparseable body from {endpoint}: {TruncateForLogging(json)}");
+        _logger.Error($"Response from {endpoint} could not be parsed as JSON. Run with --debug to see the response body.");
+        Environment.Exit(2);
     }
 ```
 
 - [ ] **Step 4: Run the tests to verify they pass**
 
-Run: `dotnet test tests/GrimoireCli.Tests/GrimoireCli.Tests.csproj --filter "HasItems|EnsureJson"`
+Run: `dotnet test tests/GrimoireCli.Tests/GrimoireCli.Tests.csproj --filter "HasItems|IsJsonOrEmpty"`
 Expected: PASS.
 
 - [ ] **Step 5: Call the guard from the one place every raw response is read**
