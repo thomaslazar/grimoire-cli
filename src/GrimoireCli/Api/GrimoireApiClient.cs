@@ -395,7 +395,8 @@ public class GrimoireApiClient
     /// channels report their channel name rather than a version, and
     /// <see cref="ParseVersion"/> reads a non-numeric segment as 0 — so comparing
     /// one would report "older than the minimum" about a string that says nothing
-    /// of the sort.
+    /// of the sort. A literal "0.0.0" parses to all zeros too and so also reads as
+    /// uncomparable, which is harmless because no Grimoire release ships as version 0.
     /// </summary>
     internal static bool IsComparableVersion(string? version)
         => !string.IsNullOrWhiteSpace(version) && ParseVersion(version).Any(p => p != 0);
