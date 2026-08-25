@@ -38,6 +38,26 @@ DEFAULT_OUT = REPO / "docs" / "grimoire-api-coverage.md"
 
 # Commands that implement an operation, keyed by "METHOD /path". Update this in
 # the same PR as any change to which endpoints the CLI calls.
+
+def tested_range() -> str:
+    """The supported server range, read from the constants that enforce it.
+
+    The spec's own `info.version` is the build the table was generated from,
+    which is a different thing: it tracks the stack the CLI develops against,
+    while these constants track what the version gate actually accepts.
+    """
+    source = (REPO / "src" / "GrimoireCli" / "Api" / "GrimoireApiClient.cs").read_text(
+        encoding="utf-8"
+    )
+    found = {}
+    for name in ("MinSupportedVersion", "MaxTestedVersion"):
+        match = re.search(rf'{name}\s*=\s*"([^"]+)"', source)
+        if match is None:
+            return "unknown"
+        found[name] = match.group(1)
+    low, high = found["MinSupportedVersion"], found["MaxTestedVersion"]
+    return f"`{low}` only" if low == high else f"`{low}`-`{high}`"
+
 IMPLEMENTED = {
     "POST /api/auth/login": "`login` ✅",
     "POST /api/auth/refresh": "🔒 automatic session renewal (all commands)",
@@ -243,6 +263,7 @@ def main() -> int:
             "Override the host with GRIMOIRE_SERVER."
         )
     version = spec["info"]["version"]
+    tested = tested_range()
     roles = resolve_roles(dependency_roles(SOURCE), spec["paths"])
 
     by_tag: dict[str, list[tuple[str, str, str, str, str]]] = {}
@@ -271,7 +292,7 @@ def main() -> int:
         "",
         f"- **Reference:** spec fetched live from the pinned stack's `/api/openapi.json` "
         f"(v{version}, {len(spec['paths'])} paths, {total} operations) and the upstream "
-        f"source at `temp/grimoire/backend/routers/`. Tested range: `{version}` only "
+        f"source at `temp/grimoire/backend/routers/`. Tested range: {tested} "
         f"(`GrimoireApiClient.cs`).",
         "- **Perm** column uses Grimoire's roles (`admin` / `gm or admin` / `not guest`); "
         "blank = any authenticated user. `?` = a dependency this script could not resolve.",

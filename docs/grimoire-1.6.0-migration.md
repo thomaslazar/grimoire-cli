@@ -294,7 +294,16 @@ reference to a released version because `main` carries work no instance runs.
   pin, which is why behaviour is read out of the running container instead.
 - `CLAUDE.md` — the unpinned-channel exception under "API client generation" goes
   away with it.
-- `docs/authentication.md` — rewrite for refresh (workstream A).
+- **`docs/grimoire-api-coverage.md` — regenerate, and only here.** The table is
+  generated from the live spec plus the role dependencies in `temp/grimoire`, so
+  it cannot be regenerated while those two disagree on version: against a 1.6.0
+  spec with a 1.5.6 source pin, every route added since 1.5.6 resolves to a blank
+  Perm column, which the table's own legend reads as "any authenticated user".
+  Measured: 62 new operations, `POST /api/backups` and
+  `DELETE /api/backups/{backup_id}` among them, would each be published as
+  needing no role. Repin `temp/grimoire` to `v1.6.0` *first*, then regenerate.
+  Until then `IMPLEMENTED` is kept current by hand and the table lags — which is
+  why `POST /api/auth/refresh` is in the script but not yet in the markdown.
 - `CLAUDE.md` — the "API client generation" section states that no success
   response carries a schema and that response DTOs are therefore hand-written.
   Both become false; the rule they justify goes with them.
@@ -350,8 +359,11 @@ docker inspect hunterreadca/grimoire:nightly --format '{{index .RepoDigests 0}}'
    and today's DTOs were right.
 3. **Output contract** — re-serialise through Kiota, or pass the server's bytes
    through verbatim?
-4. **Session commands** — expose `auth sessions` and revocation, or stop at
-   transparent refresh?
+4. ~~**Session commands** — expose `auth sessions` and revocation, or stop at
+   transparent refresh?~~ Stopped at transparent refresh. `logout` was weighed on
+   the grounds that a refresh token sits on disk for 30 days, and dropped: the
+   remedy already exists off-CLI, since revoking the session in the web UI or
+   changing the password both kill it.
 
 ## Reproducing the environment
 

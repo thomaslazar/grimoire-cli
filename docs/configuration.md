@@ -79,7 +79,7 @@ Highest wins (`ConfigManager.Resolve`):
 
 | Command | Description |
 |---------|-------------|
-| `grimoire-cli config get` | Shows current config (`accessToken` masked to `***`, plus `configPath`, `lastVersionCheck`, `lastServerVersion`) |
+| `grimoire-cli config get` | Shows current config (`accessToken` and `refreshToken` masked to `***`, plus `configPath`, `lastVersionCheck`, `lastServerVersion`) |
 | `grimoire-cli config set <key> <value>` | Sets a config value |
 
 `config set` accepts **only** `server` as a key — `ApplyConfigSet` in
