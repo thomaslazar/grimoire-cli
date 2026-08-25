@@ -34,7 +34,7 @@ public class DebugHttpHandlerTests
             Layout = new SimpleLayout("${level:uppercase=true} ${message}")
         };
         config.AddTarget(target);
-        config.AddRule(debugEnabled ? LogLevel.Debug : LogLevel.Warn, LogLevel.Fatal, target);
+        config.AddRule(debugEnabled ? LogLevel.Debug : LogLevel.Warn, LogLevel.Fatal, target, "GrimoireCli.Api.DebugHttpHandler");
         LogManager.Configuration = config;
         return target;
     }
