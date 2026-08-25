@@ -34,11 +34,13 @@ services:
     # and a floating tag would make a red CI run indistinguishable from upstream
     # changing. A digest is as reproducible as a release tag.
     #
-    # This is `edge` built 2026-08-23, reporting 1.5.6-tk8i6j. Move it deliberately
-    # — regenerate the client in the same commit, because the spec is read from
-    # whatever this pin resolves to. Support for released 1.5.6 lives on
-    # support/grimoire-1.5.6, where this file still pins the 1.5.6 tag.
-    image: hunterreadca/grimoire@sha256:f274522b32815bc6c44294028ee239396fcb17acbbb542ebfcb738d6c3f876f6
+    # This is `nightly` built 2026-08-25, where the 1.6.0 RC lands. It reports its
+    # version as the literal "nightly" — see IsComparableVersion in
+    # GrimoireApiClient. Move it deliberately and regenerate the client in the same
+    # commit, because the spec is read from whatever this pin resolves to. Support
+    # for released 1.5.6 lives on support/grimoire-1.5.6, where this file still
+    # pins the 1.5.6 tag.
+    image: hunterreadca/grimoire@sha256:90e2380acad59eef798b5f216751e3b22778fa5c1e5ca4767dcd9e38df0ed042
     ports:
       - "9481:9481"
     environment:

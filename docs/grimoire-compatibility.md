@@ -12,8 +12,8 @@ fixes are made and released there, then cherry-picked forward.
 
 `main` targets Grimoire 1.6.0, which is unreleased and needs more than a version
 bump: it shortens the access token from 30 days to 30 minutes and types every
-response in the spec. Until it tags, `docker/docker-compose.yml` on `main` pins an
-`edge` digest rather than a release. See
+response in the spec. Until it tags, `docker/docker-compose.yml` on `main` pins a
+`nightly` digest rather than a release. See
 [grimoire-1.6.0-migration.md](grimoire-1.6.0-migration.md).
 
 ## Runtime check
@@ -33,6 +33,8 @@ invocations.
 - Above `MaxTestedVersion` → a warning on stderr that the server is newer
   than anything this CLI has been tested against.
 - Inside the range → nothing (a debug line only, under `--debug`).
+- No numeric component to compare (e.g. the literal `nightly`) → skipped
+  silently, with a debug line only.
 
 A probe that fails — unreachable server, non-2xx, unparseable body — is
 silent except under `--debug`, and leaves `lastVersionCheck` untouched so the

@@ -130,10 +130,10 @@ These rules exist because help text sits on the hot path for the agents driving 
   docker compose -f docker/docker-compose.yml up -d --wait
   # then generate straight from http://host.docker.internal:9481/api/openapi.json
   ```
-- **A digest pin is a temporary exception, not the convention.** The pin is normally a release tag. It is a digest only while the targeted server version is unreleased — right now, because the CLI is being built alongside active server development. `edge` moves, and a floating tag would make a red CI run indistinguishable from upstream changing, whereas a digest is as reproducible as a release tag. **When 1.6.0 releases, the pin goes back to a release tag** (`hunterreadca/grimoire:1.6.0`); see workstream C in [docs/grimoire-1.6.0-migration.md](docs/grimoire-1.6.0-migration.md). Until then, move it deliberately and regenerate the client in the same commit, and check whether it has gone stale with:
+- **A digest pin is a temporary exception, not the convention.** The pin is normally a release tag. It is a digest only while the targeted server version is unreleased — right now, because the CLI is being built alongside active server development. The pin tracks `nightly` rather than `edge` because that is where the 1.6.0 RC lands; either channel moves, and a floating tag would make a red CI run indistinguishable from upstream changing, whereas a digest is as reproducible as a release tag. **When 1.6.0 releases, the pin goes back to a release tag** (`hunterreadca/grimoire:1.6.0`); see workstream C in [docs/grimoire-1.6.0-migration.md](docs/grimoire-1.6.0-migration.md). Until then, move it deliberately and regenerate the client in the same commit, and check whether it has gone stale with:
   ```bash
-  docker pull hunterreadca/grimoire:edge
-  docker inspect hunterreadca/grimoire:edge --format '{{index .RepoDigests 0}}'
+  docker pull hunterreadca/grimoire:nightly
+  docker inspect hunterreadca/grimoire:nightly --format '{{index .RepoDigests 0}}'
   ```
 - **Released-version support lives on `support/grimoire-1.5.6`**, where the pin is the `1.5.6` tag. Fixes for 1.5.6 are made there and released from there, then cherry-picked forward — not merged, since `main` no longer has the DTO layer they were written against.
 - **Generate with a .NET-native generator** — Kiota is the fit: a `dotnet tool`, handles the spec's OpenAPI 3.1, emits C#. No node or java is available in the devcontainer.

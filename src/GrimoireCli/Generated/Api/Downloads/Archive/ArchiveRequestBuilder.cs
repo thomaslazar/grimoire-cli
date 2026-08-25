@@ -34,7 +34,7 @@ namespace GrimoireCli.Generated.Api.Downloads.Archive
         {
         }
         /// <summary>
-        /// Stream a collection of files as a single archive. `fmt` controls the format: `zip` (default), `tar`, `tar.gz`, `tar.bz2`. `type` controls the scope: `system`, `system_category`, `map_folder`, `token_folder`.
+        /// Stream a collection of files as a single archive. `fmt` controls the format: `zip` (default), `tar`, `tar.gz`, `tar.bz2`. `type` controls the scope: `system`, `system_category`, `book_folder`, `map_folder`, `token_folder`, `audio_folder`, or `library_folder` (admin-only; any folder as it sits on disk, indexed or not).
         /// </summary>
         /// <returns>A <see cref="UntypedNode"/></returns>
         /// <param name="cancellationToken">Cancellation token to use when cancelling requests</param>
@@ -57,7 +57,7 @@ namespace GrimoireCli.Generated.Api.Downloads.Archive
             return await RequestAdapter.SendAsync<UntypedNode>(requestInfo, UntypedNode.CreateFromDiscriminatorValue, errorMapping, cancellationToken).ConfigureAwait(false);
         }
         /// <summary>
-        /// Stream a collection of files as a single archive. `fmt` controls the format: `zip` (default), `tar`, `tar.gz`, `tar.bz2`. `type` controls the scope: `system`, `system_category`, `map_folder`, `token_folder`.
+        /// Stream a collection of files as a single archive. `fmt` controls the format: `zip` (default), `tar`, `tar.gz`, `tar.bz2`. `type` controls the scope: `system`, `system_category`, `book_folder`, `map_folder`, `token_folder`, `audio_folder`, or `library_folder` (admin-only; any folder as it sits on disk, indexed or not).
         /// </summary>
         /// <returns>A <see cref="RequestInformation"/></returns>
         /// <param name="requestConfiguration">Configuration for the request such as headers, query parameters, and middleware options.</param>
@@ -85,7 +85,7 @@ namespace GrimoireCli.Generated.Api.Downloads.Archive
             return new global::GrimoireCli.Generated.Api.Downloads.Archive.ArchiveRequestBuilder(rawUrl, RequestAdapter);
         }
         /// <summary>
-        /// Stream a collection of files as a single archive. `fmt` controls the format: `zip` (default), `tar`, `tar.gz`, `tar.bz2`. `type` controls the scope: `system`, `system_category`, `map_folder`, `token_folder`.
+        /// Stream a collection of files as a single archive. `fmt` controls the format: `zip` (default), `tar`, `tar.gz`, `tar.bz2`. `type` controls the scope: `system`, `system_category`, `book_folder`, `map_folder`, `token_folder`, `audio_folder`, or `library_folder` (admin-only; any folder as it sits on disk, indexed or not).
         /// </summary>
         [global::System.CodeDom.Compiler.GeneratedCode("Kiota", "1.0.0")]
         public partial class ArchiveRequestBuilderGetQueryParameters 
@@ -110,7 +110,7 @@ namespace GrimoireCli.Generated.Api.Downloads.Archive
             [QueryParameter("fmt")]
             public string Fmt { get; set; }
 #endif
-            /// <summary>Folder path (book_folder / map_folder / token_folder / audio_folder)</summary>
+            /// <summary>Folder path (book_folder / map_folder / token_folder / audio_folder / library_folder — the latter is library-root-relative)</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
             [QueryParameter("folder")]
@@ -139,7 +139,7 @@ namespace GrimoireCli.Generated.Api.Downloads.Archive
             [QueryParameter("token")]
             public string Token { get; set; }
 #endif
-            /// <summary>Scope: system | system_category | book_folder | map_folder | token_folder | audio_folder</summary>
+            /// <summary>Scope: system | system_category | book_folder | map_folder | token_folder | audio_folder | library_folder</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
             [QueryParameter("type")]

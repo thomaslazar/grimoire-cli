@@ -51,11 +51,12 @@ conflicts with it. The edge stack comes first because everything else is built
 from the client generated against it — see
 [the design](specs/2026-08-19-edge-client-and-byte-passthrough-design.md).
 
-1. **A client generated from edge.** `docker/docker-compose.yml` pins an `edge`
-   digest and `src/GrimoireCli/Generated/` is regenerated from its spec. The review
-   is a read of the generated diff, and the gate is the smoke test against that
-   pinned stack — one CLI version targets one server version, so there is one stack
-   and it is the one being targeted.
+1. **A client generated from edge.** `docker/docker-compose.yml` pins a digest —
+   `edge` at first, moved to `nightly` once the 1.6.0 RC landed there — and
+   `src/GrimoireCli/Generated/` is regenerated from its spec. The review is a read
+   of the generated diff, and the gate is the smoke test against that pinned
+   stack — one CLI version targets one server version, so there is one stack and
+   it is the one being targeted.
 2. **Byte-passthrough output.** Services return the response bytes, commands print
    them; compact by default with `--pretty` to re-indent. `src/GrimoireCli/Models/`
    is deleted outright, because step 1 gives `--help` a generated model to draw its
@@ -311,9 +312,10 @@ apply against.
 
 **CI can pin a prerelease after all.** The earlier claim that it could not assumed
 the choice was a release tag or a floating one. `docker/docker-compose.yml` on
-`main` pins an `edge` **digest**, which is as reproducible as a release tag, so the
-smoke test against the server this branch targets is a real gate rather than a
-signal. Moving the pin is a deliberate commit that regenerates the client with it.
+`main` pins a **digest** — now on the `nightly` channel, where the 1.6.0 RC
+lands — which is as reproducible as a release tag, so the smoke test against the
+server this branch targets is a real gate rather than a signal. Moving the pin is
+a deliberate commit that regenerates the client with it.
 
 **That pin is an exception with an expiry.** It exists only because the CLI is being
 built alongside active server development, and [workstream
@@ -322,8 +324,8 @@ stack goes back to a release tag. Whether the pin has gone stale is two commands
 which is why there is no second compose file for it:
 
 ```bash
-docker pull hunterreadca/grimoire:edge
-docker inspect hunterreadca/grimoire:edge --format '{{index .RepoDigests 0}}'
+docker pull hunterreadca/grimoire:nightly
+docker inspect hunterreadca/grimoire:nightly --format '{{index .RepoDigests 0}}'
 ```
 
 ## Open questions
