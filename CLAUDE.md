@@ -85,6 +85,11 @@ Deliberate deviations today:
 - **`docs/grimoire-api-notes.md` has no abs-cli counterpart.** A meaningful slice of Grimoire's success responses still type as `{}` in the spec (see below), so verified behaviour needs somewhere to live; ABS's behaviour is read from its server source on demand.
 - **The README Commands table rule lives under "Docs, specs & roadmap", not "Command implementation conventions"** where abs-cli keeps it. It is paired there with the API-coverage rule, which abs-cli has no counterpart for, and splitting the pair to match abs-cli's placement would cost more than the drift does.
 - **No confirm-gated command.** abs-cli exempts `libraries delete` from thin pass-through with a type-the-name prompt. `library cleanup-missing` settled the question here and takes neither a prompt nor a `--yes`: the callers are agents, so a prompt is either bypassed by a flag that becomes boilerplate or hangs a non-interactive caller. The warning lives in the help text, where an agent reads it.
+- **The 401 fallback keys on `X-Token-Expired`, not on any 401.** abs-cli
+  refreshes on every 401. Grimoire marks an expired access token with that
+  header specifically so it stays distinguishable from "not authenticated" and
+  "invalid token", and `POST /api/auth/refresh` is rate-limited, so refreshing
+  on a permission denial would spend a request for nothing.
 - **The `release` skill carries an extra step reconciling the supported server
   range.** `MinSupportedVersion` / `MaxTestedVersion`, the compatibility matrix
   and the README line must agree before a tag is cut. abs-cli has no counterpart

@@ -40,6 +40,7 @@ DEFAULT_OUT = REPO / "docs" / "grimoire-api-coverage.md"
 # the same PR as any change to which endpoints the CLI calls.
 IMPLEMENTED = {
     "POST /api/auth/login": "`login` ✅",
+    "POST /api/auth/refresh": "🔒 automatic session renewal (all commands)",
     "GET /api/auth/me": "`me` ✅",
     "GET /api/about": "🔒 24-hour version check (all commands), forced at login",
     "GET /api/systems": "`systems list` ✅",

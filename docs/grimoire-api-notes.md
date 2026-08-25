@@ -1,10 +1,11 @@
 # Grimoire API notes
 
 Behaviour verified against Grimoire **v1.5.6** — the release the live instance
-and `docker/docker-compose.yml` both run — by reading `temp/grimoire/` at that
-tag and by calling the API. Don't re-derive these, and don't trust the published
-docs over them. Re-verify after a server upgrade — see
-[grimoire-compatibility.md](grimoire-compatibility.md) for the bump procedure.
+runs — by reading `temp/grimoire/` at that tag and by calling the API. The local
+stack now rides the 1.6.0 nightly, so a note measured there says so. Don't
+re-derive these, and don't trust the published docs over them. Re-verify after a
+server upgrade — see [grimoire-compatibility.md](grimoire-compatibility.md) for
+the bump procedure.
 
 `main` upstream carries unreleased work that no instance runs. Pinning the
 reference clone to the release tag is not optional; reading `main` is how the
@@ -13,14 +14,61 @@ were both examples of this at v1.5.4 — both shipped in v1.5.5, see below.
 
 ## Auth
 
-- **`HTTPBearer`.** `POST /api/auth/login` returns a JWT valid 30 days.
-- **There is no refresh endpoint.** An expired token means logging in again — the
-  main divergence from ABS, which has `auth/refresh` and a refresh token.
-- Both `/api/auth/login` and `/api/auth/setup` return `{"token": …, "user": {…}}`.
-  The key is `token`, not `access_token`.
-- Auth endpoints are rate-limited: `AUTH_RATE_LIMIT` defaults to `10/minute`, and
-  `RATE_LIMIT_ENABLED=false` disables it (`backend/security.py`). The local stack
-  sets the latter.
+Measured against `hunterreadca/grimoire:nightly`, commit
+`7f5937071f51dfc65bc09f5e5e49d33c431f0a5d` — the 1.6.0 RC, not the v1.5.6 the
+rest of this file describes.
+
+- **`HTTPBearer`.** `POST /api/auth/login` returns `{"token": …, "user": {…}}`
+  and sets two HttpOnly cookies: `grimoire_session=<jwt>` (`Path=/`,
+  `SameSite=lax`) and `grimoire_refresh=<opaque>` (`Path=/api/auth`,
+  `SameSite=strict`). Both carry `Max-Age=2592000` whatever the JWT's real
+  life, so cookie lifetime says nothing about expiry.
+- **`/api/auth/setup` returns the same body shape.** The key is `token`, not
+  `access_token`.
+- **The access token lives 30 minutes.** Observed `exp - iat` is 1800s, per
+  `ACCESS_TOKEN_EXPIRE_MINUTES` (`backend/sessions.py`, env-overridable). Claims
+  are `sub`, `username`, `role`, `iat`, `jti`, `exp`, `sid`. v1.5.6 issued a
+  single JWT valid 30 days and no refresh token at all.
+- **The refresh token is opaque text, not a JWT**, so its expiry cannot be read
+  locally. Only the server knows when it dies.
+- **`POST /api/auth/refresh` authenticates on the cookie alone** — no bearer
+  header, and the spec declares no bearer security on it. It returns the same
+  `{"token", "user"}` shape and re-sets both cookies. `sid` is unchanged across
+  a refresh: the session persists and only the tokens rotate. `rotate_session`
+  also slides `expires_at` 30 days forward, so an actively used session does
+  not age out.
+- **It tolerates a stale `Authorization` header** — verified 200 with a
+  deliberately expired token attached.
+- **Replaying a rotated refresh token revokes the session.** `rotate_session`
+  moves the old hash into `previous_token_hash`, and `get_active_session` reads
+  a hit there as theft (`backend/sessions.py`). Verified: after rotating
+  `T0 → T1`, replaying `T0` returned
+  `401 {"detail":"Invalid or expired refresh token"}` *and* killed `T1`, valid
+  seconds earlier. There is no grace column, timestamp or knob.
+- **An expired access token is distinguishable from other 401s.**
+  `get_current_user` answers it with `401`,
+  `{"detail":"Token expired - please log in again"}` and the header
+  `X-Token-Expired: 1`. A missing or malformed token yields
+  `{"detail":"Not authenticated"}` or `{"detail":"Invalid token"}` with **no**
+  such header.
+- **Access tokens are not checked against the session table** —
+  `get_current_user` only decodes the JWT (`backend/auth.py`). Revoking a
+  session does not kill tokens already issued; they stand until their own
+  `exp`. The blast radius of a revocation is the next refresh.
+- **Revocation is routine, not exceptional.** A password change revokes all
+  other sessions, an admin edit carrying a `revoke_reason` revokes all of a
+  user's, and guest promotion or removal from a campaign revoke too. The web UI
+  manages sessions directly.
+- **The renewal happy path, hand-run against the local stack:** a minted
+  expired access token swapped into the config produced `access token expiring
+  in -60s, refreshing` → `POST /api/auth/refresh 200` → `token refresh
+  succeeded` → the request succeeding, with the rotated cookie written to disk.
+  CI does not cover this; the smoke test covers only the retired-session
+  failure path.
+- Auth endpoints are rate-limited: `AUTH_RATE_LIMIT` defaults to `10/minute`,
+  and `RATE_LIMIT_ENABLED=false` disables it (`backend/security.py`). The local
+  stack sets the latter. `/api/auth/refresh` is among them, because the cookie
+  is a bearer credential.
 
 ## Responses
 

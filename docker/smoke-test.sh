@@ -929,7 +929,7 @@ grep -qi "at System\.\|Unhandled exception" "$WORK/corrupt.err" \
   && fail "a corrupt config leaked a stack trace: $(cat "$WORK/corrupt.err")"
 [ ! -s "$WORK/corrupt.out" ] || fail "stdout should stay empty on a config failure"
 # The unparseable file is moved aside rather than left to be overwritten: it may
-# hold a 30-day token that a one-character fix would recover.
+# hold the refresh token that a one-character fix would recover.
 [ -f "$CONFIG.corrupt" ] || fail "the corrupt config should have been kept aside"
 [ "$(cat "$CONFIG.corrupt")" = '{not json' ] \
   || fail "the kept-aside file should hold the original bytes"
@@ -948,7 +948,7 @@ syslist
 ok "login repairs a corrupt config"
 
 # The config is replaced, not rewritten in place: no temporary survives, and the
-# file holding a 30-day bearer token is readable only by its owner.
+# file holding the session's tokens is readable only by its owner.
 [ -z "$(find "$(dirname "$CONFIG")" -name '*.tmp' -print -quit)" ] \
   || fail "a temporary config file was left behind: $(ls "$(dirname "$CONFIG")")"
 [ "$(stat -c '%a' "$CONFIG")" = "600" ] \
