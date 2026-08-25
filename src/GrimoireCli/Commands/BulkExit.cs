@@ -1,5 +1,3 @@
-using GrimoireCli.Models;
-
 namespace GrimoireCli.Commands;
 
 /// <summary>
@@ -10,12 +8,9 @@ namespace GrimoireCli.Commands;
 /// landed and which didn't — including the all-skipped case, which is also a 3.
 /// Five endpoints share this rule across two response shapes: `errors` on the
 /// books and systems bulk endpoints, and `failed` on addons upgrade-all — the
-/// latter named differently because its wire field is `error`, not `detail`, so
-/// it cannot be a `List&lt;BulkError&gt;`.
+/// latter named differently because its wire field is `error`, not `detail`.
 /// </summary>
 public static class BulkExit
 {
-    public static int CodeFor(List<BulkError>? errors) => errors is { Count: > 0 } ? 3 : 0;
-
-    public static int CodeFor<T>(List<T>? failures) => failures is { Count: > 0 } ? 3 : 0;
+    public static int CodeFor(bool hasFailures) => hasFailures ? 3 : 0;
 }

@@ -1,5 +1,5 @@
 using System.CommandLine;
-using GrimoireCli.Models;
+using GrimoireCli.Api;
 using GrimoireCli.Output;
 using GrimoireCli.Services;
 
@@ -43,6 +43,7 @@ public static class LibraryCommand
             "and this one did not start — a books rescan still running is one",
             "cause.");
         command.AddExamples("grimoire-cli library rescan --scope \"books/Shadowrun/4 DE\"");
+        command.AddResponseExample<Generated.Models.Backend__routers__library___schemas__StatusResponse>();
         command.SetAction(async (parseResult, cancellationToken) =>
         {
             var (client, _) = CommandHelper.BuildClient(
@@ -51,8 +52,8 @@ public static class LibraryCommand
             var service = new LibraryService(client);
             var result = await service.RescanAsync(
                 parseResult.GetValue(scopeOption), parseResult.GetValue(metadataModeOption));
-            ConsoleOutput.WriteJson(result, AppJsonContext.Default.ScanTriggerResult);
-            return ScanExit.CodeFor(result);
+            ConsoleOutput.WriteRawJson(result);
+            return ScanExit.CodeFor(GrimoireApiClient.ReadStringProperty(result, "status"));
         });
         return command;
     }
@@ -73,7 +74,7 @@ public static class LibraryCommand
             "A loose file directly under books/ counts toward total_books but is",
             "never scanned, so scanned_books >= total_books never becomes true. Poll",
             "running instead.");
-        command.AddResponseExample<ScanStatus>();
+        command.AddResponseExample<Generated.Models.ScanStatusResponse>();
         command.SetAction(async (parseResult, cancellationToken) =>
         {
             var (client, _) = CommandHelper.BuildClient(
@@ -81,7 +82,7 @@ public static class LibraryCommand
                 tokenOverride: parseResult.GetValue(tokenOption));
             var service = new LibraryService(client);
             var result = await service.ScanStatusAsync();
-            ConsoleOutput.WriteJson(result, AppJsonContext.Default.ScanStatus);
+            ConsoleOutput.WriteRawJson(result);
             return 0;
         });
         return command;
@@ -136,7 +137,7 @@ public static class LibraryCommand
             "409 while a scan is running; commits per row, so a failure part-way",
             "leaves earlier removals applied.");
         command.AddExamples("grimoire-cli library cleanup-missing");
-        command.AddResponseExample<CleanupResult>();
+        command.AddResponseExample<Generated.Models.CleanupResponse>();
         command.SetAction(async (parseResult, cancellationToken) =>
         {
             var (client, _) = CommandHelper.BuildClient(
@@ -144,7 +145,7 @@ public static class LibraryCommand
                 tokenOverride: parseResult.GetValue(tokenOption));
             var service = new LibraryService(client);
             var result = await service.CleanupMissingAsync();
-            ConsoleOutput.WriteJson(result, AppJsonContext.Default.CleanupResult);
+            ConsoleOutput.WriteRawJson(result);
             return 0;
         });
         return command;

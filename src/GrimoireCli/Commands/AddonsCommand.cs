@@ -1,5 +1,5 @@
 using System.CommandLine;
-using GrimoireCli.Models;
+using GrimoireCli.Api;
 using GrimoireCli.Output;
 using GrimoireCli.Services;
 
@@ -38,7 +38,7 @@ public static class AddonsCommand
             "blocked; blocked_reason says why. Only runnable add-ons appear as",
             "metadata sources.");
         command.AddExamples("grimoire-cli addons list");
-        command.AddResponseExample<AddonListResponse>();
+        command.AddResponseExample<Generated.Models.AddonListResponse>();
         command.SetAction(async (parseResult, cancellationToken) =>
         {
             var (client, _) = CommandHelper.BuildClient(
@@ -46,7 +46,7 @@ public static class AddonsCommand
                 tokenOverride: parseResult.GetValue(tokenOption));
             var service = new AddonsService(client);
             var result = await service.ListAsync();
-            ConsoleOutput.WriteJson(result, AppJsonContext.Default.AddonListResponse);
+            ConsoleOutput.WriteRawJson(result);
             return 0;
         });
         return command;
@@ -66,7 +66,7 @@ public static class AddonsCommand
             "",
             "Installing needs a cached index, so a fresh instance runs this first.");
         command.AddExamples("grimoire-cli addons refresh");
-        command.AddResponseExample<RefreshResult>();
+        command.AddResponseExample<Generated.Models.RefreshIndexResponse>();
         command.SetAction(async (parseResult, cancellationToken) =>
         {
             var (client, _) = CommandHelper.BuildClient(
@@ -74,7 +74,7 @@ public static class AddonsCommand
                 tokenOverride: parseResult.GetValue(tokenOption));
             var service = new AddonsService(client);
             var result = await service.RefreshAsync();
-            ConsoleOutput.WriteJson(result, AppJsonContext.Default.RefreshResult);
+            ConsoleOutput.WriteRawJson(result);
             return 0;
         });
         return command;
@@ -104,7 +104,7 @@ public static class AddonsCommand
             "Approval is per install: an add-on installed or upgraded without",
             "--approve-script is unapproved, whatever it was before.");
         command.AddExamples("grimoire-cli addons install --id <addon-id> --approve-script");
-        command.AddResponseExample<AddonInstalled>();
+        command.AddResponseExample<Generated.Models.InstalledAddon>();
         command.SetAction(async (parseResult, cancellationToken) =>
         {
             var (client, _) = CommandHelper.BuildClient(
@@ -113,7 +113,7 @@ public static class AddonsCommand
             var service = new AddonsService(client);
             var result = await service.InstallAsync(
                 parseResult.GetValue(idOption)!, parseResult.GetValue(approveOption));
-            ConsoleOutput.WriteJson(result, AppJsonContext.Default.AddonInstalled);
+            ConsoleOutput.WriteRawJson(result);
             return 0;
         });
         return command;
@@ -137,7 +137,7 @@ public static class AddonsCommand
             "404 if no such add-on is installed, or if --script-approved true names",
             "an add-on that ships no script.");
         command.AddExamples("grimoire-cli addons update --id <addon-id> --enabled false");
-        command.AddResponseExample<AddonInstalled>();
+        command.AddResponseExample<Generated.Models.InstalledAddon>();
         command.SetAction(async (parseResult, cancellationToken) =>
         {
             var (client, _) = CommandHelper.BuildClient(
@@ -148,7 +148,7 @@ public static class AddonsCommand
                 parseResult.GetValue(idOption)!,
                 parseResult.GetValue(enabledOption),
                 parseResult.GetValue(scriptApprovedOption));
-            ConsoleOutput.WriteJson(result, AppJsonContext.Default.AddonInstalled);
+            ConsoleOutput.WriteRawJson(result);
             return 0;
         });
         return command;
@@ -202,7 +202,7 @@ public static class AddonsCommand
             "Script approval is not carried over, so a script-backed add-on is",
             "unapproved until re-approved with install --approve-script.");
         command.AddExamples("grimoire-cli addons upgrade-all");
-        command.AddResponseExample<UpgradeAllResult>();
+        command.AddResponseExample<Generated.Models.UpdateAllResponse>();
         command.SetAction(async (parseResult, cancellationToken) =>
         {
             var (client, _) = CommandHelper.BuildClient(
@@ -210,8 +210,8 @@ public static class AddonsCommand
                 tokenOverride: parseResult.GetValue(tokenOption));
             var service = new AddonsService(client);
             var result = await service.UpgradeAllAsync();
-            ConsoleOutput.WriteJson(result, AppJsonContext.Default.UpgradeAllResult);
-            return BulkExit.CodeFor(result.Failed);
+            ConsoleOutput.WriteRawJson(result);
+            return BulkExit.CodeFor(GrimoireApiClient.HasItems(result, "failed"));
         });
         return command;
     }
@@ -241,7 +241,7 @@ public static class AddonsCommand
             "--allow-scripts is the global switch. An add-on that ships a script also",
             "needs its own approval, from install --approve-script.");
         command.AddExamples("grimoire-cli addons settings --allow-scripts true");
-        command.AddResponseExample<AddonSettings>();
+        command.AddResponseExample<Generated.Models.AddonSettingsResponse>();
         command.SetAction(async (parseResult, cancellationToken) =>
         {
             var (client, _) = CommandHelper.BuildClient(
@@ -250,7 +250,7 @@ public static class AddonsCommand
             var service = new AddonsService(client);
             var result = await service.SettingsAsync(
                 parseResult.GetValue(indexUrlOption), parseResult.GetValue(allowScriptsOption));
-            ConsoleOutput.WriteJson(result, AppJsonContext.Default.AddonSettings);
+            ConsoleOutput.WriteRawJson(result);
             return 0;
         });
         return command;

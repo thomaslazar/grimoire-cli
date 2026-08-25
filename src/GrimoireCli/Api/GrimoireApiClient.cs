@@ -1,9 +1,7 @@
 using System.Net.Http.Headers;
 using System.Reflection;
 using System.Text.Json;
-using System.Text.Json.Serialization.Metadata;
 using GrimoireCli.Configuration;
-using GrimoireCli.Models;
 using Microsoft.Kiota.Abstractions;
 using Microsoft.Kiota.Abstractions.Authentication;
 using Microsoft.Kiota.Http.HttpClientLibrary;
@@ -128,10 +126,67 @@ public class GrimoireApiClient
     }
 
     /// <summary>
+    /// Whether a top-level array property has at least one element. The bulk
+    /// endpoints report per-item failures this way, and the exit code turns on
+    /// nothing else about them.
+    /// </summary>
+    internal static bool HasItems(string json, string property)
+    {
+        try
+        {
+            using var doc = JsonDocument.Parse(json);
+            return doc.RootElement.TryGetProperty(property, out var el)
+                   && el.ValueKind == JsonValueKind.Array
+                   && el.GetArrayLength() > 0;
+        }
+        catch (JsonException)
+        {
+            return false;
+        }
+    }
+
+    /// <summary>
+    /// Whether a body is JSON, or empty. A 204 or other bodiless success is
+    /// legitimate and parses as nothing. Pure so both branches are testable —
+    /// <see cref="EnsureJson"/> cannot be, because it exits.
+    /// </summary>
+    internal static bool IsJsonOrEmpty(string json)
+    {
+        if (string.IsNullOrWhiteSpace(json)) return true;
+        try
+        {
+            using var doc = JsonDocument.Parse(json);
+            return true;
+        }
+        catch (JsonException)
+        {
+            return false;
+        }
+    }
+
+    /// <summary>
+    /// Fails a response body that is not JSON, taking over the check the response
+    /// DTOs used to provide as a side effect of deserializing. Grimoire's SPA
+    /// catch-all answers an unroutable request (an empty, ".", or otherwise
+    /// mis-encoded id) with an HTML 200, and without this that page would reach
+    /// stdout as though it were the API's answer.
+    /// </summary>
+    internal static void EnsureJson(string json, string endpoint)
+    {
+        if (IsJsonOrEmpty(json)) return;
+        _logger.Debug($"unparseable body from {endpoint}: {TruncateForLogging(json)}");
+        _logger.Error($"Response from {endpoint} could not be parsed as JSON. Run with --debug to see the response body.");
+        Environment.Exit(2);
+    }
+
+    /// <summary>
     /// Sends a request built by a generated builder. Converting to a native
     /// HttpRequestMessage and sending it here — rather than through Kiota's
     /// SendPrimitiveAsync — keeps the response body on failures, which the error
-    /// messages include, and leaves EnsureSuccessAsync unchanged.
+    /// messages include, and leaves EnsureSuccessAsync unchanged. Every response
+    /// is passed through <see cref="EnsureJson"/> before it is returned, so a
+    /// non-JSON body (Grimoire's SPA catch-all) exits 2 here rather than
+    /// reaching a caller that will print it verbatim.
     /// </summary>
     public async Task<string> SendAsync(RequestInformation info, string? permissionHint = null, string? notFoundHint = null, TimeSpan? timeout = null)
     {
@@ -141,13 +196,9 @@ public class GrimoireApiClient
             ?? throw new InvalidOperationException($"Failed to build request for {info.URI.AbsolutePath}");
         var response = await _http.SendAsync(request, cts.Token);
         await EnsureSuccessAsync(response, permissionHint, notFoundHint);
-        return await response.Content.ReadAsStringAsync(cts.Token);
-    }
-
-    public async Task<T> SendAsync<T>(RequestInformation info, JsonTypeInfo<T> typeInfo, string? permissionHint = null, string? notFoundHint = null, TimeSpan? timeout = null)
-    {
-        var json = await SendAsync(info, permissionHint, notFoundHint, timeout);
-        return Deserialize(json, typeInfo, info.URI.PathAndQuery);
+        var body = await response.Content.ReadAsStringAsync(cts.Token);
+        EnsureJson(body, info.URI.PathAndQuery);
+        return body;
     }
 
     /// <summary>
@@ -164,34 +215,6 @@ public class GrimoireApiClient
         var response = await _http.SendAsync(request, cts.Token);
         await EnsureSuccessAsync(response, permissionHint, notFoundHint);
         return await response.Content.ReadAsStreamAsync(cts.Token);
-    }
-
-    // Shared by every typed overload above. Grimoire's SPA catch-all answers an
-    // unroutable request (an empty, ".", or otherwise mis-encoded id) with an
-    // HTML 200, not an API error — so deserialization is where that case must be
-    // caught. Routes it through the same log-and-exit(2) mechanism as
-    // EnsureSuccessAsync rather than letting JsonException surface as a raw
-    // stack trace.
-    internal static T Deserialize<T>(string json, JsonTypeInfo<T> typeInfo, string endpoint)
-    {
-        try
-        {
-            return JsonSerializer.Deserialize(json, typeInfo)
-                ?? throw new InvalidOperationException($"Failed to deserialize response from {endpoint}");
-        }
-        catch (JsonException ex)
-        {
-            // The body itself is the diagnostic that distinguishes an HTML SPA
-            // catch-all from a truncated-but-otherwise-valid JSON response, and
-            // ex.Message carries the line/byte position — but a full HTML page
-            // or huge payload on stderr would flood the terminal, so it's
-            // truncated and gated behind --debug rather than always shown.
-            _logger.Debug($"unparseable body from {endpoint}: {TruncateForLogging(json)}");
-            _logger.Debug($"JsonException: {ex.Message}");
-            _logger.Error($"Response from {endpoint} could not be parsed as JSON. Run with --debug to see the response body and parse error.");
-            Environment.Exit(2);
-            throw;
-        }
     }
 
     internal static string TruncateForLogging(string body, int maxChars = 500)

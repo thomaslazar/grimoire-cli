@@ -1,5 +1,4 @@
 using GrimoireCli.Api;
-using GrimoireCli.Models;
 
 namespace GrimoireCli.Services;
 
@@ -9,41 +8,37 @@ public class AddonsService
 
     public AddonsService(GrimoireApiClient client) => _client = client;
 
-    public async Task<AddonListResponse> ListAsync()
+    public async Task<string> ListAsync()
     {
         var info = _client.Api.Api.Addons.ToGetRequestInformation();
-        return await _client.SendAsync(
-            info, AppJsonContext.Default.AddonListResponse, permissionHint: "the admin role");
+        return await _client.SendAsync(info, permissionHint: "the admin role");
     }
 
-    public async Task<RefreshResult> RefreshAsync()
+    public async Task<string> RefreshAsync()
     {
         var info = _client.Api.Api.Addons.Refresh.ToPostRequestInformation();
-        return await _client.SendAsync(
-            info, AppJsonContext.Default.RefreshResult, permissionHint: "the admin role");
+        return await _client.SendAsync(info, permissionHint: "the admin role");
     }
 
     // No notFoundHint: install_addon raises only 502 (download failure) and 400
     // (no such id in the index, already covered by install's own Note); there is
     // no 404 path to hint at.
-    public async Task<AddonInstalled> InstallAsync(string id, bool approveScript)
+    public async Task<string> InstallAsync(string id, bool approveScript)
     {
         var body = new Generated.Models.AddonInstall { ApproveScript = approveScript };
         var info = _client.Api.Api.Addons[id].Install.ToPostRequestInformation(body);
-        return await _client.SendAsync(
-            info, AppJsonContext.Default.AddonInstalled, permissionHint: "the admin role");
+        return await _client.SendAsync(info, permissionHint: "the admin role");
     }
 
     // No notFoundHint: update_addon's 404 has two distinct causes — no such
     // add-on installed, or --script-approved true naming a script-free one —
     // and a hint would replace the server's discriminating body with a message
     // that cannot tell them apart.
-    public async Task<AddonInstalled> UpdateAsync(string id, bool? enabled, bool? scriptApproved)
+    public async Task<string> UpdateAsync(string id, bool? enabled, bool? scriptApproved)
     {
         var body = BuildUpdateBody(enabled, scriptApproved);
         var info = _client.Api.Api.Addons[id].ToPatchRequestInformation(body);
-        return await _client.SendAsync(
-            info, AppJsonContext.Default.AddonInstalled, permissionHint: "the admin role");
+        return await _client.SendAsync(info, permissionHint: "the admin role");
     }
 
     /// <summary>
@@ -71,19 +66,17 @@ public class AddonsService
             notFoundHint: "No add-on with that ID. List them with: grimoire-cli addons list");
     }
 
-    public async Task<UpgradeAllResult> UpgradeAllAsync()
+    public async Task<string> UpgradeAllAsync()
     {
         var info = _client.Api.Api.Addons.UpdateAll.ToPostRequestInformation();
-        return await _client.SendAsync(
-            info, AppJsonContext.Default.UpgradeAllResult, permissionHint: "the admin role");
+        return await _client.SendAsync(info, permissionHint: "the admin role");
     }
 
-    public async Task<AddonSettings> SettingsAsync(string? indexUrl, bool? allowScripts)
+    public async Task<string> SettingsAsync(string? indexUrl, bool? allowScripts)
     {
         var body = BuildSettingsBody(indexUrl, allowScripts);
         var info = _client.Api.Api.Addons.Settings.ToPatchRequestInformation(body);
-        return await _client.SendAsync(
-            info, AppJsonContext.Default.AddonSettings, permissionHint: "the admin role");
+        return await _client.SendAsync(info, permissionHint: "the admin role");
     }
 
     /// <summary>

@@ -1,5 +1,5 @@
 using System.CommandLine;
-using GrimoireCli.Models;
+using GrimoireCli.Api;
 using GrimoireCli.Output;
 using GrimoireCli.Services;
 
@@ -60,7 +60,7 @@ public static class SystemsCommand
             "grimoire-cli systems list --include-children --family Shadowrun",
             "grimoire-cli systems list --parent-id <container-id>",
             "grimoire-cli systems list --explicit false");
-        command.AddResponseExampleArray<GameSystemSummary>();
+        command.AddResponseExampleArray<Generated.Models.SystemSummary>();
         command.SetAction(async (parseResult, cancellationToken) =>
         {
             var server = parseResult.GetValue(serverOption);
@@ -78,7 +78,7 @@ public static class SystemsCommand
                 parseResult.GetValue(explicitOption),
                 parseResult.GetValue(parentIdOption),
                 parseResult.GetValue(includeChildrenOption));
-            ConsoleOutput.WriteJson(result, AppJsonContext.Default.ListGameSystemSummary);
+            ConsoleOutput.WriteRawJson(result);
             return 0;
         });
         return command;
@@ -114,7 +114,7 @@ public static class SystemsCommand
             "grimoire-cli systems get --id <system-id>",
             "grimoire-cli systems get --id <system-id> --category core",
             "grimoire-cli systems get --id <system-id> --book-sort page_count --book-desc");
-        command.AddResponseExample<GameSystemDetail>();
+        command.AddResponseExample<Generated.Models.SystemDetail>();
         command.SetAction(async (parseResult, cancellationToken) =>
         {
             var server = parseResult.GetValue(serverOption);
@@ -128,7 +128,7 @@ public static class SystemsCommand
                 parseResult.GetValue(genreOption),
                 parseResult.GetValue(categoryOption),
                 parseResult.GetValue(explicitOption));
-            ConsoleOutput.WriteJson(result, AppJsonContext.Default.GameSystemDetail);
+            ConsoleOutput.WriteRawJson(result);
             return 0;
         });
         return command;
@@ -212,7 +212,7 @@ public static class SystemsCommand
             "grimoire-cli systems batch-update --input items.json",
             "jq -c '{items: .}' edits.json | grimoire-cli systems batch-update --stdin");
         command.AddRequestShape<Generated.Models.GameSystemBulkUpdate>();
-        command.AddResponseExample<BulkUpdateResult>();
+        command.AddResponseExample<Generated.Models.BulkResult>();
         command.SetAction(async (parseResult, cancellationToken) =>
         {
             string body;
@@ -231,8 +231,8 @@ public static class SystemsCommand
                 serverOverride: parseResult.GetValue(serverOption),
                 tokenOverride: parseResult.GetValue(tokenOption));
             var result = await new SystemsService(client).BatchUpdateAsync(body);
-            ConsoleOutput.WriteJson(result, AppJsonContext.Default.BulkUpdateResult);
-            return BulkExit.CodeFor(result.Errors);
+            ConsoleOutput.WriteRawJson(result);
+            return BulkExit.CodeFor(GrimoireApiClient.HasItems(result, "errors"));
         });
         return command;
     }
@@ -261,7 +261,7 @@ public static class SystemsCommand
             "grimoire-cli systems batch-tag --input tags.json",
             "echo '{\"ids\":[\"<id>\"],\"tags\":[\"cyberpunk\"]}' | grimoire-cli systems batch-tag --stdin");
         command.AddRequestShape<Generated.Models.BulkAddTags>();
-        command.AddResponseExample<BulkTagResult>();
+        command.AddResponseExample<Generated.Models.BulkTagResult>();
         command.SetAction(async (parseResult, cancellationToken) =>
         {
             string body;
@@ -280,8 +280,8 @@ public static class SystemsCommand
                 serverOverride: parseResult.GetValue(serverOption),
                 tokenOverride: parseResult.GetValue(tokenOption));
             var result = await new SystemsService(client).BatchTagAsync(body);
-            ConsoleOutput.WriteJson(result, AppJsonContext.Default.BulkTagResult);
-            return BulkExit.CodeFor(result.Errors);
+            ConsoleOutput.WriteRawJson(result);
+            return BulkExit.CodeFor(GrimoireApiClient.HasItems(result, "errors"));
         });
         return command;
     }

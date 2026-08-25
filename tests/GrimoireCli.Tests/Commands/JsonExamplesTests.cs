@@ -1,16 +1,18 @@
+using System.Reflection;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using GrimoireCli.Commands;
 using Microsoft.Kiota.Abstractions.Serialization;
 
 namespace GrimoireCli.Tests.Commands;
 
-public class RequestExamplesTests
+public class JsonExamplesTests
 {
     [Fact]
     public void EverySampleParsesAsJson()
     {
-        Assert.NotEmpty(RequestExamples.All);
-        foreach (var (type, sample) in RequestExamples.All)
+        Assert.NotEmpty(JsonExamples.All);
+        foreach (var (type, sample) in JsonExamples.All)
         {
             var ex = Record.Exception(() => JsonDocument.Parse(sample));
             Assert.True(ex is null, $"Sample for {type.Name} is not valid JSON: {ex?.Message}\n{sample}");
@@ -19,17 +21,29 @@ public class RequestExamplesTests
 
     // The root keys of every sample are exactly the wire fields the model
     // deserializes — the same set JsonBodyInput.Validate accepts. If these ever
-    // diverge, --help-full advertises a body the CLI itself refuses.
+    // diverge, --help-full advertises a body the CLI itself refuses. SavedFile
+    // has no GetFieldDeserializers(), being a plain POCO rather than a Kiota
+    // model, so it's checked separately against its own [JsonPropertyName]s.
     [Fact]
     public void EverySampleRootMatchesTheModelsWireFields()
     {
-        foreach (var (type, sample) in RequestExamples.All)
+        foreach (var (type, sample) in JsonExamples.All)
         {
+            if (type == typeof(GrimoireCli.Models.SavedFile))
+            {
+                var expected = type.GetProperties()
+                    .Select(p => p.GetCustomAttribute<JsonPropertyNameAttribute>()?.Name)
+                    .OrderBy(k => k, StringComparer.Ordinal);
+                var actual = JsonDocument.Parse(sample).RootElement
+                    .EnumerateObject().Select(p => p.Name).OrderBy(k => k, StringComparer.Ordinal);
+                Assert.Equal(expected, actual);
+                continue;
+            }
             var model = (IParsable)Activator.CreateInstance(type)!;
-            var expected = model.GetFieldDeserializers().Keys.OrderBy(k => k, StringComparer.Ordinal);
-            var actual = JsonDocument.Parse(sample).RootElement
+            var expectedFields = model.GetFieldDeserializers().Keys.OrderBy(k => k, StringComparer.Ordinal);
+            var actualFields = JsonDocument.Parse(sample).RootElement
                 .EnumerateObject().Select(p => p.Name).OrderBy(k => k, StringComparer.Ordinal);
-            Assert.Equal(expected, actual);
+            Assert.Equal(expectedFields, actualFields);
         }
     }
 
@@ -38,14 +52,14 @@ public class RequestExamplesTests
     [Fact]
     public void CoversTheWholeModelTree()
     {
-        Assert.True(RequestExamples.All.Count > 80, $"Only {RequestExamples.All.Count} models discovered.");
+        Assert.True(JsonExamples.All.Count > 80, $"Only {JsonExamples.All.Count} models discovered.");
     }
 
     [Fact]
     public void ScalarsRenderWithTheirType()
     {
         var sample = JsonDocument.Parse(
-            RequestExamples.For(typeof(GrimoireCli.Generated.Models.GameSystemUpdate))).RootElement;
+            JsonExamples.For(typeof(GrimoireCli.Generated.Models.GameSystemUpdate))).RootElement;
         Assert.Equal(JsonValueKind.String, sample.GetProperty("name").ValueKind);
         Assert.Equal(0, sample.GetProperty("year").GetInt32());
         Assert.Equal(JsonValueKind.False, sample.GetProperty("is_explicit").ValueKind);
@@ -55,7 +69,7 @@ public class RequestExamplesTests
     public void ListsOfStringsRenderAsAOneElementArray()
     {
         var sample = JsonDocument.Parse(
-            RequestExamples.For(typeof(GrimoireCli.Generated.Models.GameSystemUpdate))).RootElement;
+            JsonExamples.For(typeof(GrimoireCli.Generated.Models.GameSystemUpdate))).RootElement;
         var tags = sample.GetProperty("tags");
         Assert.Equal(JsonValueKind.Array, tags.ValueKind);
         Assert.Equal("<string>", Assert.Single(tags.EnumerateArray()).GetString());
@@ -69,7 +83,7 @@ public class RequestExamplesTests
     public void EnumsRenderTheirWireValuesAsAPlaceholder()
     {
         var sample = JsonDocument.Parse(
-            RequestExamples.For(typeof(GrimoireCli.Generated.Models.RescanRequest))).RootElement;
+            JsonExamples.For(typeof(GrimoireCli.Generated.Models.RescanRequest))).RootElement;
         Assert.Equal("<new|missing|replace>", sample.GetProperty("metadata_mode").GetString());
     }
 
@@ -77,7 +91,7 @@ public class RequestExamplesTests
     public void NestedModelsRenderTheirOwnFields()
     {
         var sample = JsonDocument.Parse(
-            RequestExamples.For(typeof(GrimoireCli.Generated.Models.GameSystemUpdate))).RootElement;
+            JsonExamples.For(typeof(GrimoireCli.Generated.Models.GameSystemUpdate))).RootElement;
         var publisher = Assert.Single(sample.GetProperty("publishers").EnumerateArray());
         Assert.Equal("<string>", publisher.GetProperty("name").GetString());
         Assert.Equal("<string>", publisher.GetProperty("url").GetString());
@@ -89,20 +103,20 @@ public class RequestExamplesTests
     public void EnvelopeModelsNestTheirItems()
     {
         var sample = JsonDocument.Parse(
-            RequestExamples.For(typeof(GrimoireCli.Generated.Models.GameSystemBulkUpdate))).RootElement;
+            JsonExamples.For(typeof(GrimoireCli.Generated.Models.GameSystemBulkUpdate))).RootElement;
         var item = Assert.Single(sample.GetProperty("items").EnumerateArray());
         Assert.Equal("<string>", item.GetProperty("id").GetString());
         Assert.Equal("<string>", item.GetProperty("system_family").GetString());
     }
 
-    // SavedFilterUpdate.State is an UntypedNode — a free-form object the spec
-    // gives no shape for.
+    // SavedFilterUpdate.State is an UntypedNode — a string, number, array or
+    // object depending on the row, so the placeholder names the ambiguity
+    // rather than asserting one shape that fits no case.
     [Fact]
-    public void UntypedNodesRenderAsAnEmptyObject()
+    public void UntypedNodesRenderAsAnAnyPlaceholder()
     {
         var sample = JsonDocument.Parse(
-            RequestExamples.For(typeof(GrimoireCli.Generated.Models.SavedFilterUpdate))).RootElement;
-        Assert.Equal(JsonValueKind.Object, sample.GetProperty("state").ValueKind);
-        Assert.Empty(sample.GetProperty("state").EnumerateObject());
+            JsonExamples.For(typeof(GrimoireCli.Generated.Models.SavedFilterUpdate))).RootElement;
+        Assert.Equal("<any>", sample.GetProperty("state").GetString());
     }
 }

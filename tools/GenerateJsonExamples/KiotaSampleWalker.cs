@@ -5,7 +5,7 @@ using System.Text.Encodings.Web;
 using System.Text.Json;
 using Microsoft.Kiota.Abstractions.Serialization;
 
-namespace GrimoireCli.Tools.GenerateRequestExamples;
+namespace GrimoireCli.Tools.GenerateJsonExamples;
 
 /// <summary>
 /// Renders a Kiota request model as a pretty-printed JSON body template.
@@ -108,12 +108,14 @@ public static class KiotaSampleWalker
             writer.WriteStringValue($"<{string.Join('|', wireValues)}>");
             return;
         }
-        // UntypedNode is free-form JSON the spec gives no shape for, and it also
+        // UntypedNode is free-form JSON the spec gives no shape for — a string,
+        // number, array or object depending on the field — and it also
         // implements IParsable, so it must be answered before the model branch.
+        // "<any>" is honest about that; a fixed shape like {} would assert a
+        // shape true of no case.
         if (type == typeof(UntypedNode))
         {
-            writer.WriteStartObject();
-            writer.WriteEndObject();
+            writer.WriteStringValue("<any>");
             return;
         }
         if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(List<>))

@@ -1,5 +1,8 @@
 using System.Text.Json.Serialization;
 
+// Namespace deliberately kept as GrimoireCli.Models despite living in Output/ —
+// tools/GenerateJsonExamples/Program.cs and JsonExamplesTests.cs reference
+// GrimoireCli.Models.SavedFile by fully-qualified name.
 namespace GrimoireCli.Models;
 
 /// <summary>

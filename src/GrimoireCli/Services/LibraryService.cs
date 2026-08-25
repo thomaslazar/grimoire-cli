@@ -1,5 +1,4 @@
 using GrimoireCli.Api;
-using GrimoireCli.Models;
 
 namespace GrimoireCli.Services;
 
@@ -14,12 +13,11 @@ public class LibraryService
     /// starting a second scan, which is why the caller (ScanExit) maps that
     /// status onto exit 3 rather than treating this response as a plain success.
     /// </summary>
-    public async Task<ScanTriggerResult> RescanAsync(string? scope, string? metadataMode)
+    public async Task<string> RescanAsync(string? scope, string? metadataMode)
     {
         var body = BuildBody(scope, metadataMode);
         var info = _client.Api.Api.Rescan.ToPostRequestInformation(body);
-        return await _client.SendAsync(
-            info, AppJsonContext.Default.ScanTriggerResult, permissionHint: "the admin role");
+        return await _client.SendAsync(info, permissionHint: "the admin role");
     }
 
     /// <summary>
@@ -41,11 +39,10 @@ public class LibraryService
         return body;
     }
 
-    public async Task<ScanStatus> ScanStatusAsync()
+    public async Task<string> ScanStatusAsync()
     {
         var info = _client.Api.Api.ScanStatus.ToGetRequestInformation();
-        return await _client.SendAsync(
-            info, AppJsonContext.Default.ScanStatus, permissionHint: "the admin role");
+        return await _client.SendAsync(info, permissionHint: "the admin role");
     }
 
     public async Task<string> CancelScanAsync()
@@ -60,11 +57,10 @@ public class LibraryService
     /// 409 while a scan runs; the server's message names that state, so no hint
     /// replaces it.
     /// </summary>
-    public async Task<CleanupResult> CleanupMissingAsync()
+    public async Task<string> CleanupMissingAsync()
     {
         var info = _client.Api.Api.Maintenance.CleanupMissing.ToPostRequestInformation();
-        return await _client.SendAsync(
-            info, AppJsonContext.Default.CleanupResult, permissionHint: "the admin role");
+        return await _client.SendAsync(info, permissionHint: "the admin role");
     }
 
     private static Generated.Models.RescanRequest_metadata_mode ParseMetadataMode(string metadataMode) => metadataMode switch

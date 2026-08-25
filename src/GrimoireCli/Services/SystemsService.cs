@@ -1,7 +1,6 @@
 using System.Text;
 using GrimoireCli.Api;
 using GrimoireCli.Commands;
-using GrimoireCli.Models;
 
 namespace GrimoireCli.Services;
 
@@ -11,7 +10,7 @@ public class SystemsService
 
     public SystemsService(GrimoireApiClient client) => _client = client;
 
-    public async Task<List<GameSystemSummary>> ListAsync(
+    public async Task<string> ListAsync(
         string? sort, bool desc, string? genre, string? family,
         string? parentSystem, string? edition, string? license, bool? isExplicit,
         string? parentId, bool includeChildren)
@@ -31,10 +30,10 @@ public class SystemsService
             // parameter and an explicit false mean the same thing.
             c.QueryParameters.IncludeChildren = includeChildren ? true : null;
         });
-        return await _client.SendAsync(info, AppJsonContext.Default.ListGameSystemSummary);
+        return await _client.SendAsync(info);
     }
 
-    public async Task<GameSystemDetail> GetAsync(
+    public async Task<string> GetAsync(
         string id, string? bookSort, bool bookDesc, string? genre, string? category, bool? isExplicit)
     {
         var info = _client.Api.Api.Systems[id].ToGetRequestInformation(c =>
@@ -47,7 +46,6 @@ public class SystemsService
         });
         return await _client.SendAsync(
             info,
-            AppJsonContext.Default.GameSystemDetail,
             notFoundHint: "No system with that ID. List them with: grimoire-cli systems list");
     }
 
@@ -74,27 +72,21 @@ public class SystemsService
     /// or a rejected item goes to errors and the rest still apply. Tag creation is
     /// serialised here, which per-item concurrent PATCHes could not do.
     /// </summary>
-    public async Task<BulkUpdateResult> BatchUpdateAsync(string rawBody)
+    public async Task<string> BatchUpdateAsync(string rawBody)
     {
         var info = _client.Api.Api.Systems.Bulk.ToPostRequestInformation(
             new Generated.Models.GameSystemBulkUpdate());
         info.SetStreamContent(new MemoryStream(Encoding.UTF8.GetBytes(rawBody)), "application/json");
-        return await _client.SendAsync(
-            info,
-            AppJsonContext.Default.BulkUpdateResult,
-            permissionHint: "the gm or admin role");
+        return await _client.SendAsync(info, permissionHint: "the gm or admin role");
     }
 
     /// <summary>POST /api/systems/bulk/tags. Additive: it never removes a tag.</summary>
-    public async Task<BulkTagResult> BatchTagAsync(string rawBody)
+    public async Task<string> BatchTagAsync(string rawBody)
     {
         var info = _client.Api.Api.Systems.Bulk.Tags.ToPostRequestInformation(
             new Generated.Models.BulkAddTags());
         info.SetStreamContent(new MemoryStream(Encoding.UTF8.GetBytes(rawBody)), "application/json");
-        return await _client.SendAsync(
-            info,
-            AppJsonContext.Default.BulkTagResult,
-            permissionHint: "the gm or admin role");
+        return await _client.SendAsync(info, permissionHint: "the gm or admin role");
     }
 
     /// <summary>GET /api/systems/{id}/cover. Bytes: folder art if the library has
@@ -112,7 +104,7 @@ public class SystemsService
     /// <c>ToPostRequestInformation</c>. An empty <c>MultipartBody</c> throws ("No
     /// parts to serialize"), so the part must be added before that call.
     /// </summary>
-    public async Task<CoverUploadResult> UploadCoverAsync(string id, string filePath)
+    public async Task<string> UploadCoverAsync(string id, string filePath)
     {
         byte[] bytes;
         try
@@ -126,7 +118,7 @@ public class SystemsService
         var body = new Microsoft.Kiota.Abstractions.MultipartBody();
         body.AddOrReplacePart("file", MimeForExtension(filePath), bytes, Path.GetFileName(filePath));
         var info = _client.Api.Api.Systems[id].Cover.ToPostRequestInformation(body);
-        return await _client.SendAsync(info, AppJsonContext.Default.CoverUploadResult, permissionHint: "the gm or admin role");
+        return await _client.SendAsync(info, permissionHint: "the gm or admin role");
     }
 
     /// <summary>

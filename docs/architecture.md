@@ -11,14 +11,12 @@ Program.cs                 root command, global options, log setup, exit codes
   Commands/                System.CommandLine definitions — flags, help, examples
     CommandHelper          resolves config into a client, exits if unconfigured
     HelpExtensions         Notes / Examples / Response shape sections, --help-full
-    ResponseExamples.g.cs  generated samples (tools/GenerateResponseExamples)
-    RequestExamples.g.cs   generated body templates (tools/GenerateRequestExamples)
-  Services/                one class per resource; builds the request, deserializes
+    JsonExamples.g.cs       generated request/response samples (tools/GenerateJsonExamples)
+  Services/                one class per resource; builds the request, returns the raw body
   Api/                     GrimoireApiClient, TokenHelper, DebugHttpHandler
   Generated/               Kiota client — paths, path/query params, request bodies
-  Models/                  response DTOs + AppJsonContext (source-generated JSON)
-  Configuration/           AppConfig, ConfigManager (flags > env > file)
-  Output/                  ConsoleOutput (stdout JSON), LogSetup (stderr, NLog)
+  Configuration/           AppConfig, ConfigManager (flags > env > file), AppJsonContext (source-generated JSON)
+  Output/                  ConsoleOutput (stdout JSON), LogSetup (stderr, NLog), SavedFile
 ```
 
 A command does four things and nothing else: declare its flags, read them,
@@ -39,9 +37,13 @@ orchestration belongs in the caller, not here — see
    `Dungeons & Dragons`.
 4. `GrimoireApiClient.SendAsync` converts it to a native request, sends it with
    the bearer token, warns on stderr if the token is near expiry, and on a
-   non-2xx logs a mapped message and exits 2.
-5. The body deserializes through `AppJsonContext` into DTOs, which
-   `ConsoleOutput.WriteJson` re-serializes to stdout.
+   non-2xx logs a mapped message and exits 2. `EnsureJson` then checks the
+   body parses as JSON (or is empty) — Grimoire's SPA answers an unroutable
+   request with an HTML 200, and this is where that gets caught instead of
+   reaching stdout — and exits 2 if it doesn't.
+5. `ConsoleOutput.WriteRawJson` writes that body to stdout unmodified, or
+   re-indented under `--pretty`. Nothing deserializes it; there is no DTO on
+   this path.
 
 ## Native AOT constrains the design
 
@@ -52,18 +54,24 @@ passes in Debug** and fails only in the published binary, so `self-test` exists
 to exercise those paths offline and runs against all six published RIDs in CI.
 See [testing.md](testing.md) and [build.md](build.md).
 
-## Why responses are typed
+## Why responses are a byte passthrough
 
-Grimoire's OpenAPI spec types nearly every response as `{}` — FastAPI without
-`response_model` — so DTOs are written from the upstream serializers rather than
-generated from the spec. They carry no `[JsonExtensionData]` catch-all
-deliberately: the CLI's output is a contract for agent consumers, so a field the
-DTOs do not model is a signal to update them under the version-bump procedure in
-[grimoire-compatibility.md](grimoire-compatibility.md), not something to pass
-through unmodelled.
+A response is not deserialized into a typed model and re-serialized: the
+server's bytes reach stdout unmodified (re-indented only under `--pretty`),
+so undeclared fields, explicit `null`s and key order are all the server's.
+There is therefore no DTO to keep in step with a version bump, and no
+`[JsonExtensionData]` gap to drop an unmodelled field into.
 
-The trade-off is explicit: faithfulness to a *known* server version over
-tolerance of an unknown one.
+`GrimoireApiClient.EnsureJson` is what a hand-written DTO used to provide as
+a side effect of deserializing: Grimoire's SPA answers an unroutable request
+with an HTML 200 rather than a JSON error, and without this check that page
+would reach stdout as though it were the API's answer. It runs inside the
+string-returning `SendAsync`, so every response goes through it once,
+regardless of command.
+
+The generated request/response models (`GrimoireCli.Generated.Models`) still
+exist and are used for one thing: `--help-full` response and request samples,
+via `Commands/JsonExamples.g.cs` — see [cli-design.md](cli-design.md).
 
 ## Generated artefacts
 
@@ -71,8 +79,7 @@ These are generated and committed, each guarded by a test or a script:
 
 | File | Generator | Guard |
 |---|---|---|
-| `src/GrimoireCli/Commands/ResponseExamples.g.cs` | `tools/GenerateResponseExamples` | `ResponseExamplesDriftTest` regenerates and diffs |
-| `src/GrimoireCli/Commands/RequestExamples.g.cs` | `tools/GenerateRequestExamples` | `RequestExamplesDriftTest` regenerates and diffs |
+| `src/GrimoireCli/Commands/JsonExamples.g.cs` | `tools/GenerateJsonExamples` | `JsonExamplesDriftTest` regenerates and diffs |
 | `docs/grimoire-api-coverage.md` | `tools/generate-api-coverage.py` | roles cross-checked against the spec's own descriptions |
 | `src/GrimoireCli/Generated/` | `tools/generate-api-client.sh` | reviewed by the regeneration diff on a version bump, not a CI gate |
 

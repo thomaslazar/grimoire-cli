@@ -345,17 +345,26 @@ ok "systems get on a missing id exits 2 with a hint"
 # on Grimoire's SPA catch-all, which answers with an HTML 200 instead of a JSON
 # 404. Each must be caught as a JSON-parse failure and exit 2 with a readable
 # message on stderr — not an unhandled JsonException and a raw stack trace.
+# `systems get` prints its response with no DTO layer in front of it now, so
+# this also exercises GrimoireApiClient.EnsureJson, the guard that keeps an
+# HTML body like this one off stdout — assert that explicitly, not just the
+# exit code, since a regression that printed the page would still exit 2.
+# The catch-all only answers GET: confirmed by curl that every write verb
+# (PATCH/POST/DELETE) against these same id shapes gets an ordinary JSON 405
+# instead, so no write command can be substituted here to exercise it.
 for bad_id in "" "." "../about"; do
   set +e
-  "$CLI" systems get --id "$bad_id" >/dev/null 2>"$WORK/badid.err"; rc=$?
+  "$CLI" systems get --id "$bad_id" >"$WORK/badid.out" 2>"$WORK/badid.err"; rc=$?
   set -e
   [ "$rc" -eq 2 ] || fail "id '$bad_id' should exit 2, got $rc: $(cat "$WORK/badid.err")"
+  [ ! -s "$WORK/badid.out" ] \
+    || fail "id '$bad_id' printed to stdout instead of failing: $(cat "$WORK/badid.out")"
   grep -qi "could not be parsed as JSON" "$WORK/badid.err" \
     || fail "id '$bad_id' gave no not-JSON message: $(cat "$WORK/badid.err")"
   grep -qi "at System\.\|StackTrace\|Unhandled exception" "$WORK/badid.err" \
     && fail "id '$bad_id' leaked a stack trace: $(cat "$WORK/badid.err")"
 done
-ok "systems get on an empty, '.', or '../about' id exits 2 with no stack trace"
+ok "systems get on an empty, '.', or '../about' id exits 2 with no stack trace and empty stdout"
 
 # The first write in this suite. Shadowrun 4 DE is seeded raw for exactly this.
 # description is the field used deliberately: no assertion above filters on it,

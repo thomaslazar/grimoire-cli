@@ -1,5 +1,4 @@
 using System.CommandLine;
-using GrimoireCli.Models;
 using GrimoireCli.Output;
 using GrimoireCli.Services;
 
@@ -42,7 +41,7 @@ public static class MetadataCommands
             "supports_paste false means metadata-fetch --paste is a 400 for that",
             "source; search for an identity instead.");
         command.AddExamples($"grimoire-cli {resource} metadata-sources --id <id>");
-        command.AddResponseExample<MetadataSourceList>();
+        command.AddResponseExample<Generated.Models.MetadataSourcesResponse>();
         command.SetAction(async (parseResult, cancellationToken) =>
         {
             var (client, _) = CommandHelper.BuildClient(
@@ -50,7 +49,7 @@ public static class MetadataCommands
                 tokenOverride: parseResult.GetValue(tokenOption));
             var service = new MetadataService(client, resource);
             var result = await service.SourcesAsync(parseResult.GetValue(idOption)!);
-            ConsoleOutput.WriteJson(result, AppJsonContext.Default.MetadataSourceList);
+            ConsoleOutput.WriteRawJson(result);
             return 0;
         });
         return command;
@@ -83,7 +82,7 @@ public static class MetadataCommands
             "[] means the source matched nothing. 502 means it could not be reached",
             "or returned junk; 400 a configuration one, such as an unknown --source-id.");
         command.AddExamples($"grimoire-cli {resource} metadata-search --id <id> --source-id <source>");
-        command.AddResponseExample<MetadataSearchResult>();
+        command.AddResponseExample<Generated.Models.MetadataSearchResponse>();
         command.SetAction(async (parseResult, cancellationToken) =>
         {
             var (client, _) = CommandHelper.BuildClient(
@@ -94,7 +93,7 @@ public static class MetadataCommands
                 parseResult.GetValue(idOption)!,
                 parseResult.GetValue(sourceIdOption)!,
                 parseResult.GetValue(queryOption));
-            ConsoleOutput.WriteJson(result, AppJsonContext.Default.MetadataSearchResult);
+            ConsoleOutput.WriteRawJson(result);
             return 0;
         });
         return command;
@@ -140,7 +139,7 @@ public static class MetadataCommands
             "",
             "502 is a source failure, 400 a configuration one.");
         command.AddExamples($"grimoire-cli {resource} metadata-fetch --id <id> --source-id <source> --identity <identity>");
-        command.AddResponseExample<MetadataFetchResult>();
+        command.AddResponseExample<Generated.Models.MetadataFetchResponse>();
         command.SetAction(async (parseResult, cancellationToken) =>
         {
             var (client, _) = CommandHelper.BuildClient(
@@ -153,7 +152,7 @@ public static class MetadataCommands
                 parseResult.GetValue(identityOption),
                 parseResult.GetValue(queryOption),
                 parseResult.GetValue(pasteOption));
-            ConsoleOutput.WriteJson(result, AppJsonContext.Default.MetadataFetchResult);
+            ConsoleOutput.WriteRawJson(result);
             return 0;
         });
         return command;

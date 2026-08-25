@@ -1,4 +1,5 @@
 using System.CommandLine;
+using System.Text;
 using System.Text.Json;
 using GrimoireCli.Api;
 using GrimoireCli.Configuration;
@@ -18,7 +19,7 @@ public static class SelfTestCommand
     {
         var command = new Command("self-test", "Verify the binary works (offline; no server needed)");
         command.AddHelpSection("Notes", HelpSectionPosition.Top,
-            "Exercises source-generated JSON, JWT parsing and version comparison.",
+            "Exercises source-generated JSON, the raw JsonDocument response path, JWT parsing and version comparison.",
             "Exits 0 on success, 1 on the first failed check.");
         command.SetAction(parseResult =>
         {
@@ -48,43 +49,37 @@ public static class SelfTestCommand
             if (!dict.Contains("\"k\""))
                 failures.Add("Dictionary<string,string> JSON round-trip failed");
 
-            // Response DTOs: these cross the JSON boundary on every command that talks
-            // to the API, not just login, so they need the same AOT coverage.
-            var link = new LinkEntry { Label = "wiki", Url = "https://example.invalid/wiki" };
-            var linkBack = JsonSerializer.Deserialize(
-                JsonSerializer.Serialize(link, AppJsonContext.Default.LinkEntry), AppJsonContext.Default.LinkEntry);
-            if (linkBack?.Label != link.Label || linkBack.Url != link.Url)
-                failures.Add("LinkEntry JSON round-trip failed");
+            var saved = new SavedFile { Path = "book.pdf", Bytes = 42 };
+            var savedBack = JsonSerializer.Deserialize(
+                JsonSerializer.Serialize(saved, AppJsonContext.Default.SavedFile), AppJsonContext.Default.SavedFile);
+            if (savedBack?.Path != saved.Path || savedBack.Bytes != saved.Bytes)
+                failures.Add("SavedFile JSON round-trip failed");
 
-            var publisher = new PublisherEntry { Name = "Pegasus", Url = "https://example.invalid/pegasus" };
-            var publisherBack = JsonSerializer.Deserialize(
-                JsonSerializer.Serialize(publisher, AppJsonContext.Default.PublisherEntry), AppJsonContext.Default.PublisherEntry);
-            if (publisherBack?.Name != publisher.Name || publisherBack.Url != publisher.Url)
-                failures.Add("PublisherEntry JSON round-trip failed");
+            // The raw path is what crosses the JSON boundary now: JsonDocument
+            // under AOT, the two field readers, and the pretty-printer.
+            using (var doc = JsonDocument.Parse("{\"status\":\"ok\",\"errors\":[]}"))
+            {
+                if (doc.RootElement.GetProperty("status").GetString() != "ok")
+                    failures.Add("JsonDocument parse failed");
+            }
+            if (GrimoireApiClient.ReadStringProperty("{\"status\":\"already_running\"}", "status") != "already_running")
+                failures.Add("ReadStringProperty failed");
+            if (!GrimoireApiClient.HasItems("{\"errors\":[{\"id\":\"a\"}]}", "errors")
+                || GrimoireApiClient.HasItems("{\"errors\":[]}", "errors"))
+                failures.Add("HasItems failed");
 
-            var book = new Book { Id = "b1", Title = "Shadowrun 6 DE", PageCount = 42 };
-            var bookBack = JsonSerializer.Deserialize(
-                JsonSerializer.Serialize(book, AppJsonContext.Default.Book), AppJsonContext.Default.Book);
-            if (bookBack?.Id != book.Id || bookBack.Title != book.Title || bookBack.PageCount != book.PageCount)
-                failures.Add("Book JSON round-trip failed");
-
-            var summary = new GameSystemSummary { Id = "s1", Name = "Shadowrun 6 DE", BookCount = 227 };
-            var summaryBack = JsonSerializer.Deserialize(
-                JsonSerializer.Serialize(summary, AppJsonContext.Default.GameSystemSummary), AppJsonContext.Default.GameSystemSummary);
-            if (summaryBack?.Id != summary.Id || summaryBack.Name != summary.Name || summaryBack.BookCount != summary.BookCount)
-                failures.Add("GameSystemSummary JSON round-trip failed");
-
-            var detail = new GameSystemDetail { Id = "s1", Name = "Shadowrun 6 DE", Books = [book] };
-            var detailBack = JsonSerializer.Deserialize(
-                JsonSerializer.Serialize(detail, AppJsonContext.Default.GameSystemDetail), AppJsonContext.Default.GameSystemDetail);
-            if (detailBack?.Id != detail.Id || detailBack.Books?.Count != 1 || detailBack.Books[0].Title != book.Title)
-                failures.Add("GameSystemDetail JSON round-trip failed");
-
-            var summaryList = new List<GameSystemSummary> { summary };
-            var summaryListBack = JsonSerializer.Deserialize(
-                JsonSerializer.Serialize(summaryList, AppJsonContext.Default.ListGameSystemSummary), AppJsonContext.Default.ListGameSystemSummary);
-            if (summaryListBack?.Count != 1 || summaryListBack[0].Id != summary.Id)
-                failures.Add("List<GameSystemSummary> JSON round-trip failed");
+            // The --pretty path serializes a JsonElement, which nothing else here
+            // exercises; JsonSerializer.Serialize(JsonElement) is unconditionally
+            // annotated RequiresUnreferencedCode/RequiresDynamicCode, so WriteTo is
+            // the AOT-safe way to pretty-print (see ConsoleOutput.WriteRawJson).
+            using (var probeDoc = JsonDocument.Parse("{\"a\":1}"))
+            using (var probeStream = new MemoryStream())
+            {
+                using (var probeWriter = new Utf8JsonWriter(probeStream, new JsonWriterOptions { Indented = true }))
+                    probeDoc.RootElement.WriteTo(probeWriter);
+                if (!Encoding.UTF8.GetString(probeStream.ToArray()).Contains('\n'))
+                    failures.Add("pretty-print of a JsonElement failed");
+            }
 
             // Token parsing: base64url payload {"exp":4102444800} = 2100-01-01.
             const string token = "eyJhbGciOiJIUzI1NiJ9.eyJleHAiOjQxMDI0NDQ4MDB9.sig";

@@ -80,20 +80,22 @@ checked most recently, not to any one server in particular.
    git diff src/GrimoireCli/Generated
    ```
 
-4. Diff the serializers backing the untyped response shapes — the spec types
-   almost every response as `{}`, so the generator cannot see them and this is
-   where response changes actually show up:
+4. Diff the serializers backing the response shapes the spec still types as
+   `{}` — the generator cannot see those, and stdout is a byte passthrough
+   with no DTO to update, but a field the exit-code readers
+   (`ReadStringProperty`, `HasItems`) key on, or documented behaviour in
+   [grimoire-api-notes.md](grimoire-api-notes.md), can still change shape
+   underneath them:
 
    ```bash
    git -C temp/grimoire diff vOLD..vNEW -- backend/routers/*/_serializers.py backend/routers/*/core.py backend/models/
    ```
 
-5. Update DTOs, flags and help text to match. Regenerate the two generated
-   example trees, now downstream of the client regeneration in step 3:
+5. Update flags and help text to match. Regenerate the `--help-full` sample
+   file, now downstream of the client regeneration in step 3:
 
    ```bash
-   dotnet run --project tools/GenerateResponseExamples -- src/GrimoireCli/Commands/ResponseExamples.g.cs
-   dotnet run --project tools/GenerateRequestExamples -- src/GrimoireCli/Commands/RequestExamples.g.cs
+   dotnet run --project tools/GenerateJsonExamples -- src/GrimoireCli/Commands/JsonExamples.g.cs
    ```
 
    Re-run `bash docker/seed.sh` and `bash docker/smoke-test.sh`. Update
