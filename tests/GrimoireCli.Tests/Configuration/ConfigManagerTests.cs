@@ -321,4 +321,73 @@ public class ConfigManagerTests
             Directory.Delete(dir, recursive: true);
         }
     }
+
+    // A token from a flag or the environment belongs to a different session than
+    // the stored cookie, so the cookie must not be offered as a way to renew it.
+    [Fact]
+    public void ResolveDropsRefreshTokenWhenTheAccessTokenIsOverridden()
+    {
+        var manager = InTempDir(out var path);
+        try
+        {
+            manager.Save(new AppConfig
+            {
+                Server = "http://example.test",
+                AccessToken = "file-access",
+                RefreshToken = "file-refresh"
+            });
+            var fromFile = manager.Resolve();
+            Assert.Equal("file-refresh", fromFile.RefreshToken);
+            var flagged = manager.Resolve(flagToken: "flag-access");
+            Assert.Null(flagged.RefreshToken);
+            var fromEnv = manager.Resolve(
+                envLookup: name => name == "GRIMOIRE_TOKEN" ? "env-access" : null);
+            Assert.Null(fromEnv.RefreshToken);
+        }
+        finally
+        {
+            Directory.Delete(Path.GetDirectoryName(path)!, recursive: true);
+        }
+    }
+
+    [Fact]
+    public void UpdateTokensWritesBothAndDoesNotPersistEnvironmentValues()
+    {
+        var manager = InTempDir(out var path);
+        try
+        {
+            manager.Save(new AppConfig { Server = "http://example.test" });
+            manager.Resolve(envLookup: name => name == "GRIMOIRE_TOKEN" ? "env-only-token" : null);
+            manager.UpdateTokens("new-access", "new-refresh");
+            var raw = File.ReadAllText(path);
+            Assert.DoesNotContain("env-only-token", raw);
+            var back = manager.Load();
+            Assert.Equal("new-access", back.AccessToken);
+            Assert.Equal("new-refresh", back.RefreshToken);
+        }
+        finally
+        {
+            Directory.Delete(Path.GetDirectoryName(path)!, recursive: true);
+        }
+    }
+
+    // The server rotates on every refresh, so a 200 that carried no new cookie
+    // leaves the stored one as the best available credential.
+    [Fact]
+    public void UpdateTokensKeepsTheStoredRefreshTokenWhenGivenNull()
+    {
+        var manager = InTempDir(out var path);
+        try
+        {
+            manager.Save(new AppConfig { AccessToken = "old", RefreshToken = "keep-me" });
+            manager.UpdateTokens("new-access", null);
+            var back = manager.Load();
+            Assert.Equal("new-access", back.AccessToken);
+            Assert.Equal("keep-me", back.RefreshToken);
+        }
+        finally
+        {
+            Directory.Delete(Path.GetDirectoryName(path)!, recursive: true);
+        }
+    }
 }
