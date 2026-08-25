@@ -955,4 +955,50 @@ ok "login repairs a corrupt config"
   || fail "the config should be owner-only, got $(stat -c '%a' "$CONFIG")"
 ok "config writes leave no temporary file and stay owner-only"
 
+
+# Grimoire does not merely refuse a refresh token it has already rotated away:
+# it reads the replay as theft and revokes the session. Reaching that state on
+# purpose is the only way to check the failure path without waiting out a
+# 30-minute access token.
+DEV_SECRET=$(docker inspect docker-grimoire-1 \
+  --format '{{range .Config.Env}}{{println .}}{{end}}' 2>/dev/null \
+  | sed -n 's/^SECRET_KEY=//p')
+if [ "$DEV_SECRET" != "dev-only-not-a-real-secret" ]; then
+  echo "  skip: the retired-session case needs the dev SECRET_KEY" >&2
+else
+  STORED=$(jq -r '.refreshToken // empty' "$CONFIG")
+  [ -n "$STORED" ] || fail "login stored no refresh token: $(cat "$CONFIG")"
+  curl -sf -X POST "$SERVER/api/auth/refresh" \
+    -H "Cookie: grimoire_refresh=$STORED" -o /dev/null \
+    || fail "could not rotate the refresh token out from under the CLI"
+  # An expired but correctly signed token: TokenHelper reads its exp, finds it
+  # spent, and the CLI refreshes before sending — with the cookie just retired.
+  STALE_JWT=$(python3 -c "
+import base64,hmac,hashlib,json,time
+def b64(b): return base64.urlsafe_b64encode(b).rstrip(b'=')
+h=b64(json.dumps({'alg':'HS256','typ':'JWT'},separators=(',',':')).encode())
+n=int(time.time())
+p=b64(json.dumps({'sub':'x','username':'admin','role':'admin','iat':n-3600,'jti':'p','exp':n-60,'sid':'p'},separators=(',',':')).encode())
+print((h+b'.'+p+b'.'+b64(hmac.new(b'$DEV_SECRET',h+b'.'+p,hashlib.sha256).digest())).decode())")
+  jq --arg t "$STALE_JWT" '.accessToken = $t' "$CONFIG" >"$WORK/retired.json"
+  mv "$WORK/retired.json" "$CONFIG"
+  rc=0
+  "$CLI" systems list >"$WORK/retired.out" 2>"$WORK/retired.err" || rc=$?
+  [ "$rc" -eq 2 ] || fail "a retired refresh token should exit 2, got $rc"
+  grep -qi "session expired" "$WORK/retired.err" \
+    || fail "no readable message for a retired session: $(cat "$WORK/retired.err")"
+  grep -q "at GrimoireCli" "$WORK/retired.err" \
+    && fail "a retired session leaked a stack trace: $(cat "$WORK/retired.err")"
+  [ ! -s "$WORK/retired.out" ] || fail "stdout should stay empty when the session is gone"
+  ok "a retired refresh token fails readably with no stack trace"
+
+  # Restore a working session: this script must converge on a re-run, not drift.
+  printf 'admin' | "$CLI" login --server "$SERVER" --username admin --password-stdin \
+    >/dev/null 2>"$WORK/relogin2.err" \
+    || { cat "$WORK/relogin2.err" >&2; fail "login should recover a revoked session"; }
+  syslist
+  [ "$COUNT" -eq "$EXPECTED_SYSTEMS" ] || fail "the CLI should work again after re-login"
+  ok "login recovers a revoked session"
+fi
+
 echo "smoke: all checks passed" >&2
