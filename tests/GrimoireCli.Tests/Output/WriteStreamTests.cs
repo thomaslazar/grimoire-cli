@@ -4,6 +4,7 @@ using GrimoireCli.Output;
 
 namespace GrimoireCli.Tests.Output;
 
+[Collection("Console")]
 public class WriteStreamTests
 {
     [Fact]

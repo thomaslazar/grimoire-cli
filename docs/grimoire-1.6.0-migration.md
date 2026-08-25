@@ -51,11 +51,13 @@ conflicts with it. The edge stack comes first because everything else is built
 from the client generated against it — see
 [the design](specs/2026-08-19-edge-client-and-byte-passthrough-design.md).
 
-1. **A client generated from edge.** `docker/docker-compose.yml` pins an `edge`
-   digest and `src/GrimoireCli/Generated/` is regenerated from its spec. The review
-   is a read of the generated diff, and the gate is the smoke test against that
-   pinned stack — one CLI version targets one server version, so there is one stack
-   and it is the one being targeted.
+1. **A client generated from the prerelease channel.** `docker/docker-compose.yml`
+   tracked an `edge` digest at first, then a `nightly` one once the 1.6.0 RC landed
+   there, and now rides `nightly` unpinned — and `src/GrimoireCli/Generated/` is
+   regenerated from its spec. The review is a read of the generated diff, and the
+   gate is the smoke test against that
+   stack — one CLI version targets one server version, so there is one stack and
+   it is the one being targeted.
 2. **Byte-passthrough output.** Services return the response bytes, commands print
    them; compact by default with `--pretty` to re-indent. `src/GrimoireCli/Models/`
    is deleted outright, because step 1 gives `--help` a generated model to draw its
@@ -277,19 +279,21 @@ reference to a released version because `main` carries work no instance runs.
 
 - **`docker/docker-compose.yml` — repin the image to the release tag,
   `hunterreadca/grimoire:1.6.0`, and regenerate the client from it in the same
-  commit.** The digest pin is a deliberate, temporary exception taken only because
-  the CLI is being built alongside active server development; a released target
-  gets a release tag like every other version has. Retiring it is what closes this
-  workstream, so do it first — the rest of this list is downstream of the spec that
-  regeneration produces.
+  commit.** Riding an unpinned prerelease channel is a deliberate, temporary
+  exception taken only because the CLI is being built alongside active server
+  development; a released target gets a pinned release tag like every other version
+  has, and version bumps are deliberate from then on. Retiring it is what closes
+  this workstream, so do it first — the rest of this list is downstream of the spec
+  that regeneration produces, and this is the regeneration the whole drift-tolerant
+  arrangement was deferring.
 - `MinSupportedVersion` and `MaxTestedVersion` → 1.6.0.
 - `docs/grimoire-compatibility.md` — new matrix row, and drop the note about the
-  pin being a digest.
+  pin being an unpinned channel that can drift.
 - `README.md` — the "Tested against Grimoire" line.
 - `temp/grimoire/` — repin the clone to `v1.6.0`. Until then there is no tag to
   pin, which is why behaviour is read out of the running container instead.
-- `CLAUDE.md` — the digest-pin exception under "API client generation" goes away
-  with it.
+- `CLAUDE.md` — the unpinned-channel exception under "API client generation" goes
+  away with it.
 - `docs/authentication.md` — rewrite for refresh (workstream A).
 - `CLAUDE.md` — the "API client generation" section states that no success
   response carries a schema and that response DTOs are therefore hand-written.
@@ -309,21 +313,31 @@ get a release. Fixes are made and released there, then **cherry-picked** forward
 not merged: once workstream B lands, `main` has no `Models/` for a DTO-era fix to
 apply against.
 
-**CI can pin a prerelease after all.** The earlier claim that it could not assumed
-the choice was a release tag or a floating one. `docker/docker-compose.yml` on
-`main` pins an `edge` **digest**, which is as reproducible as a release tag, so the
-smoke test against the server this branch targets is a real gate rather than a
-signal. Moving the pin is a deliberate commit that regenerates the client with it.
+**CI can target a prerelease after all.** The earlier claim that it could not
+assumed the only choices were a release tag or a floating one, and for a while the
+answer was a digest — as reproducible as a release tag. That has since been
+relaxed: `docker/docker-compose.yml` on `main` rides `nightly` **unpinned**, where
+the 1.6.0 RC lands. The RC is not expected to move much, the window closes at
+release, and 1.6.0 needs a regeneration regardless — so a digest bought
+reproducibility at the price of repin ceremony and the risk of silently testing a
+stale RC.
 
-**That pin is an exception with an expiry.** It exists only because the CLI is being
+**The cost is accepted, not eliminated:** the spec can drift under the committed
+client between regenerations. An upstream request-shape change surfaces as a
+smoke-test failure, and the answer is to regenerate and read the diff. Which build
+a run actually used is recoverable from the image's
+`org.opencontainers.image.revision` label, a nightly-only label that matches the
+`commit_hash` in `GET /api/about`.
+
+**That arrangement is an exception with an expiry.** It exists only because the CLI is being
 built alongside active server development, and [workstream
 C](#workstream-c--version-gate-and-docs) retires it: when 1.6.0 releases the local
 stack goes back to a release tag. Whether the pin has gone stale is two commands,
 which is why there is no second compose file for it:
 
 ```bash
-docker pull hunterreadca/grimoire:edge
-docker inspect hunterreadca/grimoire:edge --format '{{index .RepoDigests 0}}'
+docker pull hunterreadca/grimoire:nightly
+docker inspect hunterreadca/grimoire:nightly --format '{{index .RepoDigests 0}}'
 ```
 
 ## Open questions
@@ -349,10 +363,10 @@ disagree on every count.
 `backend/seed_users.py` is byte-identical between 1.5.6 and the 2026-08-17 edge
 build and still reads `{DATA_PATH}/users.json` in the shape
 `docker/users.json.example` already has, so `docker/seed.sh` works against edge
-unchanged, so `docker/docker-compose.yml` with its digest pin is the whole of the
-setup — no second compose file, and not the hand-rolled `docker run` plus
+unchanged, so `docker/docker-compose.yml` on its own is the whole of the setup — no
+second compose file, and not the hand-rolled `docker run` plus
 `POST /api/auth/setup` below either. Keep the raw recipe for one-off spec
-measurements against a build the pin does not point at.
+measurements against a build the compose stack does not run.
 
 Pair the override with a spec-diff tool that pulls edge, records the build date
 and the counts, and diffs against the last recorded snapshot. Every number in this
