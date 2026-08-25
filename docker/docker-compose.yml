@@ -29,18 +29,29 @@
 # docker/env.example.
 services:
   grimoire:
-    # Pinned to the build this CLI targets. That target is now 1.6.0, which is
-    # unreleased, so the pin is a DIGEST rather than a tag: the channel moves under
-    # you and a floating tag would make a red CI run indistinguishable from upstream
-    # changing. A digest is as reproducible as a release tag.
+    # `nightly` is where the 1.6.0 RC lands, and this rides it deliberately
+    # unpinned: the RC is not expected to move much, the window closes when 1.6.0
+    # tags, and that release needs a regeneration anyway. Pinning a digest would
+    # buy reproducibility we would pay for in repin ceremony and in the risk of
+    # silently testing a stale RC.
     #
-    # This is `nightly` built 2026-08-25, where the 1.6.0 RC lands. It reports its
-    # version as the literal "nightly" — see IsComparableVersion in
-    # GrimoireApiClient. Move it deliberately and regenerate the client in the same
-    # commit, because the spec is read from whatever this pin resolves to. Support
-    # for released 1.5.6 lives on support/grimoire-1.5.6, where this file still
-    # pins the 1.5.6 tag.
-    image: hunterreadca/grimoire@sha256:90e2380acad59eef798b5f216751e3b22778fa5c1e5ca4767dcd9e38df0ed042
+    # So the spec can drift under the committed client between regenerations. A
+    # request shape changing upstream shows up as a smoke-test failure; the answer
+    # is to regenerate and read the diff, not to chase it.
+    #
+    # It reports its version as the literal "nightly" (APP_VERSION is set to the
+    # channel name at build time), which carries no number to compare — see
+    # IsComparableVersion in GrimoireApiClient. The commit is recoverable without
+    # running anything, unlike on `edge`, which carried no labels at all:
+    #
+    #   docker image inspect hunterreadca/grimoire:nightly \
+    #     --format '{{index .Config.Labels "org.opencontainers.image.revision"}}'
+    #
+    # **When 1.6.0 releases this becomes a release tag** (hunterreadca/grimoire:1.6.0)
+    # and stays pinned, with version bumps made deliberately from then on. Support
+    # for released 1.5.6 lives on support/grimoire-1.5.6, where this file pins the
+    # 1.5.6 tag.
+    image: hunterreadca/grimoire:nightly
     ports:
       - "9481:9481"
     environment:

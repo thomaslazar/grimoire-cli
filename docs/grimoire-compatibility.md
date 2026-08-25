@@ -13,7 +13,9 @@ fixes are made and released there, then cherry-picked forward.
 `main` targets Grimoire 1.6.0, which is unreleased and needs more than a version
 bump: it shortens the access token from 30 days to 30 minutes and types every
 response in the spec. Until it tags, `docker/docker-compose.yml` on `main` pins a
-`nightly` digest rather than a release. See
+unpinned `nightly` tag — where the 1.6.0 RC lands — rather than a release. The
+spec can therefore drift under the committed client between regenerations, which
+is accepted until 1.6.0 tags and the pin becomes a release tag. See
 [grimoire-1.6.0-migration.md](grimoire-1.6.0-migration.md).
 
 ## Runtime check
