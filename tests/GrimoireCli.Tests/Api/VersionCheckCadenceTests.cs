@@ -76,6 +76,26 @@ public class VersionCheckCadenceTests
     public void AnUnchangedInRangeVersionStaysSilent()
         => Assert.Null(GrimoireApiClient.VersionWarning("1.5.6", previous: "1.5.6"));
 
+    // The bug this fixes: "nightly" parsed as 0.0.0 and so read as older than the
+    // minimum supported version, which is a claim the string does not support.
+    [Theory]
+    [InlineData("nightly")]
+    [InlineData("edge")]
+    [InlineData("dev")]
+    public void AnUncomparableVersionWarnsAboutNothing(string observed)
+        => Assert.Null(GrimoireApiClient.VersionWarning(observed, previous: null));
+
+    // The "moved" prefix is about provenance, not comparability, so a move onto an
+    // uncomparable version is still worth saying.
+    [Fact]
+    public void AMoveOntoAnUncomparableVersionStillSaysItMoved()
+    {
+        var warning = GrimoireApiClient.VersionWarning("nightly", previous: "1.5.6");
+        Assert.NotNull(warning);
+        Assert.Contains("moved", warning);
+        Assert.DoesNotContain("older than the minimum", warning);
+    }
+
     // RecordServerVersion takes an injected ConfigManager (constructor parameter),
     // so this proves persistence lands on that path rather than silently falling
     // back to ~/.grimoire-cli/config.json — the fallback exists only for call

@@ -303,7 +303,10 @@ public class GrimoireApiClient
         if (observed == null) return;
         var warning = VersionWarning(observed, _config.LastServerVersion);
         if (warning != null) _logger.Warn(warning);
-        else _logger.Debug($"server version {observed} (in tested range {MinSupportedVersion}-{MaxTestedVersion})");
+        else if (IsComparableVersion(observed))
+            _logger.Debug($"server version {observed} (in tested range {MinSupportedVersion}-{MaxTestedVersion})");
+        else
+            _logger.Debug($"server version {observed} carries no version number to compare against the tested range {MinSupportedVersion}-{MaxTestedVersion}");
 
         var checkedAt = DateTimeOffset.UtcNow;
         try
@@ -373,6 +376,9 @@ public class GrimoireApiClient
             ? $"This server moved from Grimoire {previous} to {observed} since the last check. "
             : "";
 
+        if (!IsComparableVersion(observed))
+            return string.IsNullOrEmpty(moved) ? null : moved.TrimEnd();
+
         if (CompareVersions(observed, MinSupportedVersion) < 0)
             return $"{moved}Grimoire server version {observed} is older than the minimum supported version "
                    + $"({MinSupportedVersion}). Some features may not work.";
@@ -383,6 +389,16 @@ public class GrimoireApiClient
 
         return null;
     }
+
+    /// <summary>
+    /// Whether a version string carries anything to compare. The nightly and edge
+    /// channels report their channel name rather than a version, and
+    /// <see cref="ParseVersion"/> reads a non-numeric segment as 0 — so comparing
+    /// one would report "older than the minimum" about a string that says nothing
+    /// of the sort.
+    /// </summary>
+    internal static bool IsComparableVersion(string? version)
+        => !string.IsNullOrWhiteSpace(version) && ParseVersion(version).Any(p => p != 0);
 
     internal static int CompareVersions(string a, string b)
     {

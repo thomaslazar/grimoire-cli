@@ -46,4 +46,19 @@ public class CompareVersionsTests
     {
         Assert.True(GrimoireApiClient.CompareVersions("1.5.5", "1.5.4") > 0);
     }
+
+    // A version with no numeric component tells us nothing, so there is nothing to
+    // compare it against — the nightly channel reports the literal "nightly".
+    [Theory]
+    [InlineData("1.5.6", true)]
+    [InlineData("1.5.6-tk8i6j", true)]
+    [InlineData("v1.6.0", true)]
+    [InlineData("2", true)]
+    [InlineData("nightly", false)]
+    [InlineData("edge", false)]
+    [InlineData("dev", false)]
+    [InlineData("", false)]
+    [InlineData(null, false)]
+    public void IsComparableVersion_RequiresANumericComponent(string? version, bool expected)
+        => Assert.Equal(expected, GrimoireApiClient.IsComparableVersion(version));
 }
