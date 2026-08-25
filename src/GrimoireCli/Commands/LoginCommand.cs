@@ -21,8 +21,8 @@ public static class LoginCommand
         command.AddHelpSection("Notes", HelpSectionPosition.Top,
             "--password is visible in the process list and shell history. Prefer",
             "--password-stdin (reads the first line of stdin) for scripted use.",
-            "The JWT is valid 30 days and Grimoire has no refresh endpoint, so an",
-            "expired token means logging in again.",
+            "The session refreshes itself; log in again only after 30 days idle,",
+            "or if the session is revoked (password change, admin edit).",
             "OIDC accounts cannot log in here — this is the local password path.");
         command.AddExamples(
             "grimoire-cli login --server https://grimoire.example.com",
@@ -83,7 +83,7 @@ public static class LoginCommand
             AppConfig config;
             try
             {
-                var body = await client.LoginAsync(username!, password!);
+                var (body, refreshToken) = await client.LoginAsync(username!, password!);
                 var token = GrimoireApiClient.ExtractToken(body);
                 if (token == null)
                 {
@@ -94,6 +94,9 @@ public static class LoginCommand
                 config = configManager.Load();
                 config.Server = server;
                 config.AccessToken = token;
+                // A server that issues no refresh cookie must clear any stale one,
+                // so this is assigned unconditionally.
+                config.RefreshToken = refreshToken;
                 try
                 {
                     configManager.Save(config);

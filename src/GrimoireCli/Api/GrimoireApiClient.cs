@@ -35,7 +35,10 @@ public class GrimoireApiClient
     {
         _config = config;
         _configManager = configManager ?? new ConfigManager();
-        var debugHandler = new DebugHttpHandler(new HttpClientHandler());
+        // The CLI reads the refresh cookie off the login response itself and
+        // stores it, so cookie handling stays here rather than in a container
+        // whose contents die with the process.
+        var debugHandler = new DebugHttpHandler(new HttpClientHandler { UseCookies = false });
         _http = new HttpClient(debugHandler)
         {
             // Every request now carries an absolute URI from the generated builders, so
@@ -70,20 +73,28 @@ public class GrimoireApiClient
     /// <summary>
     /// POST /api/auth/login. Returns the raw response body — the OpenAPI spec types
     /// this response as an empty schema, so the token key is located by inspection
-    /// rather than by a generated model. See <see cref="ExtractToken"/>.
+    /// rather than by a generated model. See <see cref="ExtractToken"/>. The refresh
+    /// token is not in the body at all: it arrives as a <c>Set-Cookie</c> header and
+    /// is returned alongside, per <see cref="ExtractCookie"/>.
     /// </summary>
-    public async Task<string> LoginAsync(string username, string password)
+    public async Task<(string Body, string? RefreshToken)> LoginAsync(string username, string password)
     {
         var body = new Generated.Models.LoginRequest { Username = username, Password = password };
         var info = Api.Api.Auth.Login.ToPostRequestInformation(body);
-
         using var cts = new CancellationTokenSource(DefaultRequestTimeout);
         var request = await _adapter.ConvertToNativeRequestAsync<HttpRequestMessage>(info, cts.Token)
             ?? throw new InvalidOperationException("Failed to build login request");
         var response = await _http.SendAsync(request, cts.Token);
         response.EnsureSuccessStatusCode();
-        return await response.Content.ReadAsStringAsync(cts.Token);
+        var responseBody = await response.Content.ReadAsStringAsync(cts.Token);
+        return (responseBody, ReadRefreshCookie(response));
     }
+
+    /// <summary>The rotated refresh token from a login or refresh response.</summary>
+    private static string? ReadRefreshCookie(HttpResponseMessage response)
+        => response.Headers.TryGetValues("Set-Cookie", out var cookies)
+            ? ExtractCookie(cookies, RefreshCookieName)
+            : null;
 
     /// <summary>
     /// Pulls the JWT out of a login response. Grimoire's spec does not describe the
@@ -107,6 +118,28 @@ public class GrimoireApiClient
         {
             return null;
         }
+    }
+
+    /// <summary>The refresh token's cookie name, per <c>REFRESH_COOKIE_NAME</c>.</summary>
+    internal const string RefreshCookieName = "grimoire_refresh";
+
+    /// <summary>
+    /// Reads one cookie's value out of a response's Set-Cookie headers. Grimoire
+    /// delivers the refresh token only this way, so this is the sole path by
+    /// which the CLI obtains one. Returns the text between "name=" and the first
+    /// ";", which is empty when the server is clearing the cookie.
+    /// </summary>
+    internal static string? ExtractCookie(IEnumerable<string> setCookieHeaders, string name)
+    {
+        var prefix = name + "=";
+        foreach (var header in setCookieHeaders)
+        {
+            if (!header.StartsWith(prefix, StringComparison.Ordinal)) continue;
+            var value = header[prefix.Length..];
+            var end = value.IndexOf(';');
+            return end < 0 ? value : value[..end];
+        }
+        return null;
     }
 
     /// <summary>Reads a top-level string property, or null. Used for untyped responses.</summary>
@@ -222,9 +255,8 @@ public class GrimoireApiClient
             ? $"{body[..maxChars]}... (truncated, {body.Length} chars total)"
             : body;
 
-    // Grimoire issues a 30-day JWT and exposes no refresh endpoint, so there is
-    // nothing to renew — the only remedy for an expired token is another login.
-    // Warn early rather than letting the server answer 401 with no explanation.
+    // Grimoire's access token is short-lived (30 minutes), so warn early rather
+    // than letting the server answer 401 with no explanation.
     private void WarnIfTokenExpired()
     {
         var token = _http.DefaultRequestHeaders.Authorization?.Parameter;

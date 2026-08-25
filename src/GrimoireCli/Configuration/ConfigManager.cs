@@ -59,8 +59,8 @@ public class ConfigManager
     }
 
     /// <summary>
-    /// Moves an unparseable config aside before anything can overwrite it. The token
-    /// it holds is valid for 30 days and cannot be refreshed, and a file broken by a
+    /// Moves an unparseable config aside before anything can overwrite it. The refresh
+    /// token it holds is what keeps the session alive, and a file broken by a
     /// hand-edit usually still contains it — but the next write would replace the file
     /// wholesale, so leaving it in place would destroy on the following command what
     /// the warning invites the operator to repair. Moving it also means the warning is
@@ -88,8 +88,8 @@ public class ConfigManager
     /// dies mid-write cannot destroy the token already there. Both paths are in the
     /// same directory, hence the same filesystem, which is what makes the replacement
     /// atomic. This matters more since the version-check cadence writes daily rather
-    /// than only at login, and the token it would take with it lasts 30 days with no
-    /// refresh. A power loss is not covered — the rename can land before the data —
+    /// than only at login, and losing the refresh token it would take with it costs a
+    /// login. A power loss is not covered — the rename can land before the data —
     /// but a truncated file is read as absent rather than as an error.
     /// </summary>
     /// <exception cref="ConfigWriteException">

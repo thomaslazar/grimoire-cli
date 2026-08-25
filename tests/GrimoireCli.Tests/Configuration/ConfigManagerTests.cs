@@ -202,8 +202,8 @@ public class ConfigManagerTests
             var config = manager.Load();
             Assert.Null(config.Server);
             Assert.Null(config.AccessToken);
-            // The bytes are preserved beside the config: a hand-edit that broke a
-            // 30-day non-refreshable token must be recoverable.
+            // The bytes are preserved beside the config: a hand-edit that broke the
+            // refresh token must be recoverable, since losing it costs a login.
             Assert.Equal(content, File.ReadAllText($"{path}.corrupt"));
             Assert.False(File.Exists(path));
         }
@@ -278,9 +278,9 @@ public class ConfigManagerTests
         }
     }
 
-    // The file holds a bearer token valid for 30 days, so it must not be left at
-    // whatever the umask allows — and replacing the path swaps in the new file's
-    // mode, which would silently undo an operator's chmod on every write.
+    // The file holds a bearer token and the refresh token that renews it, so it must
+    // not be left at whatever the umask allows — and replacing the path swaps in the
+    // new file's mode, which would silently undo an operator's chmod on every write.
     [Fact]
     public void SaveRestrictsThePermissionsToTheOwner()
     {
