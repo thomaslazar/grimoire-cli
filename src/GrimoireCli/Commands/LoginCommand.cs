@@ -108,10 +108,21 @@ public static class LoginCommand
                     _logger.Error(ex.Message);
                     Environment.Exit(1);
                 }
-                var expiry = TokenHelper.GetExpiration(token!);
-                Console.Error.WriteLine(expiry != null
-                    ? $"Logged in to {server} (token expires {expiry:yyyy-MM-dd})"
-                    : $"Logged in to {server}");
+                // With a refresh token stored, the access token's own 30 minutes are
+                // renewed as needed, so its date would misreport how long the login
+                // lasts. A server that issues no cookie (1.5.6) hands out a 30-day
+                // token, where the date is what the operator needs.
+                if (!string.IsNullOrEmpty(refreshToken))
+                {
+                    Console.Error.WriteLine($"Logged in to {server} (session renews automatically)");
+                }
+                else
+                {
+                    var expiry = TokenHelper.GetExpiration(token!);
+                    Console.Error.WriteLine(expiry != null
+                        ? $"Logged in to {server} (token expires {expiry:yyyy-MM-dd})"
+                        : $"Logged in to {server}");
+                }
             }
             catch (HttpRequestException ex)
             {

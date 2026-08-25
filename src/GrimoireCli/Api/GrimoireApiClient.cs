@@ -24,21 +24,23 @@ public class GrimoireApiClient
     /// them through <see cref="SendAsync(RequestInformation, string?, string?, TimeSpan?)"/>
     /// — never call a generated execute method (e.g. <c>GetAsync</c>) directly. Those
     /// bypass <see cref="EnsureSuccessAsync"/>, the exit-code mapping and
-    /// <see cref="WarnIfTokenExpired"/>, and throw <c>ApiException</c> with the
+    /// <see cref="EnsureValidTokenAsync"/>, and throw <c>ApiException</c> with the
     /// response body discarded on failure.
     /// </summary>
     public Generated.GrimoireApiClient Api { get; }
 
     public static readonly TimeSpan DefaultRequestTimeout = TimeSpan.FromSeconds(100);
 
-    public GrimoireApiClient(AppConfig config, ConfigManager? configManager = null)
+    public GrimoireApiClient(AppConfig config, ConfigManager? configManager = null,
+        HttpMessageHandler? innerHandler = null)
     {
         _config = config;
         _configManager = configManager ?? new ConfigManager();
         // The CLI reads the refresh cookie off the login response itself and
         // stores it, so cookie handling stays here rather than in a container
         // whose contents die with the process.
-        var debugHandler = new DebugHttpHandler(new HttpClientHandler { UseCookies = false });
+        var debugHandler = new DebugHttpHandler(
+            innerHandler ?? new HttpClientHandler { UseCookies = false });
         _http = new HttpClient(debugHandler)
         {
             // Every request now carries an absolute URI from the generated builders, so
@@ -198,6 +200,26 @@ public class GrimoireApiClient
     }
 
     /// <summary>
+    /// Whether to renew before sending. The threshold matches abs-cli's, and a
+    /// stored cookie is required because there is nothing else to renew with.
+    /// </summary>
+    internal static bool ShouldRefreshProactively(string? accessToken, bool haveRefreshToken)
+        => haveRefreshToken
+           && !string.IsNullOrEmpty(accessToken)
+           && TokenHelper.IsExpiringSoon(accessToken, thresholdSeconds: 60);
+
+    /// <summary>
+    /// Whether a failed response is the one kind of 401 a refresh can fix.
+    /// Grimoire marks an expired access token with X-Token-Expired specifically
+    /// so it stays distinguishable from "not authenticated" and "invalid token",
+    /// and the refresh endpoint is rate-limited, so the other 401s are left alone.
+    /// </summary>
+    internal static bool ShouldRefreshOn401(HttpResponseMessage response, bool haveRefreshToken)
+        => haveRefreshToken
+           && response.StatusCode == System.Net.HttpStatusCode.Unauthorized
+           && response.Headers.Contains("X-Token-Expired");
+
+    /// <summary>
     /// Fails a response body that is not JSON, taking over the check the response
     /// DTOs used to provide as a side effect of deserializing. Grimoire's SPA
     /// catch-all answers an unroutable request (an empty, ".", or otherwise
@@ -223,15 +245,46 @@ public class GrimoireApiClient
     /// </summary>
     public async Task<string> SendAsync(RequestInformation info, string? permissionHint = null, string? notFoundHint = null, TimeSpan? timeout = null)
     {
-        await PreflightAsync();
         using var cts = new CancellationTokenSource(timeout ?? DefaultRequestTimeout);
-        var request = await _adapter.ConvertToNativeRequestAsync<HttpRequestMessage>(info, cts.Token)
-            ?? throw new InvalidOperationException($"Failed to build request for {info.URI.AbsolutePath}");
-        var response = await _http.SendAsync(request, cts.Token);
+        await PreflightAsync(cts.Token);
+        var response = await SendWithRefreshAsync(info, cts.Token);
         await EnsureSuccessAsync(response, permissionHint, notFoundHint);
         var body = await response.Content.ReadAsStringAsync(cts.Token);
         EnsureJson(body, info.URI.PathAndQuery);
         return body;
+    }
+
+    /// <summary>
+    /// Sends a request, and if the access token turns out to have expired,
+    /// renews it and sends the request once more. The retry rebuilds the native
+    /// request from the same <see cref="RequestInformation"/> — an
+    /// HttpRequestMessage cannot be resent — and rewinds the body stream first so
+    /// the second attempt carries the same content as the first. Every body the
+    /// CLI sends is a seekable MemoryStream — the SetStreamContent call sites in
+    /// Services wrap one over an in-memory byte array, and the generated builders
+    /// use SetContentFromParsable. A body that reports otherwise is not replayed.
+    /// </summary>
+    private async Task<HttpResponseMessage> SendWithRefreshAsync(
+        RequestInformation info, CancellationToken cancellationToken)
+    {
+        var request = await _adapter.ConvertToNativeRequestAsync<HttpRequestMessage>(info, cancellationToken)
+            ?? throw new InvalidOperationException($"Failed to build request for {info.URI.AbsolutePath}");
+        var response = await _http.SendAsync(request, cancellationToken);
+        if (!ShouldRefreshOn401(response, HasRefreshToken)) return response;
+        if (info.Content is { CanSeek: false })
+        {
+            // Replaying needs the body back, and this one cannot be rewound. The
+            // 401 stands, and the next invocation renews before it sends.
+            _logger.Debug($"not replaying {info.URI.AbsolutePath}: the request body cannot be rewound");
+            return response;
+        }
+        _logger.Debug($"access token expired on {info.URI.AbsolutePath}, refreshing and retrying");
+        await RefreshAsync(cancellationToken);
+        if (info.Content != null)
+            info.Content.Position = 0;
+        var retry = await _adapter.ConvertToNativeRequestAsync<HttpRequestMessage>(info, cancellationToken)
+            ?? throw new InvalidOperationException($"Failed to rebuild request for {info.URI.AbsolutePath}");
+        return await _http.SendAsync(retry, cancellationToken);
     }
 
     /// <summary>
@@ -241,11 +294,9 @@ public class GrimoireApiClient
     /// </summary>
     public async Task<Stream> SendStreamAsync(RequestInformation info, string? permissionHint = null, string? notFoundHint = null, TimeSpan? timeout = null)
     {
-        await PreflightAsync();
         using var cts = new CancellationTokenSource(timeout ?? DefaultRequestTimeout);
-        var request = await _adapter.ConvertToNativeRequestAsync<HttpRequestMessage>(info, cts.Token)
-            ?? throw new InvalidOperationException($"Failed to build request for {info.URI.AbsolutePath}");
-        var response = await _http.SendAsync(request, cts.Token);
+        await PreflightAsync(cts.Token);
+        var response = await SendWithRefreshAsync(info, cts.Token);
         await EnsureSuccessAsync(response, permissionHint, notFoundHint);
         return await response.Content.ReadAsStreamAsync(cts.Token);
     }
@@ -255,12 +306,80 @@ public class GrimoireApiClient
             ? $"{body[..maxChars]}... (truncated, {body.Length} chars total)"
             : body;
 
-    // Grimoire's access token is short-lived (30 minutes), so warn early rather
-    // than letting the server answer 401 with no explanation.
-    private void WarnIfTokenExpired()
+    private bool HasRefreshToken => !string.IsNullOrEmpty(_config.RefreshToken);
+
+    /// <summary>
+    /// Exchanges the stored refresh cookie for a new token pair. The endpoint
+    /// authenticates on the cookie alone; the stale bearer header that
+    /// HttpClient attaches from its defaults is ignored by the server. Any
+    /// failure is terminal for this command — the session is gone and only a
+    /// fresh login can replace it.
+    /// </summary>
+    private async Task RefreshAsync(CancellationToken cancellationToken)
+    {
+        var info = Api.Api.Auth.Refresh.ToPostRequestInformation();
+        var request = await _adapter.ConvertToNativeRequestAsync<HttpRequestMessage>(info, cancellationToken)
+            ?? throw new InvalidOperationException("Failed to build refresh request");
+        request.Headers.Add("Cookie", $"{RefreshCookieName}={_config.RefreshToken}");
+        var response = await _http.SendAsync(request, cancellationToken);
+        if (!response.IsSuccessStatusCode)
+        {
+            _logger.Debug($"refresh rejected: {(int)response.StatusCode} "
+                          + $"{TruncateForLogging(await response.Content.ReadAsStringAsync(cancellationToken))}");
+            SessionExpired();
+        }
+        var body = await response.Content.ReadAsStringAsync(cancellationToken);
+        var token = ExtractToken(body);
+        if (token == null)
+        {
+            _logger.Debug($"refresh response carried no token: {TruncateForLogging(body)}");
+            SessionExpired();
+        }
+        var rotated = ReadRefreshCookie(response);
+        _config.AccessToken = token;
+        if (!string.IsNullOrEmpty(rotated))
+            _config.RefreshToken = rotated;
+        _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+        try
+        {
+            _configManager.UpdateTokens(token!, string.IsNullOrEmpty(rotated) ? null : rotated);
+        }
+        catch (ConfigWriteException ex)
+        {
+            // This command still works, but the rotated token is the only live
+            // one and it is not on disk, so the next invocation starts from a
+            // credential the server has already retired.
+            _logger.Warn($"{ex.Message} The next command may need a fresh login.");
+        }
+        _logger.Debug("token refresh succeeded");
+    }
+
+    /// <summary>
+    /// Reports a session that can no longer be renewed. Routine rather than
+    /// exceptional: the server also revokes on a password change or an admin edit.
+    /// </summary>
+    private static void SessionExpired()
+    {
+        _logger.Error("Session expired. Run: grimoire-cli login");
+        Environment.Exit(2);
+    }
+
+    /// <summary>
+    /// Renews the access token before sending when it is nearly out and a stored
+    /// cookie can renew it. With no cookie — a token from a flag or the
+    /// environment, or a 1.5.6 server that issues none — the request still goes
+    /// out and the server answers with its own 401.
+    /// </summary>
+    private async Task EnsureValidTokenAsync(CancellationToken cancellationToken)
     {
         var token = _http.DefaultRequestHeaders.Authorization?.Parameter;
         if (token == null) return;
+        if (ShouldRefreshProactively(token, HasRefreshToken))
+        {
+            _logger.Debug($"access token expiring in {TokenHelper.SecondsUntilExpiry(token)}s, refreshing");
+            await RefreshAsync(cancellationToken);
+            return;
+        }
         if (TokenHelper.IsExpiringSoon(token, thresholdSeconds: 60))
             _logger.Warn("Access token has expired or is about to. Run: grimoire-cli login");
         else
@@ -268,13 +387,13 @@ public class GrimoireApiClient
     }
 
     /// <summary>
-    /// Runs before every request. The token warning is per-request because it is
+    /// Runs before every request. The token renewal is per-request because it is
     /// local and a long command can cross an expiry mid-run; the version check is
     /// once per client, and at most once a day across processes.
     /// </summary>
-    private async Task PreflightAsync()
+    private async Task PreflightAsync(CancellationToken cancellationToken)
     {
-        WarnIfTokenExpired();
+        await EnsureValidTokenAsync(cancellationToken);
         await EnsureVersionCheckedAsync();
     }
 
