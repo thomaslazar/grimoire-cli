@@ -30,8 +30,8 @@
 services:
   grimoire:
     # Pinned to the build this CLI targets. That target is now 1.6.0, which is
-    # unreleased, so the pin is a DIGEST rather than a tag: `edge` moves under you
-    # and a floating tag would make a red CI run indistinguishable from upstream
+    # unreleased, so the pin is a DIGEST rather than a tag: the channel moves under
+    # you and a floating tag would make a red CI run indistinguishable from upstream
     # changing. A digest is as reproducible as a release tag.
     #
     # This is `nightly` built 2026-08-25, where the 1.6.0 RC lands. It reports its
