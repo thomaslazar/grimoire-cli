@@ -31,12 +31,12 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | saved-filters | 0 / 4 |
 | search | 0 / 1 |
 | settings | 0 / 5 |
-| systems | 11 / 15 |
+| systems | 14 / 15 |
 | tags | 0 / 6 |
 | themes | 0 / 7 |
 | tokens | 0 / 10 |
 | users | 0 / 16 |
-| **Total** | **35 / 282** |
+| **Total** | **38 / 282** |
 
 2 operation(s) are internal-only (🔒) and excluded from covered counts.
 
@@ -377,9 +377,9 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | POST | `/api/systems/bulk/tags` | Bulk add tags to game systems | gm or admin | `systems batch-tag` ✅ |
 | GET | `/api/systems/{system_id}` | Get a game system | not guest | `systems get` ✅ |
 | PATCH | `/api/systems/{system_id}` | Update game system metadata | gm or admin | `systems update` ✅ |
-| GET | `/api/systems/{system_id}/book-folders` | List book folders |  | — |
-| PATCH | `/api/systems/{system_id}/book-folders` | Set tags on a book folder | gm or admin | — |
-| DELETE | `/api/systems/{system_id}/book-folders` | Delete a book folder | gm or admin | — |
+| GET | `/api/systems/{system_id}/book-folders` | List book folders |  | `systems book-folders list` ✅ |
+| PATCH | `/api/systems/{system_id}/book-folders` | Set tags on a book folder | gm or admin | `systems book-folders set` ✅ |
+| DELETE | `/api/systems/{system_id}/book-folders` | Delete a book folder | gm or admin | `systems book-folders delete` ✅ |
 | GET | `/api/systems/{system_id}/cover` | System cover image |  | `systems cover get` ✅ |
 | POST | `/api/systems/{system_id}/cover` | Upload a system cover | gm or admin | `systems cover upload` ✅ |
 | DELETE | `/api/systems/{system_id}/cover` | Remove an uploaded system cover | gm or admin | `systems cover delete` ✅ |

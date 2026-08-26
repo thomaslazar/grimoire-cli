@@ -404,56 +404,71 @@ and `books thumbnail`.
 
 ## Book folders
 
-Verified against v1.5.6 by reading `backend/routers/systems/core.py:261-288`,
-`backend/models/library.py:167` and `backend/services/tag_service.py`. No CLI
-command currently exposes this endpoint — `systems book-folders list|set`
-were built and then cut before merge; see the depth mismatch below and
-[hunter-read/grimoire#357](https://github.com/hunter-read/grimoire/issues/357).
+Measured against `hunterreadca/grimoire:nightly`, commit
+`7f5937071f51dfc65bc09f5e5e49d33c431f0a5d` — the 1.6.0 RC, not the v1.5.6 the
+rest of this file describes. Every claim below was observed against that build;
+source citations name the shipped backend inside the container. Backs
+`systems book-folders list|set|delete`.
 
-- **A book folder is a second, invisible tagging layer, addressed by path
-  rather than enumerated.** Its path takes the form
-  `{system_id}/{category}/{subfolder…}`; the model has three columns, `id`,
-  `path`, `tags`. Tagging one folder covers every book at or below that path,
-  resolved on read by `_book_folder_ancestor_paths` (`tag_service.py:63`). A
-  book directly in the category directory (no subfolder) belongs to no
-  folder.
-- **A `BookFolder` row exists only once a path has been tagged.** The call to
-  `upsert_folder_tags` (`routers/systems/core.py:284`) is the only site that
-  inserts one; the scanner and indexer never do. So `list_book_folders`
-  (`core.py:261`) returns folders that have been tagged, not every
-  subcategory folder present on disk — a real, untagged subfolder has no row
-  and does not appear.
-- **The inheritance never reaches a book's own `tags`.** `tags_for_resource`
-  (`tag_service.py:379`) reads only the `ResourceTag` join table; folder
-  inheritance is resolved separately in `folder_tags_in_use` (`:509`), which
-  serves the tag catalogue instead. `books get` and `systems get` do not show
-  inherited tags. Within this CLI, `book-folders list` is the only way to see
-  them; server-side, `folder_tags_in_use` also feeds `GET /api/tags`
-  (`routers/tags/core.py:35`).
+- **A book folder is a second tagging layer, addressed by path rather than by
+  id.** Its path takes the form `{system_id}/{category}/{subfolder…}`; the model
+  has three columns, `id`, `path`, `tags` (`backend/models/library.py:214`).
+  Tagging one folder covers every book at or below that path, resolved on read by
+  `_book_folder_ancestor_paths` (`backend/services/tag_service.py:117`). A book
+  directly in the category directory (no subfolder) belongs to no folder.
+- **The verbs.** `GET` returns `{"folders": [{"path", "tags"}]}` and needs only
+  an authenticated user — `list_book_folders` depends on `get_current_user`, so
+  it carries no role. `PATCH` takes `{"path", "tags"}` and echoes the same shape;
+  `DELETE` takes the path as a **query** parameter, not a body, and returns
+  `{"status": "deleted"}`. Both writes depend on `require_gm_or_admin`
+  (`backend/routers/systems/core.py:296`, `:313`, `:330`).
+- **A `BookFolder` row exists only once a path has been tagged.**
+  `upsert_folder_tags` (`tag_service.py:244`) is the only site that inserts one;
+  the scanner and indexer never do. Measured: `core/errata` existed on disk with
+  a book in it and `GET` returned `{"folders": []}` until a `PATCH` created the
+  row. So `list` reports what has been tagged, never what is on disk.
+- **The path must belong to the system in the URL.** `_require_owned_folder_path`
+  (`core.py:281`) 404s an unknown system and 400s a path that is not prefixed
+  with the system's id or has fewer than three segments. Measured: writing
+  `wrong/core/x` returned `400 {"detail": "path must be
+  '{system_id}/{category}/{subfolder...}' for this system"}`. v1.5.6 ignored the
+  URL's `system_id` on the write, so any system's folder was writable through any
+  system's URL; that is no longer true.
 - **`PATCH` replaces the tag list**, unlike `books batch-tag` /
-  `systems batch-tag`, which are additive. An empty `tags` clears the folder.
-- **The `{system_id}` in the PATCH URL is ignored by the write.**
-  `update_book_folder` takes it as a path parameter and never reads it —
-  `data.path` alone decides which row is written, with nothing validating that
-  the path belongs to that system or exists on disk. `GET` *does* filter by
-  `path.like(f"{system_id}/%")`, so read and write disagree about what the URL
-  means. A caller can write another system's folder through any system's URL.
-- **Read and write return tags differently.** `GET` resolves stored internal
-  keys to display casing via `folder_display_tags`; `PATCH` echoes the
-  internal keys straight from `upsert_folder_tags`. A round trip need not
-  match byte-for-byte.
-- **The frontend and backend derive a folder's subfolder segments at
-  different depths for a container child, so no path is correct for both
-  readers.** The frontend computes `parts.slice(categoryDepth + 1, -1)` where
-  `categoryDepth` is 3 when the system has `parent_id` set
-  (`frontend/src/components/system/folderTree.js:16-30`); the backend's
-  `tag_service.py:51-60` uses a hardcoded `parts[3:-1]` regardless of whether
-  the system is a container child. For a container child these differ by one
-  segment. Measured live: a folder tag written at the path one reader expects
-  renders correctly in the UI tree but does not resolve via
-  `GET /api/tags/{internal}/items`, or vice versa — never both. Reported
-  upstream as
-  [hunter-read/grimoire#357](https://github.com/hunter-read/grimoire/issues/357).
+  `systems batch-tag`, which are additive. Measured: `["second"]` over
+  `["Errata Fixture"]` left only `second`.
+- **An empty `tags` clears the folder but keeps the row.** Measured: after
+  `{"tags": []}` the folder still appeared in `GET` with an empty list. Removing
+  the row is what `DELETE` is for.
+- **`DELETE` removes the row and is not idempotent.** Measured:
+  `{"status": "deleted"}`, then the folder gone from `GET`, then
+  `404 {"detail": "Book folder not found"}` on the same path. Any repeatable
+  check must create before it deletes.
+- **Read and write return tags differently.** `GET` resolves stored internal keys
+  to display casing via `folder_display_tags` (`tag_service.py:263`); `PATCH`
+  echoes the internal keys straight from `upsert_folder_tags`. Measured:
+  `PATCH ["Errata Fixture"]` echoed `["errata fixture"]` and `GET` returned
+  `["Errata Fixture"]`. A round trip does not match byte-for-byte.
+- **The inheritance never reaches a book's own `tags`.** `tags_for_resource`
+  (`tag_service.py:435`) reads only the `ResourceTag` join table; folder
+  inheritance is resolved separately in `folder_tags_in_use` (`:565`), which
+  serves the tag catalogue. Measured: with the folder tagged `errata-fixture`,
+  `GET /api/books/{id}` reported `"tags": []`. `book-folders list` and the tag
+  catalogue (`GET /api/tags`, `backend/routers/tags/core.py:35`) are the only
+  places the tags surface.
+- **The subfolder depth is derived per system and handles nested containers.**
+  `system_category_depth` (`tag_service.py:52`) walks the whole container chain
+  for `2 + <ancestor count>`, `system_category_depths` (`:78`) returns every
+  system's depth in one query for the bulk resolvers, and both stop on a cycle.
+  Measured on a **container child**: with `{system}/core/errata` tagged
+  `errata-fixture`, `GET /api/tags/errata-fixture/items` returned
+  `{"items": [], "folders": [{"resource_type": "book", "path": "errata",
+  "items": [{"title": "DSA5 Errata", …}]}]}` — a one-segment folder path — and
+  `GET /api/tags` counted the book (`category: "book"`, `count: 1`). v1.5.6's
+  hardcoded `parts[3:-1]` disagreed with the frontend by one segment here, so no
+  path was correct for both readers
+  ([hunter-read/grimoire#357](https://github.com/hunter-read/grimoire/issues/357),
+  fixed).
 
 ## Cleanup of missing files
 
