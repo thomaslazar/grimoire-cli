@@ -182,3 +182,13 @@ already asserts them.
 Anything that enumerates the folder tree. The server has no endpoint for it, and
 composing one from `books list` paths belongs in the calling layer, not in a
 thin pass-through CLI.
+
+## Correction 2026-08-26
+
+The "Verified server behaviour" list above says `GET` "needs no role beyond a
+non-guest account". That is wrong. Its route registration carries no
+`dependencies=` at all — unlike `GET /{system_id}` directly above it, which has
+`require_not_guest` — and `list_book_folders` depends on `get_current_user`, so a
+guest can read book folders. `systems book-folders list` is unaffected: a route
+guarded by `get_current_user` takes no role tag, which is what it has.
+[grimoire-api-notes.md](../grimoire-api-notes.md) records the accurate version.
