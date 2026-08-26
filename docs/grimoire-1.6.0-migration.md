@@ -294,16 +294,10 @@ reference to a released version because `main` carries work no instance runs.
   pin, which is why behaviour is read out of the running container instead.
 - `CLAUDE.md` — the unpinned-channel exception under "API client generation" goes
   away with it.
-- **`docs/grimoire-api-coverage.md` — regenerate, and only here.** The table is
-  generated from the live spec plus the role dependencies in `temp/grimoire`, so
-  it cannot be regenerated while those two disagree on version: against a 1.6.0
-  spec with a 1.5.6 source pin, every route added since 1.5.6 resolves to a blank
-  Perm column, which the table's own legend reads as "any authenticated user".
-  Measured: 62 new operations, `POST /api/backups` and
-  `DELETE /api/backups/{backup_id}` among them, would each be published as
-  needing no role. Repin `temp/grimoire` to `v1.6.0` *first*, then regenerate.
-  Until then `IMPLEMENTED` is kept current by hand and the table lags — which is
-  why `POST /api/auth/refresh` is in the script but not yet in the markdown.
+- `docs/grimoire-api-coverage.md` — regenerate against the repinned stack. The
+  table already covers the 1.6.0 surface: `tools/generate-api-coverage.py` reads
+  the router source out of the running container rather than a source clone, so
+  the roles always match the spec being described.
 - `CLAUDE.md` — the "API client generation" section states that no success
   response carries a schema and that response DTOs are therefore hand-written.
   Both become false; the rule they justify goes with them.

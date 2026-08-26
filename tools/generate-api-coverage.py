@@ -10,8 +10,15 @@ Two inputs, both required:
                                stale, whereas the container cannot disagree with
                                itself. Start it first:
                                  docker compose -f docker/docker-compose.yml up -d --wait
-  temp/grimoire/               the upstream source at the deployed release tag,
-                               read for the role each route requires
+  the same container's /app/backend   the router source, read for the role each
+                               route requires. It comes from the container for
+                               the same reason the spec does, and the reason is
+                               stronger here: two inputs from one image cannot
+                               disagree about which routes exist, whereas a
+                               source tree pinned to a different version resolves
+                               every route it has never heard of to a blank Perm
+                               cell — which this table's own legend reads as "any
+                               authenticated user".
 
 Roles are not in the spec: only 10 of 178 operations mention one in their
 description, while the rest carry it as a FastAPI dependency at the route
@@ -25,7 +32,10 @@ import ast
 import json
 import os
 import re
+import shutil
+import subprocess
 import sys
+import tempfile
 import urllib.error
 import urllib.request
 from pathlib import Path
@@ -33,7 +43,6 @@ from pathlib import Path
 REPO = Path(__file__).resolve().parent.parent
 SERVER = os.environ.get("GRIMOIRE_SERVER", "http://host.docker.internal:9481")
 SPEC_URL = f"{SERVER}/api/openapi.json"
-SOURCE = REPO / "temp" / "grimoire"
 DEFAULT_OUT = REPO / "docs" / "grimoire-api-coverage.md"
 
 # Commands that implement an operation, keyed by "METHOD /path". Update this in
@@ -57,6 +66,30 @@ def tested_range() -> str:
         found[name] = match.group(1)
     low, high = found["MinSupportedVersion"], found["MaxTestedVersion"]
     return f"`{low}` only" if low == high else f"`{low}`-`{high}`"
+
+
+def router_source() -> Path:
+    """Extract the running stack's own backend tree to a temporary directory.
+
+    Returns a root holding ``backend/``, the layout ``dependency_roles`` walks.
+    """
+    container = subprocess.run(
+        ["docker", "compose", "-f", str(REPO / "docker" / "docker-compose.yml"), "ps", "-q", "grimoire"],
+        capture_output=True, text=True,
+    ).stdout.strip()
+    if not container:
+        sys.exit(
+            "the grimoire container is not running — start the stack first:\n"
+            "  docker compose -f docker/docker-compose.yml up -d --wait"
+        )
+    root = Path(tempfile.mkdtemp(prefix="grimoire-routers-"))
+    copy = subprocess.run(
+        ["docker", "cp", f"{container}:/app/backend", str(root / "backend")],
+        capture_output=True, text=True,
+    )
+    if copy.returncode != 0:
+        sys.exit(f"could not read /app/backend from the container: {copy.stderr.strip()}")
+    return root
 
 IMPLEMENTED = {
     "POST /api/auth/login": "`login` ✅",
@@ -250,9 +283,6 @@ def handler_dependency_roles(package: Path) -> dict[str, str]:
 
 
 def main() -> int:
-    if not SOURCE.exists():
-        sys.exit(f"missing {SOURCE} — clone the upstream source at the deployed tag (see CLAUDE.md)")
-
     try:
         with urllib.request.urlopen(SPEC_URL, timeout=30) as response:
             spec = json.loads(response.read().decode("utf-8"))
@@ -264,7 +294,11 @@ def main() -> int:
         )
     version = spec["info"]["version"]
     tested = tested_range()
-    roles = resolve_roles(dependency_roles(SOURCE), spec["paths"])
+    source = router_source()
+    try:
+        roles = resolve_roles(dependency_roles(source), spec["paths"])
+    finally:
+        shutil.rmtree(source, ignore_errors=True)
 
     by_tag: dict[str, list[tuple[str, str, str, str, str]]] = {}
     total = covered = internal = 0
@@ -292,7 +326,7 @@ def main() -> int:
         "",
         f"- **Reference:** spec fetched live from the pinned stack's `/api/openapi.json` "
         f"(v{version}, {len(spec['paths'])} paths, {total} operations) and the upstream "
-        f"source at `temp/grimoire/backend/routers/`. Tested range: {tested} "
+        f"router source read from the same container. Tested range: {tested} "
         f"(`GrimoireApiClient.cs`).",
         "- **Perm** column uses Grimoire's roles (`admin` / `gm or admin` / `not guest`); "
         "blank = any authenticated user. `?` = a dependency this script could not resolve.",
