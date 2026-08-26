@@ -59,8 +59,8 @@ public class ConfigManager
     }
 
     /// <summary>
-    /// Moves an unparseable config aside before anything can overwrite it. The token
-    /// it holds is valid for 30 days and cannot be refreshed, and a file broken by a
+    /// Moves an unparseable config aside before anything can overwrite it. The refresh
+    /// token it holds is what keeps the session alive, and a file broken by a
     /// hand-edit usually still contains it — but the next write would replace the file
     /// wholesale, so leaving it in place would destroy on the following command what
     /// the warning invites the operator to repair. Moving it also means the warning is
@@ -88,8 +88,8 @@ public class ConfigManager
     /// dies mid-write cannot destroy the token already there. Both paths are in the
     /// same directory, hence the same filesystem, which is what makes the replacement
     /// atomic. This matters more since the version-check cadence writes daily rather
-    /// than only at login, and the token it would take with it lasts 30 days with no
-    /// refresh. A power loss is not covered — the rename can land before the data —
+    /// than only at login, and losing the refresh token it would take with it costs a
+    /// login. A power loss is not covered — the rename can land before the data —
     /// but a truncated file is read as absent rather than as an error.
     /// </summary>
     /// <exception cref="ConfigWriteException">
@@ -139,20 +139,17 @@ public class ConfigManager
 
     public AppConfig Resolve(
         string? flagServer = null,
-        string? flagToken = null,
         Func<string, string?>? envLookup = null)
     {
         envLookup ??= Environment.GetEnvironmentVariable;
         var fileConfig = Load();
-
         return new AppConfig
         {
             Server = flagServer
                 ?? envLookup("GRIMOIRE_SERVER")
                 ?? fileConfig.Server,
-            AccessToken = flagToken
-                ?? envLookup("GRIMOIRE_TOKEN")
-                ?? fileConfig.AccessToken,
+            AccessToken = fileConfig.AccessToken,
+            RefreshToken = fileConfig.RefreshToken,
             LastVersionCheck = fileConfig.LastVersionCheck,
             LastServerVersion = fileConfig.LastServerVersion
         };
@@ -161,15 +158,33 @@ public class ConfigManager
     /// <summary>
     /// Records a version observation by read-modify-write of the config file.
     /// Deliberately reads <see cref="Load"/> rather than a resolved config:
-    /// <see cref="Resolve"/> merges GRIMOIRE_SERVER and GRIMOIRE_TOKEN from the
-    /// environment, and persisting those would write a token to disk that the
-    /// operator chose to keep out of it.
+    /// <see cref="Resolve"/> merges GRIMOIRE_SERVER from the environment, and
+    /// persisting it would write a server to disk that the operator chose to
+    /// keep out of the file.
     /// </summary>
     public void UpdateVersionCheck(string? serverVersion, DateTimeOffset checkedAt)
     {
         var onDisk = Load();
         onDisk.LastServerVersion = serverVersion;
         onDisk.LastVersionCheck = checkedAt;
+        Save(onDisk);
+    }
+
+    /// <summary>
+    /// Persists a refreshed token pair by read-modify-write of the config file,
+    /// for the same reason as <see cref="UpdateVersionCheck"/>: writing a
+    /// resolved config would put a GRIMOIRE_SERVER value on disk that the
+    /// operator chose to keep out of the file. A null
+    /// <paramref name="refreshToken"/> leaves the stored one in place — the
+    /// server rotates on every refresh, so the value already on disk is the best
+    /// credential available if a response carried no new cookie.
+    /// </summary>
+    public void UpdateTokens(string accessToken, string? refreshToken)
+    {
+        var onDisk = Load();
+        onDisk.AccessToken = accessToken;
+        if (refreshToken != null)
+            onDisk.RefreshToken = refreshToken;
         Save(onDisk);
     }
 }

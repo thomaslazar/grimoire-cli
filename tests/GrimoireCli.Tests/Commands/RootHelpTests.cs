@@ -38,7 +38,6 @@ public class RootHelpTests
         rootCommand.Subcommands.Add(SelfTestCommand.Create());
         rootCommand.AddHelpSection("Environment variables",
             "GRIMOIRE_SERVER   Server URL, overriding the config file.",
-            "GRIMOIRE_TOKEN    JWT, overriding the config file.",
             "GRIMOIRE_DEBUG=1  Same as --debug. Enables debug-level logging to stderr.");
         rootCommand.UseCustomHelpSections();
         return rootCommand;
@@ -113,7 +112,7 @@ public class RootHelpTests
         var output = RenderHelp();
         Assert.Contains("Environment variables", output);
         Assert.Contains("GRIMOIRE_SERVER", output);
-        Assert.Contains("GRIMOIRE_TOKEN", output);
+        Assert.DoesNotContain("GRIMOIRE_TOKEN", output);
         Assert.Contains("GRIMOIRE_DEBUG=1", output);
     }
 

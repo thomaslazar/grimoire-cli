@@ -26,10 +26,16 @@ public static class SelfTestCommand
             var failures = new List<string>();
 
             // Source-generated JSON round-trip: the AOT trap.
-            var config = new AppConfig { Server = "https://example.invalid", AccessToken = "abc" };
+            var config = new AppConfig
+            {
+                Server = "https://example.invalid",
+                AccessToken = "abc",
+                RefreshToken = "def"
+            };
             var json = JsonSerializer.Serialize(config, AppJsonContext.Default.AppConfig);
             var back = JsonSerializer.Deserialize(json, AppJsonContext.Default.AppConfig);
-            if (back?.Server != config.Server || back.AccessToken != config.AccessToken)
+            if (back?.Server != config.Server || back.AccessToken != config.AccessToken
+                || back.RefreshToken != config.RefreshToken)
                 failures.Add("AppConfig JSON round-trip failed");
 
             // The generated LoginRequest is the wire body login actually sends (see

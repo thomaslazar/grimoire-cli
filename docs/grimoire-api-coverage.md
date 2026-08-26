@@ -2,7 +2,7 @@
 
 Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any) that implements it.
 
-- **Reference:** spec fetched live from the pinned stack's `/api/openapi.json` (v1.5.6, 166 paths, 220 operations) and the upstream source at `temp/grimoire/backend/routers/`. Tested range: `1.5.6` only (`GrimoireApiClient.cs`).
+- **Reference:** spec fetched live from the pinned stack's `/api/openapi.json` (vnightly, 216 paths, 282 operations) and the upstream router source read from the same container. Tested range: `1.5.6` only (`GrimoireApiClient.cs`).
 - **Perm** column uses Grimoire's roles (`admin` / `gm or admin` / `not guest`); blank = any authenticated user. `?` = a dependency this script could not resolve.
 - ✅ = covered by a CLI command · — = not implemented · 🔒 = internal-only (no user-facing verb); 🔒 rows never count as covered.
 - **Regenerate with `tools/generate-api-coverage.py`; update `IMPLEMENTED` there in the same PR as any change to which endpoints the CLI calls.**
@@ -13,29 +13,32 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 |-----|-----------------|
 | (untagged) | 0 / 1 |
 | addons | 7 / 7 |
-| audio | 0 / 10 |
-| auth | 2 / 10 |
+| audio | 0 / 14 |
+| auth | 2 / 14 |
+| backups | 0 / 6 |
 | bookmarks | 0 / 4 |
 | books | 11 / 16 |
-| campaigns | 0 / 81 |
+| campaigns | 0 / 91 |
 | downloads | 0 / 1 |
-| export | 0 / 1 |
+| duplicates | 0 / 13 |
 | favorites | 0 / 3 |
+| files | 0 / 10 |
 | library | 3 / 6 |
 | logs | 0 / 1 |
 | lookups | 0 / 15 |
-| maintenance | 1 / 2 |
+| maintenance | 1 / 5 |
 | maps | 0 / 11 |
 | saved-filters | 0 / 4 |
 | search | 0 / 1 |
 | settings | 0 / 5 |
-| systems | 11 / 13 |
+| systems | 11 / 15 |
 | tags | 0 / 6 |
+| themes | 0 / 7 |
 | tokens | 0 / 10 |
-| users | 0 / 12 |
-| **Total** | **35 / 220** |
+| users | 0 / 16 |
+| **Total** | **35 / 282** |
 
-1 operation(s) are internal-only (🔒) and excluded from covered counts.
+2 operation(s) are internal-only (🔒) and excluded from covered counts.
 
 ## (untagged)
 
@@ -68,6 +71,10 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | GET | `/api/audio/{audio_id}` | Get an audio track |  | — |
 | PATCH | `/api/audio/{audio_id}` | Update audio metadata | gm or admin | — |
 | GET | `/api/audio/{audio_id}/artwork` | Audio artwork |  | — |
+| GET | `/api/audio/{audio_id}/cover` | Audio cover image | gm or admin | — |
+| POST | `/api/audio/{audio_id}/cover` | Upload an audio cover | gm or admin | — |
+| DELETE | `/api/audio/{audio_id}/cover` | Remove an audio cover | gm or admin | — |
+| POST | `/api/audio/{audio_id}/cover/from-source` | Set an audio cover from an existing image | gm or admin | — |
 | GET | `/api/audio/{audio_id}/file` | Stream/download audio file |  | — |
 
 ## auth
@@ -82,8 +89,23 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | GET | `/api/auth/openid/callback` | OIDC callback |  | — |
 | POST | `/api/auth/openid/discover` | Fetch OIDC discovery document | admin | — |
 | GET | `/api/auth/openid/login` | Start an OIDC login |  | — |
+| POST | `/api/auth/refresh` | Refresh the access token |  | 🔒 automatic session renewal (all commands) |
+| GET | `/api/auth/sessions` | List your active sessions |  | — |
+| DELETE | `/api/auth/sessions/others` | Log out everywhere else |  | — |
+| DELETE | `/api/auth/sessions/{session_id}` | Revoke one of your sessions |  | — |
 | POST | `/api/auth/setup` | First-run admin setup |  | — |
 | GET | `/api/auth/status` | Check initialization status |  | — |
+
+## backups
+
+| Method | Path | Description | Perm | CLI |
+|--------|------|-------------|------|-----|
+| GET | `/api/backups` | List backups, newest first | admin | — |
+| POST | `/api/backups` | Create a backup now | admin | — |
+| GET | `/api/backups/settings` | Read backup schedule and retention settings | admin | — |
+| PUT | `/api/backups/settings` | Configure backup schedule and retention | admin | — |
+| DELETE | `/api/backups/{backup_id}` | Delete a backup archive | admin | — |
+| GET | `/api/backups/{backup_id}/download` | Download a backup archive | admin | — |
 
 ## bookmarks
 
@@ -122,6 +144,11 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | GET | `/api/campaigns` | List campaigns for the current user |  | — |
 | POST | `/api/campaigns` | Create a campaign |  | — |
 | GET | `/api/campaigns/admin/by-user/{user_id}` | Admin: list campaigns owned by a user (read-only, minimal fields) | admin | — |
+| GET | `/api/campaigns/calendar/subscription` | Get the caller's calendar subscription URLs |  | — |
+| POST | `/api/campaigns/calendar/subscription` | Mint or rotate the caller's calendar feed token |  | — |
+| DELETE | `/api/campaigns/calendar/subscription` | Revoke the caller's calendar feed token |  | — |
+| GET | `/api/campaigns/calendar/{token}/all.ics` | ICS feed of every campaign the token's user belongs to |  | — |
+| GET | `/api/campaigns/calendar/{token}/{campaign_id}.ics` | ICS feed for a single campaign |  | — |
 | GET | `/api/campaigns/invites` | List the current user's pending campaign invitations |  | — |
 | GET | `/api/campaigns/resources/search` | Search books, maps, and tokens by name |  | — |
 | GET | `/api/campaigns/resources/suggested/{system_id}` | Suggested resources (system books) for the create wizard |  | — |
@@ -135,6 +162,9 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | POST | `/api/campaigns/{campaign_id}/banner` | Upload campaign banner |  | — |
 | GET | `/api/campaigns/{campaign_id}/banner` | Get campaign banner image |  | — |
 | DELETE | `/api/campaigns/{campaign_id}/banner` | Remove campaign banner |  | — |
+| PUT | `/api/campaigns/{campaign_id}/banner/focus` | Set the banner focal point |  | — |
+| POST | `/api/campaigns/{campaign_id}/banner/from-source` | Set the banner from an existing image |  | — |
+| GET | `/api/campaigns/{campaign_id}/calendar.ics` | Download a campaign's schedule as an .ics file |  | — |
 | GET | `/api/campaigns/{campaign_id}/categories` | List categories (optionally filtered by kind) |  | — |
 | POST | `/api/campaigns/{campaign_id}/categories` | Create a category |  | — |
 | PUT | `/api/campaigns/{campaign_id}/categories/reorder` | Reorder categories |  | — |
@@ -200,6 +230,8 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | GET | `/api/campaigns/{campaign_id}/wiki/{page_id}` | Get a wiki page |  | — |
 | PATCH | `/api/campaigns/{campaign_id}/wiki/{page_id}` | Update a wiki page |  | — |
 | DELETE | `/api/campaigns/{campaign_id}/wiki/{page_id}` | Delete a wiki page |  | — |
+| POST | `/api/campaigns/{campaign_id}/wiki/{page_id}/hide` | Hide a wiki page from your own view |  | — |
+| DELETE | `/api/campaigns/{campaign_id}/wiki/{page_id}/hide` | Un-hide a wiki page you had hidden |  | — |
 
 ## downloads
 
@@ -207,11 +239,23 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 |--------|------|-------------|------|-----|
 | GET | `/api/downloads/archive` | Download an archive of files |  | — |
 
-## export
+## duplicates
 
 | Method | Path | Description | Perm | CLI |
 |--------|------|-------------|------|-----|
-| GET | `/api/export/tags` | Export all tag data as JSON | admin | — |
+| POST | `/api/duplicates/cancel-scan` | Stop a running duplicate scan | admin | — |
+| GET | `/api/duplicates/compare` | Side-by-side comparison of two to four items | admin | — |
+| POST | `/api/duplicates/dismiss` | Mark a group as not duplicates | admin | — |
+| GET | `/api/duplicates/dismissals` | List dismissed groups | admin | — |
+| DELETE | `/api/duplicates/dismissals/{dismissal_id}` | Undo a dismissal | admin | — |
+| GET | `/api/duplicates/groups` | Candidate duplicate groups from the last scan | admin | — |
+| DELETE | `/api/duplicates/items/{resource_type}/{item_id}` | Delete one duplicate record, and optionally its file | admin | — |
+| POST | `/api/duplicates/link` | File items under a parent as its variants | admin | — |
+| POST | `/api/duplicates/merge-metadata` | Copy metadata fields from one copy onto another | admin | — |
+| POST | `/api/duplicates/promote` | Make a different copy the main version of an existing family | admin | — |
+| POST | `/api/duplicates/scan` | Start a duplicate-detection scan | admin | — |
+| GET | `/api/duplicates/scan-status` | Progress of the duplicate-detection scan | admin | — |
+| POST | `/api/duplicates/unlink` | Promote variants back to standalone entries | admin | — |
 
 ## favorites
 
@@ -220,6 +264,21 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | GET | `/api/favorites` | List current user's favorites |  | — |
 | POST | `/api/favorites` | Add a favorite |  | — |
 | DELETE | `/api/favorites/{item_type}/{item_id}` | Remove a favorite |  | — |
+
+## files
+
+| Method | Path | Description | Perm | CLI |
+|--------|------|-------------|------|-----|
+| GET | `/api/files/browse` | List a library folder with indexing state | admin | — |
+| POST | `/api/files/delete` | Delete a file or folder, with its record and sidecars | admin | — |
+| POST | `/api/files/folder` | Create a folder, optionally as a container or NSFW | admin | — |
+| DELETE | `/api/files/folder` | Delete a folder, recursively when confirmed by name | admin | — |
+| GET | `/api/files/folder/contents` | Report whether a folder holds content | admin | — |
+| PUT | `/api/files/folder/markers` | Set a folder's container/NSFW markers | admin | — |
+| POST | `/api/files/folder/scaffold` | Create the standard category folders in a system folder | admin | — |
+| POST | `/api/files/move` | Move files or folders, preserving their metadata | admin | — |
+| POST | `/api/files/rename` | Rename a file or folder on disk | admin | — |
+| POST | `/api/files/upload` | Upload a single file into a library folder | admin | — |
 
 ## library
 
@@ -264,6 +323,9 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 |--------|------|-------------|------|-----|
 | GET | `/api/health` | Liveness/readiness probe |  | — |
 | POST | `/api/maintenance/cleanup-missing` | Remove DB entries for missing files | admin | `library cleanup-missing` ✅ |
+| POST | `/api/maintenance/sidecars/export` | Write metadata sidecars for the whole library | admin | — |
+| GET | `/api/maintenance/sidecars/settings` | Read metadata sidecar export settings | admin | — |
+| PUT | `/api/maintenance/sidecars/settings` | Configure metadata sidecar export | admin | — |
 
 ## maps
 
@@ -317,9 +379,11 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | PATCH | `/api/systems/{system_id}` | Update game system metadata | gm or admin | `systems update` ✅ |
 | GET | `/api/systems/{system_id}/book-folders` | List book folders |  | — |
 | PATCH | `/api/systems/{system_id}/book-folders` | Set tags on a book folder | gm or admin | — |
+| DELETE | `/api/systems/{system_id}/book-folders` | Delete a book folder | gm or admin | — |
 | GET | `/api/systems/{system_id}/cover` | System cover image |  | `systems cover get` ✅ |
 | POST | `/api/systems/{system_id}/cover` | Upload a system cover | gm or admin | `systems cover upload` ✅ |
 | DELETE | `/api/systems/{system_id}/cover` | Remove an uploaded system cover | gm or admin | `systems cover delete` ✅ |
+| POST | `/api/systems/{system_id}/cover/from-source` | Set a system cover from an existing image | gm or admin | — |
 | POST | `/api/systems/{system_id}/metadata-fetch` | Fetch metadata for review | gm or admin | `systems metadata-fetch` ✅ |
 | POST | `/api/systems/{system_id}/metadata-search` | Search a metadata source | gm or admin | `systems metadata-search` ✅ |
 | GET | `/api/systems/{system_id}/metadata-sources` | List metadata sources | gm or admin | `systems metadata-sources` ✅ |
@@ -334,6 +398,18 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | DELETE | `/api/tags/{internal}` | Delete a tag | gm or admin | — |
 | GET | `/api/tags/{internal}/items` | Items carrying a tag |  | — |
 | POST | `/api/tags/{internal}/merge` | Merge a tag into another | gm or admin | — |
+
+## themes
+
+| Method | Path | Description | Perm | CLI |
+|--------|------|-------------|------|-----|
+| GET | `/api/themes` | List installed themes |  | — |
+| POST | `/api/themes` | Install a pasted or uploaded theme |  | — |
+| GET | `/api/themes/browse` | Browse the community catalogue |  | — |
+| POST | `/api/themes/install/{theme_id}` | Install a theme from the catalogue |  | — |
+| PUT | `/api/themes/selection` | Set the active mode and theme |  | — |
+| PUT | `/api/themes/source` | Set the catalogue URL (admin) | admin | — |
+| DELETE | `/api/themes/{theme_id}` | Uninstall a theme |  | — |
 
 ## tokens
 
@@ -365,4 +441,8 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | PATCH | `/api/users/me/preferences` | Update own preferences |  | — |
 | PATCH | `/api/users/{user_id}` | Update user role or password | admin | — |
 | DELETE | `/api/users/{user_id}` | Delete a user | admin | — |
+| GET | `/api/users/{user_id}/access-grants` | List a user's access grants | admin | — |
+| POST | `/api/users/{user_id}/access-grants` | Grant a user access to a restricted system or book | admin | — |
+| DELETE | `/api/users/{user_id}/access-grants/{grant_id}` | Revoke an access grant | admin | — |
 | POST | `/api/users/{user_id}/convert` | Convert a guest to a permanent user | admin | — |
+| POST | `/api/users/{user_id}/merge` | Merge guest accounts into one account | admin | — |

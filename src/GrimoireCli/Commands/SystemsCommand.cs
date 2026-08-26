@@ -38,13 +38,12 @@ public static class SystemsCommand
         var parentIdOption = new Option<string?>("--parent-id") { Description = "List only the children of this container" };
         var includeChildrenOption = new Option<bool>("--include-children") { Description = "Include container children (hidden by default)" };
         var serverOption = new Option<string?>("--server") { Description = "Server URL override" };
-        var tokenOption = new Option<string?>("--token") { Description = "Token override; not stored" };
         var command = new Command("list", "List all game systems")
         {
             sortOption, descOption, genreOption, familyOption,
             parentOption, editionOption, licenseOption, explicitOption,
             parentIdOption, includeChildrenOption,
-            serverOption, tokenOption
+            serverOption
         };
         command.AddHelpSection("Notes", HelpSectionPosition.Top,
             "Filters are case-insensitive exact matches, not substrings: --edition 5",
@@ -64,8 +63,7 @@ public static class SystemsCommand
         command.SetAction(async (parseResult, cancellationToken) =>
         {
             var server = parseResult.GetValue(serverOption);
-            var token = parseResult.GetValue(tokenOption);
-            var (client, _) = CommandHelper.BuildClient(serverOverride: server, tokenOverride: token);
+            var (client, _) = CommandHelper.BuildClient(serverOverride: server);
             var service = new SystemsService(client);
             var result = await service.ListAsync(
                 parseResult.GetValue(sortOption),
@@ -93,11 +91,10 @@ public static class SystemsCommand
         var categoryOption = new Option<string?>("--category") { Description = "Keep only books in this category (core, supplement, adventure, …)" };
         var explicitOption = new Option<bool?>("--explicit") { Description = "Keep only books with this explicit flag (true | false)" };
         var serverOption = new Option<string?>("--server") { Description = "Server URL override" };
-        var tokenOption = new Option<string?>("--token") { Description = "Token override; not stored" };
         var command = new Command("get", "Get one game system, with its books")
         {
             idOption, bookSortOption, bookDescOption, genreOption, categoryOption, explicitOption,
-            serverOption, tokenOption
+            serverOption
         };
         command.AddHelpSection("Notes", HelpSectionPosition.Top,
             "--genre, --category and --explicit filter the books, not the system;",
@@ -118,8 +115,7 @@ public static class SystemsCommand
         command.SetAction(async (parseResult, cancellationToken) =>
         {
             var server = parseResult.GetValue(serverOption);
-            var token = parseResult.GetValue(tokenOption);
-            var (client, _) = CommandHelper.BuildClient(serverOverride: server, tokenOverride: token);
+            var (client, _) = CommandHelper.BuildClient(serverOverride: server);
             var service = new SystemsService(client);
             var result = await service.GetAsync(
                 parseResult.GetValue(idOption)!,
@@ -140,10 +136,9 @@ public static class SystemsCommand
         var inputOption = new Option<string?>("--input") { Description = "Read the body from this file" };
         var stdinOption = new Option<bool>("--stdin") { Description = "Read the body from stdin" };
         var serverOption = new Option<string?>("--server") { Description = "Server URL override" };
-        var tokenOption = new Option<string?>("--token") { Description = "Token override; not stored" };
         var command = new Command("update", "Update one game system's metadata")
         {
-            idOption, inputOption, stdinOption, serverOption, tokenOption
+            idOption, inputOption, stdinOption, serverOption
         };
         command.AddRoleRequired("gm or admin");
         JsonBodyInput.RequireExactlyOneSource(command, inputOption, stdinOption);
@@ -175,9 +170,7 @@ public static class SystemsCommand
                 _logger.Error(ex.Message);
                 return 1;
             }
-            var (client, _) = CommandHelper.BuildClient(
-                serverOverride: parseResult.GetValue(serverOption),
-                tokenOverride: parseResult.GetValue(tokenOption));
+            var (client, _) = CommandHelper.BuildClient(serverOverride: parseResult.GetValue(serverOption));
             var service = new SystemsService(client);
             var response = await service.UpdateAsync(parseResult.GetValue(idOption)!, body);
             ConsoleOutput.WriteRawJson(response);
@@ -191,10 +184,9 @@ public static class SystemsCommand
         var inputOption = new Option<string?>("--input") { Description = "Read the body from this file" };
         var stdinOption = new Option<bool>("--stdin") { Description = "Read the body from stdin" };
         var serverOption = new Option<string?>("--server") { Description = "Server URL override" };
-        var tokenOption = new Option<string?>("--token") { Description = "Token override; not stored" };
         var command = new Command("batch-update", "Update many game systems in one transaction")
         {
-            inputOption, stdinOption, serverOption, tokenOption
+            inputOption, stdinOption, serverOption
         };
         command.AddRoleRequired("gm or admin");
         JsonBodyInput.RequireExactlyOneSource(command, inputOption, stdinOption);
@@ -227,9 +219,7 @@ public static class SystemsCommand
                 _logger.Error(ex.Message);
                 return 1;
             }
-            var (client, _) = CommandHelper.BuildClient(
-                serverOverride: parseResult.GetValue(serverOption),
-                tokenOverride: parseResult.GetValue(tokenOption));
+            var (client, _) = CommandHelper.BuildClient(serverOverride: parseResult.GetValue(serverOption));
             var result = await new SystemsService(client).BatchUpdateAsync(body);
             ConsoleOutput.WriteRawJson(result);
             return BulkExit.CodeFor(GrimoireApiClient.HasItems(result, "errors"));
@@ -242,10 +232,9 @@ public static class SystemsCommand
         var inputOption = new Option<string?>("--input") { Description = "Read the body from this file" };
         var stdinOption = new Option<bool>("--stdin") { Description = "Read the body from stdin" };
         var serverOption = new Option<string?>("--server") { Description = "Server URL override" };
-        var tokenOption = new Option<string?>("--token") { Description = "Token override; not stored" };
         var command = new Command("batch-tag", "Add tags to many game systems")
         {
-            inputOption, stdinOption, serverOption, tokenOption
+            inputOption, stdinOption, serverOption
         };
         command.AddRoleRequired("gm or admin");
         JsonBodyInput.RequireExactlyOneSource(command, inputOption, stdinOption);
@@ -276,9 +265,7 @@ public static class SystemsCommand
                 _logger.Error(ex.Message);
                 return 1;
             }
-            var (client, _) = CommandHelper.BuildClient(
-                serverOverride: parseResult.GetValue(serverOption),
-                tokenOverride: parseResult.GetValue(tokenOption));
+            var (client, _) = CommandHelper.BuildClient(serverOverride: parseResult.GetValue(serverOption));
             var result = await new SystemsService(client).BatchTagAsync(body);
             ConsoleOutput.WriteRawJson(result);
             return BulkExit.CodeFor(GrimoireApiClient.HasItems(result, "errors"));

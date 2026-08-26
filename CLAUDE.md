@@ -80,11 +80,16 @@ Parity is therefore the default rather than the goal. A difference that follows 
 
 Deliberate deviations today:
 
-- **`docs/grimoire-api-coverage.md` is generated, not hand-maintained.** `tools/generate-api-coverage.py` builds it from the spec plus the role dependency on each route in `temp/grimoire`. Grimoire publishes an OpenAPI spec and ABS does not, so abs-cli has to maintain its table by hand. Update `IMPLEMENTED` in that script, not the markdown.
+- **`docs/grimoire-api-coverage.md` is generated, not hand-maintained.** `tools/generate-api-coverage.py` builds it from the running stack's spec plus the role dependency on each route, read from the router source inside that same container. Both inputs come from one image, so they cannot disagree about which routes exist — a source tree pinned to another version resolves every route it has not heard of to a blank Perm cell, which the table's legend reads as "any authenticated user". Grimoire publishes an OpenAPI spec and ABS does not, so abs-cli has to maintain its table by hand. Update `IMPLEMENTED` in that script, not the markdown.
 - **Grouped by the spec's own OpenAPI tags** rather than hand-picked resource headings, for the same reason: the grouping is machine-derived and cannot drift from the API.
 - **`docs/grimoire-api-notes.md` has no abs-cli counterpart.** A meaningful slice of Grimoire's success responses still type as `{}` in the spec (see below), so verified behaviour needs somewhere to live; ABS's behaviour is read from its server source on demand.
 - **The README Commands table rule lives under "Docs, specs & roadmap", not "Command implementation conventions"** where abs-cli keeps it. It is paired there with the API-coverage rule, which abs-cli has no counterpart for, and splitting the pair to match abs-cli's placement would cost more than the drift does.
 - **No confirm-gated command.** abs-cli exempts `libraries delete` from thin pass-through with a type-the-name prompt. `library cleanup-missing` settled the question here and takes neither a prompt nor a `--yes`: the callers are agents, so a prompt is either bypassed by a flag that becomes boilerplate or hangs a non-interactive caller. The warning lives in the help text, where an agent reads it.
+- **The 401 fallback keys on `X-Token-Expired`, not on any 401.** abs-cli
+  refreshes on every 401. Grimoire marks an expired access token with that
+  header specifically so it stays distinguishable from "not authenticated" and
+  "invalid token", and `POST /api/auth/refresh` is rate-limited, so refreshing
+  on a permission denial would spend a request for nothing.
 - **The `release` skill carries an extra step reconciling the supported server
   range.** `MinSupportedVersion` / `MaxTestedVersion`, the compatibility matrix
   and the README line must agree before a tag is cut. abs-cli has no counterpart
@@ -104,11 +109,11 @@ The docs set and the release plumbing (`install.sh`, `install.ps1`, deb packagin
 
 - **Role tagging.** Every command whose endpoint carries a non-default role dependency MUST call `command.AddRoleRequired("<role>")` immediately after construction. Grimoire has three role dependencies (`temp/grimoire/backend/routers/`): `require_admin` → tag `admin`, `require_gm_or_admin` → tag `gm or admin`, and `require_not_guest`, which is the default for reads and gets **no** tag. A route guarded by `get_current_user` (or `get_current_user_optional`, or nothing at all, as `POST /api/auth/login` is) carries no role and likewise gets no tag. The tag must agree with the router's actual dependency, not with what the docs claim.
 - **Role hint mirroring.** When the service call passes a `permissionHint`, it MUST agree with the tag and read as a noun phrase, because `GrimoireApiClient` renders it as `Permission denied. This operation requires {hint}.` — tag `admin` ↔ hint `"the admin role"`; tag `gm or admin` ↔ hint `"the gm or admin role"`. The help-section tag and the 403 message always agree.
-- **`--server` and `--token` are declared per-subcommand on commands that consume a saved token**, matching abs-cli, and threaded into `CommandHelper.BuildClient` so the flag tier of `flags > env > file` is actually reachable. Two exceptions, both principled: `login` takes `--server` alone, because it *produces* the token and builds its own client directly; `config` and `self-test` take neither, having no API call at all.
+- **`--server` is declared per-subcommand on commands that consume a saved token**, matching abs-cli, and threaded into `CommandHelper.BuildClient` so the flag tier of the server's `flags > env > file` is actually reachable. The token comes from the config file alone. Two exceptions, both principled: `login` takes `--server` because it *produces* the token and builds its own client directly; `config` and `self-test` take neither, having no API call at all.
 - **Positional args for value-only subcommands.** Subcommands whose parameters ARE the values, with no ID key, take positional args rather than flags — `config set <key> <value>`. ID-keyed resources use `update --id --field`, where the flags mirror the API's body field names.
 - **README Commands table and API coverage** are updated in the same PR — see [Docs, specs & roadmap](#docs-specs--roadmap).
 
-`systems list` / `systems get` need no role tag: any authenticated non-guest can read them, so the mechanism is currently exercised only by `RoleSectionTests`. The first write command is what will use it for real, and is also the first to decide whether write commands take `--server` / `--token`.
+`systems list` / `systems get` need no role tag: any authenticated non-guest can read them, so the mechanism is currently exercised only by `RoleSectionTests`. The first write command is what will use it for real, and is also the first to decide whether write commands take `--server`.
 
 ## Help text
 

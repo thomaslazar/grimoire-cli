@@ -27,10 +27,9 @@ public static class CoverCommands
             Required = true,
         };
         var serverOption = new Option<string?>("--server") { Description = "Server URL override" };
-        var tokenOption = new Option<string?>("--token") { Description = "Token override; not stored" };
         var command = new Command("get", "Download the system's cover image")
         {
-            idOption, outputOption, serverOption, tokenOption
+            idOption, outputOption, serverOption
         };
         command.AddHelpSection("Notes", HelpSectionPosition.Top,
             "Serves folder cover art if the system's library folder has a cover.* or",
@@ -45,9 +44,7 @@ public static class CoverCommands
         command.AddResponseExample<SavedFile>();
         command.SetAction(async (parseResult, cancellationToken) =>
         {
-            var (client, _) = CommandHelper.BuildClient(
-                serverOverride: parseResult.GetValue(serverOption),
-                tokenOverride: parseResult.GetValue(tokenOption));
+            var (client, _) = CommandHelper.BuildClient(serverOverride: parseResult.GetValue(serverOption));
             var service = new SystemsService(client);
             await using var stream = await service.CoverAsync(parseResult.GetValue(idOption)!);
             try
@@ -69,10 +66,9 @@ public static class CoverCommands
         var idOption = new Option<string>("--id") { Description = "System ID", Required = true };
         var fileOption = new Option<string>("--file") { Description = "Path to a PNG, JPEG, WebP or GIF", Required = true };
         var serverOption = new Option<string?>("--server") { Description = "Server URL override" };
-        var tokenOption = new Option<string?>("--token") { Description = "Token override; not stored" };
         var command = new Command("upload", "Upload the system's cover image")
         {
-            idOption, fileOption, serverOption, tokenOption
+            idOption, fileOption, serverOption
         };
         command.AddRoleRequired("gm or admin");
         command.AddHelpSection("Notes", HelpSectionPosition.Top,
@@ -85,9 +81,7 @@ public static class CoverCommands
         command.AddResponseExample<Generated.Models.SystemCoverResponse>();
         command.SetAction(async (parseResult, cancellationToken) =>
         {
-            var (client, _) = CommandHelper.BuildClient(
-                serverOverride: parseResult.GetValue(serverOption),
-                tokenOverride: parseResult.GetValue(tokenOption));
+            var (client, _) = CommandHelper.BuildClient(serverOverride: parseResult.GetValue(serverOption));
             var service = new SystemsService(client);
             string result;
             try
@@ -109,10 +103,9 @@ public static class CoverCommands
     {
         var idOption = new Option<string>("--id") { Description = "System ID", Required = true };
         var serverOption = new Option<string?>("--server") { Description = "Server URL override" };
-        var tokenOption = new Option<string?>("--token") { Description = "Token override; not stored" };
         var command = new Command("delete", "Delete the system's uploaded cover image")
         {
-            idOption, serverOption, tokenOption
+            idOption, serverOption
         };
         command.AddRoleRequired("gm or admin");
         command.AddHelpSection("Notes", HelpSectionPosition.Top,
@@ -123,9 +116,7 @@ public static class CoverCommands
         command.AddExamples("grimoire-cli systems cover delete --id <system-id>");
         command.SetAction(async (parseResult, cancellationToken) =>
         {
-            var (client, _) = CommandHelper.BuildClient(
-                serverOverride: parseResult.GetValue(serverOption),
-                tokenOverride: parseResult.GetValue(tokenOption));
+            var (client, _) = CommandHelper.BuildClient(serverOverride: parseResult.GetValue(serverOption));
             var service = new SystemsService(client);
             var response = await service.DeleteCoverAsync(parseResult.GetValue(idOption)!);
             ConsoleOutput.WriteRawJson(response);

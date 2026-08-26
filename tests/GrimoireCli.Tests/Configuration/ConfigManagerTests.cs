@@ -48,10 +48,9 @@ public class ConfigManagerTests
             manager.Save(new AppConfig { Server = "https://file.invalid", AccessToken = "file-token" });
             var resolved = manager.Resolve(
                 flagServer: "https://flag.invalid",
-                flagToken: "flag-token",
-                envLookup: key => key == "GRIMOIRE_SERVER" ? "https://env.invalid" : "env-token");
+                envLookup: key => key == "GRIMOIRE_SERVER" ? "https://env.invalid" : null);
             Assert.Equal("https://flag.invalid", resolved.Server);
-            Assert.Equal("flag-token", resolved.AccessToken);
+            Assert.Equal("file-token", resolved.AccessToken);
         }
         finally
         {
@@ -67,9 +66,9 @@ public class ConfigManagerTests
         {
             manager.Save(new AppConfig { Server = "https://file.invalid", AccessToken = "file-token" });
             var resolved = manager.Resolve(
-                envLookup: key => key == "GRIMOIRE_SERVER" ? "https://env.invalid" : "env-token");
+                envLookup: key => key == "GRIMOIRE_SERVER" ? "https://env.invalid" : null);
             Assert.Equal("https://env.invalid", resolved.Server);
-            Assert.Equal("env-token", resolved.AccessToken);
+            Assert.Equal("file-token", resolved.AccessToken);
         }
         finally
         {
@@ -141,9 +140,9 @@ public class ConfigManagerTests
         }
     }
 
-    // The hazard this design exists to avoid: Resolve merges env vars into memory,
-    // so persisting the resolved config would write a token the operator kept out
-    // of the file. UpdateVersionCheck reads the file, not the resolved config.
+    // The hazard this design exists to avoid: Resolve merges GRIMOIRE_SERVER into
+    // memory, so persisting the resolved config would write a server the operator
+    // kept out of the file. UpdateVersionCheck reads the file, not the resolved config.
     [Fact]
     public void UpdateVersionCheckDoesNotPersistEnvironmentValues()
     {
@@ -151,11 +150,11 @@ public class ConfigManagerTests
         try
         {
             manager.Save(new AppConfig { Server = "http://example.test" });
-            manager.Resolve(envLookup: name => name == "GRIMOIRE_TOKEN" ? "env-only-token" : null);
+            manager.Resolve(envLookup: name => name == "GRIMOIRE_SERVER" ? "http://env-only.test" : null);
             manager.UpdateVersionCheck("1.5.6", DateTimeOffset.UtcNow);
             var raw = File.ReadAllText(path);
-            Assert.DoesNotContain("env-only-token", raw);
-            Assert.Null(manager.Load().AccessToken);
+            Assert.DoesNotContain("env-only", raw);
+            Assert.Equal("http://example.test", manager.Load().Server);
         }
         finally
         {
@@ -202,8 +201,8 @@ public class ConfigManagerTests
             var config = manager.Load();
             Assert.Null(config.Server);
             Assert.Null(config.AccessToken);
-            // The bytes are preserved beside the config: a hand-edit that broke a
-            // 30-day non-refreshable token must be recoverable.
+            // The bytes are preserved beside the config: a hand-edit that broke the
+            // refresh token must be recoverable, since losing it costs a login.
             Assert.Equal(content, File.ReadAllText($"{path}.corrupt"));
             Assert.False(File.Exists(path));
         }
@@ -278,9 +277,9 @@ public class ConfigManagerTests
         }
     }
 
-    // The file holds a bearer token valid for 30 days, so it must not be left at
-    // whatever the umask allows — and replacing the path swaps in the new file's
-    // mode, which would silently undo an operator's chmod on every write.
+    // The file holds a bearer token and the refresh token that renews it, so it must
+    // not be left at whatever the umask allows — and replacing the path swaps in the
+    // new file's mode, which would silently undo an operator's chmod on every write.
     [Fact]
     public void SaveRestrictsThePermissionsToTheOwner()
     {
@@ -319,6 +318,47 @@ public class ConfigManagerTests
         {
             File.SetUnixFileMode(dir, UnixFileMode.UserRead | UnixFileMode.UserWrite | UnixFileMode.UserExecute);
             Directory.Delete(dir, recursive: true);
+        }
+    }
+
+    [Fact]
+    public void UpdateTokensWritesBothAndDoesNotPersistEnvironmentValues()
+    {
+        var manager = InTempDir(out var path);
+        try
+        {
+            manager.Save(new AppConfig { Server = "http://example.test" });
+            manager.Resolve(envLookup: name => name == "GRIMOIRE_SERVER" ? "http://env-only.test" : null);
+            manager.UpdateTokens("new-access", "new-refresh");
+            var raw = File.ReadAllText(path);
+            Assert.DoesNotContain("env-only", raw);
+            var back = manager.Load();
+            Assert.Equal("new-access", back.AccessToken);
+            Assert.Equal("new-refresh", back.RefreshToken);
+        }
+        finally
+        {
+            Directory.Delete(Path.GetDirectoryName(path)!, recursive: true);
+        }
+    }
+
+    // The server rotates on every refresh, so a 200 that carried no new cookie
+    // leaves the stored one as the best available credential.
+    [Fact]
+    public void UpdateTokensKeepsTheStoredRefreshTokenWhenGivenNull()
+    {
+        var manager = InTempDir(out var path);
+        try
+        {
+            manager.Save(new AppConfig { AccessToken = "old", RefreshToken = "keep-me" });
+            manager.UpdateTokens("new-access", null);
+            var back = manager.Load();
+            Assert.Equal("new-access", back.AccessToken);
+            Assert.Equal("keep-me", back.RefreshToken);
+        }
+        finally
+        {
+            Directory.Delete(Path.GetDirectoryName(path)!, recursive: true);
         }
     }
 }

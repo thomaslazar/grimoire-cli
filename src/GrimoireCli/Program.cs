@@ -55,7 +55,6 @@ rootCommand.Subcommands.Add(SelfTestCommand.Create());
 
 rootCommand.AddHelpSection("Environment variables",
     "GRIMOIRE_SERVER   Server URL, overriding the config file.",
-    "GRIMOIRE_TOKEN    JWT, overriding the config file.",
     "GRIMOIRE_DEBUG=1  Same as --debug. Enables debug-level logging to stderr.");
 
 rootCommand.UseCustomHelpSections();

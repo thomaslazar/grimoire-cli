@@ -66,3 +66,7 @@ docker/addon-index/index.json
 
 # Devcontainer feature lock — regenerated per machine on rebuild; abs-cli does not track it either
 .devcontainer/devcontainer-lock.json
+
+# Python bytecode from the tools/ scripts
+__pycache__/
+*.pyc
