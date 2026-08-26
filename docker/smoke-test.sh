@@ -545,7 +545,7 @@ ok "systems cover delete removes the upload"
 # carries 3 books across 2 categories, specifically so a --limit below that
 # system's own total proves paging rather than a coincidence of the global
 # count already exceeding it.
-EXPECTED_BOOKS=17
+EXPECTED_BOOKS=18
 
 booklist() {
   LIST_JSON=$("$CLI" books list "$@" 2>"$WORK/cli.err") \

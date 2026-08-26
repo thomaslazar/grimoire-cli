@@ -84,6 +84,11 @@ book "!!Dungeons & Dragons/5e EN"      core         "Players Handbook"        14
 book "!!Dungeons & Dragons/5e EN"      adventures   "Lost Mine of Phandelver"  9
 book "Das Schwarze Auge/5 DE"          core         "DSA5 Regelwerk"          11
 book "Das Schwarze Auge/5 DE"          core         "DSA5 Aventurien"          4
+# A book one level below the category dir, so the fixture can reach book folders:
+# tags attach to a folder path, and a book sitting directly in a category dir
+# belongs to no folder. Its system is a container child, which is where the
+# frontend and backend once derived folder depth differently (upstream #357).
+book "Das Schwarze Auge/5 DE"          core/errata  "DSA5 Errata"              2
 book "The Dark Eye/5 EN"               core         "TDE5 Core Rules"         11
 book "Vampire The Masquerade/5 EN"     core         "V5 Corebook"             13
 book "Fixture Explicit RPG (nsfw)"     core         "Fixture RPG Core Rules"   3
