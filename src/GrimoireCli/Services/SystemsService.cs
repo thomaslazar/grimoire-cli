@@ -143,4 +143,44 @@ public class SystemsService
         return await _client.SendAsync(info, permissionHint: "the gm or admin role");
     }
 
+    /// <summary>
+    /// GET /api/systems/{id}/book-folders. Lists folders that have been tagged;
+    /// a folder on disk with no tags has no record and does not appear. Tags come
+    /// back in display casing.
+    /// </summary>
+    public async Task<string> BookFoldersAsync(string id)
+    {
+        var info = _client.Api.Api.Systems[id].BookFolders.ToGetRequestInformation();
+        return await _client.SendAsync(
+            info,
+            notFoundHint: "No system with that ID. List them with: grimoire-cli systems list");
+    }
+
+    /// <summary>
+    /// PATCH /api/systems/{id}/book-folders. Replaces the folder's tags, creating
+    /// the record if the path has none. The validated raw body reaches the server
+    /// byte-for-byte, as the update commands do. Tags echo back as internal keys.
+    /// </summary>
+    public async Task<string> SetBookFolderAsync(string id, string rawBody)
+    {
+        var info = _client.Api.Api.Systems[id].BookFolders.ToPatchRequestInformation(
+            new Generated.Models.BookFolderUpdate());
+        info.SetStreamContent(new MemoryStream(Encoding.UTF8.GetBytes(rawBody)), "application/json");
+        return await _client.SendAsync(info, permissionHint: "the gm or admin role");
+    }
+
+    /// <summary>
+    /// DELETE /api/systems/{id}/book-folders. The path travels as a query
+    /// parameter rather than a body. Removes the record; a path with no record is
+    /// a 404.
+    /// </summary>
+    public async Task<string> DeleteBookFolderAsync(string id, string path)
+    {
+        var info = _client.Api.Api.Systems[id].BookFolders.ToDeleteRequestInformation(
+            c => c.QueryParameters.Path = path);
+        return await _client.SendAsync(
+            info,
+            permissionHint: "the gm or admin role",
+            notFoundHint: "No book folder at that path. List them with: grimoire-cli systems book-folders list --id <id>");
+    }
 }
