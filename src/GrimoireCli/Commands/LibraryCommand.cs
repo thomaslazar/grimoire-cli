@@ -24,10 +24,9 @@ public static class LibraryCommand
         var scopeOption = new Option<string?>("--scope") { Description = "Restrict the scan to a subtree" };
         var metadataModeOption = OptionHelpers.Choice("--metadata-mode", "Re-apply OPF sidecar metadata", MetadataModes);
         var serverOption = new Option<string?>("--server") { Description = "Server URL override" };
-        var tokenOption = new Option<string?>("--token") { Description = "Token override; not stored" };
         var command = new Command("rescan", "Scan the library for new and changed files")
         {
-            scopeOption, metadataModeOption, serverOption, tokenOption
+            scopeOption, metadataModeOption, serverOption
         };
         command.AddRoleRequired("admin");
         command.AddHelpSection("Notes", HelpSectionPosition.Top,
@@ -46,9 +45,7 @@ public static class LibraryCommand
         command.AddResponseExample<Generated.Models.Backend__routers__library___schemas__StatusResponse>();
         command.SetAction(async (parseResult, cancellationToken) =>
         {
-            var (client, _) = CommandHelper.BuildClient(
-                serverOverride: parseResult.GetValue(serverOption),
-                tokenOverride: parseResult.GetValue(tokenOption));
+            var (client, _) = CommandHelper.BuildClient(serverOverride: parseResult.GetValue(serverOption));
             var service = new LibraryService(client);
             var result = await service.RescanAsync(
                 parseResult.GetValue(scopeOption), parseResult.GetValue(metadataModeOption));
@@ -61,10 +58,9 @@ public static class LibraryCommand
     private static Command CreateScanStatusCommand()
     {
         var serverOption = new Option<string?>("--server") { Description = "Server URL override" };
-        var tokenOption = new Option<string?>("--token") { Description = "Token override; not stored" };
         var command = new Command("scan-status", "Show the running scan's progress")
         {
-            serverOption, tokenOption
+            serverOption
         };
         command.AddRoleRequired("admin");
         command.AddHelpSection("Notes", HelpSectionPosition.Top,
@@ -77,9 +73,7 @@ public static class LibraryCommand
         command.AddResponseExample<Generated.Models.ScanStatusResponse>();
         command.SetAction(async (parseResult, cancellationToken) =>
         {
-            var (client, _) = CommandHelper.BuildClient(
-                serverOverride: parseResult.GetValue(serverOption),
-                tokenOverride: parseResult.GetValue(tokenOption));
+            var (client, _) = CommandHelper.BuildClient(serverOverride: parseResult.GetValue(serverOption));
             var service = new LibraryService(client);
             var result = await service.ScanStatusAsync();
             ConsoleOutput.WriteRawJson(result);
@@ -91,10 +85,9 @@ public static class LibraryCommand
     private static Command CreateCancelScanCommand()
     {
         var serverOption = new Option<string?>("--server") { Description = "Server URL override" };
-        var tokenOption = new Option<string?>("--token") { Description = "Token override; not stored" };
         var command = new Command("cancel-scan", "Stop the running scan")
         {
-            serverOption, tokenOption
+            serverOption
         };
         command.AddRoleRequired("admin");
         command.AddHelpSection("Notes", HelpSectionPosition.Top,
@@ -102,9 +95,7 @@ public static class LibraryCommand
             "whether or not one was running.");
         command.SetAction(async (parseResult, cancellationToken) =>
         {
-            var (client, _) = CommandHelper.BuildClient(
-                serverOverride: parseResult.GetValue(serverOption),
-                tokenOverride: parseResult.GetValue(tokenOption));
+            var (client, _) = CommandHelper.BuildClient(serverOverride: parseResult.GetValue(serverOption));
             var service = new LibraryService(client);
             var response = await service.CancelScanAsync();
             ConsoleOutput.WriteRawJson(response);
@@ -116,10 +107,9 @@ public static class LibraryCommand
     private static Command CreateCleanupMissingCommand()
     {
         var serverOption = new Option<string?>("--server") { Description = "Server URL override" };
-        var tokenOption = new Option<string?>("--token") { Description = "Token override; not stored" };
         var command = new Command("cleanup-missing", "Remove DB entries for files no longer on disk")
         {
-            serverOption, tokenOption
+            serverOption
         };
         command.AddRoleRequired("admin");
         command.AddHelpSection("Notes", HelpSectionPosition.Top,
@@ -140,9 +130,7 @@ public static class LibraryCommand
         command.AddResponseExample<Generated.Models.CleanupResponse>();
         command.SetAction(async (parseResult, cancellationToken) =>
         {
-            var (client, _) = CommandHelper.BuildClient(
-                serverOverride: parseResult.GetValue(serverOption),
-                tokenOverride: parseResult.GetValue(tokenOption));
+            var (client, _) = CommandHelper.BuildClient(serverOverride: parseResult.GetValue(serverOption));
             var service = new LibraryService(client);
             var result = await service.CleanupMissingAsync();
             ConsoleOutput.WriteRawJson(result);

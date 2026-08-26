@@ -63,11 +63,7 @@ logs can identify which build called.
    `grimoire-cli login --server https://grimoire.example.com`.
 
 A refreshed pair is written back to the config file, so renewal persists across
-invocations. A token supplied through `--token` or `GRIMOIRE_TOKEN` is never
-refreshed: it belongs to some other session, and renewing it against the file's
-cookie would swap identity mid-run and write a token to disk the operator chose
-to keep out of it. `ConfigManager.Resolve` therefore drops the stored refresh
-token whenever the access token was overridden.
+invocations.
 
 ### Concurrency, and the contrast with abs-cli
 

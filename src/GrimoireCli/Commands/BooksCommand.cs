@@ -37,10 +37,9 @@ public static class BooksCommand
         };
         var offsetOption = new Option<int?>("--offset") { Description = "Items to skip" };
         var serverOption = new Option<string?>("--server") { Description = "Server URL override" };
-        var tokenOption = new Option<string?>("--token") { Description = "Token override; not stored" };
         var command = new Command("list", "List books (defaults to 100 results)")
         {
-            systemIdOption, categoryOption, limitOption, offsetOption, serverOption, tokenOption
+            systemIdOption, categoryOption, limitOption, offsetOption, serverOption
         };
         command.AddHelpSection("Notes", HelpSectionPosition.Top,
             "--limit 422s above 500; page with --offset against the total in the",
@@ -58,8 +57,7 @@ public static class BooksCommand
         command.SetAction(async (parseResult, cancellationToken) =>
         {
             var server = parseResult.GetValue(serverOption);
-            var token = parseResult.GetValue(tokenOption);
-            var (client, _) = CommandHelper.BuildClient(serverOverride: server, tokenOverride: token);
+            var (client, _) = CommandHelper.BuildClient(serverOverride: server);
             var service = new BooksService(client);
             var result = await service.ListAsync(
                 parseResult.GetValue(systemIdOption),
@@ -76,10 +74,9 @@ public static class BooksCommand
     {
         var idOption = new Option<string>("--id") { Description = "Book ID", Required = true };
         var serverOption = new Option<string?>("--server") { Description = "Server URL override" };
-        var tokenOption = new Option<string?>("--token") { Description = "Token override; not stored" };
         var command = new Command("get", "Get one book")
         {
-            idOption, serverOption, tokenOption
+            idOption, serverOption
         };
         command.AddHelpSection("Notes", HelpSectionPosition.Top,
             "403 if the book is explicit and the account disallows explicit content.");
@@ -88,8 +85,7 @@ public static class BooksCommand
         command.SetAction(async (parseResult, cancellationToken) =>
         {
             var server = parseResult.GetValue(serverOption);
-            var token = parseResult.GetValue(tokenOption);
-            var (client, _) = CommandHelper.BuildClient(serverOverride: server, tokenOverride: token);
+            var (client, _) = CommandHelper.BuildClient(serverOverride: server);
             var service = new BooksService(client);
             var result = await service.GetAsync(parseResult.GetValue(idOption)!);
             ConsoleOutput.WriteRawJson(result);
@@ -104,10 +100,9 @@ public static class BooksCommand
         var inputOption = new Option<string?>("--input") { Description = "Read the body from this file" };
         var stdinOption = new Option<bool>("--stdin") { Description = "Read the body from stdin" };
         var serverOption = new Option<string?>("--server") { Description = "Server URL override" };
-        var tokenOption = new Option<string?>("--token") { Description = "Token override; not stored" };
         var command = new Command("update", "Update one book's metadata")
         {
-            idOption, inputOption, stdinOption, serverOption, tokenOption
+            idOption, inputOption, stdinOption, serverOption
         };
         command.AddRoleRequired("gm or admin");
         JsonBodyInput.RequireExactlyOneSource(command, inputOption, stdinOption);
@@ -139,9 +134,7 @@ public static class BooksCommand
                 _logger.Error(ex.Message);
                 return 1;
             }
-            var (client, _) = CommandHelper.BuildClient(
-                serverOverride: parseResult.GetValue(serverOption),
-                tokenOverride: parseResult.GetValue(tokenOption));
+            var (client, _) = CommandHelper.BuildClient(serverOverride: parseResult.GetValue(serverOption));
             var service = new BooksService(client);
             var response = await service.UpdateAsync(parseResult.GetValue(idOption)!, body);
             ConsoleOutput.WriteRawJson(response);
@@ -155,10 +148,9 @@ public static class BooksCommand
         var inputOption = new Option<string?>("--input") { Description = "Read the body from this file" };
         var stdinOption = new Option<bool>("--stdin") { Description = "Read the body from stdin" };
         var serverOption = new Option<string?>("--server") { Description = "Server URL override" };
-        var tokenOption = new Option<string?>("--token") { Description = "Token override; not stored" };
         var command = new Command("batch-update", "Update many books in one transaction")
         {
-            inputOption, stdinOption, serverOption, tokenOption
+            inputOption, stdinOption, serverOption
         };
         command.AddRoleRequired("gm or admin");
         JsonBodyInput.RequireExactlyOneSource(command, inputOption, stdinOption);
@@ -190,9 +182,7 @@ public static class BooksCommand
                 _logger.Error(ex.Message);
                 return 1;
             }
-            var (client, _) = CommandHelper.BuildClient(
-                serverOverride: parseResult.GetValue(serverOption),
-                tokenOverride: parseResult.GetValue(tokenOption));
+            var (client, _) = CommandHelper.BuildClient(serverOverride: parseResult.GetValue(serverOption));
             var result = await new BooksService(client).BatchUpdateAsync(body);
             ConsoleOutput.WriteRawJson(result);
             return BulkExit.CodeFor(GrimoireApiClient.HasItems(result, "errors"));
@@ -205,10 +195,9 @@ public static class BooksCommand
         var inputOption = new Option<string?>("--input") { Description = "Read the body from this file" };
         var stdinOption = new Option<bool>("--stdin") { Description = "Read the body from stdin" };
         var serverOption = new Option<string?>("--server") { Description = "Server URL override" };
-        var tokenOption = new Option<string?>("--token") { Description = "Token override; not stored" };
         var command = new Command("batch-tag", "Add tags to many books")
         {
-            inputOption, stdinOption, serverOption, tokenOption
+            inputOption, stdinOption, serverOption
         };
         command.AddRoleRequired("gm or admin");
         JsonBodyInput.RequireExactlyOneSource(command, inputOption, stdinOption);
@@ -239,9 +228,7 @@ public static class BooksCommand
                 _logger.Error(ex.Message);
                 return 1;
             }
-            var (client, _) = CommandHelper.BuildClient(
-                serverOverride: parseResult.GetValue(serverOption),
-                tokenOverride: parseResult.GetValue(tokenOption));
+            var (client, _) = CommandHelper.BuildClient(serverOverride: parseResult.GetValue(serverOption));
             var result = await new BooksService(client).BatchTagAsync(body);
             ConsoleOutput.WriteRawJson(result);
             return BulkExit.CodeFor(GrimoireApiClient.HasItems(result, "errors"));
@@ -257,10 +244,9 @@ public static class BooksCommand
             Description = "OCR resolution for this book (72-600); omit for the server default",
         };
         var serverOption = new Option<string?>("--server") { Description = "Server URL override" };
-        var tokenOption = new Option<string?>("--token") { Description = "Token override; not stored" };
         var command = new Command("reindex", "Re-run OCR on one book")
         {
-            idOption, dpiOption, serverOption, tokenOption
+            idOption, dpiOption, serverOption
         };
         command.AddRoleRequired("gm or admin");
         command.AddHelpSection("Notes", HelpSectionPosition.Top,
@@ -273,9 +259,7 @@ public static class BooksCommand
         command.AddExamples("grimoire-cli books reindex --id <book-id>");
         command.SetAction(async (parseResult, cancellationToken) =>
         {
-            var (client, _) = CommandHelper.BuildClient(
-                serverOverride: parseResult.GetValue(serverOption),
-                tokenOverride: parseResult.GetValue(tokenOption));
+            var (client, _) = CommandHelper.BuildClient(serverOverride: parseResult.GetValue(serverOption));
             var service = new BooksService(client);
             var response = await service.ReindexAsync(parseResult.GetValue(idOption)!, parseResult.GetValue(dpiOption));
             ConsoleOutput.WriteRawJson(response);
@@ -288,10 +272,9 @@ public static class BooksCommand
     {
         var idOption = new Option<string>("--id") { Description = "Book ID", Required = true };
         var serverOption = new Option<string?>("--server") { Description = "Server URL override" };
-        var tokenOption = new Option<string?>("--token") { Description = "Token override; not stored" };
         var command = new Command("rescan", "Re-read one book from disk and rebuild its index")
         {
-            idOption, serverOption, tokenOption
+            idOption, serverOption
         };
         command.AddRoleRequired("gm or admin");
         command.AddHelpSection("Notes", HelpSectionPosition.Top,
@@ -306,9 +289,7 @@ public static class BooksCommand
         command.AddExamples("grimoire-cli books rescan --id <book-id>");
         command.SetAction(async (parseResult, cancellationToken) =>
         {
-            var (client, _) = CommandHelper.BuildClient(
-                serverOverride: parseResult.GetValue(serverOption),
-                tokenOverride: parseResult.GetValue(tokenOption));
+            var (client, _) = CommandHelper.BuildClient(serverOverride: parseResult.GetValue(serverOption));
             var service = new BooksService(client);
             var response = await service.RescanAsync(parseResult.GetValue(idOption)!);
             ConsoleOutput.WriteRawJson(response);
@@ -326,10 +307,9 @@ public static class BooksCommand
             Required = true,
         };
         var serverOption = new Option<string?>("--server") { Description = "Server URL override" };
-        var tokenOption = new Option<string?>("--token") { Description = "Token override; not stored" };
         var command = new Command("thumbnail", "Download the book's cover thumbnail")
         {
-            idOption, outputOption, serverOption, tokenOption
+            idOption, outputOption, serverOption
         };
         command.AddHelpSection("Notes", HelpSectionPosition.Top,
             "The cover thumbnail generated from the file during a scan, not an",
@@ -343,9 +323,7 @@ public static class BooksCommand
         command.AddResponseExample<SavedFile>();
         command.SetAction(async (parseResult, cancellationToken) =>
         {
-            var (client, _) = CommandHelper.BuildClient(
-                serverOverride: parseResult.GetValue(serverOption),
-                tokenOverride: parseResult.GetValue(tokenOption));
+            var (client, _) = CommandHelper.BuildClient(serverOverride: parseResult.GetValue(serverOption));
             var service = new BooksService(client);
             await using var stream = await service.ThumbnailAsync(parseResult.GetValue(idOption)!);
             try

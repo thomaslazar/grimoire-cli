@@ -8,12 +8,10 @@ public static class CommandHelper
     private static readonly NLog.Logger _logger = NLog.LogManager.GetCurrentClassLogger();
 
     public static (GrimoireApiClient client, AppConfig config) BuildClient(
-        string? serverOverride = null, string? tokenOverride = null)
+        string? serverOverride = null)
     {
         var configManager = new ConfigManager();
-        var config = configManager.Resolve(
-            flagServer: serverOverride,
-            flagToken: tokenOverride);
+        var config = configManager.Resolve(flagServer: serverOverride);
 
         if (string.IsNullOrEmpty(config.Server))
         {

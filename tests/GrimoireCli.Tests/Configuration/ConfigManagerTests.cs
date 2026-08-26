@@ -48,10 +48,9 @@ public class ConfigManagerTests
             manager.Save(new AppConfig { Server = "https://file.invalid", AccessToken = "file-token" });
             var resolved = manager.Resolve(
                 flagServer: "https://flag.invalid",
-                flagToken: "flag-token",
-                envLookup: key => key == "GRIMOIRE_SERVER" ? "https://env.invalid" : "env-token");
+                envLookup: key => key == "GRIMOIRE_SERVER" ? "https://env.invalid" : null);
             Assert.Equal("https://flag.invalid", resolved.Server);
-            Assert.Equal("flag-token", resolved.AccessToken);
+            Assert.Equal("file-token", resolved.AccessToken);
         }
         finally
         {
@@ -67,9 +66,9 @@ public class ConfigManagerTests
         {
             manager.Save(new AppConfig { Server = "https://file.invalid", AccessToken = "file-token" });
             var resolved = manager.Resolve(
-                envLookup: key => key == "GRIMOIRE_SERVER" ? "https://env.invalid" : "env-token");
+                envLookup: key => key == "GRIMOIRE_SERVER" ? "https://env.invalid" : null);
             Assert.Equal("https://env.invalid", resolved.Server);
-            Assert.Equal("env-token", resolved.AccessToken);
+            Assert.Equal("file-token", resolved.AccessToken);
         }
         finally
         {
@@ -141,9 +140,9 @@ public class ConfigManagerTests
         }
     }
 
-    // The hazard this design exists to avoid: Resolve merges env vars into memory,
-    // so persisting the resolved config would write a token the operator kept out
-    // of the file. UpdateVersionCheck reads the file, not the resolved config.
+    // The hazard this design exists to avoid: Resolve merges GRIMOIRE_SERVER into
+    // memory, so persisting the resolved config would write a server the operator
+    // kept out of the file. UpdateVersionCheck reads the file, not the resolved config.
     [Fact]
     public void UpdateVersionCheckDoesNotPersistEnvironmentValues()
     {
@@ -151,11 +150,11 @@ public class ConfigManagerTests
         try
         {
             manager.Save(new AppConfig { Server = "http://example.test" });
-            manager.Resolve(envLookup: name => name == "GRIMOIRE_TOKEN" ? "env-only-token" : null);
+            manager.Resolve(envLookup: name => name == "GRIMOIRE_SERVER" ? "http://env-only.test" : null);
             manager.UpdateVersionCheck("1.5.6", DateTimeOffset.UtcNow);
             var raw = File.ReadAllText(path);
-            Assert.DoesNotContain("env-only-token", raw);
-            Assert.Null(manager.Load().AccessToken);
+            Assert.DoesNotContain("env-only", raw);
+            Assert.Equal("http://example.test", manager.Load().Server);
         }
         finally
         {
@@ -322,34 +321,6 @@ public class ConfigManagerTests
         }
     }
 
-    // A token from a flag or the environment belongs to a different session than
-    // the stored cookie, so the cookie must not be offered as a way to renew it.
-    [Fact]
-    public void ResolveDropsRefreshTokenWhenTheAccessTokenIsOverridden()
-    {
-        var manager = InTempDir(out var path);
-        try
-        {
-            manager.Save(new AppConfig
-            {
-                Server = "http://example.test",
-                AccessToken = "file-access",
-                RefreshToken = "file-refresh"
-            });
-            var fromFile = manager.Resolve();
-            Assert.Equal("file-refresh", fromFile.RefreshToken);
-            var flagged = manager.Resolve(flagToken: "flag-access");
-            Assert.Null(flagged.RefreshToken);
-            var fromEnv = manager.Resolve(
-                envLookup: name => name == "GRIMOIRE_TOKEN" ? "env-access" : null);
-            Assert.Null(fromEnv.RefreshToken);
-        }
-        finally
-        {
-            Directory.Delete(Path.GetDirectoryName(path)!, recursive: true);
-        }
-    }
-
     [Fact]
     public void UpdateTokensWritesBothAndDoesNotPersistEnvironmentValues()
     {
@@ -357,10 +328,10 @@ public class ConfigManagerTests
         try
         {
             manager.Save(new AppConfig { Server = "http://example.test" });
-            manager.Resolve(envLookup: name => name == "GRIMOIRE_TOKEN" ? "env-only-token" : null);
+            manager.Resolve(envLookup: name => name == "GRIMOIRE_SERVER" ? "http://env-only.test" : null);
             manager.UpdateTokens("new-access", "new-refresh");
             var raw = File.ReadAllText(path);
-            Assert.DoesNotContain("env-only-token", raw);
+            Assert.DoesNotContain("env-only", raw);
             var back = manager.Load();
             Assert.Equal("new-access", back.AccessToken);
             Assert.Equal("new-refresh", back.RefreshToken);

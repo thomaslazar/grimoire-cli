@@ -167,7 +167,7 @@ A batch verb is skip-and-continue: it exits 3 on a partial failure and names eac
 Config is stored at `~/.grimoire-cli/config.json`. Values resolve in this order:
 
 1. **CLI flags** (`--server`)
-2. **Environment variables** (`GRIMOIRE_SERVER`, `GRIMOIRE_TOKEN`)
+2. **Environment variables** (`GRIMOIRE_SERVER`)
 3. **Config file**
 
 ```bash

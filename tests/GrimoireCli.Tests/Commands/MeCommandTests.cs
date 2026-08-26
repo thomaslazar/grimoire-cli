@@ -22,10 +22,18 @@ public class MeCommandTests
     }
 
     [Fact]
-    public void AcceptsServerAndTokenOverrides()
+    public void AcceptsAServerOverride()
     {
         var root = new RootCommand { MeCommand.Create() };
-        Assert.Empty(root.Parse("me --server http://x --token t").Errors);
+        Assert.Empty(root.Parse("me --server http://x").Errors);
+    }
+
+    // The token comes from the config file alone; --token is not an option here.
+    [Fact]
+    public void RejectsATokenOverride()
+    {
+        var root = new RootCommand { MeCommand.Create() };
+        Assert.NotEmpty(root.Parse("me --token t").Errors);
     }
 
     // GET /api/auth/me is Depends(get_current_user) — any authenticated user,

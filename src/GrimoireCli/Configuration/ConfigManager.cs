@@ -139,21 +139,17 @@ public class ConfigManager
 
     public AppConfig Resolve(
         string? flagServer = null,
-        string? flagToken = null,
         Func<string, string?>? envLookup = null)
     {
         envLookup ??= Environment.GetEnvironmentVariable;
         var fileConfig = Load();
-        var tokenOverride = flagToken ?? envLookup("GRIMOIRE_TOKEN");
         return new AppConfig
         {
             Server = flagServer
                 ?? envLookup("GRIMOIRE_SERVER")
                 ?? fileConfig.Server,
-            AccessToken = tokenOverride ?? fileConfig.AccessToken,
-            // The stored cookie renews the session it was issued for, so it
-            // travels only with the access token from the same file.
-            RefreshToken = tokenOverride == null ? fileConfig.RefreshToken : null,
+            AccessToken = fileConfig.AccessToken,
+            RefreshToken = fileConfig.RefreshToken,
             LastVersionCheck = fileConfig.LastVersionCheck,
             LastServerVersion = fileConfig.LastServerVersion
         };
@@ -162,9 +158,9 @@ public class ConfigManager
     /// <summary>
     /// Records a version observation by read-modify-write of the config file.
     /// Deliberately reads <see cref="Load"/> rather than a resolved config:
-    /// <see cref="Resolve"/> merges GRIMOIRE_SERVER and GRIMOIRE_TOKEN from the
-    /// environment, and persisting those would write a token to disk that the
-    /// operator chose to keep out of it.
+    /// <see cref="Resolve"/> merges GRIMOIRE_SERVER from the environment, and
+    /// persisting it would write a server to disk that the operator chose to
+    /// keep out of the file.
     /// </summary>
     public void UpdateVersionCheck(string? serverVersion, DateTimeOffset checkedAt)
     {
@@ -177,11 +173,11 @@ public class ConfigManager
     /// <summary>
     /// Persists a refreshed token pair by read-modify-write of the config file,
     /// for the same reason as <see cref="UpdateVersionCheck"/>: writing a
-    /// resolved config would put a GRIMOIRE_TOKEN value on disk that the operator
-    /// chose to keep out of it. A null <paramref name="refreshToken"/> leaves the
-    /// stored one in place — the server rotates on every refresh, so the value
-    /// already on disk is the best credential available if a response carried no
-    /// new cookie.
+    /// resolved config would put a GRIMOIRE_SERVER value on disk that the
+    /// operator chose to keep out of the file. A null
+    /// <paramref name="refreshToken"/> leaves the stored one in place — the
+    /// server rotates on every refresh, so the value already on disk is the best
+    /// credential available if a response carried no new cookie.
     /// </summary>
     public void UpdateTokens(string accessToken, string? refreshToken)
     {

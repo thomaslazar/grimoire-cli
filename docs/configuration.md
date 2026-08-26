@@ -25,20 +25,14 @@ refresh, written by `login` and rewritten by every renewal
 (`ConfigManager.UpdateTokens`). It is absent against a 1.5.6 server, which
 issues none. See [authentication.md](authentication.md) for the renewal rules.
 
-A token supplied through `--token` or `GRIMOIRE_TOKEN` is good only for the
-access token's own 30 minutes: no refresh token accompanies it, and the stored
-one belongs to a different session, so `ConfigManager.Resolve` does not pair
-them. `login` plus the config file is the durable path.
-
 `lastVersionCheck` and `lastServerVersion` are written by the CLI's own
 24-hour version-check cadence (see
 [grimoire-compatibility.md](grimoire-compatibility.md#runtime-check)), not by
 the operator — `config set` does not accept either key. The check runs
-against whatever server and token the command resolved — file, environment,
-or `--server`/`--token` flags — so it can run before any `login` on this
-machine: on a machine with no config file, the first check via `--server`/
-`--token` creates one with only `lastVersionCheck` and `lastServerVersion`
-populated (`server` and `accessToken` stay unset until `login` writes them).
+against the token in the config file, and against whatever server the command
+resolved — file, `GRIMOIRE_SERVER`, or `--server`. It therefore runs only after
+a `login` on this machine: with no stored access token, `CommandHelper.BuildClient`
+exits 1 before any request is made.
 
 ## Reading and writing the file
 
@@ -56,8 +50,9 @@ because the replacement carries the new file's mode.
 A config file that is not valid JSON is **moved to `config.json.corrupt`** and
 reported on stderr, then treated as absent. Moving it is what makes the token
 recoverable: the file usually still contains it, and the next write would
-otherwise replace the file wholesale. `GRIMOIRE_SERVER` / `GRIMOIRE_TOKEN` still
-work in that state, and `grimoire-cli login` writes a fresh config.
+otherwise replace the file wholesale. `GRIMOIRE_SERVER` still works in that
+state, but with the stored token gone the command fails on its own terms;
+`grimoire-cli login` writes a fresh config.
 
 A write that fails — a read-only home, a full disk — is reported as an error, and
 `login` and `config set` exit non-zero rather than claiming to have saved
@@ -68,12 +63,15 @@ failure there is a debug line and the check simply runs again next time.
 
 Highest wins (`ConfigManager.Resolve`):
 
-1. Command-line flags — `CommandHelper.BuildClient(serverOverride, tokenOverride)`
-   accepts a per-call override; `systems` and `me` wire `--server`/`--token`
-   through to it. `login`'s own `--server` writes straight to the file
+1. Command-line flags — `CommandHelper.BuildClient(serverOverride)` accepts a
+   per-call server override, which every command consuming a saved token wires
+   `--server` through to. `login`'s own `--server` writes straight to the file
    instead of going through this resolution.
-2. Environment variables — `GRIMOIRE_SERVER`, `GRIMOIRE_TOKEN`
+2. Environment variables — `GRIMOIRE_SERVER`
 3. Config file (`~/.grimoire-cli/config.json`)
+
+Only the server has all three tiers. The access and refresh tokens come from the
+config file alone.
 
 ## Config Commands
 

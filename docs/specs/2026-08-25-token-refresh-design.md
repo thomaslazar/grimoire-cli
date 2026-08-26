@@ -253,3 +253,15 @@ endpoints. Logout was considered on the grounds that a refresh token sits on
 disk for 30 days, but the capability already exists off-CLI: revoking the
 session in the web UI or changing the password both kill it. It would be
 convenience, not a missing remedy.
+
+## Amendment 2026-08-26
+
+`--token` and `GRIMOIRE_TOKEN` have been removed. Section 1's scoping rule — the
+refresh token travels only with an access token that came from the file — is
+therefore moot: the file is the only token source, so `Resolve` carries
+`RefreshToken` through unconditionally.
+
+The flag was ported from abs-cli, where non-expiring user tokens and API keys
+give it a durable credential to hold. Grimoire has none: every accepted
+credential is the same 30-minute JWT that only `login` can mint, and `login`
+already writes the config file the flag existed to avoid needing.

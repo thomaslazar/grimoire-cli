@@ -232,26 +232,28 @@ echo "$LIST_JSON" | jq -e '.[] | select(.name == "Lasers And Feelings")' >/dev/n
 ok "one-page-rpgs is a container holding 2 single-book systems"
 
 # --- override flags -----------------------------------------------------------
-# --server/--token are the flag tier of ConfigManager.Resolve — the tested
-# precedence logic (ConfigManagerTests.cs) is otherwise unreachable through the
-# CLI, since no command declared the flags until now. Config is deliberately
-# emptied first so a config-file fallback can't mask a broken flag.
-TOKEN=$(jq -r .accessToken "$CONFIG")
+# --server is the flag tier of ConfigManager.Resolve — the tested precedence
+# logic (ConfigManagerTests.cs) is otherwise unreachable through the CLI. The
+# stored server is deliberately made unreachable first so a config-file fallback
+# can't mask a broken flag. The token has no flag tier and stays in the file.
 cp "$CONFIG" "$WORK/config.saved"
-echo '{}' >"$CONFIG"
+jq '.server = "http://127.0.0.1:1"' "$WORK/config.saved" >"$CONFIG"
 
-syslist --server "$SERVER" --token "$TOKEN"
+syslist --server "$SERVER"
 [ "$COUNT" -eq "$EXPECTED_SYSTEMS" ] \
-  || fail "systems list --server/--token returned $COUNT with an emptied config, expected $EXPECTED_SYSTEMS"
-ok "systems list --server/--token succeeds against an emptied config"
+  || fail "systems list --server returned $COUNT over an unreachable stored server, expected $EXPECTED_SYSTEMS"
+ok "systems list --server overrides the stored server"
 
+# A rejected token surfaces as exit 2. The refresh token goes with it, so the
+# renewal path cannot rescue the request and hide the 401.
+jq '.accessToken = "bogus-token" | del(.refreshToken)' "$WORK/config.saved" >"$CONFIG"
 set +e
-"$CLI" systems list --server "$SERVER" --token "bogus-token" >/dev/null 2>"$WORK/badtoken.err"; rc=$?
+"$CLI" systems list --server "$SERVER" >/dev/null 2>"$WORK/badtoken.err"; rc=$?
 set -e
-[ "$rc" -eq 2 ] || fail "a bogus --token should exit 2, got $rc"
+[ "$rc" -eq 2 ] || fail "a bogus stored token should exit 2, got $rc"
 grep -qi "not authenticated" "$WORK/badtoken.err" \
-  || fail "a bogus --token gave no 'Not authenticated' message: $(cat "$WORK/badtoken.err")"
-ok "a bogus --token against a correct --server exits 2"
+  || fail "a bogus stored token gave no 'Not authenticated' message: $(cat "$WORK/badtoken.err")"
+ok "a bogus stored token against a correct --server exits 2"
 
 cp "$WORK/config.saved" "$CONFIG"
 
@@ -911,13 +913,16 @@ grep -q -- "--allow-scripts" "$WORK/addonsettings.err" \
   || fail "no mention of --allow-scripts: $(cat "$WORK/addonsettings.err")"
 ok "addons settings with no flags exits 1 and names the required flags"
 
+# The token comes from the config file alone, so there is no --token to override it.
+set +e
+"$CLI" systems list --token whatever >"$WORK/notoken.out" 2>"$WORK/notoken.err"; rc=$?
+set -e
+[ "$rc" -ne 0 ] || fail "--token should be rejected as an unknown option, got $rc"
+ok "--token is not an option"
+
 # A config file that is not valid JSON must not take the CLI down with it, and
 # logging in again must be enough to recover — no hand-editing, no rm. This runs
 # last because it ends by restoring the config the earlier checks depend on.
-# GRIMOIRE_TOKEN would satisfy the command from the environment and mask the
-# failure this asserts; the suite does not set it, and this makes that a
-# requirement rather than an assumption.
-unset GRIMOIRE_TOKEN
 printf '{not json' > "$CONFIG"
 set +e
 "$CLI" systems list >"$WORK/corrupt.out" 2>"$WORK/corrupt.err"; rc=$?

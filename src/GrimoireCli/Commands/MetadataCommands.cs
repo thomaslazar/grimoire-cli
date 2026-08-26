@@ -27,10 +27,9 @@ public static class MetadataCommands
     {
         var idOption = IdOption(resource);
         var serverOption = new Option<string?>("--server") { Description = "Server URL override" };
-        var tokenOption = new Option<string?>("--token") { Description = "Token override; not stored" };
         var command = new Command("metadata-sources", "List add-ons that can supply metadata")
         {
-            idOption, serverOption, tokenOption
+            idOption, serverOption
         };
         command.AddRoleRequired("gm or admin");
         command.AddHelpSection("Notes", HelpSectionPosition.Top,
@@ -44,9 +43,7 @@ public static class MetadataCommands
         command.AddResponseExample<Generated.Models.MetadataSourcesResponse>();
         command.SetAction(async (parseResult, cancellationToken) =>
         {
-            var (client, _) = CommandHelper.BuildClient(
-                serverOverride: parseResult.GetValue(serverOption),
-                tokenOverride: parseResult.GetValue(tokenOption));
+            var (client, _) = CommandHelper.BuildClient(serverOverride: parseResult.GetValue(serverOption));
             var service = new MetadataService(client, resource);
             var result = await service.SourcesAsync(parseResult.GetValue(idOption)!);
             ConsoleOutput.WriteRawJson(result);
@@ -65,10 +62,9 @@ public static class MetadataCommands
         };
         var queryOption = new Option<string?>("--query") { Description = $"Search text; defaults to the {fallback}" };
         var serverOption = new Option<string?>("--server") { Description = "Server URL override" };
-        var tokenOption = new Option<string?>("--token") { Description = "Token override; not stored" };
         var command = new Command("metadata-search", "Search one add-on for candidates")
         {
-            idOption, sourceIdOption, queryOption, serverOption, tokenOption
+            idOption, sourceIdOption, queryOption, serverOption
         };
         command.AddRoleRequired("gm or admin");
         command.AddHelpSection("Notes", HelpSectionPosition.Top,
@@ -85,9 +81,7 @@ public static class MetadataCommands
         command.AddResponseExample<Generated.Models.MetadataSearchResponse>();
         command.SetAction(async (parseResult, cancellationToken) =>
         {
-            var (client, _) = CommandHelper.BuildClient(
-                serverOverride: parseResult.GetValue(serverOption),
-                tokenOverride: parseResult.GetValue(tokenOption));
+            var (client, _) = CommandHelper.BuildClient(serverOverride: parseResult.GetValue(serverOption));
             var service = new MetadataService(client, resource);
             var result = await service.SearchAsync(
                 parseResult.GetValue(idOption)!,
@@ -111,10 +105,9 @@ public static class MetadataCommands
         var queryOption = new Option<string?>("--query") { Description = "Query the candidate came from; required for search-backed sources" };
         var pasteOption = new Option<string?>("--paste") { Description = "Source URL or bare ID, instead of --identity" };
         var serverOption = new Option<string?>("--server") { Description = "Server URL override" };
-        var tokenOption = new Option<string?>("--token") { Description = "Token override; not stored" };
         var command = new Command("metadata-fetch", "Diff one candidate against this resource")
         {
-            idOption, sourceIdOption, identityOption, queryOption, pasteOption, serverOption, tokenOption
+            idOption, sourceIdOption, identityOption, queryOption, pasteOption, serverOption
         };
         command.AddRoleRequired("gm or admin");
         command.Validators.Add(result =>
@@ -142,9 +135,7 @@ public static class MetadataCommands
         command.AddResponseExample<Generated.Models.MetadataFetchResponse>();
         command.SetAction(async (parseResult, cancellationToken) =>
         {
-            var (client, _) = CommandHelper.BuildClient(
-                serverOverride: parseResult.GetValue(serverOption),
-                tokenOverride: parseResult.GetValue(tokenOption));
+            var (client, _) = CommandHelper.BuildClient(serverOverride: parseResult.GetValue(serverOption));
             var service = new MetadataService(client, resource);
             var result = await service.FetchAsync(
                 parseResult.GetValue(idOption)!,
