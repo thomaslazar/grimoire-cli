@@ -16,9 +16,7 @@ Both cookies carry `Max-Age=2592000` regardless of the JWT's real 30-minute
 life, so cookie lifetime is not an expiry signal.
 
 `POST /api/auth/refresh` authenticates on the cookie alone and returns a new
-pair, rotating both. A 1.5.6 server sets no `grimoire_refresh` cookie, so
-nothing is stored, every branch below degrades to 1.5.6 behaviour, and its
-single 30-day JWT keeps working.
+pair, rotating both.
 
 ## HTTP Headers
 

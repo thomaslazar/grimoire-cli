@@ -22,8 +22,8 @@ take `--id` directly).
 
 `refreshToken` is the `grimoire_refresh` cookie value from the last login or
 refresh, written by `login` and rewritten by every renewal
-(`ConfigManager.UpdateTokens`). It is absent against a 1.5.6 server, which
-issues none. See [authentication.md](authentication.md) for the renewal rules.
+(`ConfigManager.UpdateTokens`). See [authentication.md](authentication.md) for
+the renewal rules.
 
 `lastVersionCheck` and `lastServerVersion` are written by the CLI's own
 24-hour version-check cadence (see

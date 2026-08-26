@@ -366,9 +366,8 @@ public class GrimoireApiClient
 
     /// <summary>
     /// Renews the access token before sending when it is nearly out and a stored
-    /// cookie can renew it. With no cookie — a token from a flag or the
-    /// environment, or a 1.5.6 server that issues none — the request still goes
-    /// out and the server answers with its own 401.
+    /// cookie can renew it. Where no cookie is stored the request still goes out
+    /// as it stands, and the server answers with its own 401.
     /// </summary>
     private async Task EnsureValidTokenAsync(CancellationToken cancellationToken)
     {
