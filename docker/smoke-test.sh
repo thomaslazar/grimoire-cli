@@ -493,6 +493,50 @@ set -e
 grep -q "licence" "$WORK/batchtypo.err" || fail "no offending field named: $(cat "$WORK/batchtypo.err")"
 ok "an unknown field inside a batch item exits 1"
 
+# --- book folders ------------------------------------------------------------
+# Fixed path and fixed tags, so a second run converges. The fixture's only book
+# below a category directory lives here, which is what makes the inheritance
+# assertion below possible at all.
+syslist --include-children
+DSA=$(echo "$LIST_JSON" | jq -r '.[] | select(.name == "Das Schwarze Auge 5 DE") | .id')
+[ -n "$DSA" ] || fail "no Das Schwarze Auge 5 DE fixture for book folders"
+FOLDER_PATH="$DSA/core/errata"
+
+SET_JSON=$(printf '{"path":"%s","tags":["errata-smoke"]}' "$FOLDER_PATH" \
+  | "$CLI" systems book-folders set --id "$DSA" --stdin 2>"$WORK/cli.err") \
+  || { cat "$WORK/cli.err" >&2; fail "book-folders set exited non-zero"; }
+[ "$(echo "$SET_JSON" | jq -r .path)" = "$FOLDER_PATH" ] \
+  || fail "set should echo the path it wrote: $SET_JSON"
+ok "systems book-folders set writes a folder's tags"
+
+FOLDERS_JSON=$("$CLI" systems book-folders list --id "$DSA" 2>"$WORK/cli.err") \
+  || { cat "$WORK/cli.err" >&2; fail "book-folders list exited non-zero"; }
+echo "$FOLDERS_JSON" | jq -e --arg p "$FOLDER_PATH" '.folders[] | select(.path == $p)' >/dev/null \
+  || fail "the folder just written should be listed: $FOLDERS_JSON"
+ok "systems book-folders list shows the written folder"
+
+# The point of the feature: a book below the path inherits the tag. This is the
+# round trip that upstream #357 broke — the server derived the folder's depth
+# differently for a container child, and Das Schwarze Auge 5 DE is one.
+TAG_ITEMS=$(curl -sf "$SERVER/api/tags/errata-smoke/items" \
+  -H "Authorization: Bearer $(jq -r .accessToken "$CONFIG")") \
+  || fail "could not read the tag's items"
+echo "$TAG_ITEMS" | jq -e '.folders[] | select(.path == "errata") | .items[] | select(.title == "DSA5 Errata")' >/dev/null \
+  || fail "the folder tag should reach the book below it: $TAG_ITEMS"
+ok "a folder tag reaches the book below its path"
+
+DEL_JSON=$("$CLI" systems book-folders delete --id "$DSA" --path "$FOLDER_PATH" 2>"$WORK/cli.err") \
+  || { cat "$WORK/cli.err" >&2; fail "book-folders delete exited non-zero"; }
+[ "$(echo "$DEL_JSON" | jq -r .status)" = "deleted" ] \
+  || fail "delete should report the deletion: $DEL_JSON"
+ok "systems book-folders delete removes the folder"
+
+FOLDERS_JSON=$("$CLI" systems book-folders list --id "$DSA" 2>"$WORK/cli.err") \
+  || { cat "$WORK/cli.err" >&2; fail "book-folders list exited non-zero after delete"; }
+[ "$(echo "$FOLDERS_JSON" | jq '.folders | length')" -eq 0 ] \
+  || fail "the folder should be gone after delete: $FOLDERS_JSON"
+ok "the deleted folder is no longer listed"
+
 # --- system covers --------------------------------------------------------
 # A different system from Shadowrun 4 DE on purpose: that one already carries
 # the description write above and the metadata diff assertions below, and a
@@ -545,7 +589,7 @@ ok "systems cover delete removes the upload"
 # carries 3 books across 2 categories, specifically so a --limit below that
 # system's own total proves paging rather than a coincidence of the global
 # count already exceeding it.
-EXPECTED_BOOKS=17
+EXPECTED_BOOKS=18
 
 booklist() {
   LIST_JSON=$("$CLI" books list "$@" 2>"$WORK/cli.err") \

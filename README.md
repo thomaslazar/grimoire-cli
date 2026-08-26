@@ -201,6 +201,9 @@ grimoire-cli config set server https://grimoire.example.com
 | `systems cover get --id <id> --output <path\|->` | Download a system's cover image |
 | `systems cover upload --id <id> --file <path>` | Upload a system's cover image (gm or admin) |
 | `systems cover delete --id <id>` | Delete a system's uploaded cover image (gm or admin) |
+| `systems book-folders list --id <id>` | List a system's tagged subcategory folders |
+| `systems book-folders set --id <id> {--input <file> \| --stdin}` | Replace a subcategory folder's tags (gm or admin) |
+| `systems book-folders delete --id <id> --path <path>` | Remove a subcategory folder's record (gm or admin) |
 | `systems metadata-sources --id <id>` | Add-ons that can supply metadata for this system (gm or admin) |
 | `systems metadata-search --id <id> --source-id <src> [--query]` | Ranked candidates from one add-on (gm or admin) |
 | `systems metadata-fetch --id <id> --source-id <src> {--identity <i> \| --paste <url>} [--query]` | Diff a candidate against the system; writes nothing (gm or admin) |
