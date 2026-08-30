@@ -34,7 +34,7 @@ namespace GrimoireCli.Generated.Api.Files.Delete
         {
         }
         /// <summary>
-        /// Irreversible. Removes the file from disk along with its indexed record and everything keyed to it. Non-empty folders require `confirm_name`.
+        /// Soft by default: removes the indexed record and everything keyed to it while leaving the files alone, so a rescan re-adds whatever is still present and not excluded. Set `delete_files` to also unlink the files, which is irreversible. Non-empty folders require `confirm_name`.
         /// </summary>
         /// <returns>A <see cref="global::GrimoireCli.Generated.Models.DeleteResponse"/></returns>
         /// <param name="body">A file or folder to remove, with the typed-name guard for full folders.</param>
@@ -59,7 +59,7 @@ namespace GrimoireCli.Generated.Api.Files.Delete
             return await RequestAdapter.SendAsync<global::GrimoireCli.Generated.Models.DeleteResponse>(requestInfo, global::GrimoireCli.Generated.Models.DeleteResponse.CreateFromDiscriminatorValue, errorMapping, cancellationToken).ConfigureAwait(false);
         }
         /// <summary>
-        /// Irreversible. Removes the file from disk along with its indexed record and everything keyed to it. Non-empty folders require `confirm_name`.
+        /// Soft by default: removes the indexed record and everything keyed to it while leaving the files alone, so a rescan re-adds whatever is still present and not excluded. Set `delete_files` to also unlink the files, which is irreversible. Non-empty folders require `confirm_name`.
         /// </summary>
         /// <returns>A <see cref="RequestInformation"/></returns>
         /// <param name="body">A file or folder to remove, with the typed-name guard for full folders.</param>
@@ -90,7 +90,7 @@ namespace GrimoireCli.Generated.Api.Files.Delete
             return new global::GrimoireCli.Generated.Api.Files.Delete.DeleteRequestBuilder(rawUrl, RequestAdapter);
         }
         /// <summary>
-        /// Irreversible. Removes the file from disk along with its indexed record and everything keyed to it. Non-empty folders require `confirm_name`.
+        /// Soft by default: removes the indexed record and everything keyed to it while leaving the files alone, so a rescan re-adds whatever is still present and not excluded. Set `delete_files` to also unlink the files, which is irreversible. Non-empty folders require `confirm_name`.
         /// </summary>
         [global::System.CodeDom.Compiler.GeneratedCode("Kiota", "1.0.0")]
         public partial class DeleteRequestBuilderPostQueryParameters 

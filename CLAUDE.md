@@ -135,12 +135,7 @@ These rules exist because help text sits on the hot path for the agents driving 
   docker compose -f docker/docker-compose.yml up -d --wait
   # then generate straight from http://host.docker.internal:9481/api/openapi.json
   ```
-- **An unpinned channel is a temporary exception, not the convention.** The pin is normally a release tag, and becomes one again the moment 1.6.0 ships. Until then it rides `hunterreadca/grimoire:nightly`, where the 1.6.0 RC lands, deliberately unpinned: the RC is not expected to move much, the window closes at release, and that release needs a regeneration regardless — so a digest would buy reproducibility at the cost of repin ceremony and the risk of silently testing a stale RC. **Accept that the spec can drift under the committed client between regenerations.** An upstream request-shape change surfaces as a smoke-test failure; regenerate and read the diff rather than chasing it. Identify which build you actually ran against with:
-  ```bash
-  docker image inspect hunterreadca/grimoire:nightly \
-    --format '{{index .Config.Labels "org.opencontainers.image.revision"}}'
-  ```
-  That label is nightly-only — `edge` and the release tags carry no labels at all — and it matches the `commit_hash` in `GET /api/about`. **When 1.6.0 releases, the pin becomes a release tag** (`hunterreadca/grimoire:1.6.0`) and version bumps are made deliberately from then on; see workstream C in [docs/grimoire-1.6.0-migration.md](docs/grimoire-1.6.0-migration.md).
+- **The pin is a release tag, and bumps are deliberate.** `docker/docker-compose.yml` pins `hunterreadca/grimoire:1.6.0`. A tag is immutable, so the spec cannot drift under the committed client between regenerations — which is what the prerelease channel could not offer, and why riding one was a temporary exception rather than the convention. Bumping the image and regenerating from it belong in the same commit, so the generated diff is the record of what changed; the full procedure is in [docs/grimoire-compatibility.md](docs/grimoire-compatibility.md#handling-a-grimoire-release).
 - **Released-version support lives on `support/grimoire-1.5.6`**, where the pin is the `1.5.6` tag. Fixes for 1.5.6 are made there and released from there, then cherry-picked forward — not merged, since `main` no longer has the DTO layer they were written against.
 - **Generate with a .NET-native generator** — Kiota is the fit: a `dotnet tool`, handles the spec's OpenAPI 3.1, emits C#. No node or java is available in the devcontainer.
 - **What the spec gives you and what it does not.** Today's spec has 342 component schemas and 282 operations, 238 of whose success responses carry a schema — request bodies, paths, methods, query parameters and most response shapes all come from the generator and are trustworthy. The remainder are 204s or still type as `{}`. Neither gap matters for runtime deserialization any more: the CLI passes response bytes through unmodified rather than reading them into a typed model (see [docs/input-output.md](docs/input-output.md)). The generated response models are used only to render `--help` response samples, via `tools/GenerateJsonExamples`.
@@ -154,21 +149,18 @@ These rules exist because help text sits on the hot path for the agents driving 
 
 The upstream source is the authoritative reference for **behaviour and response shapes** — the half the spec does not cover (see above). The published docs have been wrong before.
 
-- Expected location: `temp/grimoire/` (gitignored). **Pin it to the build the local stack is running**, never upstream `main`, which carries work no instance runs. On `support/grimoire-1.5.6` that is the release tag. On `main` the stack rides an untagged prerelease channel, so pin to the commit it reports — which is a tighter pin than a tag, and a checkable one:
+- Expected location: `temp/grimoire/` (gitignored). **Pin it to the release the local stack runs**, never upstream `main`, which carries work no instance runs. That is `v1.6.0` here and the `1.5.6` tag on `support/grimoire-1.5.6`:
   ```bash
-  REV=$(docker image inspect hunterreadca/grimoire:nightly \
-    --format '{{index .Config.Labels "org.opencontainers.image.revision"}}')
-  rm -rf temp/grimoire && mkdir -p temp/grimoire && cd temp/grimoire
-  git init -q && git remote add origin https://github.com/hunter-read/grimoire.git
-  git fetch --depth 1 -q origin "$REV" && git checkout -q FETCH_HEAD
+  git -C temp/grimoire fetch --depth 1 origin tag v1.6.0
+  git -C temp/grimoire checkout v1.6.0
   ```
-  That label is nightly-only and matches the `commit_hash` in `GET /api/about`. **Verify the clone rather than trusting it** — the image ships its own source, so the two can be compared directly, and only `backend/tests` should differ because the image excludes it:
+  **Verify the clone rather than trusting it** — the image ships its own source, so the two can be compared directly, and only `backend/tests` should differ because the image excludes it:
   ```bash
   docker cp docker-grimoire-1:/app/backend /tmp/container-backend
   find /tmp/container-backend -name __pycache__ -type d -exec rm -rf {} +
   diff -rq temp/grimoire/backend /tmp/container-backend
   ```
-- **Repin whenever the stack moves.** An unpinned channel drifts, and a clone that has fallen behind answers questions confidently in the wrong version — the failure this rule exists to prevent. The `diff` above is what catches it.
+- **Repin in the same change that bumps the image.** A clone left behind answers questions confidently in the wrong version, which is the failure this rule exists to prevent; the `diff` above is what catches it.
 - **No spec snapshot is kept.** The spec comes from the running stack's `/api/openapi.json` at the moment it is needed — see [API client generation](#api-client-generation). A file on disk can be stale; the running container cannot.
 - **The container is always available as a second opinion**, and needs no clone at all: `docker exec docker-grimoire-1 grep -n EXPIRE backend/sessions.py`.
 - `temp/deployment-docs/` — deployment design records copied in by hand, including the live instance's URL and library structure.

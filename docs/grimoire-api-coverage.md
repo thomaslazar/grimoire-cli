@@ -2,7 +2,7 @@
 
 Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any) that implements it.
 
-- **Reference:** spec fetched live from the pinned stack's `/api/openapi.json` (vnightly, 216 paths, 282 operations) and the upstream router source read from the same container. Tested range: `1.5.6` only (`GrimoireApiClient.cs`).
+- **Reference:** spec fetched live from the pinned stack's `/api/openapi.json` (v1.6.0, 216 paths, 282 operations) and the upstream router source read from the same container. Tested range: `1.6.0` only (`GrimoireApiClient.cs`).
 - **Perm** column uses Grimoire's roles (`admin` / `gm or admin` / `not guest`); blank = any authenticated user. `?` = a dependency this script could not resolve.
 - ✅ = covered by a CLI command · — = not implemented · 🔒 = internal-only (no user-facing verb); 🔒 rows never count as covered.
 - **Regenerate with `tools/generate-api-coverage.py`; update `IMPLEMENTED` there in the same PR as any change to which endpoints the CLI calls.**
@@ -270,7 +270,7 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | Method | Path | Description | Perm | CLI |
 |--------|------|-------------|------|-----|
 | GET | `/api/files/browse` | List a library folder with indexing state | admin | — |
-| POST | `/api/files/delete` | Delete a file or folder, with its record and sidecars | admin | — |
+| POST | `/api/files/delete` | Remove a file or folder from the index, or from disk | admin | — |
 | POST | `/api/files/folder` | Create a folder, optionally as a container or NSFW | admin | — |
 | DELETE | `/api/files/folder` | Delete a folder, recursively when confirmed by name | admin | — |
 | GET | `/api/files/folder/contents` | Report whether a folder holds content | admin | — |

@@ -23,6 +23,22 @@ namespace GrimoireCli.Generated.Models
 #else
         public string Attribution { get; set; }
 #endif
+        /// <summary>The author property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public string? Author { get; set; }
+#nullable restore
+#else
+        public string Author { get; set; }
+#endif
+        /// <summary>The author_url property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public string? AuthorUrl { get; set; }
+#nullable restore
+#else
+        public string AuthorUrl { get; set; }
+#endif
         /// <summary>The available_version property</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
@@ -139,6 +155,8 @@ namespace GrimoireCli.Generated.Models
             return new Dictionary<string, Action<IParseNode>>
             {
                 { "attribution", n => { Attribution = n.GetStringValue(); } },
+                { "author", n => { Author = n.GetStringValue(); } },
+                { "author_url", n => { AuthorUrl = n.GetStringValue(); } },
                 { "available_version", n => { AvailableVersion = n.GetStringValue(); } },
                 { "blocked_reason", n => { BlockedReason = n.GetStringValue(); } },
                 { "description", n => { Description = n.GetStringValue(); } },
@@ -164,6 +182,8 @@ namespace GrimoireCli.Generated.Models
         {
             if(ReferenceEquals(writer, null)) throw new ArgumentNullException(nameof(writer));
             writer.WriteStringValue("attribution", Attribution);
+            writer.WriteStringValue("author", Author);
+            writer.WriteStringValue("author_url", AuthorUrl);
             writer.WriteStringValue("available_version", AvailableVersion);
             writer.WriteStringValue("blocked_reason", BlockedReason);
             writer.WriteStringValue("description", Description);
