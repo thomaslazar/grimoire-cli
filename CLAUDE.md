@@ -154,13 +154,23 @@ These rules exist because help text sits on the hot path for the agents driving 
 
 The upstream source is the authoritative reference for **behaviour and response shapes** — the half the spec does not cover (see above). The published docs have been wrong before.
 
-- Expected location: `temp/grimoire/` (gitignored). **Pin it to the version the branch targets.** On `support/grimoire-1.5.6` that is a release tag; never upstream `main`, which carries work no instance runs:
+- Expected location: `temp/grimoire/` (gitignored). **Pin it to the build the local stack is running**, never upstream `main`, which carries work no instance runs. On `support/grimoire-1.5.6` that is the release tag. On `main` the stack rides an untagged prerelease channel, so pin to the commit it reports — which is a tighter pin than a tag, and a checkable one:
   ```bash
-  # Match MinSupportedVersion / MaxTestedVersion in src/GrimoireCli/Api/GrimoireApiClient.cs
-  git clone --depth 1 --branch v1.5.6 https://github.com/hunter-read/grimoire.git temp/grimoire
+  REV=$(docker image inspect hunterreadca/grimoire:nightly \
+    --format '{{index .Config.Labels "org.opencontainers.image.revision"}}')
+  rm -rf temp/grimoire && mkdir -p temp/grimoire && cd temp/grimoire
+  git init -q && git remote add origin https://github.com/hunter-read/grimoire.git
+  git fetch --depth 1 -q origin "$REV" && git checkout -q FETCH_HEAD
   ```
-- **No spec snapshot is kept.** The spec comes from the running stack's `/api/openapi.json` at the moment it is needed — see [API client generation](#api-client-generation). A file on disk can be stale; the pinned container cannot.
-- **On `main` there is no tag to pin to yet**, so do not clone at all: the image ships its own backend source, and the digest-pinned container is by definition the exact build being targeted. Read behaviour out of it — `docker exec docker-grimoire-1 grep -n EXPIRE backend/sessions.py` — and repin a clone once 1.6.0 tags.
+  That label is nightly-only and matches the `commit_hash` in `GET /api/about`. **Verify the clone rather than trusting it** — the image ships its own source, so the two can be compared directly, and only `backend/tests` should differ because the image excludes it:
+  ```bash
+  docker cp docker-grimoire-1:/app/backend /tmp/container-backend
+  find /tmp/container-backend -name __pycache__ -type d -exec rm -rf {} +
+  diff -rq temp/grimoire/backend /tmp/container-backend
+  ```
+- **Repin whenever the stack moves.** An unpinned channel drifts, and a clone that has fallen behind answers questions confidently in the wrong version — the failure this rule exists to prevent. The `diff` above is what catches it.
+- **No spec snapshot is kept.** The spec comes from the running stack's `/api/openapi.json` at the moment it is needed — see [API client generation](#api-client-generation). A file on disk can be stale; the running container cannot.
+- **The container is always available as a second opinion**, and needs no clone at all: `docker exec docker-grimoire-1 grep -n EXPIRE backend/sessions.py`.
 - `temp/deployment-docs/` — deployment design records copied in by hand, including the live instance's URL and library structure.
 - `temp/` sits in the bind-mounted workspace and survives container rebuilds; populate it by hand.
 
