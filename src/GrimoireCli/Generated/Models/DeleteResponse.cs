@@ -17,6 +17,8 @@ namespace GrimoireCli.Generated.Models
         public IDictionary<string, object> AdditionalData { get; set; }
         /// <summary>The files property</summary>
         public int? Files { get; set; }
+        /// <summary>The files_deleted property</summary>
+        public bool? FilesDeleted { get; set; }
         /// <summary>The path property</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
@@ -34,6 +36,7 @@ namespace GrimoireCli.Generated.Models
         {
             AdditionalData = new Dictionary<string, object>();
             Files = 0;
+            FilesDeleted = true;
             Records = 0;
         }
         /// <summary>
@@ -55,6 +58,7 @@ namespace GrimoireCli.Generated.Models
             return new Dictionary<string, Action<IParseNode>>
             {
                 { "files", n => { Files = n.GetIntValue(); } },
+                { "files_deleted", n => { FilesDeleted = n.GetBoolValue(); } },
                 { "path", n => { Path = n.GetStringValue(); } },
                 { "records", n => { Records = n.GetIntValue(); } },
             };
@@ -67,6 +71,7 @@ namespace GrimoireCli.Generated.Models
         {
             if(ReferenceEquals(writer, null)) throw new ArgumentNullException(nameof(writer));
             writer.WriteIntValue("files", Files);
+            writer.WriteBoolValue("files_deleted", FilesDeleted);
             writer.WriteStringValue("path", Path);
             writer.WriteIntValue("records", Records);
             writer.WriteAdditionalData(AdditionalData);

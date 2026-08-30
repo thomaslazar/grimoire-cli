@@ -5,23 +5,23 @@
 | grimoire-cli | Grimoire | Status |
 |---|---|---|
 | 0.1.x | 1.5.6 | initial support, maintained on `support/grimoire-1.5.6` |
+| 0.2.x | 1.6.0 | current, on `main` |
 
 **One CLI version targets one server version.** Whoever stays on Grimoire 1.5.6
 stays on grimoire-cli `0.1.x`, which is maintained on `support/grimoire-1.5.6` —
 fixes are made and released there, then cherry-picked forward.
 
-`main` targets Grimoire 1.6.0, which is unreleased and needs more than a version
-bump: it shortens the access token from 30 days to 30 minutes and types every
-response in the spec. Until it tags, `docker/docker-compose.yml` on `main` pins a
-unpinned `nightly` tag — where the 1.6.0 RC lands — rather than a release. The
-spec can therefore drift under the committed client between regenerations, which
-is accepted until 1.6.0 tags and the pin becomes a release tag. See
-[grimoire-1.6.0-migration.md](grimoire-1.6.0-migration.md).
+`main` targets Grimoire 1.6.0. That was more than a version bump: it shortened the
+access token from 30 days to 30 minutes and made the library writable, which is
+why the CLI renews its own session ([authentication.md](authentication.md)) and
+why the `files` endpoints exist at all. `docker/docker-compose.yml` pins the
+`1.6.0` release tag, so the spec cannot drift under the committed client between
+regenerations.
 
 ## Runtime check
 
 `src/GrimoireCli/Api/GrimoireApiClient.cs` defines `MinSupportedVersion` and
-`MaxTestedVersion`, both currently `"1.5.6"`. A check runs before the first
+`MaxTestedVersion`, both currently `"1.6.0"`. A check runs before the first
 request of any command, calling `GET /api/about` and comparing the reported
 version against that range. It is throttled to once every 24 hours — a
 config with a recent `lastVersionCheck` skips the probe entirely — and

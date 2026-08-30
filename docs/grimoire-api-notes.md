@@ -14,8 +14,7 @@ were both examples of this at v1.5.4 — both shipped in v1.5.5, see below.
 
 ## Auth
 
-Measured against `hunterreadca/grimoire:nightly`, commit
-`7f5937071f51dfc65bc09f5e5e49d33c431f0a5d` — the 1.6.0 RC, not the v1.5.6 the
+Measured against `hunterreadca/grimoire:1.6.0` — not the v1.5.6 the
 rest of this file describes.
 
 - **`HTTPBearer`.** `POST /api/auth/login` returns `{"token": …, "user": {…}}`
@@ -404,8 +403,7 @@ and `books thumbnail`.
 
 ## Book folders
 
-Measured against `hunterreadca/grimoire:nightly`, commit
-`7f5937071f51dfc65bc09f5e5e49d33c431f0a5d` — the 1.6.0 RC, not the v1.5.6 the
+Measured against `hunterreadca/grimoire:1.6.0` — the 1.6.0 RC, not the v1.5.6 the
 rest of this file describes. Every claim below was observed against that build;
 source citations name the shipped backend inside the container. Backs
 `systems book-folders list|set|delete`.

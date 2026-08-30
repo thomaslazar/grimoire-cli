@@ -31,6 +31,14 @@ namespace GrimoireCli.Generated.Models
 #else
         public string Author { get; set; }
 #endif
+        /// <summary>The author_url property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public string? AuthorUrl { get; set; }
+#nullable restore
+#else
+        public string AuthorUrl { get; set; }
+#endif
         /// <summary>The description property</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
@@ -132,6 +140,7 @@ namespace GrimoireCli.Generated.Models
             {
                 { "app_mode", n => { AppMode = n.GetStringValue(); } },
                 { "author", n => { Author = n.GetStringValue(); } },
+                { "author_url", n => { AuthorUrl = n.GetStringValue(); } },
                 { "description", n => { Description = n.GetStringValue(); } },
                 { "grimoire_min_version", n => { GrimoireMinVersion = n.GetStringValue(); } },
                 { "id", n => { Id = n.GetStringValue(); } },
@@ -153,6 +162,7 @@ namespace GrimoireCli.Generated.Models
             if(ReferenceEquals(writer, null)) throw new ArgumentNullException(nameof(writer));
             writer.WriteStringValue("app_mode", AppMode);
             writer.WriteStringValue("author", Author);
+            writer.WriteStringValue("author_url", AuthorUrl);
             writer.WriteStringValue("description", Description);
             writer.WriteStringValue("grimoire_min_version", GrimoireMinVersion);
             writer.WriteStringValue("id", Id);

@@ -23,6 +23,8 @@ namespace GrimoireCli.Generated.Models
 #else
         public global::GrimoireCli.Generated.Models.DeleteRequest.DeleteRequest_confirm_name ConfirmName { get; set; }
 #endif
+        /// <summary>The delete_files property</summary>
+        public bool? DeleteFiles { get; set; }
         /// <summary>The path property</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
@@ -37,6 +39,7 @@ namespace GrimoireCli.Generated.Models
         public DeleteRequest()
         {
             AdditionalData = new Dictionary<string, object>();
+            DeleteFiles = false;
         }
         /// <summary>
         /// Creates a new instance of the appropriate class based on discriminator value
@@ -57,6 +60,7 @@ namespace GrimoireCli.Generated.Models
             return new Dictionary<string, Action<IParseNode>>
             {
                 { "confirm_name", n => { ConfirmName = n.GetObjectValue<global::GrimoireCli.Generated.Models.DeleteRequest.DeleteRequest_confirm_name>(global::GrimoireCli.Generated.Models.DeleteRequest.DeleteRequest_confirm_name.CreateFromDiscriminatorValue); } },
+                { "delete_files", n => { DeleteFiles = n.GetBoolValue(); } },
                 { "path", n => { Path = n.GetStringValue(); } },
             };
         }
@@ -68,6 +72,7 @@ namespace GrimoireCli.Generated.Models
         {
             if(ReferenceEquals(writer, null)) throw new ArgumentNullException(nameof(writer));
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.DeleteRequest.DeleteRequest_confirm_name>("confirm_name", ConfirmName);
+            writer.WriteBoolValue("delete_files", DeleteFiles);
             writer.WriteStringValue("path", Path);
             writer.WriteAdditionalData(AdditionalData);
         }
