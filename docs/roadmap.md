@@ -25,30 +25,14 @@ rather than a second layer. They come after duplicate handling.
 In this order. Cheapest and safest first; the destructive block only once a
 backup command exists to precede it.
 
-1. **Vocabularies** — `GET` on `genres`, `licenses`, `parent-systems`,
-   `system-families`, `dice-materials` — one per controlled vocabulary that
-   `GameSystemUpdate` accepts, `dice_materials` included. `systems update` takes
-   those fields today with nothing exposing their valid values, so they are set
-   by guesswork. Five read-only endpoints, no infrastructure risk, and it makes
-   commands that already shipped correct.
-
-   Reads only. The vocabularies are to get the full set of operations the API
-   offers — see **Vocabulary writes** below — but nothing in the books pipeline
-   waits on them, so they follow separately.
-
-   The data is Grimoire-specific: ABS has no controlled vocabularies. The
-   *command shape* is not — `abs-cli`'s `genres` / `tags` / `narrators` are each
-   a top-level group named after the vocabulary with `list` as a verb, and that
-   is what is harvested.
-
-2. **Safety** — `backups`: create, list, settings read and write, delete,
+1. **Safety** — `backups`: create, list, settings read and write, delete,
    download. Both `abs-cli` workflows open with a backup. That was optional while
-   the library was read-only and stops being optional the moment block 3 lands,
+   the library was read-only and stops being optional the moment block 2 lands,
    because that is when the CLI can move and delete real files. Writes to the
    data directory rather than the library, so it needs no remount and can ship
    first.
 
-3. **Ingest** — the `files` API: `upload`, `browse`, `move`, `rename`, `delete`,
+2. **Ingest** — the `files` API: `upload`, `browse`, `move`, `rename`, `delete`,
    and folder create / delete / markers / scaffold / contents. The front of the
    pipeline and what 1.6.0 exists for. All admin.
 
@@ -66,7 +50,7 @@ backup command exists to precede it.
    the create-then-clean-up shape the book-folders block uses, or runs stop
    converging.
 
-4. **Discovery** — `search`, plus `GET /api/tags` and
+3. **Discovery** — `search`, plus `GET /api/tags` and
    `GET /api/tags/{internal}/items`.
 
    `search` is `GET /api/campaigns/resources/search`. It lives at a campaigns URL
@@ -115,7 +99,7 @@ The verbs carry `resource_type` in their paths, so this generalises to maps,
 tokens and audio for free once those exist.
 
 **Vocabulary writes** — `create` and `delete` on each of the five vocabularies,
-completing the set the MVP's block 1 opens. Ten endpoints, all admin.
+completing the set the shipped vocabulary reads open. Ten endpoints, all admin.
 
 `create` and `delete` are the whole set: the API has no `PUT` or `PATCH` on any
 vocabulary, so there is no rename, and `abs-cli`'s `genres rename` /
