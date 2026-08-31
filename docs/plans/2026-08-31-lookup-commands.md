@@ -372,7 +372,7 @@ public class LookupCommandTests
     public void ParentSystemsWarnTheyShipEmpty()
     {
         var output = HelpRenderer.Render(Group("parent-systems"), ["parent-systems", "list"], full: false);
-        Assert.Contains("ships empty", output);
+        Assert.Contains("ships empty", output, StringComparison.OrdinalIgnoreCase);
     }
 
     [Fact]
