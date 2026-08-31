@@ -51,6 +51,8 @@ rootCommand.Subcommands.Add(SystemsCommand.Create());
 rootCommand.Subcommands.Add(BooksCommand.Create());
 rootCommand.Subcommands.Add(LibraryCommand.Create());
 rootCommand.Subcommands.Add(AddonsCommand.Create());
+foreach (var lookup in LookupCommands.Create())
+    rootCommand.Subcommands.Add(lookup);
 rootCommand.Subcommands.Add(SelfTestCommand.Create());
 
 rootCommand.AddHelpSection("Environment variables",
