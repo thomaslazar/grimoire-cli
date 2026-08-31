@@ -47,9 +47,11 @@ parameter.
 ## Lookup vocabularies
 
 Five read-only groups behind the API's `lookups` tag, each a parameterless
-GET naming one controlled vocabulary that the `--genre`, `--license`,
-`--parent-system`, `--family` and dice-material filters/fields elsewhere
-draw their values from.
+GET naming one controlled vocabulary. `systems list` filters, and the write
+fields on `systems update` and `books update`, draw their values from
+these — which vocabulary applies to which command differs (`books update`
+takes no `dice_materials` field, for one); see `systems update --help` for
+the exact mapping.
 
 | Command | Grimoire Endpoint | Description |
 |---------|-------------------|--------------|
