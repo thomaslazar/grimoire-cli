@@ -221,6 +221,11 @@ grimoire-cli config set server https://grimoire.example.com
 | `addons upgrade-all` | Upgrade every installed add-on; exit 3 if partial (admin) |
 | `addons uninstall --id <addon-id>` | Remove one add-on (admin) |
 | `addons settings [--index-url <url>] [--allow-scripts true\|false]` | Set the add-on index URL and script switch (admin) |
+| `genres list` | List the genre vocabulary (tiered via `parent_id`) |
+| `licenses list` | List the license vocabulary |
+| `parent-systems list` | List the parent-system vocabulary (ships empty) |
+| `system-families list` | List the system-family vocabulary |
+| `dice-materials list` | List the dice/material vocabulary |
 | `self-test` | Verify binary integrity (AOT validation, no network required) |
 
 Every command supports `--help` with examples and caveats.

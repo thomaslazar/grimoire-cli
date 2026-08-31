@@ -132,6 +132,11 @@ IMPLEMENTED = {
     "PATCH /api/systems/{system_id}/book-folders": "`systems book-folders set` ✅",
     "DELETE /api/systems/{system_id}/book-folders": "`systems book-folders delete` ✅",
     "GET /api/books/{book_id}/thumbnail": "`books thumbnail` ✅",
+    "GET /api/genres": "`genres list` ✅",
+    "GET /api/licenses": "`licenses list` ✅",
+    "GET /api/parent-systems": "`parent-systems list` ✅",
+    "GET /api/system-families": "`system-families list` ✅",
+    "GET /api/dice-materials": "`dice-materials list` ✅",
 }
 
 ROLE_LABEL = {
