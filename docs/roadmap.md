@@ -29,10 +29,17 @@ backup command exists to precede it.
    `system-families`, `dice-materials` — one per controlled vocabulary that
    `GameSystemUpdate` accepts, `dice_materials` included. `systems update` takes
    those fields today with nothing exposing their valid values, so they are set
-   by guesswork. Five read-only
-   endpoints, no infrastructure risk, and it makes commands that already shipped
-   correct. Grimoire-specific: ABS has no controlled vocabularies, so `abs-cli`
-   has no counterpart to harvest.
+   by guesswork. Five read-only endpoints, no infrastructure risk, and it makes
+   commands that already shipped correct.
+
+   Reads only. The vocabularies are to get the full set of operations the API
+   offers — see **Vocabulary writes** below — but nothing in the books pipeline
+   waits on them, so they follow separately.
+
+   The data is Grimoire-specific: ABS has no controlled vocabularies. The
+   *command shape* is not — `abs-cli`'s `genres` / `tags` / `narrators` are each
+   a top-level group named after the vocabulary with `list` as a verb, and that
+   is what is harvested.
 
 2. **Safety** — `backups`: create, list, settings read and write, delete,
    download. Both `abs-cli` workflows open with a backup. That was optional while
@@ -107,6 +114,26 @@ they are not interchangeable:
 The verbs carry `resource_type` in their paths, so this generalises to maps,
 tokens and audio for free once those exist.
 
+**Vocabulary writes** — `create` and `delete` on each of the five vocabularies,
+completing the set the MVP's block 1 opens. Ten endpoints, all admin.
+
+`create` and `delete` are the whole set: the API has no `PUT` or `PATCH` on any
+vocabulary, so there is no rename, and `abs-cli`'s `genres rename` /
+`tags rename` have no counterpart here to port. Verbs sit beside `list` on the
+group the reads already establish — `genres create`, `genres delete`.
+
+- `create` takes a name, 409s on a case-insensitive duplicate, and returns the
+  new entry with `is_default: false`. A genre additionally takes a `parent_id`,
+  and 404s if no such genre exists.
+- `delete` takes the entry's `id` — the one field the reads expose that nothing
+  else uses — and 409s while the value is in use, with a body carrying
+  `usage_count` and `name`, unless `force=true`.
+- **A forced delete strips nothing.** It removes the vocabulary row only; every
+  system and book carrying that name keeps it, because the value is stored as a
+  string rather than a foreign key. The response field is called
+  `removed_usage`, which reads as though it did, so this is the caveat the help
+  text has to carry. Deleting a genre does cascade to its children.
+
 **The other resource types** — maps (11 endpoints), tokens (10), audio (14).
 Three near-copies of the books shape: list, get, update, `bulk`, `bulk/tags`,
 folder tags plus a `bulk` variant books does not have, and binary getters. Cheaper
@@ -129,8 +156,6 @@ Rough notes, to be looked at when they come up.
   otherwise); what remains is applying it.
 - **`tags` writes** — create, rename display value, merge, delete. Catalogue
   hygiene after a sweep.
-- **`lookups` writes** — custom genres, licenses, families and the rest. Admin,
-  and blocked while in use unless forced.
 - **`saved-filters`** — four endpoints. A UI convenience; unclear that an agent
   wants stored filter state.
 - **Campaign linking** — `{campaign_id}/resources` and friends: link, bulk-link,
