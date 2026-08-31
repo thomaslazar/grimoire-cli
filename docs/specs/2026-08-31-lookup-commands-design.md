@@ -36,9 +36,11 @@ generated client.
 - **`PATCH` validates nothing against the lookup tables.**
   `services/bulk_service.py:apply_updates` is a blind `setattr` loop over the
   payload; no lookup table is consulted on any write path. An unmatched string
-  is stored as written and merely stops matching `systems list --genre` and the
-  server's own usage counts. The five lists are therefore conventions to agree
-  with, not enforced value sets.
+  is stored as written, and stops matching whichever `systems list` filter
+  covers that field — `--genre`, `--family`, `--parent-system`, `--license`;
+  dice materials have no filter at all — as well as the server's own usage
+  counts. The five lists are therefore conventions to agree with, not enforced
+  value sets.
 - **`parent-systems` ships empty.** `models/lookup_defaults.py` seeds defaults
   for genres, system families, licenses and dice materials, but
   `DEFAULT_PARENT_SYSTEMS` is `()`. Since `parent_system` is also folder-derived
@@ -105,8 +107,9 @@ Notes:
   Submit name, not id — systems and books store the name. id addresses the
   vocabulary entry itself.
 
-  Nothing validates a written value against this list: an unmatched string is
-  stored as written and stops matching systems list --genre.
+  Nothing validates a written value against this list: an unmatched string
+  is stored as written. Where systems list filters on the field (--genre,
+  --family, --parent-system, --license), an unmatched value stops matching.
 
   <per-vocabulary line>
 ```
