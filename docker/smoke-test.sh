@@ -80,6 +80,27 @@ jq -e . "$WORK/list.out" >/dev/null \
   || fail "systems list stdout was not valid JSON: $(cat "$WORK/list.out")"
 ok "systems list returned JSON on stdout"
 
+# The five controlled-vocabulary reads. Read-only, so this block is idempotent.
+# parent-systems is asserted present but allowed to be empty: Grimoire's
+# DEFAULT_PARENT_SYSTEMS is (), so a non-empty assertion would fail on a fresh
+# stack, while the other four are seeded.
+for pair in "genres:genres" "licenses:licenses" "parent-systems:parent_systems" \
+            "system-families:families" "dice-materials:dice_materials"; do
+  cmd="${pair%%:*}"
+  key="${pair##*:}"
+  "$CLI" "$cmd" list >"$WORK/$cmd.out" 2>"$WORK/$cmd.err" \
+    || { cat "$WORK/$cmd.err" >&2; fail "$cmd list exited non-zero"; }
+  jq -e "has(\"$key\")" "$WORK/$cmd.out" >/dev/null \
+    || fail "$cmd list did not return a .$key envelope: $(cat "$WORK/$cmd.out")"
+  if [ "$cmd" != "parent-systems" ]; then
+    jq -e ".$key | length > 0" "$WORK/$cmd.out" >/dev/null \
+      || fail "$cmd list should return the seeded defaults: $(cat "$WORK/$cmd.out")"
+    jq -e ".$key[0] | has(\"id\") and has(\"name\")" "$WORK/$cmd.out" >/dev/null \
+      || fail "$cmd list entries should carry id and name: $(cat "$WORK/$cmd.out")"
+  fi
+  ok "$cmd list returned a .$key envelope"
+done
+
 # 4b. The version check runs on a cadence, not only at login.
 jq -e '.lastServerVersion == "'"$EXPECTED_VERSION"'"' "$CONFIG" >/dev/null \
   || fail "login should have recorded the server version: $(cat "$CONFIG")"
