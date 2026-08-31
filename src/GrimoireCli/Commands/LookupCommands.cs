@@ -24,7 +24,8 @@ public static class LookupCommands
         "vocabulary entry itself.",
         "",
         "Nothing validates a written value against this list: an unmatched string",
-        "is stored as written and stops matching systems list --genre.",
+        "is stored as written. Where systems list filters on the field (--genre,",
+        "--family, --parent-system, --license), an unmatched value stops matching.",
         "",
     ];
 

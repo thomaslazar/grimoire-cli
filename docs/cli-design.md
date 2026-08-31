@@ -32,7 +32,7 @@ outside this CLI.
 
 ## Systems
 
-The only resource implemented today. Maps to `GET /api/systems` and
+The first resource implemented. Maps to `GET /api/systems` and
 `GET /api/systems/{id}`.
 
 | Command | Grimoire Endpoint | Description |

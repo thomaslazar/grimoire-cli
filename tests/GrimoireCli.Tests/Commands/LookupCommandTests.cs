@@ -4,10 +4,9 @@ using GrimoireCli.Commands;
 namespace GrimoireCli.Tests.Commands;
 
 /// <summary>
-/// The five vocabulary groups. The no-role-section assertion is the point: these
-/// are the first commands whose route is deliberately untagged
-/// (Depends(get_current_user), not require_not_guest), so a later reflexive
-/// AddRoleRequired must fail here.
+/// The five vocabulary groups. The no-role-section assertion is the point: their
+/// route is deliberately untagged (Depends(get_current_user), not
+/// require_not_guest), so a later reflexive AddRoleRequired must fail here.
 /// </summary>
 public class LookupCommandTests
 {
@@ -35,7 +34,7 @@ public class LookupCommandTests
 
     [Theory]
     [MemberData(nameof(Vocabularies))]
-    public void ListHelpRendersNotesThenExamplesThenOptions(string name)
+    public void ListHelpRendersNotesThenOptionsThenExamples(string name)
     {
         var output = HelpRenderer.Render(Group(name), [name, "list"], full: false);
         var notes = output.IndexOf("Notes:", StringComparison.Ordinal);
@@ -118,7 +117,7 @@ public class LookupCommandTests
     public void DiceMaterialsNoteTheirGroupField()
     {
         var output = HelpRenderer.Render(Group("dice-materials"), ["dice-materials", "list"], full: false);
-        Assert.Contains("group", output);
+        Assert.Contains("group buckets", output);
     }
 
     // Cross-references are one-way, consumer -> producer, so `update` is where the

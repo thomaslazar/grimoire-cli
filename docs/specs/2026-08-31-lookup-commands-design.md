@@ -157,11 +157,11 @@ producer → consumer direction is closed.
 **`tests/GrimoireCli.Tests/Commands/LookupCommandTests.cs`** — one `[Theory]`
 over the five vocabularies:
 
-- help renders Notes → Examples → Options in order and carries a Response shape
+- help renders Notes → Options → Examples in order and carries a Response shape
   section;
 - help carries **no** role section. This is the negative assertion that matters:
-  it is the first group where an untagged route is a verified decision rather
-  than an accident, so a later reflexive `AddRoleRequired` fails here.
+  the route is an untagged one that is a verified decision rather than an
+  accident, so a later reflexive `AddRoleRequired` fails here.
 - `list` parses with no errors; `--server <url>` is accepted; an unknown
   subcommand errors.
 
