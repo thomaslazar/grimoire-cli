@@ -151,6 +151,11 @@ public static class SystemsCommand
             "",
             "Prefer genres and character_builder_urls; the singles are legacy.",
             "",
+            "genres, license, parent_system, system_family and dice_materials draw",
+            "on vocabularies: genres list, licenses list, parent-systems list,",
+            "system-families list, dice-materials list. Nothing validates against",
+            "them — an unmatched value is stored as written.",
+            "",
             "Responds {\"status\": \"ok\"} and echoes nothing — read back with:",
             "grimoire-cli systems get --id <id>");
         command.AddExamples(

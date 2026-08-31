@@ -120,4 +120,24 @@ public class LookupCommandTests
         var output = HelpRenderer.Render(Group("dice-materials"), ["dice-materials", "list"], full: false);
         Assert.Contains("group", output);
     }
+
+    // Cross-references are one-way, consumer -> producer, so `update` is where the
+    // pointer at the vocabularies has to live.
+    [Fact]
+    public void SystemsUpdateNamesTheVocabularyCommands()
+    {
+        var output = HelpRenderer.Render(SystemsCommand.Create(), ["systems", "update"], full: false);
+        Assert.Contains("genres list", output);
+        Assert.Contains("dice-materials list", output);
+        Assert.Contains("stored as written", output);
+    }
+
+    [Fact]
+    public void BooksUpdateNamesOnlyTheVocabulariesItAccepts()
+    {
+        var output = HelpRenderer.Render(BooksCommand.Create(), ["books", "update"], full: false);
+        Assert.Contains("genres list", output);
+        Assert.Contains("licenses list", output);
+        Assert.DoesNotContain("dice-materials list", output);
+    }
 }

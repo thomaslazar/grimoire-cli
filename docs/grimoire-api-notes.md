@@ -519,3 +519,29 @@ Verified against v1.5.6 by reading `backend/routers/maintenance/`, backing
 - `POST /api/auth/setup` also exists and creates the first admin, failing once any
   user exists. The local stack uses the `users.json` path instead, so no bootstrap
   branch is needed in scripts.
+
+## Controlled vocabularies
+
+Read from `backend/routers/lookups/` at tag `v1.6.0`.
+
+- **Systems and books store the vocabulary `name`, not the `id`.** Every usage
+  count in `_helpers.py` matches on `name`, case-insensitively and with
+  surrounding whitespace stripped (`_matches`). The `id` a lookup read returns
+  addresses the vocabulary entry itself, which only `DELETE` needs.
+- **No write path validates a value against a vocabulary.**
+  `services/bulk_service.py:apply_updates` is a blind `setattr` loop over the
+  payload; no lookup table is consulted by `PATCH /api/systems/{id}`,
+  `PATCH /api/books/{id}` or either `bulk` endpoint. An unmatched string is
+  stored as written, and merely stops matching `?genre=` and the server's own
+  usage counts. The five lists are conventions to agree with, not enforced sets.
+- **`parent-systems` ships empty.** `models/lookup_defaults.py` seeds genres,
+  system families, licenses and dice materials, but `DEFAULT_PARENT_SYSTEMS` is
+  `()`. A container child's `parent_system` is folder-derived, so values in use
+  and values in the vocabulary diverge freely.
+- **All five reads are `Depends(get_current_user)`** — no role, guests included.
+  Only the `POST` and `DELETE` on each path are `require_admin`.
+- **A `DELETE` strips nothing.** It removes the vocabulary row only; every system
+  and book carrying that name keeps it, because the value is a string rather than
+  a foreign key. The response field is named `removed_usage` but reports the
+  count that *would* have blocked the delete. Deleting a genre cascades to its
+  child genres.
