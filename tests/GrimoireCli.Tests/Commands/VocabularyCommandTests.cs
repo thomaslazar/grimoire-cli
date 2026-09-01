@@ -45,15 +45,34 @@ public class VocabularyCommandTests
 
     [Theory]
     [MemberData(nameof(Vocabularies))]
-    public void ListHelpRendersNotesThenOptionsThenExamples(string name)
+    public void ListHelpRendersOptionsThenExamples(string name)
+    {
+        var output = HelpRenderer.Render(Group(name), [name, "list"], full: false);
+        var examples = output.IndexOf("Examples:", StringComparison.Ordinal);
+        var options = output.IndexOf("Options:", StringComparison.Ordinal);
+        Assert.True(options >= 0, "Options section missing");
+        Assert.True(examples > options, "Examples (Bottom) must render after Options");
+    }
+
+    // Only the two vocabularies with something an agent cannot read off the
+    // response sample carry Notes. The other three carry none, deliberately —
+    // restating a visible field is what the help-text rules forbid.
+    [Theory]
+    [InlineData("genres", false)]
+    [InlineData("licenses", false)]
+    [InlineData("system-families", false)]
+    [InlineData("parent-systems", true)]
+    [InlineData("dice-materials", true)]
+    public void OnlyVocabulariesWithARealCaveatCarryNotes(string name, bool expected)
     {
         var output = HelpRenderer.Render(Group(name), [name, "list"], full: false);
         var notes = output.IndexOf("Notes:", StringComparison.Ordinal);
-        var examples = output.IndexOf("Examples:", StringComparison.Ordinal);
-        var options = output.IndexOf("Options:", StringComparison.Ordinal);
-        Assert.True(notes >= 0, "Notes section missing");
-        Assert.True(options > notes, "Notes must render before Options");
-        Assert.True(examples > options, "Examples must render after Options");
+        Assert.Equal(expected, notes >= 0);
+        if (expected)
+        {
+            var options = output.IndexOf("Options:", StringComparison.Ordinal);
+            Assert.True(options > notes, "Notes (Top) must render before Options");
+        }
     }
 
     // How a value is submitted, and what happens when it does not match, are the
@@ -116,13 +135,6 @@ public class VocabularyCommandTests
     }
 
     [Fact]
-    public void GenresNoteTheirTiering()
-    {
-        var output = HelpRenderer.Render(Group("genres"), ["genres", "list"], full: false);
-        Assert.Contains("parent_id", output);
-    }
-
-    [Fact]
     public void ParentSystemsWarnTheyShipEmpty()
     {
         var output = HelpRenderer.Render(Group("parent-systems"), ["parent-systems", "list"], full: false);
@@ -130,10 +142,10 @@ public class VocabularyCommandTests
     }
 
     [Fact]
-    public void DiceMaterialsNoteTheirGroupField()
+    public void DiceMaterialsNoteTheirDefaultGroup()
     {
         var output = HelpRenderer.Render(Group("dice-materials"), ["dice-materials", "list"], full: false);
-        Assert.Contains("group buckets", output);
+        Assert.Contains("group is Custom when unset", output);
     }
 
     // Cross-references are one-way, consumer -> producer, so `update` is where the

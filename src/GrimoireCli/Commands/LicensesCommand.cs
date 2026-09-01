@@ -17,8 +17,6 @@ public static class LicensesCommand
     {
         var serverOption = new Option<string?>("--server") { Description = "Server URL override" };
         var command = new Command("list", "List all licenses") { serverOption };
-        command.AddHelpSection("Notes", HelpSectionPosition.Top,
-            "is_default false is a custom entry.");
         command.AddExamples("grimoire-cli licenses list");
         command.AddResponseExample<Generated.Models.LicensesResponse>();
         command.SetAction(async (parseResult, cancellationToken) =>

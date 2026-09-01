@@ -17,8 +17,6 @@ public static class SystemFamiliesCommand
     {
         var serverOption = new Option<string?>("--server") { Description = "Server URL override" };
         var command = new Command("list", "List all system families") { serverOption };
-        command.AddHelpSection("Notes", HelpSectionPosition.Top,
-            "is_default false is a custom entry.");
         command.AddExamples("grimoire-cli system-families list");
         command.AddResponseExample<Generated.Models.SystemFamiliesResponse>();
         command.SetAction(async (parseResult, cancellationToken) =>

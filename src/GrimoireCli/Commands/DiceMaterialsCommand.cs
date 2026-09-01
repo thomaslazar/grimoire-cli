@@ -18,7 +18,7 @@ public static class DiceMaterialsCommand
         var serverOption = new Option<string?>("--server") { Description = "Server URL override" };
         var command = new Command("list", "List all dice/materials") { serverOption };
         command.AddHelpSection("Notes", HelpSectionPosition.Top,
-            "group buckets the entry, and is Custom when unset.");
+            "group is Custom when unset.");
         command.AddExamples("grimoire-cli dice-materials list");
         command.AddResponseExample<Generated.Models.DiceMaterialsResponse>();
         command.SetAction(async (parseResult, cancellationToken) =>

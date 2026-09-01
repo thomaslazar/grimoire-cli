@@ -124,15 +124,24 @@ Notes:
   <per-vocabulary line>
 ```
 
-Per-vocabulary lines:
+Only two vocabularies carry a Note, because only two have something an agent
+cannot read off the response sample:
 
-- **genres** — `parent_id` links a child to its parent; ordered by `sort_order`,
-  then `name`.
-- **dice-materials** — `group` buckets the entry; defaults to `Custom`.
 - **parent-systems** — ships empty: Grimoire seeds no defaults, and
   `parent_system` is folder-derived for a container child, so values in use need
-  not appear here.
-- **licenses**, **system-families** — `is_default false` is a custom entry.
+  not appear here. Without this, `[]` reads as a failure.
+- **dice-materials** — `group` is `Custom` when unset. The default is applied by
+  `serialize_dice_material`, so it is invisible in a sample showing
+  `"group": "<string>"`.
+
+**genres**, **licenses** and **system-families** carry none. Glossing
+`parent_id`, `is_default` or `sort_order` would restate fields the response
+sample already shows, which the help-text rules forbid; `(tiered)` in the genres
+description does the `parent_id` note's job in one word. Ordering by
+`sort_order` then `name` is true of all five and changes nothing for an agent
+picking a value, so it is stated nowhere.
+`VocabularyCommandTests.OnlyVocabulariesWithARealCaveatCarryNotes` pins which
+three are deliberately empty.
 
 No cross-reference from these commands to `systems update`. Cross-references are
 one-way, consumer → producer, so the pointer lives on the consumer.

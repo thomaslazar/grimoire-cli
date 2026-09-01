@@ -17,8 +17,6 @@ public static class GenresCommand
     {
         var serverOption = new Option<string?>("--server") { Description = "Server URL override" };
         var command = new Command("list", "List all genres (tiered)") { serverOption };
-        command.AddHelpSection("Notes", HelpSectionPosition.Top,
-            "parent_id links a child to its parent. Ordered by sort_order, then name.");
         command.AddExamples("grimoire-cli genres list");
         command.AddResponseExample<Generated.Models.GenresResponse>();
         command.SetAction(async (parseResult, cancellationToken) =>
