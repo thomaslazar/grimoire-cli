@@ -4,24 +4,35 @@ using GrimoireCli.Commands;
 namespace GrimoireCli.Tests.Commands;
 
 /// <summary>
-/// The five vocabulary groups. The no-role-section assertion is the point: their
-/// route is deliberately untagged (Depends(get_current_user), not
-/// require_not_guest), so a later reflexive AddRoleRequired must fail here.
+/// The five vocabulary groups, each built by its own command class. The
+/// no-role-section assertion is the point: their route is deliberately untagged
+/// (Depends(get_current_user), not require_not_guest), so a later reflexive
+/// AddRoleRequired must fail here.
 /// </summary>
-public class LookupCommandTests
+public class VocabularyCommandTests
 {
     public static TheoryData<string> Vocabularies() =>
         new("genres", "licenses", "parent-systems", "system-families", "dice-materials");
 
-    private static Command Group(string name) =>
-        LookupCommands.Create().Single(c => c.Name == name);
-
-    [Fact]
-    public void CreateYieldsTheFiveVocabularyGroups()
+    /// <summary>
+    /// Resolves a group through the same factory Program.cs calls, so a class
+    /// left unregistered there is not silently covered by these tests.
+    /// </summary>
+    private static Command Group(string name) => name switch
     {
-        Assert.Equal(
-            ["genres", "licenses", "parent-systems", "system-families", "dice-materials"],
-            LookupCommands.Create().Select(c => c.Name).ToArray());
+        "genres" => GenresCommand.Create(),
+        "licenses" => LicensesCommand.Create(),
+        "parent-systems" => ParentSystemsCommand.Create(),
+        "system-families" => SystemFamiliesCommand.Create(),
+        "dice-materials" => DiceMaterialsCommand.Create(),
+        _ => throw new ArgumentException($"Unknown vocabulary '{name}'.", nameof(name)),
+    };
+
+    [Theory]
+    [MemberData(nameof(Vocabularies))]
+    public void EachGroupIsNamedForItsVocabulary(string name)
+    {
+        Assert.Equal(name, Group(name).Name);
     }
 
     [Theory]

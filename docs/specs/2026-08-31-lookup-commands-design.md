@@ -75,14 +75,28 @@ reachable. No `AddRoleRequired`.
 
 ## Components
 
-**`src/GrimoireCli/Commands/LookupCommands.cs`** — one file. `Create()` returns
-five `Command`s built from a table of (vocabulary name, summary, per-vocabulary
-Notes line, response-example registrar). The five bodies differ only in path and
-response model, so this follows `MetadataCommands.cs` — one builder,
-the varying part as a parameter, named commands out — rather than abs-cli's
-per-file split, which exists there because each group has three distinct verbs.
+**One file per group** — `GenresCommand.cs`, `LicensesCommand.cs`,
+`ParentSystemsCommand.cs`, `SystemFamiliesCommand.cs`, `DiceMaterialsCommand.cs`,
+each exposing `Create()`. This is abs-cli file-for-file, and it matches this
+repo's own unit of a command file: `CoverCommands.cs` holds `systems cover`'s
+verbs, `BookFolderCommands.cs` holds its group's.
 
-`Program.cs` adds the five in a loop.
+The alternative — one table-driven file, as `MetadataCommands.cs` does — was
+built first and then split. `MetadataCommands.cs` earns its shared builder
+because those endpoints are literally one upstream implementation against two
+targets; here the five only *resemble* each other, and only while the slice is
+read-only. Once `create` and `delete` land (see **Vocabulary writes** in
+[roadmap.md](../roadmap.md)) `genres` gains three verbs and two genre-only
+caveats — delete cascades to child genres, create 404s on an unknown
+`parent_id` — which belong beside `genres list`, not in a row shared with dice
+materials. Splitting now keeps that change purely additive.
+
+**`src/GrimoireCli/Commands/VocabularyCommand.cs`** — holds the one verb whose
+body really is identical across all five: `List(vocabulary, description, notes,
+addResponseExample)`, plus the shared Notes text. Cohesion per group without
+five copies of the same twenty lines.
+
+`Program.cs` adds the five groups explicitly, as it does every other group.
 
 **`src/GrimoireCli/Services/LookupsService.cs`** — `ListAsync(vocabulary)`
 switches to the generated builder's `ToGetRequestInformation()` and calls
