@@ -32,7 +32,7 @@ outside this CLI.
 
 ## Systems
 
-The only resource implemented today. Maps to `GET /api/systems` and
+The first resource implemented. Maps to `GET /api/systems` and
 `GET /api/systems/{id}`.
 
 | Command | Grimoire Endpoint | Description |
@@ -43,6 +43,23 @@ The only resource implemented today. Maps to `GET /api/systems` and
 Every query parameter the two endpoints accept is exposed as a flag — no
 parameter is left unmapped, and no flag exists that isn't backed by a
 parameter.
+
+## Lookup vocabularies
+
+Five read-only groups behind the API's `lookups` tag, each a parameterless
+GET naming one controlled vocabulary. `systems list` filters, and the write
+fields on `systems update` and `books update`, draw their values from
+these — which vocabulary applies to which command differs (`books update`
+takes no `dice_materials` field, for one); see `systems update --help` for
+the exact mapping.
+
+| Command | Grimoire Endpoint | Description |
+|---------|-------------------|--------------|
+| `grimoire-cli genres list` | `GET /api/genres` | List the genre vocabulary (tiered via `parent_id`) |
+| `grimoire-cli licenses list` | `GET /api/licenses` | List the license vocabulary |
+| `grimoire-cli parent-systems list` | `GET /api/parent-systems` | List the parent-system vocabulary (ships empty) |
+| `grimoire-cli system-families list` | `GET /api/system-families` | List the system-family vocabulary |
+| `grimoire-cli dice-materials list` | `GET /api/dice-materials` | List the dice/material vocabulary |
 
 ## Login / Config / Self-test
 
@@ -240,3 +257,10 @@ per that section's own instruction to record deviations where they're found:
   book/map/token files arrive on disk, then `POST /api/rescan` — not modeled
   as a CLI command yet. `systems cover upload` is a narrow exception: a cover
   image is stored separately from the library tree, on its own endpoint.
+- **Five top-level vocabulary groups, not one umbrella noun.** `genres`,
+  `licenses`, `parent-systems`, `system-families` and `dice-materials` each get
+  their own group, which is the shape abs-cli settled for `genres` / `tags` /
+  `narrators`. It sits against this file's "resource surface is short by design"
+  line above, and the parity wins: the API's own tag is `lookups`, but grouping
+  five distinct endpoints behind one noun would have made a flag select the
+  endpoint, which no other command here does.

@@ -25,7 +25,7 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | files | 0 / 10 |
 | library | 3 / 6 |
 | logs | 0 / 1 |
-| lookups | 0 / 15 |
+| lookups | 5 / 15 |
 | maintenance | 1 / 5 |
 | maps | 0 / 11 |
 | saved-filters | 0 / 4 |
@@ -36,7 +36,7 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | themes | 0 / 7 |
 | tokens | 0 / 10 |
 | users | 0 / 16 |
-| **Total** | **38 / 282** |
+| **Total** | **43 / 282** |
 
 2 operation(s) are internal-only (🔒) and excluded from covered counts.
 
@@ -301,19 +301,19 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 
 | Method | Path | Description | Perm | CLI |
 |--------|------|-------------|------|-----|
-| GET | `/api/dice-materials` | List all dice/materials |  | — |
+| GET | `/api/dice-materials` | List all dice/materials |  | `dice-materials list` ✅ |
 | POST | `/api/dice-materials` | Create a custom dice/material (admin) | admin | — |
 | DELETE | `/api/dice-materials/{material_id}` | Delete a dice/material (admin; blocked if in use unless force=true) | admin | — |
-| GET | `/api/genres` | List all genres (tiered) |  | — |
+| GET | `/api/genres` | List all genres (tiered) |  | `genres list` ✅ |
 | POST | `/api/genres` | Create a custom genre (admin) | admin | — |
 | DELETE | `/api/genres/{genre_id}` | Delete a genre (admin; blocked if in use unless force=true) | admin | — |
-| GET | `/api/licenses` | List all licenses |  | — |
+| GET | `/api/licenses` | List all licenses |  | `licenses list` ✅ |
 | POST | `/api/licenses` | Create a custom license (admin) | admin | — |
 | DELETE | `/api/licenses/{license_id}` | Delete a license (admin; blocked if in use unless force=true) | admin | — |
-| GET | `/api/parent-systems` | List all parent systems |  | — |
+| GET | `/api/parent-systems` | List all parent systems |  | `parent-systems list` ✅ |
 | POST | `/api/parent-systems` | Create a custom parent system (admin) | admin | — |
 | DELETE | `/api/parent-systems/{parent_id}` | Delete a parent system (admin; blocked if in use unless force=true) | admin | — |
-| GET | `/api/system-families` | List all system families |  | — |
+| GET | `/api/system-families` | List all system families |  | `system-families list` ✅ |
 | POST | `/api/system-families` | Create a custom system family (admin) | admin | — |
 | DELETE | `/api/system-families/{family_id}` | Delete a system family (admin; blocked if in use unless force=true) | admin | — |
 

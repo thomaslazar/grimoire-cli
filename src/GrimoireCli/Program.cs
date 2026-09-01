@@ -51,6 +51,11 @@ rootCommand.Subcommands.Add(SystemsCommand.Create());
 rootCommand.Subcommands.Add(BooksCommand.Create());
 rootCommand.Subcommands.Add(LibraryCommand.Create());
 rootCommand.Subcommands.Add(AddonsCommand.Create());
+rootCommand.Subcommands.Add(GenresCommand.Create());
+rootCommand.Subcommands.Add(LicensesCommand.Create());
+rootCommand.Subcommands.Add(ParentSystemsCommand.Create());
+rootCommand.Subcommands.Add(SystemFamiliesCommand.Create());
+rootCommand.Subcommands.Add(DiceMaterialsCommand.Create());
 rootCommand.Subcommands.Add(SelfTestCommand.Create());
 
 rootCommand.AddHelpSection("Environment variables",
