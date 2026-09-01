@@ -91,10 +91,12 @@ caveats — delete cascades to child genres, create 404s on an unknown
 `parent_id` — which belong beside `genres list`, not in a row shared with dice
 materials. Splitting now keeps that change purely additive.
 
-**`src/GrimoireCli/Commands/VocabularyCommand.cs`** — holds the one verb whose
-body really is identical across all five: `List(vocabulary, description, notes,
-addResponseExample)`, plus the shared Notes text. Cohesion per group without
-five copies of the same twenty lines.
+Each file is self-contained: its own `CreateListCommand()`, its own copy of the
+shared Notes text, a direct `AddResponseExample<T>()`. No shared builder — an
+intermediate version had one, and removing it made each file read exactly like
+`CoverCommands.cs`, at the cost of the shared caveat living in five places.
+`VocabularyCommandTests.ListHelpCarriesTheSharedCaveats` runs over all five and
+pins both shared phrases, so a copy that drifts fails.
 
 `Program.cs` adds the five groups explicitly, as it does every other group.
 
