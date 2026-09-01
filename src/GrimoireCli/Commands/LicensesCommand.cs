@@ -22,8 +22,8 @@ public static class LicensesCommand
         command.SetAction(async (parseResult, cancellationToken) =>
         {
             var (client, _) = CommandHelper.BuildClient(serverOverride: parseResult.GetValue(serverOption));
-            var service = new LookupsService(client);
-            var result = await service.ListAsync("licenses");
+            var service = new LicensesService(client);
+            var result = await service.ListAsync();
             ConsoleOutput.WriteRawJson(result);
             return 0;
         });

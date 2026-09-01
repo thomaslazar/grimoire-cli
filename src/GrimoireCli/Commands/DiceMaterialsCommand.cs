@@ -24,8 +24,8 @@ public static class DiceMaterialsCommand
         command.SetAction(async (parseResult, cancellationToken) =>
         {
             var (client, _) = CommandHelper.BuildClient(serverOverride: parseResult.GetValue(serverOption));
-            var service = new LookupsService(client);
-            var result = await service.ListAsync("dice-materials");
+            var service = new DiceMaterialsService(client);
+            var result = await service.ListAsync();
             ConsoleOutput.WriteRawJson(result);
             return 0;
         });

@@ -22,8 +22,8 @@ public static class GenresCommand
         command.SetAction(async (parseResult, cancellationToken) =>
         {
             var (client, _) = CommandHelper.BuildClient(serverOverride: parseResult.GetValue(serverOption));
-            var service = new LookupsService(client);
-            var result = await service.ListAsync("genres");
+            var service = new GenresService(client);
+            var result = await service.ListAsync();
             ConsoleOutput.WriteRawJson(result);
             return 0;
         });

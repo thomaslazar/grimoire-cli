@@ -22,8 +22,8 @@ public static class SystemFamiliesCommand
         command.SetAction(async (parseResult, cancellationToken) =>
         {
             var (client, _) = CommandHelper.BuildClient(serverOverride: parseResult.GetValue(serverOption));
-            var service = new LookupsService(client);
-            var result = await service.ListAsync("system-families");
+            var service = new SystemFamiliesService(client);
+            var result = await service.ListAsync();
             ConsoleOutput.WriteRawJson(result);
             return 0;
         });

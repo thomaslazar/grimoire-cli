@@ -99,10 +99,18 @@ between the five any more.
 
 `Program.cs` adds the five groups explicitly, as it does every other group.
 
-**`src/GrimoireCli/Services/LookupsService.cs`** — `ListAsync(vocabulary)`
-switches to the generated builder's `ToGetRequestInformation()` and calls
-`_client.SendAsync(info)`. No `permissionHint`, because there is no role
-dependency to name, and no `notFoundHint`, because no id appears in the path.
+**One service per group** — `GenresService`, `LicensesService`,
+`ParentSystemsService`, `SystemFamiliesService`, `DiceMaterialsService`, each
+with `ListAsync()` over its own generated builder. No `permissionHint`, because
+there is no role dependency to name, and no `notFoundHint`, because no id
+appears in any path.
+
+A single `LookupsService` with a `switch` on a vocabulary string came first and
+was retired with the command table: the caller already knows at compile time
+which endpoint it wants, so passing a string in to recover a builder was pure
+indirection, and the split has to reach the service layer or the layout is only
+half migrated. It also matches the repo's service-per-resource convention, and
+gives `create` / `delete` an obvious home when they land.
 
 **No generator work.** All five response samples already exist in
 `JsonExamples.g.cs` — `tools/GenerateJsonExamples` discovers every `IParsable`
@@ -192,10 +200,12 @@ over the five vocabularies:
 - `list` parses with no errors; `--server <url>` is accepted; an unknown
   subcommand errors.
 
-**`tests/GrimoireCli.Tests/Services/LookupsServiceTests.cs`** — pins each
-vocabulary to the request path its builder produces, so a client regeneration
-that moves a builder fails loudly rather than silently reading the wrong
-vocabulary.
+**`tests/GrimoireCli.Tests/Services/VocabularyServiceTests.cs`** — pins each
+service to the request path its builder produces, so a client regeneration that
+moves a builder fails loudly rather than silently reading the wrong vocabulary.
+The split made this test more valuable, not less: five near-identical services
+invite a copy that forgets to swap the builder, and every response has the same
+shape, so nothing else would notice.
 
 **`docker/smoke-test.sh`** — one read-only block, idempotent by construction. All
 five must exit 0 and emit valid JSON carrying the expected envelope key.
