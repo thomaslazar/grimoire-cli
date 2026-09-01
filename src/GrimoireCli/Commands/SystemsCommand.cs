@@ -153,8 +153,8 @@ public static class SystemsCommand
             "",
             "genres, license, parent_system, system_family and dice_materials draw",
             "on vocabularies: genres list, licenses list, parent-systems list,",
-            "system-families list, dice-materials list. Nothing validates against",
-            "them — an unmatched value is stored as written.",
+            "system-families list, dice-materials list. Submit the name, not the id.",
+            "Nothing validates against them — an unmatched value is stored as written.",
             "",
             "Responds {\"status\": \"ok\"} and echoes nothing — read back with:",
             "grimoire-cli systems get --id <id>");

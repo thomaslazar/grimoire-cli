@@ -18,13 +18,6 @@ public static class LicensesCommand
         var serverOption = new Option<string?>("--server") { Description = "Server URL override" };
         var command = new Command("list", "List all licenses") { serverOption };
         command.AddHelpSection("Notes", HelpSectionPosition.Top,
-            "Submit name, not id — systems and books store the name. id addresses the",
-            "vocabulary entry itself.",
-            "",
-            "Nothing validates a written value against this list: an unmatched string",
-            "is stored as written. Where systems list filters on the field (--genre,",
-            "--family, --parent-system, --license), an unmatched value stops matching.",
-            "",
             "is_default false is a custom entry.");
         command.AddExamples("grimoire-cli licenses list");
         command.AddResponseExample<Generated.Models.LicensesResponse>();

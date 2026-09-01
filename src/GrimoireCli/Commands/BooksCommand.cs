@@ -118,8 +118,8 @@ public static class BooksCommand
             "grimoire-cli books get --id <id>",
             "",
             "genres and license draw on vocabularies: genres list, licenses list.",
-            "Nothing validates against them — an unmatched value is stored as",
-            "written.");
+            "Submit the name, not the id. Nothing validates against them — an",
+            "unmatched value is stored as written.");
         command.AddExamples(
             "grimoire-cli books update --id <id> --input metadata.json",
             "echo '{\"title\":\"New Title\"}' | grimoire-cli books update --id <id> --stdin");

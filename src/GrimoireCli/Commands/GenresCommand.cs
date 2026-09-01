@@ -18,13 +18,6 @@ public static class GenresCommand
         var serverOption = new Option<string?>("--server") { Description = "Server URL override" };
         var command = new Command("list", "List all genres (tiered)") { serverOption };
         command.AddHelpSection("Notes", HelpSectionPosition.Top,
-            "Submit name, not id — systems and books store the name. id addresses the",
-            "vocabulary entry itself.",
-            "",
-            "Nothing validates a written value against this list: an unmatched string",
-            "is stored as written. Where systems list filters on the field (--genre,",
-            "--family, --parent-system, --license), an unmatched value stops matching.",
-            "",
             "parent_id links a child to its parent. Ordered by sort_order, then name.");
         command.AddExamples("grimoire-cli genres list");
         command.AddResponseExample<Generated.Models.GenresResponse>();

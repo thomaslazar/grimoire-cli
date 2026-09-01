@@ -18,13 +18,6 @@ public static class ParentSystemsCommand
         var serverOption = new Option<string?>("--server") { Description = "Server URL override" };
         var command = new Command("list", "List all parent systems") { serverOption };
         command.AddHelpSection("Notes", HelpSectionPosition.Top,
-            "Submit name, not id — systems and books store the name. id addresses the",
-            "vocabulary entry itself.",
-            "",
-            "Nothing validates a written value against this list: an unmatched string",
-            "is stored as written. Where systems list filters on the field (--genre,",
-            "--family, --parent-system, --license), an unmatched value stops matching.",
-            "",
             "Ships empty: Grimoire seeds no defaults, and a container child's",
             "parent_system is folder-derived, so a value in use need not appear here.");
         command.AddExamples("grimoire-cli parent-systems list");

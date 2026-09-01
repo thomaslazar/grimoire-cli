@@ -91,12 +91,11 @@ caveats — delete cascades to child genres, create 404s on an unknown
 `parent_id` — which belong beside `genres list`, not in a row shared with dice
 materials. Splitting now keeps that change purely additive.
 
-Each file is self-contained: its own `CreateListCommand()`, its own copy of the
-shared Notes text, a direct `AddResponseExample<T>()`. No shared builder — an
-intermediate version had one, and removing it made each file read exactly like
-`CoverCommands.cs`, at the cost of the shared caveat living in five places.
-`VocabularyCommandTests.ListHelpCarriesTheSharedCaveats` runs over all five and
-pins both shared phrases, so a copy that drifts fails.
+Each file is self-contained: its own `CreateListCommand()`, its own Notes, a
+direct `AddResponseExample<T>()`. No shared builder — an intermediate version
+had one, and removing it made each file read exactly like `CoverCommands.cs`.
+With the consumer caveats moved onto the update commands, nothing is duplicated
+between the five any more.
 
 `Program.cs` adds the five groups explicitly, as it does every other group.
 
@@ -113,20 +112,15 @@ cleanly, with the genre `parent_id` composed type resolving to `"<string>"`.
 
 ## Help text
 
-Two lines shared by all five, then one per vocabulary. The two shared lines are
-the caveats an agent cannot recover from the response sample: it shows `id` and
-`name` side by side without saying which one is written, and shows nothing at all
-about validation.
+One line per vocabulary, describing the response's own fields. Nothing about how
+a value is submitted or what happens when it does not match: that is the
+writer's business, and cross-references run consumer → producer only. An earlier
+version carried both caveats here — without naming a command, so it obeyed the
+letter of the rule while breaking it — and they now live on `systems update` and
+`books update`.
 
 ```
 Notes:
-  Submit name, not id — systems and books store the name. id addresses the
-  vocabulary entry itself.
-
-  Nothing validates a written value against this list: an unmatched string
-  is stored as written. Where systems list filters on the field (--genre,
-  --family, --parent-system, --license), an unmatched value stops matching.
-
   <per-vocabulary line>
 ```
 
@@ -145,11 +139,16 @@ one-way, consumer → producer, so the pointer lives on the consumer.
 
 ## Edits to shipped commands
 
-- **`systems update`** Notes gains a line: values for `genres`, `license`,
+- **`systems update`** Notes gains: values for `genres`, `license`,
   `parent_system`, `system_family` and `dice_materials` come from the five
-  `… list` commands, unvalidated, so an unmatched string is stored as written.
+  `… list` commands; **submit the name, not the id**; nothing validates against
+  them, so an unmatched string is stored as written.
 - **`books update`** Notes gains the same for `genres` and `license` only.
   `BookUpdate` carries no `parent_system`, `system_family` or `dice_materials`.
+
+These two are the only place the id-versus-name and no-validation caveats
+appear. `VocabularyCommandTests.ListHelpCarriesNoConsumerAdvice` asserts they
+have not drifted back onto the producers.
 
 Without these the new commands ship with nothing pointing at them, since the
 producer → consumer direction is closed.

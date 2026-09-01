@@ -56,13 +56,18 @@ public class VocabularyCommandTests
         Assert.True(examples > options, "Examples must render after Options");
     }
 
+    // How a value is submitted, and what happens when it does not match, are the
+    // writer's business. Cross-references run consumer -> producer, so that advice
+    // lives on systems update / books update and must not drift back here.
     [Theory]
     [MemberData(nameof(Vocabularies))]
-    public void ListHelpCarriesTheSharedCaveats(string name)
+    public void ListHelpCarriesNoConsumerAdvice(string name)
     {
         var output = HelpRenderer.Render(Group(name), [name, "list"], full: false);
-        Assert.Contains("Submit name, not id", output);
-        Assert.Contains("Nothing validates a written value", output);
+        Assert.DoesNotContain("Submit the name", output);
+        Assert.DoesNotContain("Nothing validates", output);
+        Assert.DoesNotContain("systems update", output);
+        Assert.DoesNotContain("books update", output);
     }
 
     [Theory]
@@ -139,6 +144,7 @@ public class VocabularyCommandTests
         var output = HelpRenderer.Render(SystemsCommand.Create(), ["systems", "update"], full: false);
         Assert.Contains("genres list", output);
         Assert.Contains("dice-materials list", output);
+        Assert.Contains("Submit the name, not the id", output);
         Assert.Contains("stored as written", output);
     }
 
@@ -148,6 +154,7 @@ public class VocabularyCommandTests
         var output = HelpRenderer.Render(BooksCommand.Create(), ["books", "update"], full: false);
         Assert.Contains("genres list", output);
         Assert.Contains("licenses list", output);
+        Assert.Contains("Submit the name, not the id", output);
         Assert.DoesNotContain("dice-materials list", output);
     }
 }
