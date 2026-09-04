@@ -63,14 +63,17 @@ public static class BackupSettingsCommands
         command.AddRoleRequired("admin");
         command.Validators.Add(result =>
         {
+            // GetResult asks only whether the flag appeared, so an unconvertible
+            // value reaches the framework's own parse error instead of throwing
+            // out of here.
             var given =
-                result.GetValue(scheduleOption) is not null
-                || result.GetValue(hourOption) is not null
-                || result.GetValue(minuteOption) is not null
-                || result.GetValue(weekdayOption) is not null
-                || result.GetValue(retentionCountOption) is not null
-                || result.GetValue(retentionGbOption) is not null
-                || result.GetValue(dirOption) is not null;
+                result.GetResult(scheduleOption) is not null
+                || result.GetResult(hourOption) is not null
+                || result.GetResult(minuteOption) is not null
+                || result.GetResult(weekdayOption) is not null
+                || result.GetResult(retentionCountOption) is not null
+                || result.GetResult(retentionGbOption) is not null
+                || result.GetResult(dirOption) is not null;
             if (!given)
                 result.AddError("Pass at least one field to set.");
         });

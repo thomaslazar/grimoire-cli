@@ -72,4 +72,19 @@ public class OptionHelpersTests
         Assert.Empty(parsed.Errors);
         Assert.Null(parsed.GetValue(option));
     }
+
+    // An unconvertible token must reach the framework's own parse error rather
+    // than throwing out of the validator, which Program.cs does not catch.
+    [Theory]
+    [InlineData("abc")]
+    [InlineData("")]
+    [InlineData("3.5")]
+    [InlineData("2147483648")]
+    public void RangeReportsRatherThanThrowsOnANonNumericValue(string value)
+    {
+        var option = OptionHelpers.Range("--hour", "Hour", 0, 23);
+        var command = new Command("demo") { option };
+        var parsed = command.Parse(["--hour", value]);
+        Assert.NotEmpty(parsed.Errors);
+    }
 }

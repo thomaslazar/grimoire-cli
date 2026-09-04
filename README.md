@@ -224,7 +224,7 @@ grimoire-cli config set server https://grimoire.example.com
 | `backups list` | List backups, newest first, with the directory and total size (admin) |
 | `backups create` | Take a backup now; 409 if one is already running (admin) |
 | `backups delete --id <backup-id>` | Delete one archive; irreversible, no prompt (admin) |
-| `backups download --id <backup-id> --output <path>` | Download one archive as zip; `-` for stdout (admin) |
+| `backups download --id <backup-id> --output <path\|->` | Download one archive as zip; `-` for stdout (admin) |
 | `backups settings get` | Read the backup schedule and retention settings (admin) |
 | `backups settings set [--schedule off\|hourly\|daily\|weekly] [--hour <0-23>] [--minute <0-59>] [--weekday <0-6>] [--retention-count <n>] [--retention-gb <n>] [--dir <path>]` | Configure the schedule and retention (admin) |
 | `genres list` | List the genre vocabulary (tiered via `parent_id`) |

@@ -558,6 +558,12 @@ byte-identical to `v1.6.0`.
 - **`POST /api/backups` snapshots the database under a read lock**, so writes are
   held off for its duration, and answers **409** when a backup is already in
   flight (`RuntimeError` → `HTTPException(409)`). An `OSError` becomes a 500.
+- **The archive does not contain the library.** It holds the database plus
+  `campaign_uploads`, `system_covers` and `audio_covers`
+  (`services/backup/_archive.py`), and its own manifest names the excludes:
+  `library (mounted read-only; back it up separately)`, `thumbnails` and
+  `page_cache`, the last two regenerating on demand. So a backup taken before a
+  destructive file operation protects the catalogue, not the files.
 - **`DELETE` answers 204** with no body, and is irreversible.
 - **`PUT /api/backups/settings` is a partial patch despite the method.** Every
   `BackupSettingsPatch` field is optional and omitted ones are left alone. It

@@ -12,7 +12,9 @@ Both `abs-cli` workflows open with a backup. That was optional while Grimoire's
 library was mounted read-only, and stops being optional the moment the `files`
 block lands, because that is when the CLI can move and delete real files. A
 backup writes to the data directory rather than the library, so it needs no
-remount and can ship first.
+remount and can ship first. The archive itself protects the database and
+user-authored assets, not the library tree — the files the `files` block will
+touch still need a separate backup.
 
 ## What the API does and does not offer
 

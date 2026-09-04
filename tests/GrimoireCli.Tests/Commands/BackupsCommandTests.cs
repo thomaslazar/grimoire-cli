@@ -102,6 +102,19 @@ public class BackupsCommandTests
         Assert.NotEmpty(BackupsCommand.Create().Parse(["settings", "set"]).Errors);
     }
 
+    // The unconvertible token must reach the framework's own parse error rather
+    // than throwing out of the "at least one flag" validator, which is what
+    // actually crashed the real CLI.
+    [Theory]
+    [InlineData("abc")]
+    [InlineData("")]
+    [InlineData("3.5")]
+    [InlineData("2147483648")]
+    public void SettingsSetReportsRatherThanThrowsOnANonNumericValue(string value)
+    {
+        Assert.NotEmpty(BackupsCommand.Create().Parse(["settings", "set", "--hour", value]).Errors);
+    }
+
     [Theory]
     [InlineData("--schedule", "daily")]
     [InlineData("--hour", "3")]
@@ -152,5 +165,14 @@ public class BackupsCommandTests
         Assert.Contains("left alone", output, StringComparison.OrdinalIgnoreCase);
         Assert.Contains("0=Mon", output);
         Assert.Contains("400", output);
+    }
+
+    [Theory]
+    [InlineData("get")]
+    [InlineData("set")]
+    public void TheSettingsPairCarriesAResponseShape(string leaf)
+    {
+        var output = HelpRenderer.Render(BackupsCommand.Create(), ["backups", "settings", leaf], full: true);
+        Assert.Contains("Response shape:", output);
     }
 }

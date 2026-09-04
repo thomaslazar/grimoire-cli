@@ -38,8 +38,11 @@ public static class OptionHelpers
         var option = new Option<int?>(name) { Description = description };
         option.Validators.Add(result =>
         {
-            var value = result.GetValueOrDefault<int?>();
-            if (value is null) return;
+            // Reading the token rather than the converted value: an unconvertible
+            // token ("abc", "", "3.5", one that overflows int) makes
+            // GetValueOrDefault throw out of Parse, and the framework already
+            // reports it as a parse error of its own.
+            if (result.Tokens.Count == 0 || !int.TryParse(result.Tokens[0].Value, out var value)) return;
             if (value < min || (max is not null && value > max))
                 result.AddError(max is null
                     ? $"'{value}' is not a valid value for {name}. Must be {min} or greater."
