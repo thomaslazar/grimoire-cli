@@ -78,4 +78,64 @@ public class BackupsCommandTests
     {
         Assert.Contains("Response shape:", Help(["backups", leaf], full: true));
     }
+
+    [Theory]
+    [InlineData("get")]
+    [InlineData("set")]
+    public void TheSettingsPairDeclaresTheAdminRole(string leaf)
+    {
+        var output = HelpRenderer.Render(BackupsCommand.Create(), ["backups", "settings", leaf], full: false);
+        Assert.Contains("Role required:", output);
+        Assert.Contains("admin", output);
+    }
+
+    [Fact]
+    public void TheGroupHostsTheSettingsSubgroup()
+    {
+        var settings = Assert.Single(
+            BackupsCommand.Create().Subcommands.Where(c => c.Name == "settings"));
+        Assert.Equal(["get", "set"], settings.Subcommands.Select(c => c.Name).ToArray());
+    }
+
+    [Fact]
+    public void SettingsSetErrorsWithNoFlags()
+    {
+        Assert.NotEmpty(BackupsCommand.Create().Parse(["settings", "set"]).Errors);
+    }
+
+    [Fact]
+    public void SettingsSetAcceptsASingleFlag()
+    {
+        Assert.Empty(BackupsCommand.Create().Parse(["settings", "set", "--schedule", "daily"]).Errors);
+        Assert.Empty(BackupsCommand.Create().Parse(["settings", "set", "--hour", "3"]).Errors);
+        Assert.Empty(BackupsCommand.Create().Parse(["settings", "set", "--dir", ""]).Errors);
+    }
+
+    [Fact]
+    public void SettingsSetRejectsAnUnknownSchedule()
+    {
+        Assert.NotEmpty(BackupsCommand.Create().Parse(["settings", "set", "--schedule", "fortnightly"]).Errors);
+    }
+
+    // The server clamps rather than refusing, so the CLI is the only thing that
+    // can tell the caller their value was not stored as given.
+    [Theory]
+    [InlineData("--hour", "24")]
+    [InlineData("--minute", "60")]
+    [InlineData("--weekday", "7")]
+    [InlineData("--retention-count", "-1")]
+    [InlineData("--retention-gb", "-1")]
+    public void SettingsSetRejectsOutOfRangeNumbers(string flag, string value)
+    {
+        Assert.NotEmpty(BackupsCommand.Create().Parse(["settings", "set", flag, value]).Errors);
+    }
+
+    [Fact]
+    public void SettingsSetDocumentsThePatchSemanticsAndTheLocks()
+    {
+        var output = HelpRenderer.Render(BackupsCommand.Create(), ["backups", "settings", "set"], full: false);
+        Assert.Contains("left alone", output, StringComparison.OrdinalIgnoreCase);
+        Assert.Contains("0=Mon", output);
+        Assert.Contains("400", output);
+    }
 }

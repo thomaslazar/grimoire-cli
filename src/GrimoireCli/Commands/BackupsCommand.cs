@@ -16,6 +16,7 @@ public static class BackupsCommand
         command.Subcommands.Add(CreateCreateCommand());
         command.Subcommands.Add(CreateDeleteCommand());
         command.Subcommands.Add(CreateDownloadCommand());
+        command.Subcommands.Add(BackupSettingsCommands.Create());
         return command;
     }
 
