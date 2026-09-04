@@ -40,13 +40,15 @@ public class VersionCheckCadenceTests
     public void AnUnknownVersionWarnsAboutNothing()
         => Assert.Null(GrimoireApiClient.VersionWarning(null, previous: null));
 
+    // The second literal is MaxTestedVersion, so a server-version bump lands here
+    // deliberately: whoever raises the ceiling confirms the message still names it.
     [Fact]
     public void ANewerServerNamesBothVersionsAndTheClient()
     {
         var warning = GrimoireApiClient.VersionWarning("1.7.0", previous: null);
         Assert.NotNull(warning);
         Assert.Contains("1.7.0", warning);
-        Assert.Contains("1.6.0", warning);
+        Assert.Contains("1.6.1", warning);
         Assert.Contains(GrimoireApiClient.ClientVersion, warning);
         Assert.Contains("newer grimoire-cli", warning);
     }

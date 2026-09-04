@@ -3,6 +3,7 @@
 using GrimoireCli.Generated.Api.Maps.Item.FileNamespace;
 using GrimoireCli.Generated.Api.Maps.Item.Page;
 using GrimoireCli.Generated.Api.Maps.Item.Thumbnail;
+using GrimoireCli.Generated.Api.Maps.Item.Vtt;
 using GrimoireCli.Generated.Models;
 using Microsoft.Kiota.Abstractions.Extensions;
 using Microsoft.Kiota.Abstractions.Serialization;
@@ -34,6 +35,11 @@ namespace GrimoireCli.Generated.Api.Maps.Item
         public global::GrimoireCli.Generated.Api.Maps.Item.Thumbnail.ThumbnailRequestBuilder Thumbnail
         {
             get => new global::GrimoireCli.Generated.Api.Maps.Item.Thumbnail.ThumbnailRequestBuilder(PathParameters, RequestAdapter);
+        }
+        /// <summary>The vtt property</summary>
+        public global::GrimoireCli.Generated.Api.Maps.Item.Vtt.VttRequestBuilder Vtt
+        {
+            get => new global::GrimoireCli.Generated.Api.Maps.Item.Vtt.VttRequestBuilder(PathParameters, RequestAdapter);
         }
         /// <summary>
         /// Instantiates a new <see cref="global::GrimoireCli.Generated.Api.Maps.Item.WithMap_ItemRequestBuilder"/> and sets the default values.

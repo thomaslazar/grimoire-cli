@@ -22,6 +22,8 @@ namespace GrimoireCli.Generated.Models
 #else
         public string Filename { get; set; }
 #endif
+        /// <summary>The has_thumbnail property</summary>
+        public bool? HasThumbnail { get; set; }
         /// <summary>The id property</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
@@ -52,6 +54,7 @@ namespace GrimoireCli.Generated.Models
         public SearchTokenHit()
         {
             AdditionalData = new Dictionary<string, object>();
+            HasThumbnail = false;
         }
         /// <summary>
         /// Creates a new instance of the appropriate class based on discriminator value
@@ -72,6 +75,7 @@ namespace GrimoireCli.Generated.Models
             return new Dictionary<string, Action<IParseNode>>
             {
                 { "filename", n => { Filename = n.GetStringValue(); } },
+                { "has_thumbnail", n => { HasThumbnail = n.GetBoolValue(); } },
                 { "id", n => { Id = n.GetStringValue(); } },
                 { "relative_path", n => { RelativePath = n.GetStringValue(); } },
                 { "tags", n => { Tags = n.GetCollectionOfPrimitiveValues<string>()?.AsList(); } },
@@ -85,6 +89,7 @@ namespace GrimoireCli.Generated.Models
         {
             if(ReferenceEquals(writer, null)) throw new ArgumentNullException(nameof(writer));
             writer.WriteStringValue("filename", Filename);
+            writer.WriteBoolValue("has_thumbnail", HasThumbnail);
             writer.WriteStringValue("id", Id);
             writer.WriteStringValue("relative_path", RelativePath);
             writer.WriteCollectionOfPrimitiveValues<string>("tags", Tags);

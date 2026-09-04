@@ -8,7 +8,7 @@ using System;
 namespace GrimoireCli.Generated.Models
 {
     /// <summary>
-    /// One book, as built by `_serializers.serialize_book`.
+    /// One book, as built by `_serializers.serialize_book`.The variant count comes from the mixin, so this row carries the same&quot;has other versions&quot; signal as the /books list rows do.
     /// </summary>
     [global::System.CodeDom.Compiler.GeneratedCode("Kiota", "1.0.0")]
     public partial class BookOut : IAdditionalDataHolder, IParsable
@@ -229,6 +229,8 @@ namespace GrimoireCli.Generated.Models
 #else
         public List<global::GrimoireCli.Generated.Models.Backend__routers__systems___schemas__LinkEntry> Urls { get; set; }
 #endif
+        /// <summary>The variant_count property</summary>
+        public int? VariantCount { get; set; }
         /// <summary>The version property</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
@@ -251,6 +253,7 @@ namespace GrimoireCli.Generated.Models
         public BookOut()
         {
             AdditionalData = new Dictionary<string, object>();
+            VariantCount = 0;
         }
         /// <summary>
         /// Creates a new instance of the appropriate class based on discriminator value
@@ -299,6 +302,7 @@ namespace GrimoireCli.Generated.Models
                 { "tags", n => { Tags = n.GetCollectionOfPrimitiveValues<string>()?.AsList(); } },
                 { "title", n => { Title = n.GetStringValue(); } },
                 { "urls", n => { Urls = n.GetCollectionOfObjectValues<global::GrimoireCli.Generated.Models.Backend__routers__systems___schemas__LinkEntry>(global::GrimoireCli.Generated.Models.Backend__routers__systems___schemas__LinkEntry.CreateFromDiscriminatorValue)?.AsList(); } },
+                { "variant_count", n => { VariantCount = n.GetIntValue(); } },
                 { "version", n => { Version = n.GetStringValue(); } },
                 { "year", n => { Year = n.GetObjectValue<global::GrimoireCli.Generated.Models.BookOut.BookOut_year>(global::GrimoireCli.Generated.Models.BookOut.BookOut_year.CreateFromDiscriminatorValue); } },
             };
@@ -339,6 +343,7 @@ namespace GrimoireCli.Generated.Models
             writer.WriteCollectionOfPrimitiveValues<string>("tags", Tags);
             writer.WriteStringValue("title", Title);
             writer.WriteCollectionOfObjectValues<global::GrimoireCli.Generated.Models.Backend__routers__systems___schemas__LinkEntry>("urls", Urls);
+            writer.WriteIntValue("variant_count", VariantCount);
             writer.WriteStringValue("version", Version);
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.BookOut.BookOut_year>("year", Year);
             writer.WriteAdditionalData(AdditionalData);

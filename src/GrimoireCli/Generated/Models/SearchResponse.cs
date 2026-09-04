@@ -22,6 +22,22 @@ namespace GrimoireCli.Generated.Models
 #else
         public List<global::GrimoireCli.Generated.Models.SearchAudioHit> Audio { get; set; }
 #endif
+        /// <summary>The book_matches property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public List<global::GrimoireCli.Generated.Models.SearchBookMatch>? BookMatches { get; set; }
+#nullable restore
+#else
+        public List<global::GrimoireCli.Generated.Models.SearchBookMatch> BookMatches { get; set; }
+#endif
+        /// <summary>The fields property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public List<string>? Fields { get; set; }
+#nullable restore
+#else
+        public List<string> Fields { get; set; }
+#endif
         /// <summary>The maps property</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
@@ -82,6 +98,8 @@ namespace GrimoireCli.Generated.Models
             return new Dictionary<string, Action<IParseNode>>
             {
                 { "audio", n => { Audio = n.GetCollectionOfObjectValues<global::GrimoireCli.Generated.Models.SearchAudioHit>(global::GrimoireCli.Generated.Models.SearchAudioHit.CreateFromDiscriminatorValue)?.AsList(); } },
+                { "book_matches", n => { BookMatches = n.GetCollectionOfObjectValues<global::GrimoireCli.Generated.Models.SearchBookMatch>(global::GrimoireCli.Generated.Models.SearchBookMatch.CreateFromDiscriminatorValue)?.AsList(); } },
+                { "fields", n => { Fields = n.GetCollectionOfPrimitiveValues<string>()?.AsList(); } },
                 { "maps", n => { Maps = n.GetCollectionOfObjectValues<global::GrimoireCli.Generated.Models.SearchMapHit>(global::GrimoireCli.Generated.Models.SearchMapHit.CreateFromDiscriminatorValue)?.AsList(); } },
                 { "query", n => { Query = n.GetStringValue(); } },
                 { "results", n => { Results = n.GetCollectionOfObjectValues<global::GrimoireCli.Generated.Models.SearchHit>(global::GrimoireCli.Generated.Models.SearchHit.CreateFromDiscriminatorValue)?.AsList(); } },
@@ -97,6 +115,8 @@ namespace GrimoireCli.Generated.Models
         {
             if(ReferenceEquals(writer, null)) throw new ArgumentNullException(nameof(writer));
             writer.WriteCollectionOfObjectValues<global::GrimoireCli.Generated.Models.SearchAudioHit>("audio", Audio);
+            writer.WriteCollectionOfObjectValues<global::GrimoireCli.Generated.Models.SearchBookMatch>("book_matches", BookMatches);
+            writer.WriteCollectionOfPrimitiveValues<string>("fields", Fields);
             writer.WriteCollectionOfObjectValues<global::GrimoireCli.Generated.Models.SearchMapHit>("maps", Maps);
             writer.WriteStringValue("query", Query);
             writer.WriteCollectionOfObjectValues<global::GrimoireCli.Generated.Models.SearchHit>("results", Results);
