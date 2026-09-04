@@ -92,8 +92,7 @@ public class BackupsCommandTests
     [Fact]
     public void TheGroupHostsTheSettingsSubgroup()
     {
-        var settings = Assert.Single(
-            BackupsCommand.Create().Subcommands.Where(c => c.Name == "settings"));
+        var settings = BackupsCommand.Create().Subcommands.Single(c => c.Name == "settings");
         Assert.Equal(["get", "set"], settings.Subcommands.Select(c => c.Name).ToArray());
     }
 
