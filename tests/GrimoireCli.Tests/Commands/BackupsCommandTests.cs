@@ -102,12 +102,17 @@ public class BackupsCommandTests
         Assert.NotEmpty(BackupsCommand.Create().Parse(["settings", "set"]).Errors);
     }
 
-    [Fact]
-    public void SettingsSetAcceptsASingleFlag()
+    [Theory]
+    [InlineData("--schedule", "daily")]
+    [InlineData("--hour", "3")]
+    [InlineData("--minute", "30")]
+    [InlineData("--weekday", "6")]
+    [InlineData("--retention-count", "7")]
+    [InlineData("--retention-gb", "20")]
+    [InlineData("--dir", "")]
+    public void SettingsSetAcceptsAnySingleFlagOnItsOwn(string flag, string value)
     {
-        Assert.Empty(BackupsCommand.Create().Parse(["settings", "set", "--schedule", "daily"]).Errors);
-        Assert.Empty(BackupsCommand.Create().Parse(["settings", "set", "--hour", "3"]).Errors);
-        Assert.Empty(BackupsCommand.Create().Parse(["settings", "set", "--dir", ""]).Errors);
+        Assert.Empty(BackupsCommand.Create().Parse(["settings", "set", flag, value]).Errors);
     }
 
     [Fact]
@@ -127,6 +132,17 @@ public class BackupsCommandTests
     public void SettingsSetRejectsOutOfRangeNumbers(string flag, string value)
     {
         Assert.NotEmpty(BackupsCommand.Create().Parse(["settings", "set", flag, value]).Errors);
+    }
+
+    // The rejection cases above cannot catch a bound that is too tight: --minute 60
+    // is out of range under both 0-59 and a mistaken 0-23. These pin the ceilings.
+    [Theory]
+    [InlineData("--hour", "23")]
+    [InlineData("--minute", "59")]
+    [InlineData("--weekday", "6")]
+    public void SettingsSetAcceptsTheTopOfEachRange(string flag, string value)
+    {
+        Assert.Empty(BackupsCommand.Create().Parse(["settings", "set", flag, value]).Errors);
     }
 
     [Fact]
