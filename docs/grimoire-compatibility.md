@@ -5,23 +5,28 @@
 | grimoire-cli | Grimoire | Status |
 |---|---|---|
 | 0.1.x | 1.5.6 | initial support, maintained on `support/grimoire-1.5.6` |
-| 0.2.x | 1.6.0 | current, on `main` |
+| 0.2.x | 1.6.0–1.6.1 | current, on `main` |
 
 **One CLI version targets one server version.** Whoever stays on Grimoire 1.5.6
 stays on grimoire-cli `0.1.x`, which is maintained on `support/grimoire-1.5.6` —
 fixes are made and released there, then cherry-picked forward.
 
-`main` targets Grimoire 1.6.0. That was more than a version bump: it shortened the
-access token from 30 days to 30 minutes and made the library writable, which is
-why the CLI renews its own session ([authentication.md](authentication.md)) and
-why the `files` endpoints exist at all. `docker/docker-compose.yml` pins the
-`1.6.0` release tag, so the spec cannot drift under the committed client between
-regenerations.
+`main` targets Grimoire 1.6.1. Reaching 1.6.0 was more than a version bump: it
+shortened the access token from 30 days to 30 minutes and made the library
+writable, which is why the CLI renews its own session
+([authentication.md](authentication.md)) and why the `files` endpoints exist at
+all. 1.6.1 on top of it is additive only — `BookOut` gained `variant_count`,
+`MapDetailResponse` gained `media_kind`, `GET /api/search/fields` and
+`GET /api/maps/{id}/vtt` are new, and `GET /api/search` grew metadata matching
+with `field:value` filters. Nothing was removed or renamed, so a 1.6.0 server
+still works and `MinSupportedVersion` stays there.
+`docker/docker-compose.yml` pins the `1.6.1` release tag, so the spec cannot
+drift under the committed client between regenerations.
 
 ## Runtime check
 
 `src/GrimoireCli/Api/GrimoireApiClient.cs` defines `MinSupportedVersion` and
-`MaxTestedVersion`, both currently `"1.6.0"`. A check runs before the first
+`MaxTestedVersion`, currently `"1.6.0"` and `"1.6.1"`. A check runs before the first
 request of any command, calling `GET /api/about` and comparing the reported
 version against that range. It is throttled to once every 24 hours — a
 config with a recent `lastVersionCheck` skips the probe entirely — and

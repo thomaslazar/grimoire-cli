@@ -488,7 +488,7 @@ public class GrimoireApiClient
     }
 
     private static readonly string MinSupportedVersion = "1.6.0";
-    private static readonly string MaxTestedVersion = "1.6.0";
+    private static readonly string MaxTestedVersion = "1.6.1";
 
     // The informational version carries CI's build stamp ("0.1.0+pr-1.a1b2c3d") so
     // server logs identify which build called. It lives in an assembly-level

@@ -129,10 +129,14 @@ convention is already settled. Audio additionally has cover management including
 
 Rough notes, to be looked at when they come up.
 
-- **`books search-full-text`** — `GET /api/search`, books-only, returns one hit
-  per matching *page* with a snippet, not one per book. The snippet contains
+- **`search-full-text`** — `GET /api/search`. Page-text hits come back one per
+  matching *page* with a snippet, not one per book, and the snippet carries
   literal `<mark>` HTML for the web UI, which the help text will need to warn
-  about since responses pass through unmodified.
+  about since responses pass through unmodified. No longer books-only as of
+  1.6.1: it also matches books, maps, tokens and audio on their own metadata and
+  takes `field:value` filters, where a metadata filter suppresses the page-text
+  search and `text:` forces it. `GET /api/search/fields` lists the filterable
+  fields, so the pair ship together.
 - **Book text extraction** — `toc`, `page/{n}/text`, `page/{n}/words`. All JSON,
   and what an agent needs to read a rulebook rather than catalogue it.
 - **The remaining binary endpoints** — `books/{id}/file`, `/page/{n}`. The output

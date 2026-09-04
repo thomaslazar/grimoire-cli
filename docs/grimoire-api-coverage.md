@@ -2,7 +2,7 @@
 
 Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any) that implements it.
 
-- **Reference:** spec fetched live from the pinned stack's `/api/openapi.json` (v1.6.0, 216 paths, 282 operations) and the upstream router source read from the same container. Tested range: `1.6.0` only (`GrimoireApiClient.cs`).
+- **Reference:** spec fetched live from the pinned stack's `/api/openapi.json` (v1.6.1, 219 paths, 285 operations) and the upstream router source read from the same container. Tested range: `1.6.0`-`1.6.1` (`GrimoireApiClient.cs`).
 - **Perm** column uses Grimoire's roles (`admin` / `gm or admin` / `not guest`); blank = any authenticated user. `?` = a dependency this script could not resolve.
 - ✅ = covered by a CLI command · — = not implemented · 🔒 = internal-only (no user-facing verb); 🔒 rows never count as covered.
 - **Regenerate with `tools/generate-api-coverage.py`; update `IMPLEMENTED` there in the same PR as any change to which endpoints the CLI calls.**
@@ -27,16 +27,16 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | logs | 0 / 1 |
 | lookups | 5 / 15 |
 | maintenance | 1 / 5 |
-| maps | 0 / 11 |
+| maps | 0 / 13 |
 | saved-filters | 0 / 4 |
-| search | 0 / 1 |
+| search | 0 / 2 |
 | settings | 0 / 5 |
 | systems | 14 / 15 |
 | tags | 0 / 6 |
 | themes | 0 / 7 |
 | tokens | 0 / 10 |
 | users | 0 / 16 |
-| **Total** | **43 / 282** |
+| **Total** | **43 / 285** |
 
 2 operation(s) are internal-only (🔒) and excluded from covered counts.
 
@@ -342,6 +342,8 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | GET | `/api/maps/{map_id}/file` | Download map file |  | — |
 | GET | `/api/maps/{map_id}/page/{page_num}` | Render a map page |  | — |
 | GET | `/api/maps/{map_id}/thumbnail` | Map thumbnail |  | — |
+| GET | `/api/maps/{map_id}/vtt/data` | Universal VTT grid and feature data |  | — |
+| GET | `/api/maps/{map_id}/vtt/image` | Universal VTT map image |  | — |
 
 ## saved-filters
 
@@ -357,6 +359,7 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | Method | Path | Description | Perm | CLI |
 |--------|------|-------------|------|-----|
 | GET | `/api/search` | Full-text search | not guest | — |
+| GET | `/api/search/fields` | Searchable fields | not guest | — |
 
 ## settings
 

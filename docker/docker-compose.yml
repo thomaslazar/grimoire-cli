@@ -36,7 +36,7 @@ services:
     #
     # The tag is immutable, so the spec cannot drift under the committed client
     # between regenerations — which is what the prerelease channel could not offer.
-    image: hunterreadca/grimoire:1.6.0
+    image: hunterreadca/grimoire:1.6.1
     ports:
       - "9481:9481"
     environment:

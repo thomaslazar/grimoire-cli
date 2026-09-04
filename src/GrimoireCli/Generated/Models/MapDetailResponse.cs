@@ -109,6 +109,14 @@ namespace GrimoireCli.Generated.Models
 #else
         public global::GrimoireCli.Generated.Models.MapDetailResponse.MapDetailResponse_map_type MapType { get; set; }
 #endif
+        /// <summary>The media_kind property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public string? MediaKind { get; set; }
+#nullable restore
+#else
+        public string MediaKind { get; set; }
+#endif
         /// <summary>The page_count property</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
@@ -195,6 +203,7 @@ namespace GrimoireCli.Generated.Models
         public MapDetailResponse()
         {
             AdditionalData = new Dictionary<string, object>();
+            MediaKind = "image";
         }
         /// <summary>
         /// Creates a new instance of the appropriate class based on discriminator value
@@ -228,6 +237,7 @@ namespace GrimoireCli.Generated.Models
                 { "is_missing", n => { IsMissing = n.GetBoolValue(); } },
                 { "is_pdf", n => { IsPdf = n.GetBoolValue(); } },
                 { "map_type", n => { MapType = n.GetObjectValue<global::GrimoireCli.Generated.Models.MapDetailResponse.MapDetailResponse_map_type>(global::GrimoireCli.Generated.Models.MapDetailResponse.MapDetailResponse_map_type.CreateFromDiscriminatorValue); } },
+                { "media_kind", n => { MediaKind = n.GetStringValue(); } },
                 { "page_count", n => { PageCount = n.GetObjectValue<global::GrimoireCli.Generated.Models.MapDetailResponse.MapDetailResponse_page_count>(global::GrimoireCli.Generated.Models.MapDetailResponse.MapDetailResponse_page_count.CreateFromDiscriminatorValue); } },
                 { "pixel_height", n => { PixelHeight = n.GetObjectValue<global::GrimoireCli.Generated.Models.MapDetailResponse.MapDetailResponse_pixel_height>(global::GrimoireCli.Generated.Models.MapDetailResponse.MapDetailResponse_pixel_height.CreateFromDiscriminatorValue); } },
                 { "pixel_width", n => { PixelWidth = n.GetObjectValue<global::GrimoireCli.Generated.Models.MapDetailResponse.MapDetailResponse_pixel_width>(global::GrimoireCli.Generated.Models.MapDetailResponse.MapDetailResponse_pixel_width.CreateFromDiscriminatorValue); } },
@@ -261,6 +271,7 @@ namespace GrimoireCli.Generated.Models
             writer.WriteBoolValue("is_missing", IsMissing);
             writer.WriteBoolValue("is_pdf", IsPdf);
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.MapDetailResponse.MapDetailResponse_map_type>("map_type", MapType);
+            writer.WriteStringValue("media_kind", MediaKind);
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.MapDetailResponse.MapDetailResponse_page_count>("page_count", PageCount);
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.MapDetailResponse.MapDetailResponse_pixel_height>("pixel_height", PixelHeight);
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.MapDetailResponse.MapDetailResponse_pixel_width>("pixel_width", PixelWidth);
