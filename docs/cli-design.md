@@ -61,6 +61,20 @@ the exact mapping.
 | `grimoire-cli system-families list` | `GET /api/system-families` | List the system-family vocabulary |
 | `grimoire-cli dice-materials list` | `GET /api/dice-materials` | List the dice/material vocabulary |
 
+## Backups
+
+Six commands behind the API's `backups` tag: list, create, delete, download
+and a settings read/write pair.
+
+| Command | Grimoire Endpoint | Description |
+|---------|-------------------|--------------|
+| `grimoire-cli backups list` | `GET /api/backups` | List backups, newest first, with the directory and total size |
+| `grimoire-cli backups create` | `POST /api/backups` | Take a backup now |
+| `grimoire-cli backups delete --id <backup-id>` | `DELETE /api/backups/{backup_id}` | Delete one archive |
+| `grimoire-cli backups download --id <backup-id> --output <path>` | `GET /api/backups/{backup_id}/download` | Download one archive as zip |
+| `grimoire-cli backups settings get` | `GET /api/backups/settings` | Read the backup schedule and retention settings |
+| `grimoire-cli backups settings set [--schedule off\|hourly\|daily\|weekly] [--hour <0-23>] [--minute <0-59>] [--weekday <0-6>] [--retention-count <n>] [--retention-gb <n>] [--dir <path>]` | `PUT /api/backups/settings` | Configure the schedule and retention |
+
 ## Login / Config / Self-test
 
 Not resource commands in the same sense — see

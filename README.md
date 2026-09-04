@@ -221,6 +221,12 @@ grimoire-cli config set server https://grimoire.example.com
 | `addons upgrade-all` | Upgrade every installed add-on; exit 3 if partial (admin) |
 | `addons uninstall --id <addon-id>` | Remove one add-on (admin) |
 | `addons settings [--index-url <url>] [--allow-scripts true\|false]` | Set the add-on index URL and script switch (admin) |
+| `backups list` | List backups, newest first, with the directory and total size (admin) |
+| `backups create` | Take a backup now; 409 if one is already running (admin) |
+| `backups delete --id <backup-id>` | Delete one archive; irreversible, no prompt (admin) |
+| `backups download --id <backup-id> --output <path>` | Download one archive as zip; `-` for stdout (admin) |
+| `backups settings get` | Read the backup schedule and retention settings (admin) |
+| `backups settings set [--schedule off\|hourly\|daily\|weekly] [--hour <0-23>] [--minute <0-59>] [--weekday <0-6>] [--retention-count <n>] [--retention-gb <n>] [--dir <path>]` | Configure the schedule and retention (admin) |
 | `genres list` | List the genre vocabulary (tiered via `parent_id`) |
 | `licenses list` | List the license vocabulary |
 | `parent-systems list` | List the parent-system vocabulary (ships empty) |

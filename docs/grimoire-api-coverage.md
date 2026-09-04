@@ -15,7 +15,7 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | addons | 7 / 7 |
 | audio | 0 / 14 |
 | auth | 2 / 14 |
-| backups | 0 / 6 |
+| backups | 6 / 6 |
 | bookmarks | 0 / 4 |
 | books | 11 / 16 |
 | campaigns | 0 / 91 |
@@ -36,7 +36,7 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | themes | 0 / 7 |
 | tokens | 0 / 10 |
 | users | 0 / 16 |
-| **Total** | **43 / 285** |
+| **Total** | **49 / 285** |
 
 2 operation(s) are internal-only (🔒) and excluded from covered counts.
 
@@ -100,12 +100,12 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 
 | Method | Path | Description | Perm | CLI |
 |--------|------|-------------|------|-----|
-| GET | `/api/backups` | List backups, newest first | admin | — |
-| POST | `/api/backups` | Create a backup now | admin | — |
-| GET | `/api/backups/settings` | Read backup schedule and retention settings | admin | — |
-| PUT | `/api/backups/settings` | Configure backup schedule and retention | admin | — |
-| DELETE | `/api/backups/{backup_id}` | Delete a backup archive | admin | — |
-| GET | `/api/backups/{backup_id}/download` | Download a backup archive | admin | — |
+| GET | `/api/backups` | List backups, newest first | admin | `backups list` ✅ |
+| POST | `/api/backups` | Create a backup now | admin | `backups create` ✅ |
+| GET | `/api/backups/settings` | Read backup schedule and retention settings | admin | `backups settings get` ✅ |
+| PUT | `/api/backups/settings` | Configure backup schedule and retention | admin | `backups settings set` ✅ |
+| DELETE | `/api/backups/{backup_id}` | Delete a backup archive | admin | `backups delete` ✅ |
+| GET | `/api/backups/{backup_id}/download` | Download a backup archive | admin | `backups download` ✅ |
 
 ## bookmarks
 
