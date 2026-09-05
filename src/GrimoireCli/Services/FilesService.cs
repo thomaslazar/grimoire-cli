@@ -42,7 +42,7 @@ public class FilesService
         {
             bytes = await File.ReadAllBytesAsync(filePath);
         }
-        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or ArgumentException)
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or ArgumentException or NotSupportedException)
         {
             throw new BodyInputException($"Could not read {filePath}: {ex.Message}");
         }
@@ -109,10 +109,8 @@ public class FilesService
     /// </summary>
     public async Task<string> DeleteFolderAsync(string path, string? confirmName)
     {
-        var body = new Generated.Models.DeleteFolderRequest { Path = path };
-        if (confirmName is not null)
-            body.ConfirmName = new Generated.Models.DeleteFolderRequest.DeleteFolderRequest_confirm_name { String = confirmName };
-        var info = _client.Api.Api.Files.Folder.ToDeleteRequestInformation(body);
+        var info = _client.Api.Api.Files.Folder.ToDeleteRequestInformation(
+            BuildDeleteFolderBody(path, confirmName));
         return await _client.SendAsync(info, permissionHint: AdminHint, notFoundHint: NotFoundHint);
     }
 
@@ -165,6 +163,19 @@ public class FilesService
         var body = new Generated.Models.DeleteRequest { Path = path, DeleteFiles = deleteFiles };
         if (confirmName is not null)
             body.ConfirmName = new Generated.Models.DeleteRequest.DeleteRequest_confirm_name { String = confirmName };
+        return body;
+    }
+
+    /// <summary>
+    /// confirm_name is a composed-type wrapper here too. Internal (not private)
+    /// for the same reason as BuildDeleteBody: a client regeneration must not be
+    /// able to change it silently.
+    /// </summary>
+    internal static Generated.Models.DeleteFolderRequest BuildDeleteFolderBody(string path, string? confirmName)
+    {
+        var body = new Generated.Models.DeleteFolderRequest { Path = path };
+        if (confirmName is not null)
+            body.ConfirmName = new Generated.Models.DeleteFolderRequest.DeleteFolderRequest_confirm_name { String = confirmName };
         return body;
     }
 }

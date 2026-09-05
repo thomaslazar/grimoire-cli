@@ -37,6 +37,15 @@ public class FilesServiceTests
     }
 
     [Fact]
+    public void TheUploadPathIsWhatTheBuilderProduces()
+    {
+        var body = new MultipartBody();
+        body.AddOrReplacePart("file", "application/octet-stream", new byte[] { 1 }, "a.bin");
+        Assert.Equal("http://example.test/api/files/upload",
+            Uri(Client().Api.Api.Files.Upload.ToPostRequestInformation(body)));
+    }
+
+    [Fact]
     public void BrowseSendsPathAndLimitAsQueryParameters()
     {
         var info = Client().Api.Api.Files.Browse.ToGetRequestInformation(c =>
@@ -101,5 +110,20 @@ public class FilesServiceTests
         var body = FilesService.BuildDeleteBody("books/X", "X", deleteFiles: true);
         Assert.Equal("X", body.ConfirmName?.String);
         Assert.True(body.DeleteFiles);
+    }
+
+    [Fact]
+    public void AnOmittedConfirmNameIsAbsentFromTheDeleteFolderBody()
+    {
+        var body = FilesService.BuildDeleteFolderBody("books/X", null);
+        Assert.Equal("books/X", body.Path);
+        Assert.Null(body.ConfirmName);
+    }
+
+    [Fact]
+    public void AGivenConfirmNameLandsOnTheStringBranchForDeleteFolder()
+    {
+        var body = FilesService.BuildDeleteFolderBody("books/X", "X");
+        Assert.Equal("X", body.ConfirmName?.String);
     }
 }
