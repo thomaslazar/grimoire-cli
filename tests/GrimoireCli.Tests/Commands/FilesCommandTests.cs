@@ -95,13 +95,6 @@ public class FilesCommandTests
     }
 
     [Fact]
-    public void UploadDocumentsThatItTakesOneFilePerRequest()
-    {
-        var output = Help(["files", "upload"]);
-        Assert.Contains("one file", output, StringComparison.OrdinalIgnoreCase);
-    }
-
-    [Fact]
     public void BrowseDocumentsItsCapAndTheIndexedDistinction()
     {
         var output = Help(["files", "browse"]);
@@ -167,14 +160,6 @@ public class FilesCommandTests
         Assert.Contains("--delete-files", output);
         Assert.Contains("rescan", output, StringComparison.OrdinalIgnoreCase);
         Assert.Contains("428", output);
-    }
-
-    [Fact]
-    public void MoveDocumentsThatItSkipsWhereUploadRenames()
-    {
-        var output = Help(["files", "move"]);
-        Assert.Contains("skip", output, StringComparison.OrdinalIgnoreCase);
-        Assert.Contains("upload renames", output);
     }
 
     // Each delete must name the other's opposite behaviour, or an agent reading

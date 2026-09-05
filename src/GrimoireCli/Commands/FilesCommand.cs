@@ -39,9 +39,6 @@ public static class FilesCommand
             "Capped at 2000 entries — read total and truncated before treating the",
             "listing as complete. child_count per folder stops counting at 1000.",
             "",
-            "singletons_taken reports which one-of-a-kind container kinds already",
-            "exist, and writable whether the library mount allows writes.",
-            "",
             "Dotfiles are excluded, as are sidecars (.opf, .nfo, .grimoire.yaml, an",
             "exported cover) sitting beside content with the same stem — and total is",
             "counted after that filter, so neither reports them.");
@@ -75,15 +72,8 @@ public static class FilesCommand
         };
         command.AddRoleRequired("admin");
         command.AddHelpSection("Notes", HelpSectionPosition.Top,
-            "Sends one file per request, as the server requires — loop for many, so a",
-            "failure names the file it happened on.",
-            "",
-            "Defaults to renaming on a collision and never overwrites. The server",
-            "refuses above 8 GiB with 413; this CLI reads the file into memory, so in",
-            "practice keep it under about 2 GiB.",
-            "",
-            "The file lands under a temporary name and is renamed into place once it is",
-            "fully written, so an interrupted upload leaves nothing for the scanner.");
+            "The server refuses above 8 GiB with 413; this CLI reads the file into",
+            "memory, so in practice keep it under about 2 GiB.");
         command.AddExamples(
             "grimoire-cli files upload --destination \"books/D&D 5e\" --file ./phb.pdf",
             "for f in *.pdf; do grimoire-cli files upload --destination books --file \"$f\"; done");
@@ -127,11 +117,6 @@ public static class FilesCommand
             sourcesOption, destinationOption, onConflictOption, serverOption
         };
         command.AddRoleRequired("admin");
-        command.AddHelpSection("Notes", HelpSectionPosition.Top,
-            "Defaults to skipping a collision and reporting it, where upload renames.",
-            "Never overwrites either way.",
-            "",
-            "One request for every source: moved and skipped report per path.");
         command.AddExamples(
             "grimoire-cli files move --sources books/loose.pdf --destination \"books/D&D 5e\"",
             "grimoire-cli files move --sources a.pdf b.pdf --destination books --on-conflict rename");
