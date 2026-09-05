@@ -32,8 +32,9 @@ public static class FilesCommand
         };
         command.AddRoleRequired("admin");
         command.AddHelpSection("Notes", HelpSectionPosition.Top,
-            "Merged with the index: record_id and title mark an indexed row, and their",
-            "absence marks a loose file the scanner has not taken.",
+            "Lists what is on disk, and which of it Grimoire has indexed: an entry",
+            "with record_id and title is in the catalogue; one without is present on",
+            "disk but not indexed.",
             "",
             "Capped at 2000 entries — read total and truncated before treating the",
             "listing as complete. child_count per folder stops counting at 1000.",

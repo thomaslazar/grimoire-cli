@@ -616,8 +616,10 @@ tag `v1.6.1`.
 - **`upload` is one file per request by design**, so a large import that fails
   partway can report and retry precisely. 8 GiB cap → **413**. The file lands
   under a temporary name and is renamed into place only once fully written.
-- **`browse` is DB-aware and bounded.** `record_id` marks an indexed row and its
-  absence a loose file; `limit` is silently clamped to `max(1, min(limit, 2000))`
+- **`browse` is DB-aware and bounded.** An entry carrying `record_id` is in the
+  catalogue; one without is present on disk but not indexed — which is how "did
+  my upload land *and* index?" is answerable at all. `limit` is silently clamped
+  to `max(1, min(limit, 2000))`
   and `total`/`truncated` report what was withheld. `child_count` per folder row
   stops at 1000.
 - **Container kinds** are `parent`, `one-page`, `agnostic`, `family`,

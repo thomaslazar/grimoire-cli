@@ -181,8 +181,8 @@ The caveats that cannot be read off a response sample:
 - **`move`** — defaults to **skipping** a collision, unlike `upload`; reports
   `moved` and `skipped` per source.
 - **`browse`** — capped at 2000: read `total` and `truncated` before treating the
-  listing as complete. `record_id` marks an indexed row; its absence marks a
-  loose file the scanner has not taken.
+  listing as complete. An entry carrying `record_id` is in the catalogue; one
+  without is present on disk but not indexed.
 - **`folder create`** — `one-page` and `agnostic` may exist only once;
   `browse`'s `singletons_taken` reports which are gone.
 - **`markers`** — omitted fields are left alone.
