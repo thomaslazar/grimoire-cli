@@ -6,8 +6,9 @@ namespace GrimoireCli.Services;
 /// <summary>
 /// The ten library file-management endpoints, every one require_admin. They
 /// write inside the library tree, so each one answers 409 when the library is
-/// mounted read-only — Grimoire detects that from EROFS on the write itself
-/// (services/library_fs/folders.py).
+/// mounted read-only — assert_writable in services/library_fs/paths.py probes
+/// with os.access before writing, and the write modules catch EROFS as a
+/// backstop.
 /// </summary>
 public class FilesService
 {

@@ -590,9 +590,10 @@ byte-identical to `v1.6.0`.
 Read from `backend/routers/files/core.py` and `backend/services/library_fs/` at
 tag `v1.6.1`.
 
-- **Every write here needs the library mounted read-write.** Grimoire detects a
-  read-only mount from `EROFS` on the write itself
-  (`services/library_fs/folders.py`) and answers **409**, so the mount is the
+- **Every write here needs the library mounted read-write.** Grimoire probes
+  writability up front with `os.access` (`services/library_fs/paths.py`'s
+  `assert_writable`) and answers **409**; each write module also catches `EROFS`
+  as a backstop, so an unwritable mount is refused either way. The mount is the
   only thing gating the whole API.
 - **The two deletes are not a matched pair.** `POST /api/files/delete` is *soft*
   by default: `delete_files: false` removes the indexed rows and everything keyed

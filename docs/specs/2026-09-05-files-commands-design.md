@@ -18,9 +18,10 @@ Ten endpoints, all `require_admin`.
 ## Prerequisite, now met
 
 `docker/docker-compose.yml` mounted the library `:ro` until this branch's parent
-commit, and Grimoire detects a read-only library from `EROFS` on the write
-itself (`services/library_fs/folders.py`), answering **409** — so the mount was
-the only thing gating every write here. It is now `:rw`, verified by a folder
+commit, and Grimoire refuses a read-only library with **409** — `assert_writable`
+in `services/library_fs/paths.py` probes with `os.access` before writing, and the
+write modules catch `EROFS` as a backstop — so the mount was the only thing
+gating every write here. It is now `:rw`, verified by a folder
 create answering 409 before and 200 after.
 
 ## Verified server behaviour
