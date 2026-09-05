@@ -51,6 +51,7 @@ rootCommand.Subcommands.Add(SystemsCommand.Create());
 rootCommand.Subcommands.Add(BooksCommand.Create());
 rootCommand.Subcommands.Add(LibraryCommand.Create());
 rootCommand.Subcommands.Add(AddonsCommand.Create());
+rootCommand.Subcommands.Add(BackupsCommand.Create());
 rootCommand.Subcommands.Add(GenresCommand.Create());
 rootCommand.Subcommands.Add(LicensesCommand.Create());
 rootCommand.Subcommands.Add(ParentSystemsCommand.Create());

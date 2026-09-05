@@ -101,6 +101,56 @@ for pair in "genres:genres" "licenses:licenses" "parent-systems:parent_systems" 
   ok "$cmd list returned a .$key envelope"
 done
 
+# Backups. create writes a real archive, so this creates one, exercises every
+# read against it, and deletes it again — the create-then-clean-up shape, so a
+# re-run converges instead of accumulating archives.
+"$CLI" backups settings get >"$WORK/bset.out" 2>"$WORK/bset.err" \
+  || { cat "$WORK/bset.err" >&2; fail "backups settings get exited non-zero"; }
+jq -e 'has("backup_schedule") and has("backup_dir") and has("schedule_env_locked")' "$WORK/bset.out" >/dev/null \
+  || fail "backups settings get should report settings and env locks: $(cat "$WORK/bset.out")"
+ok "backups settings get reports settings and env locks"
+
+# The fixture defaults, so this is a no-op on a seeded stack and converges.
+"$CLI" backups settings set --schedule off --hour 3 >"$WORK/bsset.out" 2>"$WORK/bsset.err" \
+  || { cat "$WORK/bsset.err" >&2; fail "backups settings set exited non-zero"; }
+jq -e '.backup_schedule == "off" and .backup_schedule_hour == 3' "$WORK/bsset.out" >/dev/null \
+  || fail "backups settings set should echo the full settings: $(cat "$WORK/bsset.out")"
+ok "backups settings set echoes the effective settings"
+
+"$CLI" backups create >"$WORK/bcreate.out" 2>"$WORK/bcreate.err" \
+  || { cat "$WORK/bcreate.err" >&2; fail "backups create exited non-zero"; }
+BACKUP_ID=$(jq -r .id "$WORK/bcreate.out")
+[ -n "$BACKUP_ID" ] && [ "$BACKUP_ID" != "null" ] \
+  || fail "backups create should return an id: $(cat "$WORK/bcreate.out")"
+ok "backups create returned a new archive"
+
+"$CLI" backups list >"$WORK/blist.out" 2>"$WORK/blist.err" \
+  || { cat "$WORK/blist.err" >&2; fail "backups list exited non-zero"; }
+jq -e --arg id "$BACKUP_ID" 'any(.backups[]; .id == $id)' "$WORK/blist.out" >/dev/null \
+  || fail "backups list should include the new archive: $(cat "$WORK/blist.out")"
+jq -e 'has("directory") and has("total_bytes")' "$WORK/blist.out" >/dev/null \
+  || fail "backups list should report directory and total_bytes"
+ok "backups list includes the new archive"
+
+"$CLI" backups download --id "$BACKUP_ID" --output "$WORK/backup.zip" >"$WORK/bdl.out" 2>"$WORK/bdl.err" \
+  || { cat "$WORK/bdl.err" >&2; fail "backups download exited non-zero"; }
+EXPECTED_BYTES=$(jq -r --arg id "$BACKUP_ID" '.backups[] | select(.id == $id) | .size_bytes' "$WORK/blist.out")
+jq -e --argjson n "$EXPECTED_BYTES" '.bytes == $n' "$WORK/bdl.out" >/dev/null \
+  || fail "download receipt should match the listed size_bytes: $(cat "$WORK/bdl.out")"
+ok "backups download wrote the archive and reported its size"
+
+"$CLI" backups delete --id "$BACKUP_ID" >"$WORK/bdel.out" 2>"$WORK/bdel.err" \
+  || { cat "$WORK/bdel.err" >&2; fail "backups delete exited non-zero"; }
+[ ! -s "$WORK/bdel.out" ] || [ "$(tr -d '[:space:]' <"$WORK/bdel.out")" = "" ] \
+  || fail "backups delete answers 204 and should print no body: $(cat "$WORK/bdel.out")"
+ok "backups delete answered 204 with no body"
+
+"$CLI" backups list >"$WORK/blist2.out" 2>/dev/null \
+  || fail "backups list exited non-zero after delete"
+jq -e --arg id "$BACKUP_ID" 'any(.backups[]; .id == $id) | not' "$WORK/blist2.out" >/dev/null \
+  || fail "the deleted archive should be gone: $(cat "$WORK/blist2.out")"
+ok "the deleted archive is gone, so the run converges"
+
 # 4b. The version check runs on a cadence, not only at login.
 jq -e '.lastServerVersion == "'"$EXPECTED_VERSION"'"' "$CONFIG" >/dev/null \
   || fail "login should have recorded the server version: $(cat "$CONFIG")"

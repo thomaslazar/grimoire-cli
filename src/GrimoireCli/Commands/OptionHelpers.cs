@@ -24,4 +24,30 @@ public static class OptionHelpers
         option.CompletionSources.Add(allowed);
         return option;
     }
+
+    /// <summary>
+    /// An integer option constrained to a range, rejected at parse time. The
+    /// backup settings fields it guards are clamped by the server rather than
+    /// refused — `routers/backups/core.py` stores `max(0, min(23, hour))` and
+    /// answers 200 — so an out-of-range value would otherwise be silently
+    /// stored as a different value. <paramref name="max"/> is null for a field
+    /// with a floor and no ceiling.
+    /// </summary>
+    public static Option<int?> Range(string name, string description, int min, int? max = null)
+    {
+        var option = new Option<int?>(name) { Description = description };
+        option.Validators.Add(result =>
+        {
+            // Reading the token rather than the converted value: an unconvertible
+            // token ("abc", "", "3.5", one that overflows int) makes
+            // GetValueOrDefault throw out of Parse, and the framework already
+            // reports it as a parse error of its own.
+            if (result.Tokens.Count == 0 || !int.TryParse(result.Tokens[0].Value, out var value)) return;
+            if (value < min || (max is not null && value > max))
+                result.AddError(max is null
+                    ? $"'{value}' is not a valid value for {name}. Must be {min} or greater."
+                    : $"'{value}' is not a valid value for {name}. Must be between {min} and {max}.");
+        });
+        return option;
+    }
 }

@@ -22,17 +22,9 @@ rather than a second layer. They come after duplicate handling.
 
 ## MVP
 
-In this order. Cheapest and safest first; the destructive block only once a
-backup command exists to precede it.
+In this order. Cheapest and safest first.
 
-1. **Safety** — `backups`: create, list, settings read and write, delete,
-   download. Both `abs-cli` workflows open with a backup. That was optional while
-   the library was read-only and stops being optional the moment block 2 lands,
-   because that is when the CLI can move and delete real files. Writes to the
-   data directory rather than the library, so it needs no remount and can ship
-   first.
-
-2. **Ingest** — the `files` API: `upload`, `browse`, `move`, `rename`, `delete`,
+1. **Ingest** — the `files` API: `upload`, `browse`, `move`, `rename`, `delete`,
    and folder create / delete / markers / scaffold / contents. The front of the
    pipeline and what 1.6.0 exists for. All admin.
 
@@ -43,14 +35,10 @@ backup command exists to precede it.
    is the "did my upload land *and* index?" check the pipeline has no answer for
    today.
 
-   **Prerequisite:** `docker/docker-compose.yml` mounts the library `:ro`, and
-   the server answers `409 The library is mounted read-only` to every write. The
-   dev stack must be remounted `:rw` before any of this can be smoke-tested, and
-   those smoke cases then write real files into the fixture tree — so they need
-   the create-then-clean-up shape the book-folders block uses, or runs stop
-   converging.
+   Its smoke cases write real files into the fixture tree, so they need the
+   create-then-clean-up shape the `backups` block uses, or runs stop converging.
 
-3. **Discovery** — `search`, plus `GET /api/tags` and
+2. **Discovery** — `search`, plus `GET /api/tags` and
    `GET /api/tags/{internal}/items`.
 
    `search` is `GET /api/campaigns/resources/search`. It lives at a campaigns URL

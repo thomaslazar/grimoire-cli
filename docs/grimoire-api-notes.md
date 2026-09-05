@@ -545,3 +545,42 @@ Read from `backend/routers/lookups/` at tag `v1.6.0`.
   a foreign key. The response field is named `removed_usage` but reports the
   count that *would* have blocked the delete. Deleting a genre cascades to its
   child genres.
+
+## Backups
+
+Read from `backend/routers/backups/core.py` and
+`backend/services/backup/_config.py` at tag `v1.6.1`; the router and service are
+byte-identical to `v1.6.0`.
+
+- **There is no restore endpoint, and no upload.** The six endpoints are list,
+  create, settings read/write, delete and download. An archive can be taken and
+  fetched; putting one back is out of band.
+- **`POST /api/backups` snapshots the database under a read lock**, so writes are
+  held off for its duration, and answers **409** when a backup is already in
+  flight (`RuntimeError` → `HTTPException(409)`). An `OSError` becomes a 500.
+- **The archive does not contain the library.** It holds the database plus
+  `campaign_uploads`, `system_covers` and `audio_covers`
+  (`services/backup/_archive.py`), and its own manifest names the excludes:
+  `library (mounted read-only; back it up separately)`, `thumbnails` and
+  `page_cache`, the last two regenerating on demand. So a backup taken before a
+  destructive file operation protects the catalogue, not the files.
+- **`DELETE` answers 204** with no body, and is irreversible.
+- **`PUT /api/backups/settings` is a partial patch despite the method.** Every
+  `BackupSettingsPatch` field is optional and omitted ones are left alone. It
+  returns the full effective settings rather than `{"status": "ok"}`.
+- **`backup_schedule_hour`, `_minute`, `_weekday` and both retentions are
+  silently clamped**, not refused: `max(0, min(23, hour))`, `min(59, minute)`,
+  `min(6, weekday)`, `max(0, …)`. The response is 200 and reports the clamped
+  value, so a caller who does not read it back cannot tell.
+- **Four fields are env-lockable** — `backup_schedule`,
+  `backup_retention_count`, `backup_retention_gb`, `backup_dir` — and writing a
+  locked one is a **400**. The clamped numeric fields are *not* lockable, and
+  both retentions are in both sets: they clamp *and* lock.
+- **`backup_schedule` is a closed set**: `off`, `hourly`, `daily`, `weekly`.
+- **`weekday` is 0=Mon … 6=Sun.**
+- **`backup_dir: ""` resets to `DATA_PATH/backups`**, and a non-empty path is
+  checked for existence and writability at save time rather than at the next
+  scheduled run.
+- **`GET /api/backups` reports `directory` and `total_bytes`** alongside the
+  rows, and each row's `version` is `"unknown"` when the archive's manifest is
+  unreadable — which is what makes a cross-version restore detectable.
