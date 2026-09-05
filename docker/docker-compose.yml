@@ -55,7 +55,11 @@ services:
       # The smoke test logs in several times; the default is 10/minute.
       - RATE_LIMIT_ENABLED=false
     volumes:
-      - ${GRIMOIRE_LIBRARY:-./library}:/library:ro
+      # Read-write because the files API needs it: Grimoire detects a read-only
+      # library from EROFS on the write itself (services/library_fs/folders.py)
+      # and answers 409, so the mount is the only thing that gates it. The
+      # fixture tree is disposable — docker/seed.sh rebuilds it.
+      - ${GRIMOIRE_LIBRARY:-./library}:/library:rw
       - ${GRIMOIRE_DATA:-./data}:/data
     networks:
       - grimoire-cli-dev

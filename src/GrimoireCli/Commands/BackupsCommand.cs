@@ -120,9 +120,6 @@ public static class BackupsCommand
         command.AddHelpSection("Notes", HelpSectionPosition.Top,
             "Serves the archive as application/zip.",
             "",
-            "There is no restore endpoint: the archive is the whole recovery path, and",
-            "putting one back is out of band.",
-            "",
             "--output - writes the zip to stdout; a path writes the file and prints",
             "{path, bytes}.");
         command.AddExamples(

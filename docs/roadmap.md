@@ -35,12 +35,8 @@ In this order. Cheapest and safest first.
    is the "did my upload land *and* index?" check the pipeline has no answer for
    today.
 
-   **Prerequisite:** `docker/docker-compose.yml` mounts the library `:ro`, and
-   the server answers `409 The library is mounted read-only` to every write. The
-   dev stack must be remounted `:rw` before any of this can be smoke-tested, and
-   those smoke cases then write real files into the fixture tree — so they need
-   the create-then-clean-up shape the book-folders block uses, or runs stop
-   converging.
+   Its smoke cases write real files into the fixture tree, so they need the
+   create-then-clean-up shape the `backups` block uses, or runs stop converging.
 
 2. **Discovery** — `search`, plus `GET /api/tags` and
    `GET /api/tags/{internal}/items`.

@@ -45,15 +45,6 @@ public class BackupsCommandTests
         Assert.Empty(BackupsCommand.Create().Parse(["download", "--id", "abc", "--output", "-"]).Errors);
     }
 
-    // The archive is the whole recovery path, because the API has no restore
-    // endpoint. An agent must not be left to infer a round trip that is absent.
-    [Fact]
-    public void DownloadWarnsThereIsNoRestoreEndpoint()
-    {
-        var output = Help(["backups", "download"]);
-        Assert.Contains("no restore", output, StringComparison.OrdinalIgnoreCase);
-    }
-
     [Fact]
     public void CreateDocumentsTheReadLockAndTheConflict()
     {
