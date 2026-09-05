@@ -17,6 +17,7 @@ public static class FilesCommand
         command.Subcommands.Add(CreateMoveCommand());
         command.Subcommands.Add(CreateRenameCommand());
         command.Subcommands.Add(CreateDeleteCommand());
+        command.Subcommands.Add(FilesFolderCommands.Create());
         return command;
     }
 

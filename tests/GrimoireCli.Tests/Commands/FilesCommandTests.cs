@@ -160,4 +160,89 @@ public class FilesCommandTests
         var output = Help(["files", "move"]);
         Assert.Contains("skip", output, StringComparison.OrdinalIgnoreCase);
     }
+
+    // Each delete must name the other's opposite behaviour, or an agent reading
+    // only one of them assumes they match. Both directions are pinned.
+    [Fact]
+    public void FileDeleteNamesTheFolderDeleteContrast()
+    {
+        Assert.Contains("folder delete", Help(["files", "delete"]));
+    }
+
+    [Theory]
+    [InlineData("create")]
+    [InlineData("delete")]
+    [InlineData("markers")]
+    [InlineData("scaffold")]
+    [InlineData("contents")]
+    public void EveryFolderCommandDeclaresTheAdminRole(string leaf)
+    {
+        var output = HelpRenderer.Render(FilesCommand.Create(), ["files", "folder", leaf], full: false);
+        Assert.Contains("Role required:", output);
+        Assert.Contains("admin", output);
+    }
+
+    [Fact]
+    public void TheGroupHostsTheFolderSubgroup()
+    {
+        var folder = FilesCommand.Create().Subcommands.Single(c => c.Name == "folder");
+        Assert.Equal(
+            ["create", "delete", "markers", "scaffold", "contents"],
+            folder.Subcommands.Select(c => c.Name).ToArray());
+    }
+
+    [Fact]
+    public void FolderCreateRequiresParentAndName()
+    {
+        Assert.NotEmpty(FilesCommand.Create().Parse(["folder", "create", "--parent", "books"]).Errors);
+        Assert.Empty(FilesCommand.Create().Parse(["folder", "create", "--parent", "books", "--name", "X"]).Errors);
+    }
+
+    [Theory]
+    [InlineData("parent")]
+    [InlineData("one-page")]
+    [InlineData("agnostic")]
+    [InlineData("family")]
+    [InlineData("publisher")]
+    [InlineData("generic")]
+    public void FolderCreateAcceptsEveryContainerKind(string kind)
+    {
+        Assert.Empty(FilesCommand.Create().Parse(
+            ["folder", "create", "--parent", "books", "--name", "X", "--container-kind", kind]).Errors);
+    }
+
+    [Fact]
+    public void FolderCreateRejectsAnUnknownContainerKind()
+    {
+        Assert.NotEmpty(FilesCommand.Create().Parse(
+            ["folder", "create", "--parent", "books", "--name", "X", "--container-kind", "shelf"]).Errors);
+    }
+
+    // The one-of-a-kind kinds are the trap: a second one is refused server-side.
+    [Fact]
+    public void FolderCreateDocumentsTheSingletonKinds()
+    {
+        var output = HelpRenderer.Render(FilesCommand.Create(), ["files", "folder", "create"], full: false);
+        Assert.Contains("one-page", output);
+        Assert.Contains("singletons_taken", output);
+    }
+
+    // files delete is soft by default; this one never is, and only its own help
+    // can say so where an agent will read it.
+    [Fact]
+    public void FolderDeleteDocumentsThatItAlwaysRemovesTheFiles()
+    {
+        var output = HelpRenderer.Render(FilesCommand.Create(), ["files", "folder", "delete"], full: false);
+        Assert.Contains("428", output);
+        Assert.Contains("files delete", output);
+    }
+
+    [Fact]
+    public void FolderMarkersAndContentsAndScaffoldRequireAPath()
+    {
+        Assert.NotEmpty(FilesCommand.Create().Parse(["folder", "markers"]).Errors);
+        Assert.NotEmpty(FilesCommand.Create().Parse(["folder", "scaffold"]).Errors);
+        Assert.NotEmpty(FilesCommand.Create().Parse(["folder", "contents"]).Errors);
+        Assert.Empty(FilesCommand.Create().Parse(["folder", "markers", "--path", "a"]).Errors);
+    }
 }
