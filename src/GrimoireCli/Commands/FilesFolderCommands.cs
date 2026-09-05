@@ -15,6 +15,11 @@ public static class FilesFolderCommands
     private static readonly string[] ContainerKinds =
         ["parent", "one-page", "agnostic", "family", "publisher", "generic"];
 
+    // markers can clear a marker, which the server expresses as an empty
+    // container_kind (folders.py removes every marker and writes none). create
+    // cannot: a new folder has nothing to clear.
+    private static readonly string[] MarkerContainerKinds = [.. ContainerKinds, ""];
+
     public static Command Create()
     {
         var command = new Command("folder", "Folders in the library tree");
@@ -96,7 +101,7 @@ public static class FilesFolderCommands
     private static Command CreateMarkersCommand()
     {
         var pathOption = new Option<string>("--path") { Description = "Folder to mark", Required = true };
-        var containerKindOption = OptionHelpers.Choice("--container-kind", "Container kind; \"\" clears it", ContainerKinds);
+        var containerKindOption = OptionHelpers.Choice("--container-kind", "Container kind; pass \"\" to clear it", MarkerContainerKinds);
         var nsfwOption = new Option<bool?>("--nsfw") { Description = "NSFW flag (true | false)" };
         var serverOption = new Option<string?>("--server") { Description = "Server URL override" };
         var command = new Command("markers", "Set a folder's container/NSFW markers")

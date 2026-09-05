@@ -21,9 +21,24 @@ public class FilesCommandTests
     [Theory]
     [InlineData("browse")]
     [InlineData("upload")]
+    [InlineData("move")]
+    [InlineData("rename")]
+    [InlineData("delete")]
     public void EveryCommandCarriesAResponseShape(string leaf)
     {
         Assert.Contains("Response shape:", Help(["files", leaf], full: true));
+    }
+
+    [Theory]
+    [InlineData("create")]
+    [InlineData("delete")]
+    [InlineData("markers")]
+    [InlineData("scaffold")]
+    [InlineData("contents")]
+    public void EveryFolderCommandCarriesAResponseShape(string leaf)
+    {
+        var output = HelpRenderer.Render(FilesCommand.Create(), ["files", "folder", leaf], full: true);
+        Assert.Contains("Response shape:", output);
     }
 
     // --path is optional: the server lists the library root for an empty path.
@@ -159,6 +174,7 @@ public class FilesCommandTests
     {
         var output = Help(["files", "move"]);
         Assert.Contains("skip", output, StringComparison.OrdinalIgnoreCase);
+        Assert.Contains("upload renames", output);
     }
 
     // Each delete must name the other's opposite behaviour, or an agent reading
@@ -244,5 +260,21 @@ public class FilesCommandTests
         Assert.NotEmpty(FilesCommand.Create().Parse(["folder", "scaffold"]).Errors);
         Assert.NotEmpty(FilesCommand.Create().Parse(["folder", "contents"]).Errors);
         Assert.Empty(FilesCommand.Create().Parse(["folder", "markers", "--path", "a"]).Errors);
+    }
+
+    // Clearing a marker is expressed as an empty container_kind, and markers is
+    // the only command that can do it — create has nothing to clear.
+    [Fact]
+    public void FolderMarkersAcceptsAnEmptyContainerKindToClear()
+    {
+        Assert.Empty(FilesCommand.Create().Parse(
+            ["folder", "markers", "--path", "a", "--container-kind", ""]).Errors);
+    }
+
+    [Fact]
+    public void FolderCreateStillRejectsAnEmptyContainerKind()
+    {
+        Assert.NotEmpty(FilesCommand.Create().Parse(
+            ["folder", "create", "--parent", "books", "--name", "X", "--container-kind", ""]).Errors);
     }
 }

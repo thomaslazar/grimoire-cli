@@ -7,7 +7,7 @@ namespace GrimoireCli.Commands;
 public static class FilesCommand
 {
     private static readonly NLog.Logger _logger = NLog.LogManager.GetCurrentClassLogger();
-    internal static readonly string[] ConflictPolicies = ["skip", "rename"];
+    private static readonly string[] ConflictPolicies = ["skip", "rename"];
 
     public static Command Create()
     {
@@ -39,7 +39,11 @@ public static class FilesCommand
             "listing as complete. child_count per folder stops counting at 1000.",
             "",
             "singletons_taken reports which one-of-a-kind container kinds already",
-            "exist, and writable whether the library mount allows writes.");
+            "exist, and writable whether the library mount allows writes.",
+            "",
+            "Dotfiles are excluded, as are sidecars (.opf, .nfo, .grimoire.yaml, an",
+            "exported cover) sitting beside content with the same stem — and total is",
+            "counted after that filter, so neither reports them.");
         command.AddExamples(
             "grimoire-cli files browse",
             "grimoire-cli files browse --path books --limit 100");
@@ -73,7 +77,9 @@ public static class FilesCommand
             "Sends one file per request, as the server requires — loop for many, so a",
             "failure names the file it happened on.",
             "",
-            "Defaults to renaming on a collision and never overwrites. 413 above 8 GiB.",
+            "Defaults to renaming on a collision and never overwrites. The server",
+            "refuses above 8 GiB with 413; this CLI reads the file into memory, so in",
+            "practice keep it under about 2 GiB.",
             "",
             "The file lands under a temporary name and is renamed into place once it is",
             "fully written, so an interrupted upload leaves nothing for the scanner.");
@@ -154,7 +160,8 @@ public static class FilesCommand
         };
         command.AddRoleRequired("admin");
         command.AddHelpSection("Notes", HelpSectionPosition.Top,
-            "records reports how many indexed rows followed the rename.");
+            "The records count is how many indexed rows followed the rename.",
+            "Sidecars beside the file are renamed with it.");
         command.AddExamples("grimoire-cli files rename --path books/old.pdf --new-name new.pdf");
         command.AddResponseExample<Generated.Models.RenameResponse>();
         command.SetAction(async (parseResult, cancellationToken) =>
