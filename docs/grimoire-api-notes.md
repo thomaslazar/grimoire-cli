@@ -584,3 +584,47 @@ byte-identical to `v1.6.0`.
 - **`GET /api/backups` reports `directory` and `total_bytes`** alongside the
   rows, and each row's `version` is `"unknown"` when the archive's manifest is
   unreadable — which is what makes a cross-version restore detectable.
+
+## Files
+
+Read from `backend/routers/files/core.py` and `backend/services/library_fs/` at
+tag `v1.6.1`.
+
+- **Every write here needs the library mounted read-write.** Grimoire detects a
+  read-only mount from `EROFS` on the write itself
+  (`services/library_fs/folders.py`) and answers **409**, so the mount is the
+  only thing gating the whole API.
+- **The two deletes are not a matched pair.** `POST /api/files/delete` is *soft*
+  by default: `delete_files: false` removes the indexed rows and everything keyed
+  to them, the files stay, and the next rescan re-adds whatever is still on disk.
+  `DELETE /api/files/folder` calls the same `fs.delete_path` that
+  `delete_files: true` does, so **it always unlinks** and has no soft form.
+- **A hard delete is not a trash move.** The file is unlinked, and the row goes
+  with its tags, favorites, bookmarks, progress and campaign links.
+- **428 `confirm_required`** guards a folder that still holds content, until
+  `confirm_name` matches the folder's own name. An empty folder, or one holding
+  only markers and empty descendants, needs no confirmation.
+- **The `on_conflict` defaults differ by endpoint**, deliberately: `upload`
+  defaults to `rename` (an upload is an explicit "add this"), `move` to `skip` (a
+  bulk reorganisation should step over a collision and report it). Neither ever
+  overwrites — `_dest_for` has no overwrite branch.
+- **`upload` does not validate `on_conflict`; `move` does.** `move`'s schema
+  carries `pattern="^(skip|rename)$"` and 422s on anything else. `upload`'s is a
+  bare `Form(...)` field, and `_dest_for` treats anything that is not `"skip"` as
+  rename — so an unknown value silently renames and answers 200.
+- **`upload` is one file per request by design**, so a large import that fails
+  partway can report and retry precisely. 8 GiB cap → **413**. The file lands
+  under a temporary name and is renamed into place only once fully written.
+- **`browse` is DB-aware and bounded.** `record_id` marks an indexed row and its
+  absence a loose file; `limit` is silently clamped to `max(1, min(limit, 2000))`
+  and `total`/`truncated` report what was withheld. `child_count` per folder row
+  stops at 1000.
+- **Container kinds** are `parent`, `one-page`, `agnostic`, `family`,
+  `publisher`, `generic`. **`one-page` and `agnostic` are singletons** — only one
+  of each may exist, recognised only at the top level of `books/`, and `browse`
+  reports `singletons_taken` as `{kind: path}`.
+- **`scaffold` is idempotent**, creating Core, Supplements, Adventures, Character
+  Sheets, Maps, Handouts, Homebrew and Starter Sets, and reporting `created` and
+  `existing`.
+- **`DELETE /api/files/folder` carries a request body**, which is unusual for a
+  DELETE and is what the generated builder expects.

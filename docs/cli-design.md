@@ -75,6 +75,25 @@ and a settings read/write pair.
 | `grimoire-cli backups settings get` | `GET /api/backups/settings` | Read the backup schedule and retention settings |
 | `grimoire-cli backups settings set [--schedule off\|hourly\|daily\|weekly] [--hour <0-23>] [--minute <0-59>] [--weekday <0-6>] [--retention-count <n>] [--retention-gb <n>] [--dir <path>]` | `PUT /api/backups/settings` | Configure the schedule and retention |
 
+## Files
+
+Ten commands behind the API's `files` tag: browse, upload, move, rename, a
+soft/hard delete pair, and a `folder` subgroup for create, delete, markers,
+scaffold and contents.
+
+| Command | Grimoire Endpoint | Description |
+|---------|-------------------|--------------|
+| `grimoire-cli files browse [--path <path>] [--limit <1-2000>]` | `GET /api/files/browse` | List a library folder, merged with indexing state |
+| `grimoire-cli files upload --destination <path> --file <path> [--relative-dir <path>] [--on-conflict skip\|rename]` | `POST /api/files/upload` | Upload one file; loop for many |
+| `grimoire-cli files move --sources <path>... --destination <path> [--on-conflict skip\|rename]` | `POST /api/files/move` | Move files or folders, keeping their metadata |
+| `grimoire-cli files rename --path <path> --new-name <name>` | `POST /api/files/rename` | Rename a file or folder on disk |
+| `grimoire-cli files delete --path <path> [--confirm-name <name>] [--delete-files]` | `POST /api/files/delete` | Drop index rows; `--delete-files` also unlinks, irreversibly |
+| `grimoire-cli files folder create --parent <path> --name <name> [--container-kind <kind>] [--nsfw]` | `POST /api/files/folder` | Create a folder, optionally a container or NSFW |
+| `grimoire-cli files folder delete --path <path> [--confirm-name <name>]` | `DELETE /api/files/folder` | Delete a folder and its files; always irreversible |
+| `grimoire-cli files folder markers --path <path> [--container-kind <kind>] [--nsfw true\|false]` | `PUT /api/files/folder/markers` | Set a folder's container/NSFW markers |
+| `grimoire-cli files folder scaffold --path <path>` | `POST /api/files/folder/scaffold` | Create the standard category folders |
+| `grimoire-cli files folder contents --path <path>` | `GET /api/files/folder/contents` | Report whether a folder holds content |
+
 ## Login / Config / Self-test
 
 Not resource commands in the same sense — see

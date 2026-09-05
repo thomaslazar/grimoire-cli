@@ -227,6 +227,16 @@ grimoire-cli config set server https://grimoire.example.com
 | `backups download --id <backup-id> --output <path\|->` | Download one archive as zip; `-` for stdout (admin) |
 | `backups settings get` | Read the backup schedule and retention settings (admin) |
 | `backups settings set [--schedule off\|hourly\|daily\|weekly] [--hour <0-23>] [--minute <0-59>] [--weekday <0-6>] [--retention-count <n>] [--retention-gb <n>] [--dir <path>]` | Configure the schedule and retention (admin) |
+| `files browse [--path <path>] [--limit <1-2000>]` | List a library folder, merged with indexing state (admin) |
+| `files upload --destination <path> --file <path> [--relative-dir <path>] [--on-conflict skip\|rename]` | Upload one file; loop for many (admin) |
+| `files move --sources <path>... --destination <path> [--on-conflict skip\|rename]` | Move files or folders, keeping their metadata (admin) |
+| `files rename --path <path> --new-name <name>` | Rename a file or folder on disk (admin) |
+| `files delete --path <path> [--confirm-name <name>] [--delete-files]` | Drop index rows; `--delete-files` also unlinks, irreversibly (admin) |
+| `files folder create --parent <path> --name <name> [--container-kind <kind>] [--nsfw]` | Create a folder, optionally a container or NSFW (admin) |
+| `files folder delete --path <path> [--confirm-name <name>]` | Delete a folder and its files; always irreversible (admin) |
+| `files folder markers --path <path> [--container-kind <kind>] [--nsfw true\|false]` | Set a folder's container/NSFW markers (admin) |
+| `files folder scaffold --path <path>` | Create the standard category folders (admin) |
+| `files folder contents --path <path>` | Report whether a folder holds content (admin) |
 | `genres list` | List the genre vocabulary (tiered via `parent_id`) |
 | `licenses list` | List the license vocabulary |
 | `parent-systems list` | List the parent-system vocabulary (ships empty) |
