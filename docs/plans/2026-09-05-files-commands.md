@@ -404,7 +404,7 @@ git commit -m "feat: add the files service"
 - Test: `tests/GrimoireCli.Tests/Commands/FilesCommandTests.cs`
 
 **Interfaces:**
-- Consumes: `FilesService.BrowseAsync`, `UploadAsync`; `OptionHelpers.Range`, `OptionHelpers.Choice`; `CommandHelper.BuildClient`; `ConsoleOutput.WriteRawJson`; `GrimoireCli.Models.BodyInputException`.
+- Consumes: `FilesService.BrowseAsync`, `UploadAsync`; `OptionHelpers.Range`, `OptionHelpers.Choice`; `CommandHelper.BuildClient`; `ConsoleOutput.WriteRawJson`; `BodyInputException` (declared in `JsonBodyInput.cs`, namespace `GrimoireCli.Commands`, so no `using` is needed for it).
 - Produces: `FilesCommand.Create()`. **Tasks 3 and 4 add to this same file** — register only `browse` and `upload` now, and do not create `FilesFolderCommands.cs`.
 
 - [ ] **Step 1: Write the failing test**
@@ -520,7 +520,6 @@ Expected: build failure — `FilesCommand` does not exist.
 
 ```csharp
 using System.CommandLine;
-using GrimoireCli.Models;
 using GrimoireCli.Output;
 using GrimoireCli.Services;
 
