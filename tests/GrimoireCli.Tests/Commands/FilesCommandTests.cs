@@ -31,7 +31,6 @@ public class FilesCommandTests
 
     [Theory]
     [InlineData("create")]
-    [InlineData("delete")]
     [InlineData("markers")]
     [InlineData("scaffold")]
     [InlineData("contents")]
@@ -162,17 +161,8 @@ public class FilesCommandTests
         Assert.Contains("428", output);
     }
 
-    // Each delete must name the other's opposite behaviour, or an agent reading
-    // only one of them assumes they match. Both directions are pinned.
-    [Fact]
-    public void FileDeleteNamesTheFolderDeleteContrast()
-    {
-        Assert.Contains("folder delete", Help(["files", "delete"]));
-    }
-
     [Theory]
     [InlineData("create")]
-    [InlineData("delete")]
     [InlineData("markers")]
     [InlineData("scaffold")]
     [InlineData("contents")]
@@ -183,12 +173,20 @@ public class FilesCommandTests
         Assert.Contains("admin", output);
     }
 
+    // The subgroup cannot delete, so it says where deletion lives — otherwise
+    // someone working in it has no way to find the command.
+    [Fact]
+    public void TheFolderGroupPointsAtFilesDelete()
+    {
+        Assert.Contains("files delete", HelpRenderer.Render(FilesCommand.Create(), ["files"], full: false));
+    }
+
     [Fact]
     public void TheGroupHostsTheFolderSubgroup()
     {
         var folder = FilesCommand.Create().Subcommands.Single(c => c.Name == "folder");
         Assert.Equal(
-            ["create", "delete", "markers", "scaffold", "contents"],
+            ["create", "markers", "scaffold", "contents"],
             folder.Subcommands.Select(c => c.Name).ToArray());
     }
 
@@ -226,16 +224,6 @@ public class FilesCommandTests
         var output = HelpRenderer.Render(FilesCommand.Create(), ["files", "folder", "create"], full: false);
         Assert.Contains("one-page", output);
         Assert.Contains("singletons_taken", output);
-    }
-
-    // files delete is soft by default; this one never is, and only its own help
-    // can say so where an agent will read it.
-    [Fact]
-    public void FolderDeleteDocumentsThatItAlwaysRemovesTheFiles()
-    {
-        var output = HelpRenderer.Render(FilesCommand.Create(), ["files", "folder", "delete"], full: false);
-        Assert.Contains("428", output);
-        Assert.Contains("files delete", output);
     }
 
     [Fact]

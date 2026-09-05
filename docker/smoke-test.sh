@@ -159,7 +159,7 @@ SMOKE_DIR="__smoke_files"
 # leftover would make the next run's folder create collide (409) instead of
 # merely accumulating. Best-effort and silent — it must not mask the real
 # failure or its exit code. Replaces the $WORK-only trap set above.
-trap '"$CLI" files folder delete --path "books/$SMOKE_DIR" --confirm-name "$SMOKE_DIR" >/dev/null 2>&1 || true; rm -rf "$WORK"' EXIT
+trap '"$CLI" files delete --path "books/$SMOKE_DIR" --confirm-name "$SMOKE_DIR" --delete-files >/dev/null 2>&1 || true; rm -rf "$WORK"' EXIT
 "$CLI" files folder create --parent books --name "$SMOKE_DIR" >"$WORK/fcreate.out" 2>"$WORK/fcreate.err" \
   || { cat "$WORK/fcreate.err" >&2; fail "files folder create exited non-zero"; }
 jq -e --arg p "books/$SMOKE_DIR" '.path == $p' "$WORK/fcreate.out" >/dev/null \
@@ -223,9 +223,11 @@ jq -e '.files_deleted == false' "$WORK/fdelete.out" >/dev/null \
   || fail "a delete without --delete-files should report files_deleted false: $(cat "$WORK/fdelete.out")"
 ok "files delete defaulted to the soft form"
 
-"$CLI" files folder delete --path "books/$SMOKE_DIR" --confirm-name "$SMOKE_DIR" >"$WORK/ffdelete.out" 2>"$WORK/ffdelete.err" \
-  || { cat "$WORK/ffdelete.err" >&2; fail "files folder delete exited non-zero"; }
-ok "files folder delete accepted the confirm-name"
+"$CLI" files delete --path "books/$SMOKE_DIR" --confirm-name "$SMOKE_DIR" --delete-files >"$WORK/ffdelete.out" 2>"$WORK/ffdelete.err" \
+  || { cat "$WORK/ffdelete.err" >&2; fail "files delete --delete-files exited non-zero"; }
+jq -e '.files_deleted == true' "$WORK/ffdelete.out" >/dev/null \
+  || fail "a hard delete should report files_deleted true: $(cat "$WORK/ffdelete.out")"
+ok "files delete --delete-files removed the folder and its files"
 
 "$CLI" files browse --path books >"$WORK/fbrowse2.out" 2>/dev/null \
   || fail "files browse exited non-zero after cleanup"

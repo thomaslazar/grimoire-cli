@@ -89,7 +89,6 @@ scaffold and contents.
 | `grimoire-cli files rename --path <path> --new-name <name>` | `POST /api/files/rename` | Rename a file or folder on disk |
 | `grimoire-cli files delete --path <path> [--confirm-name <name>] [--delete-files]` | `POST /api/files/delete` | Drop index entries; `--delete-files` also deletes the files, irreversibly |
 | `grimoire-cli files folder create --parent <path> --name <name> [--container-kind <kind>] [--nsfw]` | `POST /api/files/folder` | Create a folder, optionally a container or NSFW |
-| `grimoire-cli files folder delete --path <path> [--confirm-name <name>]` | `DELETE /api/files/folder` | Delete a folder and its files; always irreversible |
 | `grimoire-cli files folder markers --path <path> [--container-kind <kind>] [--nsfw true\|false]` | `PUT /api/files/folder/markers` | Set a folder's container/NSFW markers |
 | `grimoire-cli files folder scaffold --path <path>` | `POST /api/files/folder/scaffold` | Create the standard category folders |
 | `grimoire-cli files folder contents --path <path>` | `GET /api/files/folder/contents` | Report whether a folder holds content |

@@ -131,7 +131,6 @@ IMPLEMENTED = {
     "POST /api/files/rename": "`files rename` ✅",
     "POST /api/files/delete": "`files delete` ✅",
     "POST /api/files/folder": "`files folder create` ✅",
-    "DELETE /api/files/folder": "`files folder delete` ✅",
     "PUT /api/files/folder/markers": "`files folder markers` ✅",
     "POST /api/files/folder/scaffold": "`files folder scaffold` ✅",
     "GET /api/files/folder/contents": "`files folder contents` ✅",

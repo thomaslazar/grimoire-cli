@@ -595,12 +595,21 @@ tag `v1.6.1`.
   `assert_writable`) and answers **409**; each write module also catches `EROFS`
   as a backstop, so an unwritable mount is refused either way. The mount is the
   only thing gating the whole API.
-- **The two deletes are not a matched pair.** `POST /api/files/delete` is *soft*
-  by default: `delete_files: false` removes the indexed rows and everything keyed
-  to them, the files stay, and the next rescan re-adds whatever is still on disk.
-  `DELETE /api/files/folder` calls the same `fs.delete_path` that
-  `delete_files: true` does, so **it always deletes the files** and has no soft
-  form.
+- **`POST /api/files/delete` is *soft* by default and handles folders.**
+  `delete_files: false` removes the index entries at or beneath the path —
+  `_records_under` matches by path prefix — and leaves every file alone, so the
+  next rescan re-adds whatever is still on disk. It skips the writability probe,
+  so it works on a read-only library. The library root and the collection folders
+  are refused either way. `confirm_name` is read only on the hard path;
+  `unindex_path` ignores it.
+- **`DELETE /api/files/folder` is deliberately not implemented in the CLI.** It
+  calls the same `fs.delete_path` with the same arguments as
+  `POST /api/files/delete` does under `delete_files: true`, and carries no
+  folder-only guard — `delete_path` deletes a plain file just as happily. So it
+  offers nothing `files delete --delete-files` does not, while being reachable
+  *without* naming the destructive flag. The `files folder` group description
+  says where deletion lives instead. Do not add a command for it on a
+  coverage-gap sweep.
 - **A hard delete is not a trash move.** The file is deleted outright, and its
   index entry goes with its tags, favorites, bookmarks, progress and campaign
   links.

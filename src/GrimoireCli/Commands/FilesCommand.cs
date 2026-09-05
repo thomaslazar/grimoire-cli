@@ -165,25 +165,27 @@ public static class FilesCommand
     private static Command CreateDeleteCommand()
     {
         var pathOption = new Option<string>("--path") { Description = "File or folder to remove", Required = true };
-        var confirmNameOption = new Option<string?>("--confirm-name") { Description = "The folder's own name, required when it holds content" };
+        var confirmNameOption = new Option<string?>("--confirm-name") { Description = "The folder's own name; needed with --delete-files when it holds content" };
         var deleteFilesOption = new Option<bool>("--delete-files") { Description = "Also delete the files from disk; irreversible" };
         var serverOption = new Option<string?>("--server") { Description = "Server URL override" };
-        var command = new Command("delete", "Remove a file or folder from the index, or from disk")
+        var command = new Command("delete", "Remove a file or folder from the index, and optionally from disk")
         {
             pathOption, confirmNameOption, deleteFilesOption, serverOption
         };
         command.AddRoleRequired("admin");
         command.AddHelpSection("Notes", HelpSectionPosition.Top,
+            "Takes a file or a folder; a folder covers everything beneath it. The",
+            "library root and the collection folders (books/, maps/…) are refused.",
+            "",
             "Soft by default: the index entries go, the files stay, and a rescan",
             "re-adds whatever is still on disk. Works on a read-only library.",
             "",
             "--delete-files also deletes the files and cannot be undone: nothing is",
             "moved to a trash folder, and the item's tags, favorites, bookmarks,",
-            "progress and campaign links go with it. files folder delete always",
-            "deletes the files.",
+            "progress and campaign links go with it.",
             "",
-            "428 when the target is a folder still holding content and --confirm-name",
-            "is absent or does not match its name.");
+            "--confirm-name applies only with --delete-files, and only when the",
+            "target is a folder still holding something: without a match, 428.");
         command.AddExamples(
             "grimoire-cli files delete --path \"books/Monster Manual (copy).pdf\"",
             "grimoire-cli files delete --path \"books/Old Imports\" --confirm-name \"Old Imports\" --delete-files");

@@ -233,7 +233,6 @@ grimoire-cli config set server https://grimoire.example.com
 | `files rename --path <path> --new-name <name>` | Rename a file or folder on disk (admin) |
 | `files delete --path <path> [--confirm-name <name>] [--delete-files]` | Drop index entries; `--delete-files` also deletes the files, irreversibly (admin) |
 | `files folder create --parent <path> --name <name> [--container-kind <kind>] [--nsfw]` | Create a folder, optionally a container or NSFW (admin) |
-| `files folder delete --path <path> [--confirm-name <name>]` | Delete a folder and its files; always irreversible (admin) |
 | `files folder markers --path <path> [--container-kind <kind>] [--nsfw true\|false]` | Set a folder's container/NSFW markers (admin) |
 | `files folder scaffold --path <path>` | Create the standard category folders (admin) |
 | `files folder contents --path <path>` | Report whether a folder holds content (admin) |

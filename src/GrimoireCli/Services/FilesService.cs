@@ -104,17 +104,6 @@ public class FilesService
         return await _client.SendAsync(info, permissionHint: AdminHint, notFoundHint: NotFoundHint);
     }
 
-    /// <summary>
-    /// DELETE /api/files/folder, which carries a request body. Always removes the
-    /// files: unlike files delete, it has no soft form.
-    /// </summary>
-    public async Task<string> DeleteFolderAsync(string path, string? confirmName)
-    {
-        var info = _client.Api.Api.Files.Folder.ToDeleteRequestInformation(
-            BuildDeleteFolderBody(path, confirmName));
-        return await _client.SendAsync(info, permissionHint: AdminHint, notFoundHint: NotFoundHint);
-    }
-
     /// <summary>PUT /api/files/folder/markers. A partial patch: omitted fields are left alone.</summary>
     public async Task<string> MarkersAsync(string path, string? containerKind, bool? nsfw)
     {
@@ -164,19 +153,6 @@ public class FilesService
         var body = new Generated.Models.DeleteRequest { Path = path, DeleteFiles = deleteFiles };
         if (confirmName is not null)
             body.ConfirmName = new Generated.Models.DeleteRequest.DeleteRequest_confirm_name { String = confirmName };
-        return body;
-    }
-
-    /// <summary>
-    /// confirm_name is a composed-type wrapper here too. Internal (not private)
-    /// for the same reason as BuildDeleteBody: a client regeneration must not be
-    /// able to change it silently.
-    /// </summary>
-    internal static Generated.Models.DeleteFolderRequest BuildDeleteFolderBody(string path, string? confirmName)
-    {
-        var body = new Generated.Models.DeleteFolderRequest { Path = path };
-        if (confirmName is not null)
-            body.ConfirmName = new Generated.Models.DeleteFolderRequest.DeleteFolderRequest_confirm_name { String = confirmName };
         return body;
     }
 }

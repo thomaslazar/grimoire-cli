@@ -30,7 +30,6 @@ public class FilesServiceTests
         Assert.Equal("http://example.test/api/files/rename", Uri(api.Rename.ToPostRequestInformation(new Generated.Models.RenameRequest())));
         Assert.Equal("http://example.test/api/files/delete", Uri(api.DeletePath.ToPostRequestInformation(new Generated.Models.DeleteRequest())));
         Assert.Equal("http://example.test/api/files/folder", Uri(api.Folder.ToPostRequestInformation(new Generated.Models.CreateFolderRequest())));
-        Assert.Equal("http://example.test/api/files/folder", Uri(api.Folder.ToDeleteRequestInformation(new Generated.Models.DeleteFolderRequest())));
         Assert.Equal("http://example.test/api/files/folder/markers", Uri(api.Folder.Markers.ToPutRequestInformation(new Generated.Models.MarkersRequest())));
         Assert.Equal("http://example.test/api/files/folder/scaffold", Uri(api.Folder.Scaffold.ToPostRequestInformation(new Generated.Models.ScaffoldRequest())));
         Assert.Equal("http://example.test/api/files/folder/contents?path=", Uri(api.Folder.Contents.ToGetRequestInformation()));
@@ -110,20 +109,5 @@ public class FilesServiceTests
         var body = FilesService.BuildDeleteBody("books/X", "X", deleteFiles: true);
         Assert.Equal("X", body.ConfirmName?.String);
         Assert.True(body.DeleteFiles);
-    }
-
-    [Fact]
-    public void AnOmittedConfirmNameIsAbsentFromTheDeleteFolderBody()
-    {
-        var body = FilesService.BuildDeleteFolderBody("books/X", null);
-        Assert.Equal("books/X", body.Path);
-        Assert.Null(body.ConfirmName);
-    }
-
-    [Fact]
-    public void AGivenConfirmNameLandsOnTheStringBranchForDeleteFolder()
-    {
-        var body = FilesService.BuildDeleteFolderBody("books/X", "X");
-        Assert.Equal("X", body.ConfirmName?.String);
     }
 }

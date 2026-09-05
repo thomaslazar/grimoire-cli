@@ -22,9 +22,8 @@ public static class FilesFolderCommands
 
     public static Command Create()
     {
-        var command = new Command("folder", "Folders in the library tree");
+        var command = new Command("folder", "Folders in the library tree; delete them with files delete");
         command.Subcommands.Add(CreateCreateCommand());
-        command.Subcommands.Add(CreateDeleteCommand());
         command.Subcommands.Add(CreateMarkersCommand());
         command.Subcommands.Add(CreateScaffoldCommand());
         command.Subcommands.Add(CreateContentsCommand());
@@ -60,38 +59,6 @@ public static class FilesFolderCommands
                 parseResult.GetValue(nameOption)!,
                 parseResult.GetValue(containerKindOption),
                 parseResult.GetValue(nsfwOption));
-            ConsoleOutput.WriteRawJson(result);
-            return 0;
-        });
-        return command;
-    }
-
-    private static Command CreateDeleteCommand()
-    {
-        var pathOption = new Option<string>("--path") { Description = "Folder to delete", Required = true };
-        var confirmNameOption = new Option<string?>("--confirm-name") { Description = "The folder's own name, required when it holds content" };
-        var serverOption = new Option<string?>("--server") { Description = "Server URL override" };
-        var command = new Command("delete", "Delete a folder, recursively when confirmed by name")
-        {
-            pathOption, confirmNameOption, serverOption
-        };
-        command.AddRoleRequired("admin");
-        command.AddHelpSection("Notes", HelpSectionPosition.Top,
-            "Always deletes the files, and cannot be undone. files delete leaves them",
-            "unless --delete-files is passed; this has no such option.",
-            "",
-            "An empty folder, or one holding only markers and empty descendants, goes",
-            "without confirmation. One still holding content is 428 until",
-            "--confirm-name matches its own name.");
-        command.AddExamples("grimoire-cli files folder delete --path \"books/Old Imports\" --confirm-name \"Old Imports\"");
-        command.AddResponseExample<Generated.Models.DeleteResponse>();
-        command.SetAction(async (parseResult, cancellationToken) =>
-        {
-            var (client, _) = CommandHelper.BuildClient(serverOverride: parseResult.GetValue(serverOption));
-            var service = new FilesService(client);
-            var result = await service.DeleteFolderAsync(
-                parseResult.GetValue(pathOption)!,
-                parseResult.GetValue(confirmNameOption));
             ConsoleOutput.WriteRawJson(result);
             return 0;
         });
