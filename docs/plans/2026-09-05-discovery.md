@@ -118,8 +118,8 @@ public class SearchCommandTests
     }
 
     [Theory]
-    [InlineData(new[] { "search" })]
-    [InlineData(new[] { "search", "fields" })]
+    [InlineData(new object[] { new[] { "search" } })]
+    [InlineData(new object[] { new[] { "search", "fields" } })]
     public void EveryCommandCarriesAResponseShape(string[] path)
     {
         Assert.Contains("Response shape:", Help(path, full: true));
@@ -127,8 +127,8 @@ public class SearchCommandTests
 
     // Both routes are require_not_guest, which is the CLI's no-tag default.
     [Theory]
-    [InlineData(new[] { "search" })]
-    [InlineData(new[] { "search", "fields" })]
+    [InlineData(new object[] { new[] { "search" } })]
+    [InlineData(new object[] { new[] { "search", "fields" } })]
     public void NoCommandDeclaresARole(string[] path)
     {
         Assert.DoesNotContain("Role required:", Help(path));
@@ -365,8 +365,8 @@ public class TagsCommandTests
     // The server validates both type flags itself, answering 400 with the value
     // set, so the CLI declares no client-side set to mirror it.
     [Theory]
-    [InlineData(new[] { "list", "--in-use-by", "sausage" })]
-    [InlineData(new[] { "items", "--tag", "a", "--resource-type", "sausage" })]
+    [InlineData(new object[] { new[] { "list", "--in-use-by", "sausage" } })]
+    [InlineData(new object[] { new[] { "items", "--tag", "a", "--resource-type", "sausage" } })]
     public void TheTypeFlagsAreNotValidatedClientSide(string[] args)
     {
         Assert.Empty(TagsCommand.Create().Parse(args).Errors);
