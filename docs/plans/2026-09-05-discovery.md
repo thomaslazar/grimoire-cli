@@ -549,16 +549,16 @@ public static class TagsCommand
     /// </summary>
     private static void AddTaggedItemShapes(Command command)
     {
-        command.AddShapeSection("Item shape (item_type \"book\")",
-            JsonExamples.For(typeof(Generated.Models.TaggedBookItem)).Split('\n'));
-        command.AddShapeSection("Item shape (item_type \"map\")",
-            JsonExamples.For(typeof(Generated.Models.TaggedMapItem)).Split('\n'));
-        command.AddShapeSection("Item shape (item_type \"token\")",
-            JsonExamples.For(typeof(Generated.Models.TaggedTokenItem)).Split('\n'));
-        command.AddShapeSection("Item shape (item_type \"audio\")",
-            JsonExamples.For(typeof(Generated.Models.TaggedAudioItem)).Split('\n'));
-        command.AddShapeSection("Item shape (item_type \"system\")",
-            JsonExamples.For(typeof(Generated.Models.TaggedSystemItem)).Split('\n'));
+        (string Type, Type Model)[] shapes =
+        [
+            ("book", typeof(Generated.Models.TaggedBookItem)),
+            ("map", typeof(Generated.Models.TaggedMapItem)),
+            ("token", typeof(Generated.Models.TaggedTokenItem)),
+            ("audio", typeof(Generated.Models.TaggedAudioItem)),
+            ("system", typeof(Generated.Models.TaggedSystemItem)),
+        ];
+        foreach (var (type, model) in shapes)
+            command.AddShapeSection($"Item shape (item_type \"{type}\")", JsonExamples.For(model).Split('\n'));
     }
 }
 ```
