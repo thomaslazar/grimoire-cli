@@ -83,7 +83,7 @@ public static class FilesFolderCommands
             "An empty folder, or one holding only markers and empty descendants, goes",
             "without confirmation. One still holding content is 428 until",
             "--confirm-name matches its own name.");
-        command.AddExamples("grimoire-cli files folder delete --path books/old --confirm-name old");
+        command.AddExamples("grimoire-cli files folder delete --path \"books/Old Imports\" --confirm-name \"Old Imports\"");
         command.AddResponseExample<Generated.Models.DeleteResponse>();
         command.SetAction(async (parseResult, cancellationToken) =>
         {
@@ -112,8 +112,8 @@ public static class FilesFolderCommands
         command.AddHelpSection("Notes", HelpSectionPosition.Top,
             "Omitted fields are left alone.");
         command.AddExamples(
-            "grimoire-cli files folder markers --path books/adult --nsfw true",
-            "grimoire-cli files folder markers --path books/imprints --container-kind publisher");
+            "grimoire-cli files folder markers --path \"books/Kult\" --nsfw true",
+            "grimoire-cli files folder markers --path \"books/Publishers\" --container-kind publisher");
         command.AddResponseExample<Generated.Models.FolderResponse>();
         command.SetAction(async (parseResult, cancellationToken) =>
         {
@@ -141,7 +141,7 @@ public static class FilesFolderCommands
         command.AddHelpSection("Notes", HelpSectionPosition.Top,
             "Creates Core, Supplements, Adventures, Character Sheets, Maps, Handouts,",
             "Homebrew and Starter Sets. Re-running is safe.");
-        command.AddExamples("grimoire-cli files folder scaffold --path \"books/D&D 5e\"");
+        command.AddExamples("grimoire-cli files folder scaffold --path \"books/Dungeons & Dragons/5e EN\"");
         command.AddResponseExample<Generated.Models.ScaffoldResponse>();
         command.SetAction(async (parseResult, cancellationToken) =>
         {
@@ -165,7 +165,7 @@ public static class FilesFolderCommands
         command.AddRoleRequired("admin");
         command.AddHelpSection("Notes", HelpSectionPosition.Top,
             "has_content false means folder delete needs no --confirm-name.");
-        command.AddExamples("grimoire-cli files folder contents --path books/old");
+        command.AddExamples("grimoire-cli files folder contents --path \"books/Old Imports\"");
         command.AddResponseExample<Generated.Models.FolderContentsResponse>();
         command.SetAction(async (parseResult, cancellationToken) =>
         {

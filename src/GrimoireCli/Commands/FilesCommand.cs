@@ -44,7 +44,7 @@ public static class FilesCommand
             "counted after that filter, so neither reports them.");
         command.AddExamples(
             "grimoire-cli files browse",
-            "grimoire-cli files browse --path books --limit 100");
+            "grimoire-cli files browse --path \"books/Dungeons & Dragons/5e EN\" --limit 100");
         command.AddResponseExample<Generated.Models.BrowseResponse>();
         command.SetAction(async (parseResult, cancellationToken) =>
         {
@@ -75,8 +75,7 @@ public static class FilesCommand
             "The server refuses above 8 GiB with 413; this CLI reads the file into",
             "memory, so in practice keep it under about 2 GiB.");
         command.AddExamples(
-            "grimoire-cli files upload --destination \"books/D&D 5e\" --file ./phb.pdf",
-            "for f in *.pdf; do grimoire-cli files upload --destination books --file \"$f\"; done");
+            "grimoire-cli files upload --destination \"books/Call of Cthulhu/7e EN/core\" --file \"Keeper Rulebook.pdf\"");
         command.AddResponseExample<Generated.Models.UploadResponse>();
         command.SetAction(async (parseResult, cancellationToken) =>
         {
@@ -118,8 +117,8 @@ public static class FilesCommand
         };
         command.AddRoleRequired("admin");
         command.AddExamples(
-            "grimoire-cli files move --sources books/loose.pdf --destination \"books/D&D 5e\"",
-            "grimoire-cli files move --sources a.pdf b.pdf --destination books --on-conflict rename");
+            "grimoire-cli files move --sources \"books/Keeper Rulebook.pdf\" --destination \"books/Call of Cthulhu/7e EN/core\"",
+            "grimoire-cli files move --sources \"Berlin.pdf\" \"Cyberpirates.pdf\" --destination \"books/Shadowrun/5 DE\" --on-conflict rename");
         command.AddResponseExample<Generated.Models.MoveResponse>();
         command.SetAction(async (parseResult, cancellationToken) =>
         {
@@ -148,7 +147,7 @@ public static class FilesCommand
         command.AddHelpSection("Notes", HelpSectionPosition.Top,
             "The records count is how many indexed rows followed the rename.",
             "Sidecars beside the file are renamed with it.");
-        command.AddExamples("grimoire-cli files rename --path books/old.pdf --new-name new.pdf");
+        command.AddExamples("grimoire-cli files rename --path \"books/phb.pdf\" --new-name \"Player's Handbook.pdf\"");
         command.AddResponseExample<Generated.Models.RenameResponse>();
         command.SetAction(async (parseResult, cancellationToken) =>
         {
@@ -185,8 +184,8 @@ public static class FilesCommand
             "428 when the target is a folder still holding content and --confirm-name",
             "is absent or does not match its name.");
         command.AddExamples(
-            "grimoire-cli files delete --path books/gone.pdf",
-            "grimoire-cli files delete --path books/old --confirm-name old --delete-files");
+            "grimoire-cli files delete --path \"books/Monster Manual (copy).pdf\"",
+            "grimoire-cli files delete --path \"books/Old Imports\" --confirm-name \"Old Imports\" --delete-files");
         command.AddResponseExample<Generated.Models.DeleteResponse>();
         command.SetAction(async (parseResult, cancellationToken) =>
         {
