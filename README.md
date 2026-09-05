@@ -231,7 +231,7 @@ grimoire-cli config set server https://grimoire.example.com
 | `files upload --destination <path> --file <path> [--relative-dir <path>] [--on-conflict skip\|rename]` | Upload one file; loop for many (admin) |
 | `files move --sources <path>... --destination <path> [--on-conflict skip\|rename]` | Move files or folders, keeping their metadata (admin) |
 | `files rename --path <path> --new-name <name>` | Rename a file or folder on disk (admin) |
-| `files delete --path <path> [--confirm-name <name>] [--delete-files]` | Drop index rows; `--delete-files` also unlinks, irreversibly (admin) |
+| `files delete --path <path> [--confirm-name <name>] [--delete-files]` | Drop index entries; `--delete-files` also deletes the files, irreversibly (admin) |
 | `files folder create --parent <path> --name <name> [--container-kind <kind>] [--nsfw]` | Create a folder, optionally a container or NSFW (admin) |
 | `files folder delete --path <path> [--confirm-name <name>]` | Delete a folder and its files; always irreversible (admin) |
 | `files folder markers --path <path> [--container-kind <kind>] [--nsfw true\|false]` | Set a folder's container/NSFW markers (admin) |

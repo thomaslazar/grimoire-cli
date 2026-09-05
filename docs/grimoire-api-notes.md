@@ -599,9 +599,11 @@ tag `v1.6.1`.
   by default: `delete_files: false` removes the indexed rows and everything keyed
   to them, the files stay, and the next rescan re-adds whatever is still on disk.
   `DELETE /api/files/folder` calls the same `fs.delete_path` that
-  `delete_files: true` does, so **it always unlinks** and has no soft form.
-- **A hard delete is not a trash move.** The file is unlinked, and the row goes
-  with its tags, favorites, bookmarks, progress and campaign links.
+  `delete_files: true` does, so **it always deletes the files** and has no soft
+  form.
+- **A hard delete is not a trash move.** The file is deleted outright, and its
+  index entry goes with its tags, favorites, bookmarks, progress and campaign
+  links.
 - **428 `confirm_required`** guards a folder that still holds content, until
   `confirm_name` matches the folder's own name. An empty folder, or one holding
   only markers and empty descendants, needs no confirmation.

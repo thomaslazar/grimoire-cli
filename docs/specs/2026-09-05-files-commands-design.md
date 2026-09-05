@@ -46,8 +46,9 @@ Read from `backend/routers/files/core.py` and `backend/services/library_fs/`.
 - **`delete` defaults to a *soft* delete.** `delete_files: false` removes the
   indexed rows and everything keyed to them; the files stay and the next rescan
   re-adds whatever is still on disk and not excluded. It works on a read-only
-  library, where nothing could be unlinked anyway. `delete_files: true` is the
-  irreversible one: unlinked, **not** moved to a trash folder, and the row goes
+  library, where nothing could be deleted anyway. `delete_files: true` is the
+  irreversible one: the file is deleted outright, **not** moved to a trash
+  folder, and its index entry goes
   with its tags, favorites, bookmarks, progress and campaign links.
 - **`files folder delete` is always hard.** `delete_folder` calls the same
   `fs.delete_path` as `delete_entry` does under `delete_files: true`. There is no

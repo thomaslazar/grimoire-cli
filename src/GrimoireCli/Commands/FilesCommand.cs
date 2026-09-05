@@ -145,7 +145,7 @@ public static class FilesCommand
         };
         command.AddRoleRequired("admin");
         command.AddHelpSection("Notes", HelpSectionPosition.Top,
-            "The records count is how many indexed rows followed the rename.",
+            "The records count is how many index entries followed the rename.",
             "Sidecars beside the file are renamed with it.");
         command.AddExamples("grimoire-cli files rename --path \"books/phb.pdf\" --new-name \"Player's Handbook.pdf\"");
         command.AddResponseExample<Generated.Models.RenameResponse>();
@@ -166,7 +166,7 @@ public static class FilesCommand
     {
         var pathOption = new Option<string>("--path") { Description = "File or folder to remove", Required = true };
         var confirmNameOption = new Option<string?>("--confirm-name") { Description = "The folder's own name, required when it holds content" };
-        var deleteFilesOption = new Option<bool>("--delete-files") { Description = "Also unlink the files; irreversible" };
+        var deleteFilesOption = new Option<bool>("--delete-files") { Description = "Also delete the files from disk; irreversible" };
         var serverOption = new Option<string?>("--server") { Description = "Server URL override" };
         var command = new Command("delete", "Remove a file or folder from the index, or from disk")
         {
@@ -174,12 +174,13 @@ public static class FilesCommand
         };
         command.AddRoleRequired("admin");
         command.AddHelpSection("Notes", HelpSectionPosition.Top,
-            "Soft by default: the indexed rows go, the files stay, and a rescan re-adds",
-            "whatever is still on disk. Works on a read-only library.",
+            "Soft by default: the index entries go, the files stay, and a rescan",
+            "re-adds whatever is still on disk. Works on a read-only library.",
             "",
-            "--delete-files is irreversible — the file is unlinked rather than moved to",
-            "a trash folder, and the row goes with its tags, favorites, bookmarks,",
-            "progress and campaign links. files folder delete is always this form.",
+            "--delete-files also deletes the files and cannot be undone: nothing is",
+            "moved to a trash folder, and the item's tags, favorites, bookmarks,",
+            "progress and campaign links go with it. files folder delete always",
+            "deletes the files.",
             "",
             "428 when the target is a folder still holding content and --confirm-name",
             "is absent or does not match its name.");

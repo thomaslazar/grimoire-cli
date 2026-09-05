@@ -87,7 +87,7 @@ scaffold and contents.
 | `grimoire-cli files upload --destination <path> --file <path> [--relative-dir <path>] [--on-conflict skip\|rename]` | `POST /api/files/upload` | Upload one file; loop for many |
 | `grimoire-cli files move --sources <path>... --destination <path> [--on-conflict skip\|rename]` | `POST /api/files/move` | Move files or folders, keeping their metadata |
 | `grimoire-cli files rename --path <path> --new-name <name>` | `POST /api/files/rename` | Rename a file or folder on disk |
-| `grimoire-cli files delete --path <path> [--confirm-name <name>] [--delete-files]` | `POST /api/files/delete` | Drop index rows; `--delete-files` also unlinks, irreversibly |
+| `grimoire-cli files delete --path <path> [--confirm-name <name>] [--delete-files]` | `POST /api/files/delete` | Drop index entries; `--delete-files` also deletes the files, irreversibly |
 | `grimoire-cli files folder create --parent <path> --name <name> [--container-kind <kind>] [--nsfw]` | `POST /api/files/folder` | Create a folder, optionally a container or NSFW |
 | `grimoire-cli files folder delete --path <path> [--confirm-name <name>]` | `DELETE /api/files/folder` | Delete a folder and its files; always irreversible |
 | `grimoire-cli files folder markers --path <path> [--container-kind <kind>] [--nsfw true\|false]` | `PUT /api/files/folder/markers` | Set a folder's container/NSFW markers |

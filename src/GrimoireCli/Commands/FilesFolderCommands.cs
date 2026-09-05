@@ -77,8 +77,8 @@ public static class FilesFolderCommands
         };
         command.AddRoleRequired("admin");
         command.AddHelpSection("Notes", HelpSectionPosition.Top,
-            "Always removes the files, unlike files delete, which is soft unless",
-            "--delete-files is passed. Irreversible.",
+            "Always deletes the files, and cannot be undone. files delete leaves them",
+            "unless --delete-files is passed; this has no such option.",
             "",
             "An empty folder, or one holding only markers and empty descendants, goes",
             "without confirmation. One still holding content is 428 until",
