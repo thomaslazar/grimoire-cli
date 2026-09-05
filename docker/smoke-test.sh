@@ -151,6 +151,90 @@ jq -e --arg id "$BACKUP_ID" 'any(.backups[]; .id == $id) | not' "$WORK/blist2.ou
   || fail "the deleted archive should be gone: $(cat "$WORK/blist2.out")"
 ok "the deleted archive is gone, so the run converges"
 
+# Files. Every command here writes into the fixture tree, so the whole lifecycle
+# happens under one temp folder that is deleted at the end — the same
+# create-then-clean-up shape the backups block uses, so a re-run converges.
+SMOKE_DIR="__smoke_files"
+# Cleanup on failure, not just on success: the folder name is fixed, so a
+# leftover would make the next run's folder create collide (409) instead of
+# merely accumulating. Best-effort and silent — it must not mask the real
+# failure or its exit code. Replaces the $WORK-only trap set above.
+trap '"$CLI" files delete --path "books/$SMOKE_DIR" --confirm-name "$SMOKE_DIR" --delete-files >/dev/null 2>&1 || true; rm -rf "$WORK"' EXIT
+"$CLI" files folder create --parent books --name "$SMOKE_DIR" >"$WORK/fcreate.out" 2>"$WORK/fcreate.err" \
+  || { cat "$WORK/fcreate.err" >&2; fail "files folder create exited non-zero"; }
+jq -e --arg p "books/$SMOKE_DIR" '.path == $p' "$WORK/fcreate.out" >/dev/null \
+  || fail "files folder create should echo the new path: $(cat "$WORK/fcreate.out")"
+ok "files folder create made the temp folder"
+
+"$CLI" files folder contents --path "books/$SMOKE_DIR" >"$WORK/fcontents.out" 2>"$WORK/fcontents.err" \
+  || { cat "$WORK/fcontents.err" >&2; fail "files folder contents exited non-zero"; }
+jq -e '.has_content == false' "$WORK/fcontents.out" >/dev/null \
+  || fail "a new folder should report has_content false: $(cat "$WORK/fcontents.out")"
+ok "files folder contents reports an empty folder"
+
+"$CLI" files folder scaffold --path "books/$SMOKE_DIR" >"$WORK/fscaffold.out" 2>"$WORK/fscaffold.err" \
+  || { cat "$WORK/fscaffold.err" >&2; fail "files folder scaffold exited non-zero"; }
+jq -e '.created | length == 8' "$WORK/fscaffold.out" >/dev/null \
+  || fail "scaffold should create the eight category folders: $(cat "$WORK/fscaffold.out")"
+ok "files folder scaffold created the category folders"
+
+"$CLI" files folder markers --path "books/$SMOKE_DIR" --nsfw true >"$WORK/fmarkers.out" 2>"$WORK/fmarkers.err" \
+  || { cat "$WORK/fmarkers.err" >&2; fail "files folder markers exited non-zero"; }
+jq -e '.nsfw == true' "$WORK/fmarkers.out" >/dev/null \
+  || fail "markers should report the NSFW flag: $(cat "$WORK/fmarkers.out")"
+ok "files folder markers set the NSFW flag"
+
+# A tiny file of our own, so the upload never depends on a fixture book.
+printf 'smoke' >"$WORK/smoke-upload.txt"
+"$CLI" files upload --destination "books/$SMOKE_DIR" --file "$WORK/smoke-upload.txt" >"$WORK/fupload.out" 2>"$WORK/fupload.err" \
+  || { cat "$WORK/fupload.err" >&2; fail "files upload exited non-zero"; }
+jq -e '.name == "smoke-upload.txt" and .size == 5' "$WORK/fupload.out" >/dev/null \
+  || fail "upload should report the name and size: $(cat "$WORK/fupload.out")"
+ok "files upload landed one file"
+
+"$CLI" files browse --path "books/$SMOKE_DIR" >"$WORK/fbrowse.out" 2>"$WORK/fbrowse.err" \
+  || { cat "$WORK/fbrowse.err" >&2; fail "files browse exited non-zero"; }
+jq -e 'any(.entries[]; .name == "smoke-upload.txt")' "$WORK/fbrowse.out" >/dev/null \
+  || fail "browse should list the uploaded file: $(cat "$WORK/fbrowse.out")"
+jq -e 'has("total") and has("truncated") and has("writable")' "$WORK/fbrowse.out" >/dev/null \
+  || fail "browse should report total, truncated and writable"
+# The point of the DB-aware listing: an uploaded, unscanned file carries no
+# record_id, which is how "landed but not indexed" is visible at all.
+jq -e '.entries[] | select(.name == "smoke-upload.txt") | .record_id == null' "$WORK/fbrowse.out" >/dev/null \
+  || fail "an unindexed upload should carry no record_id: $(cat "$WORK/fbrowse.out")"
+ok "files browse distinguishes the unindexed upload"
+
+"$CLI" files rename --path "books/$SMOKE_DIR/smoke-upload.txt" --new-name "renamed.txt" >"$WORK/frename.out" 2>"$WORK/frename.err" \
+  || { cat "$WORK/frename.err" >&2; fail "files rename exited non-zero"; }
+jq -e --arg t "books/$SMOKE_DIR/renamed.txt" '.to == $t' "$WORK/frename.out" >/dev/null \
+  || fail "rename should report where it landed: $(cat "$WORK/frename.out")"
+ok "files rename moved the file to its new name"
+
+"$CLI" files move --sources "books/$SMOKE_DIR/renamed.txt" --destination "books/$SMOKE_DIR/Core" >"$WORK/fmove.out" 2>"$WORK/fmove.err" \
+  || { cat "$WORK/fmove.err" >&2; fail "files move exited non-zero"; }
+jq -e '.count == 1' "$WORK/fmove.out" >/dev/null \
+  || fail "move should report one moved entry: $(cat "$WORK/fmove.out")"
+ok "files move relocated the file"
+
+# Soft delete: the row goes, the file stays — files_deleted false is the proof.
+"$CLI" files delete --path "books/$SMOKE_DIR/Core/renamed.txt" >"$WORK/fdelete.out" 2>"$WORK/fdelete.err" \
+  || { cat "$WORK/fdelete.err" >&2; fail "files delete exited non-zero"; }
+jq -e '.files_deleted == false' "$WORK/fdelete.out" >/dev/null \
+  || fail "a delete without --delete-files should report files_deleted false: $(cat "$WORK/fdelete.out")"
+ok "files delete defaulted to the soft form"
+
+"$CLI" files delete --path "books/$SMOKE_DIR" --confirm-name "$SMOKE_DIR" --delete-files >"$WORK/ffdelete.out" 2>"$WORK/ffdelete.err" \
+  || { cat "$WORK/ffdelete.err" >&2; fail "files delete --delete-files exited non-zero"; }
+jq -e '.files_deleted == true' "$WORK/ffdelete.out" >/dev/null \
+  || fail "a hard delete should report files_deleted true: $(cat "$WORK/ffdelete.out")"
+ok "files delete --delete-files removed the folder and its files"
+
+"$CLI" files browse --path books >"$WORK/fbrowse2.out" 2>/dev/null \
+  || fail "files browse exited non-zero after cleanup"
+jq -e --arg n "$SMOKE_DIR" 'any(.entries[]; .name == $n) | not' "$WORK/fbrowse2.out" >/dev/null \
+  || fail "the temp folder should be gone: $(cat "$WORK/fbrowse2.out")"
+ok "the temp folder is gone, so the run converges"
+
 # 4b. The version check runs on a cadence, not only at login.
 jq -e '.lastServerVersion == "'"$EXPECTED_VERSION"'"' "$CONFIG" >/dev/null \
   || fail "login should have recorded the server version: $(cat "$CONFIG")"

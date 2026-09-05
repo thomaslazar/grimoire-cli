@@ -24,21 +24,7 @@ rather than a second layer. They come after duplicate handling.
 
 In this order. Cheapest and safest first.
 
-1. **Ingest** — the `files` API: `upload`, `browse`, `move`, `rename`, `delete`,
-   and folder create / delete / markers / scaffold / contents. The front of the
-   pipeline and what 1.6.0 exists for. All admin.
-
-   `upload` is deliberately one file per request, so a large import that fails
-   partway can report and retry precisely; its `on_conflict` defaults to renaming
-   and never overwrites. `browse` is the one to not overlook: it is DB-aware, so
-   it distinguishes indexed records from loose files the scanner ignored, which
-   is the "did my upload land *and* index?" check the pipeline has no answer for
-   today.
-
-   Its smoke cases write real files into the fixture tree, so they need the
-   create-then-clean-up shape the `backups` block uses, or runs stop converging.
-
-2. **Discovery** — `search`, plus `GET /api/tags` and
+1. **Discovery** — `search`, plus `GET /api/tags` and
    `GET /api/tags/{internal}/items`.
 
    `search` is `GET /api/campaigns/resources/search`. It lives at a campaigns URL

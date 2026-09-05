@@ -584,3 +584,61 @@ byte-identical to `v1.6.0`.
 - **`GET /api/backups` reports `directory` and `total_bytes`** alongside the
   rows, and each row's `version` is `"unknown"` when the archive's manifest is
   unreadable — which is what makes a cross-version restore detectable.
+
+## Files
+
+Read from `backend/routers/files/core.py` and `backend/services/library_fs/` at
+tag `v1.6.1`.
+
+- **Every write here needs the library mounted read-write.** Grimoire probes
+  writability up front with `os.access` (`services/library_fs/paths.py`'s
+  `assert_writable`) and answers **409**; each write module also catches `EROFS`
+  as a backstop, so an unwritable mount is refused either way. The mount is the
+  only thing gating the whole API.
+- **`POST /api/files/delete` is *soft* by default and handles folders.**
+  `delete_files: false` removes the index entries at or beneath the path —
+  `_records_under` matches by path prefix — and leaves every file alone, so the
+  next rescan re-adds whatever is still on disk. It skips the writability probe,
+  so it works on a read-only library. The library root and the collection folders
+  are refused either way. `confirm_name` is read only on the hard path;
+  `unindex_path` ignores it.
+- **`DELETE /api/files/folder` is deliberately not implemented in the CLI.** It
+  calls the same `fs.delete_path` with the same arguments as
+  `POST /api/files/delete` does under `delete_files: true`, and carries no
+  folder-only guard — `delete_path` deletes a plain file just as happily. So it
+  offers nothing `files delete --delete-files` does not, while being reachable
+  *without* naming the destructive flag. The `files folder` group description
+  says where deletion lives instead. Do not add a command for it on a
+  coverage-gap sweep.
+- **A hard delete is not a trash move.** The file is deleted outright, and its
+  index entry goes with its tags, favorites, bookmarks, progress and campaign
+  links.
+- **428 `confirm_required`** guards a folder that still holds content, until
+  `confirm_name` matches the folder's own name. An empty folder, or one holding
+  only markers and empty descendants, needs no confirmation.
+- **The `on_conflict` defaults differ by endpoint**, deliberately: `upload`
+  defaults to `rename` (an upload is an explicit "add this"), `move` to `skip` (a
+  bulk reorganisation should step over a collision and report it). Neither ever
+  overwrites — `_dest_for` has no overwrite branch.
+- **`upload` does not validate `on_conflict`; `move` does.** `move`'s schema
+  carries `pattern="^(skip|rename)$"` and 422s on anything else. `upload`'s is a
+  bare `Form(...)` field, and `_dest_for` treats anything that is not `"skip"` as
+  rename — so an unknown value silently renames and answers 200.
+- **`upload` is one file per request by design**, so a large import that fails
+  partway can report and retry precisely. 8 GiB cap → **413**. The file lands
+  under a temporary name and is renamed into place only once fully written.
+- **`browse` is DB-aware and bounded.** An entry carrying `record_id` is in the
+  catalogue; one without is present on disk but not indexed — which is how "did
+  my upload land *and* index?" is answerable at all. `limit` is silently clamped
+  to `max(1, min(limit, 2000))`
+  and `total`/`truncated` report what was withheld. `child_count` per folder row
+  stops at 1000.
+- **Container kinds** are `parent`, `one-page`, `agnostic`, `family`,
+  `publisher`, `generic`. **`one-page` and `agnostic` are singletons** — only one
+  of each may exist, recognised only at the top level of `books/`, and `browse`
+  reports `singletons_taken` as `{kind: path}`.
+- **`scaffold` is idempotent**, creating Core, Supplements, Adventures, Character
+  Sheets, Maps, Handouts, Homebrew and Starter Sets, and reporting `created` and
+  `existing`.
+- **`DELETE /api/files/folder` carries a request body**, which is unusual for a
+  DELETE and is what the generated builder expects.

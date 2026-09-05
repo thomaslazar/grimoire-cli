@@ -22,7 +22,7 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | downloads | 0 / 1 |
 | duplicates | 0 / 13 |
 | favorites | 0 / 3 |
-| files | 0 / 10 |
+| files | 9 / 10 |
 | library | 3 / 6 |
 | logs | 0 / 1 |
 | lookups | 5 / 15 |
@@ -36,7 +36,7 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | themes | 0 / 7 |
 | tokens | 0 / 10 |
 | users | 0 / 16 |
-| **Total** | **49 / 285** |
+| **Total** | **58 / 285** |
 
 2 operation(s) are internal-only (🔒) and excluded from covered counts.
 
@@ -269,16 +269,16 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 
 | Method | Path | Description | Perm | CLI |
 |--------|------|-------------|------|-----|
-| GET | `/api/files/browse` | List a library folder with indexing state | admin | — |
-| POST | `/api/files/delete` | Remove a file or folder from the index, or from disk | admin | — |
-| POST | `/api/files/folder` | Create a folder, optionally as a container or NSFW | admin | — |
+| GET | `/api/files/browse` | List a library folder with indexing state | admin | `files browse` ✅ |
+| POST | `/api/files/delete` | Remove a file or folder from the index, or from disk | admin | `files delete` ✅ |
+| POST | `/api/files/folder` | Create a folder, optionally as a container or NSFW | admin | `files folder create` ✅ |
 | DELETE | `/api/files/folder` | Delete a folder, recursively when confirmed by name | admin | — |
-| GET | `/api/files/folder/contents` | Report whether a folder holds content | admin | — |
-| PUT | `/api/files/folder/markers` | Set a folder's container/NSFW markers | admin | — |
-| POST | `/api/files/folder/scaffold` | Create the standard category folders in a system folder | admin | — |
-| POST | `/api/files/move` | Move files or folders, preserving their metadata | admin | — |
-| POST | `/api/files/rename` | Rename a file or folder on disk | admin | — |
-| POST | `/api/files/upload` | Upload a single file into a library folder | admin | — |
+| GET | `/api/files/folder/contents` | Report whether a folder holds content | admin | `files folder contents` ✅ |
+| PUT | `/api/files/folder/markers` | Set a folder's container/NSFW markers | admin | `files folder markers` ✅ |
+| POST | `/api/files/folder/scaffold` | Create the standard category folders in a system folder | admin | `files folder scaffold` ✅ |
+| POST | `/api/files/move` | Move files or folders, preserving their metadata | admin | `files move` ✅ |
+| POST | `/api/files/rename` | Rename a file or folder on disk | admin | `files rename` ✅ |
+| POST | `/api/files/upload` | Upload a single file into a library folder | admin | `files upload` ✅ |
 
 ## library
 
