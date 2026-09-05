@@ -24,20 +24,6 @@ rather than a second layer. They come after duplicate handling.
 
 In this order. Cheapest and safest first.
 
-1. **Discovery** — `search`, plus `GET /api/tags` and
-   `GET /api/tags/{internal}/items`.
-
-   `search` is `GET /api/campaigns/resources/search`. It lives at a campaigns URL
-   because it backs that feature's resource picker, but it takes no campaign id
-   and matches names across the whole library — books by title, narrowable by
-   system. It stays a top-level `search` rather than `books search` precisely
-   because it also covers maps, tokens and audio, so it needs no new command when
-   those arrive: `--type` already selects between them.
-
-   The tag reads close the sweep loop: after applying metadata, they show what
-   the catalogue now looks like, including folder-derived tags that never appear
-   on a book's own record.
-
 ## Then
 
 **Duplicate handling** — `duplicates`, thirteen endpoints. The one post-MVP block
@@ -103,14 +89,6 @@ convention is already settled. Audio additionally has cover management including
 
 Rough notes, to be looked at when they come up.
 
-- **`search-full-text`** — `GET /api/search`. Page-text hits come back one per
-  matching *page* with a snippet, not one per book, and the snippet carries
-  literal `<mark>` HTML for the web UI, which the help text will need to warn
-  about since responses pass through unmodified. No longer books-only as of
-  1.6.1: it also matches books, maps, tokens and audio on their own metadata and
-  takes `field:value` filters, where a metadata filter suppresses the page-text
-  search and `text:` forces it. `GET /api/search/fields` lists the filterable
-  fields, so the pair ship together.
 - **Book text extraction** — `toc`, `page/{n}/text`, `page/{n}/words`. All JSON,
   and what an agent needs to read a rulebook rather than catalogue it.
 - **The remaining binary endpoints** — `books/{id}/file`, `/page/{n}`. The output

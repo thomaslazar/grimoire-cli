@@ -152,6 +152,10 @@ IMPLEMENTED = {
     "GET /api/parent-systems": "`parent-systems list` ✅",
     "GET /api/system-families": "`system-families list` ✅",
     "GET /api/dice-materials": "`dice-materials list` ✅",
+    "GET /api/search": "`search` ✅",
+    "GET /api/search/fields": "`search fields` ✅",
+    "GET /api/tags": "`tags list` ✅",
+    "GET /api/tags/{internal}/items": "`tags items` ✅",
 }
 
 ROLE_LABEL = {
