@@ -93,4 +93,71 @@ public class FilesCommandTests
         Assert.Contains("truncated", output);
         Assert.Contains("record_id", output);
     }
+
+    // Reproduces the unguarded File.ReadAllBytesAsync: a missing --file must
+    // report BodyInputException rather than throw raw, before any client call.
+    [Fact]
+    public async Task UploadReportsAMissingFileInsteadOfThrowingRaw()
+    {
+        var missing = Path.Combine(Path.GetTempPath(), $"upload-missing-{Guid.NewGuid():N}.pdf");
+        var service = new GrimoireCli.Services.FilesService(null!);
+        var ex = await Assert.ThrowsAsync<BodyInputException>(
+            () => service.UploadAsync("books", missing, null, null));
+        Assert.Contains("Could not read", ex.Message);
+        Assert.Contains(missing, ex.Message);
+    }
+
+    [Theory]
+    [InlineData("move")]
+    [InlineData("rename")]
+    [InlineData("delete")]
+    public void TheMutatingCommandsDeclareTheAdminRole(string leaf)
+    {
+        var output = Help(["files", leaf]);
+        Assert.Contains("Role required:", output);
+        Assert.Contains("admin", output);
+    }
+
+    [Fact]
+    public void MoveTakesRepeatableSourcesAndRequiresADestination()
+    {
+        Assert.NotEmpty(FilesCommand.Create().Parse(["move", "--sources", "a"]).Errors);
+        Assert.Empty(FilesCommand.Create().Parse(
+            ["move", "--sources", "a", "b", "--destination", "books"]).Errors);
+        Assert.Empty(FilesCommand.Create().Parse(
+            ["move", "--sources", "a", "--sources", "b", "--destination", "books"]).Errors);
+    }
+
+    [Fact]
+    public void RenameRequiresPathAndNewName()
+    {
+        Assert.NotEmpty(FilesCommand.Create().Parse(["rename", "--path", "a"]).Errors);
+        Assert.Empty(FilesCommand.Create().Parse(["rename", "--path", "a", "--new-name", "b"]).Errors);
+    }
+
+    [Fact]
+    public void DeleteRequiresAPathAndDefaultsToTheSoftForm()
+    {
+        Assert.NotEmpty(FilesCommand.Create().Parse(["delete"]).Errors);
+        Assert.Empty(FilesCommand.Create().Parse(["delete", "--path", "a"]).Errors);
+        Assert.Empty(FilesCommand.Create().Parse(["delete", "--path", "a", "--delete-files"]).Errors);
+    }
+
+    // The two deletes behave oppositely and nothing in their names says so, so
+    // each must state its own default where an agent will read it.
+    [Fact]
+    public void DeleteDocumentsThatItIsSoftUnlessAsked()
+    {
+        var output = Help(["files", "delete"]);
+        Assert.Contains("--delete-files", output);
+        Assert.Contains("rescan", output, StringComparison.OrdinalIgnoreCase);
+        Assert.Contains("428", output);
+    }
+
+    [Fact]
+    public void MoveDocumentsThatItSkipsWhereUploadRenames()
+    {
+        var output = Help(["files", "move"]);
+        Assert.Contains("skip", output, StringComparison.OrdinalIgnoreCase);
+    }
 }

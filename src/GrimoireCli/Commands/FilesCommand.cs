@@ -14,6 +14,9 @@ public static class FilesCommand
         var command = new Command("files", "The library tree on disk");
         command.Subcommands.Add(CreateBrowseCommand());
         command.Subcommands.Add(CreateUploadCommand());
+        command.Subcommands.Add(CreateMoveCommand());
+        command.Subcommands.Add(CreateRenameCommand());
+        command.Subcommands.Add(CreateDeleteCommand());
         return command;
     }
 
@@ -95,6 +98,111 @@ public static class FilesCommand
                 _logger.Error(ex.Message);
                 return 1;
             }
+            return 0;
+        });
+        return command;
+    }
+
+    private static Command CreateMoveCommand()
+    {
+        var sourcesOption = new Option<string[]>("--sources")
+        {
+            Description = "Paths to move; repeatable",
+            Required = true,
+            AllowMultipleArgumentsPerToken = true,
+        };
+        var destinationOption = new Option<string>("--destination") { Description = "Destination folder", Required = true };
+        var onConflictOption = OptionHelpers.Choice("--on-conflict", "Collision policy; default skip", ConflictPolicies);
+        var serverOption = new Option<string?>("--server") { Description = "Server URL override" };
+        var command = new Command("move", "Move files or folders, preserving their metadata")
+        {
+            sourcesOption, destinationOption, onConflictOption, serverOption
+        };
+        command.AddRoleRequired("admin");
+        command.AddHelpSection("Notes", HelpSectionPosition.Top,
+            "Defaults to skipping a collision and reporting it, where upload renames.",
+            "Never overwrites either way.",
+            "",
+            "One request for every source: moved and skipped report per path.");
+        command.AddExamples(
+            "grimoire-cli files move --sources books/loose.pdf --destination \"books/D&D 5e\"",
+            "grimoire-cli files move --sources a.pdf b.pdf --destination books --on-conflict rename");
+        command.AddResponseExample<Generated.Models.MoveResponse>();
+        command.SetAction(async (parseResult, cancellationToken) =>
+        {
+            var (client, _) = CommandHelper.BuildClient(serverOverride: parseResult.GetValue(serverOption));
+            var service = new FilesService(client);
+            var result = await service.MoveAsync(
+                parseResult.GetValue(sourcesOption)!,
+                parseResult.GetValue(destinationOption)!,
+                parseResult.GetValue(onConflictOption));
+            ConsoleOutput.WriteRawJson(result);
+            return 0;
+        });
+        return command;
+    }
+
+    private static Command CreateRenameCommand()
+    {
+        var pathOption = new Option<string>("--path") { Description = "Path to rename", Required = true };
+        var newNameOption = new Option<string>("--new-name") { Description = "New name, without any path", Required = true };
+        var serverOption = new Option<string?>("--server") { Description = "Server URL override" };
+        var command = new Command("rename", "Rename a file or folder on disk")
+        {
+            pathOption, newNameOption, serverOption
+        };
+        command.AddRoleRequired("admin");
+        command.AddHelpSection("Notes", HelpSectionPosition.Top,
+            "records reports how many indexed rows followed the rename.");
+        command.AddExamples("grimoire-cli files rename --path books/old.pdf --new-name new.pdf");
+        command.AddResponseExample<Generated.Models.RenameResponse>();
+        command.SetAction(async (parseResult, cancellationToken) =>
+        {
+            var (client, _) = CommandHelper.BuildClient(serverOverride: parseResult.GetValue(serverOption));
+            var service = new FilesService(client);
+            var result = await service.RenameAsync(
+                parseResult.GetValue(pathOption)!,
+                parseResult.GetValue(newNameOption)!);
+            ConsoleOutput.WriteRawJson(result);
+            return 0;
+        });
+        return command;
+    }
+
+    private static Command CreateDeleteCommand()
+    {
+        var pathOption = new Option<string>("--path") { Description = "File or folder to remove", Required = true };
+        var confirmNameOption = new Option<string?>("--confirm-name") { Description = "The folder's own name, required when it holds content" };
+        var deleteFilesOption = new Option<bool>("--delete-files") { Description = "Also unlink the files; irreversible" };
+        var serverOption = new Option<string?>("--server") { Description = "Server URL override" };
+        var command = new Command("delete", "Remove a file or folder from the index, or from disk")
+        {
+            pathOption, confirmNameOption, deleteFilesOption, serverOption
+        };
+        command.AddRoleRequired("admin");
+        command.AddHelpSection("Notes", HelpSectionPosition.Top,
+            "Soft by default: the indexed rows go, the files stay, and a rescan re-adds",
+            "whatever is still on disk. Works on a read-only library.",
+            "",
+            "--delete-files is irreversible — the file is unlinked rather than moved to",
+            "a trash folder, and the row goes with its tags, favorites, bookmarks,",
+            "progress and campaign links. files folder delete is always this form.",
+            "",
+            "428 when the target is a folder still holding content and --confirm-name",
+            "is absent or does not match its name.");
+        command.AddExamples(
+            "grimoire-cli files delete --path books/gone.pdf",
+            "grimoire-cli files delete --path books/old --confirm-name old --delete-files");
+        command.AddResponseExample<Generated.Models.DeleteResponse>();
+        command.SetAction(async (parseResult, cancellationToken) =>
+        {
+            var (client, _) = CommandHelper.BuildClient(serverOverride: parseResult.GetValue(serverOption));
+            var service = new FilesService(client);
+            var result = await service.DeleteAsync(
+                parseResult.GetValue(pathOption)!,
+                parseResult.GetValue(confirmNameOption),
+                parseResult.GetValue(deleteFilesOption));
+            ConsoleOutput.WriteRawJson(result);
             return 0;
         });
         return command;
