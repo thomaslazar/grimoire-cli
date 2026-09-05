@@ -287,10 +287,11 @@ per that section's own instruction to record deviations where they're found:
   `--page`; `GET /api/systems` returns a bare array with no pagination
   envelope, so `systems list` has none either. This will need revisiting if
   a paginated list endpoint is implemented.
-- **No library-content upload.** Grimoire's library is mounted read-only;
-  book/map/token files arrive on disk, then `POST /api/rescan` — not modeled
-  as a CLI command yet. `systems cover upload` is a narrow exception: a cover
-  image is stored separately from the library tree, on its own endpoint.
+- **One file per upload invocation.** `abs-cli`'s `upload` posts every file in a
+  single multipart request because the ABS API accepts that; Grimoire's endpoint
+  is deliberately one file per request, so a large import that fails partway can
+  report and retry precisely. The CLI mirrors the endpoint rather than looping,
+  which keeps stdout the server's own bytes; importing many is a shell loop.
 - **Five top-level vocabulary groups, not one umbrella noun.** `genres`,
   `licenses`, `parent-systems`, `system-families` and `dice-materials` each get
   their own group, which is the shape abs-cli settled for `genres` / `tags` /
