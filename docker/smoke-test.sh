@@ -673,9 +673,8 @@ ok "systems book-folders list shows the written folder"
 # The point of the feature: a book below the path inherits the tag. This is the
 # round trip that upstream #357 broke — the server derived the folder's depth
 # differently for a container child, and Das Schwarze Auge 5 DE is one.
-TAG_ITEMS=$(curl -sf "$SERVER/api/tags/errata-smoke/items" \
-  -H "Authorization: Bearer $(jq -r .accessToken "$CONFIG")") \
-  || fail "could not read the tag's items"
+TAG_ITEMS=$("$CLI" tags items --tag errata-smoke 2>"$WORK/cli.err") \
+  || { cat "$WORK/cli.err" >&2; fail "tags items exited non-zero"; }
 echo "$TAG_ITEMS" | jq -e '.folders[] | select(.path == "errata") | .items[] | select(.title == "DSA5 Errata")' >/dev/null \
   || fail "the folder tag should reach the book below it: $TAG_ITEMS"
 ok "a folder tag reaches the book below its path"
@@ -831,6 +830,64 @@ jq -e --arg id "$SR4_BOOK" '.tags[$id] | index("smoke-book-alpha") != null and i
   "$WORK/btag2.out" >/dev/null \
   || fail "batch-tag should have merged both tags: $(cat "$WORK/btag2.out")"
 ok "batch-tag adds a tag and leaves the existing one in place"
+
+# --- discovery ---------------------------------------------------------------
+# Read-only throughout: nothing here writes, so a re-run converges trivially.
+# The fixture's indexed pages all read "grimoire-cli fixture · page N", which is
+# what makes an exact page-text count assertable.
+SEARCH_JSON=$("$CLI" search --query "text:fixture" --limit 3 2>"$WORK/cli.err") \
+  || { cat "$WORK/cli.err" >&2; fail "search exited non-zero"; }
+[ "$(echo "$SEARCH_JSON" | jq '.results | length')" -eq 3 ] \
+  || fail "--limit should bound the page-text results: $SEARCH_JSON"
+ok "search bounds page-text results with --limit"
+
+# The rule the field syntax exists for: a metadata filter switches off the
+# page-text search rather than narrowing it.
+SEARCH_JSON=$("$CLI" search --query "title:dsa" 2>"$WORK/cli.err") \
+  || { cat "$WORK/cli.err" >&2; fail "search with a filter exited non-zero"; }
+[ "$(echo "$SEARCH_JSON" | jq '.results | length')" -eq 0 ] \
+  || fail "a metadata filter should suppress page-text results: $SEARCH_JSON"
+[ "$(echo "$SEARCH_JSON" | jq '.book_matches | length')" -gt 0 ] \
+  || fail "title:dsa should match the DSA fixture books: $SEARCH_JSON"
+echo "$SEARCH_JSON" | jq -e '.fields | index("title") != null' >/dev/null \
+  || fail "the response should echo the filter it read: $SEARCH_JSON"
+ok "a metadata filter suppresses page-text search and is echoed in fields"
+
+# A typo'd prefix is deliberately not an error, so the only signal is an empty
+# fields — this is the case the help text warns about.
+SEARCH_JSON=$("$CLI" search --query "titel:dsa" 2>"$WORK/cli.err") \
+  || { cat "$WORK/cli.err" >&2; fail "search with an unknown prefix exited non-zero"; }
+[ "$(echo "$SEARCH_JSON" | jq '.fields | length')" -eq 0 ] \
+  || fail "an unrecognised prefix should not be read as a filter: $SEARCH_JSON"
+ok "an unrecognised field prefix is searched literally"
+
+# LIMIT -1 is unlimited in SQLite and the server has no lower bound, so the
+# guard has to be here.
+"$CLI" search --query "fixture" --limit -1 >/dev/null 2>&1 \
+  && fail "--limit -1 should be rejected before the request"
+ok "search rejects a limit the server would read as unlimited"
+
+FIELDS_JSON=$("$CLI" search fields 2>"$WORK/cli.err") \
+  || { cat "$WORK/cli.err" >&2; fail "search fields exited non-zero"; }
+echo "$FIELDS_JSON" | jq -e '.fields[] | select(.field == "title")' >/dev/null \
+  || fail "search fields should list title: $FIELDS_JSON"
+ok "search fields lists the filterable fields"
+
+TAGS_JSON=$("$CLI" tags list 2>"$WORK/cli.err") \
+  || { cat "$WORK/cli.err" >&2; fail "tags list exited non-zero"; }
+echo "$TAGS_JSON" | jq -e '.tags[] | select(.internal == "smoke-book-alpha")' >/dev/null \
+  || fail "tags list should include the tag just written: $TAGS_JSON"
+ok "tags list includes a tag written earlier in this run"
+
+TAGS_JSON=$("$CLI" tags list --in-use-by book 2>"$WORK/cli.err") \
+  || { cat "$WORK/cli.err" >&2; fail "tags list --in-use-by exited non-zero"; }
+echo "$TAGS_JSON" | jq -e '.tags[] | select(.internal == "smoke-book-alpha")' >/dev/null \
+  || fail "--in-use-by book should keep a book tag: $TAGS_JSON"
+ok "tags list narrows to one resource type"
+
+"$CLI" tags items --tag no-such-tag-smoke >/dev/null 2>&1 \
+  && fail "tags items should exit non-zero for an unknown tag"
+ok "tags items reports an unknown tag"
 
 # batch-update: one good id and one bogus id must exit 3, applying the good
 # one. license, not description: nothing above filters on a book's license,
