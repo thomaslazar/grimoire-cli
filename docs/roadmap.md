@@ -20,11 +20,7 @@ fields, `AudioUpdate` two, against `BookUpdate`'s nineteen — and they hang off
 folders rather than systems, so for them folder tagging is the whole story
 rather than a second layer. They come after duplicate handling.
 
-## MVP
-
-In this order. Cheapest and safest first.
-
-## Then
+## Next
 
 **Duplicate handling** — `duplicates`, thirteen endpoints. The one post-MVP block
 worth describing now, because it is the answer to the problem a growing PDF

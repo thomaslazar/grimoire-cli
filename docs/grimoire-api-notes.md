@@ -645,32 +645,35 @@ tag `v1.6.1`.
 
 ## Search
 
+Read from `backend/routers/search/core.py`, `backend/routers/search/_query.py`,
+`backend/routers/search/_books.py` and `backend/routers/search/_helpers.py` at
+tag `v1.6.1`; the limit behaviour was verified against the running 1.6.1 stack.
+
 `GET /api/search` is not full-text-only. As of 1.6.1 it returns five
 independently-populated arrays — `results` (page text), `book_matches`, `maps`,
 `tokens`, `audio` — and `total` counts every row across all of them, so a book
 matching by title *and* by page text is counted twice.
 
-**`limit` bounds `results` alone.** `book_matches` is capped at
-`TITLE_MATCH_LIMIT = 50` and each media set at a literal `.limit(50)`, neither
-reachable from the query string. There is no offset, so those four are a hard
-ceiling rather than a page.
-
-**`limit` has no lower bound, and `-1` means unlimited.** The route declares
-`Query(50, le=200)`, which 422s above 200, but the value reaches SQLite as a bare
-`LIMIT :limit`. Verified against a 126-page index: `limit=-1` returned all 126
-rows with a 200, and `limit=0` returned none. The CLI guards this with
-`OptionHelpers.Range(1, 200)`.
-
-**An unrecognised `field:` prefix is not an error.** It falls through to free
-text and is searched literally, because a colon is ordinary punctuation in a
-title. `q=titel:dsa` answers 200 with every array empty and `fields: []`, which
-is the only way to tell a typo from a genuine miss. A recognised metadata filter
-suppresses the page-text search; `text:` forces it back.
-
-**`campaigns/resources/search` has no command, deliberately.** It is a resource
-picker: `q` is optional so it enumerates a whole type, and its cap is 20000 per
-type rather than 50. That makes it the only way to list maps, tokens or audio
-without a search term — but those resource types have no commands yet, and each
-will arrive with its own paginated `list`. For books, `books list` already
-enumerates with `--offset` and `search` already filters. Do not add a command for
-it on a coverage-gap sweep; revisit it with the maps, tokens and audio blocks.
+- **`limit` bounds `results` alone.** `book_matches` is capped at
+  `TITLE_MATCH_LIMIT = 50` and each media set at a literal `.limit(50)`,
+  neither reachable from the query string. There is no offset, so those four
+  are a hard ceiling rather than a page.
+- **`limit` has no lower bound, and `-1` means unlimited.** The route declares
+  `Query(50, le=200)`, which 422s above 200, but the value reaches SQLite as a
+  bare `LIMIT :limit`. Verified against a 126-page index: `limit=-1` returned
+  all 126 rows with a 200, and `limit=0` returned none. The CLI guards this
+  with `OptionHelpers.Range(1, 200)`.
+- **An unrecognised `field:` prefix is not an error.** It falls through to
+  free text and is searched literally, because a colon is ordinary
+  punctuation in a title. `q=titel:dsa` answers 200 with every array empty
+  and `fields: []`, which is the only way to tell a typo from a genuine miss.
+  A recognised metadata filter suppresses the page-text search; `text:`
+  forces it back.
+- **`campaigns/resources/search` has no command, deliberately.** It is a
+  resource picker: `q` is optional so it enumerates a whole type, and its cap
+  is 20000 per type rather than 50. That makes it the only way to list maps,
+  tokens or audio without a search term — but those resource types have no
+  commands yet, and each will arrive with its own paginated `list`. For
+  books, `books list` already enumerates with `--offset` and `search` already
+  filters. Do not add a command for it on a coverage-gap sweep; revisit it
+  with the maps, tokens and audio blocks.
