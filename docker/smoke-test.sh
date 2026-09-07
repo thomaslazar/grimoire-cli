@@ -883,6 +883,8 @@ TAGS_JSON=$("$CLI" tags list --in-use-by book 2>"$WORK/cli.err") \
   || { cat "$WORK/cli.err" >&2; fail "tags list --in-use-by exited non-zero"; }
 echo "$TAGS_JSON" | jq -e '.tags[] | select(.internal == "smoke-book-alpha")' >/dev/null \
   || fail "--in-use-by book should keep a book tag: $TAGS_JSON"
+echo "$TAGS_JSON" | jq -e 'any(.tags[]; .internal == "smoke-alpha") | not' >/dev/null \
+  || fail "--in-use-by book should drop a system-only tag: $TAGS_JSON"
 ok "tags list narrows to one resource type"
 
 "$CLI" tags items --tag no-such-tag-smoke >/dev/null 2>&1 \

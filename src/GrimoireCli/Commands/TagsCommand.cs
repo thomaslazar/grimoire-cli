@@ -16,7 +16,7 @@ public static class TagsCommand
 
     private static Command CreateListCommand()
     {
-        var inUseByOption = new Option<string?>("--in-use-by") { Description = "Restrict to tags used on this resource type: system, book, map, token, audio" };
+        var inUseByOption = new Option<string?>("--in-use-by") { Description = "Restrict to tags used on this resource type (system | book | map | token | audio)" };
         var serverOption = new Option<string?>("--server") { Description = "Server URL override" };
         var command = new Command("list", "List tags with their usage counts")
         {
@@ -44,7 +44,7 @@ public static class TagsCommand
     private static Command CreateItemsCommand()
     {
         var tagOption = new Option<string>("--tag") { Description = "The tag's internal key, from tags list; matched case-insensitively", Required = true };
-        var resourceTypeOption = new Option<string?>("--resource-type") { Description = "Restrict to this resource type: system, book, map, token, audio" };
+        var resourceTypeOption = new Option<string?>("--resource-type") { Description = "Restrict to this resource type (system | book | map | token | audio)" };
         var serverOption = new Option<string?>("--server") { Description = "Server URL override" };
         var command = new Command("items", "Items and folders carrying a tag")
         {
