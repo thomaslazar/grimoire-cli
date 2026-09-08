@@ -212,7 +212,9 @@ namespace GrimoireCli.Services;
 /// (routers/duplicates/__init__.py registers no router-level dependency; each
 /// handler takes require_admin itself). resource_type and accuracy reach the
 /// generated models as enums because both are Literal upstream, so each is
-/// parsed from the flag's string here.
+/// parsed from the flag's string here. Enum.Parse cannot throw on that string:
+/// every caller declares the flag as OptionHelpers.Choice over the same set, so
+/// an unaccepted value is a parse error before any service call is made.
 /// </summary>
 public class DuplicatesService
 {
@@ -435,7 +437,7 @@ git commit -m "feat: add the duplicates service"
 
 **Interfaces:**
 - Consumes: `DuplicatesService` from Task 1 — `LinkAsync(string rawBody)`, `PromoteAsync(string, string, string, string?, string?)`, `UnlinkAsync(string, string[], string?)`, `MergeMetadataAsync(string, string, string, string[], bool)`, `DeleteItemAsync(string, string, bool, string?)`, `CompareAsync(string, string[])`. Also `OptionHelpers.Choice(string name, string description, string[] allowed)`, `JsonBodyInput.Read/Validate/RequireExactlyOneSource`, `BulkExit.CodeFor(bool)` and `GrimoireApiClient.HasItems(string json, string property)` — `books batch-update` ends `return BulkExit.CodeFor(GrimoireApiClient.HasItems(result, "errors"));` (`BooksCommand.cs:192`), and `link` uses exactly that call. Both helpers are `internal`, which the test project already sees.
-- Produces: `DuplicatesCommand.Create()` returning the `duplicates` command, which must host `DuplicatesScanCommands.Create...` leaves added by Task 3.
+- Produces: `DuplicatesCommand.Create()` returning the `duplicates` command with its six resolution leaves, and `internal static readonly string[] ResourceTypes = ["book", "map", "token", "audio"]`. Task 3 adds seven more leaves to this same `Create()`, so leave it easy to extend — but do **not** reference `DuplicatesScanCommands` in this task; that type does not exist yet.
 
 - [ ] **Step 1: Write the failing tests**
 
@@ -758,33 +760,7 @@ In `src/GrimoireCli/Program.cs`, after the `TagsCommand` line:
 rootCommand.Subcommands.Add(DuplicatesCommand.Create());
 ```
 
-- [ ] **Step 5: Stub Task 3's leaves so this builds**
-
-Task 3 owns `DuplicatesScanCommands.cs`. To keep Task 2 independently testable,
-create that file now containing only:
-
-```csharp
-using System.CommandLine;
-
-namespace GrimoireCli.Commands;
-
-/// <summary>Detection and dismissal leaves of the `duplicates` group.</summary>
-public static class DuplicatesScanCommands
-{
-    /// <summary>The seven leaves, in the order they are registered.</summary>
-    public static IEnumerable<Command> Create() => [];
-}
-```
-
-`DuplicatesCommand.Create()` ends with:
-```csharp
-foreach (var leaf in DuplicatesScanCommands.Create())
-    command.Subcommands.Add(leaf);
-return command;
-```
-Task 3 fills in the body. Do not add its leaves in this task.
-
-- [ ] **Step 6: Format, build, test**
+- [ ] **Step 5: Format, build, test**
 
 ```bash
 dotnet format GrimoireCli.sln
@@ -793,10 +769,10 @@ dotnet test tests/GrimoireCli.Tests/GrimoireCli.Tests.csproj
 ```
 Expected: build clean, all tests pass.
 
-- [ ] **Step 7: Commit**
+- [ ] **Step 6: Commit**
 
 ```bash
-git add src/GrimoireCli/Commands/DuplicatesCommand.cs src/GrimoireCli/Commands/DuplicatesScanCommands.cs src/GrimoireCli/Program.cs tests/GrimoireCli.Tests/Commands/DuplicatesCommandTests.cs
+git add src/GrimoireCli/Commands/DuplicatesCommand.cs src/GrimoireCli/Program.cs tests/GrimoireCli.Tests/Commands/DuplicatesCommandTests.cs
 git commit -m "feat: add the duplicate resolution commands"
 ```
 
@@ -805,7 +781,8 @@ git commit -m "feat: add the duplicate resolution commands"
 ### Task 3: the detection and dismissal commands
 
 **Files:**
-- Modify: `src/GrimoireCli/Commands/DuplicatesScanCommands.cs` (replace the stub body)
+- Create: `src/GrimoireCli/Commands/DuplicatesScanCommands.cs`
+- Modify: `src/GrimoireCli/Commands/DuplicatesCommand.cs` (register the seven leaves)
 - Create: `tests/GrimoireCli.Tests/Commands/DuplicatesScanCommandTests.cs`
 
 **Interfaces:**
@@ -959,7 +936,34 @@ Expected: FAIL — `Create()` returns no leaves.
 
 - [ ] **Step 3: Write the seven leaves**
 
-Replace the stub body of `DuplicatesScanCommands.Create()` with
+Create `src/GrimoireCli/Commands/DuplicatesScanCommands.cs`:
+
+```csharp
+using System.CommandLine;
+
+namespace GrimoireCli.Commands;
+
+/// <summary>
+/// The detection and dismissal leaves of the `duplicates` group. Split from
+/// DuplicatesCommand for the same reason FilesFolderCommands is split from
+/// FilesCommand: thirteen leaves in one file would be the largest command file
+/// in the repo by half.
+/// </summary>
+public static class DuplicatesScanCommands
+{
+    public static IEnumerable<Command> Create() => [ /* the seven below */ ];
+}
+```
+
+Then in `src/GrimoireCli/Commands/DuplicatesCommand.cs`, register them at the end
+of `Create()`, immediately before the `return`:
+
+```csharp
+foreach (var leaf in DuplicatesScanCommands.Create())
+    command.Subcommands.Add(leaf);
+```
+
+Fill `Create()` with
 `[CreateScanCommand(), CreateScanStatusCommand(), CreateCancelScanCommand(), CreateGroupsCommand(), CreateDismissCommand(), CreateDismissalsCommand(), CreateUndismissCommand()]`
 and add one private factory each. Use these strings **verbatim**.
 
@@ -1068,7 +1072,7 @@ Expected: build clean, all tests pass.
 - [ ] **Step 5: Commit**
 
 ```bash
-git add src/GrimoireCli/Commands/DuplicatesScanCommands.cs tests/GrimoireCli.Tests/Commands/DuplicatesScanCommandTests.cs
+git add src/GrimoireCli/Commands/DuplicatesScanCommands.cs src/GrimoireCli/Commands/DuplicatesCommand.cs tests/GrimoireCli.Tests/Commands/DuplicatesScanCommandTests.cs
 git commit -m "feat: add the duplicate detection and dismissal commands"
 ```
 
