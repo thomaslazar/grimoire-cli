@@ -14,11 +14,12 @@ metadata sweep, matching what `abs-cli` already gives for audiobooks. Its two
 workflows are the target shape: *upload and catalogue*, and *fix a metadata
 problem across the library on request*.
 
-Maps, tokens and audio are deliberately out of scope for the objective above. They are structurally
-parallel to books but carry almost no per-item metadata — `MapUpdate` has four
-fields, `AudioUpdate` two, against `BookUpdate`'s nineteen — and they hang off
-folders rather than systems, so for them folder tagging is the whole story
-rather than a second layer. They come after duplicate handling.
+Maps, tokens and audio are deliberately out of scope for the objective
+above. They are structurally parallel to books but carry almost no
+per-item metadata — `MapUpdate` has four fields, `AudioUpdate` two,
+against `BookUpdate`'s nineteen — and they hang off folders rather than
+systems, so for them folder tagging is the whole story rather than a
+second layer.
 
 ## Next
 
