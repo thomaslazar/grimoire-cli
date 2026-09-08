@@ -97,6 +97,15 @@ public class DuplicatesCommandTests
             ["delete", "--resource-type", "book", "--id", "a", "--delete-file", "true"]).Errors);
     }
 
+    // Pins Arity = ExactlyOne: nothing else forces --delete-file to take a
+    // value, so a future "simplification" that dropped it would still pass CI.
+    [Fact]
+    public void DeleteRejectsABareDeleteFileWithNoValue()
+    {
+        Assert.NotEmpty(DuplicatesCommand.Create().Parse(
+            ["delete", "--resource-type", "book", "--id", "a", "--delete-file"]).Errors);
+    }
+
     [Fact]
     public void DeleteTakesAnEmptyReparentTo()
     {

@@ -299,7 +299,7 @@ rule, so the block is read-only plus one reversible round trip:
 - `compare --ids <a> --ids <b>` over two fixture books returns two `items` and a
   `differences` array; one id alone is refused server-side.
 - `link` two fixture books, assert `linked` names the child and `errors` is
-  empty, then `unlink --id <child>` and assert it comes back — a
+  empty, then `unlink --ids <child>` and assert it comes back — a
   link/unlink round trip returns the fixture to its prior state, so a re-run
   converges.
 - `link` with a bogus child id exits 3 and names it in `errors`.

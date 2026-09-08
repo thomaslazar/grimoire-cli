@@ -43,8 +43,9 @@ public static class DuplicatesCommand
             "partial exits 3. Re-sending a fixed batch re-reports the children that",
             "already linked.",
             "",
-            "A child cannot be its own parent, cannot be in another collection, and",
-            "cannot already be a variant — variants are two levels deep, never three.",
+            "The parent must not itself be a variant, and a child must not have",
+            "variants of its own — two levels, never three. A child already filed",
+            "under another parent is moved, not refused.",
             "",
             "kind by collection. book: version, other, printer-friendly, form-fillable,",
             "spreads, single-page, black-and-white. map: version, other,",
@@ -95,8 +96,6 @@ public static class DuplicatesCommand
         };
         command.AddRoleRequired("admin");
         command.AddHelpSection("Notes", HelpSectionPosition.Top,
-            "--kind and --label describe the old parent, which becomes a variant.",
-            "",
             "One indivisible change: the old parent and every child move together.",
             "--new-parent-id must not already be a variant of something else, and",
             "--old-parent-id must not itself be a variant.");
@@ -136,13 +135,13 @@ public static class DuplicatesCommand
         command.AddRoleRequired("admin");
         command.Validators.Add(result =>
         {
-            var hasIds = result.GetValue(idsOption) is { Length: > 0 };
-            var hasParentId = result.GetValue(parentIdOption) != null;
+            var hasIds = result.GetValue(idsOption) is { } ids && ids.Any(id => !string.IsNullOrWhiteSpace(id));
+            var hasParentId = !string.IsNullOrWhiteSpace(result.GetValue(parentIdOption));
             if (!hasIds && !hasParentId)
                 result.AddError("Provide --ids or --parent-id.");
         });
         command.AddHelpSection("Notes", HelpSectionPosition.Top,
-            "--parent-id frees every variant of that parent and wins if both are given.",
+            "--parent-id wins if both are given.",
             "",
             "The files are untouched; only the parent link goes.");
         command.AddExamples(
@@ -217,7 +216,7 @@ public static class DuplicatesCommand
         var idOption = new Option<string>("--id") { Description = "Item to delete", Required = true };
         var deleteFileOption = new Option<bool>("--delete-file")
         {
-            Description = "Also delete the file from disk; irreversible",
+            Description = "true or false; also delete the file from disk, irreversible",
             Required = true,
             Arity = ArgumentArity.ExactlyOne,
         };
@@ -240,9 +239,6 @@ public static class DuplicatesCommand
             "The record goes either way, with its bookmarks, favorites, tags, campaign",
             "links, indexed page text and thumbnail. --delete-file decides only whether",
             "the file leaves the disk, with its sidecars.",
-            "",
-            "--delete-file has no default here: files delete spells the same flag and",
-            "defaults to keeping the file, so this one is stated every time.",
             "",
             "An item that has variants answers 409 unless --reparent-to is given: \"\"",
             "frees them all, an id names which of them inherits the rest.",
@@ -284,7 +280,7 @@ public static class DuplicatesCommand
         };
         command.AddRoleRequired("admin");
         command.AddHelpSection("Notes", HelpSectionPosition.Top,
-            "Two to four --ids; anything else is refused.",
+            "Fewer than two or more than four is refused.",
             "",
             "reference_counts per item is the user work attached to that copy, and",
             "suggested_parent_id is the server's pick for which to keep.");

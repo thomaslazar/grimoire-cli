@@ -40,6 +40,7 @@ public static class DuplicatesScanCommands
                         $"'{value}' is not a valid value for --resource-types. Must be one of: {string.Join(", ", DuplicatesCommand.ResourceTypes)}");
             }
         });
+        resourceTypesOption.CompletionSources.Add(DuplicatesCommand.ResourceTypes);
         var accuracyOption = OptionHelpers.Choice(
             "--accuracy", "Detection accuracy; default medium", ["exact", "high", "medium", "low"]);
         var serverOption = new Option<string?>("--server") { Description = "Server URL override" };
@@ -123,7 +124,7 @@ public static class DuplicatesScanCommands
         var resourceTypeOption = OptionHelpers.Choice("--resource-type", "Collection to act on", DuplicatesCommand.ResourceTypes);
         var minConfidenceOption = new Option<double?>("--min-confidence") { Description = "Drop groups below this score" };
         var limitOption = OptionHelpers.Range("--limit", "Groups to return; default 50, max 200", 1, 200);
-        var offsetOption = new Option<int?>("--offset") { Description = "Groups to skip" };
+        var offsetOption = OptionHelpers.Range("--offset", "Groups to skip", 0);
         var serverOption = new Option<string?>("--server") { Description = "Server URL override" };
         var command = new Command("groups", "List candidate duplicate groups from the last scan")
         {
@@ -131,8 +132,9 @@ public static class DuplicatesScanCommands
         };
         command.AddRoleRequired("admin");
         command.AddHelpSection("Notes", HelpSectionPosition.Top,
-            "Groups whose members were deleted or already resolved are dropped, so a",
-            "short page is not the end of the listing — page with --offset.",
+            "Groups whose members were deleted or already resolved are dropped and the",
+            "server walks on to fill the page, so a short page means the listing is",
+            "exhausted. total counts the groups walked for this page, not the table.",
             "",
             "suggested_kind and suggested_label per member are the server's guess, and",
             "are what link would take as-is.");

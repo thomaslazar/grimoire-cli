@@ -118,6 +118,19 @@ public class DuplicatesServiceTests
         Assert.Equal("", cleared!.String);
     }
 
+    // Pins the docstring's claim that Enum.Parse "cannot throw" across the whole
+    // resource-type set, not just whichever one another test happens to pass.
+    [Theory]
+    [InlineData("book")]
+    [InlineData("map")]
+    [InlineData("token")]
+    [InlineData("audio")]
+    public void BuildUnlinkBodyAcceptsEveryResourceType(string resourceType)
+    {
+        var body = GrimoireCli.Services.DuplicatesService.BuildUnlinkBody(resourceType, ["a"], null);
+        Assert.NotNull(body);
+    }
+
     [Fact]
     public void TheUnlinkBodyOmitsParentIdUnlessGiven()
     {
