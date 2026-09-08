@@ -1267,7 +1267,7 @@ fi
 # --- duplicates -------------------------------------------------------------
 # Read-only except for a dismiss/undismiss round trip and a link/unlink round
 # trip on two fixture books, both of which return the fixture to its prior
-# state, so a re-run converges. Four commands are deliberately not exercised:
+# state, so a re-run converges. Three commands are deliberately not exercised:
 #   delete   - irreversible; no fixture item's loss could be undone by a re-run.
 #   scan     - starts a real background detection pass whose completion is
 #              nondeterministic, and would invalidate the cancel-scan
