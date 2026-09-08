@@ -44,11 +44,53 @@ def collapse(node, stats):
     return {key: collapse(value, stats) for key, value in node.items()}
 
 
+def explode_array_queries(spec):
+    """Make every array-typed query parameter generate as repeated keys.
+
+    OpenAPI 3.x already defaults a query parameter to ``style: form,
+    explode: true`` — repeated keys — which is what FastAPI reads, so it states
+    neither. Kiota renders a *required* query parameter with simple expansion
+    regardless: the template comes out ``?ids={ids}``, which comma-joins the
+    values, and FastAPI then parses ``ids=a,b`` as the single string "a,b". So
+    ``GET /api/duplicates/compare`` answers 400 for what should be a two-item
+    compare, and the endpoint cannot be called at all.
+
+    Setting ``explode`` alone does not move it, nor does adding ``style: form``
+    — both were tried against Kiota 1.34.1 and left the template unchanged.
+    Only dropping ``required`` moves the parameter into the exploded group
+    (``{&ids*,token*}``). That is a lie about the spec, confined to array query
+    parameters, and it costs nothing here: the parameter is still sent on every
+    call, because the CLI declares its own ``--ids`` flag Required. The
+    alternative is hand-assembling the query string at the call site, which the
+    generated-client rule exists to prevent.
+
+    Recheck when the Kiota pin moves: if a required array query parameter starts
+    generating as ``{&name*}`` on its own, delete this pass.
+    """
+    marked = []
+    for operations in spec.get("paths", {}).values():
+        for operation in operations.values():
+            if not isinstance(operation, dict):
+                continue
+            for parameter in operation.get("parameters", []):
+                if (
+                    parameter.get("in") == "query"
+                    and parameter.get("schema", {}).get("type") == "array"
+                    and "explode" not in parameter
+                ):
+                    parameter["explode"] = True
+                    parameter["required"] = False
+                    marked.append(parameter.get("name", "?"))
+    return marked
+
+
 def main():
     spec = json.load(sys.stdin)
     stats = []
     normalized = collapse(spec, stats)
+    exploded = explode_array_queries(normalized)
     print(f"normalized {len(stats)} anyOf-nullable arrays (kiota#2338)", file=sys.stderr)
+    print(f"marked {len(exploded)} array query parameters exploded: {', '.join(exploded) or 'none'}", file=sys.stderr)
     json.dump(normalized, sys.stdout)
 
 

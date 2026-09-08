@@ -1264,4 +1264,137 @@ print((h+b'.'+p+b'.'+b64(hmac.new(b'$DEV_SECRET',h+b'.'+p,hashlib.sha256).digest
   ok "login recovers a revoked session"
 fi
 
+# --- duplicates -------------------------------------------------------------
+# Read-only except for a dismiss/undismiss round trip and a link/unlink round
+# trip on two fixture books, both of which return the fixture to its prior
+# state, so a re-run converges. Three commands are deliberately not exercised:
+#   delete   - irreversible; no fixture item's loss could be undone by a re-run.
+#   scan     - starts a real background detection pass whose completion is
+#              nondeterministic, and would invalidate the cancel-scan
+#              "not_running" and groups assertions in the same run.
+#   promote  - needs a family to promote within, and unwinding a swapped
+#              parent/child adds two more writes for a path the link/unlink
+#              round trip already covers.
+# Extends the files-block trap (line 162) rather than replacing it: trap bodies
+# are single-quoted, so $DUP_CHILD/$DUP_DISMISSAL are expanded when the trap
+# fires, not now — harmless while still unset, and a real cleanup once the
+# dismiss/link calls set them.
+trap '"$CLI" duplicates undismiss --id "${DUP_DISMISSAL:-}" >/dev/null 2>&1 || true; "$CLI" duplicates unlink --resource-type book --ids "${DUP_CHILD:-}" >/dev/null 2>&1 || true; "$CLI" files delete --path "books/$SMOKE_DIR" --confirm-name "$SMOKE_DIR" --delete-files >/dev/null 2>&1 || true; rm -rf "$WORK"' EXIT
+
+DUP_JSON=$("$CLI" duplicates scan-status 2>"$WORK/cli.err") \
+  || { cat "$WORK/cli.err" >&2; fail "duplicates scan-status exited non-zero"; }
+echo "$DUP_JSON" | jq -e 'has("running")' >/dev/null \
+  || fail "scan-status should report running: $DUP_JSON"
+ok "duplicates scan-status reports the detection state"
+
+DUP_JSON=$("$CLI" duplicates cancel-scan 2>"$WORK/cli.err") \
+  || { cat "$WORK/cli.err" >&2; fail "duplicates cancel-scan exited non-zero"; }
+[ "$(echo "$DUP_JSON" | jq -r .status)" = "not_running" ] \
+  || fail "cancel-scan should report not_running on an idle stack: $DUP_JSON"
+ok "duplicates cancel-scan reports an idle scanner"
+
+DUP_JSON=$("$CLI" duplicates groups 2>"$WORK/cli.err") \
+  || { cat "$WORK/cli.err" >&2; fail "duplicates groups exited non-zero"; }
+echo "$DUP_JSON" | jq -e 'has("groups")' >/dev/null \
+  || fail "groups should return a listing: $DUP_JSON"
+ok "duplicates groups lists candidate groups"
+
+# The server clamps nothing here: le=200 guards the ceiling, so the floor is
+# ours to refuse.
+"$CLI" duplicates groups --limit 0 >/dev/null 2>&1 \
+  && fail "--limit 0 should be rejected before the request"
+"$CLI" duplicates groups --limit -1 >/dev/null 2>&1 \
+  && fail "--limit -1 should be rejected before the request"
+ok "duplicates groups refuses a limit the server would not"
+
+DUP_JSON=$("$CLI" duplicates dismissals 2>"$WORK/cli.err") \
+  || { cat "$WORK/cli.err" >&2; fail "duplicates dismissals exited non-zero"; }
+echo "$DUP_JSON" | jq -e 'has("dismissals")' >/dev/null \
+  || fail "dismissals should return a listing: $DUP_JSON"
+ok "duplicates dismissals lists dismissed groups"
+
+# Two fixture books, chosen by title so the pair is stable across runs.
+booklist
+DUP_PARENT=$(echo "$LIST_JSON" | jq -r '.books[] | select(.title == "DSA5 Regelwerk") | .id')
+DUP_CHILD=$(echo "$LIST_JSON" | jq -r '.books[] | select(.title == "DSA5 Errata") | .id')
+[ -n "$DUP_PARENT" ] && [ -n "$DUP_CHILD" ] \
+  || fail "the DSA5 fixture books are needed for the variant round trip"
+
+DUP_JSON=$("$CLI" duplicates compare --resource-type book --ids "$DUP_PARENT" "$DUP_CHILD" \
+  2>"$WORK/cli.err") \
+  || { cat "$WORK/cli.err" >&2; fail "duplicates compare exited non-zero"; }
+[ "$(echo "$DUP_JSON" | jq '.items | length')" -eq 2 ] \
+  || fail "compare should return both items: $DUP_JSON"
+ok "duplicates compare returns two copies side by side"
+
+"$CLI" duplicates compare --resource-type book --ids "$DUP_PARENT" >/dev/null 2>&1 \
+  && fail "compare should refuse a single id"
+ok "duplicates compare refuses fewer than two items"
+
+# dismiss/dismissals/undismiss round trip. Runs before the link/unlink pair
+# below: while $DUP_CHILD is a variant it is hidden from listings.
+DUP_JSON=$("$CLI" duplicates dismiss --resource-type book --member-ids "$DUP_PARENT" "$DUP_CHILD" \
+  --note "smoke test" 2>"$WORK/cli.err") \
+  || { cat "$WORK/cli.err" >&2; fail "duplicates dismiss exited non-zero"; }
+DUP_DISMISSAL=$(echo "$DUP_JSON" | jq -r .id)
+[ -n "$DUP_DISMISSAL" ] || fail "dismiss should return an id: $DUP_JSON"
+ok "duplicates dismiss marks a group as not duplicates"
+
+DUP_JSON=$("$CLI" duplicates dismissals 2>"$WORK/cli.err") \
+  || { cat "$WORK/cli.err" >&2; fail "duplicates dismissals exited non-zero"; }
+echo "$DUP_JSON" | jq -e --arg id "$DUP_DISMISSAL" '.dismissals | any(.id == $id)' >/dev/null \
+  || fail "dismissals should list the new dismissal: $DUP_JSON"
+ok "duplicates dismissals lists the new dismissal"
+
+"$CLI" duplicates undismiss --id "$DUP_DISMISSAL" >/dev/null 2>"$WORK/cli.err" \
+  || { cat "$WORK/cli.err" >&2; fail "duplicates undismiss exited non-zero"; }
+DUP_JSON=$("$CLI" duplicates dismissals 2>"$WORK/cli.err") \
+  || { cat "$WORK/cli.err" >&2; fail "duplicates dismissals exited non-zero"; }
+echo "$DUP_JSON" | jq -e --arg id "$DUP_DISMISSAL" '.dismissals | any(.id == $id) | not' >/dev/null \
+  || fail "undismiss should remove the dismissal: $DUP_JSON"
+ok "duplicates undismiss makes the group findable again"
+
+# title is already set on both books, so without --overwrite the server
+# copies nothing (commit is guarded by `if updated:`) — read-only in effect.
+DUP_JSON=$("$CLI" duplicates merge-metadata --resource-type book --source-id "$DUP_PARENT" \
+  --target-id "$DUP_CHILD" --fields title 2>"$WORK/cli.err") \
+  || { cat "$WORK/cli.err" >&2; fail "duplicates merge-metadata exited non-zero"; }
+[ "$(echo "$DUP_JSON" | jq '.updated | length')" -eq 0 ] \
+  || fail "merge-metadata without --overwrite should write nothing: $DUP_JSON"
+echo "$DUP_JSON" | jq -e '.skipped | index("title") != null' >/dev/null \
+  || fail "merge-metadata should skip the already-set title: $DUP_JSON"
+ok "duplicates merge-metadata skips a field already set on the target"
+
+# A bogus child is reported per-child, so the request succeeds and exits 3.
+printf '{"resource_type":"book","parent_id":"%s","children":[{"id":"no-such-id","kind":"other","label":""}]}' \
+  "$DUP_PARENT" >"$WORK/dup-bad.json"
+set +e
+"$CLI" duplicates link --input "$WORK/dup-bad.json" >"$WORK/dup-bad.out" 2>"$WORK/cli.err"; rc=$?
+set -e
+[ "$rc" -eq 3 ] || fail "a rejected child should exit 3, got $rc: $(cat "$WORK/cli.err")"
+jq -e '.errors | length == 1 and .[0].id == "no-such-id"' "$WORK/dup-bad.out" >/dev/null \
+  || fail "the bogus child should be the only error: $(cat "$WORK/dup-bad.out")"
+ok "duplicates link reports a rejected child and exits 3"
+
+printf '{"resource_type":"book","parent_id":"%s","children":[{"id":"%s","kind":"version","label":"smoke variant"}]}' \
+  "$DUP_PARENT" "$DUP_CHILD" >"$WORK/dup-link.json"
+DUP_JSON=$("$CLI" duplicates link --input "$WORK/dup-link.json" 2>"$WORK/cli.err") \
+  || { cat "$WORK/cli.err" >&2; fail "duplicates link exited non-zero"; }
+echo "$DUP_JSON" | jq -e --arg id "$DUP_CHILD" '.linked | index($id) != null' >/dev/null \
+  || fail "link should name the child it linked: $DUP_JSON"
+[ "$(echo "$DUP_JSON" | jq '.errors | length')" -eq 0 ] \
+  || fail "link should report no errors: $DUP_JSON"
+ok "duplicates link files a book under a parent as its variant"
+
+DUP_JSON=$("$CLI" duplicates unlink --resource-type book --ids "$DUP_CHILD" 2>"$WORK/cli.err") \
+  || { cat "$WORK/cli.err" >&2; fail "duplicates unlink exited non-zero"; }
+echo "$DUP_JSON" | jq -e --arg id "$DUP_CHILD" '.unlinked | index($id) != null' >/dev/null \
+  || fail "unlink should free the child again: $DUP_JSON"
+ok "duplicates unlink promotes the variant back to standalone"
+
+# The refusal is the CLI's: with neither flag the server answers 200 {"unlinked":[]}.
+"$CLI" duplicates unlink --resource-type book >/dev/null 2>&1 \
+  && fail "unlink with neither --ids nor --parent-id should be refused"
+ok "duplicates unlink refuses a call the server would answer as a no-op"
+
 echo "smoke: all checks passed" >&2

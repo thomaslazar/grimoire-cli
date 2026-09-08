@@ -22,7 +22,7 @@ namespace GrimoireCli.Generated.Api.Duplicates.Compare
         /// </summary>
         /// <param name="pathParameters">Path parameters for the request</param>
         /// <param name="requestAdapter">The request adapter to use to execute the requests.</param>
-        public CompareRequestBuilder(Dictionary<string, object> pathParameters, IRequestAdapter requestAdapter) : base(requestAdapter, "{+baseurl}/api/duplicates/compare?ids={ids}&resource_type={resource_type}{&token*}", pathParameters)
+        public CompareRequestBuilder(Dictionary<string, object> pathParameters, IRequestAdapter requestAdapter) : base(requestAdapter, "{+baseurl}/api/duplicates/compare?resource_type={resource_type}{&ids*,token*}", pathParameters)
         {
         }
         /// <summary>
@@ -30,7 +30,7 @@ namespace GrimoireCli.Generated.Api.Duplicates.Compare
         /// </summary>
         /// <param name="rawUrl">The raw URL to use for the request builder.</param>
         /// <param name="requestAdapter">The request adapter to use to execute the requests.</param>
-        public CompareRequestBuilder(string rawUrl, IRequestAdapter requestAdapter) : base(requestAdapter, "{+baseurl}/api/duplicates/compare?ids={ids}&resource_type={resource_type}{&token*}", rawUrl)
+        public CompareRequestBuilder(string rawUrl, IRequestAdapter requestAdapter) : base(requestAdapter, "{+baseurl}/api/duplicates/compare?resource_type={resource_type}{&ids*,token*}", rawUrl)
         {
         }
         /// <summary>

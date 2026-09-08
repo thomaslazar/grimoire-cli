@@ -20,7 +20,7 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | books | 11 / 16 |
 | campaigns | 0 / 91 |
 | downloads | 0 / 1 |
-| duplicates | 0 / 13 |
+| duplicates | 13 / 13 |
 | favorites | 0 / 3 |
 | files | 9 / 10 |
 | library | 3 / 6 |
@@ -36,7 +36,7 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | themes | 0 / 7 |
 | tokens | 0 / 10 |
 | users | 0 / 16 |
-| **Total** | **62 / 285** |
+| **Total** | **75 / 285** |
 
 2 operation(s) are internal-only (🔒) and excluded from covered counts.
 
@@ -243,19 +243,19 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 
 | Method | Path | Description | Perm | CLI |
 |--------|------|-------------|------|-----|
-| POST | `/api/duplicates/cancel-scan` | Stop a running duplicate scan | admin | — |
-| GET | `/api/duplicates/compare` | Side-by-side comparison of two to four items | admin | — |
-| POST | `/api/duplicates/dismiss` | Mark a group as not duplicates | admin | — |
-| GET | `/api/duplicates/dismissals` | List dismissed groups | admin | — |
-| DELETE | `/api/duplicates/dismissals/{dismissal_id}` | Undo a dismissal | admin | — |
-| GET | `/api/duplicates/groups` | Candidate duplicate groups from the last scan | admin | — |
-| DELETE | `/api/duplicates/items/{resource_type}/{item_id}` | Delete one duplicate record, and optionally its file | admin | — |
-| POST | `/api/duplicates/link` | File items under a parent as its variants | admin | — |
-| POST | `/api/duplicates/merge-metadata` | Copy metadata fields from one copy onto another | admin | — |
-| POST | `/api/duplicates/promote` | Make a different copy the main version of an existing family | admin | — |
-| POST | `/api/duplicates/scan` | Start a duplicate-detection scan | admin | — |
-| GET | `/api/duplicates/scan-status` | Progress of the duplicate-detection scan | admin | — |
-| POST | `/api/duplicates/unlink` | Promote variants back to standalone entries | admin | — |
+| POST | `/api/duplicates/cancel-scan` | Stop a running duplicate scan | admin | `duplicates cancel-scan` ✅ |
+| GET | `/api/duplicates/compare` | Side-by-side comparison of two to four items | admin | `duplicates compare` ✅ |
+| POST | `/api/duplicates/dismiss` | Mark a group as not duplicates | admin | `duplicates dismiss` ✅ |
+| GET | `/api/duplicates/dismissals` | List dismissed groups | admin | `duplicates dismissals` ✅ |
+| DELETE | `/api/duplicates/dismissals/{dismissal_id}` | Undo a dismissal | admin | `duplicates undismiss` ✅ |
+| GET | `/api/duplicates/groups` | Candidate duplicate groups from the last scan | admin | `duplicates groups` ✅ |
+| DELETE | `/api/duplicates/items/{resource_type}/{item_id}` | Delete one duplicate record, and optionally its file | admin | `duplicates delete` ✅ |
+| POST | `/api/duplicates/link` | File items under a parent as its variants | admin | `duplicates link` ✅ |
+| POST | `/api/duplicates/merge-metadata` | Copy metadata fields from one copy onto another | admin | `duplicates merge-metadata` ✅ |
+| POST | `/api/duplicates/promote` | Make a different copy the main version of an existing family | admin | `duplicates promote` ✅ |
+| POST | `/api/duplicates/scan` | Start a duplicate-detection scan | admin | `duplicates scan` ✅ |
+| GET | `/api/duplicates/scan-status` | Progress of the duplicate-detection scan | admin | `duplicates scan-status` ✅ |
+| POST | `/api/duplicates/unlink` | Promote variants back to standalone entries | admin | `duplicates unlink` ✅ |
 
 ## favorites
 
