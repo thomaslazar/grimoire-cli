@@ -68,9 +68,14 @@ public class DuplicatesServiceTests
         });
         var uri = Uri(info);
         Assert.Contains("resource_type=book", uri);
-        // The compare URL template has no explode modifier on ids, so Kiota
-        // joins the array with commas rather than repeating the key.
-        Assert.Contains("ids=a,b", uri);
+        // FastAPI reads `ids` as repeated keys; comma-joined, `ids=a,b` arrives
+        // as the single string "a,b" and the route answers 400. Kiota renders a
+        // *required* array query parameter with simple expansion whatever its
+        // style/explode says, so tools/normalize-spec.py drops `required` on it
+        // to get `{&ids*}`. This asserts the wire form the server accepts.
+        Assert.Contains("ids=a", uri);
+        Assert.Contains("ids=b", uri);
+        Assert.DoesNotContain("ids=a,b", uri);
     }
 
     [Fact]

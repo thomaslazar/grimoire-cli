@@ -176,6 +176,37 @@ forbids — the same call already made for `in_use_by` and `resource_type`. `lin
 takes JSON, so validating would additionally mean inspecting the parsed body.
 The kinds are listed in `link`'s help instead, since nothing else exposes them.
 
+## `compare` needed a generator fix
+
+`GET /api/duplicates/compare` could not be called at all as generated. Kiota
+rendered its required `ids` array query parameter with simple expansion —
+`?ids={ids}` — which comma-joins the values, and FastAPI reads `ids` as repeated
+keys. Verified against the running stack:
+
+| Query | Result |
+| --- | --- |
+| `?resource_type=book&ids=<a>&ids=<b>` | 200 |
+| `?resource_type=book&ids=<a>,<b>` | **400 "Compare needs between two and four items."** |
+
+The spec is not at fault: OpenAPI 3.x defaults a query parameter to
+`style: form, explode: true`, so FastAPI states neither, and the default is
+exactly what it reads. Kiota ignores that for a required parameter — setting
+`explode: true`, and then `style: form` alongside it, both left the template
+byte-identical on 1.34.1.
+
+`tools/normalize-spec.py` gains a second pass that drops `required` on
+array-typed query parameters, which moves them into the exploded group
+(`{&ids*,token*}`). Dropping `required` is a lie about the spec, and a narrow
+one: it is confined to array query parameters, of which the whole spec has
+exactly one, and nothing is lost because the CLI declares its own `--ids` flag
+Required so the parameter is sent on every call. The alternative — assembling
+the query string by hand at the call site — is what the generated-client rule
+exists to prevent.
+
+The regeneration diff is three lines across two files: the `compare` template,
+twice, and the lock hash. The pass logs its count to stderr like the existing
+one, so a Kiota release that fixes this makes the workaround visibly redundant.
+
 ## What the help must carry
 
 **`mergeable_fields` never reaches the client.** `/compare` declares
