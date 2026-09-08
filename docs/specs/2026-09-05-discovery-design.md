@@ -128,6 +128,23 @@ own the syntax is learnable nowhere. `abs-cli`'s `search` settled this shape wit
 its `Search behavior` and `Fields searched` sections: Notes keeps the caveats,
 and the language sits where a caller looks for it.
 
+The fourteen canonical fields and their aliases are listed inline rather than
+delegated to `search fields`, so writing a query costs no second call. Each
+field's *scope* is listed with it, because the scope rules are what silently
+change the answer: `MEDIA_FIELDS` is `{title, tag, filename, artist, album}` and
+`BOOK_FIELDS` omits `album`, so a filter naming nothing in one set drops that
+half of the response — `_media_terms` returns `None` and `search_book_metadata`
+returns `[]` rather than an unfiltered list. `artist` and `album` reach audio
+only: `_search_media` is given `extra_fields` for audio alone, and its
+`if not clauses: return []` guard is what stops a map query with no applicable
+clause returning every map. Verified: `album:jazz` and `artist:someone` each
+returned nothing on either side, `system:auge` returned 3 books and no media, and
+`text:fixture` returned 50 page hits with no `book_matches`.
+
+`search fields` remains the drift-proof source and keeps its own command; the
+inline list is the convenience. A test pins all fourteen names, since a field
+missing from the list reads as unsupported.
+
 Four rules, each verified against the running stack:
 
 - **Different fields AND; a repeated field ORs.** `_apply_field_filters` calls

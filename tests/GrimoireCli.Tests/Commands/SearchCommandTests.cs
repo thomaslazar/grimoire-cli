@@ -73,8 +73,7 @@ public class SearchCommandTests
         Assert.DoesNotContain("Role required:", Help(path));
     }
 
-    // The query language lives entirely inside --query, and `search fields`
-    // returns field names and aliases only — never the syntax — so the AND/OR
+    // The query language lives entirely inside --query, so the AND/OR
     // semantics, the quoting rule and the year: operators are learnable from
     // this section or nowhere.
     [Theory]
@@ -84,6 +83,38 @@ public class SearchCommandTests
     public void SearchDocumentsItsQuerySyntax(string expected)
     {
         Assert.Contains(expected, Help(["search"]));
+    }
+
+    // The field list is inlined so a caller needs no second command to write a
+    // query. Every canonical name must appear, or the list is a trap: a missing
+    // one reads as unsupported. `search fields` stays the drift-proof source.
+    [Theory]
+    [InlineData("title")]
+    [InlineData("author")]
+    [InlineData("artist")]
+    [InlineData("publisher")]
+    [InlineData("system")]
+    [InlineData("category")]
+    [InlineData("tag")]
+    [InlineData("year")]
+    [InlineData("isbn")]
+    [InlineData("language")]
+    [InlineData("description")]
+    [InlineData("album")]
+    [InlineData("filename")]
+    [InlineData("text")]
+    public void SearchListsEveryFilterableField(string field)
+    {
+        Assert.Contains(field, Help(["search"]));
+    }
+
+    // A book-only field silently empties the map, token and audio results, so
+    // the list has to say which fields those are.
+    [Fact]
+    public void SearchSaysWhichFieldsDropTheMediaResults()
+    {
+        Assert.Contains("Books only:", Help(["search"]));
+        Assert.Contains("drops the map, token and audio results", Help(["search"]));
     }
 
     // The three caveats a caller cannot infer: the other result sets ignore

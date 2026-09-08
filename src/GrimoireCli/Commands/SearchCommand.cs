@@ -35,6 +35,13 @@ public static class SearchCommand
             "--book-id and --system-id drop the map, token and audio results;",
             "--book-id also empties book_matches.");
         command.AddHelpSection("Query syntax", HelpSectionPosition.Top,
+            "Fields, aliases in parens. Books and media: title (name), filename",
+            "(file), tag (tags). Books and audio: artist (artists). Audio only:",
+            "album. Books only: author (authors), publisher, system (game),",
+            "category, year, isbn, language (lang), description (desc) — any of",
+            "these also drops the map, token and audio results. text (content,",
+            "page) searches page text alone and returns no book_matches.",
+            "",
             "Different fields narrow, repeating one widens: system:pbta",
             "category:core matches both, tag:forest tag:swamp matches either.",
             "",
@@ -42,9 +49,7 @@ public static class SearchCommand
             "the field and the rest becomes free text.",
             "",
             "year: takes 1999, >1999, <=2005 or 1999-2005.",
-            "Page text also takes fire* as a prefix match — * only at the end.",
-            "",
-            "search fields lists the field names and their aliases.");
+            "Page text also takes fire* as a prefix match — * only at the end.");
         command.AddExamples(
             "grimoire-cli search --query \"dragon\"",
             "grimoire-cli search --query \"author:'Ben Robbins' year:>2010\"",
