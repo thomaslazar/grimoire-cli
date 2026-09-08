@@ -145,9 +145,28 @@ call answers `200 {"unlinked": []}` — a silent no-op. `backups settings set`
 already carries this validator shape. When both are given, `parent_id` wins
 (`core.py:124`), which the help states rather than the CLI refusing.
 
-**Nothing else is validated client-side.** `resource_type` and `accuracy` are
-`Literal`s and 422; `merge-metadata --fields` 400s naming the allowed set;
-`compare --ids` 400s outside 2–4; `dismiss` requires ≥2 `member_ids` and 422s.
+**`--resource-type` and `--accuracy` take `Choice`, forced by the generated
+models.** Both are `Literal`s upstream, so Kiota types them as enums —
+`LinkRequest_resource_type`, `ScanRequest_accuracy`, and one per model besides —
+and the model cannot hold any other value. The allowed set is therefore
+generator-derived, exactly as `JsonBodyInput.Validate` takes its field list from
+`GetFieldDeserializers().Keys`; it is not a hand-maintained mirror of server
+policy, and it moves when the client is regenerated. `Choice` is used so the
+refusal is a parse error rather than an exception out of `Enum.TryParse`.
+
+This is the first place in the repo that assigns a generated enum to a body
+field. `link` is unaffected: its JSON body is validated and sent unchanged, so
+Kiota's own deserializer handles the enum there.
+
+**Nothing else is validated client-side.** `merge-metadata --fields` 400s naming
+the allowed set; `compare --ids` 400s outside 2–4; `dismiss` requires ≥2
+`member_ids` and 422s.
+
+**Two fields are composed-type wrappers**, both `Optional[str]` upstream:
+`UnlinkRequest.ParentId` and `DeleteItemRequest.ReparentTo`. Assigning through
+the wrapper only when the flag was given is what keeps `--reparent-to ""`
+distinguishable from the flag being absent — the same mechanism
+`FilesService.BuildMarkersBody` already uses for `container_kind`.
 
 **The variant `kind` vocabulary is not mirrored.** It is closed and scoped by
 collection (`models/variants.py`: book 7, map 9, token 4, audio 5 values), and
