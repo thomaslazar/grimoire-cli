@@ -14,7 +14,9 @@ Design: [docs/specs/2026-09-08-duplicates-design.md](../specs/2026-09-08-duplica
 
 - **Help text is transcribed from this plan, not composed.** Every command
   description, flag description, Notes line and Example is given verbatim below.
-  Use them exactly. Do not add a line that is not in this plan.
+  Use them exactly. Do not add a line that is not in this plan. Where a flag is
+  listed with no description string, it ships without one — except
+  `OptionHelpers.Choice`, whose `description` parameter is not optional.
 - **Do not state anything that does not belong to the command being written.** No
   narration of what a sibling command does, no framing ("useful when…"), no
   restating a flag's description in Notes, no explaining what is already visible
@@ -665,8 +667,9 @@ command.AddExamples(
     "grimoire-cli duplicates promote --resource-type book --new-parent-id <id> --old-parent-id <id> --kind version --label \"2015 printing\"");
 command.AddResponseExample<Generated.Models.PromoteResult>();
 ```
-Flags: `--resource-type` (Choice over `ResourceTypes`, Required),
-`--new-parent-id` (Required), `--old-parent-id` (Required), `--kind`
+Flags: `--resource-type` (Choice over `ResourceTypes`, `"Collection to act on"`, Required),
+`--new-parent-id` (`"Item to promote"`, Required), `--old-parent-id`
+(`"Item to demote"`, Required), `--kind`
 (`"The old parent's kind once demoted; default other"`), `--label`
 (`"The old parent's label once demoted"`), `--server`.
 
@@ -682,7 +685,7 @@ command.AddExamples(
     "grimoire-cli duplicates unlink --resource-type book --parent-id <id>");
 command.AddResponseExample<Generated.Models.UnlinkResult>();
 ```
-Flags: `--resource-type` (Choice, Required), `--ids`
+Flags: `--resource-type` (Choice, `"Collection to act on"`, Required), `--ids`
 (`"Variants to free; repeatable"`, `AllowMultipleArgumentsPerToken = true`),
 `--parent-id` (`"Free every variant of this parent"`), `--server`. Add a command
 validator refusing when neither `--ids` nor `--parent-id` is given, with the
@@ -706,8 +709,9 @@ command.AddExamples(
     "grimoire-cli duplicates merge-metadata --resource-type book --source-id <id> --target-id <id> --fields tags --overwrite");
 command.AddResponseExample<Generated.Models.MergeMetadataResult>();
 ```
-Flags: `--resource-type` (Choice, Required), `--source-id` (Required),
-`--target-id` (Required), `--fields` (`"Fields to copy; repeatable"`, Required,
+Flags: `--resource-type` (Choice, `"Collection to act on"`, Required),
+`--source-id` (`"Item to copy from"`, Required), `--target-id`
+(`"Item to copy onto"`, Required), `--fields` (`"Fields to copy; repeatable"`, Required,
 `AllowMultipleArgumentsPerToken = true`), `--overwrite`
 (`"Replace values already set on the target"`), `--server`. Returns `0`.
 
@@ -732,7 +736,7 @@ command.AddExamples(
     "grimoire-cli duplicates delete --resource-type book --id <id> --delete-file true --reparent-to \"\"");
 command.AddResponseExample<Generated.Models.DeleteItemResult>();
 ```
-Flags: `--resource-type` (Choice, Required), `--id` (`"Item to delete"`,
+Flags: `--resource-type` (Choice, `"Collection to act on"`, Required), `--id` (`"Item to delete"`,
 Required), `--delete-file` (`Option<bool>`, **Required**,
 `"Also delete the file from disk; irreversible"`), `--reparent-to`
 (`"Which variant inherits the rest; \"\" frees them all"`), `--server`.
@@ -749,7 +753,7 @@ command.AddExamples(
     "grimoire-cli duplicates compare --resource-type book --ids <id> <id>");
 command.AddResponseExample<Generated.Models.CompareResult>();
 ```
-Flags: `--resource-type` (Choice, Required), `--ids` (`"Items to compare;
+Flags: `--resource-type` (Choice, `"Collection to act on"`, Required), `--ids` (`"Items to compare;
 repeatable"`, Required, `AllowMultipleArgumentsPerToken = true`), `--server`.
 
 - [ ] **Step 4: Register the command**
