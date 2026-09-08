@@ -1265,13 +1265,21 @@ print((h+b'.'+p+b'.'+b64(hmac.new(b'$DEV_SECRET',h+b'.'+p,hashlib.sha256).digest
 fi
 
 # --- duplicates -------------------------------------------------------------
-# Read-only except for one link/unlink round trip on two fixture books, which
-# returns the fixture to its prior state, so a re-run converges. `delete` is
-# never exercised here: it is irreversible.
+# Read-only except for a dismiss/undismiss round trip and a link/unlink round
+# trip on two fixture books, both of which return the fixture to its prior
+# state, so a re-run converges. Four commands are deliberately not exercised:
+#   delete   - irreversible; no fixture item's loss could be undone by a re-run.
+#   scan     - starts a real background detection pass whose completion is
+#              nondeterministic, and would invalidate the cancel-scan
+#              "not_running" and groups assertions in the same run.
+#   promote  - needs a family to promote within, and unwinding a swapped
+#              parent/child adds two more writes for a path the link/unlink
+#              round trip already covers.
 # Extends the files-block trap (line 162) rather than replacing it: trap bodies
-# are single-quoted, so $DUP_CHILD is expanded when the trap fires, not now —
-# harmless while it is still unset, and a real cleanup once link sets it.
-trap '"$CLI" duplicates unlink --resource-type book --ids "${DUP_CHILD:-}" >/dev/null 2>&1 || true; "$CLI" files delete --path "books/$SMOKE_DIR" --confirm-name "$SMOKE_DIR" --delete-files >/dev/null 2>&1 || true; rm -rf "$WORK"' EXIT
+# are single-quoted, so $DUP_CHILD/$DUP_DISMISSAL are expanded when the trap
+# fires, not now — harmless while still unset, and a real cleanup once the
+# dismiss/link calls set them.
+trap '"$CLI" duplicates undismiss --id "${DUP_DISMISSAL:-}" >/dev/null 2>&1 || true; "$CLI" duplicates unlink --resource-type book --ids "${DUP_CHILD:-}" >/dev/null 2>&1 || true; "$CLI" files delete --path "books/$SMOKE_DIR" --confirm-name "$SMOKE_DIR" --delete-files >/dev/null 2>&1 || true; rm -rf "$WORK"' EXIT
 
 DUP_JSON=$("$CLI" duplicates scan-status 2>"$WORK/cli.err") \
   || { cat "$WORK/cli.err" >&2; fail "duplicates scan-status exited non-zero"; }
@@ -1322,6 +1330,40 @@ ok "duplicates compare returns two copies side by side"
 "$CLI" duplicates compare --resource-type book --ids "$DUP_PARENT" >/dev/null 2>&1 \
   && fail "compare should refuse a single id"
 ok "duplicates compare refuses fewer than two items"
+
+# dismiss/dismissals/undismiss round trip. Runs before the link/unlink pair
+# below: while $DUP_CHILD is a variant it is hidden from listings.
+DUP_JSON=$("$CLI" duplicates dismiss --resource-type book --member-ids "$DUP_PARENT" "$DUP_CHILD" \
+  --note "smoke test" 2>"$WORK/cli.err") \
+  || { cat "$WORK/cli.err" >&2; fail "duplicates dismiss exited non-zero"; }
+DUP_DISMISSAL=$(echo "$DUP_JSON" | jq -r .id)
+[ -n "$DUP_DISMISSAL" ] || fail "dismiss should return an id: $DUP_JSON"
+ok "duplicates dismiss marks a group as not duplicates"
+
+DUP_JSON=$("$CLI" duplicates dismissals 2>"$WORK/cli.err") \
+  || { cat "$WORK/cli.err" >&2; fail "duplicates dismissals exited non-zero"; }
+echo "$DUP_JSON" | jq -e --arg id "$DUP_DISMISSAL" '.dismissals | any(.id == $id)' >/dev/null \
+  || fail "dismissals should list the new dismissal: $DUP_JSON"
+ok "duplicates dismissals lists the new dismissal"
+
+"$CLI" duplicates undismiss --id "$DUP_DISMISSAL" >/dev/null 2>"$WORK/cli.err" \
+  || { cat "$WORK/cli.err" >&2; fail "duplicates undismiss exited non-zero"; }
+DUP_JSON=$("$CLI" duplicates dismissals 2>"$WORK/cli.err") \
+  || { cat "$WORK/cli.err" >&2; fail "duplicates dismissals exited non-zero"; }
+echo "$DUP_JSON" | jq -e --arg id "$DUP_DISMISSAL" '.dismissals | any(.id == $id) | not' >/dev/null \
+  || fail "undismiss should remove the dismissal: $DUP_JSON"
+ok "duplicates undismiss makes the group findable again"
+
+# title is already set on both books, so without --overwrite the server
+# copies nothing (commit is guarded by `if updated:`) — read-only in effect.
+DUP_JSON=$("$CLI" duplicates merge-metadata --resource-type book --source-id "$DUP_PARENT" \
+  --target-id "$DUP_CHILD" --fields title 2>"$WORK/cli.err") \
+  || { cat "$WORK/cli.err" >&2; fail "duplicates merge-metadata exited non-zero"; }
+[ "$(echo "$DUP_JSON" | jq '.updated | length')" -eq 0 ] \
+  || fail "merge-metadata without --overwrite should write nothing: $DUP_JSON"
+echo "$DUP_JSON" | jq -e '.skipped | index("title") != null' >/dev/null \
+  || fail "merge-metadata should skip the already-set title: $DUP_JSON"
+ok "duplicates merge-metadata skips a field already set on the target"
 
 # A bogus child is reported per-child, so the request succeeds and exits 3.
 printf '{"resource_type":"book","parent_id":"%s","children":[{"id":"no-such-id","kind":"other","label":""}]}' \
