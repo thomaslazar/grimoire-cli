@@ -207,6 +207,13 @@ one-verb group.
 `cover`, but no command ships for it today — see
 [docs/roadmap.md](roadmap.md).)
 
+A leaf can also host a child while keeping its own action: `/api/search` is a
+GET with its own verb, `search`, and `/api/search/fields` nests under it as
+`search fields`. This is not the one-verb group the rule above forbids —
+`search` is a leaf that runs a search and happens to host a child, not a
+group wrapping a single verb — and because `--query` is a flag rather than a
+positional, `search fields` parses with no ambiguity against `search --query`.
+
 This corrects an earlier rule: `systems metadata-sources` /
 `metadata-search` / `metadata-fetch` were justified by "every command here is
 two levels deep," which was the wrong generalization — those three are

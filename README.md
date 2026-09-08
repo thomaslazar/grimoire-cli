@@ -241,6 +241,10 @@ grimoire-cli config set server https://grimoire.example.com
 | `parent-systems list` | List the parent-system vocabulary (ships empty) |
 | `system-families list` | List the system-family vocabulary |
 | `dice-materials list` | List the dice/material vocabulary |
+| `search --query <q> [--limit <1-200>] [--book-id <id>] [--system-id <id>]` | Search page text and metadata across the library |
+| `search fields` | The `field:` prefixes a search query accepts |
+| `tags list [--in-use-by <type>]` | List tags with their usage counts |
+| `tags items --tag <key> [--resource-type <type>]` | Items and folders carrying a tag |
 | `self-test` | Verify binary integrity (AOT validation, no network required) |
 
 Every command supports `--help` with examples and caveats.

@@ -29,14 +29,14 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | maintenance | 1 / 5 |
 | maps | 0 / 13 |
 | saved-filters | 0 / 4 |
-| search | 0 / 2 |
+| search | 2 / 2 |
 | settings | 0 / 5 |
 | systems | 14 / 15 |
-| tags | 0 / 6 |
+| tags | 2 / 6 |
 | themes | 0 / 7 |
 | tokens | 0 / 10 |
 | users | 0 / 16 |
-| **Total** | **58 / 285** |
+| **Total** | **62 / 285** |
 
 2 operation(s) are internal-only (🔒) and excluded from covered counts.
 
@@ -358,8 +358,8 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 
 | Method | Path | Description | Perm | CLI |
 |--------|------|-------------|------|-----|
-| GET | `/api/search` | Full-text search | not guest | — |
-| GET | `/api/search/fields` | Searchable fields | not guest | — |
+| GET | `/api/search` | Full-text search | not guest | `search` ✅ |
+| GET | `/api/search/fields` | Searchable fields | not guest | `search fields` ✅ |
 
 ## settings
 
@@ -395,11 +395,11 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 
 | Method | Path | Description | Perm | CLI |
 |--------|------|-------------|------|-----|
-| GET | `/api/tags` | List tags |  | — |
+| GET | `/api/tags` | List tags |  | `tags list` ✅ |
 | POST | `/api/tags` | Create a tag | gm or admin | — |
 | PATCH | `/api/tags/{internal}` | Rename a tag's display value | gm or admin | — |
 | DELETE | `/api/tags/{internal}` | Delete a tag | gm or admin | — |
-| GET | `/api/tags/{internal}/items` | Items carrying a tag |  | — |
+| GET | `/api/tags/{internal}/items` | Items carrying a tag |  | `tags items` ✅ |
 | POST | `/api/tags/{internal}/merge` | Merge a tag into another | gm or admin | — |
 
 ## themes
