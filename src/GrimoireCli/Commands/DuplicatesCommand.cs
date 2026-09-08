@@ -19,6 +19,8 @@ public static class DuplicatesCommand
         command.Subcommands.Add(CreateMergeMetadataCommand());
         command.Subcommands.Add(CreateDeleteCommand());
         command.Subcommands.Add(CreateCompareCommand());
+        foreach (var leaf in DuplicatesScanCommands.Create())
+            command.Subcommands.Add(leaf);
         return command;
     }
 
