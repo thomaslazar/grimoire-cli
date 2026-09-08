@@ -73,6 +73,19 @@ public class SearchCommandTests
         Assert.DoesNotContain("Role required:", Help(path));
     }
 
+    // The query language lives entirely inside --query, and `search fields`
+    // returns field names and aliases only — never the syntax — so the AND/OR
+    // semantics, the quoting rule and the year: operators are learnable from
+    // this section or nowhere.
+    [Theory]
+    [InlineData("tag:forest tag:swamp")]
+    [InlineData("Quote a multi-word value")]
+    [InlineData("1999-2005")]
+    public void SearchDocumentsItsQuerySyntax(string expected)
+    {
+        Assert.Contains(expected, Help(["search"]));
+    }
+
     // The three caveats a caller cannot infer: the other result sets ignore
     // --limit, a filter switches off page-text search, and a typo'd prefix is
     // searched literally instead of refused.

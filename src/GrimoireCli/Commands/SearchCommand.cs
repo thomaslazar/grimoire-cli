@@ -22,7 +22,7 @@ public static class SearchCommand
             "does not raise them.",
             "",
             "field:value filters go inside --query. Any filter switches off the",
-            "page-text search; text: switches it back on. search fields lists them.",
+            "page-text search; text: switches it back on.",
             "",
             "An unrecognised prefix is searched literally rather than refused, so",
             "a typo returns nothing. The response's fields echoes what was read",
@@ -34,6 +34,17 @@ public static class SearchCommand
             "",
             "--book-id and --system-id drop the map, token and audio results;",
             "--book-id also empties book_matches.");
+        command.AddHelpSection("Query syntax", HelpSectionPosition.Top,
+            "Different fields narrow, repeating one widens: system:pbta",
+            "category:core matches both, tag:forest tag:swamp matches either.",
+            "",
+            "Quote a multi-word value — unquoted, only the first word binds to",
+            "the field and the rest becomes free text.",
+            "",
+            "year: takes 1999, >1999, <=2005 or 1999-2005.",
+            "Page text also takes fire* as a prefix match — * only at the end.",
+            "",
+            "search fields lists the field names and their aliases.");
         command.AddExamples(
             "grimoire-cli search --query \"dragon\"",
             "grimoire-cli search --query \"author:'Ben Robbins' year:>2010\"",

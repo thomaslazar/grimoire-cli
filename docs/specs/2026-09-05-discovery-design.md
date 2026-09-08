@@ -120,6 +120,53 @@ caller concludes from the response:
 Response shape is `AddResponseExample<SearchResponse>`, which the generator
 already renders with every bucket expanded.
 
+### Query syntax section
+
+The filter language lives entirely inside `--query`, and `search fields` returns
+field names and aliases only — never the operators — so without a section of its
+own the syntax is learnable nowhere. `abs-cli`'s `search` settled this shape with
+its `Search behavior` and `Fields searched` sections: Notes keeps the caveats,
+and the language sits where a caller looks for it.
+
+Four rules, each verified against the running stack:
+
+- **Different fields AND; a repeated field ORs.** `_apply_field_filters` calls
+  `query.filter` once per field and `_any_of` within one. Verified:
+  `title:dsa title:honey` returned 4 where the two separately returned 3 and 1,
+  and `title:dsa category:nonsuch` returned 0 where `title:dsa` returned 3.
+- **A multi-word value must be quoted.** `_TOKEN_RE` binds one
+  whitespace-delimited token to the prefix and the rest falls through to free
+  text. Verified: `category:"core errata"` returned 0 against
+  `category:core errata`'s 1.
+- **`year:` takes `1999`, `>1999`, `<=2005` and `1999-2005`** (`year_bounds`).
+- **Page text takes an FTS5 prefix match, trailing `*` only.** `to_fts_query`
+  passes a token through bare only when it is a plain bareword or a bareword
+  followed by `*`; anything else is quoted into a literal phrase. So an infix
+  `*` searches for itself and matches nothing. Verified: `text:fixt*` and
+  `text:fixture*` returned 50, while `text:*ture`, `text:fi*ure` and
+  `text:f*xture` each returned 0.
+
+### Query syntax section
+
+The filter language lives entirely inside `--query`, and `search fields` returns
+field names and aliases only — never the operators — so a `Query syntax` section
+carries what is otherwise learnable nowhere. `abs-cli`'s `search` settled this
+shape with its own `Search behavior` and `Fields searched` sections; the split
+keeps Notes for caveats and puts the language where a caller looks for it.
+
+Four rules, each verified against the running stack:
+
+- **Different fields AND, a repeated field ORs.** `_apply_field_filters` calls
+  `query.filter` per field and `_any_of` within one. Verified:
+  `title:dsa title:honey` returned 4 where the two alone returned 3 and 1, and
+  `title:dsa category:nonsuch` returned 0 where `title:dsa` alone returned 3.
+- **A multi-word value must be quoted.** `_TOKEN_RE` binds one whitespace-
+  delimited token to the prefix; the rest becomes free text. Verified:
+  `category:"core errata"` returned 0, `category:core errata` returned 1.
+- **`year:` takes `1999`, `>1999`, `<=2005` and `1999-2005`** (`year_bounds`).
+- **Page text takes an FTS5 prefix match.** Verified: `text:fixt*` returned 50
+  where `text:fixt` returned 0.
+
 ## `search fields` — `GET /api/search/fields`
 
 No parameters. Returns the fourteen canonical field names with their aliases,
