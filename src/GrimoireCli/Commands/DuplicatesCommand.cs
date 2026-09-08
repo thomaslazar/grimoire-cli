@@ -36,8 +36,7 @@ public static class DuplicatesCommand
         command.AddRoleRequired("admin");
         JsonBodyInput.RequireExactlyOneSource(command, inputOption, stdinOption);
         command.AddHelpSection("Notes", HelpSectionPosition.Top,
-            "Body: {resource_type, parent_id, children:[{id, kind, label}]}. At most 20",
-            "children per request.",
+            "At most 20 children. Each requires id and kind; label is optional.",
             "",
             "Per child: a rejected one lands in errors and the rest are linked, so a",
             "partial exits 3. Re-sending a fixed batch re-reports the children that",
@@ -47,11 +46,14 @@ public static class DuplicatesCommand
             "variants of its own — two levels, never three. A child already filed",
             "under another parent is moved, not refused.",
             "",
-            "kind by collection. book: version, other, printer-friendly, form-fillable,",
-            "spreads, single-page, black-and-white. map: version, other,",
-            "printer-friendly, black-and-white, gridded, gridless, universal-vtt, video,",
-            "image. token: version, other, black-and-white, color-variation. audio:",
-            "version, other, remix, slowed, sped-up.",
+            "kind is a closed set, scoped by collection. version and other apply to",
+            "every collection; each adds its own:",
+            "  book   printer-friendly, form-fillable, spreads, single-page,",
+            "         black-and-white",
+            "  map    printer-friendly, black-and-white, gridded, gridless,",
+            "         universal-vtt, video, image",
+            "  token  black-and-white, color-variation",
+            "  audio  remix, slowed, sped-up",
             "",
             "label is free text, trimmed to 120 characters without warning.");
         command.AddExamples(

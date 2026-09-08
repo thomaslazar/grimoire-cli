@@ -111,6 +111,13 @@ mini-language, and the repeatable form is already the house shape.
 a bulk linker chunks. The cap is the server's, stated in help, not enforced
 client-side.
 
+`link`'s Notes state the cap and which child fields are mandatory, and nothing
+else about the body: `AddRequestShape<LinkRequest>` already renders the field
+list from the generated model — including `resource_type` as
+`<book|map|token|audio>`, which prose would not. What the sample cannot show is
+the cap and that `label` is the one optional child field, which is the same split
+`books batch-update` draws with "At most 1000 items. Each item requires id."
+
 ## Exit codes
 
 Three different rules apply, and the third is the one to get wrong.
@@ -174,7 +181,10 @@ collection (`models/variants.py`: book 7, map 9, token 4, audio 5 values), and
 Mirroring it would be the client-side policy duplication thin pass-through
 forbids — the same call already made for `in_use_by` and `resource_type`. `link`
 takes JSON, so validating would additionally mean inspecting the parsed body.
-The kinds are listed in `link`'s help instead, since nothing else exposes them.
+The kinds are listed in `link`'s help instead, since nothing else exposes them —
+as an indented list, one collection per line, with `version` and `other` factored
+out as the universal pair. Run together as prose the set is unreadable: the
+collection names land mid-line and `version, other` repeats four times.
 
 ## `compare` needed a generator fix
 
