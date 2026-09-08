@@ -156,6 +156,19 @@ IMPLEMENTED = {
     "GET /api/search/fields": "`search fields` ✅",
     "GET /api/tags": "`tags list` ✅",
     "GET /api/tags/{internal}/items": "`tags items` ✅",
+    "POST /api/duplicates/link": "`duplicates link` ✅",
+    "POST /api/duplicates/promote": "`duplicates promote` ✅",
+    "POST /api/duplicates/unlink": "`duplicates unlink` ✅",
+    "POST /api/duplicates/merge-metadata": "`duplicates merge-metadata` ✅",
+    "DELETE /api/duplicates/items/{resource_type}/{item_id}": "`duplicates delete` ✅",
+    "GET /api/duplicates/compare": "`duplicates compare` ✅",
+    "POST /api/duplicates/scan": "`duplicates scan` ✅",
+    "GET /api/duplicates/scan-status": "`duplicates scan-status` ✅",
+    "POST /api/duplicates/cancel-scan": "`duplicates cancel-scan` ✅",
+    "GET /api/duplicates/groups": "`duplicates groups` ✅",
+    "POST /api/duplicates/dismiss": "`duplicates dismiss` ✅",
+    "GET /api/duplicates/dismissals": "`duplicates dismissals` ✅",
+    "DELETE /api/duplicates/dismissals/{dismissal_id}": "`duplicates undismiss` ✅",
 }
 
 ROLE_LABEL = {

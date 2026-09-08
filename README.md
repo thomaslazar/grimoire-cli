@@ -245,6 +245,19 @@ grimoire-cli config set server https://grimoire.example.com
 | `search fields` | The `field:` prefixes a search query accepts |
 | `tags list [--in-use-by <type>]` | List tags with their usage counts |
 | `tags items --tag <key> [--resource-type <type>]` | Items and folders carrying a tag |
+| `duplicates link {--input <file> \| --stdin}` | File items under a parent as its variants; exit 3 if partial (admin) |
+| `duplicates promote --resource-type <t> --new-parent-id <id> --old-parent-id <id> [--kind <k>] [--label <l>]` | Make a different copy the main version of a family (admin) |
+| `duplicates unlink --resource-type <t> (--ids <id>... \| --parent-id <id>)` | Promote variants back to standalone entries (admin) |
+| `duplicates merge-metadata --resource-type <t> --source-id <id> --target-id <id> --fields <f>... [--overwrite]` | Copy metadata fields from one copy onto another (admin) |
+| `duplicates delete --resource-type <t> --id <id> --delete-file true\|false [--reparent-to <id>]` | Delete one duplicate's record, and optionally its file (admin) |
+| `duplicates compare --resource-type <t> --ids <id>...` | Compare two to four copies side by side (admin) |
+| `duplicates scan [--resource-types <t>...] [--accuracy exact\|high\|medium\|low]` | Start a duplicate-detection pass; exit 3 if already running (admin) |
+| `duplicates scan-status` | Show the duplicate scan's progress (admin) |
+| `duplicates cancel-scan` | Stop the running duplicate scan (admin) |
+| `duplicates groups [--resource-type <t>] [--min-confidence <n>] [--limit <1-200>] [--offset <n>]` | List candidate duplicate groups from the last scan (admin) |
+| `duplicates dismiss --resource-type <t> --member-ids <id>... [--note <text>]` | Mark a group as not duplicates (admin) |
+| `duplicates dismissals [--resource-type <t>]` | List dismissed groups (admin) |
+| `duplicates undismiss --id <id>` | Undo a dismissal (admin) |
 | `self-test` | Verify binary integrity (AOT validation, no network required) |
 
 Every command supports `--help` with examples and caveats.

@@ -677,3 +677,47 @@ matching by title *and* by page text is counted twice.
   books, `books list` already enumerates with `--offset` and `search` already
   filters. Do not add a command for it on a coverage-gap sweep; revisit it
   with the maps, tokens and audio blocks.
+
+## Duplicates
+
+Read from `backend/routers/duplicates/__init__.py`, `core.py`, `detection.py`,
+`_helpers.py`, `backend/models/variants.py`, `backend/services/variants.py` and
+`backend/services/library_fs/deletes.py` at tag `v1.6.1`, and verified against
+the running 1.6.1 stack.
+
+- **`DELETE /items/{resource_type}/{item_id}` deletes the file by default.**
+  `DeleteItemRequest.delete_file` is `True`, and an omitted body becomes
+  `DeleteItemRequest()`, so a bodyless call removes the file. That is the inverse
+  of `POST /api/files/delete`, which is soft by default — and deliberate:
+  `delete_file: false` keeps the file, which the next library scan re-indexes,
+  putting the duplicate back. The CLI requires the value rather than defaulting
+  it either way.
+- **What `delete` removes does not depend on the flag.** The row goes either way,
+  and `purge_references` takes the `book_search` page rows, bookmarks, favorites,
+  tags, and campaign resource links with their shares; `_purge_derived` drops the
+  thumbnail and page cache. `--delete-file` decides only whether the file leaves
+  the disk, with its sidecars. `ENOENT` is tolerated, so a record whose file is
+  already gone still deletes and reports `file_deleted: false`; `EROFS` is a 409
+  with nothing committed.
+- **`/link` validates per child, not per request.** `validate_kind` and every
+  structural guard run inside the loop, so a bad id, a repeated id or an
+  unaccepted kind lands in `errors` while the remaining children commit at
+  HTTP 200 — the exit-3 contract. Capped at 20 children.
+- **`mergeable_fields` never reaches the client.** `/compare` declares
+  `response_model=CompareResult`, which omits it; the `CompareResponse` model
+  that carries it is unused by the route. Verified: a compare response holds only
+  `differences`, `items`, `page_count_min`, `resource_type` and
+  `suggested_parent_id`. So nothing exposes the copyable set, and the only way to
+  learn it is the 400 from `/merge-metadata`, which lists it.
+- **`/unlink` with neither `ids` nor `parent_id` is a silent no-op**, answering
+  `200 {"unlinked": []}`. `parent_id` wins when both are given.
+- **`variant_label` is trimmed to 120 characters silently**
+  (`services/variants.py:215`), on both `/link` and `/promote`.
+- **`/groups` has no lower bound on `limit`.** Declared `Query(50, le=200)`; a
+  negative value slices to an empty page and answers 200.
+- **`/scan` has two conflict paths.** A *library* scan in flight is a 409; a
+  *duplicate* scan in flight is `200 {"status": "already_running"}` with nothing
+  started. `/cancel-scan` answers `not_running` or `stop_requested`, both 200.
+- **`resource_type` is a body or query field on twelve of the thirteen routes** —
+  only the item delete carries it in the path. So one command group covers books,
+  maps, tokens and audio without those command groups existing.

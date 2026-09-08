@@ -22,38 +22,6 @@ rather than a second layer. They come after duplicate handling.
 
 ## Next
 
-**Duplicate handling** — `duplicates`, thirteen endpoints. The one post-objective block
-worth describing now, because it is the answer to the problem a growing PDF
-library actually develops: the same rulebook arriving as several scans of
-differing quality, or a revised printing sitting beside the original.
-
-- `scan`, `scan-status`, `cancel-scan` — a detection pass over the library,
-  asynchronous like the library scan. It refuses with `409` while a *library*
-  scan is running and answers `{"status": "already_running"}` when a duplicate
-  scan is already in flight, so it needs both the 409 path and the exit-3
-  mapping `library rescan` already uses for the latter.
-- `groups` — the candidate groups the last scan produced.
-- `compare` — two to four items side by side, for deciding what a group is.
-
-Then one of five resolutions, which is where the design thinking will go, because
-they are not interchangeable:
-
-- `dismiss` — the group is not duplicates. Reversible: `dismissals` lists them
-  and a `DELETE` undoes one, so a wrong dismissal is not permanent.
-- `link` / `unlink` — file copies under a parent as its *variants*. Keeps every
-  copy while nominating a relationship, which is the right answer for different
-  printings.
-- `promote` — make a different copy the main version of an existing family. The
-  companion to `link`: it is how a better scan replaces the one that happened to
-  be indexed first.
-- `merge-metadata` — copy fields from one copy onto another, for when the good
-  scan has the worse metadata.
-- delete one record, and optionally its file. The only irreversible option, and
-  the one that will need the most care in help text.
-
-The verbs carry `resource_type` in their paths, so this generalises to maps,
-tokens and audio for free once those exist.
-
 **Vocabulary writes** — `create` and `delete` on each of the five vocabularies,
 completing the set the shipped vocabulary reads open. Ten endpoints, all admin.
 
