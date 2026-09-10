@@ -22,6 +22,22 @@ namespace GrimoireCli.Generated.Models
 #else
         public global::GrimoireCli.Generated.Models.MapUpdate.MapUpdate_description Description { get; set; }
 #endif
+        /// <summary>The grid_height property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public global::GrimoireCli.Generated.Models.MapUpdate.MapUpdate_grid_height? GridHeight { get; set; }
+#nullable restore
+#else
+        public global::GrimoireCli.Generated.Models.MapUpdate.MapUpdate_grid_height GridHeight { get; set; }
+#endif
+        /// <summary>The grid_px property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public global::GrimoireCli.Generated.Models.MapUpdate.MapUpdate_grid_px? GridPx { get; set; }
+#nullable restore
+#else
+        public global::GrimoireCli.Generated.Models.MapUpdate.MapUpdate_grid_px GridPx { get; set; }
+#endif
         /// <summary>The grid_size property</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
@@ -29,6 +45,14 @@ namespace GrimoireCli.Generated.Models
 #nullable restore
 #else
         public global::GrimoireCli.Generated.Models.MapUpdate.MapUpdate_grid_size GridSize { get; set; }
+#endif
+        /// <summary>The grid_width property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public global::GrimoireCli.Generated.Models.MapUpdate.MapUpdate_grid_width? GridWidth { get; set; }
+#nullable restore
+#else
+        public global::GrimoireCli.Generated.Models.MapUpdate.MapUpdate_grid_width GridWidth { get; set; }
 #endif
         /// <summary>The map_type property</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
@@ -72,7 +96,10 @@ namespace GrimoireCli.Generated.Models
             return new Dictionary<string, Action<IParseNode>>
             {
                 { "description", n => { Description = n.GetObjectValue<global::GrimoireCli.Generated.Models.MapUpdate.MapUpdate_description>(global::GrimoireCli.Generated.Models.MapUpdate.MapUpdate_description.CreateFromDiscriminatorValue); } },
+                { "grid_height", n => { GridHeight = n.GetObjectValue<global::GrimoireCli.Generated.Models.MapUpdate.MapUpdate_grid_height>(global::GrimoireCli.Generated.Models.MapUpdate.MapUpdate_grid_height.CreateFromDiscriminatorValue); } },
+                { "grid_px", n => { GridPx = n.GetObjectValue<global::GrimoireCli.Generated.Models.MapUpdate.MapUpdate_grid_px>(global::GrimoireCli.Generated.Models.MapUpdate.MapUpdate_grid_px.CreateFromDiscriminatorValue); } },
                 { "grid_size", n => { GridSize = n.GetObjectValue<global::GrimoireCli.Generated.Models.MapUpdate.MapUpdate_grid_size>(global::GrimoireCli.Generated.Models.MapUpdate.MapUpdate_grid_size.CreateFromDiscriminatorValue); } },
+                { "grid_width", n => { GridWidth = n.GetObjectValue<global::GrimoireCli.Generated.Models.MapUpdate.MapUpdate_grid_width>(global::GrimoireCli.Generated.Models.MapUpdate.MapUpdate_grid_width.CreateFromDiscriminatorValue); } },
                 { "map_type", n => { MapType = n.GetObjectValue<global::GrimoireCli.Generated.Models.MapUpdate.MapUpdate_map_type>(global::GrimoireCli.Generated.Models.MapUpdate.MapUpdate_map_type.CreateFromDiscriminatorValue); } },
                 { "tags", n => { Tags = n.GetCollectionOfPrimitiveValues<string>()?.AsList(); } },
             };
@@ -85,7 +112,10 @@ namespace GrimoireCli.Generated.Models
         {
             if(ReferenceEquals(writer, null)) throw new ArgumentNullException(nameof(writer));
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.MapUpdate.MapUpdate_description>("description", Description);
+            writer.WriteObjectValue<global::GrimoireCli.Generated.Models.MapUpdate.MapUpdate_grid_height>("grid_height", GridHeight);
+            writer.WriteObjectValue<global::GrimoireCli.Generated.Models.MapUpdate.MapUpdate_grid_px>("grid_px", GridPx);
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.MapUpdate.MapUpdate_grid_size>("grid_size", GridSize);
+            writer.WriteObjectValue<global::GrimoireCli.Generated.Models.MapUpdate.MapUpdate_grid_width>("grid_width", GridWidth);
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.MapUpdate.MapUpdate_map_type>("map_type", MapType);
             writer.WriteCollectionOfPrimitiveValues<string>("tags", Tags);
             writer.WriteAdditionalData(AdditionalData);
@@ -159,6 +189,130 @@ namespace GrimoireCli.Generated.Models
             }
         }
         /// <summary>
+        /// Composed type wrapper for classes <see cref="double"/>, <see cref="global::GrimoireCli.Generated.Models.MapUpdate_grid_heightMember1"/>
+        /// </summary>
+        [global::System.CodeDom.Compiler.GeneratedCode("Kiota", "1.0.0")]
+        public partial class MapUpdate_grid_height : IComposedTypeWrapper, IParsable
+        {
+            /// <summary>Composed type representation for type <see cref="double"/></summary>
+            public double? Double { get; set; }
+            /// <summary>Composed type representation for type <see cref="global::GrimoireCli.Generated.Models.MapUpdate_grid_heightMember1"/></summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+            public global::GrimoireCli.Generated.Models.MapUpdate_grid_heightMember1? MapUpdateGridHeightMember1 { get; set; }
+#nullable restore
+#else
+            public global::GrimoireCli.Generated.Models.MapUpdate_grid_heightMember1 MapUpdateGridHeightMember1 { get; set; }
+#endif
+            /// <summary>
+            /// Creates a new instance of the appropriate class based on discriminator value
+            /// </summary>
+            /// <returns>A <see cref="global::GrimoireCli.Generated.Models.MapUpdate.MapUpdate_grid_height"/></returns>
+            /// <param name="parseNode">The parse node to use to read the discriminator value and create the object</param>
+            public static global::GrimoireCli.Generated.Models.MapUpdate.MapUpdate_grid_height CreateFromDiscriminatorValue(IParseNode parseNode)
+            {
+                if(ReferenceEquals(parseNode, null)) throw new ArgumentNullException(nameof(parseNode));
+                var result = new global::GrimoireCli.Generated.Models.MapUpdate.MapUpdate_grid_height();
+                if(parseNode.GetDoubleValue() is double doubleValue)
+                {
+                    result.Double = doubleValue;
+                }
+                else {
+                    result.MapUpdateGridHeightMember1 = new global::GrimoireCli.Generated.Models.MapUpdate_grid_heightMember1();
+                }
+                return result;
+            }
+            /// <summary>
+            /// The deserialization information for the current model
+            /// </summary>
+            /// <returns>A IDictionary&lt;string, Action&lt;IParseNode&gt;&gt;</returns>
+            public virtual IDictionary<string, Action<IParseNode>> GetFieldDeserializers()
+            {
+                if(MapUpdateGridHeightMember1 != null)
+                {
+                    return ParseNodeHelper.MergeDeserializersForIntersectionWrapper(MapUpdateGridHeightMember1);
+                }
+                return new Dictionary<string, Action<IParseNode>>();
+            }
+            /// <summary>
+            /// Serializes information the current object
+            /// </summary>
+            /// <param name="writer">Serialization writer to use to serialize this model</param>
+            public virtual void Serialize(ISerializationWriter writer)
+            {
+                if(ReferenceEquals(writer, null)) throw new ArgumentNullException(nameof(writer));
+                if(Double != null)
+                {
+                    writer.WriteDoubleValue(null, Double);
+                }
+                else {
+                    writer.WriteObjectValue<global::GrimoireCli.Generated.Models.MapUpdate_grid_heightMember1>(null, MapUpdateGridHeightMember1);
+                }
+            }
+        }
+        /// <summary>
+        /// Composed type wrapper for classes <see cref="double"/>, <see cref="global::GrimoireCli.Generated.Models.MapUpdate_grid_pxMember1"/>
+        /// </summary>
+        [global::System.CodeDom.Compiler.GeneratedCode("Kiota", "1.0.0")]
+        public partial class MapUpdate_grid_px : IComposedTypeWrapper, IParsable
+        {
+            /// <summary>Composed type representation for type <see cref="double"/></summary>
+            public double? Double { get; set; }
+            /// <summary>Composed type representation for type <see cref="global::GrimoireCli.Generated.Models.MapUpdate_grid_pxMember1"/></summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+            public global::GrimoireCli.Generated.Models.MapUpdate_grid_pxMember1? MapUpdateGridPxMember1 { get; set; }
+#nullable restore
+#else
+            public global::GrimoireCli.Generated.Models.MapUpdate_grid_pxMember1 MapUpdateGridPxMember1 { get; set; }
+#endif
+            /// <summary>
+            /// Creates a new instance of the appropriate class based on discriminator value
+            /// </summary>
+            /// <returns>A <see cref="global::GrimoireCli.Generated.Models.MapUpdate.MapUpdate_grid_px"/></returns>
+            /// <param name="parseNode">The parse node to use to read the discriminator value and create the object</param>
+            public static global::GrimoireCli.Generated.Models.MapUpdate.MapUpdate_grid_px CreateFromDiscriminatorValue(IParseNode parseNode)
+            {
+                if(ReferenceEquals(parseNode, null)) throw new ArgumentNullException(nameof(parseNode));
+                var result = new global::GrimoireCli.Generated.Models.MapUpdate.MapUpdate_grid_px();
+                if(parseNode.GetDoubleValue() is double doubleValue)
+                {
+                    result.Double = doubleValue;
+                }
+                else {
+                    result.MapUpdateGridPxMember1 = new global::GrimoireCli.Generated.Models.MapUpdate_grid_pxMember1();
+                }
+                return result;
+            }
+            /// <summary>
+            /// The deserialization information for the current model
+            /// </summary>
+            /// <returns>A IDictionary&lt;string, Action&lt;IParseNode&gt;&gt;</returns>
+            public virtual IDictionary<string, Action<IParseNode>> GetFieldDeserializers()
+            {
+                if(MapUpdateGridPxMember1 != null)
+                {
+                    return ParseNodeHelper.MergeDeserializersForIntersectionWrapper(MapUpdateGridPxMember1);
+                }
+                return new Dictionary<string, Action<IParseNode>>();
+            }
+            /// <summary>
+            /// Serializes information the current object
+            /// </summary>
+            /// <param name="writer">Serialization writer to use to serialize this model</param>
+            public virtual void Serialize(ISerializationWriter writer)
+            {
+                if(ReferenceEquals(writer, null)) throw new ArgumentNullException(nameof(writer));
+                if(Double != null)
+                {
+                    writer.WriteDoubleValue(null, Double);
+                }
+                else {
+                    writer.WriteObjectValue<global::GrimoireCli.Generated.Models.MapUpdate_grid_pxMember1>(null, MapUpdateGridPxMember1);
+                }
+            }
+        }
+        /// <summary>
         /// Composed type wrapper for classes <see cref="global::GrimoireCli.Generated.Models.MapUpdate_grid_sizeMember1"/>, <see cref="string"/>
         /// </summary>
         [global::System.CodeDom.Compiler.GeneratedCode("Kiota", "1.0.0")]
@@ -223,6 +377,68 @@ namespace GrimoireCli.Generated.Models
                 }
                 else {
                     writer.WriteObjectValue<global::GrimoireCli.Generated.Models.MapUpdate_grid_sizeMember1>(null, MapUpdateGridSizeMember1);
+                }
+            }
+        }
+        /// <summary>
+        /// Composed type wrapper for classes <see cref="double"/>, <see cref="global::GrimoireCli.Generated.Models.MapUpdate_grid_widthMember1"/>
+        /// </summary>
+        [global::System.CodeDom.Compiler.GeneratedCode("Kiota", "1.0.0")]
+        public partial class MapUpdate_grid_width : IComposedTypeWrapper, IParsable
+        {
+            /// <summary>Composed type representation for type <see cref="double"/></summary>
+            public double? Double { get; set; }
+            /// <summary>Composed type representation for type <see cref="global::GrimoireCli.Generated.Models.MapUpdate_grid_widthMember1"/></summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+            public global::GrimoireCli.Generated.Models.MapUpdate_grid_widthMember1? MapUpdateGridWidthMember1 { get; set; }
+#nullable restore
+#else
+            public global::GrimoireCli.Generated.Models.MapUpdate_grid_widthMember1 MapUpdateGridWidthMember1 { get; set; }
+#endif
+            /// <summary>
+            /// Creates a new instance of the appropriate class based on discriminator value
+            /// </summary>
+            /// <returns>A <see cref="global::GrimoireCli.Generated.Models.MapUpdate.MapUpdate_grid_width"/></returns>
+            /// <param name="parseNode">The parse node to use to read the discriminator value and create the object</param>
+            public static global::GrimoireCli.Generated.Models.MapUpdate.MapUpdate_grid_width CreateFromDiscriminatorValue(IParseNode parseNode)
+            {
+                if(ReferenceEquals(parseNode, null)) throw new ArgumentNullException(nameof(parseNode));
+                var result = new global::GrimoireCli.Generated.Models.MapUpdate.MapUpdate_grid_width();
+                if(parseNode.GetDoubleValue() is double doubleValue)
+                {
+                    result.Double = doubleValue;
+                }
+                else {
+                    result.MapUpdateGridWidthMember1 = new global::GrimoireCli.Generated.Models.MapUpdate_grid_widthMember1();
+                }
+                return result;
+            }
+            /// <summary>
+            /// The deserialization information for the current model
+            /// </summary>
+            /// <returns>A IDictionary&lt;string, Action&lt;IParseNode&gt;&gt;</returns>
+            public virtual IDictionary<string, Action<IParseNode>> GetFieldDeserializers()
+            {
+                if(MapUpdateGridWidthMember1 != null)
+                {
+                    return ParseNodeHelper.MergeDeserializersForIntersectionWrapper(MapUpdateGridWidthMember1);
+                }
+                return new Dictionary<string, Action<IParseNode>>();
+            }
+            /// <summary>
+            /// Serializes information the current object
+            /// </summary>
+            /// <param name="writer">Serialization writer to use to serialize this model</param>
+            public virtual void Serialize(ISerializationWriter writer)
+            {
+                if(ReferenceEquals(writer, null)) throw new ArgumentNullException(nameof(writer));
+                if(Double != null)
+                {
+                    writer.WriteDoubleValue(null, Double);
+                }
+                else {
+                    writer.WriteObjectValue<global::GrimoireCli.Generated.Models.MapUpdate_grid_widthMember1>(null, MapUpdateGridWidthMember1);
                 }
             }
         }

@@ -24,5 +24,9 @@ namespace GrimoireCli.Generated.Models
         #pragma warning disable CS1591
         Audio,
         #pragma warning restore CS1591
+        [EnumMember(Value = "model")]
+        #pragma warning disable CS1591
+        Model,
+        #pragma warning restore CS1591
     }
 }

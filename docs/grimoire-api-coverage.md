@@ -2,7 +2,7 @@
 
 Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any) that implements it.
 
-- **Reference:** spec fetched live from the pinned stack's `/api/openapi.json` (v1.6.1, 219 paths, 285 operations) and the upstream router source read from the same container. Tested range: `1.6.0`-`1.6.1` (`GrimoireApiClient.cs`).
+- **Reference:** spec fetched live from the pinned stack's `/api/openapi.json` (v1.6.2, 230 paths, 301 operations) and the upstream router source read from the same container. Tested range: `1.6.2` only (`GrimoireApiClient.cs`).
 - **Perm** column uses Grimoire's roles (`admin` / `gm or admin` / `not guest`); blank = any authenticated user. `?` = a dependency this script could not resolve.
 - ✅ = covered by a CLI command · — = not implemented · 🔒 = internal-only (no user-facing verb); 🔒 rows never count as covered.
 - **Regenerate with `tools/generate-api-coverage.py`; update `IMPLEMENTED` there in the same PR as any change to which endpoints the CLI calls.**
@@ -14,6 +14,7 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | (untagged) | 0 / 1 |
 | addons | 7 / 7 |
 | audio | 0 / 14 |
+| audio-sets | 0 / 5 |
 | auth | 2 / 14 |
 | backups | 6 / 6 |
 | bookmarks | 0 / 4 |
@@ -27,7 +28,8 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | logs | 0 / 1 |
 | lookups | 5 / 15 |
 | maintenance | 1 / 5 |
-| maps | 0 / 13 |
+| maps | 0 / 14 |
+| models | 0 / 10 |
 | saved-filters | 0 / 4 |
 | search | 2 / 2 |
 | settings | 0 / 5 |
@@ -36,7 +38,7 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | themes | 0 / 7 |
 | tokens | 0 / 10 |
 | users | 0 / 16 |
-| **Total** | **75 / 285** |
+| **Total** | **75 / 301** |
 
 2 operation(s) are internal-only (🔒) and excluded from covered counts.
 
@@ -76,6 +78,16 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | DELETE | `/api/audio/{audio_id}/cover` | Remove an audio cover | gm or admin | — |
 | POST | `/api/audio/{audio_id}/cover/from-source` | Set an audio cover from an existing image | gm or admin | — |
 | GET | `/api/audio/{audio_id}/file` | Stream/download audio file |  | — |
+
+## audio-sets
+
+| Method | Path | Description | Perm | CLI |
+|--------|------|-------------|------|-----|
+| GET | `/api/audio-sets` | List the user's saved playlists and soundboards |  | — |
+| POST | `/api/audio-sets` | Save a playlist or soundboard |  | — |
+| GET | `/api/audio-sets/{set_id}` | Load one saved set, resolved against the library |  | — |
+| PATCH | `/api/audio-sets/{set_id}` | Rename a saved set or replace its contents |  | — |
+| DELETE | `/api/audio-sets/{set_id}` | Delete a saved set |  | — |
 
 ## auth
 
@@ -339,11 +351,27 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | POST | `/api/maps/bulk/tags` | Bulk add tags to maps | gm or admin | — |
 | GET | `/api/maps/{map_id}` | Get a map |  | — |
 | PATCH | `/api/maps/{map_id}` | Update map metadata | gm or admin | — |
+| GET | `/api/maps/{map_id}/export.uvtt` | Export a map as Universal VTT |  | — |
 | GET | `/api/maps/{map_id}/file` | Download map file |  | — |
 | GET | `/api/maps/{map_id}/page/{page_num}` | Render a map page |  | — |
 | GET | `/api/maps/{map_id}/thumbnail` | Map thumbnail |  | — |
 | GET | `/api/maps/{map_id}/vtt/data` | Universal VTT grid and feature data |  | — |
 | GET | `/api/maps/{map_id}/vtt/image` | Universal VTT map image |  | — |
+
+## models
+
+| Method | Path | Description | Perm | CLI |
+|--------|------|-------------|------|-----|
+| GET | `/api/model-folders` | List model folders | not guest | — |
+| PATCH | `/api/model-folders` | Set tags on a model folder | gm or admin | — |
+| POST | `/api/model-folders/bulk` | Bulk set model folder tags | gm or admin | — |
+| GET | `/api/models` | List 3D models | not guest | — |
+| POST | `/api/models/bulk` | Bulk update models | gm or admin | — |
+| POST | `/api/models/bulk/tags` | Bulk add tags to models | gm or admin | — |
+| GET | `/api/models/{model_id}` | Get a 3D model |  | — |
+| PATCH | `/api/models/{model_id}` | Update model metadata | gm or admin | — |
+| GET | `/api/models/{model_id}/file` | Download model file |  | — |
+| GET | `/api/models/{model_id}/thumbnail` | Model thumbnail |  | — |
 
 ## saved-filters
 

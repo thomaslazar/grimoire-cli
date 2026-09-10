@@ -4,6 +4,7 @@ using GrimoireCli.Generated.Api.About;
 using GrimoireCli.Generated.Api.Addons;
 using GrimoireCli.Generated.Api.Audio;
 using GrimoireCli.Generated.Api.AudioFolders;
+using GrimoireCli.Generated.Api.AudioSets;
 using GrimoireCli.Generated.Api.Auth;
 using GrimoireCli.Generated.Api.Backups;
 using GrimoireCli.Generated.Api.Bookmarks;
@@ -23,6 +24,8 @@ using GrimoireCli.Generated.Api.Logs;
 using GrimoireCli.Generated.Api.Maintenance;
 using GrimoireCli.Generated.Api.MapFolders;
 using GrimoireCli.Generated.Api.Maps;
+using GrimoireCli.Generated.Api.ModelFolders;
+using GrimoireCli.Generated.Api.ModelsRequests;
 using GrimoireCli.Generated.Api.ParentSystems;
 using GrimoireCli.Generated.Api.Rescan;
 using GrimoireCli.Generated.Api.SavedFilters;
@@ -70,6 +73,11 @@ namespace GrimoireCli.Generated.Api
         public global::GrimoireCli.Generated.Api.AudioFolders.AudioFoldersRequestBuilder AudioFolders
         {
             get => new global::GrimoireCli.Generated.Api.AudioFolders.AudioFoldersRequestBuilder(PathParameters, RequestAdapter);
+        }
+        /// <summary>The audioSets property</summary>
+        public global::GrimoireCli.Generated.Api.AudioSets.AudioSetsRequestBuilder AudioSets
+        {
+            get => new global::GrimoireCli.Generated.Api.AudioSets.AudioSetsRequestBuilder(PathParameters, RequestAdapter);
         }
         /// <summary>The auth property</summary>
         public global::GrimoireCli.Generated.Api.Auth.AuthRequestBuilder Auth
@@ -165,6 +173,16 @@ namespace GrimoireCli.Generated.Api
         public global::GrimoireCli.Generated.Api.Maps.MapsRequestBuilder Maps
         {
             get => new global::GrimoireCli.Generated.Api.Maps.MapsRequestBuilder(PathParameters, RequestAdapter);
+        }
+        /// <summary>The modelFolders property</summary>
+        public global::GrimoireCli.Generated.Api.ModelFolders.ModelFoldersRequestBuilder ModelFolders
+        {
+            get => new global::GrimoireCli.Generated.Api.ModelFolders.ModelFoldersRequestBuilder(PathParameters, RequestAdapter);
+        }
+        /// <summary>The models property</summary>
+        public global::GrimoireCli.Generated.Api.ModelsRequests.ModelsRequestBuilder Models
+        {
+            get => new global::GrimoireCli.Generated.Api.ModelsRequests.ModelsRequestBuilder(PathParameters, RequestAdapter);
         }
         /// <summary>The parentSystems property</summary>
         public global::GrimoireCli.Generated.Api.ParentSystems.ParentSystemsRequestBuilder ParentSystems

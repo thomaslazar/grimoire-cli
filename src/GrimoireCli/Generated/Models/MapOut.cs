@@ -85,6 +85,14 @@ namespace GrimoireCli.Generated.Models
 #endif
         /// <summary>The variant_count property</summary>
         public int? VariantCount { get; set; }
+        /// <summary>The variant_kinds property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public List<string>? VariantKinds { get; set; }
+#nullable restore
+#else
+        public List<string> VariantKinds { get; set; }
+#endif
         /// <summary>
         /// Instantiates a new <see cref="global::GrimoireCli.Generated.Models.MapOut"/> and sets the default values.
         /// </summary>
@@ -122,6 +130,7 @@ namespace GrimoireCli.Generated.Models
                 { "relative_path", n => { RelativePath = n.GetStringValue(); } },
                 { "tags", n => { Tags = n.GetCollectionOfPrimitiveValues<string>()?.AsList(); } },
                 { "variant_count", n => { VariantCount = n.GetIntValue(); } },
+                { "variant_kinds", n => { VariantKinds = n.GetCollectionOfPrimitiveValues<string>()?.AsList(); } },
             };
         }
         /// <summary>
@@ -142,6 +151,7 @@ namespace GrimoireCli.Generated.Models
             writer.WriteStringValue("relative_path", RelativePath);
             writer.WriteCollectionOfPrimitiveValues<string>("tags", Tags);
             writer.WriteIntValue("variant_count", VariantCount);
+            writer.WriteCollectionOfPrimitiveValues<string>("variant_kinds", VariantKinds);
             writer.WriteAdditionalData(AdditionalData);
         }
         /// <summary>

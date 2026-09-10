@@ -40,6 +40,14 @@ namespace GrimoireCli.Generated.Models
 #endif
         /// <summary>The groups_found property</summary>
         public int? GroupsFound { get; set; }
+        /// <summary>The heartbeat property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public global::GrimoireCli.Generated.Models.ScanStatus.ScanStatus_heartbeat? Heartbeat { get; set; }
+#nullable restore
+#else
+        public global::GrimoireCli.Generated.Models.ScanStatus.ScanStatus_heartbeat Heartbeat { get; set; }
+#endif
         /// <summary>The phase property</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
@@ -111,6 +119,7 @@ namespace GrimoireCli.Generated.Models
                 { "error", n => { Error = n.GetObjectValue<global::GrimoireCli.Generated.Models.ScanStatus.ScanStatus_error>(global::GrimoireCli.Generated.Models.ScanStatus.ScanStatus_error.CreateFromDiscriminatorValue); } },
                 { "finished_at", n => { FinishedAt = n.GetObjectValue<global::GrimoireCli.Generated.Models.ScanStatus.ScanStatus_finished_at>(global::GrimoireCli.Generated.Models.ScanStatus.ScanStatus_finished_at.CreateFromDiscriminatorValue); } },
                 { "groups_found", n => { GroupsFound = n.GetIntValue(); } },
+                { "heartbeat", n => { Heartbeat = n.GetObjectValue<global::GrimoireCli.Generated.Models.ScanStatus.ScanStatus_heartbeat>(global::GrimoireCli.Generated.Models.ScanStatus.ScanStatus_heartbeat.CreateFromDiscriminatorValue); } },
                 { "phase", n => { Phase = n.GetObjectValue<global::GrimoireCli.Generated.Models.ScanStatus.ScanStatus_phase>(global::GrimoireCli.Generated.Models.ScanStatus.ScanStatus_phase.CreateFromDiscriminatorValue); } },
                 { "resource_type", n => { ResourceType = n.GetObjectValue<global::GrimoireCli.Generated.Models.ScanStatus.ScanStatus_resource_type>(global::GrimoireCli.Generated.Models.ScanStatus.ScanStatus_resource_type.CreateFromDiscriminatorValue); } },
                 { "running", n => { Running = n.GetBoolValue(); } },
@@ -131,6 +140,7 @@ namespace GrimoireCli.Generated.Models
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.ScanStatus.ScanStatus_error>("error", Error);
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.ScanStatus.ScanStatus_finished_at>("finished_at", FinishedAt);
             writer.WriteIntValue("groups_found", GroupsFound);
+            writer.WriteObjectValue<global::GrimoireCli.Generated.Models.ScanStatus.ScanStatus_heartbeat>("heartbeat", Heartbeat);
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.ScanStatus.ScanStatus_phase>("phase", Phase);
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.ScanStatus.ScanStatus_resource_type>("resource_type", ResourceType);
             writer.WriteBoolValue("running", Running);
@@ -341,6 +351,74 @@ namespace GrimoireCli.Generated.Models
                 }
                 else {
                     writer.WriteObjectValue<global::GrimoireCli.Generated.Models.ScanStatus_finished_atMember1>(null, ScanStatusFinishedAtMember1);
+                }
+            }
+        }
+        /// <summary>
+        /// Composed type wrapper for classes <see cref="global::GrimoireCli.Generated.Models.ScanStatus_heartbeatMember1"/>, <see cref="string"/>
+        /// </summary>
+        [global::System.CodeDom.Compiler.GeneratedCode("Kiota", "1.0.0")]
+        public partial class ScanStatus_heartbeat : IComposedTypeWrapper, IParsable
+        {
+            /// <summary>Composed type representation for type <see cref="global::GrimoireCli.Generated.Models.ScanStatus_heartbeatMember1"/></summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+            public global::GrimoireCli.Generated.Models.ScanStatus_heartbeatMember1? ScanStatusHeartbeatMember1 { get; set; }
+#nullable restore
+#else
+            public global::GrimoireCli.Generated.Models.ScanStatus_heartbeatMember1 ScanStatusHeartbeatMember1 { get; set; }
+#endif
+            /// <summary>Composed type representation for type <see cref="string"/></summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+            public string? String { get; set; }
+#nullable restore
+#else
+            public string String { get; set; }
+#endif
+            /// <summary>
+            /// Creates a new instance of the appropriate class based on discriminator value
+            /// </summary>
+            /// <returns>A <see cref="global::GrimoireCli.Generated.Models.ScanStatus.ScanStatus_heartbeat"/></returns>
+            /// <param name="parseNode">The parse node to use to read the discriminator value and create the object</param>
+            public static global::GrimoireCli.Generated.Models.ScanStatus.ScanStatus_heartbeat CreateFromDiscriminatorValue(IParseNode parseNode)
+            {
+                if(ReferenceEquals(parseNode, null)) throw new ArgumentNullException(nameof(parseNode));
+                var result = new global::GrimoireCli.Generated.Models.ScanStatus.ScanStatus_heartbeat();
+                if(parseNode.GetStringValue() is string stringValue)
+                {
+                    result.String = stringValue;
+                }
+                else {
+                    result.ScanStatusHeartbeatMember1 = new global::GrimoireCli.Generated.Models.ScanStatus_heartbeatMember1();
+                }
+                return result;
+            }
+            /// <summary>
+            /// The deserialization information for the current model
+            /// </summary>
+            /// <returns>A IDictionary&lt;string, Action&lt;IParseNode&gt;&gt;</returns>
+            public virtual IDictionary<string, Action<IParseNode>> GetFieldDeserializers()
+            {
+                if(ScanStatusHeartbeatMember1 != null)
+                {
+                    return ParseNodeHelper.MergeDeserializersForIntersectionWrapper(ScanStatusHeartbeatMember1);
+                }
+                return new Dictionary<string, Action<IParseNode>>();
+            }
+            /// <summary>
+            /// Serializes information the current object
+            /// </summary>
+            /// <param name="writer">Serialization writer to use to serialize this model</param>
+            public virtual void Serialize(ISerializationWriter writer)
+            {
+                if(ReferenceEquals(writer, null)) throw new ArgumentNullException(nameof(writer));
+                if(String != null)
+                {
+                    writer.WriteStringValue(null, String);
+                }
+                else {
+                    writer.WriteObjectValue<global::GrimoireCli.Generated.Models.ScanStatus_heartbeatMember1>(null, ScanStatusHeartbeatMember1);
                 }
             }
         }

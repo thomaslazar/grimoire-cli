@@ -8,7 +8,7 @@ using System;
 namespace GrimoireCli.Generated.Models
 {
     /// <summary>
-    /// Detected grid dimensions for a map (see `_helpers._map_image_info`).`cell_px` is only present on the DPI/computed branches — the filename branchomits it, and PDF maps have it stripped — so it is Optional.
+    /// Detected grid dimensions for a map (see `_helpers._map_image_info`).`cell_px` is only present on the DPI/computed branches — the filename branchomits it, and PDF maps have it stripped — so it is Optional.Floats rather than ints: a manual override may carry a fractional cell countfor a map that bleeds part of a cell past its grid (issue #125). Inferredgrids still come back whole.
     /// </summary>
     [global::System.CodeDom.Compiler.GeneratedCode("Kiota", "1.0.0")]
     public partial class MapGrid : IAdditionalDataHolder, IParsable
@@ -24,7 +24,7 @@ namespace GrimoireCli.Generated.Models
         public global::GrimoireCli.Generated.Models.MapGrid.MapGrid_cell_px CellPx { get; set; }
 #endif
         /// <summary>The height property</summary>
-        public int? Height { get; set; }
+        public double? Height { get; set; }
         /// <summary>The source property</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
@@ -34,7 +34,7 @@ namespace GrimoireCli.Generated.Models
         public string Source { get; set; }
 #endif
         /// <summary>The width property</summary>
-        public int? Width { get; set; }
+        public double? Width { get; set; }
         /// <summary>
         /// Instantiates a new <see cref="global::GrimoireCli.Generated.Models.MapGrid"/> and sets the default values.
         /// </summary>
@@ -61,9 +61,9 @@ namespace GrimoireCli.Generated.Models
             return new Dictionary<string, Action<IParseNode>>
             {
                 { "cell_px", n => { CellPx = n.GetObjectValue<global::GrimoireCli.Generated.Models.MapGrid.MapGrid_cell_px>(global::GrimoireCli.Generated.Models.MapGrid.MapGrid_cell_px.CreateFromDiscriminatorValue); } },
-                { "height", n => { Height = n.GetIntValue(); } },
+                { "height", n => { Height = n.GetDoubleValue(); } },
                 { "source", n => { Source = n.GetStringValue(); } },
-                { "width", n => { Width = n.GetIntValue(); } },
+                { "width", n => { Width = n.GetDoubleValue(); } },
             };
         }
         /// <summary>
@@ -74,19 +74,19 @@ namespace GrimoireCli.Generated.Models
         {
             if(ReferenceEquals(writer, null)) throw new ArgumentNullException(nameof(writer));
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.MapGrid.MapGrid_cell_px>("cell_px", CellPx);
-            writer.WriteIntValue("height", Height);
+            writer.WriteDoubleValue("height", Height);
             writer.WriteStringValue("source", Source);
-            writer.WriteIntValue("width", Width);
+            writer.WriteDoubleValue("width", Width);
             writer.WriteAdditionalData(AdditionalData);
         }
         /// <summary>
-        /// Composed type wrapper for classes <see cref="global::GrimoireCli.Generated.Models.MapGrid_cell_pxMember1"/>, <see cref="int"/>
+        /// Composed type wrapper for classes <see cref="double"/>, <see cref="global::GrimoireCli.Generated.Models.MapGrid_cell_pxMember1"/>
         /// </summary>
         [global::System.CodeDom.Compiler.GeneratedCode("Kiota", "1.0.0")]
         public partial class MapGrid_cell_px : IComposedTypeWrapper, IParsable
         {
-            /// <summary>Composed type representation for type <see cref="int"/></summary>
-            public int? Integer { get; set; }
+            /// <summary>Composed type representation for type <see cref="double"/></summary>
+            public double? Double { get; set; }
             /// <summary>Composed type representation for type <see cref="global::GrimoireCli.Generated.Models.MapGrid_cell_pxMember1"/></summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
@@ -104,9 +104,9 @@ namespace GrimoireCli.Generated.Models
             {
                 if(ReferenceEquals(parseNode, null)) throw new ArgumentNullException(nameof(parseNode));
                 var result = new global::GrimoireCli.Generated.Models.MapGrid.MapGrid_cell_px();
-                if(parseNode.GetIntValue() is int integerValue)
+                if(parseNode.GetDoubleValue() is double doubleValue)
                 {
-                    result.Integer = integerValue;
+                    result.Double = doubleValue;
                 }
                 else {
                     result.MapGridCellPxMember1 = new global::GrimoireCli.Generated.Models.MapGrid_cell_pxMember1();
@@ -132,9 +132,9 @@ namespace GrimoireCli.Generated.Models
             public virtual void Serialize(ISerializationWriter writer)
             {
                 if(ReferenceEquals(writer, null)) throw new ArgumentNullException(nameof(writer));
-                if(Integer != null)
+                if(Double != null)
                 {
-                    writer.WriteIntValue(null, Integer);
+                    writer.WriteDoubleValue(null, Double);
                 }
                 else {
                     writer.WriteObjectValue<global::GrimoireCli.Generated.Models.MapGrid_cell_pxMember1>(null, MapGridCellPxMember1);

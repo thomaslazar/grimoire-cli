@@ -41,7 +41,7 @@ echo "generating from $SERVER (Grimoire $(echo "$SPEC_JSON" | jq -r '.info.versi
 
 # Kiota drops every property of a schema reached only through an `anyOf: [array
 # of $ref, null]` — microsoft/kiota#2338, still open and present in 1.34.1, the
-# latest release. FastAPI emits that wrapper for any Optional[list[Model]], so
+# pinned release. FastAPI emits that wrapper for any Optional[list[Model]], so
 # PublisherEntry, both LinkEntry variants and CampaignResourceInput generate as
 # empty shells that know none of their own fields. Collapsing the wrapper to the
 # array branch is enough to restore them, and the branch it drops carries no

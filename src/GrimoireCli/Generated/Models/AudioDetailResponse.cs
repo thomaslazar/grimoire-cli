@@ -123,6 +123,14 @@ namespace GrimoireCli.Generated.Models
 #else
         public string VariantKind { get; set; }
 #endif
+        /// <summary>The variant_kinds property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public List<string>? VariantKinds { get; set; }
+#nullable restore
+#else
+        public List<string> VariantKinds { get; set; }
+#endif
         /// <summary>The variant_label property</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
@@ -200,6 +208,7 @@ namespace GrimoireCli.Generated.Models
                 { "title", n => { Title = n.GetStringValue(); } },
                 { "variant_count", n => { VariantCount = n.GetIntValue(); } },
                 { "variant_kind", n => { VariantKind = n.GetStringValue(); } },
+                { "variant_kinds", n => { VariantKinds = n.GetCollectionOfPrimitiveValues<string>()?.AsList(); } },
                 { "variant_label", n => { VariantLabel = n.GetStringValue(); } },
                 { "variant_main_id", n => { VariantMainId = n.GetObjectValue<global::GrimoireCli.Generated.Models.AudioDetailResponse.AudioDetailResponse_variant_main_id>(global::GrimoireCli.Generated.Models.AudioDetailResponse.AudioDetailResponse_variant_main_id.CreateFromDiscriminatorValue); } },
                 { "variant_parent_id", n => { VariantParentId = n.GetObjectValue<global::GrimoireCli.Generated.Models.AudioDetailResponse.AudioDetailResponse_variant_parent_id>(global::GrimoireCli.Generated.Models.AudioDetailResponse.AudioDetailResponse_variant_parent_id.CreateFromDiscriminatorValue); } },
@@ -231,6 +240,7 @@ namespace GrimoireCli.Generated.Models
             writer.WriteStringValue("title", Title);
             writer.WriteIntValue("variant_count", VariantCount);
             writer.WriteStringValue("variant_kind", VariantKind);
+            writer.WriteCollectionOfPrimitiveValues<string>("variant_kinds", VariantKinds);
             writer.WriteStringValue("variant_label", VariantLabel);
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.AudioDetailResponse.AudioDetailResponse_variant_main_id>("variant_main_id", VariantMainId);
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.AudioDetailResponse.AudioDetailResponse_variant_parent_id>("variant_parent_id", VariantParentId);

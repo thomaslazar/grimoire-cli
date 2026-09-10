@@ -47,6 +47,14 @@ namespace GrimoireCli.Generated.Models
 #else
         public global::GrimoireCli.Generated.Models.ScanStatusResponse.ScanStatusResponse_new_maps NewMaps { get; set; }
 #endif
+        /// <summary>The new_models property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public global::GrimoireCli.Generated.Models.ScanStatusResponse.ScanStatusResponse_new_models? NewModels { get; set; }
+#nullable restore
+#else
+        public global::GrimoireCli.Generated.Models.ScanStatusResponse.ScanStatusResponse_new_models NewModels { get; set; }
+#endif
         /// <summary>The new_tokens property</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
@@ -105,6 +113,14 @@ namespace GrimoireCli.Generated.Models
 #else
         public global::GrimoireCli.Generated.Models.ScanStatusResponse.ScanStatusResponse_scanned_maps ScannedMaps { get; set; }
 #endif
+        /// <summary>The scanned_models property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public global::GrimoireCli.Generated.Models.ScanStatusResponse.ScanStatusResponse_scanned_models? ScannedModels { get; set; }
+#nullable restore
+#else
+        public global::GrimoireCli.Generated.Models.ScanStatusResponse.ScanStatusResponse_scanned_models ScannedModels { get; set; }
+#endif
         /// <summary>The scanned_tokens property</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
@@ -112,6 +128,22 @@ namespace GrimoireCli.Generated.Models
 #nullable restore
 #else
         public global::GrimoireCli.Generated.Models.ScanStatusResponse.ScanStatusResponse_scanned_tokens ScannedTokens { get; set; }
+#endif
+        /// <summary>The thumbs_current property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public global::GrimoireCli.Generated.Models.ScanStatusResponse.ScanStatusResponse_thumbs_current? ThumbsCurrent { get; set; }
+#nullable restore
+#else
+        public global::GrimoireCli.Generated.Models.ScanStatusResponse.ScanStatusResponse_thumbs_current ThumbsCurrent { get; set; }
+#endif
+        /// <summary>The thumbs_done property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public global::GrimoireCli.Generated.Models.ScanStatusResponse.ScanStatusResponse_thumbs_done? ThumbsDone { get; set; }
+#nullable restore
+#else
+        public global::GrimoireCli.Generated.Models.ScanStatusResponse.ScanStatusResponse_thumbs_done ThumbsDone { get; set; }
 #endif
         /// <summary>The to_index property</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
@@ -145,6 +177,14 @@ namespace GrimoireCli.Generated.Models
 #else
         public global::GrimoireCli.Generated.Models.ScanStatusResponse.ScanStatusResponse_total_maps TotalMaps { get; set; }
 #endif
+        /// <summary>The total_models property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public global::GrimoireCli.Generated.Models.ScanStatusResponse.ScanStatusResponse_total_models? TotalModels { get; set; }
+#nullable restore
+#else
+        public global::GrimoireCli.Generated.Models.ScanStatusResponse.ScanStatusResponse_total_models TotalModels { get; set; }
+#endif
         /// <summary>The total_ocr property</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
@@ -152,6 +192,14 @@ namespace GrimoireCli.Generated.Models
 #nullable restore
 #else
         public global::GrimoireCli.Generated.Models.ScanStatusResponse.ScanStatusResponse_total_ocr TotalOcr { get; set; }
+#endif
+        /// <summary>The total_thumbs property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public global::GrimoireCli.Generated.Models.ScanStatusResponse.ScanStatusResponse_total_thumbs? TotalThumbs { get; set; }
+#nullable restore
+#else
+        public global::GrimoireCli.Generated.Models.ScanStatusResponse.ScanStatusResponse_total_thumbs TotalThumbs { get; set; }
 #endif
         /// <summary>The total_tokens property</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
@@ -198,6 +246,7 @@ namespace GrimoireCli.Generated.Models
                 { "new_audio", n => { NewAudio = n.GetObjectValue<global::GrimoireCli.Generated.Models.ScanStatusResponse.ScanStatusResponse_new_audio>(global::GrimoireCli.Generated.Models.ScanStatusResponse.ScanStatusResponse_new_audio.CreateFromDiscriminatorValue); } },
                 { "new_books", n => { NewBooks = n.GetObjectValue<global::GrimoireCli.Generated.Models.ScanStatusResponse.ScanStatusResponse_new_books>(global::GrimoireCli.Generated.Models.ScanStatusResponse.ScanStatusResponse_new_books.CreateFromDiscriminatorValue); } },
                 { "new_maps", n => { NewMaps = n.GetObjectValue<global::GrimoireCli.Generated.Models.ScanStatusResponse.ScanStatusResponse_new_maps>(global::GrimoireCli.Generated.Models.ScanStatusResponse.ScanStatusResponse_new_maps.CreateFromDiscriminatorValue); } },
+                { "new_models", n => { NewModels = n.GetObjectValue<global::GrimoireCli.Generated.Models.ScanStatusResponse.ScanStatusResponse_new_models>(global::GrimoireCli.Generated.Models.ScanStatusResponse.ScanStatusResponse_new_models.CreateFromDiscriminatorValue); } },
                 { "new_tokens", n => { NewTokens = n.GetObjectValue<global::GrimoireCli.Generated.Models.ScanStatusResponse.ScanStatusResponse_new_tokens>(global::GrimoireCli.Generated.Models.ScanStatusResponse.ScanStatusResponse_new_tokens.CreateFromDiscriminatorValue); } },
                 { "ocr_current", n => { OcrCurrent = n.GetObjectValue<global::GrimoireCli.Generated.Models.ScanStatusResponse.ScanStatusResponse_ocr_current>(global::GrimoireCli.Generated.Models.ScanStatusResponse.ScanStatusResponse_ocr_current.CreateFromDiscriminatorValue); } },
                 { "ocr_done", n => { OcrDone = n.GetObjectValue<global::GrimoireCli.Generated.Models.ScanStatusResponse.ScanStatusResponse_ocr_done>(global::GrimoireCli.Generated.Models.ScanStatusResponse.ScanStatusResponse_ocr_done.CreateFromDiscriminatorValue); } },
@@ -206,12 +255,17 @@ namespace GrimoireCli.Generated.Models
                 { "scanned_audio", n => { ScannedAudio = n.GetObjectValue<global::GrimoireCli.Generated.Models.ScanStatusResponse.ScanStatusResponse_scanned_audio>(global::GrimoireCli.Generated.Models.ScanStatusResponse.ScanStatusResponse_scanned_audio.CreateFromDiscriminatorValue); } },
                 { "scanned_books", n => { ScannedBooks = n.GetObjectValue<global::GrimoireCli.Generated.Models.ScanStatusResponse.ScanStatusResponse_scanned_books>(global::GrimoireCli.Generated.Models.ScanStatusResponse.ScanStatusResponse_scanned_books.CreateFromDiscriminatorValue); } },
                 { "scanned_maps", n => { ScannedMaps = n.GetObjectValue<global::GrimoireCli.Generated.Models.ScanStatusResponse.ScanStatusResponse_scanned_maps>(global::GrimoireCli.Generated.Models.ScanStatusResponse.ScanStatusResponse_scanned_maps.CreateFromDiscriminatorValue); } },
+                { "scanned_models", n => { ScannedModels = n.GetObjectValue<global::GrimoireCli.Generated.Models.ScanStatusResponse.ScanStatusResponse_scanned_models>(global::GrimoireCli.Generated.Models.ScanStatusResponse.ScanStatusResponse_scanned_models.CreateFromDiscriminatorValue); } },
                 { "scanned_tokens", n => { ScannedTokens = n.GetObjectValue<global::GrimoireCli.Generated.Models.ScanStatusResponse.ScanStatusResponse_scanned_tokens>(global::GrimoireCli.Generated.Models.ScanStatusResponse.ScanStatusResponse_scanned_tokens.CreateFromDiscriminatorValue); } },
+                { "thumbs_current", n => { ThumbsCurrent = n.GetObjectValue<global::GrimoireCli.Generated.Models.ScanStatusResponse.ScanStatusResponse_thumbs_current>(global::GrimoireCli.Generated.Models.ScanStatusResponse.ScanStatusResponse_thumbs_current.CreateFromDiscriminatorValue); } },
+                { "thumbs_done", n => { ThumbsDone = n.GetObjectValue<global::GrimoireCli.Generated.Models.ScanStatusResponse.ScanStatusResponse_thumbs_done>(global::GrimoireCli.Generated.Models.ScanStatusResponse.ScanStatusResponse_thumbs_done.CreateFromDiscriminatorValue); } },
                 { "to_index", n => { ToIndex = n.GetObjectValue<global::GrimoireCli.Generated.Models.ScanStatusResponse.ScanStatusResponse_to_index>(global::GrimoireCli.Generated.Models.ScanStatusResponse.ScanStatusResponse_to_index.CreateFromDiscriminatorValue); } },
                 { "total_audio", n => { TotalAudio = n.GetObjectValue<global::GrimoireCli.Generated.Models.ScanStatusResponse.ScanStatusResponse_total_audio>(global::GrimoireCli.Generated.Models.ScanStatusResponse.ScanStatusResponse_total_audio.CreateFromDiscriminatorValue); } },
                 { "total_books", n => { TotalBooks = n.GetObjectValue<global::GrimoireCli.Generated.Models.ScanStatusResponse.ScanStatusResponse_total_books>(global::GrimoireCli.Generated.Models.ScanStatusResponse.ScanStatusResponse_total_books.CreateFromDiscriminatorValue); } },
                 { "total_maps", n => { TotalMaps = n.GetObjectValue<global::GrimoireCli.Generated.Models.ScanStatusResponse.ScanStatusResponse_total_maps>(global::GrimoireCli.Generated.Models.ScanStatusResponse.ScanStatusResponse_total_maps.CreateFromDiscriminatorValue); } },
+                { "total_models", n => { TotalModels = n.GetObjectValue<global::GrimoireCli.Generated.Models.ScanStatusResponse.ScanStatusResponse_total_models>(global::GrimoireCli.Generated.Models.ScanStatusResponse.ScanStatusResponse_total_models.CreateFromDiscriminatorValue); } },
                 { "total_ocr", n => { TotalOcr = n.GetObjectValue<global::GrimoireCli.Generated.Models.ScanStatusResponse.ScanStatusResponse_total_ocr>(global::GrimoireCli.Generated.Models.ScanStatusResponse.ScanStatusResponse_total_ocr.CreateFromDiscriminatorValue); } },
+                { "total_thumbs", n => { TotalThumbs = n.GetObjectValue<global::GrimoireCli.Generated.Models.ScanStatusResponse.ScanStatusResponse_total_thumbs>(global::GrimoireCli.Generated.Models.ScanStatusResponse.ScanStatusResponse_total_thumbs.CreateFromDiscriminatorValue); } },
                 { "total_tokens", n => { TotalTokens = n.GetObjectValue<global::GrimoireCli.Generated.Models.ScanStatusResponse.ScanStatusResponse_total_tokens>(global::GrimoireCli.Generated.Models.ScanStatusResponse.ScanStatusResponse_total_tokens.CreateFromDiscriminatorValue); } },
                 { "updated_books", n => { UpdatedBooks = n.GetObjectValue<global::GrimoireCli.Generated.Models.ScanStatusResponse.ScanStatusResponse_updated_books>(global::GrimoireCli.Generated.Models.ScanStatusResponse.ScanStatusResponse_updated_books.CreateFromDiscriminatorValue); } },
             };
@@ -227,6 +281,7 @@ namespace GrimoireCli.Generated.Models
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.ScanStatusResponse.ScanStatusResponse_new_audio>("new_audio", NewAudio);
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.ScanStatusResponse.ScanStatusResponse_new_books>("new_books", NewBooks);
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.ScanStatusResponse.ScanStatusResponse_new_maps>("new_maps", NewMaps);
+            writer.WriteObjectValue<global::GrimoireCli.Generated.Models.ScanStatusResponse.ScanStatusResponse_new_models>("new_models", NewModels);
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.ScanStatusResponse.ScanStatusResponse_new_tokens>("new_tokens", NewTokens);
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.ScanStatusResponse.ScanStatusResponse_ocr_current>("ocr_current", OcrCurrent);
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.ScanStatusResponse.ScanStatusResponse_ocr_done>("ocr_done", OcrDone);
@@ -235,12 +290,17 @@ namespace GrimoireCli.Generated.Models
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.ScanStatusResponse.ScanStatusResponse_scanned_audio>("scanned_audio", ScannedAudio);
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.ScanStatusResponse.ScanStatusResponse_scanned_books>("scanned_books", ScannedBooks);
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.ScanStatusResponse.ScanStatusResponse_scanned_maps>("scanned_maps", ScannedMaps);
+            writer.WriteObjectValue<global::GrimoireCli.Generated.Models.ScanStatusResponse.ScanStatusResponse_scanned_models>("scanned_models", ScannedModels);
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.ScanStatusResponse.ScanStatusResponse_scanned_tokens>("scanned_tokens", ScannedTokens);
+            writer.WriteObjectValue<global::GrimoireCli.Generated.Models.ScanStatusResponse.ScanStatusResponse_thumbs_current>("thumbs_current", ThumbsCurrent);
+            writer.WriteObjectValue<global::GrimoireCli.Generated.Models.ScanStatusResponse.ScanStatusResponse_thumbs_done>("thumbs_done", ThumbsDone);
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.ScanStatusResponse.ScanStatusResponse_to_index>("to_index", ToIndex);
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.ScanStatusResponse.ScanStatusResponse_total_audio>("total_audio", TotalAudio);
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.ScanStatusResponse.ScanStatusResponse_total_books>("total_books", TotalBooks);
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.ScanStatusResponse.ScanStatusResponse_total_maps>("total_maps", TotalMaps);
+            writer.WriteObjectValue<global::GrimoireCli.Generated.Models.ScanStatusResponse.ScanStatusResponse_total_models>("total_models", TotalModels);
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.ScanStatusResponse.ScanStatusResponse_total_ocr>("total_ocr", TotalOcr);
+            writer.WriteObjectValue<global::GrimoireCli.Generated.Models.ScanStatusResponse.ScanStatusResponse_total_thumbs>("total_thumbs", TotalThumbs);
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.ScanStatusResponse.ScanStatusResponse_total_tokens>("total_tokens", TotalTokens);
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.ScanStatusResponse.ScanStatusResponse_updated_books>("updated_books", UpdatedBooks);
             writer.WriteAdditionalData(AdditionalData);
@@ -490,6 +550,68 @@ namespace GrimoireCli.Generated.Models
                 }
                 else {
                     writer.WriteObjectValue<global::GrimoireCli.Generated.Models.ScanStatusResponse_new_mapsMember1>(null, ScanStatusResponseNewMapsMember1);
+                }
+            }
+        }
+        /// <summary>
+        /// Composed type wrapper for classes <see cref="global::GrimoireCli.Generated.Models.ScanStatusResponse_new_modelsMember1"/>, <see cref="int"/>
+        /// </summary>
+        [global::System.CodeDom.Compiler.GeneratedCode("Kiota", "1.0.0")]
+        public partial class ScanStatusResponse_new_models : IComposedTypeWrapper, IParsable
+        {
+            /// <summary>Composed type representation for type <see cref="int"/></summary>
+            public int? Integer { get; set; }
+            /// <summary>Composed type representation for type <see cref="global::GrimoireCli.Generated.Models.ScanStatusResponse_new_modelsMember1"/></summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+            public global::GrimoireCli.Generated.Models.ScanStatusResponse_new_modelsMember1? ScanStatusResponseNewModelsMember1 { get; set; }
+#nullable restore
+#else
+            public global::GrimoireCli.Generated.Models.ScanStatusResponse_new_modelsMember1 ScanStatusResponseNewModelsMember1 { get; set; }
+#endif
+            /// <summary>
+            /// Creates a new instance of the appropriate class based on discriminator value
+            /// </summary>
+            /// <returns>A <see cref="global::GrimoireCli.Generated.Models.ScanStatusResponse.ScanStatusResponse_new_models"/></returns>
+            /// <param name="parseNode">The parse node to use to read the discriminator value and create the object</param>
+            public static global::GrimoireCli.Generated.Models.ScanStatusResponse.ScanStatusResponse_new_models CreateFromDiscriminatorValue(IParseNode parseNode)
+            {
+                if(ReferenceEquals(parseNode, null)) throw new ArgumentNullException(nameof(parseNode));
+                var result = new global::GrimoireCli.Generated.Models.ScanStatusResponse.ScanStatusResponse_new_models();
+                if(parseNode.GetIntValue() is int integerValue)
+                {
+                    result.Integer = integerValue;
+                }
+                else {
+                    result.ScanStatusResponseNewModelsMember1 = new global::GrimoireCli.Generated.Models.ScanStatusResponse_new_modelsMember1();
+                }
+                return result;
+            }
+            /// <summary>
+            /// The deserialization information for the current model
+            /// </summary>
+            /// <returns>A IDictionary&lt;string, Action&lt;IParseNode&gt;&gt;</returns>
+            public virtual IDictionary<string, Action<IParseNode>> GetFieldDeserializers()
+            {
+                if(ScanStatusResponseNewModelsMember1 != null)
+                {
+                    return ParseNodeHelper.MergeDeserializersForIntersectionWrapper(ScanStatusResponseNewModelsMember1);
+                }
+                return new Dictionary<string, Action<IParseNode>>();
+            }
+            /// <summary>
+            /// Serializes information the current object
+            /// </summary>
+            /// <param name="writer">Serialization writer to use to serialize this model</param>
+            public virtual void Serialize(ISerializationWriter writer)
+            {
+                if(ReferenceEquals(writer, null)) throw new ArgumentNullException(nameof(writer));
+                if(Integer != null)
+                {
+                    writer.WriteIntValue(null, Integer);
+                }
+                else {
+                    writer.WriteObjectValue<global::GrimoireCli.Generated.Models.ScanStatusResponse_new_modelsMember1>(null, ScanStatusResponseNewModelsMember1);
                 }
             }
         }
@@ -940,6 +1062,68 @@ namespace GrimoireCli.Generated.Models
             }
         }
         /// <summary>
+        /// Composed type wrapper for classes <see cref="global::GrimoireCli.Generated.Models.ScanStatusResponse_scanned_modelsMember1"/>, <see cref="int"/>
+        /// </summary>
+        [global::System.CodeDom.Compiler.GeneratedCode("Kiota", "1.0.0")]
+        public partial class ScanStatusResponse_scanned_models : IComposedTypeWrapper, IParsable
+        {
+            /// <summary>Composed type representation for type <see cref="int"/></summary>
+            public int? Integer { get; set; }
+            /// <summary>Composed type representation for type <see cref="global::GrimoireCli.Generated.Models.ScanStatusResponse_scanned_modelsMember1"/></summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+            public global::GrimoireCli.Generated.Models.ScanStatusResponse_scanned_modelsMember1? ScanStatusResponseScannedModelsMember1 { get; set; }
+#nullable restore
+#else
+            public global::GrimoireCli.Generated.Models.ScanStatusResponse_scanned_modelsMember1 ScanStatusResponseScannedModelsMember1 { get; set; }
+#endif
+            /// <summary>
+            /// Creates a new instance of the appropriate class based on discriminator value
+            /// </summary>
+            /// <returns>A <see cref="global::GrimoireCli.Generated.Models.ScanStatusResponse.ScanStatusResponse_scanned_models"/></returns>
+            /// <param name="parseNode">The parse node to use to read the discriminator value and create the object</param>
+            public static global::GrimoireCli.Generated.Models.ScanStatusResponse.ScanStatusResponse_scanned_models CreateFromDiscriminatorValue(IParseNode parseNode)
+            {
+                if(ReferenceEquals(parseNode, null)) throw new ArgumentNullException(nameof(parseNode));
+                var result = new global::GrimoireCli.Generated.Models.ScanStatusResponse.ScanStatusResponse_scanned_models();
+                if(parseNode.GetIntValue() is int integerValue)
+                {
+                    result.Integer = integerValue;
+                }
+                else {
+                    result.ScanStatusResponseScannedModelsMember1 = new global::GrimoireCli.Generated.Models.ScanStatusResponse_scanned_modelsMember1();
+                }
+                return result;
+            }
+            /// <summary>
+            /// The deserialization information for the current model
+            /// </summary>
+            /// <returns>A IDictionary&lt;string, Action&lt;IParseNode&gt;&gt;</returns>
+            public virtual IDictionary<string, Action<IParseNode>> GetFieldDeserializers()
+            {
+                if(ScanStatusResponseScannedModelsMember1 != null)
+                {
+                    return ParseNodeHelper.MergeDeserializersForIntersectionWrapper(ScanStatusResponseScannedModelsMember1);
+                }
+                return new Dictionary<string, Action<IParseNode>>();
+            }
+            /// <summary>
+            /// Serializes information the current object
+            /// </summary>
+            /// <param name="writer">Serialization writer to use to serialize this model</param>
+            public virtual void Serialize(ISerializationWriter writer)
+            {
+                if(ReferenceEquals(writer, null)) throw new ArgumentNullException(nameof(writer));
+                if(Integer != null)
+                {
+                    writer.WriteIntValue(null, Integer);
+                }
+                else {
+                    writer.WriteObjectValue<global::GrimoireCli.Generated.Models.ScanStatusResponse_scanned_modelsMember1>(null, ScanStatusResponseScannedModelsMember1);
+                }
+            }
+        }
+        /// <summary>
         /// Composed type wrapper for classes <see cref="global::GrimoireCli.Generated.Models.ScanStatusResponse_scanned_tokensMember1"/>, <see cref="int"/>
         /// </summary>
         [global::System.CodeDom.Compiler.GeneratedCode("Kiota", "1.0.0")]
@@ -998,6 +1182,136 @@ namespace GrimoireCli.Generated.Models
                 }
                 else {
                     writer.WriteObjectValue<global::GrimoireCli.Generated.Models.ScanStatusResponse_scanned_tokensMember1>(null, ScanStatusResponseScannedTokensMember1);
+                }
+            }
+        }
+        /// <summary>
+        /// Composed type wrapper for classes <see cref="global::GrimoireCli.Generated.Models.ScanStatusResponse_thumbs_currentMember1"/>, <see cref="string"/>
+        /// </summary>
+        [global::System.CodeDom.Compiler.GeneratedCode("Kiota", "1.0.0")]
+        public partial class ScanStatusResponse_thumbs_current : IComposedTypeWrapper, IParsable
+        {
+            /// <summary>Composed type representation for type <see cref="global::GrimoireCli.Generated.Models.ScanStatusResponse_thumbs_currentMember1"/></summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+            public global::GrimoireCli.Generated.Models.ScanStatusResponse_thumbs_currentMember1? ScanStatusResponseThumbsCurrentMember1 { get; set; }
+#nullable restore
+#else
+            public global::GrimoireCli.Generated.Models.ScanStatusResponse_thumbs_currentMember1 ScanStatusResponseThumbsCurrentMember1 { get; set; }
+#endif
+            /// <summary>Composed type representation for type <see cref="string"/></summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+            public string? String { get; set; }
+#nullable restore
+#else
+            public string String { get; set; }
+#endif
+            /// <summary>
+            /// Creates a new instance of the appropriate class based on discriminator value
+            /// </summary>
+            /// <returns>A <see cref="global::GrimoireCli.Generated.Models.ScanStatusResponse.ScanStatusResponse_thumbs_current"/></returns>
+            /// <param name="parseNode">The parse node to use to read the discriminator value and create the object</param>
+            public static global::GrimoireCli.Generated.Models.ScanStatusResponse.ScanStatusResponse_thumbs_current CreateFromDiscriminatorValue(IParseNode parseNode)
+            {
+                if(ReferenceEquals(parseNode, null)) throw new ArgumentNullException(nameof(parseNode));
+                var result = new global::GrimoireCli.Generated.Models.ScanStatusResponse.ScanStatusResponse_thumbs_current();
+                if(parseNode.GetStringValue() is string stringValue)
+                {
+                    result.String = stringValue;
+                }
+                else {
+                    result.ScanStatusResponseThumbsCurrentMember1 = new global::GrimoireCli.Generated.Models.ScanStatusResponse_thumbs_currentMember1();
+                }
+                return result;
+            }
+            /// <summary>
+            /// The deserialization information for the current model
+            /// </summary>
+            /// <returns>A IDictionary&lt;string, Action&lt;IParseNode&gt;&gt;</returns>
+            public virtual IDictionary<string, Action<IParseNode>> GetFieldDeserializers()
+            {
+                if(ScanStatusResponseThumbsCurrentMember1 != null)
+                {
+                    return ParseNodeHelper.MergeDeserializersForIntersectionWrapper(ScanStatusResponseThumbsCurrentMember1);
+                }
+                return new Dictionary<string, Action<IParseNode>>();
+            }
+            /// <summary>
+            /// Serializes information the current object
+            /// </summary>
+            /// <param name="writer">Serialization writer to use to serialize this model</param>
+            public virtual void Serialize(ISerializationWriter writer)
+            {
+                if(ReferenceEquals(writer, null)) throw new ArgumentNullException(nameof(writer));
+                if(String != null)
+                {
+                    writer.WriteStringValue(null, String);
+                }
+                else {
+                    writer.WriteObjectValue<global::GrimoireCli.Generated.Models.ScanStatusResponse_thumbs_currentMember1>(null, ScanStatusResponseThumbsCurrentMember1);
+                }
+            }
+        }
+        /// <summary>
+        /// Composed type wrapper for classes <see cref="global::GrimoireCli.Generated.Models.ScanStatusResponse_thumbs_doneMember1"/>, <see cref="int"/>
+        /// </summary>
+        [global::System.CodeDom.Compiler.GeneratedCode("Kiota", "1.0.0")]
+        public partial class ScanStatusResponse_thumbs_done : IComposedTypeWrapper, IParsable
+        {
+            /// <summary>Composed type representation for type <see cref="int"/></summary>
+            public int? Integer { get; set; }
+            /// <summary>Composed type representation for type <see cref="global::GrimoireCli.Generated.Models.ScanStatusResponse_thumbs_doneMember1"/></summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+            public global::GrimoireCli.Generated.Models.ScanStatusResponse_thumbs_doneMember1? ScanStatusResponseThumbsDoneMember1 { get; set; }
+#nullable restore
+#else
+            public global::GrimoireCli.Generated.Models.ScanStatusResponse_thumbs_doneMember1 ScanStatusResponseThumbsDoneMember1 { get; set; }
+#endif
+            /// <summary>
+            /// Creates a new instance of the appropriate class based on discriminator value
+            /// </summary>
+            /// <returns>A <see cref="global::GrimoireCli.Generated.Models.ScanStatusResponse.ScanStatusResponse_thumbs_done"/></returns>
+            /// <param name="parseNode">The parse node to use to read the discriminator value and create the object</param>
+            public static global::GrimoireCli.Generated.Models.ScanStatusResponse.ScanStatusResponse_thumbs_done CreateFromDiscriminatorValue(IParseNode parseNode)
+            {
+                if(ReferenceEquals(parseNode, null)) throw new ArgumentNullException(nameof(parseNode));
+                var result = new global::GrimoireCli.Generated.Models.ScanStatusResponse.ScanStatusResponse_thumbs_done();
+                if(parseNode.GetIntValue() is int integerValue)
+                {
+                    result.Integer = integerValue;
+                }
+                else {
+                    result.ScanStatusResponseThumbsDoneMember1 = new global::GrimoireCli.Generated.Models.ScanStatusResponse_thumbs_doneMember1();
+                }
+                return result;
+            }
+            /// <summary>
+            /// The deserialization information for the current model
+            /// </summary>
+            /// <returns>A IDictionary&lt;string, Action&lt;IParseNode&gt;&gt;</returns>
+            public virtual IDictionary<string, Action<IParseNode>> GetFieldDeserializers()
+            {
+                if(ScanStatusResponseThumbsDoneMember1 != null)
+                {
+                    return ParseNodeHelper.MergeDeserializersForIntersectionWrapper(ScanStatusResponseThumbsDoneMember1);
+                }
+                return new Dictionary<string, Action<IParseNode>>();
+            }
+            /// <summary>
+            /// Serializes information the current object
+            /// </summary>
+            /// <param name="writer">Serialization writer to use to serialize this model</param>
+            public virtual void Serialize(ISerializationWriter writer)
+            {
+                if(ReferenceEquals(writer, null)) throw new ArgumentNullException(nameof(writer));
+                if(Integer != null)
+                {
+                    writer.WriteIntValue(null, Integer);
+                }
+                else {
+                    writer.WriteObjectValue<global::GrimoireCli.Generated.Models.ScanStatusResponse_thumbs_doneMember1>(null, ScanStatusResponseThumbsDoneMember1);
                 }
             }
         }
@@ -1250,6 +1564,68 @@ namespace GrimoireCli.Generated.Models
             }
         }
         /// <summary>
+        /// Composed type wrapper for classes <see cref="global::GrimoireCli.Generated.Models.ScanStatusResponse_total_modelsMember1"/>, <see cref="int"/>
+        /// </summary>
+        [global::System.CodeDom.Compiler.GeneratedCode("Kiota", "1.0.0")]
+        public partial class ScanStatusResponse_total_models : IComposedTypeWrapper, IParsable
+        {
+            /// <summary>Composed type representation for type <see cref="int"/></summary>
+            public int? Integer { get; set; }
+            /// <summary>Composed type representation for type <see cref="global::GrimoireCli.Generated.Models.ScanStatusResponse_total_modelsMember1"/></summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+            public global::GrimoireCli.Generated.Models.ScanStatusResponse_total_modelsMember1? ScanStatusResponseTotalModelsMember1 { get; set; }
+#nullable restore
+#else
+            public global::GrimoireCli.Generated.Models.ScanStatusResponse_total_modelsMember1 ScanStatusResponseTotalModelsMember1 { get; set; }
+#endif
+            /// <summary>
+            /// Creates a new instance of the appropriate class based on discriminator value
+            /// </summary>
+            /// <returns>A <see cref="global::GrimoireCli.Generated.Models.ScanStatusResponse.ScanStatusResponse_total_models"/></returns>
+            /// <param name="parseNode">The parse node to use to read the discriminator value and create the object</param>
+            public static global::GrimoireCli.Generated.Models.ScanStatusResponse.ScanStatusResponse_total_models CreateFromDiscriminatorValue(IParseNode parseNode)
+            {
+                if(ReferenceEquals(parseNode, null)) throw new ArgumentNullException(nameof(parseNode));
+                var result = new global::GrimoireCli.Generated.Models.ScanStatusResponse.ScanStatusResponse_total_models();
+                if(parseNode.GetIntValue() is int integerValue)
+                {
+                    result.Integer = integerValue;
+                }
+                else {
+                    result.ScanStatusResponseTotalModelsMember1 = new global::GrimoireCli.Generated.Models.ScanStatusResponse_total_modelsMember1();
+                }
+                return result;
+            }
+            /// <summary>
+            /// The deserialization information for the current model
+            /// </summary>
+            /// <returns>A IDictionary&lt;string, Action&lt;IParseNode&gt;&gt;</returns>
+            public virtual IDictionary<string, Action<IParseNode>> GetFieldDeserializers()
+            {
+                if(ScanStatusResponseTotalModelsMember1 != null)
+                {
+                    return ParseNodeHelper.MergeDeserializersForIntersectionWrapper(ScanStatusResponseTotalModelsMember1);
+                }
+                return new Dictionary<string, Action<IParseNode>>();
+            }
+            /// <summary>
+            /// Serializes information the current object
+            /// </summary>
+            /// <param name="writer">Serialization writer to use to serialize this model</param>
+            public virtual void Serialize(ISerializationWriter writer)
+            {
+                if(ReferenceEquals(writer, null)) throw new ArgumentNullException(nameof(writer));
+                if(Integer != null)
+                {
+                    writer.WriteIntValue(null, Integer);
+                }
+                else {
+                    writer.WriteObjectValue<global::GrimoireCli.Generated.Models.ScanStatusResponse_total_modelsMember1>(null, ScanStatusResponseTotalModelsMember1);
+                }
+            }
+        }
+        /// <summary>
         /// Composed type wrapper for classes <see cref="global::GrimoireCli.Generated.Models.ScanStatusResponse_total_ocrMember1"/>, <see cref="int"/>
         /// </summary>
         [global::System.CodeDom.Compiler.GeneratedCode("Kiota", "1.0.0")]
@@ -1308,6 +1684,68 @@ namespace GrimoireCli.Generated.Models
                 }
                 else {
                     writer.WriteObjectValue<global::GrimoireCli.Generated.Models.ScanStatusResponse_total_ocrMember1>(null, ScanStatusResponseTotalOcrMember1);
+                }
+            }
+        }
+        /// <summary>
+        /// Composed type wrapper for classes <see cref="global::GrimoireCli.Generated.Models.ScanStatusResponse_total_thumbsMember1"/>, <see cref="int"/>
+        /// </summary>
+        [global::System.CodeDom.Compiler.GeneratedCode("Kiota", "1.0.0")]
+        public partial class ScanStatusResponse_total_thumbs : IComposedTypeWrapper, IParsable
+        {
+            /// <summary>Composed type representation for type <see cref="int"/></summary>
+            public int? Integer { get; set; }
+            /// <summary>Composed type representation for type <see cref="global::GrimoireCli.Generated.Models.ScanStatusResponse_total_thumbsMember1"/></summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+            public global::GrimoireCli.Generated.Models.ScanStatusResponse_total_thumbsMember1? ScanStatusResponseTotalThumbsMember1 { get; set; }
+#nullable restore
+#else
+            public global::GrimoireCli.Generated.Models.ScanStatusResponse_total_thumbsMember1 ScanStatusResponseTotalThumbsMember1 { get; set; }
+#endif
+            /// <summary>
+            /// Creates a new instance of the appropriate class based on discriminator value
+            /// </summary>
+            /// <returns>A <see cref="global::GrimoireCli.Generated.Models.ScanStatusResponse.ScanStatusResponse_total_thumbs"/></returns>
+            /// <param name="parseNode">The parse node to use to read the discriminator value and create the object</param>
+            public static global::GrimoireCli.Generated.Models.ScanStatusResponse.ScanStatusResponse_total_thumbs CreateFromDiscriminatorValue(IParseNode parseNode)
+            {
+                if(ReferenceEquals(parseNode, null)) throw new ArgumentNullException(nameof(parseNode));
+                var result = new global::GrimoireCli.Generated.Models.ScanStatusResponse.ScanStatusResponse_total_thumbs();
+                if(parseNode.GetIntValue() is int integerValue)
+                {
+                    result.Integer = integerValue;
+                }
+                else {
+                    result.ScanStatusResponseTotalThumbsMember1 = new global::GrimoireCli.Generated.Models.ScanStatusResponse_total_thumbsMember1();
+                }
+                return result;
+            }
+            /// <summary>
+            /// The deserialization information for the current model
+            /// </summary>
+            /// <returns>A IDictionary&lt;string, Action&lt;IParseNode&gt;&gt;</returns>
+            public virtual IDictionary<string, Action<IParseNode>> GetFieldDeserializers()
+            {
+                if(ScanStatusResponseTotalThumbsMember1 != null)
+                {
+                    return ParseNodeHelper.MergeDeserializersForIntersectionWrapper(ScanStatusResponseTotalThumbsMember1);
+                }
+                return new Dictionary<string, Action<IParseNode>>();
+            }
+            /// <summary>
+            /// Serializes information the current object
+            /// </summary>
+            /// <param name="writer">Serialization writer to use to serialize this model</param>
+            public virtual void Serialize(ISerializationWriter writer)
+            {
+                if(ReferenceEquals(writer, null)) throw new ArgumentNullException(nameof(writer));
+                if(Integer != null)
+                {
+                    writer.WriteIntValue(null, Integer);
+                }
+                else {
+                    writer.WriteObjectValue<global::GrimoireCli.Generated.Models.ScanStatusResponse_total_thumbsMember1>(null, ScanStatusResponseTotalThumbsMember1);
                 }
             }
         }

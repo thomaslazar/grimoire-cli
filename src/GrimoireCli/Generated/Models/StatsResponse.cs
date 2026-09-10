@@ -23,8 +23,12 @@ namespace GrimoireCli.Generated.Models
         public int? GameSystems { get; set; }
         /// <summary>The indexed_books property</summary>
         public int? IndexedBooks { get; set; }
+        /// <summary>The library_size_mb property</summary>
+        public double? LibrarySizeMb { get; set; }
         /// <summary>The maps property</summary>
         public int? Maps { get; set; }
+        /// <summary>The models property</summary>
+        public int? Models { get; set; }
         /// <summary>The tokens property</summary>
         public int? Tokens { get; set; }
         /// <summary>The total_pages property</summary>
@@ -60,7 +64,9 @@ namespace GrimoireCli.Generated.Models
                 { "books", n => { Books = n.GetIntValue(); } },
                 { "game_systems", n => { GameSystems = n.GetIntValue(); } },
                 { "indexed_books", n => { IndexedBooks = n.GetIntValue(); } },
+                { "library_size_mb", n => { LibrarySizeMb = n.GetDoubleValue(); } },
                 { "maps", n => { Maps = n.GetIntValue(); } },
+                { "models", n => { Models = n.GetIntValue(); } },
                 { "tokens", n => { Tokens = n.GetIntValue(); } },
                 { "total_pages", n => { TotalPages = n.GetIntValue(); } },
                 { "total_size_mb", n => { TotalSizeMb = n.GetDoubleValue(); } },
@@ -77,7 +83,9 @@ namespace GrimoireCli.Generated.Models
             writer.WriteIntValue("books", Books);
             writer.WriteIntValue("game_systems", GameSystems);
             writer.WriteIntValue("indexed_books", IndexedBooks);
+            writer.WriteDoubleValue("library_size_mb", LibrarySizeMb);
             writer.WriteIntValue("maps", Maps);
+            writer.WriteIntValue("models", Models);
             writer.WriteIntValue("tokens", Tokens);
             writer.WriteIntValue("total_pages", TotalPages);
             writer.WriteDoubleValue("total_size_mb", TotalSizeMb);

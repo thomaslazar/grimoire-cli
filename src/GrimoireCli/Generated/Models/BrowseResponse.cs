@@ -14,6 +14,8 @@ namespace GrimoireCli.Generated.Models
     {
         /// <summary>Stores additional data not described in the OpenAPI description found when deserializing. Can be used for serialization as well.</summary>
         public IDictionary<string, object> AdditionalData { get; set; }
+        /// <summary>The category_host property</summary>
+        public bool? CategoryHost { get; set; }
         /// <summary>The entries property</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
@@ -58,6 +60,7 @@ namespace GrimoireCli.Generated.Models
         public BrowseResponse()
         {
             AdditionalData = new Dictionary<string, object>();
+            CategoryHost = false;
             Total = 0;
             Truncated = false;
         }
@@ -79,6 +82,7 @@ namespace GrimoireCli.Generated.Models
         {
             return new Dictionary<string, Action<IParseNode>>
             {
+                { "category_host", n => { CategoryHost = n.GetBoolValue(); } },
                 { "entries", n => { Entries = n.GetCollectionOfObjectValues<global::GrimoireCli.Generated.Models.BrowseEntry>(global::GrimoireCli.Generated.Models.BrowseEntry.CreateFromDiscriminatorValue)?.AsList(); } },
                 { "parent", n => { Parent = n.GetObjectValue<global::GrimoireCli.Generated.Models.BrowseResponse.BrowseResponse_parent>(global::GrimoireCli.Generated.Models.BrowseResponse.BrowseResponse_parent.CreateFromDiscriminatorValue); } },
                 { "path", n => { Path = n.GetStringValue(); } },
@@ -95,6 +99,7 @@ namespace GrimoireCli.Generated.Models
         public virtual void Serialize(ISerializationWriter writer)
         {
             if(ReferenceEquals(writer, null)) throw new ArgumentNullException(nameof(writer));
+            writer.WriteBoolValue("category_host", CategoryHost);
             writer.WriteCollectionOfObjectValues<global::GrimoireCli.Generated.Models.BrowseEntry>("entries", Entries);
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.BrowseResponse.BrowseResponse_parent>("parent", Parent);
             writer.WriteStringValue("path", Path);

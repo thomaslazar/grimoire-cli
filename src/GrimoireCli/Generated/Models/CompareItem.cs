@@ -133,6 +133,14 @@ namespace GrimoireCli.Generated.Models
 #else
         public string VariantKind { get; set; }
 #endif
+        /// <summary>The variant_main property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public global::GrimoireCli.Generated.Models.VariantMain? VariantMain { get; set; }
+#nullable restore
+#else
+        public global::GrimoireCli.Generated.Models.VariantMain VariantMain { get; set; }
+#endif
         /// <summary>The variant_parent_id property</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
@@ -193,6 +201,7 @@ namespace GrimoireCli.Generated.Models
                 { "tags", n => { Tags = n.GetCollectionOfPrimitiveValues<string>()?.AsList(); } },
                 { "title", n => { Title = n.GetObjectValue<global::GrimoireCli.Generated.Models.CompareItem.CompareItem_title>(global::GrimoireCli.Generated.Models.CompareItem.CompareItem_title.CreateFromDiscriminatorValue); } },
                 { "variant_kind", n => { VariantKind = n.GetStringValue(); } },
+                { "variant_main", n => { VariantMain = n.GetObjectValue<global::GrimoireCli.Generated.Models.VariantMain>(global::GrimoireCli.Generated.Models.VariantMain.CreateFromDiscriminatorValue); } },
                 { "variant_parent_id", n => { VariantParentId = n.GetObjectValue<global::GrimoireCli.Generated.Models.CompareItem.CompareItem_variant_parent_id>(global::GrimoireCli.Generated.Models.CompareItem.CompareItem_variant_parent_id.CreateFromDiscriminatorValue); } },
                 { "variants", n => { Variants = n.GetCollectionOfObjectValues<global::GrimoireCli.Generated.Models.VariantEntry>(global::GrimoireCli.Generated.Models.VariantEntry.CreateFromDiscriminatorValue)?.AsList(); } },
             };
@@ -221,6 +230,7 @@ namespace GrimoireCli.Generated.Models
             writer.WriteCollectionOfPrimitiveValues<string>("tags", Tags);
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.CompareItem.CompareItem_title>("title", Title);
             writer.WriteStringValue("variant_kind", VariantKind);
+            writer.WriteObjectValue<global::GrimoireCli.Generated.Models.VariantMain>("variant_main", VariantMain);
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.CompareItem.CompareItem_variant_parent_id>("variant_parent_id", VariantParentId);
             writer.WriteCollectionOfObjectValues<global::GrimoireCli.Generated.Models.VariantEntry>("variants", Variants);
             writer.WriteAdditionalData(AdditionalData);

@@ -102,6 +102,14 @@ namespace GrimoireCli.Generated.Models
 #else
         public global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_hide_maps HideMaps { get; set; }
 #endif
+        /// <summary>The hide_models property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_hide_models? HideModels { get; set; }
+#nullable restore
+#else
+        public global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_hide_models HideModels { get; set; }
+#endif
         /// <summary>The hide_tokens property</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
@@ -318,6 +326,14 @@ namespace GrimoireCli.Generated.Models
 #else
         public global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_show_stat_books ShowStatBooks { get; set; }
 #endif
+        /// <summary>The show_stat_library_size property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_show_stat_library_size? ShowStatLibrarySize { get; set; }
+#nullable restore
+#else
+        public global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_show_stat_library_size ShowStatLibrarySize { get; set; }
+#endif
         /// <summary>The show_stat_maps property</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
@@ -325,6 +341,14 @@ namespace GrimoireCli.Generated.Models
 #nullable restore
 #else
         public global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_show_stat_maps ShowStatMaps { get; set; }
+#endif
+        /// <summary>The show_stat_models property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_show_stat_models? ShowStatModels { get; set; }
+#nullable restore
+#else
+        public global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_show_stat_models ShowStatModels { get; set; }
 #endif
         /// <summary>The show_stat_pages property</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
@@ -402,6 +426,7 @@ namespace GrimoireCli.Generated.Models
                 { "hide_audio", n => { HideAudio = n.GetObjectValue<global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_hide_audio>(global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_hide_audio.CreateFromDiscriminatorValue); } },
                 { "hide_campaigns", n => { HideCampaigns = n.GetObjectValue<global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_hide_campaigns>(global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_hide_campaigns.CreateFromDiscriminatorValue); } },
                 { "hide_maps", n => { HideMaps = n.GetObjectValue<global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_hide_maps>(global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_hide_maps.CreateFromDiscriminatorValue); } },
+                { "hide_models", n => { HideModels = n.GetObjectValue<global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_hide_models>(global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_hide_models.CreateFromDiscriminatorValue); } },
                 { "hide_tokens", n => { HideTokens = n.GetObjectValue<global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_hide_tokens>(global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_hide_tokens.CreateFromDiscriminatorValue); } },
                 { "oidc_authorization_endpoint", n => { OidcAuthorizationEndpoint = n.GetObjectValue<global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_oidc_authorization_endpoint>(global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_oidc_authorization_endpoint.CreateFromDiscriminatorValue); } },
                 { "oidc_auto_launch", n => { OidcAutoLaunch = n.GetObjectValue<global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_oidc_auto_launch>(global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_oidc_auto_launch.CreateFromDiscriminatorValue); } },
@@ -429,7 +454,9 @@ namespace GrimoireCli.Generated.Models
                 { "restricted_categories", n => { RestrictedCategories = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
                 { "show_stat_audio", n => { ShowStatAudio = n.GetObjectValue<global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_show_stat_audio>(global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_show_stat_audio.CreateFromDiscriminatorValue); } },
                 { "show_stat_books", n => { ShowStatBooks = n.GetObjectValue<global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_show_stat_books>(global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_show_stat_books.CreateFromDiscriminatorValue); } },
+                { "show_stat_library_size", n => { ShowStatLibrarySize = n.GetObjectValue<global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_show_stat_library_size>(global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_show_stat_library_size.CreateFromDiscriminatorValue); } },
                 { "show_stat_maps", n => { ShowStatMaps = n.GetObjectValue<global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_show_stat_maps>(global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_show_stat_maps.CreateFromDiscriminatorValue); } },
+                { "show_stat_models", n => { ShowStatModels = n.GetObjectValue<global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_show_stat_models>(global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_show_stat_models.CreateFromDiscriminatorValue); } },
                 { "show_stat_pages", n => { ShowStatPages = n.GetObjectValue<global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_show_stat_pages>(global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_show_stat_pages.CreateFromDiscriminatorValue); } },
                 { "show_stat_size", n => { ShowStatSize = n.GetObjectValue<global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_show_stat_size>(global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_show_stat_size.CreateFromDiscriminatorValue); } },
                 { "show_stat_systems", n => { ShowStatSystems = n.GetObjectValue<global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_show_stat_systems>(global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_show_stat_systems.CreateFromDiscriminatorValue); } },
@@ -455,6 +482,7 @@ namespace GrimoireCli.Generated.Models
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_hide_audio>("hide_audio", HideAudio);
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_hide_campaigns>("hide_campaigns", HideCampaigns);
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_hide_maps>("hide_maps", HideMaps);
+            writer.WriteObjectValue<global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_hide_models>("hide_models", HideModels);
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_hide_tokens>("hide_tokens", HideTokens);
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_oidc_authorization_endpoint>("oidc_authorization_endpoint", OidcAuthorizationEndpoint);
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_oidc_auto_launch>("oidc_auto_launch", OidcAutoLaunch);
@@ -482,7 +510,9 @@ namespace GrimoireCli.Generated.Models
             writer.WriteObjectValue<UntypedNode>("restricted_categories", RestrictedCategories);
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_show_stat_audio>("show_stat_audio", ShowStatAudio);
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_show_stat_books>("show_stat_books", ShowStatBooks);
+            writer.WriteObjectValue<global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_show_stat_library_size>("show_stat_library_size", ShowStatLibrarySize);
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_show_stat_maps>("show_stat_maps", ShowStatMaps);
+            writer.WriteObjectValue<global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_show_stat_models>("show_stat_models", ShowStatModels);
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_show_stat_pages>("show_stat_pages", ShowStatPages);
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_show_stat_size>("show_stat_size", ShowStatSize);
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_show_stat_systems>("show_stat_systems", ShowStatSystems);
@@ -1175,6 +1205,68 @@ namespace GrimoireCli.Generated.Models
                 }
                 else {
                     writer.WriteObjectValue<global::GrimoireCli.Generated.Models.SettingsPatch_hide_mapsMember1>(null, SettingsPatchHideMapsMember1);
+                }
+            }
+        }
+        /// <summary>
+        /// Composed type wrapper for classes <see cref="bool"/>, <see cref="global::GrimoireCli.Generated.Models.SettingsPatch_hide_modelsMember1"/>
+        /// </summary>
+        [global::System.CodeDom.Compiler.GeneratedCode("Kiota", "1.0.0")]
+        public partial class SettingsPatch_hide_models : IComposedTypeWrapper, IParsable
+        {
+            /// <summary>Composed type representation for type <see cref="bool"/></summary>
+            public bool? Boolean { get; set; }
+            /// <summary>Composed type representation for type <see cref="global::GrimoireCli.Generated.Models.SettingsPatch_hide_modelsMember1"/></summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+            public global::GrimoireCli.Generated.Models.SettingsPatch_hide_modelsMember1? SettingsPatchHideModelsMember1 { get; set; }
+#nullable restore
+#else
+            public global::GrimoireCli.Generated.Models.SettingsPatch_hide_modelsMember1 SettingsPatchHideModelsMember1 { get; set; }
+#endif
+            /// <summary>
+            /// Creates a new instance of the appropriate class based on discriminator value
+            /// </summary>
+            /// <returns>A <see cref="global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_hide_models"/></returns>
+            /// <param name="parseNode">The parse node to use to read the discriminator value and create the object</param>
+            public static global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_hide_models CreateFromDiscriminatorValue(IParseNode parseNode)
+            {
+                if(ReferenceEquals(parseNode, null)) throw new ArgumentNullException(nameof(parseNode));
+                var result = new global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_hide_models();
+                if(parseNode.GetBoolValue() is bool booleanValue)
+                {
+                    result.Boolean = booleanValue;
+                }
+                else {
+                    result.SettingsPatchHideModelsMember1 = new global::GrimoireCli.Generated.Models.SettingsPatch_hide_modelsMember1();
+                }
+                return result;
+            }
+            /// <summary>
+            /// The deserialization information for the current model
+            /// </summary>
+            /// <returns>A IDictionary&lt;string, Action&lt;IParseNode&gt;&gt;</returns>
+            public virtual IDictionary<string, Action<IParseNode>> GetFieldDeserializers()
+            {
+                if(SettingsPatchHideModelsMember1 != null)
+                {
+                    return ParseNodeHelper.MergeDeserializersForIntersectionWrapper(SettingsPatchHideModelsMember1);
+                }
+                return new Dictionary<string, Action<IParseNode>>();
+            }
+            /// <summary>
+            /// Serializes information the current object
+            /// </summary>
+            /// <param name="writer">Serialization writer to use to serialize this model</param>
+            public virtual void Serialize(ISerializationWriter writer)
+            {
+                if(ReferenceEquals(writer, null)) throw new ArgumentNullException(nameof(writer));
+                if(Boolean != null)
+                {
+                    writer.WriteBoolValue(null, Boolean);
+                }
+                else {
+                    writer.WriteObjectValue<global::GrimoireCli.Generated.Models.SettingsPatch_hide_modelsMember1>(null, SettingsPatchHideModelsMember1);
                 }
             }
         }
@@ -2881,6 +2973,68 @@ namespace GrimoireCli.Generated.Models
             }
         }
         /// <summary>
+        /// Composed type wrapper for classes <see cref="bool"/>, <see cref="global::GrimoireCli.Generated.Models.SettingsPatch_show_stat_library_sizeMember1"/>
+        /// </summary>
+        [global::System.CodeDom.Compiler.GeneratedCode("Kiota", "1.0.0")]
+        public partial class SettingsPatch_show_stat_library_size : IComposedTypeWrapper, IParsable
+        {
+            /// <summary>Composed type representation for type <see cref="bool"/></summary>
+            public bool? Boolean { get; set; }
+            /// <summary>Composed type representation for type <see cref="global::GrimoireCli.Generated.Models.SettingsPatch_show_stat_library_sizeMember1"/></summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+            public global::GrimoireCli.Generated.Models.SettingsPatch_show_stat_library_sizeMember1? SettingsPatchShowStatLibrarySizeMember1 { get; set; }
+#nullable restore
+#else
+            public global::GrimoireCli.Generated.Models.SettingsPatch_show_stat_library_sizeMember1 SettingsPatchShowStatLibrarySizeMember1 { get; set; }
+#endif
+            /// <summary>
+            /// Creates a new instance of the appropriate class based on discriminator value
+            /// </summary>
+            /// <returns>A <see cref="global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_show_stat_library_size"/></returns>
+            /// <param name="parseNode">The parse node to use to read the discriminator value and create the object</param>
+            public static global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_show_stat_library_size CreateFromDiscriminatorValue(IParseNode parseNode)
+            {
+                if(ReferenceEquals(parseNode, null)) throw new ArgumentNullException(nameof(parseNode));
+                var result = new global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_show_stat_library_size();
+                if(parseNode.GetBoolValue() is bool booleanValue)
+                {
+                    result.Boolean = booleanValue;
+                }
+                else {
+                    result.SettingsPatchShowStatLibrarySizeMember1 = new global::GrimoireCli.Generated.Models.SettingsPatch_show_stat_library_sizeMember1();
+                }
+                return result;
+            }
+            /// <summary>
+            /// The deserialization information for the current model
+            /// </summary>
+            /// <returns>A IDictionary&lt;string, Action&lt;IParseNode&gt;&gt;</returns>
+            public virtual IDictionary<string, Action<IParseNode>> GetFieldDeserializers()
+            {
+                if(SettingsPatchShowStatLibrarySizeMember1 != null)
+                {
+                    return ParseNodeHelper.MergeDeserializersForIntersectionWrapper(SettingsPatchShowStatLibrarySizeMember1);
+                }
+                return new Dictionary<string, Action<IParseNode>>();
+            }
+            /// <summary>
+            /// Serializes information the current object
+            /// </summary>
+            /// <param name="writer">Serialization writer to use to serialize this model</param>
+            public virtual void Serialize(ISerializationWriter writer)
+            {
+                if(ReferenceEquals(writer, null)) throw new ArgumentNullException(nameof(writer));
+                if(Boolean != null)
+                {
+                    writer.WriteBoolValue(null, Boolean);
+                }
+                else {
+                    writer.WriteObjectValue<global::GrimoireCli.Generated.Models.SettingsPatch_show_stat_library_sizeMember1>(null, SettingsPatchShowStatLibrarySizeMember1);
+                }
+            }
+        }
+        /// <summary>
         /// Composed type wrapper for classes <see cref="bool"/>, <see cref="global::GrimoireCli.Generated.Models.SettingsPatch_show_stat_mapsMember1"/>
         /// </summary>
         [global::System.CodeDom.Compiler.GeneratedCode("Kiota", "1.0.0")]
@@ -2939,6 +3093,68 @@ namespace GrimoireCli.Generated.Models
                 }
                 else {
                     writer.WriteObjectValue<global::GrimoireCli.Generated.Models.SettingsPatch_show_stat_mapsMember1>(null, SettingsPatchShowStatMapsMember1);
+                }
+            }
+        }
+        /// <summary>
+        /// Composed type wrapper for classes <see cref="bool"/>, <see cref="global::GrimoireCli.Generated.Models.SettingsPatch_show_stat_modelsMember1"/>
+        /// </summary>
+        [global::System.CodeDom.Compiler.GeneratedCode("Kiota", "1.0.0")]
+        public partial class SettingsPatch_show_stat_models : IComposedTypeWrapper, IParsable
+        {
+            /// <summary>Composed type representation for type <see cref="bool"/></summary>
+            public bool? Boolean { get; set; }
+            /// <summary>Composed type representation for type <see cref="global::GrimoireCli.Generated.Models.SettingsPatch_show_stat_modelsMember1"/></summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+            public global::GrimoireCli.Generated.Models.SettingsPatch_show_stat_modelsMember1? SettingsPatchShowStatModelsMember1 { get; set; }
+#nullable restore
+#else
+            public global::GrimoireCli.Generated.Models.SettingsPatch_show_stat_modelsMember1 SettingsPatchShowStatModelsMember1 { get; set; }
+#endif
+            /// <summary>
+            /// Creates a new instance of the appropriate class based on discriminator value
+            /// </summary>
+            /// <returns>A <see cref="global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_show_stat_models"/></returns>
+            /// <param name="parseNode">The parse node to use to read the discriminator value and create the object</param>
+            public static global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_show_stat_models CreateFromDiscriminatorValue(IParseNode parseNode)
+            {
+                if(ReferenceEquals(parseNode, null)) throw new ArgumentNullException(nameof(parseNode));
+                var result = new global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_show_stat_models();
+                if(parseNode.GetBoolValue() is bool booleanValue)
+                {
+                    result.Boolean = booleanValue;
+                }
+                else {
+                    result.SettingsPatchShowStatModelsMember1 = new global::GrimoireCli.Generated.Models.SettingsPatch_show_stat_modelsMember1();
+                }
+                return result;
+            }
+            /// <summary>
+            /// The deserialization information for the current model
+            /// </summary>
+            /// <returns>A IDictionary&lt;string, Action&lt;IParseNode&gt;&gt;</returns>
+            public virtual IDictionary<string, Action<IParseNode>> GetFieldDeserializers()
+            {
+                if(SettingsPatchShowStatModelsMember1 != null)
+                {
+                    return ParseNodeHelper.MergeDeserializersForIntersectionWrapper(SettingsPatchShowStatModelsMember1);
+                }
+                return new Dictionary<string, Action<IParseNode>>();
+            }
+            /// <summary>
+            /// Serializes information the current object
+            /// </summary>
+            /// <param name="writer">Serialization writer to use to serialize this model</param>
+            public virtual void Serialize(ISerializationWriter writer)
+            {
+                if(ReferenceEquals(writer, null)) throw new ArgumentNullException(nameof(writer));
+                if(Boolean != null)
+                {
+                    writer.WriteBoolValue(null, Boolean);
+                }
+                else {
+                    writer.WriteObjectValue<global::GrimoireCli.Generated.Models.SettingsPatch_show_stat_modelsMember1>(null, SettingsPatchShowStatModelsMember1);
                 }
             }
         }
