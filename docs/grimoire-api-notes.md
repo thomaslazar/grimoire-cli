@@ -2,7 +2,7 @@
 
 Behaviour verified against Grimoire **v1.5.6** — the release the live instance
 runs — by reading `temp/grimoire/` at that tag and by calling the API. The local
-stack now rides the 1.6.0 nightly, so a note measured there says so. Don't
+stack runs the `1.6.2` release, so a note measured there says so. Don't
 re-derive these, and don't trust the published docs over them. Re-verify after a
 server upgrade — see [grimoire-compatibility.md](grimoire-compatibility.md) for
 the bump procedure.
@@ -588,7 +588,7 @@ byte-identical to `v1.6.0`.
 ## Files
 
 Read from `backend/routers/files/core.py` and `backend/services/library_fs/` at
-tag `v1.6.1`.
+tag `v1.6.2`.
 
 - **Every write here needs the library mounted read-write.** Grimoire probes
   writability up front with `os.access` (`services/library_fs/paths.py`'s
@@ -602,6 +602,12 @@ tag `v1.6.1`.
   so it works on a read-only library. The library root and the collection folders
   are refused either way. `confirm_name` is read only on the hard path;
   `unindex_path` ignores it.
+- **A soft delete also prunes the `GameSystem` row**, as of 1.6.2
+  (`deletes.py::_unindex_system_row`) — `_records_under` knows only path-keyed
+  file rows, so unindexing a system folder used to forget its books and leave the
+  shelf itself standing. The row goes only when it has no books and no child
+  systems left, and never when it carries a custom name, a description, a cover,
+  or a campaign reference. It is counted in `records`.
 - **`DELETE /api/files/folder` is deliberately not implemented in the CLI.** It
   calls the same `fs.delete_path` with the same arguments as
   `POST /api/files/delete` does under `delete_files: true`, and carries no
@@ -640,6 +646,13 @@ tag `v1.6.1`.
 - **`scaffold` is idempotent**, creating Core, Supplements, Adventures, Character
   Sheets, Maps, Handouts, Homebrew and Starter Sets, and reporting `created` and
   `existing`.
+- **`scaffold` takes a system folder, not a container.** As of 1.6.2 the guard is
+  `is_category_host` rather than a depth test: under `books/`, at least one level
+  down, and not itself a container — a container's children *are* the system
+  folders. Anything else is a 400 `invalid`. `browse` answers the same question
+  per row and for the browsed folder, as `category_host`, so a caller need not
+  re-derive it. The old depth test also mis-read a system nested under two
+  containers, creating one category folder instead of eight (upstream #412/#413).
 - **`DELETE /api/files/folder` carries a request body**, which is unusual for a
   DELETE and is what the generated builder expects.
 
@@ -647,16 +660,16 @@ tag `v1.6.1`.
 
 Read from `backend/routers/search/core.py`, `backend/routers/search/_query.py`,
 `backend/routers/search/_books.py` and `backend/routers/search/_helpers.py` at
-tag `v1.6.1`; the limit behaviour was verified against the running 1.6.1 stack.
+tag `v1.6.2`; the limit behaviour was verified against the running 1.6.1 stack.
 
-`GET /api/search` is not full-text-only. As of 1.6.1 it returns five
+`GET /api/search` is not full-text-only. As of 1.6.2 it returns six
 independently-populated arrays — `results` (page text), `book_matches`, `maps`,
-`tokens`, `audio` — and `total` counts every row across all of them, so a book
-matching by title *and* by page text is counted twice.
+`tokens`, `audio`, `models` — and `total` counts every row across all of them,
+so a book matching by title *and* by page text is counted twice.
 
 - **`limit` bounds `results` alone.** `book_matches` is capped at
   `TITLE_MATCH_LIMIT = 50` and each media set at a literal `.limit(50)`,
-  neither reachable from the query string. There is no offset, so those four
+  neither reachable from the query string. There is no offset, so those five
   are a hard ceiling rather than a page.
 - **`limit` has no lower bound, and `-1` means unlimited.** The route declares
   `Query(50, le=200)`, which 422s above 200, but the value reaches SQLite as a
@@ -682,8 +695,8 @@ matching by title *and* by page text is counted twice.
 
 Read from `backend/routers/duplicates/__init__.py`, `core.py`, `detection.py`,
 `_helpers.py`, `backend/models/variants.py`, `backend/services/variants.py` and
-`backend/services/library_fs/deletes.py` at tag `v1.6.1`, and verified against
-the running 1.6.1 stack.
+`backend/services/library_fs/deletes.py` at tag `v1.6.2`, and verified against
+the running 1.6.2 stack.
 
 - **`DELETE /items/{resource_type}/{item_id}` deletes the file by default.**
   `DeleteItemRequest.delete_file` is `True`, and an omitted body becomes
@@ -717,7 +730,19 @@ the running 1.6.1 stack.
   negative value slices to an empty page and answers 200.
 - **`/scan` has two conflict paths.** A *library* scan in flight is a 409; a
   *duplicate* scan in flight is `200 {"status": "already_running"}` with nothing
-  started. `/cancel-scan` answers `not_running` or `stop_requested`, both 200.
+  started. `/cancel-scan` answers `not_running`, `stop_requested` or
+  `cleared_stale`, all 200.
+- **A duplicate scan whose heartbeat went stale blocks nothing** (upstream #304,
+  new in 1.6.2). `ScanStatus.heartbeat` is what distinguishes a slow scan from an
+  abandoned one: `/scan` calls `force_clear` and starts anyway
+  (`detection.py:43`), and `/cancel-scan` clears the record outright and reports
+  `cleared_stale` (`detection.py:71`). Before that a killed worker left `running`
+  true for good and refused every later scan.
 - **`resource_type` is a body or query field on twelve of the thirteen routes** —
   only the item delete carries it in the path. So one command group covers books,
-  maps, tokens and audio without those command groups existing.
+  maps, tokens, audio and models without those command groups existing.
+- **`model` joined the vocabulary in 1.6.2**, and with it four variant kinds
+  (`presupported`, `unsupported`, `split`, `merged`) and its own mergeable set
+  (`description`, `is_explicit`, `is_supported`, `tags`). The four existing
+  collections' kind and mergeable sets are unchanged: 1.6.2 moved them into
+  `models/collections.py` verbatim.

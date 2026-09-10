@@ -107,7 +107,11 @@ public static class FilesFolderCommands
         command.AddRoleRequired("admin");
         command.AddHelpSection("Notes", HelpSectionPosition.Top,
             "Creates Core, Supplements, Adventures, Character Sheets, Maps, Handouts,",
-            "Homebrew and Starter Sets. Re-running is safe.");
+            "Homebrew and Starter Sets. Re-running is safe.",
+            "",
+            "--path must be a system folder: books/ itself and container folders",
+            "hold systems, not categories, and are refused with 400. files browse",
+            "reports category_host per row.");
         command.AddExamples("grimoire-cli files folder scaffold --path \"books/Dungeons & Dragons/5e EN\"");
         command.AddResponseExample<Generated.Models.ScaffoldResponse>();
         command.SetAction(async (parseResult, cancellationToken) =>
