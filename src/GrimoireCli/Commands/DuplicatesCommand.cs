@@ -8,7 +8,7 @@ namespace GrimoireCli.Commands;
 public static class DuplicatesCommand
 {
     private static readonly NLog.Logger _logger = NLog.LogManager.GetCurrentClassLogger();
-    internal static readonly string[] ResourceTypes = ["book", "map", "token", "audio"];
+    internal static readonly string[] ResourceTypes = ["book", "map", "token", "audio", "model"];
 
     public static Command Create()
     {
@@ -54,6 +54,7 @@ public static class DuplicatesCommand
             "         universal-vtt, video, image",
             "  token  black-and-white, color-variation",
             "  audio  remix, slowed, sped-up",
+            "  model  presupported, unsupported, split, merged",
             "",
             "label is free text, trimmed to 120 characters without warning.");
         command.AddExamples(
@@ -191,7 +192,8 @@ public static class DuplicatesCommand
             "publisher_url, urls, genres, isbn, version, language, license, year, month,",
             "day, category, is_explicit, tags. map: description, map_type, grid_size,",
             "tags. token: description, is_explicit, tags. audio: description, title,",
-            "artist, album, tags. Anything else is refused with the collection's set.");
+            "artist, album, tags. model: description, is_explicit, is_supported, tags.",
+            "Anything else is refused with the collection's set.");
         command.AddExamples(
             "grimoire-cli duplicates merge-metadata --resource-type book --source-id <id> --target-id <id> --fields title description",
             "grimoire-cli duplicates merge-metadata --resource-type book --source-id <id> --target-id <id> --fields tags --overwrite");

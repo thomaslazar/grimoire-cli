@@ -16,7 +16,7 @@ public static class TagsCommand
 
     private static Command CreateListCommand()
     {
-        var inUseByOption = new Option<string?>("--in-use-by") { Description = "Restrict to tags used on this resource type (system | book | map | token | audio)" };
+        var inUseByOption = new Option<string?>("--in-use-by") { Description = "Restrict to tags used on this resource type (system | book | map | token | audio | model)" };
         var serverOption = new Option<string?>("--server") { Description = "Server URL override" };
         var command = new Command("list", "List tags with their usage counts")
         {
@@ -44,7 +44,7 @@ public static class TagsCommand
     private static Command CreateItemsCommand()
     {
         var tagOption = new Option<string>("--tag") { Description = "The tag's internal key, from tags list; matched case-insensitively", Required = true };
-        var resourceTypeOption = new Option<string?>("--resource-type") { Description = "Restrict to this resource type (system | book | map | token | audio)" };
+        var resourceTypeOption = new Option<string?>("--resource-type") { Description = "Restrict to this resource type (system | book | map | token | audio | model)" };
         var serverOption = new Option<string?>("--server") { Description = "Server URL override" };
         var command = new Command("items", "Items and folders carrying a tag")
         {
@@ -70,7 +70,7 @@ public static class TagsCommand
     }
 
     /// <summary>
-    /// Spells out the five shapes the response's items arrays hold. The
+    /// Spells out the six shapes the response's items arrays hold. The
     /// generated sample renders the union as a bare list of type names, which
     /// names the branches without showing any of their fields. Private rather
     /// than a HelpExtensions helper: one command calls it.
@@ -83,6 +83,7 @@ public static class TagsCommand
             ("map", typeof(Generated.Models.TaggedMapItem)),
             ("token", typeof(Generated.Models.TaggedTokenItem)),
             ("audio", typeof(Generated.Models.TaggedAudioItem)),
+            ("model", typeof(Generated.Models.TaggedModelItem)),
             ("system", typeof(Generated.Models.TaggedSystemItem)),
         ];
         foreach (var (type, model) in shapes)

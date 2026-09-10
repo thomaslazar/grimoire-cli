@@ -18,8 +18,8 @@ public static class SearchCommand
             queryOption, limitOption, bookIdOption, systemIdOption, serverOption
         };
         command.AddHelpSection("Notes", HelpSectionPosition.Top,
-            "book_matches, maps, tokens and audio are capped at 50 each; --limit",
-            "does not raise them.",
+            "book_matches, maps, tokens, audio and models are capped at 50 each;",
+            "--limit does not raise them.",
             "",
             "field:value filters go inside --query. Any filter switches off the",
             "page-text search; text: switches it back on.",
@@ -32,15 +32,15 @@ public static class SearchCommand
             "",
             "snippet carries literal <mark> HTML.",
             "",
-            "--book-id and --system-id drop the map, token and audio results;",
-            "--book-id also empties book_matches.");
+            "--book-id and --system-id drop the map, token, audio and model",
+            "results; --book-id also empties book_matches.");
         command.AddHelpSection("Query syntax", HelpSectionPosition.Top,
             "Fields, aliases in parens. Books and media: title (name), filename",
             "(file), tag (tags). Books and audio: artist (artists). Audio only:",
             "album. Books only: author (authors), publisher, system (game),",
             "category, year, isbn, language (lang), description (desc) — any of",
-            "these also drops the map, token and audio results. text (content,",
-            "page) searches page text alone and returns no book_matches.",
+            "these also drops the map, token, audio and model results. text",
+            "(content, page) searches page text alone and returns no book_matches.",
             "",
             "Different fields narrow, repeating one widens: system:pbta",
             "category:core matches both, tag:forest tag:swamp matches either.",
