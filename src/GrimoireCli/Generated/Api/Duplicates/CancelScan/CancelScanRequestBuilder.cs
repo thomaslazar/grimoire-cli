@@ -34,7 +34,7 @@ namespace GrimoireCli.Generated.Api.Duplicates.CancelScan
         {
         }
         /// <summary>
-        /// Stop a running duplicate scan
+        /// Stop a running scan, or clear one that is no longer running at all.Asking a live scan to stop only sets a flag for its thread to notice, whichis right: the thread has partial results to discard on the way out. But ascan whose process was killed leaves that flag pointing at nothing, and thestatus stays ``running`` forever - Stop appears dead and every later scan isrefused as already running (issue #304). So a status whose heartbeat hasgone stale is cleared here directly, which is the only path that canrecover it from the UI.
         /// </summary>
         /// <returns>A <see cref="global::GrimoireCli.Generated.Models.ScanTriggerResult"/></returns>
         /// <param name="cancellationToken">Cancellation token to use when cancelling requests</param>
@@ -57,7 +57,7 @@ namespace GrimoireCli.Generated.Api.Duplicates.CancelScan
             return await RequestAdapter.SendAsync<global::GrimoireCli.Generated.Models.ScanTriggerResult>(requestInfo, global::GrimoireCli.Generated.Models.ScanTriggerResult.CreateFromDiscriminatorValue, errorMapping, cancellationToken).ConfigureAwait(false);
         }
         /// <summary>
-        /// Stop a running duplicate scan
+        /// Stop a running scan, or clear one that is no longer running at all.Asking a live scan to stop only sets a flag for its thread to notice, whichis right: the thread has partial results to discard on the way out. But ascan whose process was killed leaves that flag pointing at nothing, and thestatus stays ``running`` forever - Stop appears dead and every later scan isrefused as already running (issue #304). So a status whose heartbeat hasgone stale is cleared here directly, which is the only path that canrecover it from the UI.
         /// </summary>
         /// <returns>A <see cref="RequestInformation"/></returns>
         /// <param name="requestConfiguration">Configuration for the request such as headers, query parameters, and middleware options.</param>
@@ -85,7 +85,7 @@ namespace GrimoireCli.Generated.Api.Duplicates.CancelScan
             return new global::GrimoireCli.Generated.Api.Duplicates.CancelScan.CancelScanRequestBuilder(rawUrl, RequestAdapter);
         }
         /// <summary>
-        /// Stop a running duplicate scan
+        /// Stop a running scan, or clear one that is no longer running at all.Asking a live scan to stop only sets a flag for its thread to notice, whichis right: the thread has partial results to discard on the way out. But ascan whose process was killed leaves that flag pointing at nothing, and thestatus stays ``running`` forever - Stop appears dead and every later scan isrefused as already running (issue #304). So a status whose heartbeat hasgone stale is cleared here directly, which is the only path that canrecover it from the UI.
         /// </summary>
         [global::System.CodeDom.Compiler.GeneratedCode("Kiota", "1.0.0")]
         public partial class CancelScanRequestBuilderPostQueryParameters 

@@ -108,13 +108,13 @@ public class SearchCommandTests
         Assert.Contains(field, Help(["search"]));
     }
 
-    // A book-only field silently empties the map, token and audio results, so
-    // the list has to say which fields those are.
+    // A book-only field silently empties the map, token, audio and model
+    // results, so the list has to say which fields those are.
     [Fact]
     public void SearchSaysWhichFieldsDropTheMediaResults()
     {
         Assert.Contains("Books only:", Help(["search"]));
-        Assert.Contains("drops the map, token and audio results", Help(["search"]));
+        Assert.Contains("drops the map, token, audio and model results", Help(["search"]));
     }
 
     // The three caveats a caller cannot infer: the other result sets ignore

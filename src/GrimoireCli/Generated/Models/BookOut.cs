@@ -231,6 +231,14 @@ namespace GrimoireCli.Generated.Models
 #endif
         /// <summary>The variant_count property</summary>
         public int? VariantCount { get; set; }
+        /// <summary>The variant_kinds property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public List<string>? VariantKinds { get; set; }
+#nullable restore
+#else
+        public List<string> VariantKinds { get; set; }
+#endif
         /// <summary>The version property</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
@@ -303,6 +311,7 @@ namespace GrimoireCli.Generated.Models
                 { "title", n => { Title = n.GetStringValue(); } },
                 { "urls", n => { Urls = n.GetCollectionOfObjectValues<global::GrimoireCli.Generated.Models.Backend__routers__systems___schemas__LinkEntry>(global::GrimoireCli.Generated.Models.Backend__routers__systems___schemas__LinkEntry.CreateFromDiscriminatorValue)?.AsList(); } },
                 { "variant_count", n => { VariantCount = n.GetIntValue(); } },
+                { "variant_kinds", n => { VariantKinds = n.GetCollectionOfPrimitiveValues<string>()?.AsList(); } },
                 { "version", n => { Version = n.GetStringValue(); } },
                 { "year", n => { Year = n.GetObjectValue<global::GrimoireCli.Generated.Models.BookOut.BookOut_year>(global::GrimoireCli.Generated.Models.BookOut.BookOut_year.CreateFromDiscriminatorValue); } },
             };
@@ -344,6 +353,7 @@ namespace GrimoireCli.Generated.Models
             writer.WriteStringValue("title", Title);
             writer.WriteCollectionOfObjectValues<global::GrimoireCli.Generated.Models.Backend__routers__systems___schemas__LinkEntry>("urls", Urls);
             writer.WriteIntValue("variant_count", VariantCount);
+            writer.WriteCollectionOfPrimitiveValues<string>("variant_kinds", VariantKinds);
             writer.WriteStringValue("version", Version);
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.BookOut.BookOut_year>("year", Year);
             writer.WriteAdditionalData(AdditionalData);

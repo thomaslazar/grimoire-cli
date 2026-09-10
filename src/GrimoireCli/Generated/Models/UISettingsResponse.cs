@@ -29,6 +29,8 @@ namespace GrimoireCli.Generated.Models
         public bool? HideCampaigns { get; set; }
         /// <summary>The hide_maps property</summary>
         public bool? HideMaps { get; set; }
+        /// <summary>The hide_models property</summary>
+        public bool? HideModels { get; set; }
         /// <summary>The hide_tokens property</summary>
         public bool? HideTokens { get; set; }
         /// <summary>The library_writable property</summary>
@@ -37,8 +39,12 @@ namespace GrimoireCli.Generated.Models
         public bool? ShowStatAudio { get; set; }
         /// <summary>The show_stat_books property</summary>
         public bool? ShowStatBooks { get; set; }
+        /// <summary>The show_stat_library_size property</summary>
+        public bool? ShowStatLibrarySize { get; set; }
         /// <summary>The show_stat_maps property</summary>
         public bool? ShowStatMaps { get; set; }
+        /// <summary>The show_stat_models property</summary>
+        public bool? ShowStatModels { get; set; }
         /// <summary>The show_stat_pages property</summary>
         public bool? ShowStatPages { get; set; }
         /// <summary>The show_stat_size property</summary>
@@ -79,11 +85,14 @@ namespace GrimoireCli.Generated.Models
                 { "hide_audio", n => { HideAudio = n.GetBoolValue(); } },
                 { "hide_campaigns", n => { HideCampaigns = n.GetBoolValue(); } },
                 { "hide_maps", n => { HideMaps = n.GetBoolValue(); } },
+                { "hide_models", n => { HideModels = n.GetBoolValue(); } },
                 { "hide_tokens", n => { HideTokens = n.GetBoolValue(); } },
                 { "library_writable", n => { LibraryWritable = n.GetBoolValue(); } },
                 { "show_stat_audio", n => { ShowStatAudio = n.GetBoolValue(); } },
                 { "show_stat_books", n => { ShowStatBooks = n.GetBoolValue(); } },
+                { "show_stat_library_size", n => { ShowStatLibrarySize = n.GetBoolValue(); } },
                 { "show_stat_maps", n => { ShowStatMaps = n.GetBoolValue(); } },
+                { "show_stat_models", n => { ShowStatModels = n.GetBoolValue(); } },
                 { "show_stat_pages", n => { ShowStatPages = n.GetBoolValue(); } },
                 { "show_stat_size", n => { ShowStatSize = n.GetBoolValue(); } },
                 { "show_stat_systems", n => { ShowStatSystems = n.GetBoolValue(); } },
@@ -104,11 +113,14 @@ namespace GrimoireCli.Generated.Models
             writer.WriteBoolValue("hide_audio", HideAudio);
             writer.WriteBoolValue("hide_campaigns", HideCampaigns);
             writer.WriteBoolValue("hide_maps", HideMaps);
+            writer.WriteBoolValue("hide_models", HideModels);
             writer.WriteBoolValue("hide_tokens", HideTokens);
             writer.WriteBoolValue("library_writable", LibraryWritable);
             writer.WriteBoolValue("show_stat_audio", ShowStatAudio);
             writer.WriteBoolValue("show_stat_books", ShowStatBooks);
+            writer.WriteBoolValue("show_stat_library_size", ShowStatLibrarySize);
             writer.WriteBoolValue("show_stat_maps", ShowStatMaps);
+            writer.WriteBoolValue("show_stat_models", ShowStatModels);
             writer.WriteBoolValue("show_stat_pages", ShowStatPages);
             writer.WriteBoolValue("show_stat_size", ShowStatSize);
             writer.WriteBoolValue("show_stat_systems", ShowStatSystems);

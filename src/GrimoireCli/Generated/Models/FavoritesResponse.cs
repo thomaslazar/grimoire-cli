@@ -71,7 +71,7 @@ namespace GrimoireCli.Generated.Models
             writer.WriteAdditionalData(AdditionalData);
         }
         /// <summary>
-        /// Composed type wrapper for classes <see cref="global::GrimoireCli.Generated.Models.FavoriteAudioItem"/>, <see cref="global::GrimoireCli.Generated.Models.FavoriteBookItem"/>, <see cref="global::GrimoireCli.Generated.Models.FavoriteMapItem"/>, <see cref="global::GrimoireCli.Generated.Models.FavoriteSystemItem"/>, <see cref="global::GrimoireCli.Generated.Models.FavoriteTagItem"/>, <see cref="global::GrimoireCli.Generated.Models.FavoriteTokenItem"/>
+        /// Composed type wrapper for classes <see cref="global::GrimoireCli.Generated.Models.FavoriteAudioItem"/>, <see cref="global::GrimoireCli.Generated.Models.FavoriteBookItem"/>, <see cref="global::GrimoireCli.Generated.Models.FavoriteMapItem"/>, <see cref="global::GrimoireCli.Generated.Models.FavoriteModelItem"/>, <see cref="global::GrimoireCli.Generated.Models.FavoriteSystemItem"/>, <see cref="global::GrimoireCli.Generated.Models.FavoriteTagItem"/>, <see cref="global::GrimoireCli.Generated.Models.FavoriteTokenItem"/>
         /// </summary>
         [global::System.CodeDom.Compiler.GeneratedCode("Kiota", "1.0.0")]
         public partial class FavoritesResponse_items : IComposedTypeWrapper, IParsable
@@ -99,6 +99,14 @@ namespace GrimoireCli.Generated.Models
 #nullable restore
 #else
             public global::GrimoireCli.Generated.Models.FavoriteMapItem FavoriteMapItem { get; set; }
+#endif
+            /// <summary>Composed type representation for type <see cref="global::GrimoireCli.Generated.Models.FavoriteModelItem"/></summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+            public global::GrimoireCli.Generated.Models.FavoriteModelItem? FavoriteModelItem { get; set; }
+#nullable restore
+#else
+            public global::GrimoireCli.Generated.Models.FavoriteModelItem FavoriteModelItem { get; set; }
 #endif
             /// <summary>Composed type representation for type <see cref="global::GrimoireCli.Generated.Models.FavoriteSystemItem"/></summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
@@ -146,6 +154,10 @@ namespace GrimoireCli.Generated.Models
                 {
                     result.FavoriteMapItem = new global::GrimoireCli.Generated.Models.FavoriteMapItem();
                 }
+                else if("model".Equals(mappingValue, StringComparison.OrdinalIgnoreCase))
+                {
+                    result.FavoriteModelItem = new global::GrimoireCli.Generated.Models.FavoriteModelItem();
+                }
                 else if("system".Equals(mappingValue, StringComparison.OrdinalIgnoreCase))
                 {
                     result.FavoriteSystemItem = new global::GrimoireCli.Generated.Models.FavoriteSystemItem();
@@ -177,6 +189,10 @@ namespace GrimoireCli.Generated.Models
                 else if(FavoriteMapItem != null)
                 {
                     return FavoriteMapItem.GetFieldDeserializers();
+                }
+                else if(FavoriteModelItem != null)
+                {
+                    return FavoriteModelItem.GetFieldDeserializers();
                 }
                 else if(FavoriteSystemItem != null)
                 {
@@ -210,6 +226,10 @@ namespace GrimoireCli.Generated.Models
                 else if(FavoriteMapItem != null)
                 {
                     writer.WriteObjectValue<global::GrimoireCli.Generated.Models.FavoriteMapItem>(null, FavoriteMapItem);
+                }
+                else if(FavoriteModelItem != null)
+                {
+                    writer.WriteObjectValue<global::GrimoireCli.Generated.Models.FavoriteModelItem>(null, FavoriteModelItem);
                 }
                 else if(FavoriteSystemItem != null)
                 {

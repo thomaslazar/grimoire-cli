@@ -88,8 +88,8 @@ Recovery is one `login`.
 `login` also calls `GET /api/about` right after saving the token and compares
 the reported server version against `MinSupportedVersion` /
 `MaxTestedVersion` (`GrimoireApiClient.RecordServerVersion`), warning on
-stderr if the server is older or newer than the tested range (1.5.6–1.5.6
-today). This is a forced check; see
+stderr if the server is older or newer than the tested range, whose current
+value is stated once in the doc linked below. This is a forced check; see
 [grimoire-compatibility.md](grimoire-compatibility.md#runtime-check) for the
 24-hour cadence that runs on every other command.
 

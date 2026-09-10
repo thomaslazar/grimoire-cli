@@ -46,6 +46,14 @@ namespace GrimoireCli.Generated.Models
 #else
         public List<global::GrimoireCli.Generated.Models.SearchMapHit> Maps { get; set; }
 #endif
+        /// <summary>The models property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public List<global::GrimoireCli.Generated.Models.SearchModelHit>? Models { get; set; }
+#nullable restore
+#else
+        public List<global::GrimoireCli.Generated.Models.SearchModelHit> Models { get; set; }
+#endif
         /// <summary>The query property</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
@@ -101,6 +109,7 @@ namespace GrimoireCli.Generated.Models
                 { "book_matches", n => { BookMatches = n.GetCollectionOfObjectValues<global::GrimoireCli.Generated.Models.SearchBookMatch>(global::GrimoireCli.Generated.Models.SearchBookMatch.CreateFromDiscriminatorValue)?.AsList(); } },
                 { "fields", n => { Fields = n.GetCollectionOfPrimitiveValues<string>()?.AsList(); } },
                 { "maps", n => { Maps = n.GetCollectionOfObjectValues<global::GrimoireCli.Generated.Models.SearchMapHit>(global::GrimoireCli.Generated.Models.SearchMapHit.CreateFromDiscriminatorValue)?.AsList(); } },
+                { "models", n => { Models = n.GetCollectionOfObjectValues<global::GrimoireCli.Generated.Models.SearchModelHit>(global::GrimoireCli.Generated.Models.SearchModelHit.CreateFromDiscriminatorValue)?.AsList(); } },
                 { "query", n => { Query = n.GetStringValue(); } },
                 { "results", n => { Results = n.GetCollectionOfObjectValues<global::GrimoireCli.Generated.Models.SearchHit>(global::GrimoireCli.Generated.Models.SearchHit.CreateFromDiscriminatorValue)?.AsList(); } },
                 { "tokens", n => { Tokens = n.GetCollectionOfObjectValues<global::GrimoireCli.Generated.Models.SearchTokenHit>(global::GrimoireCli.Generated.Models.SearchTokenHit.CreateFromDiscriminatorValue)?.AsList(); } },
@@ -118,6 +127,7 @@ namespace GrimoireCli.Generated.Models
             writer.WriteCollectionOfObjectValues<global::GrimoireCli.Generated.Models.SearchBookMatch>("book_matches", BookMatches);
             writer.WriteCollectionOfPrimitiveValues<string>("fields", Fields);
             writer.WriteCollectionOfObjectValues<global::GrimoireCli.Generated.Models.SearchMapHit>("maps", Maps);
+            writer.WriteCollectionOfObjectValues<global::GrimoireCli.Generated.Models.SearchModelHit>("models", Models);
             writer.WriteStringValue("query", Query);
             writer.WriteCollectionOfObjectValues<global::GrimoireCli.Generated.Models.SearchHit>("results", Results);
             writer.WriteCollectionOfObjectValues<global::GrimoireCli.Generated.Models.SearchTokenHit>("tokens", Tokens);

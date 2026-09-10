@@ -15,6 +15,8 @@ namespace GrimoireCli.Generated.Models
     {
         /// <summary>Stores additional data not described in the OpenAPI description found when deserializing. Can be used for serialization as well.</summary>
         public IDictionary<string, object> AdditionalData { get; set; }
+        /// <summary>The category_host property</summary>
+        public bool? CategoryHost { get; set; }
         /// <summary>The child_count property</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
@@ -93,6 +95,7 @@ namespace GrimoireCli.Generated.Models
         public BrowseEntry()
         {
             AdditionalData = new Dictionary<string, object>();
+            CategoryHost = false;
             HasThumbnail = false;
             IsMissing = false;
             Nsfw = false;
@@ -115,6 +118,7 @@ namespace GrimoireCli.Generated.Models
         {
             return new Dictionary<string, Action<IParseNode>>
             {
+                { "category_host", n => { CategoryHost = n.GetBoolValue(); } },
                 { "child_count", n => { ChildCount = n.GetObjectValue<global::GrimoireCli.Generated.Models.BrowseEntry.BrowseEntry_child_count>(global::GrimoireCli.Generated.Models.BrowseEntry.BrowseEntry_child_count.CreateFromDiscriminatorValue); } },
                 { "collection", n => { Collection = n.GetObjectValue<global::GrimoireCli.Generated.Models.BrowseEntry.BrowseEntry_collection>(global::GrimoireCli.Generated.Models.BrowseEntry.BrowseEntry_collection.CreateFromDiscriminatorValue); } },
                 { "container_kind", n => { ContainerKind = n.GetObjectValue<global::GrimoireCli.Generated.Models.BrowseEntry.BrowseEntry_container_kind>(global::GrimoireCli.Generated.Models.BrowseEntry.BrowseEntry_container_kind.CreateFromDiscriminatorValue); } },
@@ -136,6 +140,7 @@ namespace GrimoireCli.Generated.Models
         public virtual void Serialize(ISerializationWriter writer)
         {
             if(ReferenceEquals(writer, null)) throw new ArgumentNullException(nameof(writer));
+            writer.WriteBoolValue("category_host", CategoryHost);
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.BrowseEntry.BrowseEntry_child_count>("child_count", ChildCount);
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.BrowseEntry.BrowseEntry_collection>("collection", Collection);
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.BrowseEntry.BrowseEntry_container_kind>("container_kind", ContainerKind);

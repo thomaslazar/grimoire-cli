@@ -101,7 +101,7 @@ namespace GrimoireCli.Generated.Models
             writer.WriteAdditionalData(AdditionalData);
         }
         /// <summary>
-        /// Composed type wrapper for classes <see cref="global::GrimoireCli.Generated.Models.TaggedAudioItem"/>, <see cref="global::GrimoireCli.Generated.Models.TaggedBookItem"/>, <see cref="global::GrimoireCli.Generated.Models.TaggedMapItem"/>, <see cref="global::GrimoireCli.Generated.Models.TaggedSystemItem"/>, <see cref="global::GrimoireCli.Generated.Models.TaggedTokenItem"/>
+        /// Composed type wrapper for classes <see cref="global::GrimoireCli.Generated.Models.TaggedAudioItem"/>, <see cref="global::GrimoireCli.Generated.Models.TaggedBookItem"/>, <see cref="global::GrimoireCli.Generated.Models.TaggedMapItem"/>, <see cref="global::GrimoireCli.Generated.Models.TaggedModelItem"/>, <see cref="global::GrimoireCli.Generated.Models.TaggedSystemItem"/>, <see cref="global::GrimoireCli.Generated.Models.TaggedTokenItem"/>
         /// </summary>
         [global::System.CodeDom.Compiler.GeneratedCode("Kiota", "1.0.0")]
         public partial class TagItemsResponse_items : IComposedTypeWrapper, IParsable
@@ -129,6 +129,14 @@ namespace GrimoireCli.Generated.Models
 #nullable restore
 #else
             public global::GrimoireCli.Generated.Models.TaggedMapItem TaggedMapItem { get; set; }
+#endif
+            /// <summary>Composed type representation for type <see cref="global::GrimoireCli.Generated.Models.TaggedModelItem"/></summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+            public global::GrimoireCli.Generated.Models.TaggedModelItem? TaggedModelItem { get; set; }
+#nullable restore
+#else
+            public global::GrimoireCli.Generated.Models.TaggedModelItem TaggedModelItem { get; set; }
 #endif
             /// <summary>Composed type representation for type <see cref="global::GrimoireCli.Generated.Models.TaggedSystemItem"/></summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
@@ -168,6 +176,10 @@ namespace GrimoireCli.Generated.Models
                 {
                     result.TaggedMapItem = new global::GrimoireCli.Generated.Models.TaggedMapItem();
                 }
+                else if("model".Equals(mappingValue, StringComparison.OrdinalIgnoreCase))
+                {
+                    result.TaggedModelItem = new global::GrimoireCli.Generated.Models.TaggedModelItem();
+                }
                 else if("system".Equals(mappingValue, StringComparison.OrdinalIgnoreCase))
                 {
                     result.TaggedSystemItem = new global::GrimoireCli.Generated.Models.TaggedSystemItem();
@@ -195,6 +207,10 @@ namespace GrimoireCli.Generated.Models
                 else if(TaggedMapItem != null)
                 {
                     return TaggedMapItem.GetFieldDeserializers();
+                }
+                else if(TaggedModelItem != null)
+                {
+                    return TaggedModelItem.GetFieldDeserializers();
                 }
                 else if(TaggedSystemItem != null)
                 {
@@ -224,6 +240,10 @@ namespace GrimoireCli.Generated.Models
                 else if(TaggedMapItem != null)
                 {
                     writer.WriteObjectValue<global::GrimoireCli.Generated.Models.TaggedMapItem>(null, TaggedMapItem);
+                }
+                else if(TaggedModelItem != null)
+                {
+                    writer.WriteObjectValue<global::GrimoireCli.Generated.Models.TaggedModelItem>(null, TaggedModelItem);
                 }
                 else if(TaggedSystemItem != null)
                 {

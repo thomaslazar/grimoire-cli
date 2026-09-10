@@ -5,28 +5,43 @@
 | grimoire-cli | Grimoire | Status |
 |---|---|---|
 | 0.1.x | 1.5.6 | initial support, maintained on `support/grimoire-1.5.6` |
-| 0.2.x | 1.6.0–1.6.1 | current, on `main` |
+| 0.2.x | 1.6.2 | current, on `main` |
 
 **One CLI version targets one server version.** Whoever stays on Grimoire 1.5.6
 stays on grimoire-cli `0.1.x`, which is maintained on `support/grimoire-1.5.6` —
 fixes are made and released there, then cherry-picked forward.
 
-`main` targets Grimoire 1.6.1. Reaching 1.6.0 was more than a version bump: it
+`main` targets Grimoire 1.6.2. Reaching 1.6.0 was more than a version bump: it
 shortened the access token from 30 days to 30 minutes and made the library
 writable, which is why the CLI renews its own session
 ([authentication.md](authentication.md)) and why the `files` endpoints exist at
 all. 1.6.1 on top of it is additive only — `BookOut` gained `variant_count`,
 `MapDetailResponse` gained `media_kind`, `GET /api/search/fields` and
 `GET /api/maps/{id}/vtt` are new, and `GET /api/search` grew metadata matching
-with `field:value` filters. Nothing was removed or renamed, so a 1.6.0 server
-still works and `MinSupportedVersion` stays there.
-`docker/docker-compose.yml` pins the `1.6.1` release tag, so the spec cannot
+with `field:value` filters.
+
+1.6.2 is additive too, and larger: **`model` is a fifth collection** alongside
+books, maps, tokens and audio, with its own `models/` library section,
+`/api/models` and `/api/model-folders` routes, and a `model` member in every
+resource-type vocabulary the CLI already exposes — `duplicates`, `tags`,
+`search`, `library rescan --scope`. `/api/audio-sets` and
+`GET /api/maps/{id}/export.uvtt` are new too, unimplemented here.
+
+**`MinSupportedVersion` moved up with it, so the supported range is 1.6.2
+alone.** Nothing was removed or renamed, so the *client* would still function
+against 1.6.0 or 1.6.1 — but its own flag vocabularies now offer `model`
+(`duplicates --resource-type`, `tags --resource-type`,
+`library rescan --scope models/`), which those servers reject. A floor below
+the collection the CLI advertises would promise support it cannot keep, and one
+CLI version targeting one server version is the rule the matrix above already
+states.
+`docker/docker-compose.yml` pins the `1.6.2` release tag, so the spec cannot
 drift under the committed client between regenerations.
 
 ## Runtime check
 
 `src/GrimoireCli/Api/GrimoireApiClient.cs` defines `MinSupportedVersion` and
-`MaxTestedVersion`, currently `"1.6.0"` and `"1.6.1"`. A check runs before the first
+`MaxTestedVersion`, currently both `"1.6.2"`. A check runs before the first
 request of any command, calling `GET /api/about` and comparing the reported
 version against that range. It is throttled to once every 24 hours — a
 config with a recent `lastVersionCheck` skips the probe entirely — and
@@ -97,8 +112,14 @@ checked most recently, not to any one server in particular.
    underneath them:
 
    ```bash
-   git -C temp/grimoire diff vOLD..vNEW -- backend/routers/*/_serializers.py backend/routers/*/core.py backend/models/
+   git -C temp/grimoire diff vOLD..vNEW -- backend/routers/ backend/models/ backend/services/
    ```
+
+   Scope it no tighter than that. A release can move a documented rule out of
+   `core.py` entirely: 1.6.2 changed the scaffold guard in
+   `services/library_fs/folders.py`, the duplicate-scan statuses in
+   `routers/duplicates/detection.py` and the mergeable-field sets in
+   `models/collections.py`, none of which a `*/core.py` glob reaches.
 
 5. Update flags and help text to match. Regenerate the `--help-full` sample
    file, now downstream of the client regeneration in step 3:

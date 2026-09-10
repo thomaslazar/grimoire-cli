@@ -22,7 +22,7 @@ namespace GrimoireCli.Generated.Api.Downloads.Archive
         /// </summary>
         /// <param name="pathParameters">Path parameters for the request</param>
         /// <param name="requestAdapter">The request adapter to use to execute the requests.</param>
-        public ArchiveRequestBuilder(Dictionary<string, object> pathParameters, IRequestAdapter requestAdapter) : base(requestAdapter, "{+baseurl}/api/downloads/archive?type={type}{&category*,fmt*,folder*,id*,token*}", pathParameters)
+        public ArchiveRequestBuilder(Dictionary<string, object> pathParameters, IRequestAdapter requestAdapter) : base(requestAdapter, "{+baseurl}/api/downloads/archive?type={type}{&category*,fmt*,folder*,id*,resource_type*,tag*,token*}", pathParameters)
         {
         }
         /// <summary>
@@ -30,11 +30,11 @@ namespace GrimoireCli.Generated.Api.Downloads.Archive
         /// </summary>
         /// <param name="rawUrl">The raw URL to use for the request builder.</param>
         /// <param name="requestAdapter">The request adapter to use to execute the requests.</param>
-        public ArchiveRequestBuilder(string rawUrl, IRequestAdapter requestAdapter) : base(requestAdapter, "{+baseurl}/api/downloads/archive?type={type}{&category*,fmt*,folder*,id*,token*}", rawUrl)
+        public ArchiveRequestBuilder(string rawUrl, IRequestAdapter requestAdapter) : base(requestAdapter, "{+baseurl}/api/downloads/archive?type={type}{&category*,fmt*,folder*,id*,resource_type*,tag*,token*}", rawUrl)
         {
         }
         /// <summary>
-        /// Stream a collection of files as a single archive. `fmt` controls the format: `zip` (default), `tar`, `tar.gz`, `tar.bz2`. `type` controls the scope: `system`, `system_category`, `book_folder`, `map_folder`, `token_folder`, `audio_folder`, or `library_folder` (admin-only; any folder as it sits on disk, indexed or not).
+        /// Stream a collection of files as a single archive. `fmt` controls the format: `zip` (default), `tar`, `tar.gz`, `tar.bz2`. `type` controls the scope: `system`, `system_category`, `book_folder`, `map_folder`, `token_folder`, `audio_folder`, `tag` (everything carrying a tag, grouped by resource type), `tag_type` (one type&apos;s slice of a tag), `tag_folder` (one tagged folder), or `library_folder` (admin-only; any folder as it sits on disk, indexed or not).
         /// </summary>
         /// <returns>A <see cref="UntypedNode"/></returns>
         /// <param name="cancellationToken">Cancellation token to use when cancelling requests</param>
@@ -57,7 +57,7 @@ namespace GrimoireCli.Generated.Api.Downloads.Archive
             return await RequestAdapter.SendAsync<UntypedNode>(requestInfo, UntypedNode.CreateFromDiscriminatorValue, errorMapping, cancellationToken).ConfigureAwait(false);
         }
         /// <summary>
-        /// Stream a collection of files as a single archive. `fmt` controls the format: `zip` (default), `tar`, `tar.gz`, `tar.bz2`. `type` controls the scope: `system`, `system_category`, `book_folder`, `map_folder`, `token_folder`, `audio_folder`, or `library_folder` (admin-only; any folder as it sits on disk, indexed or not).
+        /// Stream a collection of files as a single archive. `fmt` controls the format: `zip` (default), `tar`, `tar.gz`, `tar.bz2`. `type` controls the scope: `system`, `system_category`, `book_folder`, `map_folder`, `token_folder`, `audio_folder`, `tag` (everything carrying a tag, grouped by resource type), `tag_type` (one type&apos;s slice of a tag), `tag_folder` (one tagged folder), or `library_folder` (admin-only; any folder as it sits on disk, indexed or not).
         /// </summary>
         /// <returns>A <see cref="RequestInformation"/></returns>
         /// <param name="requestConfiguration">Configuration for the request such as headers, query parameters, and middleware options.</param>
@@ -85,7 +85,7 @@ namespace GrimoireCli.Generated.Api.Downloads.Archive
             return new global::GrimoireCli.Generated.Api.Downloads.Archive.ArchiveRequestBuilder(rawUrl, RequestAdapter);
         }
         /// <summary>
-        /// Stream a collection of files as a single archive. `fmt` controls the format: `zip` (default), `tar`, `tar.gz`, `tar.bz2`. `type` controls the scope: `system`, `system_category`, `book_folder`, `map_folder`, `token_folder`, `audio_folder`, or `library_folder` (admin-only; any folder as it sits on disk, indexed or not).
+        /// Stream a collection of files as a single archive. `fmt` controls the format: `zip` (default), `tar`, `tar.gz`, `tar.bz2`. `type` controls the scope: `system`, `system_category`, `book_folder`, `map_folder`, `token_folder`, `audio_folder`, `tag` (everything carrying a tag, grouped by resource type), `tag_type` (one type&apos;s slice of a tag), `tag_folder` (one tagged folder), or `library_folder` (admin-only; any folder as it sits on disk, indexed or not).
         /// </summary>
         [global::System.CodeDom.Compiler.GeneratedCode("Kiota", "1.0.0")]
         public partial class ArchiveRequestBuilderGetQueryParameters 
@@ -110,7 +110,7 @@ namespace GrimoireCli.Generated.Api.Downloads.Archive
             [QueryParameter("fmt")]
             public string Fmt { get; set; }
 #endif
-            /// <summary>Folder path (book_folder / map_folder / token_folder / audio_folder / library_folder — the latter is library-root-relative)</summary>
+            /// <summary>Folder path (book_folder / map_folder / token_folder / audio_folder / model_folder / library_folder — the latter is library-root-relative)</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
             [QueryParameter("folder")]
@@ -130,6 +130,26 @@ namespace GrimoireCli.Generated.Api.Downloads.Archive
             [QueryParameter("id")]
             public string Id { get; set; }
 #endif
+            /// <summary>Resource type to scope a tag archive to: book | map | token | audio | model (tag_type / tag_folder)</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+            [QueryParameter("resource_type")]
+            public string? ResourceType { get; set; }
+#nullable restore
+#else
+            [QueryParameter("resource_type")]
+            public string ResourceType { get; set; }
+#endif
+            /// <summary>Tag internal key (tag / tag_type / tag_folder)</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+            [QueryParameter("tag")]
+            public string? Tag { get; set; }
+#nullable restore
+#else
+            [QueryParameter("tag")]
+            public string Tag { get; set; }
+#endif
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
             [QueryParameter("token")]
@@ -139,7 +159,7 @@ namespace GrimoireCli.Generated.Api.Downloads.Archive
             [QueryParameter("token")]
             public string Token { get; set; }
 #endif
-            /// <summary>Scope: system | system_category | book_folder | map_folder | token_folder | audio_folder | library_folder</summary>
+            /// <summary>Scope: system | system_category | book_folder | map_folder | token_folder | audio_folder | model_folder | library_folder | tag | tag_type | tag_folder</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
             [QueryParameter("type")]

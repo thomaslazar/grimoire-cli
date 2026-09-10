@@ -53,13 +53,15 @@ public static class DuplicatesScanCommands
             "Runs in the background; poll scan-status.",
             "",
             "409 while a library scan is running. A duplicate scan already in flight",
-            "answers 200 with already_running and exit 3, having started nothing.",
+            "answers 200 with already_running and exit 3, having started nothing — a",
+            "scan whose heartbeat has gone stale is discarded instead and this one",
+            "starts.",
             "",
             "--accuracy trades certainty for reach: exact matches only byte-identical",
             "files and never guesses; the looser levels take longer and return matches",
             "that need judging.",
             "",
-            "Omitting --resource-types scans all four.");
+            "Omitting --resource-types scans all five.");
         command.AddExamples(
             "grimoire-cli duplicates scan",
             "grimoire-cli duplicates scan --resource-types book --accuracy exact");
@@ -106,7 +108,8 @@ public static class DuplicatesScanCommands
         command.AddRoleRequired("admin");
         command.AddHelpSection("Notes", HelpSectionPosition.Top,
             "Requests a stop rather than waiting for one; poll scan-status. Reports",
-            "not_running and exits 0 when no scan is in flight.");
+            "not_running when no scan is in flight, and cleared_stale when it cleared",
+            "an abandoned one outright. Exits 0 either way.");
         command.AddExamples("grimoire-cli duplicates cancel-scan");
         command.AddResponseExample<Generated.Models.ScanTriggerResult>();
         command.SetAction(async (parseResult, cancellationToken) =>
