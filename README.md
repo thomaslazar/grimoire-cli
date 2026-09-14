@@ -2,17 +2,22 @@
 
 A command-line interface for [Grimoire](https://github.com/hunter-read/grimoire), the self-hosted TTRPG library manager. Built for agent-driven metadata management — JSON in, JSON out.
 
-Native AOT binary. No runtime required. ~10 MB.
+Native AOT binary. No runtime required. ~14 MB.
 
 > **Note:** This tool was built using agentic software engineering (AI-assisted coding) and reviewed by a human. See the git history for details.
 
 ## Features
 
-- **JSON-only output** — stdout is always valid JSON from the Grimoire API, logs and errors go to stderr
 - **Metadata lookup** — search Grimoire's add-on sources and get a per-field diff against what you already have; applying is your own explicit `update`
+- **Library file management** — browse the tree with its indexing state, upload, move, rename and delete; create folders, mark containers, scaffold a system's category folders
+- **Duplicate resolution** — scan for candidates, compare copies side by side, file one under another as a variant, promote a different copy, merge metadata across them
+- **Search and tags** — full-text page search plus `field:value` metadata filters, and tags across every resource type
+- **Backups** — take one before a bulk change, then list, download and manage the schedule
+- **Batch operations** — update or tag many systems or books in one transaction, with per-item errors and exit 3 on a partial
+- **Transparent session renewal** — Grimoire's 30-minute access token is refreshed before the request, and again if the server reports it expired
+- **JSON-only output** — stdout is always valid JSON from the Grimoire API, logs and errors go to stderr
 - **Native AOT** — single self-contained binary, no .NET runtime needed
 - **Thin pass-through** — one command, one endpoint; no hidden pre-fetching or client-side policy
-- **Config precedence** — CLI flags > environment variables > config file
 - **Terse `--help`** — written for AI agents that pay for every token
 
 ## Installation
@@ -34,7 +39,7 @@ Installs to `~/.local/bin/grimoire-cli`. Override with environment variables:
 
 ```bash
 # specific version
-curl -fsSL https://raw.githubusercontent.com/thomaslazar/grimoire-cli/main/install.sh | GRIMOIRE_CLI_VERSION=v0.1.0 bash
+curl -fsSL https://raw.githubusercontent.com/thomaslazar/grimoire-cli/main/install.sh | GRIMOIRE_CLI_VERSION=v0.2.0 bash
 
 # custom directory
 curl -fsSL https://raw.githubusercontent.com/thomaslazar/grimoire-cli/main/install.sh | GRIMOIRE_CLI_INSTALL_DIR=/usr/local/bin bash
@@ -50,7 +55,7 @@ Installs to `%LOCALAPPDATA%\grimoire-cli\`. Override with environment variables:
 
 ```powershell
 # specific version
-$env:GRIMOIRE_CLI_VERSION = "v0.1.0"; irm https://raw.githubusercontent.com/thomaslazar/grimoire-cli/main/install.ps1 | iex
+$env:GRIMOIRE_CLI_VERSION = "v0.2.0"; irm https://raw.githubusercontent.com/thomaslazar/grimoire-cli/main/install.ps1 | iex
 
 # custom directory
 $env:GRIMOIRE_CLI_INSTALL_DIR = "C:\tools\grimoire-cli"; irm https://raw.githubusercontent.com/thomaslazar/grimoire-cli/main/install.ps1 | iex
@@ -61,7 +66,7 @@ $env:GRIMOIRE_CLI_INSTALL_DIR = "C:\tools\grimoire-cli"; irm https://raw.githubu
 Download from the [latest release](https://github.com/thomaslazar/grimoire-cli/releases/latest):
 
 ```bash
-sudo dpkg -i grimoire-cli_0.1.0_amd64.deb
+sudo dpkg -i grimoire-cli_0.2.0_amd64.deb
 ```
 
 ### Download a release
@@ -110,7 +115,7 @@ chmod +x grimoire-cli
 
 **macOS users:** the binaries are not signed or notarized, so Gatekeeper blocks them on first run. Clear the quarantine attribute with `sudo xattr -d com.apple.quarantine grimoire-cli`.
 
-CI-built binaries stamp their origin into the version, so an installed one identifies itself — `grimoire-cli --version` prints `0.1.0+pr-1.a1b2c3d` for a pull-request build and a bare `0.1.0` for a release. The same string goes out in the `User-Agent`.
+CI-built binaries stamp their origin into the version, so an installed one identifies itself — `grimoire-cli --version` prints `0.2.0+pr-1.a1b2c3d` for a pull-request build and a bare `0.2.0` for a release. The same string goes out in the `User-Agent`.
 
 ## Quick start
 
@@ -121,8 +126,23 @@ grimoire-cli login --server https://grimoire.example.com
 # List game systems
 grimoire-cli systems list | jq
 
-# One system, with its books
+# One system, with its books and their full metadata
 grimoire-cli systems get --id <system-id>
+
+# Search page text and metadata together
+grimoire-cli search --query "author:'Ben Robbins' year:>2010"
+
+# What is on disk, and which of it Grimoire has indexed
+grimoire-cli files browse --path "books/Call of Cthulhu"
+
+# Edit one book
+echo '{"description":"A haunted-house scenario."}' | grimoire-cli books update --id <book-id> --stdin
+
+# Take a backup before a bulk change
+grimoire-cli backups create
+
+# Look for duplicate copies
+grimoire-cli duplicates scan --accuracy exact
 
 # Verify the binary itself, no server needed
 grimoire-cli self-test
@@ -295,7 +315,8 @@ mkdir -p docker/data && cp docker/users.json.example docker/data/users.json
 docker compose -f docker/docker-compose.yml up -d --wait
 bash docker/seed.sh
 bash docker/smoke-test.sh
-docker compose -f docker/docker-compose.yml down && rm -rf docker/data docker/library/books
+docker compose -f docker/docker-compose.yml down
+rm -rf docker/data docker/library/books docker/addon-index/index.json
 ```
 
 The fixture copy is required before the first boot — Grimoire seeds its users from `/data/users.json` at startup, and without it the stack comes up with no users. Seeded logins are `admin/admin`, `gm/gm`, `player/player`; throwaway dev credentials for a throwaway stack. `docker/seed.sh` then populates the library with fixture books — `smoke-test.sh` asserts on that fixture set and fails without it.
@@ -307,6 +328,7 @@ From inside the dev container the daemon runs on the host, so reach the stack at
 ```
 src/GrimoireCli/
   Commands/       # CLI command definitions (System.CommandLine)
+  Services/       # one per command group; wraps the generated client
   Api/            # HTTP client, token helper, debug handler
   Generated/      # Kiota client, generated from the OpenAPI spec — never hand-edit
   Configuration/  # Config file, env var, flag resolution, JsonContext for AOT
