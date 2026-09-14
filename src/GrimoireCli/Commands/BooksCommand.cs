@@ -42,6 +42,10 @@ public static class BooksCommand
             systemIdOption, categoryOption, limitOption, offsetOption, serverOption
         };
         command.AddHelpSection("Notes", HelpSectionPosition.Top,
+            "Rows are a reduced shape — no tags, language, isbn, authors, artists,",
+            "genres, urls or description. systems get returns every book in one",
+            "system carrying all of them, in one call.",
+            "",
             "--limit 422s above 500; page with --offset against the total in the",
             "response.",
             "",

@@ -18,6 +18,10 @@ public static class SearchCommand
             queryOption, limitOption, bookIdOption, systemIdOption, serverOption
         };
         command.AddHelpSection("Notes", HelpSectionPosition.Top,
+            "results is page-text hits alone. A title or metadata match lands in",
+            "book_matches instead, so a query that found something can still come",
+            "back with results empty.",
+            "",
             "book_matches, maps, tokens, audio and models are capped at 50 each;",
             "--limit does not raise them.",
             "",
