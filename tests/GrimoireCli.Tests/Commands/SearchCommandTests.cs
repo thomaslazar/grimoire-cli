@@ -117,6 +117,16 @@ public class SearchCommandTests
         Assert.Contains("drops the map, token, audio and model results", Help(["search"]));
     }
 
+    // Reading results and reporting "no matches" on a query that matched a title
+    // is the misread this line exists to prevent.
+    [Fact]
+    public void SearchSaysResultsCoversPageTextAlone()
+    {
+        var output = Help(["search"]);
+        Assert.Contains("results is page-text hits alone", output);
+        Assert.Contains("book_matches instead", output);
+    }
+
     // The three caveats a caller cannot infer: the other result sets ignore
     // --limit, a filter switches off page-text search, and a typo'd prefix is
     // searched literally instead of refused.

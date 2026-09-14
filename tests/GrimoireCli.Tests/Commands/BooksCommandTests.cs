@@ -15,6 +15,19 @@ public class BooksCommandTests
         Assert.Contains("--offset", output);
     }
 
+    // The row is a smaller shape than books get returns, and absence is the one
+    // thing the response sample cannot show — a caller reads the sample, sees no
+    // tags, and cannot tell a missing field from an empty one.
+    [Fact]
+    public void ListNamesTheFieldsItsRowsOmit()
+    {
+        var output = RenderHelp(["books", "list"], full: false);
+        Assert.Contains("reduced shape", output);
+        Assert.Contains("tags", output);
+        Assert.Contains("language", output);
+        Assert.Contains("systems get", output);
+    }
+
     [Fact]
     public void ListShowsTheEnvelopeNotABareArray()
     {
