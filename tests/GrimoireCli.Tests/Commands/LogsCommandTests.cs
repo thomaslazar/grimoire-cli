@@ -92,4 +92,51 @@ public class LogsCommandTests
         Assert.Contains("\"max_seq\":", output);
         Assert.Contains("\"total\":", output);
     }
+
+    // The buffer is fed at DEBUG whatever LOG_LEVEL is set to, so --level debug
+    // returns detail an operator cannot see in docker logs. Issue #45 recorded
+    // this backwards, which is why it is pinned.
+    [Fact]
+    public void LogsSaysDebugIsAvailableRegardlessOfServerLogLevel()
+    {
+        var output = Help();
+        // Not "20000": --limit's own description carries that number too, so the
+        // assertion would pass with no Notes section at all.
+        Assert.Contains("Ring buffer", output);
+        Assert.Contains("LOG_LEVEL", output);
+    }
+
+    // Measured: eight info entries at seq [1,2,7,9,10,100,102,103] answered
+    // limit=2 with [102,103] and limit=2&offset=2 with [10,100].
+    [Fact]
+    public void LogsSaysHowAPageIsSelectedAndOrdered()
+    {
+        var output = Help();
+        Assert.Contains("newest end", output);
+        Assert.Contains("oldest-first", output);
+    }
+
+    // Measured: after_seq=100 and after_seq=100&offset=2 returned the same page.
+    [Fact]
+    public void LogsSaysOffsetIsIgnoredWithAfterSeq()
+    {
+        Assert.Contains("ignored when --after-seq", Help());
+    }
+
+    // Measured: level=error returned entries [] with max_seq 107. Without this,
+    // a caller filtering narrowly cannot tell the cursor still advanced.
+    [Fact]
+    public void LogsTeachesTheCursorAndItsBufferWideScope()
+    {
+        var output = Help();
+        Assert.Contains("max_seq", output);
+        Assert.Contains("whole buffer", output);
+    }
+
+    // total is the count at that level: 107 for debug, 8 for info, 0 for error.
+    [Fact]
+    public void LogsSaysWhatTotalCounts()
+    {
+        Assert.Contains("total counts what matches --level", Help());
+    }
 }

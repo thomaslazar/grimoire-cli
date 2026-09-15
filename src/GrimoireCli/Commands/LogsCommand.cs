@@ -20,6 +20,20 @@ public static class LogsCommand
             levelOption, limitOption, offsetOption, afterSeqOption, serverOption
         };
         command.AddRoleRequired("admin");
+        command.AddHelpSection("Notes", HelpSectionPosition.Top,
+            "Ring buffer of the last 20000 entries; anything older is gone. DEBUG is",
+            "available here whatever the server's LOG_LEVEL is set to.",
+            "",
+            "--level is a minimum: error returns error and critical.",
+            "",
+            "A page is taken from the newest end and returned oldest-first. --offset",
+            "skips from the newest end too, and is ignored when --after-seq is given.",
+            "",
+            "To poll, pass the previous response's max_seq back as --after-seq. max_seq",
+            "tracks the whole buffer rather than the filtered set, so a --level that",
+            "matches nothing still advances the cursor.",
+            "",
+            "total counts what matches --level, not what this page holds.");
         command.AddExamples(
             "grimoire-cli logs --level error",
             "grimoire-cli logs --after-seq 1423 --level warning");
