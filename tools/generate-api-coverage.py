@@ -154,6 +154,7 @@ IMPLEMENTED = {
     "GET /api/dice-materials": "`dice-materials list` ✅",
     "GET /api/search": "`search` ✅",
     "GET /api/search/fields": "`search fields` ✅",
+    "GET /api/logs": "`logs` ✅",
     "GET /api/tags": "`tags list` ✅",
     "GET /api/tags/{internal}/items": "`tags items` ✅",
     "POST /api/duplicates/link": "`duplicates link` ✅",

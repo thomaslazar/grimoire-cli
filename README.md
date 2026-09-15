@@ -263,6 +263,7 @@ grimoire-cli config set server https://grimoire.example.com
 | `dice-materials list` | List the dice/material vocabulary |
 | `search --query <q> [--limit <1-200>] [--book-id <id>] [--system-id <id>]` | Search page text and metadata across the library |
 | `search fields` | The `field:` prefixes a search query accepts |
+| `logs [--level <l>] [--limit <n>] [--offset <n>] [--after-seq <n>]` | Read the server's application log (admin) |
 | `tags list [--in-use-by <type>]` | List tags with their usage counts |
 | `tags items --tag <key> [--resource-type <type>]` | Items and folders carrying a tag |
 | `duplicates link {--input <file> \| --stdin}` | File items under a parent as its variants; exit 3 if partial (admin) |

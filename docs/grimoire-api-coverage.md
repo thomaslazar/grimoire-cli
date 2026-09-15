@@ -25,7 +25,7 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | favorites | 0 / 3 |
 | files | 9 / 10 |
 | library | 3 / 6 |
-| logs | 0 / 1 |
+| logs | 1 / 1 |
 | lookups | 5 / 15 |
 | maintenance | 1 / 5 |
 | maps | 0 / 14 |
@@ -38,7 +38,7 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | themes | 0 / 7 |
 | tokens | 0 / 10 |
 | users | 0 / 16 |
-| **Total** | **75 / 301** |
+| **Total** | **76 / 301** |
 
 2 operation(s) are internal-only (🔒) and excluded from covered counts.
 
@@ -307,7 +307,7 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 
 | Method | Path | Description | Perm | CLI |
 |--------|------|-------------|------|-----|
-| GET | `/api/logs` | Application logs | admin | — |
+| GET | `/api/logs` | Application logs | admin | `logs` ✅ |
 
 ## lookups
 
