@@ -7,66 +7,53 @@ list, and not a running tally — those belong where they already live:
 git history for what changed. An item lands here when it is decided, and leaves
 when it ships.
 
+**One line and one link per item.** Endpoint lists, verified server behaviour and
+the caveats help text will have to carry live in the issue, so this file stays
+short enough to read in one go.
+
 ## The objective
 
 One agent-drivable pipeline for **books**, from a file arriving to a finished
-metadata sweep, matching what `abs-cli` already gives for audiobooks. Its two
-workflows are the target shape: *upload and catalogue*, and *fix a metadata
-problem across the library on request*.
+metadata sweep, matching what `abs-cli` gives for audiobooks. Its two workflows
+are the target shape: *upload and catalogue*, and *fix a metadata problem across
+the library on request*. **Met as of v0.2.0.**
 
-Maps, tokens and audio are deliberately out of scope for the objective
-above. They are structurally parallel to books but carry almost no
-per-item metadata — `MapUpdate` has four fields, `AudioUpdate` two,
-against `BookUpdate`'s nineteen — and they hang off folders rather than
-systems, so for them folder tagging is the whole story rather than a
-second layer.
+What follows extends it to the rest of the library. Grimoire holds five
+collections, and the cross-cutting commands already reach all of them —
+`duplicates`, `tags items` and `search` all take every resource type, `files`
+manages every tree, `library rescan --scope` reaches every section. Only
+`list`/`get`/`update` stop at books. Closing that asymmetry is the direction.
+
+The sharpest symptom, and the thing to fix first: the only way to set a tag on a
+map today is `duplicates merge-metadata --resource-type map --fields tags`,
+copying it off another map that already carries it.
 
 ## Next
 
-**Vocabulary writes** — `create` and `delete` on each of the five vocabularies,
-completing the set the shipped vocabulary reads open. Ten endpoints, all admin.
+1. **[maps per-item layer](https://github.com/thomaslazar/grimoire-cli/issues/38)** — first, because it has the richest update model and the only real list filters, so it settles the shape the other three port.
+2. **[models per-item layer](https://github.com/thomaslazar/grimoire-cli/issues/39)** — next, because 1.6.2's model variant kinds are already accepted by `duplicates link` and unusable without a way to list candidates.
+3. **[tokens per-item layer](https://github.com/thomaslazar/grimoire-cli/issues/40)** — mechanical once maps lands.
+4. **[audio per-item layer](https://github.com/thomaslazar/grimoire-cli/issues/41)** — last of the four; thinnest update model, plus an optional cover block.
+5. **[tags writes](https://github.com/thomaslazar/grimoire-cli/issues/42)** — create, rename, delete, merge. Deliberately after the four above: each collection that gains `batch-tag` makes the hygiene problem bigger, so this lands when it is most needed.
+6. **[vocabulary writes](https://github.com/thomaslazar/grimoire-cli/issues/43)** — completes the five lookups the shipped reads open.
 
-`create` and `delete` are the whole set: the API has no `PUT` or `PATCH` on any
-vocabulary, so there is no rename, and `abs-cli`'s `genres rename` /
-`tags rename` have no counterpart here to port. Verbs sit beside `list` on the
-group the reads already establish — `genres create`, `genres delete`.
-
-- `create` takes a name, 409s on a case-insensitive duplicate, and returns the
-  new entry with `is_default: false`. A genre additionally takes a `parent_id`,
-  and 404s if no such genre exists.
-- `delete` takes the entry's `id` — the one field the reads expose that nothing
-  else uses — and 409s while the value is in use, with a body carrying
-  `usage_count` and `name`, unless `force=true`.
-- **A forced delete strips nothing.** It removes the vocabulary row only; every
-  system and book carrying that name keeps it, because the value is stored as a
-  string rather than a foreign key. The response field is called
-  `removed_usage`, which reads as though it did, so this is the caveat the help
-  text has to carry. Deleting a genre does cascade to its children.
-
-**The other resource types** — maps (11 endpoints), tokens (10), audio (14).
-Three near-copies of the books shape: list, get, update, `bulk`, `bulk/tags`,
-folder tags plus a `bulk` variant books does not have, and binary getters. Cheaper
-than the count suggests, since the update models are nearly empty and the binary
-convention is already settled. Audio additionally has cover management including
-`cover/from-source`, mirroring `systems cover`.
+**[Small completions](https://github.com/thomaslazar/grimoire-cli/issues/44)** —
+`library stats`, `systems cover from-source`, and the binary getters for each new
+collection. Too small to schedule; fold each into whichever block is in flight.
 
 ## Later
 
-Rough notes, to be looked at when they come up.
+Decided, but not next.
 
-- **Book text extraction** — `toc`, `page/{n}/text`, `page/{n}/words`. All JSON,
-  and what an agent needs to read a rulebook rather than catalogue it.
-- **The remaining binary endpoints** — `books/{id}/file`, `/page/{n}`. The output
-  convention is settled (`--output`, `-` for stdout, a `SavedFile` receipt
-  otherwise); what remains is applying it.
-- **`tags` writes** — create, rename display value, merge, delete. Catalogue
-  hygiene after a sweep.
-- **`saved-filters`** — four endpoints. A UI convenience; unclear that an agent
-  wants stored filter state.
-- **Campaign linking** — `{campaign_id}/resources` and friends: link, bulk-link,
-  reorder, visibility, unlink. A real workflow, but downstream of library
-  management rather than part of it.
-- **Administration** — `users`, `settings`, `themes`, `logs`, `bookmarks`,
-  `favorites`, `downloads`.
-- **`campaigns` proper** — 91 endpoints of session notes, wikis, guests and
-  handouts. Grimoire's play side, and no part of managing a library.
+- **[logs](https://github.com/thomaslazar/grimoire-cli/issues/45)** — the one administration endpoint that serves the library workflow. Four shipped commands start background work and report only `scan_started`; when one fails, the server log is where the reason is, and without it diagnosis means asking a human to open the UI.
+- **[book reading](https://github.com/thomaslazar/grimoire-cli/issues/46)** — `toc`, page text, page words. Serves "look up the relevant section and explain it to me" rather than library management: a different axis, and cheap whenever it is wanted.
+- **[sidecar export](https://github.com/thomaslazar/grimoire-cli/issues/47)** — makes a metadata sweep survive the instance, and closes a loop `library rescan --metadata-mode` already half-owns. One endpoint in practice; the settings behind it are a one-time UI action.
+- **[remaining binary endpoints](https://github.com/thomaslazar/grimoire-cli/issues/48)** — book file, page render, and the archive download that can export a tag-scoped slice of the library in one call.
+
+## Open questions
+
+Not intended work — decisions to make before any of it could be.
+
+- **[Per-user state](https://github.com/thomaslazar/grimoire-cli/issues/49)** — favorites, bookmarks, saved filters. A human's UI state; an agent writing to it either pollutes a real person's view or writes into a void.
+- **[Administration](https://github.com/thomaslazar/grimoire-cli/issues/50)** — users, the rest of auth, themes, settings. A different product from library management.
+- **[Campaigns](https://github.com/thomaslazar/grimoire-cli/issues/51)** — 91 operations, 30% of the API. The linking half touches the library; the play side is a separate tool.
