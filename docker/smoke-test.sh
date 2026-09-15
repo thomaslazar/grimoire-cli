@@ -1410,16 +1410,32 @@ echo "$LOGS_JSON" | jq -e '.max_seq > 0' >/dev/null \
 ok "logs returns a page and a cursor"
 
 # A page is emitted oldest-first, so seq ascends within it.
+echo "$LOGS_JSON" | jq -e '.entries | length > 1' >/dev/null \
+  || fail "need more than one entry to prove ordering: $LOGS_JSON"
 echo "$LOGS_JSON" | jq -e '[.entries[].seq] == ([.entries[].seq] | sort)' >/dev/null \
   || fail "a logs page should be ordered oldest-first: $LOGS_JSON"
 ok "logs orders a page oldest-first"
 
-# level is a minimum and hierarchical, so debug totals at least as much as info.
-DEBUG_TOTAL=$("$CLI" logs --level debug --limit 1 2>/dev/null | jq -r .total)
-INFO_TOTAL=$("$CLI" logs --level info --limit 1 2>/dev/null | jq -r .total)
-[ "$DEBUG_TOTAL" -ge "$INFO_TOTAL" ] \
-  || fail "--level debug should total at least --level info: $DEBUG_TOTAL < $INFO_TOTAL"
+# debug is the whole buffer and info a strict subset of it, so a server that
+# ignored --level would answer both with the same total. Strictly greater is
+# what distinguishes a working filter from an ignored parameter.
+DEBUG_JSON=$("$CLI" logs --level debug --limit 1 2>"$WORK/cli.err") \
+  || { cat "$WORK/cli.err" >&2; fail "logs --level debug exited non-zero"; }
+INFO_JSON=$("$CLI" logs --level info --limit 1 2>"$WORK/cli.err") \
+  || { cat "$WORK/cli.err" >&2; fail "logs --level info exited non-zero"; }
+DEBUG_TOTAL=$(echo "$DEBUG_JSON" | jq -r .total)
+INFO_TOTAL=$(echo "$INFO_JSON" | jq -r .total)
+[ "$DEBUG_TOTAL" -gt "$INFO_TOTAL" ] \
+  || fail "--level debug should total strictly more than info: $DEBUG_TOTAL vs $INFO_TOTAL"
 ok "logs --level narrows the total"
+
+# total alone cannot show the filter reached the entries, so check the page
+# carries nothing below the level asked for.
+WARN_JSON=$("$CLI" logs --level warning --limit 50 2>"$WORK/cli.err") \
+  || { cat "$WORK/cli.err" >&2; fail "logs --level warning exited non-zero"; }
+echo "$WARN_JSON" | jq -e '[.entries[].level] - ["WARNING","ERROR","CRITICAL"] == []' >/dev/null \
+  || fail "--level warning should return no entry below warning: $WARN_JSON"
+ok "logs --level filters the entries, not just the total"
 
 # The idle poll: nothing is newer than max_seq, and the cursor does not move.
 MAX_SEQ=$(echo "$LOGS_JSON" | jq -r .max_seq)
