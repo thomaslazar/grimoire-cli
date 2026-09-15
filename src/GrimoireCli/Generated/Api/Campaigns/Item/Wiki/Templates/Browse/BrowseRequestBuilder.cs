@@ -90,16 +90,22 @@ namespace GrimoireCli.Generated.Api.Campaigns.Item.Wiki.Templates.Browse
         [global::System.CodeDom.Compiler.GeneratedCode("Kiota", "1.0.0")]
         public partial class BrowseRequestBuilderGetQueryParameters 
         {
+            #pragma warning disable CS1591
             [QueryParameter("refresh")]
             public bool? Refresh { get; set; }
+            #pragma warning restore CS1591
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
+            #pragma warning disable CS1591
             [QueryParameter("token")]
             public string? Token { get; set; }
+            #pragma warning restore CS1591
 #nullable restore
 #else
+            #pragma warning disable CS1591
             [QueryParameter("token")]
             public string Token { get; set; }
+            #pragma warning restore CS1591
 #endif
         }
         /// <summary>
