@@ -32,6 +32,8 @@ public static class LogsCommand
             "To poll, pass the previous response's max_seq back as --after-seq. max_seq",
             "tracks the whole buffer rather than the filtered set, so a --level that",
             "matches nothing still advances the cursor.",
+            "A poll returns the newest --limit of what is new, so a backlog larger",
+            "than --limit silently drops its oldest entries — raise it when catching up.",
             "",
             "total counts what matches --level, not what this page holds.");
         command.AddExamples(

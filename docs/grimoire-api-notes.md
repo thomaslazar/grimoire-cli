@@ -712,6 +712,11 @@ measured against the running 1.6.2 stack.
 - **`max_seq` tracks the whole buffer, not the filtered set.** `level=error`
   returned `entries: []` with `max_seq: 107`, so a poll filtered to a level that
   matches nothing still advances the cursor.
+- **A poll truncates from the oldest end.** With `after_seq` set the handler
+  returns `new[-limit:]` (`config.py:466`) — the *newest* `limit` of what is
+  new, not the oldest. Measured: 96 entries arrived and a poll with `limit=3`
+  returned seq `[1471, 1472, 1473]`, skipping 93 that advancing the cursor then
+  loses for good. A caller catching up on a backlog must raise `limit`.
 - **`total` counts what matches `level`**, not what the page holds.
 
 ## Duplicates

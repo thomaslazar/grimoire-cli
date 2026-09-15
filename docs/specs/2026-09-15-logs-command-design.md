@@ -68,6 +68,11 @@ limit, offset}`.
   returned `entries: []` with `max_seq: 107`. This is what makes the cursor
   safe under a narrow filter: a poll that matches nothing still advances, so
   the caller cannot be pinned to a stale position.
+- **A poll returns the newest `limit` of what is new, not the oldest.** With
+  `after_seq > 0` the handler does `new[-limit:]` (`config.py:466`). Measured:
+  96 entries arrived and `after_seq` with `limit=3` returned seq
+  `[1471, 1472, 1473]`, skipping 93 — a caller catching up on a backlog must
+  raise `limit` or lose entries for good.
 - **`total` counts what matches `level`**, not what the page holds and not the
   buffer size.
 - **An exhausted cursor is an empty page.** `after_seq=107` returned
@@ -169,9 +174,12 @@ Unit tests, in `tests/GrimoireCli.Tests/Commands/LogsCommandTests.cs`:
 A smoke-test block, since the help claims are about live behaviour:
 
 - a default call returns a page and a `max_seq`
-- `--level error` narrows `total` relative to `--level debug`
+- a page is ordered oldest-first by `seq`
+- `--level info` totals strictly less than `--level debug`, and a filtered
+  page carries no entry below the level asked for
 - `--after-seq <max_seq>` returns `entries: []` with `max_seq` unchanged — the
   idle poll, which is the behaviour the command exists for
+- an unknown `--level` is refused client-side
 
 The block is read-only and idempotent, so it re-runs cleanly.
 

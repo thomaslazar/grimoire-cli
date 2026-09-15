@@ -21,12 +21,12 @@ public class LogsCommandTests
     }
 
     // The route is require_admin, so the tag and the 403 message have to agree.
+    // A single Contains for the whole tag would still pass if it regressed to
+    // "gm or admin", since that also contains "admin".
     [Fact]
     public void LogsDeclaresTheAdminRole()
     {
-        var output = Help();
-        Assert.Contains("Role required:", output);
-        Assert.Contains("admin", output);
+        Assert.Contains("Role required:\n  admin\n", Help());
     }
 
     [Theory]

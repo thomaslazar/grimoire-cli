@@ -1430,11 +1430,15 @@ INFO_TOTAL=$(echo "$INFO_JSON" | jq -r .total)
 ok "logs --level narrows the total"
 
 # total alone cannot show the filter reached the entries, so check the page
-# carries nothing below the level asked for.
-WARN_JSON=$("$CLI" logs --level warning --limit 50 2>"$WORK/cli.err") \
-  || { cat "$WORK/cli.err" >&2; fail "logs --level warning exited non-zero"; }
-echo "$WARN_JSON" | jq -e '[.entries[].level] - ["WARNING","ERROR","CRITICAL"] == []' >/dev/null \
-  || fail "--level warning should return no entry below warning: $WARN_JSON"
+# carries nothing below the level asked for. info rather than warning: the
+# smoke run's own requests guarantee INFO entries, and an empty page would
+# make the set-difference assertion vacuously true.
+INFO_PAGE=$("$CLI" logs --level info --limit 50 2>"$WORK/cli.err") \
+  || { cat "$WORK/cli.err" >&2; fail "logs --level info exited non-zero"; }
+echo "$INFO_PAGE" | jq -e '.entries | length > 0' >/dev/null \
+  || fail "expected at least one info entry to check filtering: $INFO_PAGE"
+echo "$INFO_PAGE" | jq -e '[.entries[].level] - ["INFO","WARNING","ERROR","CRITICAL"] == []' >/dev/null \
+  || fail "--level info should return no DEBUG entry: $INFO_PAGE"
 ok "logs --level filters the entries, not just the total"
 
 # The idle poll: nothing is newer than max_seq, and the cursor does not move.
