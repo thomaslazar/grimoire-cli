@@ -162,12 +162,16 @@ namespace GrimoireCli.Generated.Api.Tags
 #endif
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
+            #pragma warning disable CS1591
             [QueryParameter("token")]
             public string? Token { get; set; }
+            #pragma warning restore CS1591
 #nullable restore
 #else
+            #pragma warning disable CS1591
             [QueryParameter("token")]
             public string Token { get; set; }
+            #pragma warning restore CS1591
 #endif
         }
         /// <summary>
@@ -186,12 +190,16 @@ namespace GrimoireCli.Generated.Api.Tags
         {
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
+            #pragma warning disable CS1591
             [QueryParameter("token")]
             public string? Token { get; set; }
+            #pragma warning restore CS1591
 #nullable restore
 #else
+            #pragma warning disable CS1591
             [QueryParameter("token")]
             public string Token { get; set; }
+            #pragma warning restore CS1591
 #endif
         }
         /// <summary>

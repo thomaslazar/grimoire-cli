@@ -175,16 +175,22 @@ namespace GrimoireCli.Generated.Api.Campaigns
         [global::System.CodeDom.Compiler.GeneratedCode("Kiota", "1.0.0")]
         public partial class CampaignsRequestBuilderGetQueryParameters 
         {
+            #pragma warning disable CS1591
             [QueryParameter("include_archived")]
             public bool? IncludeArchived { get; set; }
+            #pragma warning restore CS1591
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
+            #pragma warning disable CS1591
             [QueryParameter("token")]
             public string? Token { get; set; }
+            #pragma warning restore CS1591
 #nullable restore
 #else
+            #pragma warning disable CS1591
             [QueryParameter("token")]
             public string Token { get; set; }
+            #pragma warning restore CS1591
 #endif
         }
         /// <summary>
@@ -203,12 +209,16 @@ namespace GrimoireCli.Generated.Api.Campaigns
         {
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
+            #pragma warning disable CS1591
             [QueryParameter("token")]
             public string? Token { get; set; }
+            #pragma warning restore CS1591
 #nullable restore
 #else
+            #pragma warning disable CS1591
             [QueryParameter("token")]
             public string Token { get; set; }
+            #pragma warning restore CS1591
 #endif
         }
         /// <summary>

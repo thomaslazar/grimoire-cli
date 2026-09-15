@@ -152,12 +152,16 @@ namespace GrimoireCli.Generated.Api.Downloads.Archive
 #endif
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
+            #pragma warning disable CS1591
             [QueryParameter("token")]
             public string? Token { get; set; }
+            #pragma warning restore CS1591
 #nullable restore
 #else
+            #pragma warning disable CS1591
             [QueryParameter("token")]
             public string Token { get; set; }
+            #pragma warning restore CS1591
 #endif
             /// <summary>Scope: system | system_category | book_folder | map_folder | token_folder | audio_folder | model_folder | library_folder | tag | tag_type | tag_folder</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
