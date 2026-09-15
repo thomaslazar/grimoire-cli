@@ -1397,4 +1397,40 @@ ok "duplicates unlink promotes the variant back to standalone"
   && fail "unlink with neither --ids nor --parent-id should be refused"
 ok "duplicates unlink refuses a call the server would answer as a no-op"
 
+# logs: the cursor contract is the whole point of the command, so the idle poll
+# is asserted rather than just a non-empty page. max_seq is buffer-wide, so a
+# filter that matches nothing still advances it — which is what lets a caller
+# poll on --level error without losing its place.
+LOGS_JSON=$("$CLI" logs --limit 5 2>"$WORK/cli.err") \
+  || { cat "$WORK/cli.err" >&2; fail "logs exited non-zero"; }
+echo "$LOGS_JSON" | jq -e '.entries | length > 0' >/dev/null \
+  || fail "logs should return entries on a seeded stack: $LOGS_JSON"
+echo "$LOGS_JSON" | jq -e '.max_seq > 0' >/dev/null \
+  || fail "logs should report a cursor: $LOGS_JSON"
+ok "logs returns a page and a cursor"
+
+# A page is emitted oldest-first, so seq ascends within it.
+echo "$LOGS_JSON" | jq -e '[.entries[].seq] == ([.entries[].seq] | sort)' >/dev/null \
+  || fail "a logs page should be ordered oldest-first: $LOGS_JSON"
+ok "logs orders a page oldest-first"
+
+# level is a minimum and hierarchical, so debug totals at least as much as info.
+DEBUG_TOTAL=$("$CLI" logs --level debug --limit 1 2>/dev/null | jq -r .total)
+INFO_TOTAL=$("$CLI" logs --level info --limit 1 2>/dev/null | jq -r .total)
+[ "$DEBUG_TOTAL" -ge "$INFO_TOTAL" ] \
+  || fail "--level debug should total at least --level info: $DEBUG_TOTAL < $INFO_TOTAL"
+ok "logs --level narrows the total"
+
+# The idle poll: nothing is newer than max_seq, and the cursor does not move.
+MAX_SEQ=$(echo "$LOGS_JSON" | jq -r .max_seq)
+POLL_JSON=$("$CLI" logs --after-seq "$MAX_SEQ" 2>"$WORK/cli.err") \
+  || { cat "$WORK/cli.err" >&2; fail "logs --after-seq exited non-zero"; }
+echo "$POLL_JSON" | jq -e '.entries == []' >/dev/null \
+  || fail "--after-seq max_seq should return no entries: $POLL_JSON"
+ok "logs --after-seq at the cursor returns an empty page"
+
+"$CLI" logs --level trace >/dev/null 2>&1 \
+  && fail "logs should refuse a level the server does not declare"
+ok "logs refuses an unknown level"
+
 echo "smoke: all checks passed" >&2
