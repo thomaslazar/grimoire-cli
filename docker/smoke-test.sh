@@ -1218,6 +1218,25 @@ ok "login repairs a corrupt config"
   || fail "the config should be owner-only, got $(stat -c '%a' "$CONFIG")"
 ok "config writes leave no temporary file and stay owner-only"
 
+# A server that is simply down is the commonest failure there is, and until
+# recently the only one that escaped as a raw .NET trace: the exception left the
+# command action, and System.CommandLine's own pipeline printed it and returned 1
+# before Program's handler could run. Exit 2 is asserted alongside the message —
+# 1 means a local/config problem in this CLI, which a dead server is not.
+cp "$CONFIG" "$WORK/config.reachable"
+jq '.server = "http://127.0.0.1:1"' "$WORK/config.reachable" >"$CONFIG"
+set +e
+"$CLI" systems list >"$WORK/down.out" 2>"$WORK/down.err"; rc=$?
+set -e
+cp "$WORK/config.reachable" "$CONFIG"
+[ "$rc" -eq 2 ] || fail "an unreachable server should exit 2, got $rc"
+grep -qi "cannot reach" "$WORK/down.err" \
+  || fail "no readable message for an unreachable server: $(cat "$WORK/down.err")"
+grep -qi "at System\.\|Unhandled exception" "$WORK/down.err" \
+  && fail "an unreachable server leaked a stack trace: $(cat "$WORK/down.err")"
+[ ! -s "$WORK/down.out" ] || fail "stdout should stay empty when the server is unreachable"
+ok "an unreachable server fails readably with no stack trace"
+
 
 # Grimoire does not merely refuse a refresh token it has already rotated away:
 # it reads the replay as theft and revokes the session. Reaching that state on
