@@ -839,6 +839,82 @@ jq -e --arg id "$SR4_BOOK" '.tags[$id] | index("smoke-book-alpha") != null and i
   || fail "batch-tag should have merged both tags: $(cat "$WORK/btag2.out")"
 ok "batch-tag adds a tag and leaves the existing one in place"
 
+# --- maps ----------------------------------------------------------------
+# Requires docker/seed.sh to have run — three fixture maps, two directly under
+# maps/battlemaps and one under maps/battlemaps/caves.
+"$CLI" maps list >"$WORK/maps.out" 2>"$WORK/maps.err" \
+  || { cat "$WORK/maps.err" >&2; fail "maps list exited non-zero"; }
+jq -e '.total >= 3 and (.maps | length) >= 3' "$WORK/maps.out" >/dev/null \
+  || fail "maps list should report the seeded maps: $(cat "$WORK/maps.out")"
+ok "maps list returns the seeded maps"
+
+"$CLI" maps list --limit 1 >"$WORK/maps-limit.out" 2>&1 \
+  || fail "maps list --limit exited non-zero"
+jq -e '(.maps | length) == 1' "$WORK/maps-limit.out" >/dev/null \
+  || fail "--limit 1 should return one row: $(cat "$WORK/maps-limit.out")"
+ok "maps list --limit bounds the page"
+
+# The exact-match rule: --folder takes the folder part of relative_path, which
+# excludes the maps/ root — folder_path on a map under maps/battlemaps reads
+# "battlemaps", not "maps/battlemaps" (verified via maps get below). The child
+# folder's map must not appear.
+"$CLI" maps list --folder "battlemaps" >"$WORK/maps-folder.out" 2>&1 \
+  || fail "maps list --folder exited non-zero"
+jq -e '[.maps[].relative_path] | all(startswith("maps/battlemaps/caves") | not)' \
+  "$WORK/maps-folder.out" >/dev/null \
+  || fail "--folder must not reach a subfolder: $(cat "$WORK/maps-folder.out")"
+ok "maps list --folder is an exact folder, not a subtree"
+
+MAP_ID=$(jq -r '.maps[] | select(.filename == "Tavern.png") | .id' "$WORK/maps.out")
+[ -n "$MAP_ID" ] || fail "no fixture map id found: $(cat "$WORK/maps.out")"
+
+"$CLI" maps get --id "$MAP_ID" >"$WORK/mapget.out" 2>&1 \
+  || fail "maps get exited non-zero"
+jq -e 'has("grid") and has("folder_path") and has("folder_tags")' "$WORK/mapget.out" >/dev/null \
+  || fail "maps get should carry grid and folder context: $(cat "$WORK/mapget.out")"
+jq -e '.folder_path == "battlemaps"' "$WORK/mapget.out" >/dev/null \
+  || fail "folder_path should exclude the maps/ root: $(cat "$WORK/mapget.out")"
+ok "maps get returns grid and folder context"
+
+echo '{"grid_px":70}' | "$CLI" maps update --id "$MAP_ID" --stdin >"$WORK/mapupd.out" 2>&1 \
+  || fail "maps update exited non-zero"
+"$CLI" maps get --id "$MAP_ID" >"$WORK/mapget2.out" 2>&1
+jq -e '.grid_px == 70' "$WORK/mapget2.out" >/dev/null \
+  || fail "the grid override should read back: $(cat "$WORK/mapget2.out")"
+ok "maps update sets a grid override"
+
+# The documented clear. This is also what makes the block idempotent.
+echo '{"grid_px":0}' | "$CLI" maps update --id "$MAP_ID" --stdin >"$WORK/mapclr.out" 2>&1 \
+  || fail "maps update --stdin with 0 exited non-zero"
+"$CLI" maps get --id "$MAP_ID" >"$WORK/mapget3.out" 2>&1
+jq -e '.grid_px == null' "$WORK/mapget3.out" >/dev/null \
+  || fail "0 should clear the grid override: $(cat "$WORK/mapget3.out")"
+ok "maps update clears a grid override with 0"
+
+# The symptom the whole group exists to fix: tagging a map without duplicates.
+echo "{\"ids\":[\"$MAP_ID\"],\"tags\":[\"smoke-map\"]}" \
+  | "$CLI" maps batch-tag --stdin >"$WORK/maptag.out" 2>&1 \
+  || fail "maps batch-tag exited non-zero"
+"$CLI" tags items --tag smoke-map --resource-type map >"$WORK/maptagitems.out" 2>&1 \
+  || fail "tags items exited non-zero"
+jq -e --arg id "$MAP_ID" '[.. | .item_id? // empty] | any(. == $id)' "$WORK/maptagitems.out" >/dev/null \
+  || fail "the tagged map should be findable: $(cat "$WORK/maptagitems.out")"
+ok "maps batch-tag tags a map without duplicates merge-metadata"
+
+echo '{"path":"battlemaps","tags":["Smoke Folder"]}' \
+  | "$CLI" maps folders set --stdin >"$WORK/mapfset.out" 2>&1 \
+  || fail "maps folders set exited non-zero"
+"$CLI" maps folders list >"$WORK/mapflist.out" 2>&1 \
+  || fail "maps folders list exited non-zero"
+jq -e '[.folders[] | select(.path == "battlemaps") | .tags[]] | any(. == "Smoke Folder")' \
+  "$WORK/mapflist.out" >/dev/null \
+  || fail "the folder tag should list in display casing: $(cat "$WORK/mapflist.out")"
+ok "maps folders set writes a tag that lists in display casing"
+
+echo '{"grid_px":"seventy"}' | "$CLI" maps update --id "$MAP_ID" --stdin >/dev/null 2>&1 \
+  && fail "a wrong-typed grid should not exit 0"
+ok "maps update refuses a body the server would reject"
+
 # --- discovery ---------------------------------------------------------------
 # Read-only throughout: nothing here writes, so a re-run converges trivially.
 # The fixture's indexed pages all read "grimoire-cli fixture · page N", which is
