@@ -860,6 +860,10 @@ ok "maps list --limit bounds the page"
 # folder's map must not appear.
 "$CLI" maps list --folder "battlemaps" >"$WORK/maps-folder.out" 2>&1 \
   || fail "maps list --folder exited non-zero"
+# all() over an empty array is vacuously true, so length is asserted first —
+# a regression that returned zero maps must not pass as "no subfolder leaked".
+jq -e '(.maps | length) == 2' "$WORK/maps-folder.out" >/dev/null \
+  || fail "--folder should return the 2 maps directly under it: $(cat "$WORK/maps-folder.out")"
 jq -e '[.maps[].relative_path] | all(startswith("maps/battlemaps/caves") | not)' \
   "$WORK/maps-folder.out" >/dev/null \
   || fail "--folder must not reach a subfolder: $(cat "$WORK/maps-folder.out")"

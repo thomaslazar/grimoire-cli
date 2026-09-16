@@ -33,7 +33,8 @@ public static class MapsCommand
         };
         command.AddHelpSection("Notes", HelpSectionPosition.Top,
             "--folder is an exact folder, not a subtree: battlemaps excludes",
-            "battlemaps/caves. Values are the folder part of relative_path.",
+            "battlemaps/caves. Its value is folder_path from maps get, not",
+            "relative_path — the maps/ collection root is stripped from folder_path.",
             "",
             "Variants are hidden — only the main copy of a family is listed.");
         command.AddExamples(
