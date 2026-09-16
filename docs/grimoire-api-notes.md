@@ -692,6 +692,54 @@ tag `v1.7.0`.
 - **`DELETE /api/files/folder` carries a request body**, which is unusual for a
   DELETE and is what the generated builder expects.
 
+## Maps
+
+Read from `backend/routers/maps/core.py` and `_schemas.py` at tag `v1.7.0`, and
+measured against the running 1.7.0 stack.
+
+- **`limit` defaults to 100000 with no ceiling.** `Query(100000)` and no `le=`,
+  so an unflagged `GET /api/maps` returns the whole library. `tokens`, `models`
+  and `audio` declare the same. `books` is the outlier at `Query(100, le=500)`.
+  The CLI supplies its own default of 100 here, which is the one place `maps
+  list` holds an opinion the server does not.
+- **Paging is implemented twice and `folder` picks which.** Without it the
+  server pages in SQL (`q.offset(offset).limit(limit)`); with it the whole
+  subtree is materialised and sliced in Python (`filtered[offset : offset +
+  limit]`). A negative limit is therefore unlimited in the first branch and
+  "drop the last row" in the second. The CLI refuses one with
+  `OptionHelpers.Range(1)`.
+- **`folder` is an exact match against `folder_path`, not `relative_path`, and
+  the leading path segment is stripped.** Membership is
+  `_folder_path(m.relative_path) == folder`, and `_folder_path` drops
+  `Path(relative_path).parts[1:-1]` — the first segment (the collection root,
+  `maps/`) and the filename. Measured: a map at `relative_path`
+  `maps/battlemaps/Crossroads.png` reports `folder_path` `battlemaps`. So
+  `folder=battlemaps` returns it and excludes `battlemaps/caves`, while
+  `folder=maps/battlemaps` matches nothing and comes back `{"total": 0}` with no
+  error — the value simply is not in the index. Always pass what `maps get`
+  reports as `folder_path`, never `relative_path`.
+- **A grid override is cleared by sending `0`, and only the single PATCH
+  honours it.** The validator normalises `0` to `None` (`round(v, 2) or None`),
+  which `exclude_none=True` would swallow; `update_map` re-applies the clear
+  from `model_fields_set`, and `bulk_update_maps` does not. A batch can set a
+  grid, never clear one. Measured: `{"grid_px":0}` through `maps update` read
+  back as null.
+- **`grid_warning` is advisory.** `PATCH /api/maps/{id}` answers `{"status",
+  "grid_warning"}`, and the warning rides along when a saved override looks
+  implausible for the map's pixel dimensions. The write succeeded regardless,
+  so the CLI exits 0.
+- **`GET /api/maps/{id}` carries two grids.** `grid` is what detection found,
+  with its own `source`; `grid_width`/`grid_height`/`grid_px` are the stored
+  override. All three null means detection is in charge.
+- **Folder tags read and write differently.** `GET /api/map-folders` resolves to
+  display casing; the PATCH and the bulk echo the stored internal keys. Same
+  asymmetry as `systems book-folders`.
+- **Every batch body caps at 1000 and none may be empty.** `items`, `ids`,
+  `folders` and `tags` each carry `min_length=1`, so an empty batch is a 422
+  rather than a no-op.
+- **`map-folders` has no delete**, unlike `systems book-folders`, and gains a
+  bulk verb book folders have no counterpart for.
+
 ## Search
 
 Read from `backend/routers/search/core.py`, `backend/routers/search/_query.py`,

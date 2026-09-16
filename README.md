@@ -257,6 +257,14 @@ grimoire-cli config set server https://grimoire.example.com
 | `files folder markers --path <path> [--container-kind <kind>] [--nsfw true\|false] [--frames-container true\|false]` | Set a folder's container/NSFW/frame markers (admin) |
 | `files folder scaffold --path <path>` | Create the standard category folders (admin) |
 | `files folder contents --path <path>` | Report whether a folder holds content (admin) |
+| `maps list [--map-type <t>] [--folder <path>] [--limit <n>] [--offset <n>]` | List maps (defaults to 100 results) |
+| `maps get --id <id>` | Get one map, with its detected grid and any manual override |
+| `maps update --id <id> {--input <file> \| --stdin}` | Update one map's metadata (gm or admin) |
+| `maps batch-update {--input <file> \| --stdin}` | Update many maps in one transaction; exit 3 if partial (gm or admin) |
+| `maps batch-tag {--input <file> \| --stdin}` | Add tags to many maps, additively; exit 3 if partial (gm or admin) |
+| `maps folders list` | List tagged map folders |
+| `maps folders set {--input <file> \| --stdin}` | Replace one map folder's tags (gm or admin) |
+| `maps folders batch-set {--input <file> \| --stdin}` | Set tags on many map folders in one transaction (gm or admin) |
 | `genres list` | List the genre vocabulary (tiered via `parent_id`) |
 | `licenses list` | List the license vocabulary |
 | `parent-systems list` | List the parent-system vocabulary (ships empty) |

@@ -28,7 +28,7 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | logs | 1 / 1 |
 | lookups | 5 / 15 |
 | maintenance | 1 / 5 |
-| maps | 0 / 16 |
+| maps | 8 / 16 |
 | models | 0 / 10 |
 | saved-filters | 0 / 4 |
 | search | 2 / 2 |
@@ -39,7 +39,7 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | token-frames | 0 / 2 |
 | tokens | 0 / 10 |
 | users | 0 / 16 |
-| **Total** | **76 / 309** |
+| **Total** | **84 / 309** |
 
 2 operation(s) are internal-only (🔒) and excluded from covered counts.
 
@@ -348,14 +348,14 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 
 | Method | Path | Description | Perm | CLI |
 |--------|------|-------------|------|-----|
-| GET | `/api/map-folders` | List map folders | not guest | — |
-| PATCH | `/api/map-folders` | Set tags on a map folder | gm or admin | — |
-| POST | `/api/map-folders/bulk` | Bulk set map folder tags | gm or admin | — |
-| GET | `/api/maps` | List maps | not guest | — |
-| POST | `/api/maps/bulk` | Bulk update maps | gm or admin | — |
-| POST | `/api/maps/bulk/tags` | Bulk add tags to maps | gm or admin | — |
-| GET | `/api/maps/{map_id}` | Get a map |  | — |
-| PATCH | `/api/maps/{map_id}` | Update map metadata | gm or admin | — |
+| GET | `/api/map-folders` | List map folders | not guest | `maps folders list` ✅ |
+| PATCH | `/api/map-folders` | Set tags on a map folder | gm or admin | `maps folders set` ✅ |
+| POST | `/api/map-folders/bulk` | Bulk set map folder tags | gm or admin | `maps folders batch-set` ✅ |
+| GET | `/api/maps` | List maps | not guest | `maps list` ✅ |
+| POST | `/api/maps/bulk` | Bulk update maps | gm or admin | `maps batch-update` ✅ |
+| POST | `/api/maps/bulk/tags` | Bulk add tags to maps | gm or admin | `maps batch-tag` ✅ |
+| GET | `/api/maps/{map_id}` | Get a map |  | `maps get` ✅ |
+| PATCH | `/api/maps/{map_id}` | Update map metadata | gm or admin | `maps update` ✅ |
 | GET | `/api/maps/{map_id}/export.uvtt` | Export a map as Universal VTT |  | — |
 | GET | `/api/maps/{map_id}/file` | Download map file |  | — |
 | GET | `/api/maps/{map_id}/page/{page_num}` | Render a map page |  | — |
