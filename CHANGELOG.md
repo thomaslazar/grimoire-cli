@@ -3,6 +3,96 @@
 All notable changes to grimoire-cli are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## v0.2.1 — 2026-09-16
+
+A tidying release: one new command, and a round of corrections to things that
+were wrong, misleading, or carrying weight they had not earned. **It removes a
+flag, so read the first highlight before upgrading.**
+
+### Highlights
+
+- **Breaking: `--server` is gone from every command except `login`.** It could
+  never do what its name promised. The config file holds one server *and* one
+  token, so pointing the flag at a second instance sent the first instance's
+  token and got a 401 — all it could actually do was re-address the instance
+  `login` had already named. Use `GRIMOIRE_SERVER` for a one-off, or
+  `grimoire-cli config set server <url>` to change the stored value. A caller
+  that passes the removed flag now gets a parse error rather than a silent
+  ignore.
+- **`login` reads `GRIMOIRE_SERVER` too**, falling back to it before prompting.
+  That makes the variable work for the command that *establishes* the server,
+  not just the ones that consume it, and it gives an unattended login a way in
+  that does not involve a flag:
+  `GRIMOIRE_SERVER=<url> grimoire-cli login --username <u> --password-stdin`.
+- **New: `grimoire-cli logs`** reads the server's application log, the missing
+  half of four commands that start background work and report only that it
+  started. It exposes the server's own polling cursor — read `max_seq`, pass it
+  back as `--after-seq` — and its help documents the traps that costs a caller
+  otherwise: a page is taken from the newest end but returned oldest-first, and
+  a poll returns the newest `--limit` of what is new, so a backlog larger than
+  `--limit` silently drops its oldest entries.
+- **A server that is down now says so.** Any authenticated command against an
+  unreachable server used to print a 13-frame .NET stack trace and exit 1. It
+  now reports `Cannot reach the Grimoire server at <url>` and exits 2, which is
+  the code every other API failure already used. `--debug` still yields the
+  trace.
+- **`books list` and `search` say what they actually return.** The list rows are
+  a deliberately smaller shape than `books get` — no `tags`, `language`, `isbn`,
+  `authors` — and `systems get` is the one-call way to read all of them for a
+  whole shelf. `search`'s `results` holds page-text hits alone; a title or
+  metadata match lands in `book_matches`, so a successful query can come back
+  with `results` empty. Both cost a real caller a wrong answer before they were
+  written down.
+- **One generator workaround deleted.** Kiota 1.35.0 renders a required array
+  query parameter correctly on its own, so the spec pass that forced it is gone.
+  The remaining normalisation covers microsoft/kiota#2338, which is still open.
+
+### Changes
+
+### Features
+
+- feat: add the logs command
+- feat: let login take its server from GRIMOIRE_SERVER
+
+### Fixes
+
+- fix: address final review findings on server-flag removal
+- fix: correct logs backlog-drop docs, smoke gap, and stale spec
+- fix: report an unreachable server readably instead of crashing
+
+### Refactors
+
+- refactor: drop --server from every command but login
+- refactor: drop the flag tier from server resolution
+
+### Tests
+
+- test: cover server resolution through the environment tier
+- test: cover the logs cursor contract in the smoke test
+- test: drive the unreachable-server check through the env tier
+- test: fix vacuous and unguarded logs level assertion in smoke test
+
+### Chores
+
+- chore: bump Kiota to 1.35.0 and drop the array-query workaround
+- chore: bump version to 0.2.1
+
+### Docs
+
+- docs: design the logs command
+- docs: design the removal of --server from non-login commands
+- docs: document the logs buffer, paging and cursor in help
+- docs: fix stale precedence-order section in configuration.md
+- docs: move logs into Next, ahead of the collection work
+- docs: move the roadmap's detail into issues and reorder
+- docs: name what books list omits and what search's results covers
+- docs: plan the logs command implementation
+- docs: plan the removal of --server from non-login commands
+- docs: record that only login takes --server
+- docs: record the logs command and its verified behaviour
+- docs: refresh the readme for the 0.2.0 surface
+- docs: remove redundant flag restatement from logs help
+
 ## v0.2.0 — 2026-09-11
 
 The release that makes grimoire-cli cover the library rather than just its
