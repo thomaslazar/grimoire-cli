@@ -67,15 +67,16 @@ failure there is a debug line and the check simply runs again next time.
 
 Highest wins (`ConfigManager.Resolve`):
 
-1. Command-line flags — `CommandHelper.BuildClient(serverOverride)` accepts a
-   per-call server override, which every command consuming a saved token wires
-   `--server` through to. `login`'s own `--server` writes straight to the file
-   instead of going through this resolution.
-2. Environment variables — `GRIMOIRE_SERVER`
-3. Config file (`~/.grimoire-cli/config.json`)
+1. Environment variable — `GRIMOIRE_SERVER`
+2. Config file (`~/.grimoire-cli/config.json`)
 
-Only the server has all three tiers. The access and refresh tokens come from the
-config file alone.
+`login` is the exception: its `--server` writes straight to the file rather than
+going through this resolution, and falls back to `GRIMOIRE_SERVER` and then an
+interactive prompt when the flag is absent. No other command takes a server flag.
+
+The access and refresh tokens come from the config file alone, which is why a
+per-command server flag could only ever re-address the instance the stored token
+already belongs to.
 
 ## Config Commands
 
