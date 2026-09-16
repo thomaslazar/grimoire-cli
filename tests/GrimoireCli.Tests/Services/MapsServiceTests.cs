@@ -1,3 +1,5 @@
+using System.Net;
+using System.Text;
 using GrimoireCli.Api;
 using GrimoireCli.Configuration;
 using GrimoireCli.Services;
@@ -88,5 +90,63 @@ public class MapsServiceTests
         var body = new StreamReader(info.Content).ReadToEnd();
         Assert.Equal("{\"grid_px\":0}", body);
         Assert.Equal(Method.PATCH, info.HttpMethod);
+    }
+
+    // The builder-level tests above stop at the RequestInformation. This one goes
+    // through MapsService, so a raw-body call that lost its SetStreamContent —
+    // and would therefore send the empty model instead of what the caller typed —
+    // fails here rather than reaching a server.
+    private sealed class RecordingHandler : HttpMessageHandler
+    {
+        public List<(HttpMethod Method, string Url, string Body)> Seen { get; } = new();
+
+        protected override async Task<HttpResponseMessage> SendAsync(
+            HttpRequestMessage request, CancellationToken cancellationToken)
+        {
+            var body = request.Content == null
+                ? "" : await request.Content.ReadAsStringAsync(cancellationToken);
+            Seen.Add((request.Method, request.RequestUri!.AbsoluteUri, body));
+            return new HttpResponseMessage(HttpStatusCode.OK)
+            {
+                Content = new StringContent("{}", Encoding.UTF8, "application/json")
+            };
+        }
+    }
+
+    [Fact]
+    public async Task EveryRawBodyCallSendsItsBodyUnchangedToItsOwnRoute()
+    {
+        var handler = new RecordingHandler();
+        var dir = Directory.CreateTempSubdirectory().FullName;
+        var config = new AppConfig
+        {
+            Server = "http://example.test",
+            AccessToken = "t",
+            // Keeps PreflightAsync from probing /api/about through the stub.
+            LastVersionCheck = DateTimeOffset.UtcNow,
+            LastServerVersion = "nightly"
+        };
+        var manager = new ConfigManager(Path.Combine(dir, "config.json"));
+        manager.Save(config);
+        var service = new MapsService(new GrimoireApiClient(config, manager, handler));
+
+        await service.UpdateAsync("abc", "{\"grid_px\":0}");
+        await service.BatchUpdateAsync("{\"items\":[{\"id\":\"abc\",\"grid_px\":70}]}");
+        await service.BatchTagAsync("{\"ids\":[\"abc\"],\"tags\":[\"cave\"]}");
+        await service.FoldersSetAsync("{\"path\":\"battlemaps\",\"tags\":[\"cave\"]}");
+        await service.FoldersBatchSetAsync("{\"folders\":[{\"path\":\"battlemaps\",\"tags\":[]}]}");
+
+        Assert.Equal(new[]
+        {
+            (HttpMethod.Patch, "http://example.test/api/maps/abc", "{\"grid_px\":0}"),
+            (HttpMethod.Post, "http://example.test/api/maps/bulk",
+                "{\"items\":[{\"id\":\"abc\",\"grid_px\":70}]}"),
+            (HttpMethod.Post, "http://example.test/api/maps/bulk/tags",
+                "{\"ids\":[\"abc\"],\"tags\":[\"cave\"]}"),
+            (HttpMethod.Patch, "http://example.test/api/map-folders",
+                "{\"path\":\"battlemaps\",\"tags\":[\"cave\"]}"),
+            (HttpMethod.Post, "http://example.test/api/map-folders/bulk",
+                "{\"folders\":[{\"path\":\"battlemaps\",\"tags\":[]}]}"),
+        }, handler.Seen);
     }
 }

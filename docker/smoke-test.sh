@@ -915,9 +915,21 @@ jq -e '[.folders[] | select(.path == "battlemaps") | .tags[]] | any(. == "Smoke 
   || fail "the folder tag should list in display casing: $(cat "$WORK/mapflist.out")"
 ok "maps folders set writes a tag that lists in display casing"
 
+# An unknown field is refused client-side: exit 1, and no request is made. The
+# server ignores an extra key, so only the CLI can catch a misspelled field.
+set +e
+echo '{"grid_pixels":70}' | "$CLI" maps update --id "$MAP_ID" --stdin \
+  >/dev/null 2>"$WORK/maptypo.err"; rc=$?
+set -e
+[ "$rc" -eq 1 ] || fail "an unknown map field should exit 1, got $rc: $(cat "$WORK/maptypo.err")"
+grep -q "grid_pixels" "$WORK/maptypo.err" || fail "no offending field named: $(cat "$WORK/maptypo.err")"
+ok "maps update refuses an unknown field before any request"
+
+# A declared field with the wrong type passes client validation untouched, so
+# this is the server's 422 reaching the caller as a non-zero exit.
 echo '{"grid_px":"seventy"}' | "$CLI" maps update --id "$MAP_ID" --stdin >/dev/null 2>&1 \
   && fail "a wrong-typed grid should not exit 0"
-ok "maps update refuses a body the server would reject"
+ok "maps update surfaces the server's rejection of a wrong-typed grid"
 
 # --- discovery ---------------------------------------------------------------
 # Read-only throughout: nothing here writes, so a re-run converges trivially.

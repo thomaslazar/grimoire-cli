@@ -133,4 +133,32 @@ public class MapsCommandTests
     {
         Assert.Contains("\"grid_px\"", Help(["maps", "update"], full: true));
     }
+
+    // The server ignores an unknown key rather than rejecting it, so a misspelled
+    // field would otherwise answer {"status": "ok"} having written nothing.
+    [Fact]
+    public void UpdateRejectsAFieldMapUpdateDoesNotDeclare()
+    {
+        var ex = Assert.Throws<BodyInputException>(() => JsonBodyInput.Validate(
+            "{\"grid_pixels\":70}",
+            GrimoireCli.Generated.Models.MapUpdate.CreateFromDiscriminatorValue,
+            "pass it with --id"));
+        Assert.Contains("grid_pixels", ex.Message);
+    }
+
+    // Harvested from books, where a validate hook makes it true. Maps has none:
+    // anything but an unresolved id fails the envelope and discards the batch.
+    [Fact]
+    public void BatchUpdateSaysAnInvalidItemDiscardsTheWholeBatch()
+    {
+        var help = Help(["maps", "batch-update"]);
+        Assert.Contains("Only an unresolved id lands in errors", help);
+        Assert.Contains("422s the whole batch", help);
+    }
+
+    [Fact]
+    public void UpdateDocumentsThatNullDoesNotClearAField()
+    {
+        Assert.Contains("an explicit null", Help(["maps", "update"]));
+    }
 }
