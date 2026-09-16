@@ -386,29 +386,37 @@ echo "$LIST_JSON" | jq -e '.[] | select(.name == "Lasers And Feelings")' >/dev/n
   || fail "expected 'Lasers And Feelings' — prettify_collection_name capitalises 'and'"
 ok "one-page-rpgs is a container holding 2 single-book systems"
 
-# --- override flags -----------------------------------------------------------
-# --server is the flag tier of ConfigManager.Resolve — the tested precedence
-# logic (ConfigManagerTests.cs) is otherwise unreachable through the CLI. The
-# stored server is deliberately made unreachable first so a config-file fallback
-# can't mask a broken flag. The token has no flag tier and stays in the file.
+# --- server resolution --------------------------------------------------------
+# GRIMOIRE_SERVER is the only tier above the config file now that --server is
+# gone from everything but login. The stored server is deliberately made
+# unreachable first so a config-file fallback can't mask a broken env tier. The
+# token has no env tier and stays in the file.
 cp "$CONFIG" "$WORK/config.saved"
 jq '.server = "http://127.0.0.1:1"' "$WORK/config.saved" >"$CONFIG"
 
-syslist --server "$SERVER"
+LIST_JSON=$(GRIMOIRE_SERVER="$SERVER" "$CLI" systems list 2>"$WORK/cli.err") \
+  || { cat "$WORK/cli.err" >&2; fail "systems list with GRIMOIRE_SERVER exited non-zero"; }
+COUNT=$(echo "$LIST_JSON" | jq 'length')
 [ "$COUNT" -eq "$EXPECTED_SYSTEMS" ] \
-  || fail "systems list --server returned $COUNT over an unreachable stored server, expected $EXPECTED_SYSTEMS"
-ok "systems list --server overrides the stored server"
+  || fail "GRIMOIRE_SERVER returned $COUNT over an unreachable stored server, expected $EXPECTED_SYSTEMS"
+ok "GRIMOIRE_SERVER overrides the stored server"
+
+# The flag is gone: a caller still passing it gets a parse error, not a silent
+# ignore that would send the request somewhere it did not intend.
+"$CLI" systems list --server "$SERVER" >/dev/null 2>&1 \
+  && fail "systems list should no longer accept --server"
+ok "systems list refuses the removed --server flag"
 
 # A rejected token surfaces as exit 2. The refresh token goes with it, so the
 # renewal path cannot rescue the request and hide the 401.
 jq '.accessToken = "bogus-token" | del(.refreshToken)' "$WORK/config.saved" >"$CONFIG"
 set +e
-"$CLI" systems list --server "$SERVER" >/dev/null 2>"$WORK/badtoken.err"; rc=$?
+GRIMOIRE_SERVER="$SERVER" "$CLI" systems list >/dev/null 2>"$WORK/badtoken.err"; rc=$?
 set -e
 [ "$rc" -eq 2 ] || fail "a bogus stored token should exit 2, got $rc"
 grep -qi "not authenticated" "$WORK/badtoken.err" \
   || fail "a bogus stored token gave no 'Not authenticated' message: $(cat "$WORK/badtoken.err")"
-ok "a bogus stored token against a correct --server exits 2"
+ok "a bogus stored token against a reachable server exits 2"
 
 cp "$WORK/config.saved" "$CONFIG"
 
@@ -1209,6 +1217,17 @@ jq -e --arg s "$SERVER" '.server == $s' "$CONFIG" >/dev/null \
 syslist
 [ "$COUNT" -eq "$EXPECTED_SYSTEMS" ] || fail "the CLI should work again after re-login"
 ok "login repairs a corrupt config"
+
+# login is the one command that still takes --server, and now the one that also
+# reads GRIMOIRE_SERVER. Without the variable an unattended login has no way in:
+# the prompt's ReadLine returns null and the command exits 1.
+cp "$CONFIG" "$WORK/config.beforeenvlogin"
+printf 'admin' | GRIMOIRE_SERVER="$SERVER" "$CLI" login --username admin --password-stdin \
+  >/dev/null 2>"$WORK/envlogin.err" \
+  || { cat "$WORK/envlogin.err" >&2; fail "login should take its server from GRIMOIRE_SERVER"; }
+jq -e --arg s "$SERVER" '.server == $s' "$CONFIG" >/dev/null \
+  || fail "login did not store the server from GRIMOIRE_SERVER: $(cat "$CONFIG")"
+ok "login takes its server from GRIMOIRE_SERVER"
 
 # The config is replaced, not rewritten in place: no temporary survives, and the
 # file holding the session's tokens is readable only by its owner.
