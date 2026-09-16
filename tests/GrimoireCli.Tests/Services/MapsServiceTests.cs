@@ -7,6 +7,12 @@ using Microsoft.Kiota.Abstractions;
 
 namespace GrimoireCli.Tests.Services;
 
+// EveryRawBodyCallSendsItsBodyUnchangedToItsOwnRoute sends through
+// GrimoireApiClient's pipeline, and DebugHttpHandler sits in it — so this class
+// writes into whatever global NLog target is configured at the time. Without the
+// collection it races DebugHttpHandlerTests, whose assertions count the lines in
+// that target.
+[Collection("NLog")]
 public class MapsServiceTests
 {
     private static GrimoireApiClient Client() =>
