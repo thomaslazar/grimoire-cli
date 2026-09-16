@@ -22,11 +22,7 @@ public static class BackupsCommand
 
     private static Command CreateListCommand()
     {
-        var serverOption = new Option<string?>("--server") { Description = "Server URL override" };
-        var command = new Command("list", "List backups, newest first")
-        {
-            serverOption
-        };
+        var command = new Command("list", "List backups, newest first");
         command.AddRoleRequired("admin");
         command.AddHelpSection("Notes", HelpSectionPosition.Top,
             "Reports directory and total_bytes alongside the rows.",
@@ -37,7 +33,7 @@ public static class BackupsCommand
         command.AddResponseExample<Generated.Models.BackupListResponse>();
         command.SetAction(async (parseResult, cancellationToken) =>
         {
-            var (client, _) = CommandHelper.BuildClient(serverOverride: parseResult.GetValue(serverOption));
+            var (client, _) = CommandHelper.BuildClient();
             var service = new BackupsService(client);
             var result = await service.ListAsync();
             ConsoleOutput.WriteRawJson(result);
@@ -48,11 +44,7 @@ public static class BackupsCommand
 
     private static Command CreateCreateCommand()
     {
-        var serverOption = new Option<string?>("--server") { Description = "Server URL override" };
-        var command = new Command("create", "Take a backup now")
-        {
-            serverOption
-        };
+        var command = new Command("create", "Take a backup now");
         command.AddRoleRequired("admin");
         command.AddHelpSection("Notes", HelpSectionPosition.Top,
             "Snapshots the database under a read lock, so writes are held off until it",
@@ -68,7 +60,7 @@ public static class BackupsCommand
         command.AddResponseExample<Generated.Models.BackupItem>();
         command.SetAction(async (parseResult, cancellationToken) =>
         {
-            var (client, _) = CommandHelper.BuildClient(serverOverride: parseResult.GetValue(serverOption));
+            var (client, _) = CommandHelper.BuildClient();
             var service = new BackupsService(client);
             var result = await service.CreateAsync();
             ConsoleOutput.WriteRawJson(result);
@@ -80,10 +72,9 @@ public static class BackupsCommand
     private static Command CreateDeleteCommand()
     {
         var idOption = new Option<string>("--id") { Description = "Backup ID", Required = true };
-        var serverOption = new Option<string?>("--server") { Description = "Server URL override" };
         var command = new Command("delete", "Delete one backup archive")
         {
-            idOption, serverOption
+            idOption
         };
         command.AddRoleRequired("admin");
         command.AddHelpSection("Notes", HelpSectionPosition.Top,
@@ -94,7 +85,7 @@ public static class BackupsCommand
         command.AddExamples("grimoire-cli backups delete --id <backup-id>");
         command.SetAction(async (parseResult, cancellationToken) =>
         {
-            var (client, _) = CommandHelper.BuildClient(serverOverride: parseResult.GetValue(serverOption));
+            var (client, _) = CommandHelper.BuildClient();
             var service = new BackupsService(client);
             var result = await service.DeleteAsync(parseResult.GetValue(idOption)!);
             ConsoleOutput.WriteRawJson(result);
@@ -111,10 +102,9 @@ public static class BackupsCommand
             Description = "Output file path, or '-' for binary to stdout",
             Required = true,
         };
-        var serverOption = new Option<string?>("--server") { Description = "Server URL override" };
         var command = new Command("download", "Download one backup archive")
         {
-            idOption, outputOption, serverOption
+            idOption, outputOption
         };
         command.AddRoleRequired("admin");
         command.AddHelpSection("Notes", HelpSectionPosition.Top,
@@ -128,7 +118,7 @@ public static class BackupsCommand
         command.AddResponseExample<SavedFile>();
         command.SetAction(async (parseResult, cancellationToken) =>
         {
-            var (client, _) = CommandHelper.BuildClient(serverOverride: parseResult.GetValue(serverOption));
+            var (client, _) = CommandHelper.BuildClient();
             var service = new BackupsService(client);
             await using var stream = await service.DownloadAsync(parseResult.GetValue(idOption)!);
             try

@@ -22,11 +22,7 @@ public static class AddonsCommand
 
     private static Command CreateListCommand()
     {
-        var serverOption = new Option<string?>("--server") { Description = "Server URL override" };
-        var command = new Command("list", "List installed and available add-ons")
-        {
-            serverOption
-        };
+        var command = new Command("list", "List installed and available add-ons");
         command.AddRoleRequired("admin");
         command.AddHelpSection("Notes", HelpSectionPosition.Top,
             "available comes from the cached index — empty until addons refresh runs,",
@@ -40,7 +36,7 @@ public static class AddonsCommand
         command.AddResponseExample<Generated.Models.AddonListResponse>();
         command.SetAction(async (parseResult, cancellationToken) =>
         {
-            var (client, _) = CommandHelper.BuildClient(serverOverride: parseResult.GetValue(serverOption));
+            var (client, _) = CommandHelper.BuildClient();
             var service = new AddonsService(client);
             var result = await service.ListAsync();
             ConsoleOutput.WriteRawJson(result);
@@ -51,11 +47,7 @@ public static class AddonsCommand
 
     private static Command CreateRefreshCommand()
     {
-        var serverOption = new Option<string?>("--server") { Description = "Server URL override" };
-        var command = new Command("refresh", "Fetch the add-on index")
-        {
-            serverOption
-        };
+        var command = new Command("refresh", "Fetch the add-on index");
         command.AddRoleRequired("admin");
         command.AddHelpSection("Notes", HelpSectionPosition.Top,
             "Fetches index_url over the network; count is what the index offered.",
@@ -65,7 +57,7 @@ public static class AddonsCommand
         command.AddResponseExample<Generated.Models.RefreshIndexResponse>();
         command.SetAction(async (parseResult, cancellationToken) =>
         {
-            var (client, _) = CommandHelper.BuildClient(serverOverride: parseResult.GetValue(serverOption));
+            var (client, _) = CommandHelper.BuildClient();
             var service = new AddonsService(client);
             var result = await service.RefreshAsync();
             ConsoleOutput.WriteRawJson(result);
@@ -81,10 +73,9 @@ public static class AddonsCommand
         {
             Description = "Consent to run this add-on's script; ignored when it ships none",
         };
-        var serverOption = new Option<string?>("--server") { Description = "Server URL override" };
         var command = new Command("install", "Install or upgrade one add-on")
         {
-            idOption, approveOption, serverOption
+            idOption, approveOption
         };
         command.AddRoleRequired("admin");
         command.AddHelpSection("Notes", HelpSectionPosition.Top,
@@ -100,7 +91,7 @@ public static class AddonsCommand
         command.AddResponseExample<Generated.Models.InstalledAddon>();
         command.SetAction(async (parseResult, cancellationToken) =>
         {
-            var (client, _) = CommandHelper.BuildClient(serverOverride: parseResult.GetValue(serverOption));
+            var (client, _) = CommandHelper.BuildClient();
             var service = new AddonsService(client);
             var result = await service.InstallAsync(
                 parseResult.GetValue(idOption)!, parseResult.GetValue(approveOption));
@@ -115,10 +106,9 @@ public static class AddonsCommand
         var idOption = new Option<string>("--id") { Description = "Add-on ID", Required = true };
         var enabledOption = new Option<bool?>("--enabled") { Description = "Enable or disable the add-on (true | false)" };
         var scriptApprovedOption = new Option<bool?>("--script-approved") { Description = "Grant or revoke script approval (true | false)" };
-        var serverOption = new Option<string?>("--server") { Description = "Server URL override" };
         var command = new Command("update", "Enable, disable, or approve one add-on")
         {
-            idOption, enabledOption, scriptApprovedOption, serverOption
+            idOption, enabledOption, scriptApprovedOption
         };
         command.AddRoleRequired("admin");
         command.AddHelpSection("Notes", HelpSectionPosition.Top,
@@ -130,7 +120,7 @@ public static class AddonsCommand
         command.AddResponseExample<Generated.Models.InstalledAddon>();
         command.SetAction(async (parseResult, cancellationToken) =>
         {
-            var (client, _) = CommandHelper.BuildClient(serverOverride: parseResult.GetValue(serverOption));
+            var (client, _) = CommandHelper.BuildClient();
             var service = new AddonsService(client);
             var result = await service.UpdateAsync(
                 parseResult.GetValue(idOption)!,
@@ -145,10 +135,9 @@ public static class AddonsCommand
     private static Command CreateUninstallCommand()
     {
         var idOption = new Option<string>("--id") { Description = "Add-on ID", Required = true };
-        var serverOption = new Option<string?>("--server") { Description = "Server URL override" };
         var command = new Command("uninstall", "Remove one add-on")
         {
-            idOption, serverOption
+            idOption
         };
         command.AddRoleRequired("admin");
         command.AddHelpSection("Notes", HelpSectionPosition.Top,
@@ -159,7 +148,7 @@ public static class AddonsCommand
         command.AddExamples("grimoire-cli addons uninstall --id <addon-id>");
         command.SetAction(async (parseResult, cancellationToken) =>
         {
-            var (client, _) = CommandHelper.BuildClient(serverOverride: parseResult.GetValue(serverOption));
+            var (client, _) = CommandHelper.BuildClient();
             var service = new AddonsService(client);
             var response = await service.UninstallAsync(parseResult.GetValue(idOption)!);
             ConsoleOutput.WriteRawJson(response);
@@ -170,11 +159,7 @@ public static class AddonsCommand
 
     private static Command CreateUpgradeAllCommand()
     {
-        var serverOption = new Option<string?>("--server") { Description = "Server URL override" };
-        var command = new Command("upgrade-all", "Upgrade every installed add-on")
-        {
-            serverOption
-        };
+        var command = new Command("upgrade-all", "Upgrade every installed add-on");
         command.AddRoleRequired("admin");
         command.AddHelpSection("Notes", HelpSectionPosition.Top,
             "Refreshes the index first, and carries on with the cached one if that",
@@ -189,7 +174,7 @@ public static class AddonsCommand
         command.AddResponseExample<Generated.Models.UpdateAllResponse>();
         command.SetAction(async (parseResult, cancellationToken) =>
         {
-            var (client, _) = CommandHelper.BuildClient(serverOverride: parseResult.GetValue(serverOption));
+            var (client, _) = CommandHelper.BuildClient();
             var service = new AddonsService(client);
             var result = await service.UpgradeAllAsync();
             ConsoleOutput.WriteRawJson(result);
@@ -202,10 +187,9 @@ public static class AddonsCommand
     {
         var indexUrlOption = new Option<string?>("--index-url") { Description = "Add-on index URL" };
         var allowScriptsOption = new Option<bool?>("--allow-scripts") { Description = "Allow add-on scripts to run (true | false)" };
-        var serverOption = new Option<string?>("--server") { Description = "Server URL override" };
         var command = new Command("settings", "Set the add-on index URL and script switch")
         {
-            indexUrlOption, allowScriptsOption, serverOption
+            indexUrlOption, allowScriptsOption
         };
         command.AddRoleRequired("admin");
         command.Validators.Add(result =>
@@ -225,7 +209,7 @@ public static class AddonsCommand
         command.AddResponseExample<Generated.Models.AddonSettingsResponse>();
         command.SetAction(async (parseResult, cancellationToken) =>
         {
-            var (client, _) = CommandHelper.BuildClient(serverOverride: parseResult.GetValue(serverOption));
+            var (client, _) = CommandHelper.BuildClient();
             var service = new AddonsService(client);
             var result = await service.SettingsAsync(
                 parseResult.GetValue(indexUrlOption), parseResult.GetValue(allowScriptsOption));

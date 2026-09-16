@@ -21,11 +21,14 @@ public class MeCommandTests
         Assert.NotEmpty(root.Parse("me extra").Errors);
     }
 
+    // --server was removed from every command but login: the config file and
+    // GRIMOIRE_SERVER are the only ways to name a server. A parse error is what
+    // proves the option is gone rather than merely hidden from help.
     [Fact]
-    public void AcceptsAServerOverride()
+    public void RejectsAServerOverride()
     {
         var root = new RootCommand { MeCommand.Create() };
-        Assert.Empty(root.Parse("me --server http://x").Errors);
+        Assert.NotEmpty(root.Parse("me --server http://x").Errors);
     }
 
     // The token comes from the config file alone; --token is not an option here.

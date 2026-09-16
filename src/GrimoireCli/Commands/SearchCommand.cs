@@ -12,10 +12,9 @@ public static class SearchCommand
         var limitOption = OptionHelpers.Range("--limit", "Page-text results; default 50, max 200", 1, 200);
         var bookIdOption = new Option<string?>("--book-id") { Description = "Restrict to one book" };
         var systemIdOption = new Option<string?>("--system-id") { Description = "Restrict to one game system" };
-        var serverOption = new Option<string?>("--server") { Description = "Server URL override" };
         var command = new Command("search", "Search page text and metadata across the library")
         {
-            queryOption, limitOption, bookIdOption, systemIdOption, serverOption
+            queryOption, limitOption, bookIdOption, systemIdOption
         };
         command.AddHelpSection("Notes", HelpSectionPosition.Top,
             "results is page-text hits alone. A title or metadata match lands in",
@@ -61,7 +60,7 @@ public static class SearchCommand
         command.AddResponseExample<Generated.Models.SearchResponse>();
         command.SetAction(async (parseResult, cancellationToken) =>
         {
-            var (client, _) = CommandHelper.BuildClient(serverOverride: parseResult.GetValue(serverOption));
+            var (client, _) = CommandHelper.BuildClient();
             var service = new SearchService(client);
             var result = await service.SearchAsync(
                 parseResult.GetValue(queryOption)!,
@@ -77,13 +76,12 @@ public static class SearchCommand
 
     private static Command CreateFieldsCommand()
     {
-        var serverOption = new Option<string?>("--server") { Description = "Server URL override" };
-        var command = new Command("fields", "The field: prefixes a search query accepts, with their aliases") { serverOption };
+        var command = new Command("fields", "The field: prefixes a search query accepts, with their aliases");
         command.AddExamples("grimoire-cli search fields");
         command.AddResponseExample<Generated.Models.SearchFieldsResponse>();
         command.SetAction(async (parseResult, cancellationToken) =>
         {
-            var (client, _) = CommandHelper.BuildClient(serverOverride: parseResult.GetValue(serverOption));
+            var (client, _) = CommandHelper.BuildClient();
             var service = new SearchService(client);
             var result = await service.FieldsAsync();
             ConsoleOutput.WriteRawJson(result);

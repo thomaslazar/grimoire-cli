@@ -17,10 +17,9 @@ public static class TagsCommand
     private static Command CreateListCommand()
     {
         var inUseByOption = new Option<string?>("--in-use-by") { Description = "Restrict to tags used on this resource type (system | book | map | token | audio | model)" };
-        var serverOption = new Option<string?>("--server") { Description = "Server URL override" };
         var command = new Command("list", "List tags with their usage counts")
         {
-            inUseByOption, serverOption
+            inUseByOption
         };
         command.AddHelpSection("Notes", HelpSectionPosition.Top,
             "Folder-derived tags are merged in and counted, and category is the",
@@ -32,7 +31,7 @@ public static class TagsCommand
         command.AddResponseExample<Generated.Models.TagsResponse>();
         command.SetAction(async (parseResult, cancellationToken) =>
         {
-            var (client, _) = CommandHelper.BuildClient(serverOverride: parseResult.GetValue(serverOption));
+            var (client, _) = CommandHelper.BuildClient();
             var service = new TagsService(client);
             var result = await service.ListAsync(parseResult.GetValue(inUseByOption));
             ConsoleOutput.WriteRawJson(result);
@@ -45,10 +44,9 @@ public static class TagsCommand
     {
         var tagOption = new Option<string>("--tag") { Description = "The tag's internal key, from tags list; matched case-insensitively", Required = true };
         var resourceTypeOption = new Option<string?>("--resource-type") { Description = "Restrict to this resource type (system | book | map | token | audio | model)" };
-        var serverOption = new Option<string?>("--server") { Description = "Server URL override" };
         var command = new Command("items", "Items and folders carrying a tag")
         {
-            tagOption, resourceTypeOption, serverOption
+            tagOption, resourceTypeOption
         };
         command.AddHelpSection("Notes", HelpSectionPosition.Top,
             "Items carrying the tag directly are in items; those inheriting it",
@@ -58,7 +56,7 @@ public static class TagsCommand
         AddTaggedItemShapes(command);
         command.SetAction(async (parseResult, cancellationToken) =>
         {
-            var (client, _) = CommandHelper.BuildClient(serverOverride: parseResult.GetValue(serverOption));
+            var (client, _) = CommandHelper.BuildClient();
             var service = new TagsService(client);
             var result = await service.ItemsAsync(
                 parseResult.GetValue(tagOption)!,

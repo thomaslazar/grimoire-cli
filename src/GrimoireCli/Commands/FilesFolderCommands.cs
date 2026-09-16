@@ -36,10 +36,9 @@ public static class FilesFolderCommands
         var nameOption = new Option<string>("--name") { Description = "New folder's name", Required = true };
         var containerKindOption = OptionHelpers.Choice("--container-kind", "Mark it as a container of this kind", ContainerKinds);
         var nsfwOption = new Option<bool>("--nsfw") { Description = "Mark it NSFW" };
-        var serverOption = new Option<string?>("--server") { Description = "Server URL override" };
         var command = new Command("create", "Create a folder, optionally as a container or NSFW")
         {
-            parentOption, nameOption, containerKindOption, nsfwOption, serverOption
+            parentOption, nameOption, containerKindOption, nsfwOption
         };
         command.AddRoleRequired("admin");
         command.AddHelpSection("Notes", HelpSectionPosition.Top,
@@ -52,7 +51,7 @@ public static class FilesFolderCommands
         command.AddResponseExample<Generated.Models.FolderResponse>();
         command.SetAction(async (parseResult, cancellationToken) =>
         {
-            var (client, _) = CommandHelper.BuildClient(serverOverride: parseResult.GetValue(serverOption));
+            var (client, _) = CommandHelper.BuildClient();
             var service = new FilesService(client);
             var result = await service.CreateFolderAsync(
                 parseResult.GetValue(parentOption)!,
@@ -70,10 +69,9 @@ public static class FilesFolderCommands
         var pathOption = new Option<string>("--path") { Description = "Folder to mark", Required = true };
         var containerKindOption = OptionHelpers.Choice("--container-kind", "Container kind; pass \"\" to clear it", MarkerContainerKinds);
         var nsfwOption = new Option<bool?>("--nsfw") { Description = "NSFW flag (true | false)" };
-        var serverOption = new Option<string?>("--server") { Description = "Server URL override" };
         var command = new Command("markers", "Set a folder's container/NSFW markers")
         {
-            pathOption, containerKindOption, nsfwOption, serverOption
+            pathOption, containerKindOption, nsfwOption
         };
         command.AddRoleRequired("admin");
         command.AddHelpSection("Notes", HelpSectionPosition.Top,
@@ -84,7 +82,7 @@ public static class FilesFolderCommands
         command.AddResponseExample<Generated.Models.FolderResponse>();
         command.SetAction(async (parseResult, cancellationToken) =>
         {
-            var (client, _) = CommandHelper.BuildClient(serverOverride: parseResult.GetValue(serverOption));
+            var (client, _) = CommandHelper.BuildClient();
             var service = new FilesService(client);
             var result = await service.MarkersAsync(
                 parseResult.GetValue(pathOption)!,
@@ -99,10 +97,9 @@ public static class FilesFolderCommands
     private static Command CreateScaffoldCommand()
     {
         var pathOption = new Option<string>("--path") { Description = "System folder to scaffold", Required = true };
-        var serverOption = new Option<string?>("--server") { Description = "Server URL override" };
         var command = new Command("scaffold", "Create the standard category folders in a system folder")
         {
-            pathOption, serverOption
+            pathOption
         };
         command.AddRoleRequired("admin");
         command.AddHelpSection("Notes", HelpSectionPosition.Top,
@@ -116,7 +113,7 @@ public static class FilesFolderCommands
         command.AddResponseExample<Generated.Models.ScaffoldResponse>();
         command.SetAction(async (parseResult, cancellationToken) =>
         {
-            var (client, _) = CommandHelper.BuildClient(serverOverride: parseResult.GetValue(serverOption));
+            var (client, _) = CommandHelper.BuildClient();
             var service = new FilesService(client);
             var result = await service.ScaffoldAsync(parseResult.GetValue(pathOption)!);
             ConsoleOutput.WriteRawJson(result);
@@ -128,10 +125,9 @@ public static class FilesFolderCommands
     private static Command CreateContentsCommand()
     {
         var pathOption = new Option<string>("--path") { Description = "Folder to check", Required = true };
-        var serverOption = new Option<string?>("--server") { Description = "Server URL override" };
         var command = new Command("contents", "Report whether a folder holds content")
         {
-            pathOption, serverOption
+            pathOption
         };
         command.AddRoleRequired("admin");
         command.AddHelpSection("Notes", HelpSectionPosition.Top,
@@ -140,7 +136,7 @@ public static class FilesFolderCommands
         command.AddResponseExample<Generated.Models.FolderContentsResponse>();
         command.SetAction(async (parseResult, cancellationToken) =>
         {
-            var (client, _) = CommandHelper.BuildClient(serverOverride: parseResult.GetValue(serverOption));
+            var (client, _) = CommandHelper.BuildClient();
             var service = new FilesService(client);
             var result = await service.FolderContentsAsync(parseResult.GetValue(pathOption)!);
             ConsoleOutput.WriteRawJson(result);

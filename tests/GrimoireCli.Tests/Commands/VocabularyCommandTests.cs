@@ -107,11 +107,11 @@ public class VocabularyCommandTests
 
     [Theory]
     [MemberData(nameof(Vocabularies))]
-    public void ListParsesAndAcceptsServer(string name)
+    public void ListParsesAndRejectsServer(string name)
     {
         var group = Group(name);
         Assert.Empty(group.Parse(["list"]).Errors);
-        Assert.Empty(group.Parse(["list", "--server", "http://example.test"]).Errors);
+        Assert.NotEmpty(group.Parse(["list", "--server", "http://example.test"]).Errors);
     }
 
     [Theory]
