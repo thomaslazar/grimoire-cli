@@ -17,6 +17,7 @@ public static class MapsCommand
         command.Subcommands.Add(CreateUpdateCommand());
         command.Subcommands.Add(CreateBatchUpdateCommand());
         command.Subcommands.Add(CreateBatchTagCommand());
+        command.Subcommands.Add(MapFolderCommands.Create());
         return command;
     }
 
