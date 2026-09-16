@@ -411,7 +411,6 @@ public static class MapsCommand
         var command = new Command("maps", "Read and edit map metadata");
         command.Subcommands.Add(CreateListCommand());
         command.Subcommands.Add(CreateGetCommand());
-        command.Subcommands.Add(MapFolderCommands.Create());
         return command;
     }
 
@@ -479,9 +478,9 @@ public static class MapsCommand
 }
 ```
 
-`Create()` already wires `MapFolderCommands.Create()`, which Task 4 writes. Until
-then this file will not compile — so for **this task only**, comment that one line
-out and restore it in Task 4. Add nothing else as a stand-in.
+`Create()` carries only the two reads for now. Task 3 adds the three writes and
+Task 4 adds the folder group, each registering its own subcommands in this same
+method. Do not add a placeholder for either.
 
 - [ ] **Step 4: Register the group**
 
@@ -792,7 +791,7 @@ git commit -m "feat: add maps update, batch-update and batch-tag"
 
 **Files:**
 - Create: `src/GrimoireCli/Commands/MapFolderCommands.cs`
-- Modify: `src/GrimoireCli/Commands/MapsCommand.cs` (restore the commented line)
+- Modify: `src/GrimoireCli/Commands/MapsCommand.cs` (one registration line)
 - Create: `tests/GrimoireCli.Tests/Commands/MapFolderCommandTests.cs`
 
 **Interfaces:**
@@ -1006,9 +1005,14 @@ public static class MapFolderCommands
 }
 ```
 
-- [ ] **Step 4: Restore the folder wiring**
+- [ ] **Step 4: Wire the folder group**
 
-In `MapsCommand.cs`, uncomment `command.Subcommands.Add(MapFolderCommands.Create());`.
+In `MapsCommand.cs`, add the folder group as the last subcommand in `Create()`,
+after the three write commands Task 3 registered:
+
+```csharp
+        command.Subcommands.Add(MapFolderCommands.Create());
+```
 
 - [ ] **Step 5: Run the tests to verify they pass**
 
