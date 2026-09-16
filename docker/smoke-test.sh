@@ -1223,13 +1223,14 @@ ok "config writes leave no temporary file and stay owner-only"
 # command action, and System.CommandLine's own pipeline printed it and returned 1
 # before Program's handler could run. Exit 2 is asserted alongside the message —
 # 1 means a local/config problem in this CLI, which a dead server is not.
-cp "$CONFIG" "$WORK/config.reachable"
-jq '.server = "http://127.0.0.1:1"' "$WORK/config.reachable" >"$CONFIG"
+#
+# The dead address goes in through GRIMOIRE_SERVER rather than the config file:
+# CI exports that variable for the whole job, and the env tier outranks the file,
+# so editing the file here would be overridden and the command would succeed.
 set +e
-"$CLI" systems list >"$WORK/down.out" 2>"$WORK/down.err"; rc=$?
+GRIMOIRE_SERVER=http://127.0.0.1:1 "$CLI" systems list >"$WORK/down.out" 2>"$WORK/down.err"; rc=$?
 set -e
-cp "$WORK/config.reachable" "$CONFIG"
-[ "$rc" -eq 2 ] || fail "an unreachable server should exit 2, got $rc"
+[ "$rc" -eq 2 ] || fail "an unreachable server should exit 2, got $rc: $(cat "$WORK/down.err")"
 grep -qi "cannot reach" "$WORK/down.err" \
   || fail "no readable message for an unreachable server: $(cat "$WORK/down.err")"
 grep -qi "at System\.\|Unhandled exception" "$WORK/down.err" \
