@@ -25,7 +25,8 @@ public static class MapsCommand
     {
         var mapTypeOption = new Option<string?>("--map-type") { Description = "Filter by map type" };
         var folderOption = new Option<string?>("--folder") { Description = "Filter by exact folder path" };
-        var limitOption = OptionHelpers.Range("--limit", "Results per page (default 100; the server sets no maximum)", 1);
+        var limitOption = OptionHelpers.Range("--limit", "Results per page (the server sets no maximum)", 1);
+        limitOption.DefaultValueFactory = _ => 100;
         var offsetOption = OptionHelpers.Range("--offset", "Items to skip", 0);
         var command = new Command("list", "List maps")
         {
@@ -36,7 +37,9 @@ public static class MapsCommand
             "battlemaps/caves. Its value is folder_path from maps get, not",
             "relative_path — the maps/ collection root is stripped from folder_path.",
             "",
-            "Variants are hidden — only the main copy of a family is listed.");
+            "Variants are hidden — only the main copy of a family is listed.",
+            "",
+            "Page with --offset against total in the response.");
         command.AddExamples(
             "grimoire-cli maps list",
             "grimoire-cli maps list --folder battlemaps --limit 20",
@@ -49,7 +52,7 @@ public static class MapsCommand
             var result = await service.ListAsync(
                 parseResult.GetValue(mapTypeOption),
                 parseResult.GetValue(folderOption),
-                parseResult.GetValue(limitOption) ?? 100,
+                parseResult.GetValue(limitOption),
                 parseResult.GetValue(offsetOption));
             ConsoleOutput.WriteRawJson(result);
             return 0;
@@ -93,6 +96,9 @@ public static class MapsCommand
         command.AddRoleRequired("gm or admin");
         JsonBodyInput.RequireExactlyOneSource(command, inputOption, stdinOption);
         command.AddHelpSection("Notes", HelpSectionPosition.Top,
+            "Clear description, map_type or grid_size with \"\"; an explicit null",
+            "does nothing.",
+            "",
             "tags replace the set. To add without removing, use batch-tag.",
             "",
             "grid_width, grid_height and grid_px take 0 to clear the override and",
@@ -101,10 +107,9 @@ public static class MapsCommand
             "grid_width and grid_height are 0-1000, grid_px 0-2000; outside that is",
             "a 422.",
             "",
-            "grid_warning in the response is advisory — the write succeeded.",
-            "",
-            "Responds {\"status\": \"ok\"} and echoes nothing — read back with:",
-            "grimoire-cli maps get --id <id>");
+            "Responds {\"status\": \"ok\", \"grid_warning\": …} and echoes no field",
+            "values. grid_warning is advisory — the write succeeded either way.",
+            "Read back with: grimoire-cli maps get --id <id>");
         command.AddExamples(
             "grimoire-cli maps update --id <id> --input grid.json",
             "echo '{\"grid_px\":70}' | grimoire-cli maps update --id <id> --stdin",
@@ -146,8 +151,12 @@ public static class MapsCommand
         command.AddHelpSection("Notes", HelpSectionPosition.Top,
             "1 to 1000 items. Each item requires id.",
             "",
-            "Skip-and-continue: a bad id or item lands in errors, the rest apply.",
-            "Exit 3 is HTTP 200 with a non-empty errors list — a partial write.",
+            "Only an unresolved id lands in errors, and the rest apply. Exit 3 is",
+            "HTTP 200 with a non-empty errors list — a partial write.",
+            "",
+            "Nothing else is per-item: a schema-invalid item 422s the whole batch",
+            "and nothing is written. grid_width and grid_height are 0-1000, grid_px",
+            "0-2000, and no tag may contain / or \\.",
             "",
             "A grid field sent as 0 is dropped here, so this cannot clear an",
             "override — maps update can.");
@@ -194,7 +203,9 @@ public static class MapsCommand
             "",
             "Additive — it never removes a tag. maps update replaces the set.",
             "",
-            "Exit 3 is HTTP 200 with a non-empty errors list — a partial write.");
+            "Only an unresolved id lands in errors. Exit 3 is HTTP 200 with a",
+            "non-empty errors list — a partial write. A tag containing / or \\ is a",
+            "422 on the whole request, which writes nothing.");
         command.AddExamples(
             "grimoire-cli maps batch-tag --input tags.json",
             "echo '{\"ids\":[\"<id>\"],\"tags\":[\"dungeon\"]}' | grimoire-cli maps batch-tag --stdin");

@@ -724,6 +724,20 @@ measured against the running 1.7.0 stack.
   from `model_fields_set`, and `bulk_update_maps` does not. A batch can set a
   grid, never clear one. Measured: `{"grid_px":0}` through `maps update` read
   back as null.
+- **An explicit `null` is a silent no-op on the single PATCH.** `update_map`
+  dumps with `exclude_none=True`, so `{"description": null}` answers
+  `{"status": "ok"}` and changes nothing; `""` is what clears `description`,
+  `map_type` or `grid_size`. The grid fields are the exception, re-applied from
+  `model_fields_set` as above.
+- **The bulk endpoints pass no `validate` hook, so only an unresolved id is a
+  per-item error.** `bulk_update_maps` and `bulk_add_map_tags` call
+  `bulk_service.run_bulk_update` / `run_bulk_add_tags` without one, and the only
+  entry they can append to `errors` is `"Map not found"`. Anything a schema
+  rejects — `grid_width`/`grid_height` outside 0-1000, `grid_px` outside 0-2000,
+  a tag carrying `/` or `\` (`TAG_FORBIDDEN_CHARS`) — fails Pydantic on the
+  envelope, so the request 422s and nothing is written. `books` differs: it
+  passes `validate=_apply_access`, which is what makes skip-and-continue true
+  there and not here.
 - **`grid_warning` is advisory.** `PATCH /api/maps/{id}` answers `{"status",
   "grid_warning"}`, and the warning rides along when a saved override looks
   implausible for the map's pixel dimensions. The write succeeded regardless,
@@ -731,6 +745,11 @@ measured against the running 1.7.0 stack.
 - **`GET /api/maps/{id}` carries two grids.** `grid` is what detection found,
   with its own `source`; `grid_width`/`grid_height`/`grid_px` are the stored
   override. All three null means detection is in charge.
+- **Folder-tag inheritance does not reach `GET /api/maps/{id}`.** `get_map`
+  resolves `folder_tags` from `MapFolder.filter_by(path=folder_path)` — an exact
+  match — while `tags` and `search` bucket by `_ancestor_folder_paths`. Tagging
+  `battlemaps` therefore shows up for a map under `battlemaps/caves` in those
+  two and reads back as `folder_tags: []` on the map itself.
 - **Folder tags read and write differently.** `GET /api/map-folders` resolves to
   display casing; the PATCH and the bulk echo the stored internal keys. Same
   asymmetry as `systems book-folders`.
@@ -738,7 +757,9 @@ measured against the running 1.7.0 stack.
   `folders` and `tags` each carry `min_length=1`, so an empty batch is a 422
   rather than a no-op.
 - **`map-folders` has no delete**, unlike `systems book-folders`, and gains a
-  bulk verb book folders have no counterpart for.
+  bulk verb book folders have no counterpart for. `tag_service.upsert_folder_tags`
+  inserts a row for any path string without checking the tree, so a typo'd path
+  creates a row that nothing can ever remove.
 
 ## Search
 

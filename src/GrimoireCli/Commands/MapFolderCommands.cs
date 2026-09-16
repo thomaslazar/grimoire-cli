@@ -57,10 +57,13 @@ public static class MapFolderCommands
         JsonBodyInput.RequireExactlyOneSource(command, inputOption, stdinOption);
         command.AddHelpSection("Notes", HelpSectionPosition.Top,
             "tags replace the folder's set; an empty list clears it and keeps the",
-            "row. The folder is addressed by path in the body, and need not exist",
-            "on disk.",
+            "row. The folder is addressed by path in the body: a path that is not",
+            "on disk still creates a row, and nothing removes one — there is no",
+            "delete, so a typo is permanent.",
             "",
-            "A tag reaches every map at or below the path.");
+            "A tag reaches every map at or below the path in tags items and search.",
+            "maps get matches folder_path exactly, so folder_tags on a map in a",
+            "subfolder of the tagged path reads empty.");
         command.AddExamples(
             "echo '{\"path\":\"battlemaps/caves\",\"tags\":[\"cave\"]}' | grimoire-cli maps folders set --stdin");
         command.AddRequestShape<Generated.Models.FolderTagsUpdate>();
@@ -99,7 +102,8 @@ public static class MapFolderCommands
         command.AddRoleRequired("gm or admin");
         JsonBodyInput.RequireExactlyOneSource(command, inputOption, stdinOption);
         command.AddHelpSection("Notes", HelpSectionPosition.Top,
-            "1 to 1000 folders. Each replaces that folder's tags, as set does.",
+            "1 to 1000 folders. Each replaces that folder's tags, as set does —",
+            "including creating a permanent row for a path that is not on disk.",
             "",
             "All or nothing: there is no per-item error list and no exit 3 here.");
         command.AddExamples("grimoire-cli maps folders batch-set --input folders.json");
