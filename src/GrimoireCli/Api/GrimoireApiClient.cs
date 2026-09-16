@@ -255,6 +255,44 @@ public class GrimoireApiClient
     }
 
     /// <summary>
+    /// The stderr line for a request that never reached the server. Split from the
+    /// sending so it can be tested: the caller exits the process, which would take
+    /// the test host with it — the same split <see cref="VersionWarning"/> uses.
+    ///
+    /// A timeout reads differently from an unreachable host on purpose. Raising a
+    /// command's budget is a remedy for one and useless for the other, and both
+    /// arrive here as a failure to get a response.
+    /// </summary>
+    internal static string TransportErrorMessage(Exception ex, string? server) => ex switch
+    {
+        TaskCanceledException => $"The request to {server} timed out.",
+        _ => $"Cannot reach the Grimoire server at {server}. {ex.Message}"
+    };
+
+    /// <summary>
+    /// Sends one request, turning a failure to reach the server into the same
+    /// readable error-and-exit that every HTTP status already gets. Without it the
+    /// exception escapes the command action, and System.CommandLine's own pipeline
+    /// catches it first — printing a .NET stack trace and returning 1 before
+    /// Program's handler runs, which is why that handler cannot do this job.
+    /// </summary>
+    private async Task<HttpResponseMessage> SendOrExitAsync(
+        HttpRequestMessage request, CancellationToken cancellationToken)
+    {
+        try
+        {
+            return await _http.SendAsync(request, cancellationToken);
+        }
+        catch (Exception ex) when (ex is HttpRequestException or TaskCanceledException)
+        {
+            _logger.Error(TransportErrorMessage(ex, _config.Server));
+            _logger.Debug(ex.ToString());
+            Environment.Exit(2);
+            throw;
+        }
+    }
+
+    /// <summary>
     /// Sends a request, and if the access token turns out to have expired,
     /// renews it and sends the request once more. The retry rebuilds the native
     /// request from the same <see cref="RequestInformation"/> — an
@@ -269,7 +307,7 @@ public class GrimoireApiClient
     {
         var request = await _adapter.ConvertToNativeRequestAsync<HttpRequestMessage>(info, cancellationToken)
             ?? throw new InvalidOperationException($"Failed to build request for {info.URI.AbsolutePath}");
-        var response = await _http.SendAsync(request, cancellationToken);
+        var response = await SendOrExitAsync(request, cancellationToken);
         if (!ShouldRefreshOn401(response, HasRefreshToken)) return response;
         if (info.Content is { CanSeek: false })
         {
@@ -284,7 +322,7 @@ public class GrimoireApiClient
             info.Content.Position = 0;
         var retry = await _adapter.ConvertToNativeRequestAsync<HttpRequestMessage>(info, cancellationToken)
             ?? throw new InvalidOperationException($"Failed to rebuild request for {info.URI.AbsolutePath}");
-        return await _http.SendAsync(retry, cancellationToken);
+        return await SendOrExitAsync(retry, cancellationToken);
     }
 
     /// <summary>
@@ -321,7 +359,7 @@ public class GrimoireApiClient
         var request = await _adapter.ConvertToNativeRequestAsync<HttpRequestMessage>(info, cancellationToken)
             ?? throw new InvalidOperationException("Failed to build refresh request");
         request.Headers.Add("Cookie", $"{RefreshCookieName}={_config.RefreshToken}");
-        var response = await _http.SendAsync(request, cancellationToken);
+        var response = await SendOrExitAsync(request, cancellationToken);
         if (!response.IsSuccessStatusCode)
         {
             _logger.Debug($"refresh rejected: {(int)response.StatusCode} "
