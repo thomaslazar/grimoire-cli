@@ -34,7 +34,7 @@ namespace GrimoireCli.Generated.Api.Maps.Item.ExportUvtt
         {
         }
         /// <summary>
-        /// Builds a Universal VTT (`.uvtt`) file for a raster map: the image as base64 WebP plus the grid resolution, with empty walls/portals/lights. The grid is the manual override when one is set, else the detected grid, else a 140px default. 400 for PDF, video, archive, or existing Universal VTT maps.
+        /// Builds a Universal VTT (`.uvtt`) file for a raster map: the image as base64 WebP, the grid resolution, and any walls/portals/lights authored in the in-app editor (empty arrays when nothing has been authored). The grid is the manual override when one is set, else the detected grid, else a 140px default. The file is assembled on demand and never written into the library. 400 for PDF, video, archive, or existing Universal VTT maps.
         /// </summary>
         /// <returns>A <see cref="UntypedNode"/></returns>
         /// <param name="cancellationToken">Cancellation token to use when cancelling requests</param>
@@ -57,7 +57,7 @@ namespace GrimoireCli.Generated.Api.Maps.Item.ExportUvtt
             return await RequestAdapter.SendAsync<UntypedNode>(requestInfo, UntypedNode.CreateFromDiscriminatorValue, errorMapping, cancellationToken).ConfigureAwait(false);
         }
         /// <summary>
-        /// Builds a Universal VTT (`.uvtt`) file for a raster map: the image as base64 WebP plus the grid resolution, with empty walls/portals/lights. The grid is the manual override when one is set, else the detected grid, else a 140px default. 400 for PDF, video, archive, or existing Universal VTT maps.
+        /// Builds a Universal VTT (`.uvtt`) file for a raster map: the image as base64 WebP, the grid resolution, and any walls/portals/lights authored in the in-app editor (empty arrays when nothing has been authored). The grid is the manual override when one is set, else the detected grid, else a 140px default. The file is assembled on demand and never written into the library. 400 for PDF, video, archive, or existing Universal VTT maps.
         /// </summary>
         /// <returns>A <see cref="RequestInformation"/></returns>
         /// <param name="requestConfiguration">Configuration for the request such as headers, query parameters, and middleware options.</param>
@@ -85,7 +85,7 @@ namespace GrimoireCli.Generated.Api.Maps.Item.ExportUvtt
             return new global::GrimoireCli.Generated.Api.Maps.Item.ExportUvtt.ExportUvttRequestBuilder(rawUrl, RequestAdapter);
         }
         /// <summary>
-        /// Builds a Universal VTT (`.uvtt`) file for a raster map: the image as base64 WebP plus the grid resolution, with empty walls/portals/lights. The grid is the manual override when one is set, else the detected grid, else a 140px default. 400 for PDF, video, archive, or existing Universal VTT maps.
+        /// Builds a Universal VTT (`.uvtt`) file for a raster map: the image as base64 WebP, the grid resolution, and any walls/portals/lights authored in the in-app editor (empty arrays when nothing has been authored). The grid is the manual override when one is set, else the detected grid, else a 140px default. The file is assembled on demand and never written into the library. 400 for PDF, video, archive, or existing Universal VTT maps.
         /// </summary>
         [global::System.CodeDom.Compiler.GeneratedCode("Kiota", "1.0.0")]
         public partial class ExportUvttRequestBuilderGetQueryParameters 

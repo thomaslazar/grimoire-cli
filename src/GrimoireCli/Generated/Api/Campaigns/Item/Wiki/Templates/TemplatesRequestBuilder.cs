@@ -3,7 +3,6 @@
 using GrimoireCli.Generated.Api.Campaigns.Item.Wiki.Templates.Browse;
 using GrimoireCli.Generated.Api.Campaigns.Item.Wiki.Templates.Download;
 using GrimoireCli.Generated.Api.Campaigns.Item.Wiki.Templates.Item;
-using GrimoireCli.Generated.Api.Campaigns.Item.Wiki.Templates.Source;
 using GrimoireCli.Generated.Api.Campaigns.Item.Wiki.Templates.Upload;
 using GrimoireCli.Generated.Models;
 using Microsoft.Kiota.Abstractions.Extensions;
@@ -31,11 +30,6 @@ namespace GrimoireCli.Generated.Api.Campaigns.Item.Wiki.Templates
         public global::GrimoireCli.Generated.Api.Campaigns.Item.Wiki.Templates.Download.DownloadRequestBuilder Download
         {
             get => new global::GrimoireCli.Generated.Api.Campaigns.Item.Wiki.Templates.Download.DownloadRequestBuilder(PathParameters, RequestAdapter);
-        }
-        /// <summary>The source property</summary>
-        public global::GrimoireCli.Generated.Api.Campaigns.Item.Wiki.Templates.Source.SourceRequestBuilder Source
-        {
-            get => new global::GrimoireCli.Generated.Api.Campaigns.Item.Wiki.Templates.Source.SourceRequestBuilder(PathParameters, RequestAdapter);
         }
         /// <summary>The upload property</summary>
         public global::GrimoireCli.Generated.Api.Campaigns.Item.Wiki.Templates.Upload.UploadRequestBuilder Upload

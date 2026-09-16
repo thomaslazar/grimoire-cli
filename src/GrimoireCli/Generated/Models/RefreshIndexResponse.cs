@@ -16,6 +16,14 @@ namespace GrimoireCli.Generated.Models
         public IDictionary<string, object> AdditionalData { get; set; }
         /// <summary>The count property</summary>
         public int? Count { get; set; }
+        /// <summary>The errors property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public List<global::GrimoireCli.Generated.Models.RefreshIndexResponse_errors>? Errors { get; set; }
+#nullable restore
+#else
+        public List<global::GrimoireCli.Generated.Models.RefreshIndexResponse_errors> Errors { get; set; }
+#endif
         /// <summary>The status property</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
@@ -50,6 +58,7 @@ namespace GrimoireCli.Generated.Models
             return new Dictionary<string, Action<IParseNode>>
             {
                 { "count", n => { Count = n.GetIntValue(); } },
+                { "errors", n => { Errors = n.GetCollectionOfObjectValues<global::GrimoireCli.Generated.Models.RefreshIndexResponse_errors>(global::GrimoireCli.Generated.Models.RefreshIndexResponse_errors.CreateFromDiscriminatorValue)?.AsList(); } },
                 { "status", n => { Status = n.GetStringValue(); } },
             };
         }
@@ -61,6 +70,7 @@ namespace GrimoireCli.Generated.Models
         {
             if(ReferenceEquals(writer, null)) throw new ArgumentNullException(nameof(writer));
             writer.WriteIntValue("count", Count);
+            writer.WriteCollectionOfObjectValues<global::GrimoireCli.Generated.Models.RefreshIndexResponse_errors>("errors", Errors);
             writer.WriteStringValue("status", Status);
             writer.WriteAdditionalData(AdditionalData);
         }

@@ -23,6 +23,8 @@ namespace GrimoireCli.Generated.Models
 #else
         public string ContainerKind { get; set; }
 #endif
+        /// <summary>The frames_container property</summary>
+        public bool? FramesContainer { get; set; }
         /// <summary>The markers property</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
@@ -55,6 +57,7 @@ namespace GrimoireCli.Generated.Models
         public FolderResponse()
         {
             AdditionalData = new Dictionary<string, object>();
+            FramesContainer = false;
             Nsfw = false;
         }
         /// <summary>
@@ -76,6 +79,7 @@ namespace GrimoireCli.Generated.Models
             return new Dictionary<string, Action<IParseNode>>
             {
                 { "container_kind", n => { ContainerKind = n.GetStringValue(); } },
+                { "frames_container", n => { FramesContainer = n.GetBoolValue(); } },
                 { "markers", n => { Markers = n.GetCollectionOfPrimitiveValues<string>()?.AsList(); } },
                 { "name", n => { Name = n.GetObjectValue<global::GrimoireCli.Generated.Models.FolderResponse.FolderResponse_name>(global::GrimoireCli.Generated.Models.FolderResponse.FolderResponse_name.CreateFromDiscriminatorValue); } },
                 { "nsfw", n => { Nsfw = n.GetBoolValue(); } },
@@ -90,6 +94,7 @@ namespace GrimoireCli.Generated.Models
         {
             if(ReferenceEquals(writer, null)) throw new ArgumentNullException(nameof(writer));
             writer.WriteStringValue("container_kind", ContainerKind);
+            writer.WriteBoolValue("frames_container", FramesContainer);
             writer.WriteCollectionOfPrimitiveValues<string>("markers", Markers);
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.FolderResponse.FolderResponse_name>("name", Name);
             writer.WriteBoolValue("nsfw", Nsfw);

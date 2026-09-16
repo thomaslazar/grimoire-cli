@@ -30,6 +30,14 @@ namespace GrimoireCli.Generated.Models
 #else
         public global::GrimoireCli.Generated.Models.AddonSettingsUpdate.AddonSettingsUpdate_index_url IndexUrl { get; set; }
 #endif
+        /// <summary>The index_urls property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public List<string>? IndexUrls { get; set; }
+#nullable restore
+#else
+        public List<string> IndexUrls { get; set; }
+#endif
         /// <summary>
         /// Instantiates a new <see cref="global::GrimoireCli.Generated.Models.AddonSettingsUpdate"/> and sets the default values.
         /// </summary>
@@ -57,6 +65,7 @@ namespace GrimoireCli.Generated.Models
             {
                 { "allow_scripts", n => { AllowScripts = n.GetObjectValue<global::GrimoireCli.Generated.Models.AddonSettingsUpdate.AddonSettingsUpdate_allow_scripts>(global::GrimoireCli.Generated.Models.AddonSettingsUpdate.AddonSettingsUpdate_allow_scripts.CreateFromDiscriminatorValue); } },
                 { "index_url", n => { IndexUrl = n.GetObjectValue<global::GrimoireCli.Generated.Models.AddonSettingsUpdate.AddonSettingsUpdate_index_url>(global::GrimoireCli.Generated.Models.AddonSettingsUpdate.AddonSettingsUpdate_index_url.CreateFromDiscriminatorValue); } },
+                { "index_urls", n => { IndexUrls = n.GetCollectionOfPrimitiveValues<string>()?.AsList(); } },
             };
         }
         /// <summary>
@@ -68,6 +77,7 @@ namespace GrimoireCli.Generated.Models
             if(ReferenceEquals(writer, null)) throw new ArgumentNullException(nameof(writer));
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.AddonSettingsUpdate.AddonSettingsUpdate_allow_scripts>("allow_scripts", AllowScripts);
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.AddonSettingsUpdate.AddonSettingsUpdate_index_url>("index_url", IndexUrl);
+            writer.WriteCollectionOfPrimitiveValues<string>("index_urls", IndexUrls);
             writer.WriteAdditionalData(AdditionalData);
         }
         /// <summary>

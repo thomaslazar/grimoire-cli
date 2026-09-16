@@ -55,6 +55,14 @@ namespace GrimoireCli.Generated.Models
 #else
         public string Subtitle { get; set; }
 #endif
+        /// <summary>The variants property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public List<global::GrimoireCli.Generated.Models.ResourceSearchVariant>? Variants { get; set; }
+#nullable restore
+#else
+        public List<global::GrimoireCli.Generated.Models.ResourceSearchVariant> Variants { get; set; }
+#endif
         /// <summary>
         /// Instantiates a new <see cref="global::GrimoireCli.Generated.Models.ResourceSearchHit"/> and sets the default values.
         /// </summary>
@@ -85,6 +93,7 @@ namespace GrimoireCli.Generated.Models
                 { "resource_id", n => { ResourceId = n.GetStringValue(); } },
                 { "resource_type", n => { ResourceType = n.GetStringValue(); } },
                 { "subtitle", n => { Subtitle = n.GetStringValue(); } },
+                { "variants", n => { Variants = n.GetCollectionOfObjectValues<global::GrimoireCli.Generated.Models.ResourceSearchVariant>(global::GrimoireCli.Generated.Models.ResourceSearchVariant.CreateFromDiscriminatorValue)?.AsList(); } },
             };
         }
         /// <summary>
@@ -99,6 +108,7 @@ namespace GrimoireCli.Generated.Models
             writer.WriteStringValue("resource_id", ResourceId);
             writer.WriteStringValue("resource_type", ResourceType);
             writer.WriteStringValue("subtitle", Subtitle);
+            writer.WriteCollectionOfObjectValues<global::GrimoireCli.Generated.Models.ResourceSearchVariant>("variants", Variants);
             writer.WriteAdditionalData(AdditionalData);
         }
         /// <summary>

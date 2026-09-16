@@ -8,7 +8,7 @@ using System;
 namespace GrimoireCli.Generated.Models
 {
     /// <summary>
-    /// Rename a tag&apos;s human-facing display value (internal key is immutable).
+    /// Rename a tag&apos;s human-facing display value.The internal key follows the new display when its normalized form changes,so the new value has to be addressable too — which is what lets a tag thatalready contains a slash be renamed out of trouble.
     /// </summary>
     [global::System.CodeDom.Compiler.GeneratedCode("Kiota", "1.0.0")]
     public partial class TagDisplayUpdate : IAdditionalDataHolder, IParsable

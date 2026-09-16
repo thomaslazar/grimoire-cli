@@ -62,18 +62,20 @@ public class FilesServiceTests
     [Fact]
     public void OmittedMarkerFieldsAreAbsentFromTheBody()
     {
-        var body = FilesService.BuildMarkersBody("books/X", null, null);
+        var body = FilesService.BuildMarkersBody("books/X", null, null, null);
         Assert.Equal("books/X", body.Path);
         Assert.Null(body.ContainerKind);
         Assert.Null(body.Nsfw);
+        Assert.Null(body.FramesContainer);
     }
 
     [Fact]
     public void GivenMarkerFieldsLandOnTheirWrapperBranches()
     {
-        var body = FilesService.BuildMarkersBody("books/X", "parent", true);
+        var body = FilesService.BuildMarkersBody("books/X", "parent", true, true);
         Assert.Equal("parent", body.ContainerKind?.String);
         Assert.True(body.Nsfw?.Boolean);
+        Assert.True(body.FramesContainer?.Boolean);
     }
 
     // Clearing a container kind is expressed as "", which must survive rather
@@ -81,7 +83,7 @@ public class FilesServiceTests
     [Fact]
     public void AnEmptyContainerKindSurvivesAsAnEmptyString()
     {
-        var body = FilesService.BuildMarkersBody("books/X", "", null);
+        var body = FilesService.BuildMarkersBody("books/X", "", null, null);
         Assert.NotNull(body.ContainerKind);
         Assert.Equal("", body.ContainerKind?.String);
     }
@@ -89,9 +91,11 @@ public class FilesServiceTests
     [Fact]
     public void FalseIsSentForNsfwRatherThanTreatedAsAbsent()
     {
-        var body = FilesService.BuildMarkersBody("books/X", null, false);
+        var body = FilesService.BuildMarkersBody("books/X", null, false, false);
         Assert.NotNull(body.Nsfw);
         Assert.False(body.Nsfw?.Boolean);
+        Assert.NotNull(body.FramesContainer);
+        Assert.False(body.FramesContainer?.Boolean);
     }
 
     [Fact]
