@@ -81,4 +81,56 @@ public class MapsCommandTests
     {
         Assert.Contains("\"folder_tags\"", Help(["maps", "get"], full: true));
     }
+
+    [Theory]
+    [InlineData("update")]
+    [InlineData("batch-update")]
+    [InlineData("batch-tag")]
+    public void WritesDeclareTheGmOrAdminRole(string sub)
+    {
+        Assert.Contains("Role required:\n  gm or admin\n", Help(["maps", sub]));
+    }
+
+    [Fact]
+    public void UpdateRequiresExactlyOneBodySource()
+    {
+        Assert.NotEmpty(MapsCommand.Create().Parse(["update", "--id", "x"]).Errors);
+        Assert.NotEmpty(MapsCommand.Create()
+            .Parse(["update", "--id", "x", "--stdin", "--input", "f.json"]).Errors);
+    }
+
+    // The asymmetry a caller cannot guess: a 0 clears on update and is dropped
+    // on batch-update, so both commands have to say so.
+    [Fact]
+    public void UpdateDocumentsTheGridClear()
+    {
+        Assert.Contains("0 to clear", Help(["maps", "update"]));
+    }
+
+    [Fact]
+    public void BatchUpdateSaysItCannotClearAGrid()
+    {
+        Assert.Contains("cannot", Help(["maps", "batch-update"]));
+    }
+
+    // grid_warning is not a partial write; conflating it with exit 3 would tell
+    // a caller a successful write failed.
+    [Fact]
+    public void UpdateSaysTheGridWarningIsAdvisory()
+    {
+        Assert.Contains("advisory", Help(["maps", "update"]));
+    }
+
+    [Fact]
+    public void BatchesDocumentTheThousandItemCap()
+    {
+        Assert.Contains("1000", Help(["maps", "batch-update"]));
+        Assert.Contains("1000", Help(["maps", "batch-tag"]));
+    }
+
+    [Fact]
+    public void UpdateRendersTheRequestShape()
+    {
+        Assert.Contains("\"grid_px\"", Help(["maps", "update"], full: true));
+    }
 }
