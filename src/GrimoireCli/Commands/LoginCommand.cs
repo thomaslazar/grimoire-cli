@@ -10,7 +10,7 @@ public static class LoginCommand
 
     public static Command Create()
     {
-        var serverOption = new Option<string?>("--server") { Description = "Grimoire server URL" };
+        var serverOption = new Option<string?>("--server") { Description = "Grimoire server URL; falls back to GRIMOIRE_SERVER, then prompts" };
         var usernameOption = new Option<string?>("--username") { Description = "Username (prompts if omitted)" };
         var passwordOption = new Option<string?>("--password") { Description = "Password — visible in process list / shell history; prefer --password-stdin" };
         var passwordStdinOption = new Option<bool>("--password-stdin") { Description = "Read the password from the first line of stdin" };
@@ -29,7 +29,13 @@ public static class LoginCommand
             "grimoire-cli login --server https://grimoire.example.com --username agent --password-stdin <<<\"$GRIMOIRE_PW\"");
         command.SetAction(async (parseResult, cancellationToken) =>
         {
-            var server = parseResult.GetValue(serverOption);
+            // GRIMOIRE_SERVER before the prompt, so the variable that serves every
+            // other command also serves the one that establishes the server — and so
+            // an unattended login has a way in that is not the flag. The prompt is
+            // last because a non-interactive caller gets null from ReadLine and the
+            // empty-answer guard below turns that into a readable exit.
+            var server = parseResult.GetValue(serverOption)
+                ?? Environment.GetEnvironmentVariable("GRIMOIRE_SERVER");
             var configManager = new ConfigManager();
             if (server == null)
             {
