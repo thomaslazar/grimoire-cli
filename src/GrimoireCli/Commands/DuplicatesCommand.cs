@@ -28,10 +28,9 @@ public static class DuplicatesCommand
     {
         var inputOption = new Option<string?>("--input") { Description = "Read the body from this file" };
         var stdinOption = new Option<bool>("--stdin") { Description = "Read the body from stdin" };
-        var serverOption = new Option<string?>("--server") { Description = "Server URL override" };
         var command = new Command("link", "File items under a parent as its variants")
         {
-            inputOption, stdinOption, serverOption
+            inputOption, stdinOption
         };
         command.AddRoleRequired("admin");
         JsonBodyInput.RequireExactlyOneSource(command, inputOption, stdinOption);
@@ -76,7 +75,7 @@ public static class DuplicatesCommand
                 _logger.Error(ex.Message);
                 return 1;
             }
-            var (client, _) = CommandHelper.BuildClient(serverOverride: parseResult.GetValue(serverOption));
+            var (client, _) = CommandHelper.BuildClient();
             var result = await new DuplicatesService(client).LinkAsync(body);
             ConsoleOutput.WriteRawJson(result);
             return BulkExit.CodeFor(GrimoireApiClient.HasItems(result, "errors"));
@@ -92,10 +91,9 @@ public static class DuplicatesCommand
         var oldParentIdOption = new Option<string>("--old-parent-id") { Description = "Item to demote", Required = true };
         var kindOption = new Option<string?>("--kind") { Description = "The old parent's kind once demoted; default other" };
         var labelOption = new Option<string?>("--label") { Description = "The old parent's label once demoted" };
-        var serverOption = new Option<string?>("--server") { Description = "Server URL override" };
         var command = new Command("promote", "Make a different copy the main version of a family")
         {
-            resourceTypeOption, newParentIdOption, oldParentIdOption, kindOption, labelOption, serverOption
+            resourceTypeOption, newParentIdOption, oldParentIdOption, kindOption, labelOption
         };
         command.AddRoleRequired("admin");
         command.AddHelpSection("Notes", HelpSectionPosition.Top,
@@ -107,7 +105,7 @@ public static class DuplicatesCommand
         command.AddResponseExample<Generated.Models.PromoteResult>();
         command.SetAction(async (parseResult, cancellationToken) =>
         {
-            var (client, _) = CommandHelper.BuildClient(serverOverride: parseResult.GetValue(serverOption));
+            var (client, _) = CommandHelper.BuildClient();
             var result = await new DuplicatesService(client).PromoteAsync(
                 parseResult.GetValue(resourceTypeOption)!,
                 parseResult.GetValue(newParentIdOption)!,
@@ -130,10 +128,9 @@ public static class DuplicatesCommand
             AllowMultipleArgumentsPerToken = true,
         };
         var parentIdOption = new Option<string?>("--parent-id") { Description = "Free every variant of this parent" };
-        var serverOption = new Option<string?>("--server") { Description = "Server URL override" };
         var command = new Command("unlink", "Promote variants back to standalone entries")
         {
-            resourceTypeOption, idsOption, parentIdOption, serverOption
+            resourceTypeOption, idsOption, parentIdOption
         };
         command.AddRoleRequired("admin");
         command.Validators.Add(result =>
@@ -153,7 +150,7 @@ public static class DuplicatesCommand
         command.AddResponseExample<Generated.Models.UnlinkResult>();
         command.SetAction(async (parseResult, cancellationToken) =>
         {
-            var (client, _) = CommandHelper.BuildClient(serverOverride: parseResult.GetValue(serverOption));
+            var (client, _) = CommandHelper.BuildClient();
             var result = await new DuplicatesService(client).UnlinkAsync(
                 parseResult.GetValue(resourceTypeOption)!,
                 parseResult.GetValue(idsOption) ?? [],
@@ -177,10 +174,9 @@ public static class DuplicatesCommand
             AllowMultipleArgumentsPerToken = true,
         };
         var overwriteOption = new Option<bool>("--overwrite") { Description = "Replace values already set on the target" };
-        var serverOption = new Option<string?>("--server") { Description = "Server URL override" };
         var command = new Command("merge-metadata", "Copy metadata fields from one copy onto another")
         {
-            resourceTypeOption, sourceIdOption, targetIdOption, fieldsOption, overwriteOption, serverOption
+            resourceTypeOption, sourceIdOption, targetIdOption, fieldsOption, overwriteOption
         };
         command.AddRoleRequired("admin");
         command.AddHelpSection("Notes", HelpSectionPosition.Top,
@@ -200,7 +196,7 @@ public static class DuplicatesCommand
         command.AddResponseExample<Generated.Models.MergeMetadataResult>();
         command.SetAction(async (parseResult, cancellationToken) =>
         {
-            var (client, _) = CommandHelper.BuildClient(serverOverride: parseResult.GetValue(serverOption));
+            var (client, _) = CommandHelper.BuildClient();
             var result = await new DuplicatesService(client).MergeMetadataAsync(
                 parseResult.GetValue(resourceTypeOption)!,
                 parseResult.GetValue(sourceIdOption)!,
@@ -225,10 +221,9 @@ public static class DuplicatesCommand
             Arity = ArgumentArity.ExactlyOne,
         };
         var reparentToOption = new Option<string?>("--reparent-to") { Description = "Which variant inherits the rest; \"\" frees them all" };
-        var serverOption = new Option<string?>("--server") { Description = "Server URL override" };
         var command = new Command("delete", "Delete one duplicate's record, and optionally its file")
         {
-            resourceTypeOption, idOption, deleteFileOption, reparentToOption, serverOption
+            resourceTypeOption, idOption, deleteFileOption, reparentToOption
         };
         command.AddRoleRequired("admin");
         // Option<bool>.Required isn't enforced by System.CommandLine — bool's own
@@ -255,7 +250,7 @@ public static class DuplicatesCommand
         command.AddResponseExample<Generated.Models.DeleteItemResult>();
         command.SetAction(async (parseResult, cancellationToken) =>
         {
-            var (client, _) = CommandHelper.BuildClient(serverOverride: parseResult.GetValue(serverOption));
+            var (client, _) = CommandHelper.BuildClient();
             var result = await new DuplicatesService(client).DeleteItemAsync(
                 parseResult.GetValue(resourceTypeOption)!,
                 parseResult.GetValue(idOption)!,
@@ -277,10 +272,9 @@ public static class DuplicatesCommand
             Required = true,
             AllowMultipleArgumentsPerToken = true,
         };
-        var serverOption = new Option<string?>("--server") { Description = "Server URL override" };
         var command = new Command("compare", "Compare two to four copies side by side")
         {
-            resourceTypeOption, idsOption, serverOption
+            resourceTypeOption, idsOption
         };
         command.AddRoleRequired("admin");
         command.AddHelpSection("Notes", HelpSectionPosition.Top,
@@ -293,7 +287,7 @@ public static class DuplicatesCommand
         command.AddResponseExample<Generated.Models.CompareResult>();
         command.SetAction(async (parseResult, cancellationToken) =>
         {
-            var (client, _) = CommandHelper.BuildClient(serverOverride: parseResult.GetValue(serverOption));
+            var (client, _) = CommandHelper.BuildClient();
             var result = await new DuplicatesService(client).CompareAsync(
                 parseResult.GetValue(resourceTypeOption)!,
                 parseResult.GetValue(idsOption)!);

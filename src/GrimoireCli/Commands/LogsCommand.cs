@@ -14,10 +14,9 @@ public static class LogsCommand
         var limitOption = OptionHelpers.Range("--limit", "Entries to return; default 200, max 20000", 1, 20000);
         var offsetOption = OptionHelpers.Range("--offset", "Entries to skip from the newest end", 0);
         var afterSeqOption = OptionHelpers.Range("--after-seq", "Return only entries newer than this seq", 0);
-        var serverOption = new Option<string?>("--server") { Description = "Server URL override" };
         var command = new Command("logs", "Read the server's application log")
         {
-            levelOption, limitOption, offsetOption, afterSeqOption, serverOption
+            levelOption, limitOption, offsetOption, afterSeqOption
         };
         command.AddRoleRequired("admin");
         command.AddHelpSection("Notes", HelpSectionPosition.Top,
@@ -42,7 +41,7 @@ public static class LogsCommand
         command.AddResponseExample<Generated.Models.LogsResponse>();
         command.SetAction(async (parseResult, cancellationToken) =>
         {
-            var (client, _) = CommandHelper.BuildClient(serverOverride: parseResult.GetValue(serverOption));
+            var (client, _) = CommandHelper.BuildClient();
             var result = await new LogsService(client).ReadAsync(
                 parseResult.GetValue(levelOption),
                 parseResult.GetValue(limitOption),

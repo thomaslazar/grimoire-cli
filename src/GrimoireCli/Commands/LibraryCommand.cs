@@ -23,10 +23,9 @@ public static class LibraryCommand
     {
         var scopeOption = new Option<string?>("--scope") { Description = "Restrict the scan to a subtree" };
         var metadataModeOption = OptionHelpers.Choice("--metadata-mode", "Re-apply OPF sidecar metadata", MetadataModes);
-        var serverOption = new Option<string?>("--server") { Description = "Server URL override" };
         var command = new Command("rescan", "Scan the library for new and changed files")
         {
-            scopeOption, metadataModeOption, serverOption
+            scopeOption, metadataModeOption
         };
         command.AddRoleRequired("admin");
         command.AddHelpSection("Notes", HelpSectionPosition.Top,
@@ -45,7 +44,7 @@ public static class LibraryCommand
         command.AddResponseExample<Generated.Models.Backend__routers__library___schemas__StatusResponse>();
         command.SetAction(async (parseResult, cancellationToken) =>
         {
-            var (client, _) = CommandHelper.BuildClient(serverOverride: parseResult.GetValue(serverOption));
+            var (client, _) = CommandHelper.BuildClient();
             var service = new LibraryService(client);
             var result = await service.RescanAsync(
                 parseResult.GetValue(scopeOption), parseResult.GetValue(metadataModeOption));
@@ -57,11 +56,7 @@ public static class LibraryCommand
 
     private static Command CreateScanStatusCommand()
     {
-        var serverOption = new Option<string?>("--server") { Description = "Server URL override" };
-        var command = new Command("scan-status", "Show the running scan's progress")
-        {
-            serverOption
-        };
+        var command = new Command("scan-status", "Show the running scan's progress");
         command.AddRoleRequired("admin");
         command.AddHelpSection("Notes", HelpSectionPosition.Top,
             "phase is scanning, indexing or ocr; the counters belong to the scan in",
@@ -73,7 +68,7 @@ public static class LibraryCommand
         command.AddResponseExample<Generated.Models.ScanStatusResponse>();
         command.SetAction(async (parseResult, cancellationToken) =>
         {
-            var (client, _) = CommandHelper.BuildClient(serverOverride: parseResult.GetValue(serverOption));
+            var (client, _) = CommandHelper.BuildClient();
             var service = new LibraryService(client);
             var result = await service.ScanStatusAsync();
             ConsoleOutput.WriteRawJson(result);
@@ -84,18 +79,14 @@ public static class LibraryCommand
 
     private static Command CreateCancelScanCommand()
     {
-        var serverOption = new Option<string?>("--server") { Description = "Server URL override" };
-        var command = new Command("cancel-scan", "Stop the running scan")
-        {
-            serverOption
-        };
+        var command = new Command("cancel-scan", "Stop the running scan");
         command.AddRoleRequired("admin");
         command.AddHelpSection("Notes", HelpSectionPosition.Top,
             "Requests a graceful stop; the scan ends at its next checkpoint. Exits 0",
             "whether or not one was running.");
         command.SetAction(async (parseResult, cancellationToken) =>
         {
-            var (client, _) = CommandHelper.BuildClient(serverOverride: parseResult.GetValue(serverOption));
+            var (client, _) = CommandHelper.BuildClient();
             var service = new LibraryService(client);
             var response = await service.CancelScanAsync();
             ConsoleOutput.WriteRawJson(response);
@@ -106,11 +97,7 @@ public static class LibraryCommand
 
     private static Command CreateCleanupMissingCommand()
     {
-        var serverOption = new Option<string?>("--server") { Description = "Server URL override" };
-        var command = new Command("cleanup-missing", "Remove DB entries for files no longer on disk")
-        {
-            serverOption
-        };
+        var command = new Command("cleanup-missing", "Remove DB entries for files no longer on disk");
         command.AddRoleRequired("admin");
         command.AddHelpSection("Notes", HelpSectionPosition.Top,
             "Deletes DB rows for files no longer on disk, each book's search index",
@@ -130,7 +117,7 @@ public static class LibraryCommand
         command.AddResponseExample<Generated.Models.CleanupResponse>();
         command.SetAction(async (parseResult, cancellationToken) =>
         {
-            var (client, _) = CommandHelper.BuildClient(serverOverride: parseResult.GetValue(serverOption));
+            var (client, _) = CommandHelper.BuildClient();
             var service = new LibraryService(client);
             var result = await service.CleanupMissingAsync();
             ConsoleOutput.WriteRawJson(result);

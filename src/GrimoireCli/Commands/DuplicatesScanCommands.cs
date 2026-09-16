@@ -43,10 +43,9 @@ public static class DuplicatesScanCommands
         resourceTypesOption.CompletionSources.Add(DuplicatesCommand.ResourceTypes);
         var accuracyOption = OptionHelpers.Choice(
             "--accuracy", "Detection accuracy; default medium", ["exact", "high", "medium", "low"]);
-        var serverOption = new Option<string?>("--server") { Description = "Server URL override" };
         var command = new Command("scan", "Start a duplicate-detection pass")
         {
-            resourceTypesOption, accuracyOption, serverOption
+            resourceTypesOption, accuracyOption
         };
         command.AddRoleRequired("admin");
         command.AddHelpSection("Notes", HelpSectionPosition.Top,
@@ -68,7 +67,7 @@ public static class DuplicatesScanCommands
         command.AddResponseExample<Generated.Models.ScanTriggerResult>();
         command.SetAction(async (parseResult, cancellationToken) =>
         {
-            var (client, _) = CommandHelper.BuildClient(serverOverride: parseResult.GetValue(serverOption));
+            var (client, _) = CommandHelper.BuildClient();
             var result = await new DuplicatesService(client).ScanAsync(
                 parseResult.GetValue(resourceTypesOption) ?? [],
                 parseResult.GetValue(accuracyOption));
@@ -80,17 +79,13 @@ public static class DuplicatesScanCommands
 
     private static Command CreateScanStatusCommand()
     {
-        var serverOption = new Option<string?>("--server") { Description = "Server URL override" };
-        var command = new Command("scan-status", "Show the duplicate scan's progress")
-        {
-            serverOption
-        };
+        var command = new Command("scan-status", "Show the duplicate scan's progress");
         command.AddRoleRequired("admin");
         command.AddExamples("grimoire-cli duplicates scan-status");
         command.AddResponseExample<Generated.Models.ScanStatus>();
         command.SetAction(async (parseResult, cancellationToken) =>
         {
-            var (client, _) = CommandHelper.BuildClient(serverOverride: parseResult.GetValue(serverOption));
+            var (client, _) = CommandHelper.BuildClient();
             var result = await new DuplicatesService(client).ScanStatusAsync();
             ConsoleOutput.WriteRawJson(result);
             return 0;
@@ -100,11 +95,7 @@ public static class DuplicatesScanCommands
 
     private static Command CreateCancelScanCommand()
     {
-        var serverOption = new Option<string?>("--server") { Description = "Server URL override" };
-        var command = new Command("cancel-scan", "Stop the running duplicate scan")
-        {
-            serverOption
-        };
+        var command = new Command("cancel-scan", "Stop the running duplicate scan");
         command.AddRoleRequired("admin");
         command.AddHelpSection("Notes", HelpSectionPosition.Top,
             "Requests a stop rather than waiting for one; poll scan-status. Reports",
@@ -114,7 +105,7 @@ public static class DuplicatesScanCommands
         command.AddResponseExample<Generated.Models.ScanTriggerResult>();
         command.SetAction(async (parseResult, cancellationToken) =>
         {
-            var (client, _) = CommandHelper.BuildClient(serverOverride: parseResult.GetValue(serverOption));
+            var (client, _) = CommandHelper.BuildClient();
             var result = await new DuplicatesService(client).CancelScanAsync();
             ConsoleOutput.WriteRawJson(result);
             return 0;
@@ -128,10 +119,9 @@ public static class DuplicatesScanCommands
         var minConfidenceOption = new Option<double?>("--min-confidence") { Description = "Drop groups below this score" };
         var limitOption = OptionHelpers.Range("--limit", "Groups to return; default 50, max 200", 1, 200);
         var offsetOption = OptionHelpers.Range("--offset", "Groups to skip", 0);
-        var serverOption = new Option<string?>("--server") { Description = "Server URL override" };
         var command = new Command("groups", "List candidate duplicate groups from the last scan")
         {
-            resourceTypeOption, minConfidenceOption, limitOption, offsetOption, serverOption
+            resourceTypeOption, minConfidenceOption, limitOption, offsetOption
         };
         command.AddRoleRequired("admin");
         command.AddHelpSection("Notes", HelpSectionPosition.Top,
@@ -147,7 +137,7 @@ public static class DuplicatesScanCommands
         command.AddResponseExample<Generated.Models.GroupListResponse>();
         command.SetAction(async (parseResult, cancellationToken) =>
         {
-            var (client, _) = CommandHelper.BuildClient(serverOverride: parseResult.GetValue(serverOption));
+            var (client, _) = CommandHelper.BuildClient();
             var result = await new DuplicatesService(client).GroupsAsync(
                 parseResult.GetValue(resourceTypeOption),
                 parseResult.GetValue(minConfidenceOption),
@@ -170,10 +160,9 @@ public static class DuplicatesScanCommands
             AllowMultipleArgumentsPerToken = true,
         };
         var noteOption = new Option<string?>("--note") { Description = "Why they are not duplicates" };
-        var serverOption = new Option<string?>("--server") { Description = "Server URL override" };
         var command = new Command("dismiss", "Mark a group as not duplicates")
         {
-            resourceTypeOption, memberIdsOption, noteOption, serverOption
+            resourceTypeOption, memberIdsOption, noteOption
         };
         command.AddRoleRequired("admin");
         command.AddHelpSection("Notes", HelpSectionPosition.Top,
@@ -183,7 +172,7 @@ public static class DuplicatesScanCommands
         command.AddResponseExample<Generated.Models.DismissalOut>();
         command.SetAction(async (parseResult, cancellationToken) =>
         {
-            var (client, _) = CommandHelper.BuildClient(serverOverride: parseResult.GetValue(serverOption));
+            var (client, _) = CommandHelper.BuildClient();
             var result = await new DuplicatesService(client).DismissAsync(
                 parseResult.GetValue(resourceTypeOption)!,
                 parseResult.GetValue(memberIdsOption)!,
@@ -197,17 +186,16 @@ public static class DuplicatesScanCommands
     private static Command CreateDismissalsCommand()
     {
         var resourceTypeOption = OptionHelpers.Choice("--resource-type", "Collection to act on", DuplicatesCommand.ResourceTypes);
-        var serverOption = new Option<string?>("--server") { Description = "Server URL override" };
         var command = new Command("dismissals", "List dismissed groups")
         {
-            resourceTypeOption, serverOption
+            resourceTypeOption
         };
         command.AddRoleRequired("admin");
         command.AddExamples("grimoire-cli duplicates dismissals");
         command.AddResponseExample<Generated.Models.DismissalListResponse>();
         command.SetAction(async (parseResult, cancellationToken) =>
         {
-            var (client, _) = CommandHelper.BuildClient(serverOverride: parseResult.GetValue(serverOption));
+            var (client, _) = CommandHelper.BuildClient();
             var result = await new DuplicatesService(client).DismissalsAsync(parseResult.GetValue(resourceTypeOption));
             ConsoleOutput.WriteRawJson(result);
             return 0;
@@ -218,17 +206,16 @@ public static class DuplicatesScanCommands
     private static Command CreateUndismissCommand()
     {
         var idOption = new Option<string>("--id") { Description = "Dismissal to undo, from dismissals", Required = true };
-        var serverOption = new Option<string?>("--server") { Description = "Server URL override" };
         var command = new Command("undismiss", "Undo a dismissal, so the group can be found again")
         {
-            idOption, serverOption
+            idOption
         };
         command.AddRoleRequired("admin");
         command.AddExamples("grimoire-cli duplicates undismiss --id <dismissal-id>");
         command.AddResponseExample<Generated.Models.ScanTriggerResult>();
         command.SetAction(async (parseResult, cancellationToken) =>
         {
-            var (client, _) = CommandHelper.BuildClient(serverOverride: parseResult.GetValue(serverOption));
+            var (client, _) = CommandHelper.BuildClient();
             var result = await new DuplicatesService(client).UndismissAsync(parseResult.GetValue(idOption)!);
             ConsoleOutput.WriteRawJson(result);
             return 0;

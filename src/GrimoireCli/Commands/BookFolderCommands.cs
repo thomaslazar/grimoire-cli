@@ -20,10 +20,9 @@ public static class BookFolderCommands
     private static Command CreateListCommand()
     {
         var idOption = new Option<string>("--id") { Description = "System ID", Required = true };
-        var serverOption = new Option<string?>("--server") { Description = "Server URL override" };
         var command = new Command("list", "List a system's tagged subcategory folders")
         {
-            idOption, serverOption
+            idOption
         };
         command.AddHelpSection("Notes", HelpSectionPosition.Top,
             "Folders that have been tagged, not the folders on disk — a record is",
@@ -37,7 +36,7 @@ public static class BookFolderCommands
         command.AddResponseExample<Generated.Models.BookFoldersResponse>();
         command.SetAction(async (parseResult, cancellationToken) =>
         {
-            var (client, _) = CommandHelper.BuildClient(serverOverride: parseResult.GetValue(serverOption));
+            var (client, _) = CommandHelper.BuildClient();
             var service = new SystemsService(client);
             var result = await service.BookFoldersAsync(parseResult.GetValue(idOption)!);
             ConsoleOutput.WriteRawJson(result);
@@ -51,10 +50,9 @@ public static class BookFolderCommands
         var idOption = new Option<string>("--id") { Description = "System ID", Required = true };
         var inputOption = new Option<string?>("--input") { Description = "Read the body from this file" };
         var stdinOption = new Option<bool>("--stdin") { Description = "Read the body from stdin" };
-        var serverOption = new Option<string?>("--server") { Description = "Server URL override" };
         var command = new Command("set", "Set a subcategory folder's tags")
         {
-            idOption, inputOption, stdinOption, serverOption
+            idOption, inputOption, stdinOption
         };
         command.AddRoleRequired("gm or admin");
         JsonBodyInput.RequireExactlyOneSource(command, inputOption, stdinOption);
@@ -86,7 +84,7 @@ public static class BookFolderCommands
                 _logger.Error(ex.Message);
                 return 1;
             }
-            var (client, _) = CommandHelper.BuildClient(serverOverride: parseResult.GetValue(serverOption));
+            var (client, _) = CommandHelper.BuildClient();
             var service = new SystemsService(client);
             var result = await service.SetBookFolderAsync(parseResult.GetValue(idOption)!, body);
             ConsoleOutput.WriteRawJson(result);
@@ -99,10 +97,9 @@ public static class BookFolderCommands
     {
         var idOption = new Option<string>("--id") { Description = "System ID", Required = true };
         var pathOption = new Option<string>("--path") { Description = "Folder path to remove", Required = true };
-        var serverOption = new Option<string?>("--server") { Description = "Server URL override" };
         var command = new Command("delete", "Remove a subcategory folder's record")
         {
-            idOption, pathOption, serverOption
+            idOption, pathOption
         };
         command.AddRoleRequired("gm or admin");
         command.AddHelpSection("Notes", HelpSectionPosition.Top,
@@ -115,7 +112,7 @@ public static class BookFolderCommands
         command.AddResponseExample<Generated.Models.Backend__routers__systems___schemas__StatusResponse>();
         command.SetAction(async (parseResult, cancellationToken) =>
         {
-            var (client, _) = CommandHelper.BuildClient(serverOverride: parseResult.GetValue(serverOption));
+            var (client, _) = CommandHelper.BuildClient();
             var service = new SystemsService(client);
             var result = await service.DeleteBookFolderAsync(
                 parseResult.GetValue(idOption)!, parseResult.GetValue(pathOption)!);

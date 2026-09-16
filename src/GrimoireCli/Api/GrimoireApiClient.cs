@@ -46,8 +46,8 @@ public class GrimoireApiClient
             // Every request now carries an absolute URI from the generated builders, so
             // this no longer does any routing — but it still does two real jobs: the
             // `Uri` constructor validates `config.Server` eagerly, so a malformed
-            // `--server` throws here rather than at first send, and the debug line below
-            // reads it. Do not delete it, and do not "keep it in sync" with
+            // server URL throws here rather than at first send, and the debug line
+            // below reads it. Do not delete it, and do not "keep it in sync" with
             // `_adapter.BaseUrl`, which correctly has no trailing slash.
             BaseAddress = new Uri(config.Server!.TrimEnd('/') + "/"),
             // Timeouts are managed per-request via CancellationTokenSource so long

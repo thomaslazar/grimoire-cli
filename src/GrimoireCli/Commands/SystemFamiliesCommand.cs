@@ -15,13 +15,12 @@ public static class SystemFamiliesCommand
 
     private static Command CreateListCommand()
     {
-        var serverOption = new Option<string?>("--server") { Description = "Server URL override" };
-        var command = new Command("list", "List all system families") { serverOption };
+        var command = new Command("list", "List all system families");
         command.AddExamples("grimoire-cli system-families list");
         command.AddResponseExample<Generated.Models.SystemFamiliesResponse>();
         command.SetAction(async (parseResult, cancellationToken) =>
         {
-            var (client, _) = CommandHelper.BuildClient(serverOverride: parseResult.GetValue(serverOption));
+            var (client, _) = CommandHelper.BuildClient();
             var service = new SystemFamiliesService(client);
             var result = await service.ListAsync();
             ConsoleOutput.WriteRawJson(result);

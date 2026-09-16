@@ -26,10 +26,9 @@ public static class CoverCommands
             Description = "Output file path, or '-' for binary to stdout",
             Required = true,
         };
-        var serverOption = new Option<string?>("--server") { Description = "Server URL override" };
         var command = new Command("get", "Download the system's cover image")
         {
-            idOption, outputOption, serverOption
+            idOption, outputOption
         };
         command.AddHelpSection("Notes", HelpSectionPosition.Top,
             "Serves folder cover art if the system's library folder has a cover.* or",
@@ -44,7 +43,7 @@ public static class CoverCommands
         command.AddResponseExample<SavedFile>();
         command.SetAction(async (parseResult, cancellationToken) =>
         {
-            var (client, _) = CommandHelper.BuildClient(serverOverride: parseResult.GetValue(serverOption));
+            var (client, _) = CommandHelper.BuildClient();
             var service = new SystemsService(client);
             await using var stream = await service.CoverAsync(parseResult.GetValue(idOption)!);
             try
@@ -65,10 +64,9 @@ public static class CoverCommands
     {
         var idOption = new Option<string>("--id") { Description = "System ID", Required = true };
         var fileOption = new Option<string>("--file") { Description = "Path to a PNG, JPEG, WebP or GIF", Required = true };
-        var serverOption = new Option<string?>("--server") { Description = "Server URL override" };
         var command = new Command("upload", "Upload the system's cover image")
         {
-            idOption, fileOption, serverOption
+            idOption, fileOption
         };
         command.AddRoleRequired("gm or admin");
         command.AddHelpSection("Notes", HelpSectionPosition.Top,
@@ -81,7 +79,7 @@ public static class CoverCommands
         command.AddResponseExample<Generated.Models.SystemCoverResponse>();
         command.SetAction(async (parseResult, cancellationToken) =>
         {
-            var (client, _) = CommandHelper.BuildClient(serverOverride: parseResult.GetValue(serverOption));
+            var (client, _) = CommandHelper.BuildClient();
             var service = new SystemsService(client);
             string result;
             try
@@ -102,10 +100,9 @@ public static class CoverCommands
     private static Command CreateDeleteCommand()
     {
         var idOption = new Option<string>("--id") { Description = "System ID", Required = true };
-        var serverOption = new Option<string?>("--server") { Description = "Server URL override" };
         var command = new Command("delete", "Delete the system's uploaded cover image")
         {
-            idOption, serverOption
+            idOption
         };
         command.AddRoleRequired("gm or admin");
         command.AddHelpSection("Notes", HelpSectionPosition.Top,
@@ -116,7 +113,7 @@ public static class CoverCommands
         command.AddExamples("grimoire-cli systems cover delete --id <system-id>");
         command.SetAction(async (parseResult, cancellationToken) =>
         {
-            var (client, _) = CommandHelper.BuildClient(serverOverride: parseResult.GetValue(serverOption));
+            var (client, _) = CommandHelper.BuildClient();
             var service = new SystemsService(client);
             var response = await service.DeleteCoverAsync(parseResult.GetValue(idOption)!);
             ConsoleOutput.WriteRawJson(response);

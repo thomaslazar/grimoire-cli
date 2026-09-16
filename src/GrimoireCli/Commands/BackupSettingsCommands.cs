@@ -22,11 +22,7 @@ public static class BackupSettingsCommands
 
     private static Command CreateGetCommand()
     {
-        var serverOption = new Option<string?>("--server") { Description = "Server URL override" };
-        var command = new Command("get", "Read the backup schedule and retention settings")
-        {
-            serverOption
-        };
+        var command = new Command("get", "Read the backup schedule and retention settings");
         command.AddRoleRequired("admin");
         command.AddHelpSection("Notes", HelpSectionPosition.Top,
             "A field whose *_env_locked is true is pinned by an environment variable;",
@@ -35,7 +31,7 @@ public static class BackupSettingsCommands
         command.AddResponseExample<Generated.Models.BackupSettingsResponse>();
         command.SetAction(async (parseResult, cancellationToken) =>
         {
-            var (client, _) = CommandHelper.BuildClient(serverOverride: parseResult.GetValue(serverOption));
+            var (client, _) = CommandHelper.BuildClient();
             var service = new BackupsService(client);
             var result = await service.SettingsAsync();
             ConsoleOutput.WriteRawJson(result);
@@ -53,12 +49,10 @@ public static class BackupSettingsCommands
         var retentionCountOption = OptionHelpers.Range("--retention-count", "Archives to keep; 0 for no limit", 0);
         var retentionGbOption = OptionHelpers.Range("--retention-gb", "Budget in GB; 0 for no limit", 0);
         var dirOption = new Option<string?>("--dir") { Description = "Backup directory; \"\" resets to the default" };
-        var serverOption = new Option<string?>("--server") { Description = "Server URL override" };
         var command = new Command("set", "Configure the backup schedule and retention")
         {
             scheduleOption, hourOption, minuteOption, weekdayOption,
-            retentionCountOption, retentionGbOption, dirOption,
-            serverOption
+            retentionCountOption, retentionGbOption, dirOption
         };
         command.AddRoleRequired("admin");
         command.Validators.Add(result =>
@@ -99,7 +93,7 @@ public static class BackupSettingsCommands
         command.AddResponseExample<Generated.Models.BackupSettingsResponse>();
         command.SetAction(async (parseResult, cancellationToken) =>
         {
-            var (client, _) = CommandHelper.BuildClient(serverOverride: parseResult.GetValue(serverOption));
+            var (client, _) = CommandHelper.BuildClient();
             var service = new BackupsService(client);
             var result = await service.UpdateSettingsAsync(
                 parseResult.GetValue(scheduleOption),

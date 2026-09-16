@@ -8,11 +8,7 @@ public static class MeCommand
 {
     public static Command Create()
     {
-        var serverOption = new Option<string?>("--server") { Description = "Server URL override" };
-        var command = new Command("me", "Show the authenticated account")
-        {
-            serverOption
-        };
+        var command = new Command("me", "Show the authenticated account");
         command.AddHelpSection("Notes", HelpSectionPosition.Top,
             "role is admin, gm, player or guest. Writes need gm or admin.",
             "",
@@ -24,7 +20,7 @@ public static class MeCommand
         command.AddResponseExample<Generated.Models.AuthMeResponse>();
         command.SetAction(async (parseResult, cancellationToken) =>
         {
-            var (client, _) = CommandHelper.BuildClient(serverOverride: parseResult.GetValue(serverOption));
+            var (client, _) = CommandHelper.BuildClient();
             var result = await new AuthService(client).MeAsync();
             ConsoleOutput.WriteRawJson(result);
             return 0;

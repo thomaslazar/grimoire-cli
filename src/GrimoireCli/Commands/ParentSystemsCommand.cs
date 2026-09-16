@@ -15,8 +15,7 @@ public static class ParentSystemsCommand
 
     private static Command CreateListCommand()
     {
-        var serverOption = new Option<string?>("--server") { Description = "Server URL override" };
-        var command = new Command("list", "List all parent systems") { serverOption };
+        var command = new Command("list", "List all parent systems");
         command.AddHelpSection("Notes", HelpSectionPosition.Top,
             "Ships empty: Grimoire seeds no defaults, and a container child's",
             "parent_system is folder-derived, so a value in use need not appear here.");
@@ -24,7 +23,7 @@ public static class ParentSystemsCommand
         command.AddResponseExample<Generated.Models.ParentSystemsResponse>();
         command.SetAction(async (parseResult, cancellationToken) =>
         {
-            var (client, _) = CommandHelper.BuildClient(serverOverride: parseResult.GetValue(serverOption));
+            var (client, _) = CommandHelper.BuildClient();
             var service = new ParentSystemsService(client);
             var result = await service.ListAsync();
             ConsoleOutput.WriteRawJson(result);

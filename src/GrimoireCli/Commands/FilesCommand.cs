@@ -25,10 +25,9 @@ public static class FilesCommand
     {
         var pathOption = new Option<string?>("--path") { Description = "Folder to list; omit for the library root" };
         var limitOption = OptionHelpers.Range("--limit", "Entries to return; default and cap 2000", 1, 2000);
-        var serverOption = new Option<string?>("--server") { Description = "Server URL override" };
         var command = new Command("browse", "List a library folder with indexing state")
         {
-            pathOption, limitOption, serverOption
+            pathOption, limitOption
         };
         command.AddRoleRequired("admin");
         command.AddHelpSection("Notes", HelpSectionPosition.Top,
@@ -48,7 +47,7 @@ public static class FilesCommand
         command.AddResponseExample<Generated.Models.BrowseResponse>();
         command.SetAction(async (parseResult, cancellationToken) =>
         {
-            var (client, _) = CommandHelper.BuildClient(serverOverride: parseResult.GetValue(serverOption));
+            var (client, _) = CommandHelper.BuildClient();
             var service = new FilesService(client);
             var result = await service.BrowseAsync(
                 parseResult.GetValue(pathOption),
@@ -65,10 +64,9 @@ public static class FilesCommand
         var fileOption = new Option<string>("--file") { Description = "Local file to upload", Required = true };
         var relativeDirOption = new Option<string?>("--relative-dir") { Description = "Sub-path under the destination, created if missing" };
         var onConflictOption = OptionHelpers.Choice("--on-conflict", "Collision policy; default rename", ConflictPolicies);
-        var serverOption = new Option<string?>("--server") { Description = "Server URL override" };
         var command = new Command("upload", "Upload a single file into a library folder")
         {
-            destinationOption, fileOption, relativeDirOption, onConflictOption, serverOption
+            destinationOption, fileOption, relativeDirOption, onConflictOption
         };
         command.AddRoleRequired("admin");
         command.AddHelpSection("Notes", HelpSectionPosition.Top,
@@ -79,7 +77,7 @@ public static class FilesCommand
         command.AddResponseExample<Generated.Models.UploadResponse>();
         command.SetAction(async (parseResult, cancellationToken) =>
         {
-            var (client, _) = CommandHelper.BuildClient(serverOverride: parseResult.GetValue(serverOption));
+            var (client, _) = CommandHelper.BuildClient();
             var service = new FilesService(client);
             try
             {
@@ -110,10 +108,9 @@ public static class FilesCommand
         };
         var destinationOption = new Option<string>("--destination") { Description = "Destination folder", Required = true };
         var onConflictOption = OptionHelpers.Choice("--on-conflict", "Collision policy; default skip", ConflictPolicies);
-        var serverOption = new Option<string?>("--server") { Description = "Server URL override" };
         var command = new Command("move", "Move files or folders, preserving their metadata")
         {
-            sourcesOption, destinationOption, onConflictOption, serverOption
+            sourcesOption, destinationOption, onConflictOption
         };
         command.AddRoleRequired("admin");
         command.AddExamples(
@@ -122,7 +119,7 @@ public static class FilesCommand
         command.AddResponseExample<Generated.Models.MoveResponse>();
         command.SetAction(async (parseResult, cancellationToken) =>
         {
-            var (client, _) = CommandHelper.BuildClient(serverOverride: parseResult.GetValue(serverOption));
+            var (client, _) = CommandHelper.BuildClient();
             var service = new FilesService(client);
             var result = await service.MoveAsync(
                 parseResult.GetValue(sourcesOption)!,
@@ -138,10 +135,9 @@ public static class FilesCommand
     {
         var pathOption = new Option<string>("--path") { Description = "Path to rename", Required = true };
         var newNameOption = new Option<string>("--new-name") { Description = "New name, without any path", Required = true };
-        var serverOption = new Option<string?>("--server") { Description = "Server URL override" };
         var command = new Command("rename", "Rename a file or folder on disk")
         {
-            pathOption, newNameOption, serverOption
+            pathOption, newNameOption
         };
         command.AddRoleRequired("admin");
         command.AddHelpSection("Notes", HelpSectionPosition.Top,
@@ -151,7 +147,7 @@ public static class FilesCommand
         command.AddResponseExample<Generated.Models.RenameResponse>();
         command.SetAction(async (parseResult, cancellationToken) =>
         {
-            var (client, _) = CommandHelper.BuildClient(serverOverride: parseResult.GetValue(serverOption));
+            var (client, _) = CommandHelper.BuildClient();
             var service = new FilesService(client);
             var result = await service.RenameAsync(
                 parseResult.GetValue(pathOption)!,
@@ -167,10 +163,9 @@ public static class FilesCommand
         var pathOption = new Option<string>("--path") { Description = "File or folder to remove", Required = true };
         var confirmNameOption = new Option<string?>("--confirm-name") { Description = "The folder's own name; needed with --delete-files when it holds content" };
         var deleteFilesOption = new Option<bool>("--delete-files") { Description = "Also delete the files from disk; irreversible" };
-        var serverOption = new Option<string?>("--server") { Description = "Server URL override" };
         var command = new Command("delete", "Remove a file or folder from the index, and optionally from disk")
         {
-            pathOption, confirmNameOption, deleteFilesOption, serverOption
+            pathOption, confirmNameOption, deleteFilesOption
         };
         command.AddRoleRequired("admin");
         command.AddHelpSection("Notes", HelpSectionPosition.Top,
@@ -194,7 +189,7 @@ public static class FilesCommand
         command.AddResponseExample<Generated.Models.DeleteResponse>();
         command.SetAction(async (parseResult, cancellationToken) =>
         {
-            var (client, _) = CommandHelper.BuildClient(serverOverride: parseResult.GetValue(serverOption));
+            var (client, _) = CommandHelper.BuildClient();
             var service = new FilesService(client);
             var result = await service.DeleteAsync(
                 parseResult.GetValue(pathOption)!,

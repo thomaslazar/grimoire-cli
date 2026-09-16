@@ -83,6 +83,7 @@ Recovery is one `login`.
 |---------|-------------|
 | `grimoire-cli login --server <url>` | Server via flag, prompts for username/password. |
 | `grimoire-cli login --server <url> --username <u> --password-stdin` | Password piped via stdin (first line only) — the scriptable path. |
+| `GRIMOIRE_SERVER=<url> grimoire-cli login --username <u> --password-stdin` | Fully unattended — server from the environment. |
 | `grimoire-cli login --server <url> --username <u> --password <pw>` | Password via flag — visible in process list and shell history, discouraged in help text. |
 
 `login` also calls `GET /api/about` right after saving the token and compares

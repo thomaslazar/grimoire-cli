@@ -68,7 +68,7 @@ hard gate.
 ### Known limitation: one server, one slot
 
 `lastVersionCheck` / `lastServerVersion` are a single slot in the config
-file, not keyed by server. Pointing `--server` or `GRIMOIRE_SERVER` at a
+file, not keyed by server. Pointing `GRIMOIRE_SERVER` at a
 second instance records that instance's version into the same slot, which
 can suppress the check for the original server for up to 24 hours and, if
 the two are alternated, can print a warning claiming the server "moved"

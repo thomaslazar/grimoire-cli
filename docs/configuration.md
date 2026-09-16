@@ -29,10 +29,10 @@ the renewal rules.
 24-hour version-check cadence (see
 [grimoire-compatibility.md](grimoire-compatibility.md#runtime-check)), not by
 the operator — `config set` does not accept either key. The check runs
-against the token in the config file, and against whatever server the command
-resolved — file, `GRIMOIRE_SERVER`, or `--server`. It therefore runs only after
-a `login` on this machine: with no stored access token, `CommandHelper.BuildClient`
-exits 1 before any request is made.
+against the token in the config file, and against whatever server the
+command resolved — `GRIMOIRE_SERVER`, or the config file. It therefore runs
+only after a `login` on this machine: with no stored access token,
+`CommandHelper.BuildClient` exits 1 before any request is made.
 
 ## Reading and writing the file
 
@@ -63,15 +63,16 @@ failure there is a debug line and the check simply runs again next time.
 
 Highest wins (`ConfigManager.Resolve`):
 
-1. Command-line flags — `CommandHelper.BuildClient(serverOverride)` accepts a
-   per-call server override, which every command consuming a saved token wires
-   `--server` through to. `login`'s own `--server` writes straight to the file
-   instead of going through this resolution.
-2. Environment variables — `GRIMOIRE_SERVER`
-3. Config file (`~/.grimoire-cli/config.json`)
+1. Environment variable — `GRIMOIRE_SERVER`
+2. Config file (`~/.grimoire-cli/config.json`)
 
-Only the server has all three tiers. The access and refresh tokens come from the
-config file alone.
+`login` is the exception: its `--server` writes straight to the file rather than
+going through this resolution, and falls back to `GRIMOIRE_SERVER` and then an
+interactive prompt when the flag is absent. No other command takes a server flag.
+
+The access and refresh tokens come from the config file alone, which is why a
+per-command server flag could only ever re-address the instance the stored token
+already belongs to.
 
 ## Config Commands
 

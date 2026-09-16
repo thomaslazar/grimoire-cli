@@ -7,11 +7,10 @@ public static class CommandHelper
 {
     private static readonly NLog.Logger _logger = NLog.LogManager.GetCurrentClassLogger();
 
-    public static (GrimoireApiClient client, AppConfig config) BuildClient(
-        string? serverOverride = null)
+    public static (GrimoireApiClient client, AppConfig config) BuildClient()
     {
         var configManager = new ConfigManager();
-        var config = configManager.Resolve(flagServer: serverOverride);
+        var config = configManager.Resolve();
 
         if (string.IsNullOrEmpty(config.Server))
         {

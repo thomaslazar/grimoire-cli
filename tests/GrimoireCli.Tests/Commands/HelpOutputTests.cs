@@ -37,10 +37,10 @@ public class HelpOutputTests
     }
 
     [Fact]
-    public void SystemsList_PlainHelp_ShowsServerOption_AndNoTokenOption()
+    public void SystemsList_PlainHelp_HasNoServerOrTokenOption()
     {
         var output = RenderHelp(helpFull: false, "systems", "list");
-        Assert.Contains("--server", output);
+        Assert.DoesNotContain("--server", output);
         Assert.DoesNotContain("--token", output);
     }
 
@@ -81,10 +81,10 @@ public class HelpOutputTests
     }
 
     [Fact]
-    public void SystemsGet_PlainHelp_ShowsServerOption_AndNoTokenOption()
+    public void SystemsGet_PlainHelp_HasNoServerOrTokenOption()
     {
         var output = RenderHelp(helpFull: false, "systems", "get");
-        Assert.Contains("--server", output);
+        Assert.DoesNotContain("--server", output);
         Assert.DoesNotContain("--token", output);
     }
 
