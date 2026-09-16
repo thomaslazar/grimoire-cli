@@ -691,6 +691,34 @@ so a book matching by title *and* by page text is counted twice.
   filters. Do not add a command for it on a coverage-gap sweep; revisit it
   with the maps, tokens and audio blocks.
 
+## Logs
+
+Read from `backend/routers/logs/core.py` and `_schemas.py` at tag `v1.6.2`, and
+measured against the running 1.6.2 stack.
+
+- **An in-memory ring buffer of 20 000 entries**, with no disk history behind it.
+  Anything older is gone.
+- **DEBUG is always available regardless of `LOG_LEVEL`.** The env var governs
+  console output; the handler feeding this buffer is installed at DEBUG. So the
+  endpoint returns detail an operator cannot see in `docker logs`.
+- **`level` is a minimum and hierarchical.** On a freshly booted stack: `debug`
+  totalled 107, `info` 8, `error` 0.
+- **A page is taken from the newest end and returned oldest-first.** With the
+  eight `info` entries at seq `[1, 2, 7, 9, 10, 100, 102, 103]`, `limit=2` gave
+  `[102, 103]`, `limit=2&offset=2` gave `[10, 100]`, and `limit=3&offset=5` gave
+  `[1, 2, 7]`.
+- **`offset` is ignored once `after_seq` is set** — `after_seq=100` and
+  `after_seq=100&offset=2` returned the identical page.
+- **`max_seq` tracks the whole buffer, not the filtered set.** `level=error`
+  returned `entries: []` with `max_seq: 107`, so a poll filtered to a level that
+  matches nothing still advances the cursor.
+- **A poll truncates from the oldest end.** With `after_seq` set the handler
+  returns `new[-limit:]` (`config.py:466`) — the *newest* `limit` of what is
+  new, not the oldest. Measured: 96 entries arrived and a poll with `limit=3`
+  returned seq `[1471, 1472, 1473]`, skipping 93 that advancing the cursor then
+  loses for good. A caller catching up on a backlog must raise `limit`.
+- **`total` counts what matches `level`**, not what the page holds.
+
 ## Duplicates
 
 Read from `backend/routers/duplicates/__init__.py`, `core.py`, `detection.py`,

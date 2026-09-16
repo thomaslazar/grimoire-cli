@@ -30,13 +30,12 @@ tags`, copying it off another map that already carries it.
 
 ## Next
 
-1. **[logs](https://github.com/thomaslazar/grimoire-cli/issues/45)** — one endpoint, and everything after it benefits: `library rescan`, `duplicates scan`, `books reindex` and `books rescan` all start background work and report only `scan_started`, so a failure currently explains itself only in the UI.
-2. **[maps per-item layer](https://github.com/thomaslazar/grimoire-cli/issues/38)** — first of the four, because it has the richest update model and the only real list filters, so it settles the shape the other three port.
-3. **[models per-item layer](https://github.com/thomaslazar/grimoire-cli/issues/39)** — next, because 1.6.2's model variant kinds are already accepted by `duplicates link` and unusable without a way to list candidates.
-4. **[tokens per-item layer](https://github.com/thomaslazar/grimoire-cli/issues/40)** — mechanical once maps lands.
-5. **[audio per-item layer](https://github.com/thomaslazar/grimoire-cli/issues/41)** — last of the four; thinnest update model, plus an optional cover block.
-6. **[tags writes](https://github.com/thomaslazar/grimoire-cli/issues/42)** — create, rename, delete, merge. Deliberately after the four above: each collection that gains `batch-tag` makes the hygiene problem bigger, so this lands when it is most needed.
-7. **[vocabulary writes](https://github.com/thomaslazar/grimoire-cli/issues/43)** — completes the five lookups the shipped reads open.
+1. **[maps per-item layer](https://github.com/thomaslazar/grimoire-cli/issues/38)** — first of the four, because it has the richest update model and the only real list filters, so it settles the shape the other three port.
+2. **[models per-item layer](https://github.com/thomaslazar/grimoire-cli/issues/39)** — next, because 1.6.2's model variant kinds are already accepted by `duplicates link` and unusable without a way to list candidates.
+3. **[tokens per-item layer](https://github.com/thomaslazar/grimoire-cli/issues/40)** — mechanical once maps lands.
+4. **[audio per-item layer](https://github.com/thomaslazar/grimoire-cli/issues/41)** — last of the four; thinnest update model, plus an optional cover block.
+5. **[tags writes](https://github.com/thomaslazar/grimoire-cli/issues/42)** — create, rename, delete, merge. Deliberately after the four above: each collection that gains `batch-tag` makes the hygiene problem bigger, so this lands when it is most needed.
+6. **[vocabulary writes](https://github.com/thomaslazar/grimoire-cli/issues/43)** — completes the five lookups the shipped reads open.
 
 **[Small completions](https://github.com/thomaslazar/grimoire-cli/issues/44)** —
 `library stats`, `systems cover from-source`, and the binary getters for each new

@@ -1397,4 +1397,60 @@ ok "duplicates unlink promotes the variant back to standalone"
   && fail "unlink with neither --ids nor --parent-id should be refused"
 ok "duplicates unlink refuses a call the server would answer as a no-op"
 
+# logs: the cursor contract is the whole point of the command, so the idle poll
+# is asserted rather than just a non-empty page. max_seq is buffer-wide, so a
+# filter that matches nothing still advances it — which is what lets a caller
+# poll on --level error without losing its place.
+LOGS_JSON=$("$CLI" logs --limit 5 2>"$WORK/cli.err") \
+  || { cat "$WORK/cli.err" >&2; fail "logs exited non-zero"; }
+echo "$LOGS_JSON" | jq -e '.entries | length > 0' >/dev/null \
+  || fail "logs should return entries on a seeded stack: $LOGS_JSON"
+echo "$LOGS_JSON" | jq -e '.max_seq > 0' >/dev/null \
+  || fail "logs should report a cursor: $LOGS_JSON"
+ok "logs returns a page and a cursor"
+
+# A page is emitted oldest-first, so seq ascends within it.
+echo "$LOGS_JSON" | jq -e '.entries | length > 1' >/dev/null \
+  || fail "need more than one entry to prove ordering: $LOGS_JSON"
+echo "$LOGS_JSON" | jq -e '[.entries[].seq] == ([.entries[].seq] | sort)' >/dev/null \
+  || fail "a logs page should be ordered oldest-first: $LOGS_JSON"
+ok "logs orders a page oldest-first"
+
+# debug is the whole buffer and info a strict subset of it, so a server that
+# ignored --level would answer both with the same total. Strictly greater is
+# what distinguishes a working filter from an ignored parameter.
+DEBUG_JSON=$("$CLI" logs --level debug --limit 1 2>"$WORK/cli.err") \
+  || { cat "$WORK/cli.err" >&2; fail "logs --level debug exited non-zero"; }
+INFO_JSON=$("$CLI" logs --level info --limit 1 2>"$WORK/cli.err") \
+  || { cat "$WORK/cli.err" >&2; fail "logs --level info exited non-zero"; }
+DEBUG_TOTAL=$(echo "$DEBUG_JSON" | jq -r .total)
+INFO_TOTAL=$(echo "$INFO_JSON" | jq -r .total)
+[ "$DEBUG_TOTAL" -gt "$INFO_TOTAL" ] \
+  || fail "--level debug should total strictly more than info: $DEBUG_TOTAL vs $INFO_TOTAL"
+ok "logs --level narrows the total"
+
+# total alone cannot show the filter reached the entries, so check the page
+# carries nothing below the level asked for. info rather than warning: the
+# smoke run's own requests guarantee INFO entries, and an empty page would
+# make the set-difference assertion vacuously true.
+INFO_PAGE=$("$CLI" logs --level info --limit 50 2>"$WORK/cli.err") \
+  || { cat "$WORK/cli.err" >&2; fail "logs --level info exited non-zero"; }
+echo "$INFO_PAGE" | jq -e '.entries | length > 0' >/dev/null \
+  || fail "expected at least one info entry to check filtering: $INFO_PAGE"
+echo "$INFO_PAGE" | jq -e '[.entries[].level] - ["INFO","WARNING","ERROR","CRITICAL"] == []' >/dev/null \
+  || fail "--level info should return no DEBUG entry: $INFO_PAGE"
+ok "logs --level filters the entries, not just the total"
+
+# The idle poll: nothing is newer than max_seq, and the cursor does not move.
+MAX_SEQ=$(echo "$LOGS_JSON" | jq -r .max_seq)
+POLL_JSON=$("$CLI" logs --after-seq "$MAX_SEQ" 2>"$WORK/cli.err") \
+  || { cat "$WORK/cli.err" >&2; fail "logs --after-seq exited non-zero"; }
+echo "$POLL_JSON" | jq -e '.entries == []' >/dev/null \
+  || fail "--after-seq max_seq should return no entries: $POLL_JSON"
+ok "logs --after-seq at the cursor returns an empty page"
+
+"$CLI" logs --level trace >/dev/null 2>&1 \
+  && fail "logs should refuse a level the server does not declare"
+ok "logs refuses an unknown level"
+
 echo "smoke: all checks passed" >&2
