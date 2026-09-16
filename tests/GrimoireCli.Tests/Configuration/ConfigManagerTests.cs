@@ -40,25 +40,6 @@ public class ConfigManagerTests
     }
 
     [Fact]
-    public void ResolvePrefersFlagOverEnvAndFile()
-    {
-        var manager = InTempDir(out var path);
-        try
-        {
-            manager.Save(new AppConfig { Server = "https://file.invalid", AccessToken = "file-token" });
-            var resolved = manager.Resolve(
-                flagServer: "https://flag.invalid",
-                envLookup: key => key == "GRIMOIRE_SERVER" ? "https://env.invalid" : null);
-            Assert.Equal("https://flag.invalid", resolved.Server);
-            Assert.Equal("file-token", resolved.AccessToken);
-        }
-        finally
-        {
-            Directory.Delete(Path.GetDirectoryName(path)!, recursive: true);
-        }
-    }
-
-    [Fact]
     public void ResolvePrefersEnvOverFile()
     {
         var manager = InTempDir(out var path);

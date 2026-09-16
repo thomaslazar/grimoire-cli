@@ -137,17 +137,13 @@ public class ConfigManager
         }
     }
 
-    public AppConfig Resolve(
-        string? flagServer = null,
-        Func<string, string?>? envLookup = null)
+    public AppConfig Resolve(Func<string, string?>? envLookup = null)
     {
         envLookup ??= Environment.GetEnvironmentVariable;
         var fileConfig = Load();
         return new AppConfig
         {
-            Server = flagServer
-                ?? envLookup("GRIMOIRE_SERVER")
-                ?? fileConfig.Server,
+            Server = envLookup("GRIMOIRE_SERVER") ?? fileConfig.Server,
             AccessToken = fileConfig.AccessToken,
             RefreshToken = fileConfig.RefreshToken,
             LastVersionCheck = fileConfig.LastVersionCheck,
