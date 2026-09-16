@@ -1221,7 +1221,11 @@ ok "login repairs a corrupt config"
 # login is the one command that still takes --server, and now the one that also
 # reads GRIMOIRE_SERVER. Without the variable an unattended login has no way in:
 # the prompt's ReadLine returns null and the command exits 1.
-cp "$CONFIG" "$WORK/config.beforeenvlogin"
+# The stored server is broken first so the check below proves login wrote what
+# the environment named: the earlier login already stored $SERVER, so without
+# this the assertion would hold whether or not the variable was read at all.
+jq '.server = "http://127.0.0.1:1"' "$CONFIG" >"$WORK/config.sabotaged" \
+  && mv "$WORK/config.sabotaged" "$CONFIG"
 printf 'admin' | GRIMOIRE_SERVER="$SERVER" "$CLI" login --username admin --password-stdin \
   >/dev/null 2>"$WORK/envlogin.err" \
   || { cat "$WORK/envlogin.err" >&2; fail "login should take its server from GRIMOIRE_SERVER"; }

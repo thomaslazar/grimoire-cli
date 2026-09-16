@@ -29,14 +29,10 @@ the renewal rules.
 24-hour version-check cadence (see
 [grimoire-compatibility.md](grimoire-compatibility.md#runtime-check)), not by
 the operator — `config set` does not accept either key. The check runs
-against the token in the config file, and against whatever server the command
-resolved — `GRIMOIRE_SERVER`, or the config file. The token has no env or flag
-tier of its own, so there's nothing for a per-command server override to
-re-address but the instance that token belongs to; only `login` takes a
-server flag, and it builds its own client rather than consulting this file.
-The check therefore runs only after a `login` on this
-machine: with no stored access token, `CommandHelper.BuildClient` exits 1
-before any request is made.
+against the token in the config file, and against whatever server the
+command resolved — `GRIMOIRE_SERVER`, or the config file. It therefore runs
+only after a `login` on this machine: with no stored access token,
+`CommandHelper.BuildClient` exits 1 before any request is made.
 
 ## Reading and writing the file
 
