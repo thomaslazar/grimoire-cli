@@ -13,6 +13,10 @@ namespace GrimoireCli.Generated.Models
     [global::System.CodeDom.Compiler.GeneratedCode("Kiota", "1.0.0")]
     public partial class BrowseEntry : IAdditionalDataHolder, IParsable
     {
+        /// <summary>The accepts_container_kind property</summary>
+        public bool? AcceptsContainerKind { get; set; }
+        /// <summary>The accepts_frames_marker property</summary>
+        public bool? AcceptsFramesMarker { get; set; }
         /// <summary>Stores additional data not described in the OpenAPI description found when deserializing. Can be used for serialization as well.</summary>
         public IDictionary<string, object> AdditionalData { get; set; }
         /// <summary>The category_host property</summary>
@@ -41,6 +45,8 @@ namespace GrimoireCli.Generated.Models
 #else
         public global::GrimoireCli.Generated.Models.BrowseEntry.BrowseEntry_container_kind ContainerKind { get; set; }
 #endif
+        /// <summary>The frames_container property</summary>
+        public bool? FramesContainer { get; set; }
         /// <summary>The has_thumbnail property</summary>
         public bool? HasThumbnail { get; set; }
         /// <summary>The is_dir property</summary>
@@ -95,7 +101,10 @@ namespace GrimoireCli.Generated.Models
         public BrowseEntry()
         {
             AdditionalData = new Dictionary<string, object>();
+            AcceptsContainerKind = false;
+            AcceptsFramesMarker = false;
             CategoryHost = false;
+            FramesContainer = false;
             HasThumbnail = false;
             IsMissing = false;
             Nsfw = false;
@@ -118,10 +127,13 @@ namespace GrimoireCli.Generated.Models
         {
             return new Dictionary<string, Action<IParseNode>>
             {
+                { "accepts_container_kind", n => { AcceptsContainerKind = n.GetBoolValue(); } },
+                { "accepts_frames_marker", n => { AcceptsFramesMarker = n.GetBoolValue(); } },
                 { "category_host", n => { CategoryHost = n.GetBoolValue(); } },
                 { "child_count", n => { ChildCount = n.GetObjectValue<global::GrimoireCli.Generated.Models.BrowseEntry.BrowseEntry_child_count>(global::GrimoireCli.Generated.Models.BrowseEntry.BrowseEntry_child_count.CreateFromDiscriminatorValue); } },
                 { "collection", n => { Collection = n.GetObjectValue<global::GrimoireCli.Generated.Models.BrowseEntry.BrowseEntry_collection>(global::GrimoireCli.Generated.Models.BrowseEntry.BrowseEntry_collection.CreateFromDiscriminatorValue); } },
                 { "container_kind", n => { ContainerKind = n.GetObjectValue<global::GrimoireCli.Generated.Models.BrowseEntry.BrowseEntry_container_kind>(global::GrimoireCli.Generated.Models.BrowseEntry.BrowseEntry_container_kind.CreateFromDiscriminatorValue); } },
+                { "frames_container", n => { FramesContainer = n.GetBoolValue(); } },
                 { "has_thumbnail", n => { HasThumbnail = n.GetBoolValue(); } },
                 { "is_dir", n => { IsDir = n.GetBoolValue(); } },
                 { "is_missing", n => { IsMissing = n.GetBoolValue(); } },
@@ -140,10 +152,13 @@ namespace GrimoireCli.Generated.Models
         public virtual void Serialize(ISerializationWriter writer)
         {
             if(ReferenceEquals(writer, null)) throw new ArgumentNullException(nameof(writer));
+            writer.WriteBoolValue("accepts_container_kind", AcceptsContainerKind);
+            writer.WriteBoolValue("accepts_frames_marker", AcceptsFramesMarker);
             writer.WriteBoolValue("category_host", CategoryHost);
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.BrowseEntry.BrowseEntry_child_count>("child_count", ChildCount);
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.BrowseEntry.BrowseEntry_collection>("collection", Collection);
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.BrowseEntry.BrowseEntry_container_kind>("container_kind", ContainerKind);
+            writer.WriteBoolValue("frames_container", FramesContainer);
             writer.WriteBoolValue("has_thumbnail", HasThumbnail);
             writer.WriteBoolValue("is_dir", IsDir);
             writer.WriteBoolValue("is_missing", IsMissing);

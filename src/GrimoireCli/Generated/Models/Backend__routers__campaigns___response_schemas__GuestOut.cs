@@ -35,6 +35,8 @@ namespace GrimoireCli.Generated.Models
         public bool? HasArt { get; set; }
         /// <summary>The has_sheet property</summary>
         public bool? HasSheet { get; set; }
+        /// <summary>The has_token property</summary>
+        public bool? HasToken { get; set; }
         /// <summary>The id property</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
@@ -73,6 +75,7 @@ namespace GrimoireCli.Generated.Models
         public Backend__routers__campaigns___response_schemas__GuestOut()
         {
             AdditionalData = new Dictionary<string, object>();
+            HasToken = false;
         }
         /// <summary>
         /// Creates a new instance of the appropriate class based on discriminator value
@@ -96,6 +99,7 @@ namespace GrimoireCli.Generated.Models
                 { "guest_code", n => { GuestCode = n.GetObjectValue<global::GrimoireCli.Generated.Models.Backend__routers__campaigns___response_schemas__GuestOut.Backend__routers__campaigns___response_schemas__GuestOut_guest_code>(global::GrimoireCli.Generated.Models.Backend__routers__campaigns___response_schemas__GuestOut.Backend__routers__campaigns___response_schemas__GuestOut_guest_code.CreateFromDiscriminatorValue); } },
                 { "has_art", n => { HasArt = n.GetBoolValue(); } },
                 { "has_sheet", n => { HasSheet = n.GetBoolValue(); } },
+                { "has_token", n => { HasToken = n.GetBoolValue(); } },
                 { "id", n => { Id = n.GetStringValue(); } },
                 { "nickname", n => { Nickname = n.GetObjectValue<global::GrimoireCli.Generated.Models.Backend__routers__campaigns___response_schemas__GuestOut.Backend__routers__campaigns___response_schemas__GuestOut_nickname>(global::GrimoireCli.Generated.Models.Backend__routers__campaigns___response_schemas__GuestOut.Backend__routers__campaigns___response_schemas__GuestOut_nickname.CreateFromDiscriminatorValue); } },
                 { "status", n => { Status = n.GetObjectValue<global::GrimoireCli.Generated.Models.Backend__routers__campaigns___response_schemas__GuestOut.Backend__routers__campaigns___response_schemas__GuestOut_status>(global::GrimoireCli.Generated.Models.Backend__routers__campaigns___response_schemas__GuestOut.Backend__routers__campaigns___response_schemas__GuestOut_status.CreateFromDiscriminatorValue); } },
@@ -113,6 +117,7 @@ namespace GrimoireCli.Generated.Models
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.Backend__routers__campaigns___response_schemas__GuestOut.Backend__routers__campaigns___response_schemas__GuestOut_guest_code>("guest_code", GuestCode);
             writer.WriteBoolValue("has_art", HasArt);
             writer.WriteBoolValue("has_sheet", HasSheet);
+            writer.WriteBoolValue("has_token", HasToken);
             writer.WriteStringValue("id", Id);
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.Backend__routers__campaigns___response_schemas__GuestOut.Backend__routers__campaigns___response_schemas__GuestOut_nickname>("nickname", Nickname);
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.Backend__routers__campaigns___response_schemas__GuestOut.Backend__routers__campaigns___response_schemas__GuestOut_status>("status", Status);

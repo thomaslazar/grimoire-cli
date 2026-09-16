@@ -22,6 +22,14 @@ namespace GrimoireCli.Generated.Models
 #else
         public List<global::GrimoireCli.Generated.Models.Backend__routers__tokens___schemas__FolderTagsOut> Folders { get; set; }
 #endif
+        /// <summary>The frame_folders property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public List<string>? FrameFolders { get; set; }
+#nullable restore
+#else
+        public List<string> FrameFolders { get; set; }
+#endif
         /// <summary>
         /// Instantiates a new <see cref="global::GrimoireCli.Generated.Models.TokenFoldersResponse"/> and sets the default values.
         /// </summary>
@@ -48,6 +56,7 @@ namespace GrimoireCli.Generated.Models
             return new Dictionary<string, Action<IParseNode>>
             {
                 { "folders", n => { Folders = n.GetCollectionOfObjectValues<global::GrimoireCli.Generated.Models.Backend__routers__tokens___schemas__FolderTagsOut>(global::GrimoireCli.Generated.Models.Backend__routers__tokens___schemas__FolderTagsOut.CreateFromDiscriminatorValue)?.AsList(); } },
+                { "frame_folders", n => { FrameFolders = n.GetCollectionOfPrimitiveValues<string>()?.AsList(); } },
             };
         }
         /// <summary>
@@ -58,6 +67,7 @@ namespace GrimoireCli.Generated.Models
         {
             if(ReferenceEquals(writer, null)) throw new ArgumentNullException(nameof(writer));
             writer.WriteCollectionOfObjectValues<global::GrimoireCli.Generated.Models.Backend__routers__tokens___schemas__FolderTagsOut>("folders", Folders);
+            writer.WriteCollectionOfPrimitiveValues<string>("frame_folders", FrameFolders);
             writer.WriteAdditionalData(AdditionalData);
         }
     }

@@ -39,6 +39,14 @@ namespace GrimoireCli.Generated.Models
 #else
         public string AuthorUrl { get; set; }
 #endif
+        /// <summary>The available_in property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public List<global::GrimoireCli.Generated.Models.InstalledAddon_available_in>? AvailableIn { get; set; }
+#nullable restore
+#else
+        public List<global::GrimoireCli.Generated.Models.InstalledAddon_available_in> AvailableIn { get; set; }
+#endif
         /// <summary>The available_version property</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
@@ -54,6 +62,14 @@ namespace GrimoireCli.Generated.Models
 #nullable restore
 #else
         public string BlockedReason { get; set; }
+#endif
+        /// <summary>The changelog property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public List<global::GrimoireCli.Generated.Models.ChangelogEntry>? Changelog { get; set; }
+#nullable restore
+#else
+        public List<global::GrimoireCli.Generated.Models.ChangelogEntry> Changelog { get; set; }
 #endif
         /// <summary>The description property</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
@@ -80,6 +96,14 @@ namespace GrimoireCli.Generated.Models
 #nullable restore
 #else
         public string Id { get; set; }
+#endif
+        /// <summary>The index_url property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public global::GrimoireCli.Generated.Models.InstalledAddon.InstalledAddon_index_url? IndexUrl { get; set; }
+#nullable restore
+#else
+        public global::GrimoireCli.Generated.Models.InstalledAddon.InstalledAddon_index_url IndexUrl { get; set; }
 #endif
         /// <summary>The kind property</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
@@ -110,6 +134,14 @@ namespace GrimoireCli.Generated.Models
 #nullable restore
 #else
         public string Source { get; set; }
+#endif
+        /// <summary>The source_url property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public global::GrimoireCli.Generated.Models.InstalledAddon.InstalledAddon_source_url? SourceUrl { get; set; }
+#nullable restore
+#else
+        public global::GrimoireCli.Generated.Models.InstalledAddon.InstalledAddon_source_url SourceUrl { get; set; }
 #endif
         /// <summary>The target property</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
@@ -157,18 +189,22 @@ namespace GrimoireCli.Generated.Models
                 { "attribution", n => { Attribution = n.GetStringValue(); } },
                 { "author", n => { Author = n.GetStringValue(); } },
                 { "author_url", n => { AuthorUrl = n.GetStringValue(); } },
+                { "available_in", n => { AvailableIn = n.GetCollectionOfObjectValues<global::GrimoireCli.Generated.Models.InstalledAddon_available_in>(global::GrimoireCli.Generated.Models.InstalledAddon_available_in.CreateFromDiscriminatorValue)?.AsList(); } },
                 { "available_version", n => { AvailableVersion = n.GetStringValue(); } },
                 { "blocked_reason", n => { BlockedReason = n.GetStringValue(); } },
+                { "changelog", n => { Changelog = n.GetCollectionOfObjectValues<global::GrimoireCli.Generated.Models.ChangelogEntry>(global::GrimoireCli.Generated.Models.ChangelogEntry.CreateFromDiscriminatorValue)?.AsList(); } },
                 { "description", n => { Description = n.GetStringValue(); } },
                 { "enabled", n => { Enabled = n.GetBoolValue(); } },
                 { "homepage", n => { Homepage = n.GetStringValue(); } },
                 { "id", n => { Id = n.GetStringValue(); } },
+                { "index_url", n => { IndexUrl = n.GetObjectValue<global::GrimoireCli.Generated.Models.InstalledAddon.InstalledAddon_index_url>(global::GrimoireCli.Generated.Models.InstalledAddon.InstalledAddon_index_url.CreateFromDiscriminatorValue); } },
                 { "kind", n => { Kind = n.GetStringValue(); } },
                 { "name", n => { Name = n.GetStringValue(); } },
                 { "requires_script", n => { RequiresScript = n.GetBoolValue(); } },
                 { "runnable", n => { Runnable = n.GetBoolValue(); } },
                 { "script_approved", n => { ScriptApproved = n.GetBoolValue(); } },
                 { "source", n => { Source = n.GetStringValue(); } },
+                { "source_url", n => { SourceUrl = n.GetObjectValue<global::GrimoireCli.Generated.Models.InstalledAddon.InstalledAddon_source_url>(global::GrimoireCli.Generated.Models.InstalledAddon.InstalledAddon_source_url.CreateFromDiscriminatorValue); } },
                 { "target", n => { Target = n.GetStringValue(); } },
                 { "update_available", n => { UpdateAvailable = n.GetBoolValue(); } },
                 { "version", n => { Version = n.GetStringValue(); } },
@@ -184,22 +220,162 @@ namespace GrimoireCli.Generated.Models
             writer.WriteStringValue("attribution", Attribution);
             writer.WriteStringValue("author", Author);
             writer.WriteStringValue("author_url", AuthorUrl);
+            writer.WriteCollectionOfObjectValues<global::GrimoireCli.Generated.Models.InstalledAddon_available_in>("available_in", AvailableIn);
             writer.WriteStringValue("available_version", AvailableVersion);
             writer.WriteStringValue("blocked_reason", BlockedReason);
+            writer.WriteCollectionOfObjectValues<global::GrimoireCli.Generated.Models.ChangelogEntry>("changelog", Changelog);
             writer.WriteStringValue("description", Description);
             writer.WriteBoolValue("enabled", Enabled);
             writer.WriteStringValue("homepage", Homepage);
             writer.WriteStringValue("id", Id);
+            writer.WriteObjectValue<global::GrimoireCli.Generated.Models.InstalledAddon.InstalledAddon_index_url>("index_url", IndexUrl);
             writer.WriteStringValue("kind", Kind);
             writer.WriteStringValue("name", Name);
             writer.WriteBoolValue("requires_script", RequiresScript);
             writer.WriteBoolValue("runnable", Runnable);
             writer.WriteBoolValue("script_approved", ScriptApproved);
             writer.WriteStringValue("source", Source);
+            writer.WriteObjectValue<global::GrimoireCli.Generated.Models.InstalledAddon.InstalledAddon_source_url>("source_url", SourceUrl);
             writer.WriteStringValue("target", Target);
             writer.WriteBoolValue("update_available", UpdateAvailable);
             writer.WriteStringValue("version", Version);
             writer.WriteAdditionalData(AdditionalData);
+        }
+        /// <summary>
+        /// Composed type wrapper for classes <see cref="global::GrimoireCli.Generated.Models.InstalledAddon_index_urlMember1"/>, <see cref="string"/>
+        /// </summary>
+        [global::System.CodeDom.Compiler.GeneratedCode("Kiota", "1.0.0")]
+        public partial class InstalledAddon_index_url : IComposedTypeWrapper, IParsable
+        {
+            /// <summary>Composed type representation for type <see cref="global::GrimoireCli.Generated.Models.InstalledAddon_index_urlMember1"/></summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+            public global::GrimoireCli.Generated.Models.InstalledAddon_index_urlMember1? InstalledAddonIndexUrlMember1 { get; set; }
+#nullable restore
+#else
+            public global::GrimoireCli.Generated.Models.InstalledAddon_index_urlMember1 InstalledAddonIndexUrlMember1 { get; set; }
+#endif
+            /// <summary>Composed type representation for type <see cref="string"/></summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+            public string? String { get; set; }
+#nullable restore
+#else
+            public string String { get; set; }
+#endif
+            /// <summary>
+            /// Creates a new instance of the appropriate class based on discriminator value
+            /// </summary>
+            /// <returns>A <see cref="global::GrimoireCli.Generated.Models.InstalledAddon.InstalledAddon_index_url"/></returns>
+            /// <param name="parseNode">The parse node to use to read the discriminator value and create the object</param>
+            public static global::GrimoireCli.Generated.Models.InstalledAddon.InstalledAddon_index_url CreateFromDiscriminatorValue(IParseNode parseNode)
+            {
+                if(ReferenceEquals(parseNode, null)) throw new ArgumentNullException(nameof(parseNode));
+                var result = new global::GrimoireCli.Generated.Models.InstalledAddon.InstalledAddon_index_url();
+                if(parseNode.GetStringValue() is string stringValue)
+                {
+                    result.String = stringValue;
+                }
+                else {
+                    result.InstalledAddonIndexUrlMember1 = new global::GrimoireCli.Generated.Models.InstalledAddon_index_urlMember1();
+                }
+                return result;
+            }
+            /// <summary>
+            /// The deserialization information for the current model
+            /// </summary>
+            /// <returns>A IDictionary&lt;string, Action&lt;IParseNode&gt;&gt;</returns>
+            public virtual IDictionary<string, Action<IParseNode>> GetFieldDeserializers()
+            {
+                if(InstalledAddonIndexUrlMember1 != null)
+                {
+                    return ParseNodeHelper.MergeDeserializersForIntersectionWrapper(InstalledAddonIndexUrlMember1);
+                }
+                return new Dictionary<string, Action<IParseNode>>();
+            }
+            /// <summary>
+            /// Serializes information the current object
+            /// </summary>
+            /// <param name="writer">Serialization writer to use to serialize this model</param>
+            public virtual void Serialize(ISerializationWriter writer)
+            {
+                if(ReferenceEquals(writer, null)) throw new ArgumentNullException(nameof(writer));
+                if(String != null)
+                {
+                    writer.WriteStringValue(null, String);
+                }
+                else {
+                    writer.WriteObjectValue<global::GrimoireCli.Generated.Models.InstalledAddon_index_urlMember1>(null, InstalledAddonIndexUrlMember1);
+                }
+            }
+        }
+        /// <summary>
+        /// Composed type wrapper for classes <see cref="global::GrimoireCli.Generated.Models.InstalledAddon_source_urlMember1"/>, <see cref="string"/>
+        /// </summary>
+        [global::System.CodeDom.Compiler.GeneratedCode("Kiota", "1.0.0")]
+        public partial class InstalledAddon_source_url : IComposedTypeWrapper, IParsable
+        {
+            /// <summary>Composed type representation for type <see cref="global::GrimoireCli.Generated.Models.InstalledAddon_source_urlMember1"/></summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+            public global::GrimoireCli.Generated.Models.InstalledAddon_source_urlMember1? InstalledAddonSourceUrlMember1 { get; set; }
+#nullable restore
+#else
+            public global::GrimoireCli.Generated.Models.InstalledAddon_source_urlMember1 InstalledAddonSourceUrlMember1 { get; set; }
+#endif
+            /// <summary>Composed type representation for type <see cref="string"/></summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+            public string? String { get; set; }
+#nullable restore
+#else
+            public string String { get; set; }
+#endif
+            /// <summary>
+            /// Creates a new instance of the appropriate class based on discriminator value
+            /// </summary>
+            /// <returns>A <see cref="global::GrimoireCli.Generated.Models.InstalledAddon.InstalledAddon_source_url"/></returns>
+            /// <param name="parseNode">The parse node to use to read the discriminator value and create the object</param>
+            public static global::GrimoireCli.Generated.Models.InstalledAddon.InstalledAddon_source_url CreateFromDiscriminatorValue(IParseNode parseNode)
+            {
+                if(ReferenceEquals(parseNode, null)) throw new ArgumentNullException(nameof(parseNode));
+                var result = new global::GrimoireCli.Generated.Models.InstalledAddon.InstalledAddon_source_url();
+                if(parseNode.GetStringValue() is string stringValue)
+                {
+                    result.String = stringValue;
+                }
+                else {
+                    result.InstalledAddonSourceUrlMember1 = new global::GrimoireCli.Generated.Models.InstalledAddon_source_urlMember1();
+                }
+                return result;
+            }
+            /// <summary>
+            /// The deserialization information for the current model
+            /// </summary>
+            /// <returns>A IDictionary&lt;string, Action&lt;IParseNode&gt;&gt;</returns>
+            public virtual IDictionary<string, Action<IParseNode>> GetFieldDeserializers()
+            {
+                if(InstalledAddonSourceUrlMember1 != null)
+                {
+                    return ParseNodeHelper.MergeDeserializersForIntersectionWrapper(InstalledAddonSourceUrlMember1);
+                }
+                return new Dictionary<string, Action<IParseNode>>();
+            }
+            /// <summary>
+            /// Serializes information the current object
+            /// </summary>
+            /// <param name="writer">Serialization writer to use to serialize this model</param>
+            public virtual void Serialize(ISerializationWriter writer)
+            {
+                if(ReferenceEquals(writer, null)) throw new ArgumentNullException(nameof(writer));
+                if(String != null)
+                {
+                    writer.WriteStringValue(null, String);
+                }
+                else {
+                    writer.WriteObjectValue<global::GrimoireCli.Generated.Models.InstalledAddon_source_urlMember1>(null, InstalledAddonSourceUrlMember1);
+                }
+            }
         }
     }
 }

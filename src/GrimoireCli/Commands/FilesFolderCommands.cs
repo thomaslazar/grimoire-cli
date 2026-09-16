@@ -36,15 +36,22 @@ public static class FilesFolderCommands
         var nameOption = new Option<string>("--name") { Description = "New folder's name", Required = true };
         var containerKindOption = OptionHelpers.Choice("--container-kind", "Mark it as a container of this kind", ContainerKinds);
         var nsfwOption = new Option<bool>("--nsfw") { Description = "Mark it NSFW" };
-        var command = new Command("create", "Create a folder, optionally as a container or NSFW")
+        var framesOption = new Option<bool>("--frames-container") { Description = "Mark it as holding token-editor frame art" };
+        var command = new Command("create", "Create a folder, optionally as a container, a frame folder, or NSFW")
         {
-            parentOption, nameOption, containerKindOption, nsfwOption
+            parentOption, nameOption, containerKindOption, nsfwOption, framesOption
         };
         command.AddRoleRequired("admin");
         command.AddHelpSection("Notes", HelpSectionPosition.Top,
-            "one-page and agnostic may exist only once in the library, and are",
-            "recognised only at the top level of books/ — files browse reports",
-            "singletons_taken for the ones already gone.");
+            "--container-kind only applies where a game system belongs: inside books/,",
+            "at a depth reached through containers alone. one-page and agnostic may",
+            "exist only once in the library.",
+            "",
+            "--frames-container only applies under tokens/, at any depth below it.",
+            "",
+            "Either marker outside its own tree is 400. files browse reports",
+            "children_accept_container_kind, children_accept_frames_marker and",
+            "singletons_taken for the --parent folder.");
         command.AddExamples(
             "grimoire-cli files folder create --parent books --name \"Call of Cthulhu\"",
             "grimoire-cli files folder create --parent books --name Publishers --container-kind publisher");
@@ -57,7 +64,8 @@ public static class FilesFolderCommands
                 parseResult.GetValue(parentOption)!,
                 parseResult.GetValue(nameOption)!,
                 parseResult.GetValue(containerKindOption),
-                parseResult.GetValue(nsfwOption));
+                parseResult.GetValue(nsfwOption),
+                parseResult.GetValue(framesOption));
             ConsoleOutput.WriteRawJson(result);
             return 0;
         });
@@ -69,13 +77,21 @@ public static class FilesFolderCommands
         var pathOption = new Option<string>("--path") { Description = "Folder to mark", Required = true };
         var containerKindOption = OptionHelpers.Choice("--container-kind", "Container kind; pass \"\" to clear it", MarkerContainerKinds);
         var nsfwOption = new Option<bool?>("--nsfw") { Description = "NSFW flag (true | false)" };
-        var command = new Command("markers", "Set a folder's container/NSFW markers")
+        var framesOption = new Option<bool?>("--frames-container") { Description = "Frame-folder flag (true | false)" };
+        var command = new Command("markers", "Set a folder's container/NSFW/frame markers")
         {
-            pathOption, containerKindOption, nsfwOption
+            pathOption, containerKindOption, nsfwOption, framesOption
         };
         command.AddRoleRequired("admin");
         command.AddHelpSection("Notes", HelpSectionPosition.Top,
-            "Omitted fields are left alone.");
+            "Omitted fields are left alone.",
+            "",
+            "Setting --container-kind needs a folder where a game system belongs",
+            "(inside books/, at a depth reached through containers alone); setting",
+            "--frames-container needs one under tokens/. Either outside its own tree is",
+            "400. Clearing is always allowed, so a marker written by hand in the wrong",
+            "place stays removable. files browse reports accepts_container_kind and",
+            "accepts_frames_marker per row.");
         command.AddExamples(
             "grimoire-cli files folder markers --path \"books/Kult\" --nsfw true",
             "grimoire-cli files folder markers --path \"books/Publishers\" --container-kind publisher");
@@ -87,7 +103,8 @@ public static class FilesFolderCommands
             var result = await service.MarkersAsync(
                 parseResult.GetValue(pathOption)!,
                 parseResult.GetValue(containerKindOption),
-                parseResult.GetValue(nsfwOption));
+                parseResult.GetValue(nsfwOption),
+                parseResult.GetValue(framesOption));
             ConsoleOutput.WriteRawJson(result);
             return 0;
         });

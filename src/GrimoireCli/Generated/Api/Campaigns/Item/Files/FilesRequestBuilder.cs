@@ -47,7 +47,7 @@ namespace GrimoireCli.Generated.Api.Campaigns.Item.Files
         {
         }
         /// <summary>
-        /// GM uploads a file that becomes a linked &apos;file&apos; resource. Admins bypass limits.
+        /// Uploads a file and links it as a `file` resource. Optional form fields `category_id` / `new_category_name` file it under a resource category in the same call. GM or admin role required.
         /// </summary>
         /// <returns>A <see cref="global::GrimoireCli.Generated.Models.LinkedResourceOut"/></returns>
         /// <param name="body">The request body</param>
@@ -72,7 +72,7 @@ namespace GrimoireCli.Generated.Api.Campaigns.Item.Files
             return await RequestAdapter.SendAsync<global::GrimoireCli.Generated.Models.LinkedResourceOut>(requestInfo, global::GrimoireCli.Generated.Models.LinkedResourceOut.CreateFromDiscriminatorValue, errorMapping, cancellationToken).ConfigureAwait(false);
         }
         /// <summary>
-        /// GM uploads a file that becomes a linked &apos;file&apos; resource. Admins bypass limits.
+        /// Uploads a file and links it as a `file` resource. Optional form fields `category_id` / `new_category_name` file it under a resource category in the same call. GM or admin role required.
         /// </summary>
         /// <returns>A <see cref="RequestInformation"/></returns>
         /// <param name="body">The request body</param>
@@ -103,7 +103,7 @@ namespace GrimoireCli.Generated.Api.Campaigns.Item.Files
             return new global::GrimoireCli.Generated.Api.Campaigns.Item.Files.FilesRequestBuilder(rawUrl, RequestAdapter);
         }
         /// <summary>
-        /// GM uploads a file that becomes a linked &apos;file&apos; resource. Admins bypass limits.
+        /// Uploads a file and links it as a `file` resource. Optional form fields `category_id` / `new_category_name` file it under a resource category in the same call. GM or admin role required.
         /// </summary>
         [global::System.CodeDom.Compiler.GeneratedCode("Kiota", "1.0.0")]
         public partial class FilesRequestBuilderPostQueryParameters 

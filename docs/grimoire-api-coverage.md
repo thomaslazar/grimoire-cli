@@ -2,7 +2,7 @@
 
 Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any) that implements it.
 
-- **Reference:** spec fetched live from the pinned stack's `/api/openapi.json` (v1.6.2, 230 paths, 301 operations) and the upstream router source read from the same container. Tested range: `1.6.2` only (`GrimoireApiClient.cs`).
+- **Reference:** spec fetched live from the pinned stack's `/api/openapi.json` (v1.7.0, 235 paths, 309 operations) and the upstream router source read from the same container. Tested range: `1.7.0` only (`GrimoireApiClient.cs`).
 - **Perm** column uses Grimoire's roles (`admin` / `gm or admin` / `not guest`); blank = any authenticated user. `?` = a dependency this script could not resolve.
 - ✅ = covered by a CLI command · — = not implemented · 🔒 = internal-only (no user-facing verb); 🔒 rows never count as covered.
 - **Regenerate with `tools/generate-api-coverage.py`; update `IMPLEMENTED` there in the same PR as any change to which endpoints the CLI calls.**
@@ -12,23 +12,23 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | Tag | Covered / Total |
 |-----|-----------------|
 | (untagged) | 0 / 1 |
-| addons | 7 / 7 |
+| addons | 7 / 8 |
 | audio | 0 / 14 |
 | audio-sets | 0 / 5 |
 | auth | 2 / 14 |
 | backups | 6 / 6 |
 | bookmarks | 0 / 4 |
 | books | 11 / 16 |
-| campaigns | 0 / 91 |
+| campaigns | 0 / 93 |
 | downloads | 0 / 1 |
 | duplicates | 13 / 13 |
 | favorites | 0 / 3 |
 | files | 9 / 10 |
-| library | 3 / 6 |
+| library | 3 / 7 |
 | logs | 1 / 1 |
 | lookups | 5 / 15 |
 | maintenance | 1 / 5 |
-| maps | 0 / 14 |
+| maps | 0 / 16 |
 | models | 0 / 10 |
 | saved-filters | 0 / 4 |
 | search | 2 / 2 |
@@ -36,9 +36,10 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | systems | 14 / 15 |
 | tags | 2 / 6 |
 | themes | 0 / 7 |
+| token-frames | 0 / 2 |
 | tokens | 0 / 10 |
 | users | 0 / 16 |
-| **Total** | **76 / 301** |
+| **Total** | **76 / 309** |
 
 2 operation(s) are internal-only (🔒) and excluded from covered counts.
 
@@ -56,6 +57,7 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | POST | `/api/addons/refresh` | Refresh the add-on index | admin | `addons refresh` ✅ |
 | PATCH | `/api/addons/settings` | Update add-on settings | admin | `addons settings` ✅ |
 | POST | `/api/addons/update-all` | Update all add-ons | admin | `addons upgrade-all` ✅ |
+| GET | `/api/addons/verify-index` | Verify an add-on index URL |  | — |
 | PATCH | `/api/addons/{addon_id}` | Enable, disable, or approve an add-on | admin | `addons update` ✅ |
 | DELETE | `/api/addons/{addon_id}` | Uninstall an add-on | admin | `addons uninstall` ✅ |
 | POST | `/api/addons/{addon_id}/install` | Install or update an add-on | admin | `addons install` ✅ |
@@ -200,6 +202,9 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | GET | `/api/campaigns/{campaign_id}/members/{member_id}/sheet` | Download a member's character sheet |  | — |
 | DELETE | `/api/campaigns/{campaign_id}/members/{member_id}/sheet` | Remove a member's character sheet |  | — |
 | POST | `/api/campaigns/{campaign_id}/members/{member_id}/sheet/duplicate` | Duplicate a blank sheet into a member's slot |  | — |
+| POST | `/api/campaigns/{campaign_id}/members/{member_id}/token` | Upload a member's character token |  | — |
+| GET | `/api/campaigns/{campaign_id}/members/{member_id}/token` | Get a member's character token |  | — |
+| DELETE | `/api/campaigns/{campaign_id}/members/{member_id}/token` | Remove a member's character token |  | — |
 | PATCH | `/api/campaigns/{campaign_id}/members/{user_id}` | Accept or decline an invitation |  | — |
 | DELETE | `/api/campaigns/{campaign_id}/members/{user_id}` | Remove a member |  | — |
 | PUT | `/api/campaigns/{campaign_id}/resource-group-order` | Set the resource panel's group display order (categories + type groups) |  | — |
@@ -231,7 +236,6 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | POST | `/api/campaigns/{campaign_id}/wiki/templates` | Write a new note template |  | — |
 | GET | `/api/campaigns/{campaign_id}/wiki/templates/browse` | Browse the community note-template catalogue |  | — |
 | POST | `/api/campaigns/{campaign_id}/wiki/templates/download/{template_id}` | Download a community note template into the campaign |  | — |
-| PUT | `/api/campaigns/{campaign_id}/wiki/templates/source` | Set the note-template catalogue URL |  | — |
 | POST | `/api/campaigns/{campaign_id}/wiki/templates/upload` | Add a note template from an uploaded .md file |  | — |
 | GET | `/api/campaigns/{campaign_id}/wiki/templates/{template_id}` | Get a note template incl. its body |  | — |
 | PATCH | `/api/campaigns/{campaign_id}/wiki/templates/{template_id}` | Edit a note template |  | — |
@@ -298,6 +302,7 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 |--------|------|-------------|------|-----|
 | GET | `/api/about` | Build information |  | 🔒 24-hour version check (all commands), forced at login |
 | POST | `/api/cancel-scan` | Cancel running scan | admin | `library cancel-scan` ✅ |
+| GET | `/api/changelog` | Release changelog |  | — |
 | GET | `/api/latest-release` | Latest published release |  | — |
 | POST | `/api/rescan` | Rescan and reindex library | admin | `library rescan` ✅ |
 | GET | `/api/scan-status` | Scan status | admin | `library scan-status` ✅ |
@@ -355,6 +360,8 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | GET | `/api/maps/{map_id}/file` | Download map file |  | — |
 | GET | `/api/maps/{map_id}/page/{page_num}` | Render a map page |  | — |
 | GET | `/api/maps/{map_id}/thumbnail` | Map thumbnail |  | — |
+| GET | `/api/maps/{map_id}/vtt/authoring` | Get authored Universal VTT geometry |  | — |
+| PUT | `/api/maps/{map_id}/vtt/authoring` | Replace authored Universal VTT geometry | gm or admin | — |
 | GET | `/api/maps/{map_id}/vtt/data` | Universal VTT grid and feature data |  | — |
 | GET | `/api/maps/{map_id}/vtt/image` | Universal VTT map image |  | — |
 
@@ -425,10 +432,10 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 |--------|------|-------------|------|-----|
 | GET | `/api/tags` | List tags |  | `tags list` ✅ |
 | POST | `/api/tags` | Create a tag | gm or admin | — |
-| PATCH | `/api/tags/{internal}` | Rename a tag's display value | gm or admin | — |
-| DELETE | `/api/tags/{internal}` | Delete a tag | gm or admin | — |
+| PATCH | `/api/tags/{internal}` | Rename a tag's display value |  | — |
+| DELETE | `/api/tags/{internal}` | Delete a tag |  | — |
 | GET | `/api/tags/{internal}/items` | Items carrying a tag |  | `tags items` ✅ |
-| POST | `/api/tags/{internal}/merge` | Merge a tag into another | gm or admin | — |
+| POST | `/api/tags/{internal}/merge` | Merge a tag into another |  | — |
 
 ## themes
 
@@ -441,6 +448,13 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | PUT | `/api/themes/selection` | Set the active mode and theme |  | — |
 | PUT | `/api/themes/source` | Set the catalogue URL (admin) | admin | — |
 | DELETE | `/api/themes/{theme_id}` | Uninstall a theme |  | — |
+
+## token-frames
+
+| Method | Path | Description | Perm | CLI |
+|--------|------|-------------|------|-----|
+| GET | `/api/token-frames` | List token frames | not guest | — |
+| GET | `/api/token-frames/{frame_id}/file` | Serve a token frame image | not guest | — |
 
 ## tokens
 

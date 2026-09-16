@@ -4,6 +4,7 @@ using GrimoireCli.Generated.Api.Addons.Item;
 using GrimoireCli.Generated.Api.Addons.Refresh;
 using GrimoireCli.Generated.Api.Addons.Settings;
 using GrimoireCli.Generated.Api.Addons.UpdateAll;
+using GrimoireCli.Generated.Api.Addons.VerifyIndex;
 using GrimoireCli.Generated.Models;
 using Microsoft.Kiota.Abstractions.Extensions;
 using Microsoft.Kiota.Abstractions.Serialization;
@@ -35,6 +36,11 @@ namespace GrimoireCli.Generated.Api.Addons
         public global::GrimoireCli.Generated.Api.Addons.UpdateAll.UpdateAllRequestBuilder UpdateAll
         {
             get => new global::GrimoireCli.Generated.Api.Addons.UpdateAll.UpdateAllRequestBuilder(PathParameters, RequestAdapter);
+        }
+        /// <summary>The verifyIndex property</summary>
+        public global::GrimoireCli.Generated.Api.Addons.VerifyIndex.VerifyIndexRequestBuilder VerifyIndex
+        {
+            get => new global::GrimoireCli.Generated.Api.Addons.VerifyIndex.VerifyIndexRequestBuilder(PathParameters, RequestAdapter);
         }
         /// <summary>Gets an item from the GrimoireCli.Generated.api.addons.item collection</summary>
         /// <param name="position">Unique identifier of the item</param>

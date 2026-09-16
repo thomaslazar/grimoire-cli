@@ -71,7 +71,7 @@ namespace GrimoireCli.Generated.Api.Tags.Item
         /// Rename a tag. Its ``internal`` match key follows the new display when thenormalized form changes (so a typo fix like ``freinds`` → ``friends`` alsofixes search-by-internal); if that key already exists, the tags are merged.
         /// </summary>
         /// <returns>A <see cref="global::GrimoireCli.Generated.Models.TagRenamedResponse"/></returns>
-        /// <param name="body">Rename a tag&apos;s human-facing display value (internal key is immutable).</param>
+        /// <param name="body">Rename a tag&apos;s human-facing display value.The internal key follows the new display when its normalized form changes,so the new value has to be addressable too — which is what lets a tag thatalready contains a slash be renamed out of trouble.</param>
         /// <param name="cancellationToken">Cancellation token to use when cancelling requests</param>
         /// <param name="requestConfiguration">Configuration for the request such as headers, query parameters, and middleware options.</param>
         /// <exception cref="global::GrimoireCli.Generated.Models.HTTPValidationError">When receiving a 422 status code</exception>
@@ -115,7 +115,7 @@ namespace GrimoireCli.Generated.Api.Tags.Item
         /// Rename a tag. Its ``internal`` match key follows the new display when thenormalized form changes (so a typo fix like ``freinds`` → ``friends`` alsofixes search-by-internal); if that key already exists, the tags are merged.
         /// </summary>
         /// <returns>A <see cref="RequestInformation"/></returns>
-        /// <param name="body">Rename a tag&apos;s human-facing display value (internal key is immutable).</param>
+        /// <param name="body">Rename a tag&apos;s human-facing display value.The internal key follows the new display when its normalized form changes,so the new value has to be addressable too — which is what lets a tag thatalready contains a slash be renamed out of trouble.</param>
         /// <param name="requestConfiguration">Configuration for the request such as headers, query parameters, and middleware options.</param>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable

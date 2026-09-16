@@ -63,6 +63,14 @@ namespace GrimoireCli.Generated.Models
 #else
         public string Id { get; set; }
 #endif
+        /// <summary>The index_url property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public string? IndexUrl { get; set; }
+#nullable restore
+#else
+        public string IndexUrl { get; set; }
+#endif
         /// <summary>The installed property</summary>
         public bool? Installed { get; set; }
         /// <summary>The mode property</summary>
@@ -144,6 +152,7 @@ namespace GrimoireCli.Generated.Models
                 { "description", n => { Description = n.GetStringValue(); } },
                 { "grimoire_min_version", n => { GrimoireMinVersion = n.GetStringValue(); } },
                 { "id", n => { Id = n.GetStringValue(); } },
+                { "index_url", n => { IndexUrl = n.GetStringValue(); } },
                 { "installed", n => { Installed = n.GetBoolValue(); } },
                 { "mode", n => { Mode = n.GetStringValue(); } },
                 { "modes", n => { Modes = n.GetCollectionOfPrimitiveValues<string>()?.AsList(); } },
@@ -166,6 +175,7 @@ namespace GrimoireCli.Generated.Models
             writer.WriteStringValue("description", Description);
             writer.WriteStringValue("grimoire_min_version", GrimoireMinVersion);
             writer.WriteStringValue("id", Id);
+            writer.WriteStringValue("index_url", IndexUrl);
             writer.WriteBoolValue("installed", Installed);
             writer.WriteStringValue("mode", Mode);
             writer.WriteCollectionOfPrimitiveValues<string>("modes", Modes);

@@ -22,6 +22,8 @@ namespace GrimoireCli.Generated.Models
 #else
         public string ContainerKind { get; set; }
 #endif
+        /// <summary>The frames_container property</summary>
+        public bool? FramesContainer { get; set; }
         /// <summary>The name property</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
@@ -46,6 +48,7 @@ namespace GrimoireCli.Generated.Models
         public CreateFolderRequest()
         {
             AdditionalData = new Dictionary<string, object>();
+            FramesContainer = false;
             Nsfw = false;
         }
         /// <summary>
@@ -67,6 +70,7 @@ namespace GrimoireCli.Generated.Models
             return new Dictionary<string, Action<IParseNode>>
             {
                 { "container_kind", n => { ContainerKind = n.GetStringValue(); } },
+                { "frames_container", n => { FramesContainer = n.GetBoolValue(); } },
                 { "name", n => { Name = n.GetStringValue(); } },
                 { "nsfw", n => { Nsfw = n.GetBoolValue(); } },
                 { "parent", n => { Parent = n.GetStringValue(); } },
@@ -80,6 +84,7 @@ namespace GrimoireCli.Generated.Models
         {
             if(ReferenceEquals(writer, null)) throw new ArgumentNullException(nameof(writer));
             writer.WriteStringValue("container_kind", ContainerKind);
+            writer.WriteBoolValue("frames_container", FramesContainer);
             writer.WriteStringValue("name", Name);
             writer.WriteBoolValue("nsfw", Nsfw);
             writer.WriteStringValue("parent", Parent);

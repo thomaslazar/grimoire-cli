@@ -9,37 +9,27 @@ namespace GrimoireCli.Generated.Models
 {
     [global::System.CodeDom.Compiler.GeneratedCode("Kiota", "1.0.0")]
     #pragma warning disable CS1591
-    public partial class WikiTemplateSourceOut : IAdditionalDataHolder, IParsable
+    public partial class CampaignMemberOut_has_tokenMember1 : IAdditionalDataHolder, IParsable
     #pragma warning restore CS1591
     {
         /// <summary>Stores additional data not described in the OpenAPI description found when deserializing. Can be used for serialization as well.</summary>
         public IDictionary<string, object> AdditionalData { get; set; }
-        /// <summary>The index_url property</summary>
-#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
-#nullable enable
-        public string? IndexUrl { get; set; }
-#nullable restore
-#else
-        public string IndexUrl { get; set; }
-#endif
-        /// <summary>The is_custom_url property</summary>
-        public bool? IsCustomUrl { get; set; }
         /// <summary>
-        /// Instantiates a new <see cref="global::GrimoireCli.Generated.Models.WikiTemplateSourceOut"/> and sets the default values.
+        /// Instantiates a new <see cref="global::GrimoireCli.Generated.Models.CampaignMemberOut_has_tokenMember1"/> and sets the default values.
         /// </summary>
-        public WikiTemplateSourceOut()
+        public CampaignMemberOut_has_tokenMember1()
         {
             AdditionalData = new Dictionary<string, object>();
         }
         /// <summary>
         /// Creates a new instance of the appropriate class based on discriminator value
         /// </summary>
-        /// <returns>A <see cref="global::GrimoireCli.Generated.Models.WikiTemplateSourceOut"/></returns>
+        /// <returns>A <see cref="global::GrimoireCli.Generated.Models.CampaignMemberOut_has_tokenMember1"/></returns>
         /// <param name="parseNode">The parse node to use to read the discriminator value and create the object</param>
-        public static global::GrimoireCli.Generated.Models.WikiTemplateSourceOut CreateFromDiscriminatorValue(IParseNode parseNode)
+        public static global::GrimoireCli.Generated.Models.CampaignMemberOut_has_tokenMember1 CreateFromDiscriminatorValue(IParseNode parseNode)
         {
             if(ReferenceEquals(parseNode, null)) throw new ArgumentNullException(nameof(parseNode));
-            return new global::GrimoireCli.Generated.Models.WikiTemplateSourceOut();
+            return new global::GrimoireCli.Generated.Models.CampaignMemberOut_has_tokenMember1();
         }
         /// <summary>
         /// The deserialization information for the current model
@@ -49,8 +39,6 @@ namespace GrimoireCli.Generated.Models
         {
             return new Dictionary<string, Action<IParseNode>>
             {
-                { "index_url", n => { IndexUrl = n.GetStringValue(); } },
-                { "is_custom_url", n => { IsCustomUrl = n.GetBoolValue(); } },
             };
         }
         /// <summary>
@@ -60,8 +48,6 @@ namespace GrimoireCli.Generated.Models
         public virtual void Serialize(ISerializationWriter writer)
         {
             if(ReferenceEquals(writer, null)) throw new ArgumentNullException(nameof(writer));
-            writer.WriteStringValue("index_url", IndexUrl);
-            writer.WriteBoolValue("is_custom_url", IsCustomUrl);
             writer.WriteAdditionalData(AdditionalData);
         }
     }

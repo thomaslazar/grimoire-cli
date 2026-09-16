@@ -2,7 +2,7 @@
 
 Behaviour verified against Grimoire **v1.5.6** — the release the live instance
 runs — by reading `temp/grimoire/` at that tag and by calling the API. The local
-stack runs the `1.6.2` release, so a note measured there says so. Don't
+stack runs the `1.7.0` release, so a note measured there says so. Don't
 re-derive these, and don't trust the published docs over them. Re-verify after a
 server upgrade — see [grimoire-compatibility.md](grimoire-compatibility.md) for
 the bump procedure.
@@ -107,6 +107,16 @@ Applies to both `PATCH /api/systems/{id}` and `PATCH /api/books/{id}`
   `backend/routers/_bulk_schemas.py`). An unresolved id, or a `validate` hook
   rejection (e.g. a system name clash), fails only its own item — reported in
   the response's `errors` — not the whole batch.
+- **A tag may not contain `/` or `\`**, as of 1.7.0 (`services/tag_service.py`'s
+  `TAG_FORBIDDEN_CHARS`, applied by every request schema that accepts tags). A
+  slash reads as a path separator in `/api/tags/{internal}`, and Grimoire has no
+  subtags, so `Storage/Box1` was a flat tag that could be created but never
+  renamed or deleted (upstream #430). Validation is on **input only**: the bulk
+  add path and the duplicate-merge field copier fold stored tags back in and a
+  legacy tag must not 500 an unrelated write, and a `tags.json` bypasses the
+  check entirely because Grimoire treats that file as the user's own. The tag
+  routes took `{internal:path}` in the same release, so a legacy slashed tag is
+  still reachable by `tags items` and can be renamed out of trouble.
 - **Renaming a system was unguarded on v1.5.4.** `name` and `slug` are both
   `unique=True` (`backend/models/library.py:24-25`); the handler had no
   conflict check, so a duplicate name failed at commit as an opaque 500 rather
@@ -342,6 +352,14 @@ Verified against v1.5.6, backing the seven `addons` commands.
   which is what lets `docker/smoke-test.sh` point `addons settings
   --index-url` at the internal `addon-index` service instead of the real
   `raw.githubusercontent.com` catalogue.
+- **The index setting is a comma-joined list**, as of 1.7.0. `AddonSettingsUpdate`
+  takes `index_urls` as well as `index_url`, and the plural wins when both are
+  sent; either way the value is stored in one setting and split back out on read.
+  `addons list` and `addons settings` therefore answer with both, `index_url`
+  being the first entry (or `default_index_url` when the list is empty). Entries
+  gained `available_in`, `changelog` and `source_url`, and `addons refresh`
+  reports per-index `errors` alongside its `count`. The CLI still sets one URL:
+  `--index-url` writes the singular field, which is the whole list.
 
 ## Metadata lookup
 
@@ -588,7 +606,7 @@ byte-identical to `v1.6.0`.
 ## Files
 
 Read from `backend/routers/files/core.py` and `backend/services/library_fs/` at
-tag `v1.6.2`.
+tag `v1.7.0`.
 
 - **Every write here needs the library mounted read-write.** Grimoire probes
   writability up front with `os.access` (`services/library_fs/paths.py`'s
@@ -638,11 +656,29 @@ tag `v1.6.2`.
   my upload land *and* index?" is answerable at all. `limit` is silently clamped
   to `max(1, min(limit, 2000))`
   and `total`/`truncated` report what was withheld. `child_count` per folder row
-  stops at 1000.
+  stops at 1000. Each row also carries `accepts_container_kind` and
+  `accepts_frames_marker`, and the response carries the same pair about a *new
+  child* as `children_accept_container_kind` / `children_accept_frames_marker` —
+  computed server-side so the nesting rules stay with the scanner rather than
+  being re-derived by a caller.
 - **Container kinds** are `parent`, `one-page`, `agnostic`, `family`,
   `publisher`, `generic`. **`one-page` and `agnostic` are singletons** — only one
   of each may exist, recognised only at the top level of `books/`, and `browse`
   reports `singletons_taken` as `{kind: path}`.
+- **A folder marker is refused where it would be inert**, as of 1.7.0
+  (`library_fs/folders.py`'s `accepts_container_kind` / `accepts_frames_marker`).
+  A container kind says "my children are game systems", which only the books
+  scanner reads, so it is allowed only inside `books/` at a depth reached through
+  containers alone — one level deeper is a *system* folder, whose children are
+  categories. The frame marker is read only by the `token-frames` walk, so it is
+  allowed anywhere under `tokens/` except `tokens/` itself, at any depth and with
+  no precedence chain. Anything else is a 400 `invalid`. Both guards cover
+  *setting* only: clearing is always allowed, so a marker written by hand in the
+  wrong place stays removable through the API.
+- **`frames_container` is a third marker, independent of the container kinds.**
+  It declares that a token folder's images are token-editor frame art and says
+  nothing about how the children relate, so it is reported and set separately
+  from `container_kind` on `create`, `markers` and every `browse` row.
 - **`scaffold` is idempotent**, creating Core, Supplements, Adventures, Character
   Sheets, Maps, Handouts, Homebrew and Starter Sets, and reporting `created` and
   `existing`.

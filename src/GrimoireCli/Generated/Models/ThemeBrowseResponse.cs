@@ -14,6 +14,14 @@ namespace GrimoireCli.Generated.Models
     {
         /// <summary>Stores additional data not described in the OpenAPI description found when deserializing. Can be used for serialization as well.</summary>
         public IDictionary<string, object> AdditionalData { get; set; }
+        /// <summary>The default_index_url property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public string? DefaultIndexUrl { get; set; }
+#nullable restore
+#else
+        public string DefaultIndexUrl { get; set; }
+#endif
         /// <summary>The generated property</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
@@ -65,6 +73,7 @@ namespace GrimoireCli.Generated.Models
         {
             return new Dictionary<string, Action<IParseNode>>
             {
+                { "default_index_url", n => { DefaultIndexUrl = n.GetStringValue(); } },
                 { "generated", n => { Generated = n.GetStringValue(); } },
                 { "index_url", n => { IndexUrl = n.GetStringValue(); } },
                 { "is_custom_url", n => { IsCustomUrl = n.GetBoolValue(); } },
@@ -78,6 +87,7 @@ namespace GrimoireCli.Generated.Models
         public virtual void Serialize(ISerializationWriter writer)
         {
             if(ReferenceEquals(writer, null)) throw new ArgumentNullException(nameof(writer));
+            writer.WriteStringValue("default_index_url", DefaultIndexUrl);
             writer.WriteStringValue("generated", Generated);
             writer.WriteStringValue("index_url", IndexUrl);
             writer.WriteBoolValue("is_custom_url", IsCustomUrl);

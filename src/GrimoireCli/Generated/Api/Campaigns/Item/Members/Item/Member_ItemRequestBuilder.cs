@@ -2,6 +2,7 @@
 #pragma warning disable CS0618
 using GrimoireCli.Generated.Api.Campaigns.Item.Members.Item.Art;
 using GrimoireCli.Generated.Api.Campaigns.Item.Members.Item.Sheet;
+using GrimoireCli.Generated.Api.Campaigns.Item.Members.Item.Token;
 using GrimoireCli.Generated.Models;
 using Microsoft.Kiota.Abstractions.Extensions;
 using Microsoft.Kiota.Abstractions.Serialization;
@@ -28,6 +29,11 @@ namespace GrimoireCli.Generated.Api.Campaigns.Item.Members.Item
         public global::GrimoireCli.Generated.Api.Campaigns.Item.Members.Item.Sheet.SheetRequestBuilder Sheet
         {
             get => new global::GrimoireCli.Generated.Api.Campaigns.Item.Members.Item.Sheet.SheetRequestBuilder(PathParameters, RequestAdapter);
+        }
+        /// <summary>The token property</summary>
+        public global::GrimoireCli.Generated.Api.Campaigns.Item.Members.Item.Token.TokenRequestBuilder Token
+        {
+            get => new global::GrimoireCli.Generated.Api.Campaigns.Item.Members.Item.Token.TokenRequestBuilder(PathParameters, RequestAdapter);
         }
         /// <summary>
         /// Instantiates a new <see cref="global::GrimoireCli.Generated.Api.Campaigns.Item.Members.Item.Member_ItemRequestBuilder"/> and sets the default values.

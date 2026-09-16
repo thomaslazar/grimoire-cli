@@ -91,7 +91,7 @@ public class FilesService
     }
 
     /// <summary>POST /api/files/folder.</summary>
-    public async Task<string> CreateFolderAsync(string parent, string name, string? containerKind, bool nsfw)
+    public async Task<string> CreateFolderAsync(string parent, string name, string? containerKind, bool nsfw, bool framesContainer)
     {
         var body = new Generated.Models.CreateFolderRequest
         {
@@ -99,16 +99,17 @@ public class FilesService
             Name = name,
             ContainerKind = containerKind,
             Nsfw = nsfw,
+            FramesContainer = framesContainer,
         };
         var info = _client.Api.Api.Files.Folder.ToPostRequestInformation(body);
         return await _client.SendAsync(info, permissionHint: AdminHint, notFoundHint: NotFoundHint);
     }
 
     /// <summary>PUT /api/files/folder/markers. A partial patch: omitted fields are left alone.</summary>
-    public async Task<string> MarkersAsync(string path, string? containerKind, bool? nsfw)
+    public async Task<string> MarkersAsync(string path, string? containerKind, bool? nsfw, bool? framesContainer)
     {
         var info = _client.Api.Api.Files.Folder.Markers.ToPutRequestInformation(
-            BuildMarkersBody(path, containerKind, nsfw));
+            BuildMarkersBody(path, containerKind, nsfw, framesContainer));
         return await _client.SendAsync(info, permissionHint: AdminHint, notFoundHint: NotFoundHint);
     }
 
@@ -129,18 +130,21 @@ public class FilesService
     }
 
     /// <summary>
-    /// container_kind and nsfw are composed-type wrappers because both are
-    /// Optional upstream. Assigning through the wrapper only when the flag was
-    /// given is what keeps this a partial patch. Internal (not private) so a test
-    /// can pin that a client regeneration cannot silently change it.
+    /// container_kind, nsfw and frames_container are composed-type wrappers
+    /// because all three are Optional upstream. Assigning through the wrapper
+    /// only when the flag was given is what keeps this a partial patch. Internal
+    /// (not private) so a test can pin that a client regeneration cannot
+    /// silently change it.
     /// </summary>
-    internal static Generated.Models.MarkersRequest BuildMarkersBody(string path, string? containerKind, bool? nsfw)
+    internal static Generated.Models.MarkersRequest BuildMarkersBody(string path, string? containerKind, bool? nsfw, bool? framesContainer)
     {
         var body = new Generated.Models.MarkersRequest { Path = path };
         if (containerKind is not null)
             body.ContainerKind = new Generated.Models.MarkersRequest.MarkersRequest_container_kind { String = containerKind };
         if (nsfw is not null)
             body.Nsfw = new Generated.Models.MarkersRequest.MarkersRequest_nsfw { Boolean = nsfw.Value };
+        if (framesContainer is not null)
+            body.FramesContainer = new Generated.Models.MarkersRequest.MarkersRequest_frames_container { Boolean = framesContainer.Value };
         return body;
     }
 

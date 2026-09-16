@@ -34,7 +34,7 @@ namespace GrimoireCli.Generated.Api.Files.Folder.Markers
         {
         }
         /// <summary>
-        /// Set or clear a folder&apos;s container-kind and NSFW markers.
+        /// Set or clear a folder&apos;s container-kind, NSFW, and frame markers.
         /// </summary>
         /// <returns>A <see cref="global::GrimoireCli.Generated.Models.FolderResponse"/></returns>
         /// <param name="body">The request body</param>
@@ -59,7 +59,7 @@ namespace GrimoireCli.Generated.Api.Files.Folder.Markers
             return await RequestAdapter.SendAsync<global::GrimoireCli.Generated.Models.FolderResponse>(requestInfo, global::GrimoireCli.Generated.Models.FolderResponse.CreateFromDiscriminatorValue, errorMapping, cancellationToken).ConfigureAwait(false);
         }
         /// <summary>
-        /// Set or clear a folder&apos;s container-kind and NSFW markers.
+        /// Set or clear a folder&apos;s container-kind, NSFW, and frame markers.
         /// </summary>
         /// <returns>A <see cref="RequestInformation"/></returns>
         /// <param name="body">The request body</param>
@@ -90,7 +90,7 @@ namespace GrimoireCli.Generated.Api.Files.Folder.Markers
             return new global::GrimoireCli.Generated.Api.Files.Folder.Markers.MarkersRequestBuilder(rawUrl, RequestAdapter);
         }
         /// <summary>
-        /// Set or clear a folder&apos;s container-kind and NSFW markers.
+        /// Set or clear a folder&apos;s container-kind, NSFW, and frame markers.
         /// </summary>
         [global::System.CodeDom.Compiler.GeneratedCode("Kiota", "1.0.0")]
         public partial class MarkersRequestBuilderPutQueryParameters 

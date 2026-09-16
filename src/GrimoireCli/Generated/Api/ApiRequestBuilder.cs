@@ -11,6 +11,7 @@ using GrimoireCli.Generated.Api.Bookmarks;
 using GrimoireCli.Generated.Api.Books;
 using GrimoireCli.Generated.Api.Campaigns;
 using GrimoireCli.Generated.Api.CancelScan;
+using GrimoireCli.Generated.Api.Changelog;
 using GrimoireCli.Generated.Api.DiceMaterials;
 using GrimoireCli.Generated.Api.Downloads;
 using GrimoireCli.Generated.Api.Duplicates;
@@ -38,6 +39,7 @@ using GrimoireCli.Generated.Api.Systems;
 using GrimoireCli.Generated.Api.Tags;
 using GrimoireCli.Generated.Api.Themes;
 using GrimoireCli.Generated.Api.TokenFolders;
+using GrimoireCli.Generated.Api.TokenFrames;
 using GrimoireCli.Generated.Api.Tokens;
 using GrimoireCli.Generated.Api.Users;
 using Microsoft.Kiota.Abstractions.Extensions;
@@ -108,6 +110,11 @@ namespace GrimoireCli.Generated.Api
         public global::GrimoireCli.Generated.Api.CancelScan.CancelScanRequestBuilder CancelScan
         {
             get => new global::GrimoireCli.Generated.Api.CancelScan.CancelScanRequestBuilder(PathParameters, RequestAdapter);
+        }
+        /// <summary>The changelog property</summary>
+        public global::GrimoireCli.Generated.Api.Changelog.ChangelogRequestBuilder Changelog
+        {
+            get => new global::GrimoireCli.Generated.Api.Changelog.ChangelogRequestBuilder(PathParameters, RequestAdapter);
         }
         /// <summary>The diceMaterials property</summary>
         public global::GrimoireCli.Generated.Api.DiceMaterials.DiceMaterialsRequestBuilder DiceMaterials
@@ -243,6 +250,11 @@ namespace GrimoireCli.Generated.Api
         public global::GrimoireCli.Generated.Api.TokenFolders.TokenFoldersRequestBuilder TokenFolders
         {
             get => new global::GrimoireCli.Generated.Api.TokenFolders.TokenFoldersRequestBuilder(PathParameters, RequestAdapter);
+        }
+        /// <summary>The tokenFrames property</summary>
+        public global::GrimoireCli.Generated.Api.TokenFrames.TokenFramesRequestBuilder TokenFrames
+        {
+            get => new global::GrimoireCli.Generated.Api.TokenFrames.TokenFramesRequestBuilder(PathParameters, RequestAdapter);
         }
         /// <summary>The tokens property</summary>
         public global::GrimoireCli.Generated.Api.Tokens.TokensRequestBuilder Tokens

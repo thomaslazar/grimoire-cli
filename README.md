@@ -253,8 +253,8 @@ grimoire-cli config set server https://grimoire.example.com
 | `files move --sources <path>... --destination <path> [--on-conflict skip\|rename]` | Move files or folders, keeping their metadata (admin) |
 | `files rename --path <path> --new-name <name>` | Rename a file or folder on disk (admin) |
 | `files delete --path <path> [--confirm-name <name>] [--delete-files]` | Drop index entries; `--delete-files` also deletes the files, irreversibly (admin) |
-| `files folder create --parent <path> --name <name> [--container-kind <kind>] [--nsfw]` | Create a folder, optionally a container or NSFW (admin) |
-| `files folder markers --path <path> [--container-kind <kind>] [--nsfw true\|false]` | Set a folder's container/NSFW markers (admin) |
+| `files folder create --parent <path> --name <name> [--container-kind <kind>] [--nsfw] [--frames-container]` | Create a folder, optionally a container, a frame folder, or NSFW (admin) |
+| `files folder markers --path <path> [--container-kind <kind>] [--nsfw true\|false] [--frames-container true\|false]` | Set a folder's container/NSFW/frame markers (admin) |
 | `files folder scaffold --path <path>` | Create the standard category folders (admin) |
 | `files folder contents --path <path>` | Report whether a folder holds content (admin) |
 | `genres list` | List the genre vocabulary (tiered via `parent_id`) |
@@ -350,7 +350,7 @@ Verified API behaviour worth reading before designing a command: [docs/grimoire-
 
 ## Compatibility
 
-Requires Grimoire **v1.6.2**, the only supported server version. The CLI warns on login if the server reports anything else. See [docs/grimoire-compatibility.md](docs/grimoire-compatibility.md) for the version matrix and the bump procedure.
+Requires Grimoire **v1.7.0**, the only supported server version. The CLI warns on login if the server reports anything else. See [docs/grimoire-compatibility.md](docs/grimoire-compatibility.md) for the version matrix and the bump procedure.
 
 ## License
 
