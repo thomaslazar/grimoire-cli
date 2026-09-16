@@ -186,9 +186,10 @@ A batch verb is skip-and-continue: it exits 3 on a partial failure and names eac
 
 Config is stored at `~/.grimoire-cli/config.json`. Values resolve in this order:
 
-1. **CLI flags** (`--server`)
-2. **Environment variables** (`GRIMOIRE_SERVER`)
-3. **Config file**
+1. **Environment variables** (`GRIMOIRE_SERVER`)
+2. **Config file**
+
+`login` is the exception: it takes `--server`, falls back to `GRIMOIRE_SERVER`, then prompts. No other command takes a server flag — the access token lives in the config file alone, so there is nothing for a per-command flag to switch to.
 
 ```bash
 grimoire-cli config get
