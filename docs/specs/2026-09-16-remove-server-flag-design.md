@@ -151,10 +151,16 @@ The unreachable-server block added for
 - **`docs/configuration.md`** — the same, plus the reason the flag tier is gone:
   the token lives in the config file alone, so there is nothing for a per-command
   flag to switch to.
+- **`docs/grimoire-compatibility.md`** — the "one server, one slot" note names
+  `--server` alongside `GRIMOIRE_SERVER`; only the variable can do this now. The
+  limitation itself stands.
 - **`CLAUDE.md`** — rewrite the `--server` convention bullet. It currently
   mandates the per-subcommand pattern and justifies it as matching abs-cli, which
   is false. It becomes: `login` takes `--server` because it produces the config;
-  every other command resolves the server from the environment or the file.
+  every other command resolves the server from the environment or the file. A
+  second, stale sentence saying the first write command would decide whether
+  write commands take `--server` is trimmed — write commands shipped long ago,
+  and the decision is now made for every command at once.
 
 ## Out of scope
 
