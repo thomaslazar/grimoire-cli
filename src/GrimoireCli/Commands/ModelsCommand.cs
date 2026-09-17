@@ -19,6 +19,7 @@ public static class ModelsCommand
         command.Subcommands.Add(CreateUpdateCommand());
         command.Subcommands.Add(CreateBatchUpdateCommand());
         command.Subcommands.Add(CreateBatchTagCommand());
+        command.Subcommands.Add(ModelFolderCommands.Create());
         return command;
     }
 
