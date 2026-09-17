@@ -808,8 +808,12 @@ and measured against the running 1.7.1 stack.
 - **`bulk_update_models` passes no `validate` hook** (`core.py:200-212`), as on
   maps. Only `"Model not found"` reaches `errors`; a schema-invalid item 422s
   the whole batch with nothing written.
-- **Supported/unsupported is inferred folder-level**, not per file —
-  `Goblins/Presupported/goblin_a.stl` (`indexer/media.py:349`).
+- **Supported/unsupported is inferred from the whole relative path — folder or
+  filename.** `_detect_support` matches both regexes against the path with the
+  filename included (`indexer/media.py:365-377`), so `goblin_unsupported.stl`
+  is detected in an untagged folder; the convention it targets is folder-level,
+  `Goblins/Presupported/goblin_a.stl`. Unsupported is tried first, since
+  "unsupported" contains "supported".
 - **`.stl` is the only format that renders a thumbnail**
   (`indexer/models3d.py:67`); `serve_model_thumbnail` 404s on a miss rather than
   serving a placeholder (`core.py:183`).

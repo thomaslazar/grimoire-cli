@@ -34,7 +34,7 @@ item that already carries it.
 
 1. **[tokens per-item layer](https://github.com/thomaslazar/grimoire-cli/issues/40)** — mechanical, following the shape maps already settled.
 2. **[audio per-item layer](https://github.com/thomaslazar/grimoire-cli/issues/41)** — last of the four; thinnest update model, plus an optional cover block.
-3. **[tags writes](https://github.com/thomaslazar/grimoire-cli/issues/42)** — create, rename, delete, merge. Deliberately after the four above: each collection that gains `batch-tag` makes the hygiene problem bigger, so this lands when it is most needed.
+3. **[tags writes](https://github.com/thomaslazar/grimoire-cli/issues/42)** — create, rename, delete, merge. Deliberately after the four collection layers: each collection that gains `batch-tag` makes the hygiene problem bigger, so this lands when it is most needed.
 4. **[vocabulary writes](https://github.com/thomaslazar/grimoire-cli/issues/43)** — completes the five lookups the shipped reads open.
 
 **[Small completions](https://github.com/thomaslazar/grimoire-cli/issues/44)** —

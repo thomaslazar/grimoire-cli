@@ -104,13 +104,15 @@ public class ModelsCommandTests
             .Parse(["update", "--id", "x", "--stdin", "--input", "f.json"]).Errors);
     }
 
-    // The sharp one: is_supported can leave unknown but never return to it.
+    // The sharp one: only unknown is one-way. true and false both write in
+    // either direction, so help that calls the field itself one-way is wrong.
     [Fact]
-    public void UpdateSaysIsSupportedIsOneWay()
+    public void UpdateSaysOnlyUnknownIsOneWay()
     {
         var help = Help(["models", "update"]);
-        Assert.Contains("one-way", help);
-        Assert.Contains("unknown", help);
+        Assert.Contains("only unknown is", help);
+        Assert.Contains("true and false in either direction", help);
+        Assert.DoesNotContain("is_supported is one-way", help);
     }
 
     // Only an unresolved id is per-item here; models passes no validate hook.

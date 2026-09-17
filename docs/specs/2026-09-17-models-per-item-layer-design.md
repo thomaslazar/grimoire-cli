@@ -50,14 +50,15 @@ tag containing `/` or `\` is a 422, as everywhere else since 1.7.0.
 
 ### Measured facts
 
-- **`is_supported` is a one-way trip.** The column is tri-state — true,
-  false, or null meaning "the scanner could not tell" — but `update_model`
-  applies `data.model_dump(exclude_none=True)` with **no** `model_fields_set`
-  re-application (`core.py:195`). So `{"is_supported": null}` is dropped and the
-  write answers `{"status": "ok"}` having changed nothing. A model can be moved
-  from unknown to true or false and **never back**. This is maps' grid-clear
-  asymmetry inverted: there `update_map` rescues a sent `0` deliberately
-  (`maps/core.py:630-633`); here nothing rescues a sent `null`.
+- **Only unknown is a one-way trip; the field itself is reversible.** The
+  column is tri-state — true, false, or null meaning "the scanner could not
+  tell". `update_model` applies `data.model_dump(exclude_none=True)` with **no**
+  `model_fields_set` re-application (`core.py:195`), so `{"is_supported": null}`
+  is dropped and the write answers `{"status": "ok"}` having changed nothing.
+  Sending `true` or `false` writes normally in either direction, including back
+  over the other value. A model can be moved out of unknown and **never back**.
+  This is maps' grid-clear asymmetry inverted: there `update_map` rescues a sent
+  `0` deliberately (`maps/core.py:630-633`); here nothing rescues a sent `null`.
 - **Read and write disagree about the same fact.** `Model3DOut` exposes the
   derived pair `is_presupported` / `is_unsupported` rather than the column
   (`_schemas.py:43-52, 66-67`), both false when unknown, because a single
@@ -90,9 +91,11 @@ tag containing `/` or `\` is a 422, as everywhere else since 1.7.0.
   any path string — so a folder-tag write to a path that was never on disk is
   unreachable afterwards. 1.7.1's `_purge_folders` only runs when a real
   directory is deleted.
-- **Supported/unsupported is inferred folder-level**, not per file —
-  `Goblins/Presupported/goblin_a.stl` (`indexer/media.py:349`). That is what the
-  fixture tree has to mirror for the flag to be observable at all.
+- **Supported/unsupported is inferred from the whole relative path — folder or
+  filename.** `_detect_support` runs both regexes over the path with the
+  filename included (`indexer/media.py:365-377`); the convention it targets is
+  folder-level, `Goblins/Presupported/goblin_a.stl`. That is what the fixture
+  tree mirrors for the flag to be observable at all.
 
 ## Design
 
@@ -153,8 +156,9 @@ Notes:
 
   Clear description with ""; an explicit null does nothing.
 
-  is_supported is one-way: a model whose support state is unknown can be set
-  true or false, but nothing sets it back to unknown. null is dropped.
+  is_supported takes true and false in either direction; only unknown is
+  one-way. A null is dropped, so a model can leave unknown but never
+  return to it.
 
   Responds {"status": "ok"} and echoes nothing — read back with:
   grimoire-cli models get --id <id>
@@ -187,38 +191,43 @@ writes a tree that mirrors the folder-level inference:
 
 ```
 models/Goblins/Presupported/Goblin Archer.stl
-models/Goblins/Unsupported/Goblin Archer.stl
+models/Goblins/Unsupported/Goblin Shaman.stl
+models/Goblins/Loose/Goblin Whelp.stl
 ```
 
 so `is_presupported` and `is_unsupported` are both observable on real rows.
+Distinct filenames let the smoke assertions name the row they mean. The third,
+in a folder neither regex matches, starts unknown and is where the
+`is_supported` write lands, leaving the other two untouched.
 
 The smoke block covers what unit tests cannot:
 
 - `models list` returns the seeded models; `--limit 1` returns one
 - `models get` reports `folder_path`, `folder_tags` and the derived pair
 - the seeded pair reads one `is_presupported` and one `is_unsupported`
-- `models update` sets `is_supported`, and `models get` reads the derived pair
-  flipped to match
+- `models update` sets `is_supported` false then true, and `models get` reads
+  the derived pair flipped to match each time — a real transition on every run
 - **`{"is_supported": null}` answers `{"status": "ok"}` and changes nothing** —
-  the one-way claim, measured rather than asserted from source
+  the unknown-is-one-way claim, measured rather than asserted from source
 - `models batch-tag` adds a tag and `tags items --tag <t> --resource-type model`
   finds it — the symptom this issue names, closed end to end
 - `models folders set` then `models folders list` shows the tag in display casing
 - an unknown field exits **1** (client-side refusal), distinct from a server 422's
   exit 2
 
-Writes stay on the seeded model fixtures with fixed values. The one-way
-`is_supported` is the block's idempotence hazard: the run must leave it at a
-fixed state rather than toggling, since nothing can restore unknown.
+Writes stay on the seeded model fixtures with fixed values. `is_supported` is
+reversible between true and false, so the run may toggle it and still converge;
+what it must not do is write the Presupported/Unsupported fixtures, since
+nothing can restore unknown and the derived-pair check depends on them.
 
 ## Documentation
 
 - README Commands table gains nine rows.
 - `tools/generate-api-coverage.py` gains nine `IMPLEMENTED` entries and the table
   regenerates; `models` goes 0/10 → 9/10.
-- `docs/grimoire-api-notes.md` gains a `## Models` section: the one-way
-  `is_supported`, the read/write field mismatch, the filterless list, and the
-  thumbnail 404.
+- `docs/grimoire-api-notes.md` gains a `## Models` section: the reversible
+  `is_supported` with its unreachable unknown, the read/write field mismatch,
+  the filterless list, and the thumbnail 404.
 - `docs/roadmap.md` loses the models item and renumbers. As with maps, re-read
   the framing prose: the sharpest-symptom paragraph currently names tokens,
   models and audio, and models leaves that set.

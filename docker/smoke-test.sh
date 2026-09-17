@@ -947,18 +947,21 @@ jq -e '(.models | length) == 1' "$WORK/models-limit.out" >/dev/null \
   || fail "--limit 1 should return one row: $(cat "$WORK/models-limit.out")"
 ok "models list --limit bounds the page"
 
-# The folder-level inference: one fixture under Presupported/, one under
-# Unsupported/, so each derived flag has a row that carries it. Neither of
-# these two is ever written below — is_supported is a one-way trip (never
-# back to unknown), so a write here would permanently erase the pair this
-# check relies on for every future run.
-jq -e '[.models[] | select(.is_presupported == true)] | length >= 1' "$WORK/models.out" >/dev/null \
-  || fail "no presupported fixture: $(cat "$WORK/models.out")"
-jq -e '[.models[] | select(.is_unsupported == true)] | length >= 1' "$WORK/models.out" >/dev/null \
-  || fail "no unsupported fixture: $(cat "$WORK/models.out")"
+# The path inference: each assertion names the fixture it means, so it fails
+# if that exact file stops being classified. Matching on the flag alone would
+# stop discriminating from run 2, when the Loose fixture the write below
+# lands on is already presupported and would satisfy the check on its own.
+# Neither named fixture is ever written — nothing can restore unknown, so a
+# write here would permanently erase the pair for every future run.
+jq -e '.models[] | select(.filename == "Goblin Archer.stl") | .is_presupported == true' \
+  "$WORK/models.out" >/dev/null \
+  || fail "the Presupported fixture should read presupported: $(cat "$WORK/models.out")"
+jq -e '.models[] | select(.filename == "Goblin Shaman.stl") | .is_unsupported == true' \
+  "$WORK/models.out" >/dev/null \
+  || fail "the Unsupported fixture should read unsupported: $(cat "$WORK/models.out")"
 ok "the derived support pair reflects the fixture folders"
 
-MODEL_ID=$(jq -r '.models[] | select(.is_unsupported == true) | .id' "$WORK/models.out" | head -1)
+MODEL_ID=$(jq -r '.models[] | select(.filename == "Goblin Shaman.stl") | .id' "$WORK/models.out")
 [ -n "$MODEL_ID" ] || fail "no unsupported fixture id: $(cat "$WORK/models.out")"
 
 "$CLI" models get --id "$MODEL_ID" >"$WORK/modelget.out" 2>&1 \
