@@ -112,6 +112,14 @@ say "wrote $EXPECTED_BOOKS fixture books"
 python3 "$HERE/make-fixtures.py" --png "$HERE/fixture-cover.png"
 say "wrote fixture cover image"
 
+# Map fixtures. Two in one folder and one in a child, so the smoke test can show
+# that --folder is an exact match rather than a subtree.
+mkdir -p "$LIBRARY/maps/battlemaps/caves"
+python3 "$HERE/make-fixtures.py" --png "$LIBRARY/maps/battlemaps/Tavern.png"
+python3 "$HERE/make-fixtures.py" --png "$LIBRARY/maps/battlemaps/Crossroads.png"
+python3 "$HERE/make-fixtures.py" --png "$LIBRARY/maps/battlemaps/caves/Deep Cave.png"
+say "wrote 3 fixture maps"
+
 # 4. Rescan, then wait for completion. `running` reads false before the scan
 #    starts too, so completion is tested with scanned_books.
 curl -sf -X POST "$SERVER/api/rescan" -H "$AUTH" \

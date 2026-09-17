@@ -5,6 +5,9 @@ using GrimoireCli.Configuration;
 
 namespace GrimoireCli.Tests.Api;
 
+// Sends through GrimoireApiClient's pipeline, so it emits DebugHttpHandler log
+// lines into the global NLog target for the same reason MapsServiceTests does.
+[Collection("NLog")]
 public class TokenRefreshTests
 {
     // Signature-free JWTs: only the exp claim is read, by TokenHelper.
