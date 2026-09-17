@@ -15,11 +15,11 @@ namespace GrimoireCli.Tests.Services;
 public class ModelsServiceTests
 {
     private static GrimoireApiClient Client() =>
-        new(new AppConfig { Server = "http://localhost:9481", AccessToken = "t" });
+        new(new AppConfig { Server = "http://example.test", AccessToken = "t" });
 
     private static string Uri(RequestInformation info)
     {
-        info.PathParameters["baseurl"] = "http://localhost:9481";
+        info.PathParameters["baseurl"] = "http://example.test";
         return info.URI.AbsoluteUri;
     }
 

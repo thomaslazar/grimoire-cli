@@ -35,6 +35,9 @@ public static class ModelsCommand
         command.AddHelpSection("Notes", HelpSectionPosition.Top,
             "Variants are hidden — only the main copy of a family is listed.",
             "",
+            "A model with is_presupported and is_unsupported both false is unknown,",
+            "not unsupported.",
+            "",
             "The account's explicit permission filters the list server-side.",
             "",
             "Page with --offset against total in the response.");
@@ -136,9 +139,9 @@ public static class ModelsCommand
             "",
             "Clear description with \"\"; an explicit null does nothing.",
             "",
-            "is_supported is one-way: a model whose support state is unknown can be",
-            "set true or false, but nothing sets it back to unknown — a null is",
-            "dropped and the write still answers ok.",
+            "is_supported takes true and false in either direction; only unknown is",
+            "one-way. A null is dropped, so a model can leave unknown but never",
+            "return to it.",
             "",
             "Responds {\"status\": \"ok\"} and echoes nothing — read back with:",
             "grimoire-cli models get --id <id>");
@@ -188,7 +191,7 @@ public static class ModelsCommand
             "Nothing else is per-item: a schema-invalid item 422s the whole batch",
             "and nothing is written. No tag may contain / or \\.",
             "",
-            "is_supported cannot be cleared here either — see models update.");
+            "is_supported cannot return to unknown here either — see models update.");
         command.AddExamples(
             "grimoire-cli models batch-update --input items.json",
             "jq -c '{items: .}' edits.json | grimoire-cli models batch-update --stdin");
@@ -233,7 +236,8 @@ public static class ModelsCommand
             "Additive — it never removes a tag. models update replaces the set.",
             "",
             "Only an unresolved id lands in errors. Exit 3 is HTTP 200 with a",
-            "non-empty errors list — a partial write.");
+            "non-empty errors list — a partial write. A tag containing / or \\ is a",
+            "422 on the whole request, which writes nothing.");
         command.AddExamples(
             "grimoire-cli models batch-tag --input tags.json",
             "echo '{\"ids\":[\"<id>\"],\"tags\":[\"goblin\"]}' | grimoire-cli models batch-tag --stdin");
