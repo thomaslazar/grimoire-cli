@@ -16,6 +16,9 @@ public static class ModelsCommand
         command.Subcommands.Add(CreateListCommand());
         command.Subcommands.Add(CreateGetCommand());
         command.Subcommands.Add(CreateThumbnailCommand());
+        command.Subcommands.Add(CreateUpdateCommand());
+        command.Subcommands.Add(CreateBatchUpdateCommand());
+        command.Subcommands.Add(CreateBatchTagCommand());
         return command;
     }
 
@@ -112,6 +115,148 @@ public static class ModelsCommand
                 return 1;
             }
             return 0;
+        });
+        return command;
+    }
+
+    private static Command CreateUpdateCommand()
+    {
+        var idOption = new Option<string>("--id") { Description = "Model ID", Required = true };
+        var inputOption = new Option<string?>("--input") { Description = "Read the body from this file" };
+        var stdinOption = new Option<bool>("--stdin") { Description = "Read the body from stdin" };
+        var command = new Command("update", "Update one model's metadata")
+        {
+            idOption, inputOption, stdinOption
+        };
+        command.AddRoleRequired("gm or admin");
+        JsonBodyInput.RequireExactlyOneSource(command, inputOption, stdinOption);
+        command.AddHelpSection("Notes", HelpSectionPosition.Top,
+            "tags replace the set. To add without removing, use batch-tag.",
+            "",
+            "Clear description with \"\"; an explicit null does nothing.",
+            "",
+            "is_supported is one-way: a model whose support state is unknown can be",
+            "set true or false, but nothing sets it back to unknown — a null is",
+            "dropped and the write still answers ok.",
+            "",
+            "Responds {\"status\": \"ok\"} and echoes nothing — read back with:",
+            "grimoire-cli models get --id <id>");
+        command.AddExamples(
+            "grimoire-cli models update --id <id> --input meta.json",
+            "echo '{\"is_supported\":true}' | grimoire-cli models update --id <id> --stdin");
+        command.AddRequestShape<Generated.Models.Model3DUpdate>();
+        command.SetAction(async (parseResult, cancellationToken) =>
+        {
+            string body;
+            try
+            {
+                body = JsonBodyInput.Read(parseResult.GetValue(inputOption), parseResult.GetValue(stdinOption));
+                JsonBodyInput.Validate(body, Generated.Models.Model3DUpdate.CreateFromDiscriminatorValue,
+                    "pass it with --id");
+            }
+            catch (BodyInputException ex)
+            {
+                _logger.Error(ex.Message);
+                return 1;
+            }
+            var (client, _) = CommandHelper.BuildClient();
+            var service = new ModelsService(client);
+            var response = await service.UpdateAsync(parseResult.GetValue(idOption)!, body);
+            ConsoleOutput.WriteRawJson(response);
+            return 0;
+        });
+        return command;
+    }
+
+    private static Command CreateBatchUpdateCommand()
+    {
+        var inputOption = new Option<string?>("--input") { Description = "Read the body from this file" };
+        var stdinOption = new Option<bool>("--stdin") { Description = "Read the body from stdin" };
+        var command = new Command("batch-update", "Update many models in one transaction")
+        {
+            inputOption, stdinOption
+        };
+        command.AddRoleRequired("gm or admin");
+        JsonBodyInput.RequireExactlyOneSource(command, inputOption, stdinOption);
+        command.AddHelpSection("Notes", HelpSectionPosition.Top,
+            "1 to 1000 items. Each item requires id.",
+            "",
+            "Only an unresolved id lands in errors, and the rest apply. Exit 3 is",
+            "HTTP 200 with a non-empty errors list — a partial write.",
+            "",
+            "Nothing else is per-item: a schema-invalid item 422s the whole batch",
+            "and nothing is written. No tag may contain / or \\.",
+            "",
+            "is_supported cannot be cleared here either — see models update.");
+        command.AddExamples(
+            "grimoire-cli models batch-update --input items.json",
+            "jq -c '{items: .}' edits.json | grimoire-cli models batch-update --stdin");
+        command.AddRequestShape<Generated.Models.Model3DBulkUpdate>();
+        command.AddResponseExample<Generated.Models.BulkResult>();
+        command.SetAction(async (parseResult, cancellationToken) =>
+        {
+            string body;
+            try
+            {
+                body = JsonBodyInput.Read(parseResult.GetValue(inputOption), parseResult.GetValue(stdinOption));
+                JsonBodyInput.Validate(body, Generated.Models.Model3DBulkUpdate.CreateFromDiscriminatorValue,
+                    "pass each id inside items");
+            }
+            catch (BodyInputException ex)
+            {
+                _logger.Error(ex.Message);
+                return 1;
+            }
+            var (client, _) = CommandHelper.BuildClient();
+            var service = new ModelsService(client);
+            var result = await service.BatchUpdateAsync(body);
+            ConsoleOutput.WriteRawJson(result);
+            return BulkExit.CodeFor(GrimoireApiClient.HasItems(result, "errors"));
+        });
+        return command;
+    }
+
+    private static Command CreateBatchTagCommand()
+    {
+        var inputOption = new Option<string?>("--input") { Description = "Read the body from this file" };
+        var stdinOption = new Option<bool>("--stdin") { Description = "Read the body from stdin" };
+        var command = new Command("batch-tag", "Add tags to many models, additively")
+        {
+            inputOption, stdinOption
+        };
+        command.AddRoleRequired("gm or admin");
+        JsonBodyInput.RequireExactlyOneSource(command, inputOption, stdinOption);
+        command.AddHelpSection("Notes", HelpSectionPosition.Top,
+            "1 to 1000 ids, and at least one tag; an empty list either side is a 422.",
+            "",
+            "Additive — it never removes a tag. models update replaces the set.",
+            "",
+            "Only an unresolved id lands in errors. Exit 3 is HTTP 200 with a",
+            "non-empty errors list — a partial write.");
+        command.AddExamples(
+            "grimoire-cli models batch-tag --input tags.json",
+            "echo '{\"ids\":[\"<id>\"],\"tags\":[\"goblin\"]}' | grimoire-cli models batch-tag --stdin");
+        command.AddRequestShape<Generated.Models.BulkAddTags>();
+        command.AddResponseExample<Generated.Models.BulkTagResult>();
+        command.SetAction(async (parseResult, cancellationToken) =>
+        {
+            string body;
+            try
+            {
+                body = JsonBodyInput.Read(parseResult.GetValue(inputOption), parseResult.GetValue(stdinOption));
+                JsonBodyInput.Validate(body, Generated.Models.BulkAddTags.CreateFromDiscriminatorValue,
+                    "pass each id inside ids");
+            }
+            catch (BodyInputException ex)
+            {
+                _logger.Error(ex.Message);
+                return 1;
+            }
+            var (client, _) = CommandHelper.BuildClient();
+            var service = new ModelsService(client);
+            var result = await service.BatchTagAsync(body);
+            ConsoleOutput.WriteRawJson(result);
+            return BulkExit.CodeFor(GrimoireApiClient.HasItems(result, "errors"));
         });
         return command;
     }
