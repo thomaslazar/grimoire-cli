@@ -173,6 +173,8 @@ namespace GrimoireCli.Generated.Models
 #endif
         /// <summary>The ocr_indexed property</summary>
         public bool? OcrIndexed { get; set; }
+        /// <summary>The ocr_pages_skipped property</summary>
+        public int? OcrPagesSkipped { get; set; }
         /// <summary>The page_count property</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
@@ -261,6 +263,7 @@ namespace GrimoireCli.Generated.Models
         public BookOut()
         {
             AdditionalData = new Dictionary<string, object>();
+            OcrPagesSkipped = 0;
             VariantCount = 0;
         }
         /// <summary>
@@ -303,6 +306,7 @@ namespace GrimoireCli.Generated.Models
                 { "month", n => { Month = n.GetObjectValue<global::GrimoireCli.Generated.Models.BookOut.BookOut_month>(global::GrimoireCli.Generated.Models.BookOut.BookOut_month.CreateFromDiscriminatorValue); } },
                 { "ocr_dpi", n => { OcrDpi = n.GetObjectValue<global::GrimoireCli.Generated.Models.BookOut.BookOut_ocr_dpi>(global::GrimoireCli.Generated.Models.BookOut.BookOut_ocr_dpi.CreateFromDiscriminatorValue); } },
                 { "ocr_indexed", n => { OcrIndexed = n.GetBoolValue(); } },
+                { "ocr_pages_skipped", n => { OcrPagesSkipped = n.GetIntValue(); } },
                 { "page_count", n => { PageCount = n.GetObjectValue<global::GrimoireCli.Generated.Models.BookOut.BookOut_page_count>(global::GrimoireCli.Generated.Models.BookOut.BookOut_page_count.CreateFromDiscriminatorValue); } },
                 { "publisher", n => { Publisher = n.GetObjectValue<global::GrimoireCli.Generated.Models.BookOut.BookOut_publisher>(global::GrimoireCli.Generated.Models.BookOut.BookOut_publisher.CreateFromDiscriminatorValue); } },
                 { "publisher_url", n => { PublisherUrl = n.GetObjectValue<global::GrimoireCli.Generated.Models.BookOut.BookOut_publisher_url>(global::GrimoireCli.Generated.Models.BookOut.BookOut_publisher_url.CreateFromDiscriminatorValue); } },
@@ -345,6 +349,7 @@ namespace GrimoireCli.Generated.Models
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.BookOut.BookOut_month>("month", Month);
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.BookOut.BookOut_ocr_dpi>("ocr_dpi", OcrDpi);
             writer.WriteBoolValue("ocr_indexed", OcrIndexed);
+            writer.WriteIntValue("ocr_pages_skipped", OcrPagesSkipped);
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.BookOut.BookOut_page_count>("page_count", PageCount);
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.BookOut.BookOut_publisher>("publisher", Publisher);
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.BookOut.BookOut_publisher_url>("publisher_url", PublisherUrl);

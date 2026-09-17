@@ -358,7 +358,7 @@ Verified API behaviour worth reading before designing a command: [docs/grimoire-
 
 ## Compatibility
 
-Requires Grimoire **v1.7.0**, the only supported server version. The CLI warns on login if the server reports anything else. See [docs/grimoire-compatibility.md](docs/grimoire-compatibility.md) for the version matrix and the bump procedure.
+Requires Grimoire **v1.7.0 or v1.7.1**. The CLI warns on login if the server reports anything else. See [docs/grimoire-compatibility.md](docs/grimoire-compatibility.md) for the version matrix and the bump procedure.
 
 ## License
 

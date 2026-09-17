@@ -255,7 +255,11 @@ public static class BooksCommand
             "",
             "Clears the book's search index and re-queues it from page 1. The OCR",
             "runs in the background — watch it with:",
-            "grimoire-cli library scan-status");
+            "grimoire-cli library scan-status",
+            "",
+            "books get reports ocr_pages_skipped: above 0 the book is indexed but",
+            "only partly searchable, those pages having timed out. Re-running resets",
+            "the count and retries them. Requires Grimoire 1.7.1.");
         command.AddExamples("grimoire-cli books reindex --id <book-id>");
         command.SetAction(async (parseResult, cancellationToken) =>
         {
