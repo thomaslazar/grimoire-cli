@@ -120,6 +120,18 @@ python3 "$HERE/make-fixtures.py" --png "$LIBRARY/maps/battlemaps/Crossroads.png"
 python3 "$HERE/make-fixtures.py" --png "$LIBRARY/maps/battlemaps/caves/Deep Cave.png"
 say "wrote 3 fixture maps"
 
+# Model fixtures. The supported/unsupported flag is inferred folder-level, not
+# per file, so the same mini goes under both to make each derived flag
+# observable. A third, in a folder neither regex matches, starts unknown —
+# is_supported is a one-way trip (never back to unknown), so the smoke test's
+# write lands here rather than on Presupported/Unsupported, which must stay
+# put for the derived-pair check to hold on every re-run.
+mkdir -p "$LIBRARY/models/Goblins/Presupported" "$LIBRARY/models/Goblins/Unsupported" "$LIBRARY/models/Goblins/Loose"
+python3 "$HERE/make-fixtures.py" --stl "$LIBRARY/models/Goblins/Presupported/Goblin Archer.stl"
+python3 "$HERE/make-fixtures.py" --stl "$LIBRARY/models/Goblins/Unsupported/Goblin Shaman.stl"
+python3 "$HERE/make-fixtures.py" --stl "$LIBRARY/models/Goblins/Loose/Goblin Whelp.stl"
+say "wrote 3 fixture models"
+
 # 4. Rescan, then wait for completion. `running` reads false before the scan
 #    starts too, so completion is tested with scanned_books.
 curl -sf -X POST "$SERVER/api/rescan" -H "$AUTH" \
