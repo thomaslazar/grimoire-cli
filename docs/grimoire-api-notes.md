@@ -2,7 +2,7 @@
 
 Behaviour verified against Grimoire **v1.5.6** — the release the live instance
 runs — by reading `temp/grimoire/` at that tag and by calling the API. The local
-stack runs the `1.7.0` release, so a note measured there says so. Don't
+stack runs the `1.7.1` release, so a note measured there says so. Don't
 re-derive these, and don't trust the published docs over them. Re-verify after a
 server upgrade — see [grimoire-compatibility.md](grimoire-compatibility.md) for
 the bump procedure.
@@ -117,6 +117,11 @@ Applies to both `PATCH /api/systems/{id}` and `PATCH /api/books/{id}`
   check entirely because Grimoire treats that file as the user's own. The tag
   routes took `{internal:path}` in the same release, so a legacy slashed tag is
   still reachable by `tags items` and can be renamed out of trouble.
+- **`GET /api/tags` counts are live, as of 1.7.1** (`routers/tags/core.py`'s
+  switch to `tag_service.live_link_counts`). A tag's `count` now comes from the
+  same live-resource resolution `/items` uses, so a tag whose carriers are gone
+  reads 0 rather than counting dead links. Counts can drop across the 1.7.0 →
+  1.7.1 upgrade with nothing having been untagged.
 - **Renaming a system was unguarded on v1.5.4.** `name` and `slug` are both
   `unique=True` (`backend/models/library.py:24-25`); the handler had no
   conflict check, so a duplicate name failed at commit as an opaque 500 rather
@@ -689,6 +694,18 @@ tag `v1.7.0`.
   per row and for the browsed folder, as `category_host`, so a caller need not
   re-derive it. The old depth test also mis-read a system nested under two
   containers, creating one category folder instead of eight (upstream #412/#413).
+- **Folder-tag rows follow the tree, as of 1.7.1** (`library_fs/deletes.py`'s
+  `_purge_folders`, `moves.py`'s `_relink_folders`, upstream #445). Deleting a
+  directory now removes the folder-tag rows at and beneath it, and a move or
+  rename carries them onto the new path with their descendants; a destination row
+  that already exists absorbs the source's tags rather than colliding on the
+  unique path. On 1.7.0 both left the row behind — tags silently stopped applying
+  to everything inside, while the row lived on as a folder the tags view still
+  listed for a directory that no longer existed. **A row for a path that was
+  never on disk is unreachable on either version**: the purge runs only from the
+  real-directory delete path, so a folder-tag write to a typo'd path is permanent.
+  Book folders are deliberately exempt — a `BookFolder.path` is
+  `{system_id}/{category}/…` rather than a disk path.
 - **`DELETE /api/files/folder` carries a request body**, which is unusual for a
   DELETE and is what the generated builder expects.
 

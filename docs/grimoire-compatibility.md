@@ -6,7 +6,7 @@
 |---|---|---|
 | 0.1.x | 1.5.6 | initial support, maintained on `support/grimoire-1.5.6` |
 | 0.2.x | 1.6.2 | superseded by 0.3.x |
-| 0.3.x | 1.7.0 | current, on `main` |
+| 0.3.x | 1.7.0 – 1.7.1 | current, on `main` |
 
 **The floor rises only when something forces it**, not on every server release.
 Each row above records a pairing that was necessary at the time — 1.5.6 → 1.6.0
@@ -68,13 +68,35 @@ plain `BaseModel`s with Pydantic's default `extra='ignore'`, so that flag's fiel
 is dropped and the folder is created with no marker and a 200. A silent no-op is
 what the floor warning is for; without the new flag this release would not have
 needed one.
-`docker/docker-compose.yml` pins the `1.7.0` release tag, so the spec cannot
+`docker/docker-compose.yml` pins the `1.7.1` release tag, so the spec cannot
 drift under the committed client between regenerations.
+
+**1.7.1 raised `MaxTestedVersion` and left the floor alone** — the first bump
+here to do so, and the shape a bump takes when nothing forces a floor. Its
+request surface is unchanged but for one additive response field, so the CLI
+reaches 1.7.0 and 1.7.1 alike and the supported range is both. What it changes
+is behaviour the CLI passes through:
+
+- **`tags list` counts are live.** A tag's `count` now comes from the same
+  resolution `/items` uses, so a tag whose carriers are gone reads 0 rather than
+  counting dead links. Counts can therefore drop across this upgrade without
+  anything having been untagged.
+- **Folder-tag rows follow the tree.** `files delete` on a directory now purges
+  the folder-tag rows at and beneath it, and `files move` / `files rename` carry
+  them onto the new path, descendants included; a collision absorbs the source's
+  tags into the existing destination row. On 1.7.0 both left the rows behind,
+  stranded on a path that no longer existed (upstream #445). A row for a path
+  that was never on disk is still unreachable on either version — nothing walks
+  it, because the purge runs only when a real directory is deleted.
+- **`ocr_pages_skipped` is new on `books get` and the book rows of
+  `systems get`.** Greater than 0 means the book is indexed but only partly
+  searchable: those pages exceeded `OCR_PAGE_TIMEOUT` and their text is missing.
+  `books reindex` resets it to 0.
 
 ## Runtime check
 
 `src/GrimoireCli/Api/GrimoireApiClient.cs` defines `MinSupportedVersion` and
-`MaxTestedVersion`, currently both `"1.7.0"`. A check runs before the first
+`MaxTestedVersion`, currently `"1.7.0"` and `"1.7.1"`. A check runs before the first
 request of any command, calling `GET /api/about` and comparing the reported
 version against that range. It is throttled to once every 24 hours — a
 config with a recent `lastVersionCheck` skips the probe entirely — and

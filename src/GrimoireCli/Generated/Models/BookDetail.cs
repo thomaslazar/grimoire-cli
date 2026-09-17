@@ -181,6 +181,8 @@ namespace GrimoireCli.Generated.Models
 #endif
         /// <summary>The ocr_indexed property</summary>
         public bool? OcrIndexed { get; set; }
+        /// <summary>The ocr_pages_skipped property</summary>
+        public int? OcrPagesSkipped { get; set; }
         /// <summary>The ocr_pending property</summary>
         public bool? OcrPending { get; set; }
         /// <summary>The page_count property</summary>
@@ -293,6 +295,7 @@ namespace GrimoireCli.Generated.Models
         public BookDetail()
         {
             AdditionalData = new Dictionary<string, object>();
+            OcrPagesSkipped = 0;
         }
         /// <summary>
         /// Creates a new instance of the appropriate class based on discriminator value
@@ -335,6 +338,7 @@ namespace GrimoireCli.Generated.Models
                 { "month", n => { Month = n.GetObjectValue<global::GrimoireCli.Generated.Models.BookDetail.BookDetail_month>(global::GrimoireCli.Generated.Models.BookDetail.BookDetail_month.CreateFromDiscriminatorValue); } },
                 { "ocr_dpi", n => { OcrDpi = n.GetObjectValue<global::GrimoireCli.Generated.Models.BookDetail.BookDetail_ocr_dpi>(global::GrimoireCli.Generated.Models.BookDetail.BookDetail_ocr_dpi.CreateFromDiscriminatorValue); } },
                 { "ocr_indexed", n => { OcrIndexed = n.GetBoolValue(); } },
+                { "ocr_pages_skipped", n => { OcrPagesSkipped = n.GetIntValue(); } },
                 { "ocr_pending", n => { OcrPending = n.GetBoolValue(); } },
                 { "page_count", n => { PageCount = n.GetObjectValue<global::GrimoireCli.Generated.Models.BookDetail.BookDetail_page_count>(global::GrimoireCli.Generated.Models.BookDetail.BookDetail_page_count.CreateFromDiscriminatorValue); } },
                 { "publisher", n => { Publisher = n.GetObjectValue<global::GrimoireCli.Generated.Models.BookDetail.BookDetail_publisher>(global::GrimoireCli.Generated.Models.BookDetail.BookDetail_publisher.CreateFromDiscriminatorValue); } },
@@ -381,6 +385,7 @@ namespace GrimoireCli.Generated.Models
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.BookDetail.BookDetail_month>("month", Month);
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.BookDetail.BookDetail_ocr_dpi>("ocr_dpi", OcrDpi);
             writer.WriteBoolValue("ocr_indexed", OcrIndexed);
+            writer.WriteIntValue("ocr_pages_skipped", OcrPagesSkipped);
             writer.WriteBoolValue("ocr_pending", OcrPending);
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.BookDetail.BookDetail_page_count>("page_count", PageCount);
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.BookDetail.BookDetail_publisher>("publisher", Publisher);
