@@ -968,14 +968,26 @@ jq -e 'has("folder_path") and has("folder_tags") and has("is_presupported")' \
   || fail "models get should carry folder context and the pair: $(cat "$WORK/modelget.out")"
 ok "models get returns folder context and the derived pair"
 
-# The is_supported write lands on the Loose fixture, not on $MODEL_ID: it starts
-# unknown (both derived flags false), so the write is a real transition rather
-# than a no-op, and it never has to be undone to keep the block idempotent —
-# is_supported can leave unknown but never return to it, so this fixture stays
-# presupported for good after its first run, and asserting it is presupported
-# again on every later run still passes.
+# The is_supported write lands on the Loose fixture, not on $MODEL_ID:
+# Presupported/Unsupported must stay untouched for the derived-pair check
+# above to hold on every future run.
+#
+# true and false are both fully reversible — update_model applies either like
+# any other field. Only null is one-way: it is dropped (exclude_none=True), so
+# a model can leave unknown but never return to it. Because true/false are
+# reversible, asserting only "ends true" would be a real transition the first
+# time this fixture is ever touched, but a no-op on every run after that (it
+# is already true), so a broken update path would pass silently from the
+# second run onward. Toggling false-then-true forces a genuine transition on
+# every single run.
 WRITE_ID=$(jq -r '.models[] | select(.filename == "Goblin Whelp.stl") | .id' "$WORK/models.out")
 [ -n "$WRITE_ID" ] || fail "no Loose fixture id: $(cat "$WORK/models.out")"
+
+echo '{"is_supported":false}' | "$CLI" models update --id "$WRITE_ID" --stdin >/dev/null 2>&1 \
+  || fail "models update exited non-zero"
+"$CLI" models get --id "$WRITE_ID" >"$WORK/modelget2a.out" 2>&1
+jq -e '.is_unsupported == true' "$WORK/modelget2a.out" >/dev/null \
+  || fail "is_supported false should read back as unsupported: $(cat "$WORK/modelget2a.out")"
 
 echo '{"is_supported":true}' | "$CLI" models update --id "$WRITE_ID" --stdin >/dev/null 2>&1 \
   || fail "models update exited non-zero"
@@ -985,7 +997,10 @@ jq -e '.is_presupported == true' "$WORK/modelget2.out" >/dev/null \
 ok "models update writes is_supported and the derived pair follows"
 
 # The one-way rule: a null is dropped, the write still answers ok, and the
-# value does not return to unknown. This is what the help text claims.
+# value does not return to unknown. This is what the help text claims. This
+# check always follows a same-run true write above, so a regression that let
+# null clear the field back to unknown would flip is_presupported to false
+# right here — it does not rely on state left over from a previous run.
 echo '{"is_supported":null}' | "$CLI" models update --id "$WRITE_ID" --stdin >"$WORK/modelnull.out" 2>&1 \
   || fail "models update with a null exited non-zero"
 "$CLI" models get --id "$WRITE_ID" >"$WORK/modelget3.out" 2>&1
