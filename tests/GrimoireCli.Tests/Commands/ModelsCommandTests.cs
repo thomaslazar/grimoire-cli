@@ -1,0 +1,89 @@
+using GrimoireCli.Commands;
+
+namespace GrimoireCli.Tests.Commands;
+
+public class ModelsCommandTests
+{
+    private static string Help(string[] path, bool full = false) =>
+        HelpRenderer.Render(ModelsCommand.Create(), path, full);
+
+    [Fact]
+    public void ListParsesWithNoArguments()
+    {
+        Assert.Empty(ModelsCommand.Create().Parse(["list"]).Errors);
+    }
+
+    // All three reads are require_not_guest or weaker, which carries no tag.
+    [Theory]
+    [InlineData("list")]
+    [InlineData("get")]
+    [InlineData("thumbnail")]
+    public void ReadsDeclareNoRole(string sub)
+    {
+        Assert.DoesNotContain("Role required:", Help(["models", sub]));
+    }
+
+    [Theory]
+    [InlineData("0")]
+    [InlineData("-1")]
+    public void ListRejectsALimitBelowOne(string limit)
+    {
+        Assert.NotEmpty(ModelsCommand.Create().Parse(["list", "--limit", limit]).Errors);
+    }
+
+    // The server declares no ceiling, so the CLI must not invent one.
+    [Fact]
+    public void ListAcceptsALimitAboveAnyServerPageSize()
+    {
+        Assert.Empty(ModelsCommand.Create().Parse(["list", "--limit", "100000"]).Errors);
+    }
+
+    [Fact]
+    public void ListRejectsANegativeOffset()
+    {
+        Assert.NotEmpty(ModelsCommand.Create().Parse(["list", "--offset", "-1"]).Errors);
+    }
+
+    // The default has to render natively, not live in a description string.
+    [Fact]
+    public void ListRendersItsLimitDefault()
+    {
+        Assert.Contains("[default: 100]", Help(["models", "list"]));
+    }
+
+    // The read side exposes a derived pair; the write side takes one tri-state
+    // field. Without this a caller reads is_presupported and tries to write it.
+    [Fact]
+    public void GetExplainsTheDerivedSupportPair()
+    {
+        var help = Help(["models", "get"]);
+        Assert.Contains("is_presupported", help);
+        Assert.Contains("unknown", help);
+    }
+
+    [Fact]
+    public void GetRequiresAnId()
+    {
+        Assert.NotEmpty(ModelsCommand.Create().Parse(["get"]).Errors);
+    }
+
+    [Fact]
+    public void ThumbnailRequiresAnIdAndAnOutput()
+    {
+        Assert.NotEmpty(ModelsCommand.Create().Parse(["thumbnail", "--id", "x"]).Errors);
+        Assert.NotEmpty(ModelsCommand.Create().Parse(["thumbnail", "--output", "x.webp"]).Errors);
+        Assert.Empty(ModelsCommand.Create().Parse(["thumbnail", "--id", "x", "--output", "x.webp"]).Errors);
+    }
+
+    [Fact]
+    public void ListRendersItsResponseShape()
+    {
+        Assert.Contains("\"models\"", Help(["models", "list"], full: true));
+    }
+
+    [Fact]
+    public void GetRendersItsResponseShape()
+    {
+        Assert.Contains("\"folder_tags\"", Help(["models", "get"], full: true));
+    }
+}
