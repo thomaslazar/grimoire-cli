@@ -778,6 +778,49 @@ measured against the running 1.7.0 stack.
   inserts a row for any path string without checking the tree, so a typo'd path
   creates a row that nothing can ever remove.
 
+## Models
+
+Read from `backend/routers/models/core.py` and `_schemas.py` at tag `v1.7.1`,
+and measured against the running 1.7.1 stack.
+
+- **`is_supported` accepts true and false reversibly; only `null` is a
+  one-way trip.** The column is tri-state — true, false, or null meaning "the
+  scanner could not tell" — and `update_model` applies
+  `model_dump(exclude_none=True)` with no `model_fields_set` re-application
+  (`core.py:195`), so a sent `null` is dropped and the write answers
+  `{"status": "ok"}` having changed nothing. Sending `true` or `false` writes
+  normally in either direction, including back over the other value — nothing
+  about the field itself is one-way. What cannot happen is returning to
+  unknown once set: a model can leave null but never come back to it. Maps
+  rescues a sent `0` deliberately (`maps/core.py:630-633`); nothing here
+  rescues a `null`. Measured: `null` after `true` read back as still
+  presupported; `false` after `true`, and `true` after `false`, both read back
+  changed.
+- **Read and write disagree about the same fact.** `Model3DOut` exposes the
+  derived pair `is_presupported` / `is_unsupported` (`_schemas.py:43-52, 66-67`),
+  both false when unknown; the write path takes the single `is_supported`. The
+  field a caller reads is never the field it writes.
+- **`GET /api/models` takes `limit` and `offset` only** (`core.py:32-33`), with
+  `Query(100000)` and no `le=`. No folder or type filter, so unlike maps this
+  endpoint only ever pages in SQL and a negative limit has one meaning.
+- **Explicit rows are filtered server-side per account** (`core.py:37-40`), and
+  variants never reach the list (`core.py:38`).
+- **`bulk_update_models` passes no `validate` hook** (`core.py:200-212`), as on
+  maps. Only `"Model not found"` reaches `errors`; a schema-invalid item 422s
+  the whole batch with nothing written.
+- **Supported/unsupported is inferred from the whole relative path — folder or
+  filename.** `_detect_support` matches both regexes against the path with the
+  filename included (`indexer/media.py:365-377`), so `goblin_unsupported.stl`
+  is detected in an untagged folder; the convention it targets is folder-level,
+  `Goblins/Presupported/goblin_a.stl`. Unsupported is tried first, since
+  "unsupported" contains "supported".
+- **`.stl` is the only format that renders a thumbnail**
+  (`indexer/models3d.py:67`); `serve_model_thumbnail` 404s on a miss rather than
+  serving a placeholder (`core.py:183`).
+- **Folder tags read and write differently**, as on maps: display casing on the
+  read (`core.py:76`), stored internal keys echoed by the PATCH and the bulk
+  (`core.py:91`, `core.py:237`). `model-folders` has no delete.
+
 ## Search
 
 Read from `backend/routers/search/core.py`, `backend/routers/search/_query.py`,

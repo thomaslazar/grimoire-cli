@@ -265,6 +265,15 @@ grimoire-cli config set server https://grimoire.example.com
 | `maps folders list` | List tagged map folders |
 | `maps folders set {--input <file> \| --stdin}` | Replace one map folder's tags (gm or admin) |
 | `maps folders batch-set {--input <file> \| --stdin}` | Set tags on many map folders in one transaction (gm or admin) |
+| `models list [--limit <n>] [--offset <n>]` | List 3D models (defaults to 100 results) |
+| `models get --id <id>` | Get one model, with its derived support pair |
+| `models thumbnail --id <id> --output <path\|->` | Download a model's rendered thumbnail |
+| `models update --id <id> {--input <file> \| --stdin}` | Update one model's metadata (gm or admin) |
+| `models batch-update {--input <file> \| --stdin}` | Update many models in one transaction; exit 3 if partial (gm or admin) |
+| `models batch-tag {--input <file> \| --stdin}` | Add tags to many models, additively; exit 3 if partial (gm or admin) |
+| `models folders list` | List tagged model folders |
+| `models folders set {--input <file> \| --stdin}` | Replace one model folder's tags (gm or admin) |
+| `models folders batch-set {--input <file> \| --stdin}` | Set tags on many model folders in one transaction (gm or admin) |
 | `genres list` | List the genre vocabulary (tiered via `parent_id`) |
 | `licenses list` | List the license vocabulary |
 | `parent-systems list` | List the parent-system vocabulary (ships empty) |

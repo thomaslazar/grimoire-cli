@@ -54,6 +54,7 @@ rootCommand.Subcommands.Add(AddonsCommand.Create());
 rootCommand.Subcommands.Add(BackupsCommand.Create());
 rootCommand.Subcommands.Add(FilesCommand.Create());
 rootCommand.Subcommands.Add(MapsCommand.Create());
+rootCommand.Subcommands.Add(ModelsCommand.Create());
 rootCommand.Subcommands.Add(SearchCommand.Create());
 rootCommand.Subcommands.Add(LogsCommand.Create());
 rootCommand.Subcommands.Add(TagsCommand.Create());
