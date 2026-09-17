@@ -86,4 +86,61 @@ public class ModelsCommandTests
     {
         Assert.Contains("\"folder_tags\"", Help(["models", "get"], full: true));
     }
+
+    [Theory]
+    [InlineData("update")]
+    [InlineData("batch-update")]
+    [InlineData("batch-tag")]
+    public void WritesDeclareTheGmOrAdminRole(string sub)
+    {
+        Assert.Contains("Role required:\n  gm or admin\n", Help(["models", sub]));
+    }
+
+    [Fact]
+    public void UpdateRequiresExactlyOneBodySource()
+    {
+        Assert.NotEmpty(ModelsCommand.Create().Parse(["update", "--id", "x"]).Errors);
+        Assert.NotEmpty(ModelsCommand.Create()
+            .Parse(["update", "--id", "x", "--stdin", "--input", "f.json"]).Errors);
+    }
+
+    // The sharp one: is_supported can leave unknown but never return to it.
+    [Fact]
+    public void UpdateSaysIsSupportedIsOneWay()
+    {
+        var help = Help(["models", "update"]);
+        Assert.Contains("one-way", help);
+        Assert.Contains("unknown", help);
+    }
+
+    // Only an unresolved id is per-item here; models passes no validate hook.
+    [Fact]
+    public void BatchUpdateSaysOnlyAnUnresolvedIdIsPerItem()
+    {
+        var help = Help(["models", "batch-update"]);
+        Assert.Contains("unresolved id", help);
+        Assert.Contains("422", help);
+    }
+
+    [Fact]
+    public void BatchesDocumentTheThousandItemCap()
+    {
+        Assert.Contains("1000", Help(["models", "batch-update"]));
+        Assert.Contains("1000", Help(["models", "batch-tag"]));
+    }
+
+    [Fact]
+    public void UpdateRejectsAFieldModel3DUpdateDoesNotDeclare()
+    {
+        Assert.Throws<BodyInputException>(() =>
+            JsonBodyInput.Validate("{\"is_suported\":true}",
+                GrimoireCli.Generated.Models.Model3DUpdate.CreateFromDiscriminatorValue,
+                "pass it with --id"));
+    }
+
+    [Fact]
+    public void UpdateRendersTheRequestShape()
+    {
+        Assert.Contains("\"is_supported\"", Help(["models", "update"], full: true));
+    }
 }

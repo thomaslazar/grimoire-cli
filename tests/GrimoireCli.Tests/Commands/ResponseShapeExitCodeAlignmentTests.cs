@@ -26,6 +26,8 @@ public class ResponseShapeExitCodeAlignmentTests
             (BooksCommand.Create(), ["books", "batch-tag"], "errors"),
             (MapsCommand.Create(), ["maps", "batch-update"], "errors"),
             (MapsCommand.Create(), ["maps", "batch-tag"], "errors"),
+            (ModelsCommand.Create(), ["models", "batch-update"], "errors"),
+            (ModelsCommand.Create(), ["models", "batch-tag"], "errors"),
             (AddonsCommand.Create(), ["addons", "upgrade-all"], "failed"),
             (LibraryCommand.Create(), ["library", "rescan"], "status"),
         };
