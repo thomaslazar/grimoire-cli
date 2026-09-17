@@ -931,6 +931,102 @@ echo '{"grid_px":"seventy"}' | "$CLI" maps update --id "$MAP_ID" --stdin >/dev/n
   && fail "a wrong-typed grid should not exit 0"
 ok "maps update surfaces the server's rejection of a wrong-typed grid"
 
+# ---- models -----------------------------------------------------------------
+# Requires docker/seed.sh to have run — three fixture models: one under
+# Goblins/Presupported, one under Goblins/Unsupported, and one under
+# Goblins/Loose that neither regex matches (is_supported starts unknown).
+"$CLI" models list >"$WORK/models.out" 2>"$WORK/models.err" \
+  || { cat "$WORK/models.err" >&2; fail "models list exited non-zero"; }
+jq -e '.total >= 3 and (.models | length) >= 3' "$WORK/models.out" >/dev/null \
+  || fail "models list should report the seeded models: $(cat "$WORK/models.out")"
+ok "models list returns the seeded models"
+
+"$CLI" models list --limit 1 >"$WORK/models-limit.out" 2>&1 \
+  || fail "models list --limit exited non-zero"
+jq -e '(.models | length) == 1' "$WORK/models-limit.out" >/dev/null \
+  || fail "--limit 1 should return one row: $(cat "$WORK/models-limit.out")"
+ok "models list --limit bounds the page"
+
+# The folder-level inference: one fixture under Presupported/, one under
+# Unsupported/, so each derived flag has a row that carries it. Neither of
+# these two is ever written below — is_supported is a one-way trip (never
+# back to unknown), so a write here would permanently erase the pair this
+# check relies on for every future run.
+jq -e '[.models[] | select(.is_presupported == true)] | length >= 1' "$WORK/models.out" >/dev/null \
+  || fail "no presupported fixture: $(cat "$WORK/models.out")"
+jq -e '[.models[] | select(.is_unsupported == true)] | length >= 1' "$WORK/models.out" >/dev/null \
+  || fail "no unsupported fixture: $(cat "$WORK/models.out")"
+ok "the derived support pair reflects the fixture folders"
+
+MODEL_ID=$(jq -r '.models[] | select(.is_unsupported == true) | .id' "$WORK/models.out" | head -1)
+[ -n "$MODEL_ID" ] || fail "no unsupported fixture id: $(cat "$WORK/models.out")"
+
+"$CLI" models get --id "$MODEL_ID" >"$WORK/modelget.out" 2>&1 \
+  || fail "models get exited non-zero"
+jq -e 'has("folder_path") and has("folder_tags") and has("is_presupported")' \
+  "$WORK/modelget.out" >/dev/null \
+  || fail "models get should carry folder context and the pair: $(cat "$WORK/modelget.out")"
+ok "models get returns folder context and the derived pair"
+
+# The is_supported write lands on the Loose fixture, not on $MODEL_ID: it starts
+# unknown (both derived flags false), so the write is a real transition rather
+# than a no-op, and it never has to be undone to keep the block idempotent —
+# is_supported can leave unknown but never return to it, so this fixture stays
+# presupported for good after its first run, and asserting it is presupported
+# again on every later run still passes.
+WRITE_ID=$(jq -r '.models[] | select(.filename == "Goblin Whelp.stl") | .id' "$WORK/models.out")
+[ -n "$WRITE_ID" ] || fail "no Loose fixture id: $(cat "$WORK/models.out")"
+
+echo '{"is_supported":true}' | "$CLI" models update --id "$WRITE_ID" --stdin >/dev/null 2>&1 \
+  || fail "models update exited non-zero"
+"$CLI" models get --id "$WRITE_ID" >"$WORK/modelget2.out" 2>&1
+jq -e '.is_presupported == true' "$WORK/modelget2.out" >/dev/null \
+  || fail "is_supported true should read back as presupported: $(cat "$WORK/modelget2.out")"
+ok "models update writes is_supported and the derived pair follows"
+
+# The one-way rule: a null is dropped, the write still answers ok, and the
+# value does not return to unknown. This is what the help text claims.
+echo '{"is_supported":null}' | "$CLI" models update --id "$WRITE_ID" --stdin >"$WORK/modelnull.out" 2>&1 \
+  || fail "models update with a null exited non-zero"
+"$CLI" models get --id "$WRITE_ID" >"$WORK/modelget3.out" 2>&1
+jq -e '.is_presupported == true' "$WORK/modelget3.out" >/dev/null \
+  || fail "a null should have changed nothing: $(cat "$WORK/modelget3.out")"
+ok "models update cannot return is_supported to unknown"
+
+# The symptom the whole group exists to fix: tagging a model directly.
+echo "{\"ids\":[\"$MODEL_ID\"],\"tags\":[\"smoke-model\"]}" \
+  | "$CLI" models batch-tag --stdin >/dev/null 2>&1 \
+  || fail "models batch-tag exited non-zero"
+"$CLI" tags items --tag smoke-model --resource-type model >"$WORK/modeltag.out" 2>&1 \
+  || fail "tags items exited non-zero"
+jq -e --arg id "$MODEL_ID" '[.. | .item_id? // empty] | any(. == $id)' "$WORK/modeltag.out" >/dev/null \
+  || fail "the tagged model should be findable: $(cat "$WORK/modeltag.out")"
+ok "models batch-tag tags a model without duplicates merge-metadata"
+
+echo '{"path":"Goblins","tags":["Smoke Models"]}' \
+  | "$CLI" models folders set --stdin >/dev/null 2>&1 \
+  || fail "models folders set exited non-zero"
+"$CLI" models folders list >"$WORK/modelflist.out" 2>&1 \
+  || fail "models folders list exited non-zero"
+jq -e '[.folders[] | select(.path == "Goblins") | .tags[]] | any(. == "Smoke Models")' \
+  "$WORK/modelflist.out" >/dev/null \
+  || fail "the folder tag should list in display casing: $(cat "$WORK/modelflist.out")"
+ok "models folders set writes a tag that lists in display casing"
+
+"$CLI" models thumbnail --id "$MODEL_ID" --output "$WORK/mini.webp" >/dev/null 2>&1 \
+  || fail "models thumbnail exited non-zero"
+[ -s "$WORK/mini.webp" ] || fail "models thumbnail wrote no bytes"
+ok "models thumbnail downloads the rendered image"
+
+# An unknown field is refused client-side: exit 1, and no request is made.
+set +e
+echo '{"is_suported":true}' | "$CLI" models update --id "$MODEL_ID" --stdin \
+  >/dev/null 2>"$WORK/modeltypo.err"; rc=$?
+set -e
+[ "$rc" -eq 1 ] || fail "an unknown model field should exit 1, got $rc: $(cat "$WORK/modeltypo.err")"
+grep -q "is_suported" "$WORK/modeltypo.err" || fail "no offending field named: $(cat "$WORK/modeltypo.err")"
+ok "models update refuses an unknown field before any request"
+
 # --- discovery ---------------------------------------------------------------
 # Read-only throughout: nothing here writes, so a re-run converges trivially.
 # The fixture's indexed pages all read "grimoire-cli fixture · page N", which is
