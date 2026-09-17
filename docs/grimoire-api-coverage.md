@@ -29,7 +29,7 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | lookups | 5 / 15 |
 | maintenance | 1 / 5 |
 | maps | 8 / 16 |
-| models | 0 / 10 |
+| models | 9 / 10 |
 | saved-filters | 0 / 4 |
 | search | 2 / 2 |
 | settings | 0 / 5 |
@@ -39,7 +39,7 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | token-frames | 0 / 2 |
 | tokens | 0 / 10 |
 | users | 0 / 16 |
-| **Total** | **84 / 309** |
+| **Total** | **93 / 309** |
 
 2 operation(s) are internal-only (🔒) and excluded from covered counts.
 
@@ -369,16 +369,16 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 
 | Method | Path | Description | Perm | CLI |
 |--------|------|-------------|------|-----|
-| GET | `/api/model-folders` | List model folders | not guest | — |
-| PATCH | `/api/model-folders` | Set tags on a model folder | gm or admin | — |
-| POST | `/api/model-folders/bulk` | Bulk set model folder tags | gm or admin | — |
-| GET | `/api/models` | List 3D models | not guest | — |
-| POST | `/api/models/bulk` | Bulk update models | gm or admin | — |
-| POST | `/api/models/bulk/tags` | Bulk add tags to models | gm or admin | — |
-| GET | `/api/models/{model_id}` | Get a 3D model |  | — |
-| PATCH | `/api/models/{model_id}` | Update model metadata | gm or admin | — |
+| GET | `/api/model-folders` | List model folders | not guest | `models folders list` ✅ |
+| PATCH | `/api/model-folders` | Set tags on a model folder | gm or admin | `models folders set` ✅ |
+| POST | `/api/model-folders/bulk` | Bulk set model folder tags | gm or admin | `models folders batch-set` ✅ |
+| GET | `/api/models` | List 3D models | not guest | `models list` ✅ |
+| POST | `/api/models/bulk` | Bulk update models | gm or admin | `models batch-update` ✅ |
+| POST | `/api/models/bulk/tags` | Bulk add tags to models | gm or admin | `models batch-tag` ✅ |
+| GET | `/api/models/{model_id}` | Get a 3D model |  | `models get` ✅ |
+| PATCH | `/api/models/{model_id}` | Update model metadata | gm or admin | `models update` ✅ |
 | GET | `/api/models/{model_id}/file` | Download model file |  | — |
-| GET | `/api/models/{model_id}/thumbnail` | Model thumbnail |  | — |
+| GET | `/api/models/{model_id}/thumbnail` | Model thumbnail |  | `models thumbnail` ✅ |
 
 ## saved-filters
 
