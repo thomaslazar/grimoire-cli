@@ -133,6 +133,16 @@ python3 "$HERE/make-fixtures.py" --stl "$LIBRARY/models/Goblins/Unsupported/Gobl
 python3 "$HERE/make-fixtures.py" --stl "$LIBRARY/models/Goblins/Loose/Goblin Whelp.stl"
 say "wrote 3 fixture models"
 
+# Token and audio fixtures. Each collection gets a subfolder as well as a top
+# folder, so the folder-tag inheritance gap — a tag on the parent reaches tags
+# items and search but reads empty on an item in a child — is observable.
+mkdir -p "$LIBRARY/tokens/Monsters/Undead" "$LIBRARY/audio/Ambience/Battle"
+python3 "$HERE/make-fixtures.py" --png "$LIBRARY/tokens/Monsters/Goblin.png"
+python3 "$HERE/make-fixtures.py" --png "$LIBRARY/tokens/Monsters/Undead/Skeleton.png"
+python3 "$HERE/make-fixtures.py" --wav "$LIBRARY/audio/Ambience/Tavern.wav"
+python3 "$HERE/make-fixtures.py" --wav "$LIBRARY/audio/Ambience/Battle/Drums.wav"
+say "wrote 2 fixture tokens and 2 fixture audio tracks"
+
 # 4. Rescan, then wait for completion. `running` reads false before the scan
 #    starts too, so completion is tested with scanned_books.
 curl -sf -X POST "$SERVER/api/rescan" -H "$AUTH" \

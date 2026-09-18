@@ -8,6 +8,7 @@ here is parseable by the indexer. Install with: sudo apt-get install -y python3-
 Usage: make-fixtures.py <path> <pages>
        make-fixtures.py --png <path>
        make-fixtures.py --stl <path>
+       make-fixtures.py --wav <path>
 """
 import sys
 
@@ -66,16 +67,37 @@ def make_stl(path: str) -> None:
         fh.write(header + struct.pack("<I", 1) + triangle)
 
 
+def make_wav(path: str) -> None:
+    """A short silent WAV.
+
+    Grimoire indexes .wav (indexer/constants.py's AUDIO_EXTS) and reads duration
+    from the file itself, so a real header is enough to get a non-zero duration
+    with empty title/artist/album — which is exactly the shape the tag-metadata
+    caveat describes. Written with the stdlib wave module; no audio library is
+    installed in the devcontainer.
+    """
+    import wave
+
+    with wave.open(path, "wb") as fh:
+        fh.setnchannels(1)
+        fh.setsampwidth(2)
+        fh.setframerate(8000)
+        fh.writeframes(b"\x00\x00" * 4000)  # half a second of silence
+
+
 if __name__ == "__main__":
     if len(sys.argv) == 3 and sys.argv[1] == "--png":
         make_png(sys.argv[2])
     elif len(sys.argv) == 3 and sys.argv[1] == "--stl":
         make_stl(sys.argv[2])
+    elif len(sys.argv) == 3 and sys.argv[1] == "--wav":
+        make_wav(sys.argv[2])
     elif len(sys.argv) == 3:
         make_pdf(sys.argv[1], int(sys.argv[2]))
     else:
         sys.exit(
             "Usage: make-fixtures.py <path> <pages>\n"
             "       make-fixtures.py --png <path>\n"
-            "       make-fixtures.py --stl <path>"
+            "       make-fixtures.py --stl <path>\n"
+            "       make-fixtures.py --wav <path>"
         )
