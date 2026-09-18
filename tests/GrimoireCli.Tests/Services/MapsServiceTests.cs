@@ -155,4 +155,11 @@ public class MapsServiceTests
                 "{\"folders\":[{\"path\":\"battlemaps\",\"tags\":[]}]}"),
         }, handler.Seen);
     }
+
+    [Fact]
+    public void ThumbnailResolvesToItsOwnRoute()
+    {
+        Assert.EndsWith("/api/maps/abc/thumbnail",
+            Uri(Client().Api.Api.Maps["abc"].Thumbnail.ToGetRequestInformation()));
+    }
 }

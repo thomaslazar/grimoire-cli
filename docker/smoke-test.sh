@@ -880,6 +880,11 @@ jq -e '.folder_path == "battlemaps"' "$WORK/mapget.out" >/dev/null \
   || fail "folder_path should exclude the maps/ root: $(cat "$WORK/mapget.out")"
 ok "maps get returns grid and folder context"
 
+"$CLI" maps thumbnail --id "$MAP_ID" --output "$WORK/mapthumb.webp" >/dev/null 2>&1 \
+  || fail "maps thumbnail exited non-zero"
+[ -s "$WORK/mapthumb.webp" ] || fail "maps thumbnail wrote no bytes"
+ok "maps thumbnail downloads the rendered image"
+
 echo '{"grid_px":70}' | "$CLI" maps update --id "$MAP_ID" --stdin >"$WORK/mapupd.out" 2>&1 \
   || fail "maps update exited non-zero"
 "$CLI" maps get --id "$MAP_ID" >"$WORK/mapget2.out" 2>&1
@@ -1044,6 +1049,129 @@ set -e
 [ "$rc" -eq 1 ] || fail "an unknown model field should exit 1, got $rc: $(cat "$WORK/modeltypo.err")"
 grep -q "is_suported" "$WORK/modeltypo.err" || fail "no offending field named: $(cat "$WORK/modeltypo.err")"
 ok "models update refuses an unknown field before any request"
+
+# ---- tokens -----------------------------------------------------------------
+# Requires docker/seed.sh to have run — two fixture tokens: Goblin.png directly
+# under Monsters, and Skeleton.png under Monsters/Undead.
+"$CLI" tokens list >"$WORK/tokens.out" 2>"$WORK/tokens.err" \
+  || { cat "$WORK/tokens.err" >&2; fail "tokens list exited non-zero"; }
+jq -e '.total >= 2 and (.tokens | length) >= 2' "$WORK/tokens.out" >/dev/null \
+  || fail "tokens list should report the seeded tokens: $(cat "$WORK/tokens.out")"
+ok "tokens list returns the seeded tokens"
+
+"$CLI" tokens list --limit 1 >"$WORK/tokens-limit.out" 2>&1 \
+  || fail "tokens list --limit exited non-zero"
+jq -e '(.tokens | length) == 1' "$WORK/tokens-limit.out" >/dev/null \
+  || fail "--limit 1 should return one row: $(cat "$WORK/tokens-limit.out")"
+ok "tokens list --limit bounds the page"
+
+TOKEN_ID=$(jq -r '.tokens[] | select(.filename == "Goblin.png") | .id' "$WORK/tokens.out")
+[ -n "$TOKEN_ID" ] || fail "no Goblin.png fixture id: $(cat "$WORK/tokens.out")"
+
+"$CLI" tokens get --id "$TOKEN_ID" >"$WORK/tokenget.out" 2>&1 \
+  || fail "tokens get exited non-zero"
+jq -e 'has("folder_path") and has("folder_tags") and has("is_explicit")' \
+  "$WORK/tokenget.out" >/dev/null \
+  || fail "tokens get should carry folder context: $(cat "$WORK/tokenget.out")"
+ok "tokens get returns folder context"
+
+"$CLI" tokens thumbnail --id "$TOKEN_ID" --output "$WORK/goblin.webp" >/dev/null 2>&1 \
+  || fail "tokens thumbnail exited non-zero"
+[ -s "$WORK/goblin.webp" ] || fail "tokens thumbnail wrote no bytes"
+ok "tokens thumbnail downloads the rendered image"
+
+echo "{\"ids\":[\"$TOKEN_ID\"],\"tags\":[\"smoke-token\"]}" \
+  | "$CLI" tokens batch-tag --stdin >/dev/null 2>&1 \
+  || fail "tokens batch-tag exited non-zero"
+"$CLI" tags items --tag smoke-token --resource-type token >"$WORK/tokentag.out" 2>&1 \
+  || fail "tags items exited non-zero"
+jq -e --arg id "$TOKEN_ID" '[.. | .item_id? // empty] | any(. == $id)' "$WORK/tokentag.out" >/dev/null \
+  || fail "the tagged token should be findable: $(cat "$WORK/tokentag.out")"
+ok "tokens batch-tag tags a token without duplicates merge-metadata"
+
+echo '{"path":"Monsters","tags":["Smoke Tokens"]}' \
+  | "$CLI" tokens folders set --stdin >/dev/null 2>&1 \
+  || fail "tokens folders set exited non-zero"
+"$CLI" tokens folders list >"$WORK/tokenflist.out" 2>&1 \
+  || fail "tokens folders list exited non-zero"
+jq -e '[.folders[] | select(.path == "Monsters") | .tags[]] | any(. == "Smoke Tokens")' \
+  "$WORK/tokenflist.out" >/dev/null \
+  || fail "the folder tag should list in display casing: $(cat "$WORK/tokenflist.out")"
+ok "tokens folders set writes a tag that lists in display casing"
+
+# An unknown field is refused client-side: exit 1, distinct from a server 422's 2.
+set +e
+echo '{"is_explict":true}' | "$CLI" tokens update --id "$TOKEN_ID" --stdin \
+  >/dev/null 2>"$WORK/tokentypo.err"; rc=$?
+set -e
+[ "$rc" -eq 1 ] || fail "an unknown token field should exit 1, got $rc: $(cat "$WORK/tokentypo.err")"
+grep -q "is_explict" "$WORK/tokentypo.err" || fail "no offending field named: $(cat "$WORK/tokentypo.err")"
+ok "tokens update refuses an unknown field before any request"
+
+# ---- audio ------------------------------------------------------------------
+# Requires docker/seed.sh to have run — two fixture tracks: Tavern.wav directly
+# under Ambience, and Drums.wav under Ambience/Battle.
+"$CLI" audio list >"$WORK/audio.out" 2>"$WORK/audio.err" \
+  || { cat "$WORK/audio.err" >&2; fail "audio list exited non-zero"; }
+jq -e '.total >= 2 and (.audio | length) >= 2' "$WORK/audio.out" >/dev/null \
+  || fail "audio list should report the seeded tracks: $(cat "$WORK/audio.out")"
+ok "audio list returns the seeded tracks"
+
+AUDIO_ID=$(jq -r '.audio[] | select(.filename == "Tavern.wav") | .id' "$WORK/audio.out")
+[ -n "$AUDIO_ID" ] || fail "no Tavern.wav fixture id: $(cat "$WORK/audio.out")"
+
+# The tag metadata audio update cannot write: duration is read from the file,
+# title/artist/album are empty because the fixture carries no tags.
+jq -e '.audio[] | select(.filename == "Tavern.wav") | .duration > 0 and .title == ""' \
+  "$WORK/audio.out" >/dev/null \
+  || fail "the fixture should have a duration and no title: $(cat "$WORK/audio.out")"
+ok "audio list reports scan-derived duration with empty tag metadata"
+
+"$CLI" audio get --id "$AUDIO_ID" >"$WORK/audioget.out" 2>&1 \
+  || fail "audio get exited non-zero"
+jq -e 'has("folder_path") and has("folder_tags") and has("has_artwork")' \
+  "$WORK/audioget.out" >/dev/null \
+  || fail "audio get should carry folder context: $(cat "$WORK/audioget.out")"
+ok "audio get returns folder context"
+
+# Tavern.wav carries no embedded art, but seed.sh drops a cover.png beside it
+# in Ambience/ — _find_folder_artwork (indexer/metadata.py) claims a same-folder
+# cover.*/folder.* image as folder art, which serve_audio_artwork falls back to
+# before embedded art. This proves route, --id handling and the download path
+# together, not just that some 4xx/5xx came back.
+"$CLI" audio artwork --id "$AUDIO_ID" --output "$WORK/artwork.png" >/dev/null 2>&1 \
+  || fail "audio artwork exited non-zero"
+[ -s "$WORK/artwork.png" ] || fail "audio artwork wrote no bytes"
+ok "audio artwork downloads the folder cover image"
+
+echo "{\"ids\":[\"$AUDIO_ID\"],\"tags\":[\"smoke-audio\"]}" \
+  | "$CLI" audio batch-tag --stdin >/dev/null 2>&1 \
+  || fail "audio batch-tag exited non-zero"
+"$CLI" tags items --tag smoke-audio --resource-type audio >"$WORK/audiotag.out" 2>&1 \
+  || fail "tags items exited non-zero"
+jq -e --arg id "$AUDIO_ID" '[.. | .item_id? // empty] | any(. == $id)' "$WORK/audiotag.out" >/dev/null \
+  || fail "the tagged track should be findable: $(cat "$WORK/audiotag.out")"
+ok "audio batch-tag tags a track without duplicates merge-metadata"
+
+echo '{"path":"Ambience","tags":["Smoke Audio"]}' \
+  | "$CLI" audio folders set --stdin >/dev/null 2>&1 \
+  || fail "audio folders set exited non-zero"
+"$CLI" audio folders list >"$WORK/audioflist.out" 2>&1 \
+  || fail "audio folders list exited non-zero"
+jq -e '[.folders[] | select(.path == "Ambience") | .tags[]] | any(. == "Smoke Audio")' \
+  "$WORK/audioflist.out" >/dev/null \
+  || fail "the folder tag should list in display casing: $(cat "$WORK/audioflist.out")"
+ok "audio folders set writes a tag that lists in display casing"
+
+# artist is scan-derived and AudioUpdate does not declare it, so this is refused
+# client-side at exit 1 rather than reaching the server.
+set +e
+echo '{"artist":"nope"}' | "$CLI" audio update --id "$AUDIO_ID" --stdin \
+  >/dev/null 2>"$WORK/audiotypo.err"; rc=$?
+set -e
+[ "$rc" -eq 1 ] || fail "writing artist should exit 1, got $rc: $(cat "$WORK/audiotypo.err")"
+grep -q "artist" "$WORK/audiotypo.err" || fail "no offending field named: $(cat "$WORK/audiotypo.err")"
+ok "audio update refuses the scan-derived artist field before any request"
 
 # --- discovery ---------------------------------------------------------------
 # Read-only throughout: nothing here writes, so a re-run converges trivially.

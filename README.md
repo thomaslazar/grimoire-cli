@@ -259,6 +259,7 @@ grimoire-cli config set server https://grimoire.example.com
 | `files folder contents --path <path>` | Report whether a folder holds content (admin) |
 | `maps list [--map-type <t>] [--folder <path>] [--limit <n>] [--offset <n>]` | List maps (defaults to 100 results) |
 | `maps get --id <id>` | Get one map, with its detected grid and any manual override |
+| `maps thumbnail --id <id> --output <path\|->` | Download a map's scan-generated thumbnail |
 | `maps update --id <id> {--input <file> \| --stdin}` | Update one map's metadata (gm or admin) |
 | `maps batch-update {--input <file> \| --stdin}` | Update many maps in one transaction; exit 3 if partial (gm or admin) |
 | `maps batch-tag {--input <file> \| --stdin}` | Add tags to many maps, additively; exit 3 if partial (gm or admin) |
@@ -274,6 +275,24 @@ grimoire-cli config set server https://grimoire.example.com
 | `models folders list` | List tagged model folders |
 | `models folders set {--input <file> \| --stdin}` | Replace one model folder's tags (gm or admin) |
 | `models folders batch-set {--input <file> \| --stdin}` | Set tags on many model folders in one transaction (gm or admin) |
+| `tokens list [--limit <n>] [--offset <n>]` | List tokens (defaults to 100 results) |
+| `tokens get --id <id>` | Get one token |
+| `tokens thumbnail --id <id> --output <path\|->` | Download a token's rendered thumbnail |
+| `tokens update --id <id> {--input <file> \| --stdin}` | Update one token's metadata (gm or admin) |
+| `tokens batch-update {--input <file> \| --stdin}` | Update many tokens in one transaction; exit 3 if partial (gm or admin) |
+| `tokens batch-tag {--input <file> \| --stdin}` | Add tags to many tokens, additively; exit 3 if partial (gm or admin) |
+| `tokens folders list` | List tagged token folders |
+| `tokens folders set {--input <file> \| --stdin}` | Replace one token folder's tags (gm or admin) |
+| `tokens folders batch-set {--input <file> \| --stdin}` | Set tags on many token folders in one transaction (gm or admin) |
+| `audio list [--limit <n>] [--offset <n>]` | List audio tracks (defaults to 100 results) |
+| `audio get --id <id>` | Get one audio track |
+| `audio artwork --id <id> --output <path\|->` | Download an audio track's artwork |
+| `audio update --id <id> {--input <file> \| --stdin}` | Update one audio track's metadata (gm or admin) |
+| `audio batch-update {--input <file> \| --stdin}` | Update many audio tracks in one transaction; exit 3 if partial (gm or admin) |
+| `audio batch-tag {--input <file> \| --stdin}` | Add tags to many audio tracks, additively; exit 3 if partial (gm or admin) |
+| `audio folders list` | List tagged audio folders |
+| `audio folders set {--input <file> \| --stdin}` | Replace one audio folder's tags (gm or admin) |
+| `audio folders batch-set {--input <file> \| --stdin}` | Set tags on many audio folders in one transaction (gm or admin) |
 | `genres list` | List the genre vocabulary (tiered via `parent_id`) |
 | `licenses list` | List the license vocabulary |
 | `parent-systems list` | List the parent-system vocabulary (ships empty) |

@@ -13,7 +13,7 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 |-----|-----------------|
 | (untagged) | 0 / 1 |
 | addons | 7 / 8 |
-| audio | 0 / 14 |
+| audio | 9 / 14 |
 | audio-sets | 0 / 5 |
 | auth | 2 / 14 |
 | backups | 6 / 6 |
@@ -28,7 +28,7 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | logs | 1 / 1 |
 | lookups | 5 / 15 |
 | maintenance | 1 / 5 |
-| maps | 8 / 16 |
+| maps | 9 / 16 |
 | models | 9 / 10 |
 | saved-filters | 0 / 4 |
 | search | 2 / 2 |
@@ -37,9 +37,9 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | tags | 2 / 6 |
 | themes | 0 / 7 |
 | token-frames | 0 / 2 |
-| tokens | 0 / 10 |
+| tokens | 9 / 10 |
 | users | 0 / 16 |
-| **Total** | **93 / 309** |
+| **Total** | **112 / 309** |
 
 2 operation(s) are internal-only (🔒) and excluded from covered counts.
 
@@ -66,15 +66,15 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 
 | Method | Path | Description | Perm | CLI |
 |--------|------|-------------|------|-----|
-| GET | `/api/audio` | List audio | not guest | — |
-| GET | `/api/audio-folders` | List audio folders | not guest | — |
-| PATCH | `/api/audio-folders` | Set tags on an audio folder | gm or admin | — |
-| POST | `/api/audio-folders/bulk` | Bulk set audio folder tags | gm or admin | — |
-| POST | `/api/audio/bulk` | Bulk update audio tracks | gm or admin | — |
-| POST | `/api/audio/bulk/tags` | Bulk add tags to audio tracks | gm or admin | — |
-| GET | `/api/audio/{audio_id}` | Get an audio track |  | — |
-| PATCH | `/api/audio/{audio_id}` | Update audio metadata | gm or admin | — |
-| GET | `/api/audio/{audio_id}/artwork` | Audio artwork |  | — |
+| GET | `/api/audio` | List audio | not guest | `audio list` ✅ |
+| GET | `/api/audio-folders` | List audio folders | not guest | `audio folders list` ✅ |
+| PATCH | `/api/audio-folders` | Set tags on an audio folder | gm or admin | `audio folders set` ✅ |
+| POST | `/api/audio-folders/bulk` | Bulk set audio folder tags | gm or admin | `audio folders batch-set` ✅ |
+| POST | `/api/audio/bulk` | Bulk update audio tracks | gm or admin | `audio batch-update` ✅ |
+| POST | `/api/audio/bulk/tags` | Bulk add tags to audio tracks | gm or admin | `audio batch-tag` ✅ |
+| GET | `/api/audio/{audio_id}` | Get an audio track |  | `audio get` ✅ |
+| PATCH | `/api/audio/{audio_id}` | Update audio metadata | gm or admin | `audio update` ✅ |
+| GET | `/api/audio/{audio_id}/artwork` | Audio artwork |  | `audio artwork` ✅ |
 | GET | `/api/audio/{audio_id}/cover` | Audio cover image | gm or admin | — |
 | POST | `/api/audio/{audio_id}/cover` | Upload an audio cover | gm or admin | — |
 | DELETE | `/api/audio/{audio_id}/cover` | Remove an audio cover | gm or admin | — |
@@ -359,7 +359,7 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | GET | `/api/maps/{map_id}/export.uvtt` | Export a map as Universal VTT |  | — |
 | GET | `/api/maps/{map_id}/file` | Download map file |  | — |
 | GET | `/api/maps/{map_id}/page/{page_num}` | Render a map page |  | — |
-| GET | `/api/maps/{map_id}/thumbnail` | Map thumbnail |  | — |
+| GET | `/api/maps/{map_id}/thumbnail` | Map thumbnail |  | `maps thumbnail` ✅ |
 | GET | `/api/maps/{map_id}/vtt/authoring` | Get authored Universal VTT geometry |  | — |
 | PUT | `/api/maps/{map_id}/vtt/authoring` | Replace authored Universal VTT geometry | gm or admin | — |
 | GET | `/api/maps/{map_id}/vtt/data` | Universal VTT grid and feature data |  | — |
@@ -460,16 +460,16 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 
 | Method | Path | Description | Perm | CLI |
 |--------|------|-------------|------|-----|
-| GET | `/api/token-folders` | List token folders | not guest | — |
-| PATCH | `/api/token-folders` | Set tags on a token folder | gm or admin | — |
-| POST | `/api/token-folders/bulk` | Bulk set token folder tags | gm or admin | — |
-| GET | `/api/tokens` | List tokens | not guest | — |
-| POST | `/api/tokens/bulk` | Bulk update tokens | gm or admin | — |
-| POST | `/api/tokens/bulk/tags` | Bulk add tags to tokens | gm or admin | — |
-| GET | `/api/tokens/{token_id}` | Get a token |  | — |
-| PATCH | `/api/tokens/{token_id}` | Update token metadata | gm or admin | — |
+| GET | `/api/token-folders` | List token folders | not guest | `tokens folders list` ✅ |
+| PATCH | `/api/token-folders` | Set tags on a token folder | gm or admin | `tokens folders set` ✅ |
+| POST | `/api/token-folders/bulk` | Bulk set token folder tags | gm or admin | `tokens folders batch-set` ✅ |
+| GET | `/api/tokens` | List tokens | not guest | `tokens list` ✅ |
+| POST | `/api/tokens/bulk` | Bulk update tokens | gm or admin | `tokens batch-update` ✅ |
+| POST | `/api/tokens/bulk/tags` | Bulk add tags to tokens | gm or admin | `tokens batch-tag` ✅ |
+| GET | `/api/tokens/{token_id}` | Get a token |  | `tokens get` ✅ |
+| PATCH | `/api/tokens/{token_id}` | Update token metadata | gm or admin | `tokens update` ✅ |
 | GET | `/api/tokens/{token_id}/file` | Download token file |  | — |
-| GET | `/api/tokens/{token_id}/thumbnail` | Token thumbnail |  | — |
+| GET | `/api/tokens/{token_id}/thumbnail` | Token thumbnail |  | `tokens thumbnail` ✅ |
 
 ## users
 
