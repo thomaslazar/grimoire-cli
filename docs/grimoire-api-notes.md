@@ -160,11 +160,17 @@ Applies to both `PATCH /api/systems/{id}` and `PATCH /api/books/{id}`
 - `POST /api/tags/{internal}/merge` moves item links only. Folder tags are
   untouched (`routers/tags/core.py:208-237`), so a tag carried by a folder is
   still carried by it after the merge and reappears in `tags list`. The 404 is
-  about a missing catalog row, not about having no links: **merging a
-  folder-derived tag succeeds** — verified live against 1.7.1 — because every
-  folder tag gets a catalog row, both when written through the API and when
-  scanned from a `tags.json` (`services/tag_service/_folders.py:63`,
-  `indexer/tags.py:81`). The target is created if missing; a self-merge 400s.
+  about a missing catalog row, not about having no links, and a folder tag
+  normally has one, written through the API or registered by a `tags.json`
+  scan (`services/tag_service/_folders.py:63`, `indexer/tags.py:81`) — which is
+  why merging a folder-derived tag succeeded when verified live against 1.7.1.
+  But `library cleanup-missing` reaches `prune_orphan_tags`
+  (`services/tag_service/_admin.py:156`), which deletes any `Tag` row with no
+  `ResourceTag` link (`routers/maintenance/_helpers.py:231`) — a folder tag has
+  none by construction, its count being derived at read time — so after a
+  cleanup run a tag carried only by folders has no catalog row and `merge`
+  404s on it, while `rename` still works because it materialises a row first.
+  The target is created if missing; a self-merge 400s.
 - `POST /api/tags` is idempotent by internal key and answers 201; `display`
   defaults to the value's own trimmed casing (`_catalog.py:22`).
 - `DELETE /api/tags/{internal}` answers 204 and strips folder associations as

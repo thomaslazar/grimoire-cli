@@ -42,10 +42,13 @@ to say the opposite.
   400s (`core.py:185`).
 - **`merge` creates its target** if absent (`core.py:219`), 400s on a blank
   target (`:220`) and on a self-merge (`:222`), and 404s when the *source* has no
-  catalog row (`:213`) — so a folder-only tag cannot be merged, only renamed. It
-  re-points `ResourceTag` rows and deletes duplicates (`:225-233`); folder tags
-  are untouched, so a source tag carried by a folder reappears in `tags list`
-  after the merge.
+  catalog row (`:213`). A folder tag has one by default, so this only bites
+  after `library cleanup-missing` has pruned it (`prune_orphan_tags`,
+  `services/tag_service/_admin.py:156`, reached via
+  `routers/maintenance/_helpers.py:231`) — until then a folder-only tag merges
+  fine. It re-points `ResourceTag` rows and deletes duplicates (`:225-233`);
+  folder tags are untouched, so a source tag carried by a folder reappears in
+  `tags list` after the merge.
 - **`delete` is 204** (`routers/tags/__init__.py:67`). It unlinks every resource
   and strips the tag from folder tags (`core.py:239-257`); a rescan may reapply
   it from `tags.json`. 404 only when neither a catalog row nor a folder
@@ -78,11 +81,12 @@ lives in the help text, where an agent reads it.
 
 ## To verify against the local stack, not assume
 
-- `merge` on a folder-only tag returns 404, and a merged tag carried by a folder
-  survives in `tags list`.
-- A slashed internal key round-trips through Kiota's path encoding on all four
-  commands — the route is `{internal:path}` precisely so such tags stay
-  reachable (`routers/tags/__init__.py:22-31`).
+- Merging a folder-derived tag that still has its catalog row succeeded (200)
+  when verified live, and a merged tag carried by a folder survives in
+  `tags list`.
+- A slashed internal key round-trips through Kiota's path encoding on
+  `tags items` and is rejected by `create` — the route is `{internal:path}`
+  precisely so such tags stay reachable (`routers/tags/__init__.py:22-31`).
 
 ## Docs in the same PR
 
