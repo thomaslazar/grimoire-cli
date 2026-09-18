@@ -303,6 +303,10 @@ grimoire-cli config set server https://grimoire.example.com
 | `logs [--level <l>] [--limit <n>] [--offset <n>] [--after-seq <n>]` | Read the server's application log (admin) |
 | `tags list [--in-use-by <type>]` | List tags with their usage counts |
 | `tags items --tag <key> [--resource-type <type>]` | Items and folders carrying a tag |
+| `tags create --value <value> [--display <text>]` | Create a tag up front; idempotent (gm or admin) |
+| `tags rename --tag <key> --display <text>` | Rename a tag; the key follows and may merge (gm or admin) |
+| `tags delete --tag <key>` | Delete a tag everywhere; no undo (gm or admin) |
+| `tags merge --tag <key> --into <key>` | Merge one tag into another (gm or admin) |
 | `duplicates link {--input <file> \| --stdin}` | File items under a parent as its variants; exit 3 if partial (admin) |
 | `duplicates promote --resource-type <t> --new-parent-id <id> --old-parent-id <id> [--kind <k>] [--label <l>]` | Make a different copy the main version of a family (admin) |
 | `duplicates unlink --resource-type <t> (--ids <id>... \| --parent-id <id>)` | Promote variants back to standalone entries (admin) |

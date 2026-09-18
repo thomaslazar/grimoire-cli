@@ -150,6 +150,36 @@ Applies to both `PATCH /api/systems/{id}` and `PATCH /api/books/{id}`
   `category=Core` returns no books and `category=core` returns them. Verified
   against a running instance.
 
+### Tag writes
+
+- `PATCH /api/tags/{internal}` re-keys. The internal key follows the new
+  display whenever its lowercased form changes, folder `tags.json` entries are
+  rewritten onto the new key, and if another tag already owns that key the two
+  are **merged**, with the survivor returned
+  (`services/tag_service/_admin.py:68-130`, v1.7.1).
+- `POST /api/tags/{internal}/merge` moves item links only. Folder tags are
+  untouched (`routers/tags/core.py:208-237`), so a tag carried by a folder is
+  still carried by it after the merge and reappears in `tags list`. The 404 is
+  about a missing catalog row, not about having no links, and a folder tag
+  normally has one, written through the API or registered by a `tags.json`
+  scan (`services/tag_service/_folders.py:63`, `indexer/tags.py:81`) — which is
+  why merging a folder-derived tag succeeded when verified live against 1.7.1.
+  But `library cleanup-missing` reaches `prune_orphan_tags`
+  (`services/tag_service/_admin.py:156`), which deletes any `Tag` row with no
+  `ResourceTag` link (`routers/maintenance/_helpers.py:231`) — a folder tag has
+  none by construction, its count being derived at read time — so after a
+  cleanup run a tag carried only by folders has no catalog row and `merge`
+  404s on it, while `rename` still works because it materialises a row first.
+  The target is created if missing; a self-merge 400s.
+- `POST /api/tags` is idempotent by internal key and answers 201; `display`
+  defaults to the value's own trimmed casing (`_catalog.py:22`).
+- `DELETE /api/tags/{internal}` answers 204 and strips folder associations as
+  well as item links; the library is read-only, so a `tags.json` tag returns on
+  the next rescan (`routers/tags/core.py:239-257`).
+- `/` and `\` are rejected in a created value, a new display and a merge
+  *target*, but not in a merge *source* — merging is the documented way out of
+  a tag created before that rule (`_catalog.py:40`, `routers/tags/_schemas.py`).
+
 ## Systems writes and `me`
 
 Verified against v1.5.6, backing `systems update`, `systems batch-update`,
