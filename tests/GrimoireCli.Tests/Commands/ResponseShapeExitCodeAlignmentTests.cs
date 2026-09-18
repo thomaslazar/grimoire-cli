@@ -28,6 +28,10 @@ public class ResponseShapeExitCodeAlignmentTests
             (MapsCommand.Create(), ["maps", "batch-tag"], "errors"),
             (ModelsCommand.Create(), ["models", "batch-update"], "errors"),
             (ModelsCommand.Create(), ["models", "batch-tag"], "errors"),
+            (TokensCommand.Create(), ["tokens", "batch-update"], "errors"),
+            (TokensCommand.Create(), ["tokens", "batch-tag"], "errors"),
+            (AudioCommand.Create(), ["audio", "batch-update"], "errors"),
+            (AudioCommand.Create(), ["audio", "batch-tag"], "errors"),
             (AddonsCommand.Create(), ["addons", "upgrade-all"], "failed"),
             (LibraryCommand.Create(), ["library", "rescan"], "status"),
         };

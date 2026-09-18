@@ -821,6 +821,35 @@ and measured against the running 1.7.1 stack.
   read (`core.py:76`), stored internal keys echoed by the PATCH and the bulk
   (`core.py:91`, `core.py:237`). `model-folders` has no delete.
 
+## Tokens and audio
+
+Read from `backend/routers/tokens/` and `backend/routers/audio/` at tag
+`v1.7.1`, and measured against the running 1.7.1 stack. The `## Models` facts
+about the missing `validate` hook, the dropped `null`, and folder-tag handling
+hold unchanged on both; only the differences are recorded here.
+
+- **`audio` has no `is_explicit` at all** — not on the row
+  (`audio/core.py:30-44`), not on `AudioUpdate` (`audio/_schemas.py:10-12`),
+  and `list_audio` (`audio/core.py:51-58`) takes only `limit`, `offset` and
+  the session. `tokens` does filter per account (`tokens/core.py:34-37`), as
+  `books` and `models` do. A caller cannot hide an audio track from a player
+  by marking it explicit, because there is nothing to mark.
+- **`audio` carries four scan-derived fields no endpoint can write.**
+  `duration`, `title`, `artist` and `album` are read from the file at index
+  time (`indexer/metadata.py:25-52`) and appear on the row
+  (`audio/core.py:37-40`); `AudioUpdate` declares only `description` and
+  `tags` (`audio/_schemas.py:10-12`). Measured: a tagless WAV indexes with a
+  real `duration` and empty strings for the other three.
+- **`GET /api/audio/{id}/artwork` resolves three sources, then 404s**
+  (`audio/core.py:145-170`): a cover set deliberately through the UI, then
+  folder art, then art embedded in the file. `has_artwork` on the row says
+  whether any exists. `has_cover` (`audio/core.py:44`) is true only for the
+  first of the three.
+- **The two list endpoints order differently.** `tokens` orders by
+  `relative_path` (`tokens/core.py:41`), so a page is a contiguous run of
+  folders in display order, as `maps` does. `audio` orders by `filename`
+  (`audio/core.py:58`), so a page can straddle folders.
+
 ## Search
 
 Read from `backend/routers/search/core.py`, `backend/routers/search/_query.py`,
