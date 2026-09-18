@@ -79,6 +79,13 @@ deletable-defaults warning. `create` carries the 409-on-duplicate, and on
 `genres` the parent 404. No client-side guard on either — server policy is passed
 through.
 
+Shipped deviates from this in two places, both kept as-is: `genres create`'s
+Notes don't carry the parent 404 — `--parent-id`'s own description already
+points at `genres list`, and the service names a not-found hint at runtime, so
+the Notes line would only repeat it. And every `create`'s Notes carry an
+enforcement caveat ("Creating a value does not make it enforced...") this
+paragraph never mentioned.
+
 ## Testing
 
 The two existing table-driven files cover all five groups and are extended

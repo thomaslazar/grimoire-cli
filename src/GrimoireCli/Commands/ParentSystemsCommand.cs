@@ -73,11 +73,7 @@ public static class ParentSystemsCommand
             "409 while the name is in use; the body carries usage_count and name.",
             "",
             "--force strips nothing: removed_usage counts the systems that",
-            "keep the value, stored as a plain string rather than a reference.",
-            "",
-            "Built-in entries are deletable and cannot be restored: the defaults",
-            "are seeded once by migration, and create returns a new id with",
-            "is_default false.");
+            "keep the value, stored as a plain string rather than a reference.");
         command.AddExamples(
             "grimoire-cli parent-systems delete --id <parent-id>",
             "grimoire-cli parent-systems delete --id <parent-id> --force");
