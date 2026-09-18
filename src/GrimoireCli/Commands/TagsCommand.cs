@@ -84,10 +84,11 @@ public static class TagsCommand
             "Idempotent: an existing tag is returned unchanged. Tags are also",
             "created on first use, so this is only needed to reserve one.",
             "",
-            "'/' and '\\' are rejected: the key addresses the tag in the path.",
+            "'/' and '\\' are rejected in --value: the key addresses the tag in",
+            "the path.",
             "",
-            "category is the resource type the tag is first used on, so a tag",
-            "created here and not yet applied reads as shared.");
+            "category defaults to shared and stays shared permanently: applying",
+            "the tag to a single type later never narrows it.");
         command.AddExamples("grimoire-cli tags create --value \"GM Screen\"");
         command.AddResponseExample<Generated.Models.TagCreatedResponse>();
         command.SetAction(async (parseResult, cancellationToken) =>
@@ -117,6 +118,9 @@ public static class TagsCommand
             "changes, and folder tags are rewritten onto the new key. If another",
             "tag already owns that key, the two are merged and the survivor is",
             "returned — there is no warning and no undo.",
+            "",
+            "A tag that exists only on a folder is materialised first, so the new",
+            "display survives a rescan.",
             "",
             "'/' and '\\' are rejected in the new display.");
         command.AddExamples(
@@ -182,7 +186,10 @@ public static class TagsCommand
             "Use tags rename to move a folder-only tag.",
             "",
             "'/' and '\\' are rejected in --into but allowed in --tag, so a tag",
-            "that predates that rule can be merged out of trouble.");
+            "that predates that rule can be merged out of trouble.",
+            "",
+            "404 when --tag has no catalog row: library cleanup-missing prunes",
+            "the row of a tag carried only by folders. tags rename still works.");
         command.AddExamples("grimoire-cli tags merge --tag \"D&D\" --into dungeons-and-dragons");
         command.AddResponseExample<Generated.Models.TagRenamedResponse>();
         command.SetAction(async (parseResult, cancellationToken) =>
