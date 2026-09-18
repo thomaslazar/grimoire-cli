@@ -1830,4 +1830,54 @@ ok "logs --after-seq at the cursor returns an empty page"
   && fail "logs should refuse a level the server does not declare"
 ok "logs refuses an unknown level"
 
+# --- tag writes --------------------------------------------------------------
+# Fixed names, invented by this script and deleted at the end, so a re-run
+# converges. Nothing here touches a fixture's own tags.
+CREATE_JSON=$("$CLI" tags create --value "Smoke Alpha Tag" 2>"$WORK/cli.err") \
+  || { cat "$WORK/cli.err" >&2; fail "tags create exited non-zero"; }
+[ "$(echo "$CREATE_JSON" | jq -r .internal)" = "smoke alpha tag" ] \
+  || fail "create should lowercase the internal key: $CREATE_JSON"
+[ "$(echo "$CREATE_JSON" | jq -r .display)" = "Smoke Alpha Tag" ] \
+  || fail "create should keep the entered casing: $CREATE_JSON"
+ok "tags create returns the new tag's key and display"
+
+AGAIN_JSON=$("$CLI" tags create --value "smoke alpha tag" 2>"$WORK/cli.err") \
+  || { cat "$WORK/cli.err" >&2; fail "tags create is not idempotent"; }
+[ "$(echo "$AGAIN_JSON" | jq -r .display)" = "Smoke Alpha Tag" ] \
+  || fail "a second create should not rewrite the display: $AGAIN_JSON"
+ok "tags create is idempotent by internal key"
+
+# The rename that re-keys: the issue this was built from claimed it could not.
+RENAME_JSON=$("$CLI" tags rename --tag "smoke alpha tag" --display "Smoke Renamed Tag" 2>"$WORK/cli.err") \
+  || { cat "$WORK/cli.err" >&2; fail "tags rename exited non-zero"; }
+[ "$(echo "$RENAME_JSON" | jq -r .internal)" = "smoke renamed tag" ] \
+  || fail "rename should re-key the tag: $RENAME_JSON"
+ok "tags rename moves the internal key with the display"
+
+"$CLI" tags create --value "Smoke Beta Tag" >/dev/null 2>"$WORK/cli.err" \
+  || { cat "$WORK/cli.err" >&2; fail "tags create exited non-zero for the merge source"; }
+MERGE_JSON=$("$CLI" tags merge --tag "smoke beta tag" --into "smoke renamed tag" 2>"$WORK/cli.err") \
+  || { cat "$WORK/cli.err" >&2; fail "tags merge exited non-zero"; }
+[ "$(echo "$MERGE_JSON" | jq -r .internal)" = "smoke renamed tag" ] \
+  || fail "merge should return the survivor: $MERGE_JSON"
+"$CLI" tags list 2>"$WORK/cli.err" | jq -e '[.tags[].internal] | index("smoke beta tag") == null' >/dev/null \
+  || fail "the merged-away tag should be gone from the listing"
+ok "tags merge folds the source into the target"
+
+"$CLI" tags merge --tag "smoke renamed tag" --into "smoke renamed tag" >/dev/null 2>&1 \
+  && fail "merging a tag into itself should fail"
+ok "tags merge refuses a self-merge"
+
+"$CLI" tags delete --tag "smoke renamed tag" >"$WORK/tagdel.out" 2>"$WORK/cli.err" \
+  || { cat "$WORK/cli.err" >&2; fail "tags delete exited non-zero"; }
+[ ! -s "$WORK/tagdel.out" ] || [ "$(tr -d '[:space:]' <"$WORK/tagdel.out")" = "" ] \
+  || fail "204 should print nothing: $(cat "$WORK/tagdel.out")"
+"$CLI" tags list 2>"$WORK/cli.err" | jq -e '[.tags[].internal] | index("smoke renamed tag") == null' >/dev/null \
+  || fail "the deleted tag should be gone from the listing"
+ok "tags delete removes the tag and prints no body"
+
+"$CLI" tags delete --tag "no-such-smoke-tag" >/dev/null 2>&1 \
+  && fail "deleting a tag that does not exist should fail"
+ok "tags delete refuses an unknown tag"
+
 echo "smoke: all checks passed" >&2
