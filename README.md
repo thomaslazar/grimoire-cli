@@ -286,7 +286,7 @@ grimoire-cli config set server https://grimoire.example.com
 | `tokens folders batch-set {--input <file> \| --stdin}` | Set tags on many token folders in one transaction (gm or admin) |
 | `audio list [--limit <n>] [--offset <n>]` | List audio tracks (defaults to 100 results) |
 | `audio get --id <id>` | Get one audio track |
-| `audio artwork --id <id> --output <path\|->` | Download the audio track's artwork |
+| `audio artwork --id <id> --output <path\|->` | Download an audio track's artwork |
 | `audio update --id <id> {--input <file> \| --stdin}` | Update one audio track's metadata (gm or admin) |
 | `audio batch-update {--input <file> \| --stdin}` | Update many audio tracks in one transaction; exit 3 if partial (gm or admin) |
 | `audio batch-tag {--input <file> \| --stdin}` | Add tags to many audio tracks, additively; exit 3 if partial (gm or admin) |

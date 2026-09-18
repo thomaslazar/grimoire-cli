@@ -17,7 +17,7 @@ public class AudioService
 
     public AudioService(GrimoireApiClient client) => _client = client;
 
-    /// <summary>GET /api/audio. Variants and disallowed explicit rows are excluded server-side.</summary>
+    /// <summary>GET /api/audio. Variants are excluded server-side; only family mains are listed.</summary>
     public async Task<string> ListAsync(int? limit, int? offset)
     {
         var info = _client.Api.Api.Audio.ToGetRequestInformation(c =>
@@ -28,7 +28,7 @@ public class AudioService
         return await _client.SendAsync(info);
     }
 
-    /// <summary>GET /api/audio/{id}. Carries the derived is_presupported/is_unsupported pair.</summary>
+    /// <summary>GET /api/audio/{id}. Adds folder tags and the variant family to the list row.</summary>
     public async Task<string> GetAsync(string id)
     {
         var info = _client.Api.Api.Audio[id].ToGetRequestInformation();

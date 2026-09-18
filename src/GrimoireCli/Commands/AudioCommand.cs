@@ -131,8 +131,8 @@ public static class AudioCommand
             "",
             "Clear description with \"\"; an explicit null does nothing.",
             "",
-            "duration, title, artist and album are read from the file's tags at",
-            "scan time and cannot be set here.",
+            "duration, title, artist and album are read from the file at scan",
+            "time and cannot be set here.",
             "",
             "Responds {\"status\": \"ok\"} and echoes nothing — read back with:",
             "grimoire-cli audio get --id <id>");

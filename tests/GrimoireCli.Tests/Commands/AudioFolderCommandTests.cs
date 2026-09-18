@@ -42,12 +42,14 @@ public class AudioFolderCommandTests
             .Parse(["folders", "set", "--stdin", "--input", "f.json"]).Errors);
     }
 
+    // Diffing a write against a read otherwise looks like data loss.
     [Fact]
     public void FoldersListNotesTheDisplayCasingAsymmetry()
     {
         Assert.Contains("display", Help(["audio", "folders", "list"]));
     }
 
+    // A typo'd path creates a row nothing can reach afterwards.
     [Fact]
     public void FoldersSetWarnsThatARowIsPermanent()
     {

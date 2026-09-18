@@ -13,6 +13,7 @@ public class TokensCommandTests
         Assert.Empty(TokensCommand.Create().Parse(["list"]).Errors);
     }
 
+    // All three reads are require_not_guest or weaker, which carries no tag.
     [Theory]
     [InlineData("list")]
     [InlineData("get")]
@@ -52,6 +53,7 @@ public class TokensCommandTests
         Assert.NotEmpty(TokensCommand.Create().Parse(["list", "--offset", "-1"]).Errors);
     }
 
+    // The default has to render natively, not live in a description string.
     [Fact]
     public void ListRendersItsLimitDefault()
     {
@@ -102,6 +104,12 @@ public class TokensCommandTests
             JsonBodyInput.Validate("{\"is_explict\":true}",
                 GrimoireCli.Generated.Models.TokenUpdate.CreateFromDiscriminatorValue,
                 "pass it with --id"));
+    }
+
+    [Fact]
+    public void GetRequiresAnId()
+    {
+        Assert.NotEmpty(TokensCommand.Create().Parse(["get"]).Errors);
     }
 
     [Fact]

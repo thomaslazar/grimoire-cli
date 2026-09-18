@@ -28,7 +28,7 @@ public class TokensService
         return await _client.SendAsync(info);
     }
 
-    /// <summary>GET /api/tokens/{id}. Carries the derived is_presupported/is_unsupported pair.</summary>
+    /// <summary>GET /api/tokens/{id}. Adds folder tags, pixel dimensions and the variant family.</summary>
     public async Task<string> GetAsync(string id)
     {
         var info = _client.Api.Api.Tokens[id].ToGetRequestInformation();

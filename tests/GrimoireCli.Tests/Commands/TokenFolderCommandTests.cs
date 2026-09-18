@@ -42,16 +42,28 @@ public class TokenFolderCommandTests
             .Parse(["folders", "set", "--stdin", "--input", "f.json"]).Errors);
     }
 
+    // Diffing a write against a read otherwise looks like data loss.
     [Fact]
     public void FoldersListNotesTheDisplayCasingAsymmetry()
     {
         Assert.Contains("display", Help(["tokens", "folders", "list"]));
     }
 
+    // A typo'd path creates a row nothing can reach afterwards.
     [Fact]
     public void FoldersSetWarnsThatARowIsPermanent()
     {
         Assert.Contains("permanent", Help(["tokens", "folders", "set"]));
+    }
+
+    // frame_folders is on-disk state, and this is the only command that reads it
+    // back — a caller told "never what is on disk" would not look here.
+    [Fact]
+    public void FoldersListExplainsFrameFolders()
+    {
+        var help = Help(["tokens", "folders", "list"]);
+        Assert.Contains("frame_folders", help);
+        Assert.Contains(".frames-container", help);
     }
 
     [Fact]
