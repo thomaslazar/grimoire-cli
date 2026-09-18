@@ -37,10 +37,9 @@ public class VocabularyCommandTests
 
     [Theory]
     [MemberData(nameof(Vocabularies))]
-    public void EachGroupHasExactlyOneListSubcommand(string name)
+    public void EachGroupHostsTheReadThenTheWrites(string name)
     {
-        var group = Group(name);
-        Assert.Equal(["list"], group.Subcommands.Select(c => c.Name).ToArray());
+        Assert.Equal(["list", "create", "delete"], Group(name).Subcommands.Select(c => c.Name).ToArray());
     }
 
     [Theory]
@@ -118,7 +117,7 @@ public class VocabularyCommandTests
     [MemberData(nameof(Vocabularies))]
     public void AnUnknownSubcommandErrors(string name)
     {
-        Assert.NotEmpty(Group(name).Parse(["create", "--name", "x"]).Errors);
+        Assert.NotEmpty(Group(name).Parse(["rename", "--name", "x"]).Errors);
     }
 
     // The response shape is the only place the id/name distinction the Notes warn
@@ -168,5 +167,85 @@ public class VocabularyCommandTests
         Assert.Contains("licenses list", output);
         Assert.Contains("Submit the name, not the id", output);
         Assert.DoesNotContain("dice-materials list", output);
+    }
+
+    [Theory]
+    [MemberData(nameof(Vocabularies))]
+    public void BothWritesDeclareTheAdminRole(string name)
+    {
+        foreach (var leaf in new[] { "create", "delete" })
+        {
+            var help = HelpRenderer.Render(Group(name), [name, leaf], full: false);
+            Assert.Contains("Role required:", help);
+            Assert.Contains("admin", help);
+        }
+    }
+
+    [Theory]
+    [MemberData(nameof(Vocabularies))]
+    public void CreateRequiresAName(string name)
+    {
+        Assert.NotEmpty(Group(name).Parse(["create"]).Errors);
+        Assert.Empty(Group(name).Parse(["create", "--name", "Solo"]).Errors);
+    }
+
+    [Theory]
+    [MemberData(nameof(Vocabularies))]
+    public void DeleteRequiresAnIdAndTakesForce(string name)
+    {
+        Assert.NotEmpty(Group(name).Parse(["delete"]).Errors);
+        Assert.Empty(Group(name).Parse(["delete", "--id", "v1"]).Errors);
+        Assert.Empty(Group(name).Parse(["delete", "--id", "v1", "--force"]).Errors);
+    }
+
+    // removed_usage reads as though a forced delete cleaned the value off every
+    // system and book. It does the opposite, and that is the whole reason these
+    // Notes exist.
+    [Theory]
+    [MemberData(nameof(Vocabularies))]
+    public void DeleteWarnsThatForceStripsNothing(string name)
+    {
+        var help = HelpRenderer.Render(Group(name), [name, "delete"], full: false);
+        Assert.Contains("removed_usage", help);
+        Assert.Contains("keep the value", help);
+    }
+
+    // No delete handler checks is_default, and the defaults are seeded by a
+    // one-time migration, so this is unrecoverable.
+    [Theory]
+    [MemberData(nameof(Vocabularies))]
+    public void DeleteWarnsThatBuiltInsAreDeletable(string name)
+    {
+        var help = HelpRenderer.Render(Group(name), [name, "delete"], full: false);
+        Assert.Contains("Built-in entries", help);
+    }
+
+    [Theory]
+    [MemberData(nameof(Vocabularies))]
+    public void BothWritesCarryAResponseShape(string name)
+    {
+        foreach (var leaf in new[] { "create", "delete" })
+            Assert.Contains("Response shape:", HelpRenderer.Render(Group(name), [name, leaf], full: true));
+    }
+
+    [Fact]
+    public void OnlyGenresTakesAParent()
+    {
+        Assert.Empty(GenresCommand.Create().Parse(["create", "--name", "Solo", "--parent-id", "g1"]).Errors);
+        Assert.NotEmpty(LicensesCommand.Create().Parse(["create", "--name", "OGL", "--parent-id", "g1"]).Errors);
+    }
+
+    [Fact]
+    public void OnlyDiceMaterialsTakesAGroup()
+    {
+        Assert.Empty(DiceMaterialsCommand.Create().Parse(["create", "--name", "Oak", "--group", "Wood"]).Errors);
+        Assert.NotEmpty(LicensesCommand.Create().Parse(["create", "--name", "OGL", "--group", "Wood"]).Errors);
+    }
+
+    [Fact]
+    public void OnlyGenresDeleteMentionsChildren()
+    {
+        Assert.Contains("child genres", HelpRenderer.Render(GenresCommand.Create(), ["genres", "delete"], full: false));
+        Assert.DoesNotContain("child", HelpRenderer.Render(LicensesCommand.Create(), ["licenses", "delete"], full: false));
     }
 }
