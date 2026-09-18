@@ -6,8 +6,9 @@ namespace GrimoireCli.Services;
 /// <summary>
 /// The `dice-materials` vocabulary: list, create and delete. The read is a
 /// parameterless GET guarded only by get_current_user (routers/lookups/core.py),
-/// so it names no permissionHint and no notFoundHint; create and delete are
-/// admin-only and carry an id, so they name both.
+/// so it names no hints. Create is require_admin and takes no id, so it names
+/// only a permissionHint; delete is require_admin and carries the id, so it
+/// names a notFoundHint too.
 /// </summary>
 public class DiceMaterialsService
 {
