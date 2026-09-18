@@ -599,6 +599,25 @@ Read from `backend/routers/lookups/` at tag `v1.6.0`.
   count that *would* have blocked the delete. Deleting a genre cascades to its
   child genres.
 
+### Vocabulary writes
+
+- A forced delete strips nothing, verified live: a forced `licenses delete`
+  against a value one system carried returned `{"status":"ok","removed_usage":1}`,
+  matching the `usage_count` the unforced attempt's 409 had reported, and the
+  system kept the license string afterward. Genre children are the exception —
+  they are cascaded away with the parent.
+- Built-in entries are deletable and not restorable — read from source, not
+  verified live: `create` always returns `is_default: false`, so there is no
+  way to construct an entry with `is_default: true` to delete and confirm
+  against. No delete handler checks `is_default`, and the defaults are seeded
+  by one-time migrations (`migrations/versions/0004_expand_metadata.py`,
+  `0006_parent_system_licenses.py`) rather than re-seeded on boot.
+- `create` matches an existing name case-insensitively (`ilike`) and 409s;
+  `genres create` 404s on an unknown `parent_id`; `dice-materials create`
+  coalesces a blank or omitted `group` to `"Custom"` (`core.py:278`).
+- Usage is counted by name, case-insensitively, over the systems and books
+  carrying it (`routers/lookups/_helpers.py:71-127`).
+
 ## Backups
 
 Read from `backend/routers/backups/core.py` and
