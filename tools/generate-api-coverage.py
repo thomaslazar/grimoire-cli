@@ -136,6 +136,7 @@ IMPLEMENTED = {
     "GET /api/files/folder/contents": "`files folder contents` ✅",
     "GET /api/maps": "`maps list` ✅",
     "GET /api/maps/{map_id}": "`maps get` ✅",
+    "GET /api/maps/{map_id}/thumbnail": "`maps thumbnail` ✅",
     "PATCH /api/maps/{map_id}": "`maps update` ✅",
     "POST /api/maps/bulk": "`maps batch-update` ✅",
     "POST /api/maps/bulk/tags": "`maps batch-tag` ✅",

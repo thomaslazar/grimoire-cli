@@ -161,4 +161,19 @@ public class MapsCommandTests
     {
         Assert.Contains("an explicit null", Help(["maps", "update"]));
     }
+
+    // serve_map_thumbnail depends on get_current_user, which carries no tag.
+    [Fact]
+    public void ThumbnailDeclaresNoRole()
+    {
+        Assert.DoesNotContain("Role required:", Help(["maps", "thumbnail"]));
+    }
+
+    [Fact]
+    public void ThumbnailRequiresAnIdAndAnOutput()
+    {
+        Assert.NotEmpty(MapsCommand.Create().Parse(["thumbnail", "--id", "x"]).Errors);
+        Assert.NotEmpty(MapsCommand.Create().Parse(["thumbnail", "--output", "x.webp"]).Errors);
+        Assert.Empty(MapsCommand.Create().Parse(["thumbnail", "--id", "x", "--output", "x.webp"]).Errors);
+    }
 }

@@ -37,6 +37,13 @@ public class MapsService
         return await _client.SendAsync(info, notFoundHint: NotFoundHint);
     }
 
+    /// <summary>GET /api/maps/{id}/thumbnail. 404 when none was generated.</summary>
+    public async Task<Stream> ThumbnailAsync(string id)
+    {
+        var info = _client.Api.Api.Maps[id].Thumbnail.ToGetRequestInformation();
+        return await _client.SendStreamAsync(info);
+    }
+
     /// <summary>
     /// PATCH /api/maps/{id}. The generated builder supplies the URL, method and
     /// path parameter only; the validated raw body replaces the content so it
