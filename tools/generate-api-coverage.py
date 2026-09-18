@@ -317,6 +317,12 @@ def resolve_roles(raw: dict[tuple[str, str], str], spec_paths: dict[str, dict]) 
             for (raw_method, raw_path), role in raw.items():
                 if raw_method != method:
                     continue
+                # A route registered with a Starlette path converter (e.g.
+                # ``{internal:path}``, used so a tag key containing a slash stays
+                # addressable) has no converter in the spec's own path — FastAPI
+                # strips it when building the OpenAPI document. Strip it here too,
+                # or the suffix match never fires and the role is lost.
+                raw_path = re.sub(r"\{(\w+):\w+\}", r"{\1}", raw_path)
                 if path == raw_path or path.endswith(raw_path if raw_path.startswith("/") else "/" + raw_path):
                     if len(raw_path) > best_len:
                         best, best_len = role, len(raw_path)
