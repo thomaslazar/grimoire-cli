@@ -843,7 +843,7 @@ hold unchanged on both; only the differences are recorded here.
 - **`GET /api/audio/{id}/artwork` resolves three sources, then 404s**
   (`audio/core.py:145-170`): a cover set deliberately through the UI, then
   folder art, then art embedded in the file. `has_artwork` on the row says
-  whether any exists. `has_cover` (`audio/core.py:41`) is true only for the
+  whether any exists. `has_cover` (`audio/core.py:44`) is true only for the
   first of the three, and nothing in the CLI reads or writes it yet.
 - **The two list endpoints order differently.** `tokens` orders by
   `relative_path` (`tokens/core.py:41`), so a page is a contiguous run of
