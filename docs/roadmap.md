@@ -18,12 +18,13 @@ metadata sweep, matching what `abs-cli` gives for audiobooks. Its two workflows
 are the target shape: *upload and catalogue*, and *fix a metadata problem across
 the library on request*. **Met as of v0.2.0.**
 
-What follows extends it to the rest of the library. Grimoire holds five
-collections, and the cross-cutting commands already reach all of them —
-`duplicates`, `tags items` and `search` all take every resource type, `files`
-manages every tree, `library rescan --scope` reaches every section. Every
-collection now has `list`/`get`/`update`, plus batch-update, batch-tag and
-folder tagging.
+What follows is tag and vocabulary hygiene across that library. The
+per-collection commands and the cross-cutting ones — `duplicates`, `tags items`
+and `search` take every resource type, `files` manages every tree, `library
+rescan --scope` reaches every section — already put tags and lookup values on
+everything Grimoire holds; what they cannot do is curate the tags and
+vocabularies themselves, which is what makes a sweep repeatable rather than a
+pile of near-duplicate labels.
 
 ## Next
 
@@ -31,8 +32,9 @@ folder tagging.
 2. **[vocabulary writes](https://github.com/thomaslazar/grimoire-cli/issues/43)** — completes the five lookups the shipped reads open.
 
 **[Small completions](https://github.com/thomaslazar/grimoire-cli/issues/44)** —
-`library stats` and `systems cover from-source`. Too small to schedule; fold
-each into whichever block is in flight.
+`library stats`, `systems cover from-source`, and maps' remaining binary
+getters (`page/{n}`, `vtt/image`, `vtt/data`, `export.uvtt`). Too small to
+schedule; fold each into whichever block is in flight.
 
 ## Later
 

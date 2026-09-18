@@ -26,8 +26,10 @@ public static class TokenFolderCommands
     {
         var command = new Command("list", "List tagged token folders");
         command.AddHelpSection("Notes", HelpSectionPosition.Top,
-            "Reports what has been tagged, never what is on disk — a row exists",
-            "only once a path has been given tags.",
+            "folders reports what has been tagged, never what is on disk — a row",
+            "exists only once a path has been given tags. frame_folders is the disk",
+            "state instead: every path under tokens/ holding a .frames-container",
+            "marker, at any depth, tagged or not. Tokens only.",
             "",
             "Tags come back in display casing here; set and batch-set echo the",
             "stored internal keys instead.");

@@ -835,8 +835,8 @@ hold unchanged on both; only the differences are recorded here.
   `books` and `models` do. A caller cannot hide an audio track from a player
   by marking it explicit, because there is nothing to mark.
 - **`audio` carries four scan-derived fields no endpoint can write.**
-  `duration`, `title`, `artist` and `album` are read from the file's tags at
-  index time (`indexer/metadata.py:25-52`) and appear on the row
+  `duration`, `title`, `artist` and `album` are read from the file at index
+  time (`indexer/metadata.py:25-52`) and appear on the row
   (`audio/core.py:37-40`); `AudioUpdate` declares only `description` and
   `tags` (`audio/_schemas.py:10-12`). Measured: a tagless WAV indexes with a
   real `duration` and empty strings for the other three.
@@ -844,7 +844,7 @@ hold unchanged on both; only the differences are recorded here.
   (`audio/core.py:145-170`): a cover set deliberately through the UI, then
   folder art, then art embedded in the file. `has_artwork` on the row says
   whether any exists. `has_cover` (`audio/core.py:44`) is true only for the
-  first of the three, and nothing in the CLI reads or writes it yet.
+  first of the three.
 - **The two list endpoints order differently.** `tokens` orders by
   `relative_path` (`tokens/core.py:41`), so a page is a contiguous run of
   folders in display order, as `maps` does. `audio` orders by `filename`

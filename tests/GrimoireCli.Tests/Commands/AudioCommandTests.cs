@@ -13,6 +13,7 @@ public class AudioCommandTests
         Assert.Empty(AudioCommand.Create().Parse(["list"]).Errors);
     }
 
+    // All three reads are require_not_guest or weaker, which carries no tag.
     [Theory]
     [InlineData("list")]
     [InlineData("get")]
@@ -52,6 +53,7 @@ public class AudioCommandTests
         Assert.NotEmpty(AudioCommand.Create().Parse(["list", "--offset", "-1"]).Errors);
     }
 
+    // The default has to render natively, not live in a description string.
     [Fact]
     public void ListRendersItsLimitDefault()
     {
@@ -95,7 +97,7 @@ public class AudioCommandTests
         Assert.Contains("422 on the whole request", Help(["audio", "batch-tag"]));
     }
 
-    // duration/title/artist/album come from the file's tags at index time and
+    // duration/title/artist/album are read off the file at index time and
     // AudioUpdate accepts none of them, so a caller reading artist in a response
     // will otherwise try to PATCH it.
     [Fact]
@@ -122,6 +124,12 @@ public class AudioCommandTests
             JsonBodyInput.Validate("{\"artist\":\"nope\"}",
                 GrimoireCli.Generated.Models.AudioUpdate.CreateFromDiscriminatorValue,
                 "pass it with --id"));
+    }
+
+    [Fact]
+    public void GetRequiresAnId()
+    {
+        Assert.NotEmpty(AudioCommand.Create().Parse(["get"]).Errors);
     }
 
     [Fact]

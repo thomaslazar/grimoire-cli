@@ -23,6 +23,8 @@ public class AudioServiceTests
         return info.URI.AbsoluteUri;
     }
 
+    // An omitted flag must not reach the wire: the server's own default is what
+    // should apply, not an empty value.
     [Fact]
     public void ListSendsOnlyThePagingItWasGiven()
     {
