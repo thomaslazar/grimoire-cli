@@ -156,7 +156,7 @@ Applies to both `PATCH /api/systems/{id}` and `PATCH /api/books/{id}`
   display whenever its lowercased form changes, folder `tags.json` entries are
   rewritten onto the new key, and if another tag already owns that key the two
   are **merged**, with the survivor returned
-  (`services/tag_service/_admin.py:68-113`, v1.7.1).
+  (`services/tag_service/_admin.py:68-130`, v1.7.1).
 - `POST /api/tags/{internal}/merge` moves item links only. Folder tags are
   untouched (`routers/tags/core.py:208-237`), so a tag carried by a folder is
   still carried by it after the merge and reappears in `tags list`. The 404 is

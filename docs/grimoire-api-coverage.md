@@ -432,10 +432,10 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 |--------|------|-------------|------|-----|
 | GET | `/api/tags` | List tags |  | `tags list` ✅ |
 | POST | `/api/tags` | Create a tag | gm or admin | `tags create` ✅ |
-| PATCH | `/api/tags/{internal}` | Rename a tag's display value |  | `tags rename` ✅ |
-| DELETE | `/api/tags/{internal}` | Delete a tag |  | `tags delete` ✅ |
+| PATCH | `/api/tags/{internal}` | Rename a tag's display value | gm or admin | `tags rename` ✅ |
+| DELETE | `/api/tags/{internal}` | Delete a tag | gm or admin | `tags delete` ✅ |
 | GET | `/api/tags/{internal}/items` | Items carrying a tag |  | `tags items` ✅ |
-| POST | `/api/tags/{internal}/merge` | Merge a tag into another |  | `tags merge` ✅ |
+| POST | `/api/tags/{internal}/merge` | Merge a tag into another | gm or admin | `tags merge` ✅ |
 
 ## themes
 
