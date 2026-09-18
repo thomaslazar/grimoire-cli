@@ -1129,17 +1129,15 @@ jq -e 'has("folder_path") and has("folder_tags") and has("has_artwork")' \
   || fail "audio get should carry folder context: $(cat "$WORK/audioget.out")"
 ok "audio get returns folder context"
 
-# The fixture WAV carries no embedded art and its folder has no cover image, so
-# every one of artwork's three sources (cover, folder art, embedded art) is
-# absent — verified live: this 404s with "Not Found" on both a first and a
-# re-run, so asserting the 404 stays meaningful rather than passing either way.
-set +e
-"$CLI" audio artwork --id "$AUDIO_ID" --output "$WORK/artwork.jpg" >/dev/null 2>"$WORK/artwork.err"; rc=$?
-set -e
-[ "$rc" -eq 2 ] || fail "artwork on a track with none should exit 2, got $rc: $(cat "$WORK/artwork.err")"
-grep -qi "not found" "$WORK/artwork.err" \
-  || fail "no not-found hint: $(cat "$WORK/artwork.err")"
-ok "audio artwork 404s when the track has no cover, folder art, or embedded art"
+# Tavern.wav carries no embedded art, but seed.sh drops a cover.png beside it
+# in Ambience/ — _find_folder_artwork (indexer/metadata.py) claims a same-folder
+# cover.*/folder.* image as folder art, which serve_audio_artwork falls back to
+# before embedded art. This proves route, --id handling and the download path
+# together, not just that some 4xx/5xx came back.
+"$CLI" audio artwork --id "$AUDIO_ID" --output "$WORK/artwork.png" >/dev/null 2>&1 \
+  || fail "audio artwork exited non-zero"
+[ -s "$WORK/artwork.png" ] || fail "audio artwork wrote no bytes"
+ok "audio artwork downloads the folder cover image"
 
 echo "{\"ids\":[\"$AUDIO_ID\"],\"tags\":[\"smoke-audio\"]}" \
   | "$CLI" audio batch-tag --stdin >/dev/null 2>&1 \

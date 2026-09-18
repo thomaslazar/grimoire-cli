@@ -141,6 +141,11 @@ python3 "$HERE/make-fixtures.py" --png "$LIBRARY/tokens/Monsters/Goblin.png"
 python3 "$HERE/make-fixtures.py" --png "$LIBRARY/tokens/Monsters/Undead/Skeleton.png"
 python3 "$HERE/make-fixtures.py" --wav "$LIBRARY/audio/Ambience/Tavern.wav"
 python3 "$HERE/make-fixtures.py" --wav "$LIBRARY/audio/Ambience/Battle/Drums.wav"
+# Folder art for the artwork smoke check: _find_folder_artwork (indexer/metadata.py)
+# claims a same-folder cover.<ext>/folder.<ext> image, and .png is not in
+# AUDIO_EXTS, so this is skipped by the audio walk rather than becoming a track
+# of its own — it only makes Tavern.wav's artwork endpoint resolve to real bytes.
+python3 "$HERE/make-fixtures.py" --png "$LIBRARY/audio/Ambience/cover.png"
 say "wrote 2 fixture tokens and 2 fixture audio tracks"
 
 # 4. Rescan, then wait for completion. `running` reads false before the scan
