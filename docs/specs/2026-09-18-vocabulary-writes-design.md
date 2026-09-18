@@ -101,9 +101,15 @@ fixture's metadata.
 
 - A forced delete really leaves the string on a system that carries it — the
   `removed_usage` claim, tested on a value this smoke run applied itself, never
-  on fixture metadata it did not write.
-- Deleting an entry with `is_default: true` is permitted — checked on a
-  throwaway entry created for the purpose, never on a real built-in.
+  on fixture metadata it did not write. Outcome: `removed_usage` came back `1`
+  against a `usage_count` of `1`, and the system kept the license string.
+- Deleting an entry with `is_default: true` is permitted — cannot be checked
+  live: `create` always returns `is_default: false`, and the constraints rule
+  out touching a real built-in, so no throwaway entry with `is_default: true`
+  can exist to delete. What was confirmed live is the other half: a
+  non-default entry deletes cleanly. The built-in case rests on reading the
+  server source (no delete handler checks `is_default`; defaults are seeded by
+  one-time migrations, not re-seeded on boot).
 
 ## Docs in the same PR
 
