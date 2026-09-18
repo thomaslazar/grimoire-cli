@@ -211,13 +211,27 @@ public class VocabularyCommandTests
     }
 
     // No delete handler checks is_default, and the defaults are seeded by a
-    // one-time migration, so this is unrecoverable.
+    // one-time migration, so this is unrecoverable. Parent systems are excluded:
+    // DEFAULT_PARENT_SYSTEMS is empty, so every row there is user-created and the
+    // warning would be false.
     [Theory]
-    [MemberData(nameof(Vocabularies))]
+    [InlineData("genres")]
+    [InlineData("licenses")]
+    [InlineData("system-families")]
+    [InlineData("dice-materials")]
     public void DeleteWarnsThatBuiltInsAreDeletable(string name)
     {
         var help = HelpRenderer.Render(Group(name), [name, "delete"], full: false);
         Assert.Contains("Built-in entries", help);
+    }
+
+    // Parent systems ship no defaults (DEFAULT_PARENT_SYSTEMS is empty), so unlike
+    // the other four groups this one must not claim built-ins are deletable.
+    [Fact]
+    public void ParentSystemsDeleteDoesNotWarnAboutBuiltIns()
+    {
+        var help = HelpRenderer.Render(Group("parent-systems"), ["parent-systems", "delete"], full: false);
+        Assert.DoesNotContain("Built-in entries", help);
     }
 
     [Theory]
