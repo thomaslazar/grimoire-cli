@@ -1880,4 +1880,78 @@ ok "tags delete removes the tag and prints no body"
   && fail "deleting a tag that does not exist should fail"
 ok "tags delete refuses an unknown tag"
 
+# --- vocabulary writes -------------------------------------------------------
+# Fixed names, invented here and deleted before the block ends, so a re-run
+# converges. Nothing here touches a built-in entry or a fixture's own metadata.
+for VOCAB in genres licenses parent-systems system-families; do
+  case "$VOCAB" in
+    genres) LISTKEY=genres ;;
+    licenses) LISTKEY=licenses ;;
+    parent-systems) LISTKEY=parent_systems ;;
+    system-families) LISTKEY=families ;;
+  esac
+  CREATED=$("$CLI" "$VOCAB" create --name "Smoke Vocab" 2>"$WORK/cli.err") \
+    || { cat "$WORK/cli.err" >&2; fail "$VOCAB create exited non-zero"; }
+  [ "$(echo "$CREATED" | jq -r .name)" = "Smoke Vocab" ] \
+    || fail "$VOCAB create should echo the name: $CREATED"
+  [ "$(echo "$CREATED" | jq -r .is_default)" = "false" ] \
+    || fail "$VOCAB create should mark the entry custom: $CREATED"
+  VID=$(echo "$CREATED" | jq -r .id)
+
+  "$CLI" "$VOCAB" create --name "smoke vocab" >/dev/null 2>&1 \
+    && fail "$VOCAB create should refuse a case-insensitive duplicate"
+
+  DELETED=$("$CLI" "$VOCAB" delete --id "$VID" 2>"$WORK/cli.err") \
+    || { cat "$WORK/cli.err" >&2; fail "$VOCAB delete exited non-zero"; }
+  [ "$(echo "$DELETED" | jq -r .removed_usage)" = "0" ] \
+    || fail "$VOCAB delete of an unused entry should report no usage: $DELETED"
+  "$CLI" "$VOCAB" list 2>"$WORK/cli.err" \
+    | jq -e --arg k "$LISTKEY" '[.[$k][].name] | index("Smoke Vocab") == null' >/dev/null \
+    || fail "$VOCAB should no longer list the deleted entry"
+  ok "$VOCAB create and delete round-trip"
+done
+
+# dice-materials carries an extra field, so it is checked on its own rather than
+# in the loop above.
+DICE=$("$CLI" dice-materials create --name "Smoke Vocab" --group "Smoke" 2>"$WORK/cli.err") \
+  || { cat "$WORK/cli.err" >&2; fail "dice-materials create exited non-zero"; }
+[ "$(echo "$DICE" | jq -r .group)" = "Smoke" ] \
+  || fail "dice-materials create should keep the group it was given: $DICE"
+DICE_ID=$(echo "$DICE" | jq -r .id)
+"$CLI" dice-materials delete --id "$DICE_ID" >/dev/null 2>"$WORK/cli.err" \
+  || { cat "$WORK/cli.err" >&2; fail "dice-materials delete exited non-zero"; }
+ok "dice-materials create keeps its group and deletes cleanly"
+
+DICE=$("$CLI" dice-materials create --name "Smoke Vocab" 2>"$WORK/cli.err") \
+  || { cat "$WORK/cli.err" >&2; fail "dice-materials create exited non-zero"; }
+[ "$(echo "$DICE" | jq -r .group)" = "Custom" ] \
+  || fail "an omitted --group should leave the server's Custom default: $DICE"
+"$CLI" dice-materials delete --id "$(echo "$DICE" | jq -r .id)" >/dev/null 2>&1 \
+  || fail "dice-materials delete exited non-zero"
+ok "an omitted --group leaves the server's default"
+
+# The genre cascade: a child goes with its parent, and no other vocabulary has
+# this behaviour to check.
+PARENT=$("$CLI" genres create --name "Smoke Parent" 2>"$WORK/cli.err") \
+  || { cat "$WORK/cli.err" >&2; fail "genres create exited non-zero"; }
+PARENT_ID=$(echo "$PARENT" | jq -r .id)
+CHILD=$("$CLI" genres create --name "Smoke Child" --parent-id "$PARENT_ID" 2>"$WORK/cli.err") \
+  || { cat "$WORK/cli.err" >&2; fail "genres create --parent-id exited non-zero"; }
+[ "$(echo "$CHILD" | jq -r .parent_id)" = "$PARENT_ID" ] \
+  || fail "the child should carry its parent's id: $CHILD"
+"$CLI" genres delete --id "$PARENT_ID" >/dev/null 2>"$WORK/cli.err" \
+  || { cat "$WORK/cli.err" >&2; fail "genres delete exited non-zero"; }
+"$CLI" genres list 2>"$WORK/cli.err" \
+  | jq -e '[.genres[].name] | index("Smoke Child") == null' >/dev/null \
+  || fail "deleting a parent genre should take its children with it"
+ok "deleting a parent genre cascades to its children"
+
+"$CLI" genres create --name "Smoke Orphan" --parent-id "no-such-genre" >/dev/null 2>&1 \
+  && fail "genres create should refuse an unknown --parent-id"
+ok "genres create refuses an unknown --parent-id"
+
+"$CLI" licenses delete --id "no-such-license" >/dev/null 2>&1 \
+  && fail "deleting an entry that does not exist should fail"
+ok "vocabulary delete refuses an unknown id"
+
 echo "smoke: all checks passed" >&2
