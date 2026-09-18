@@ -118,9 +118,6 @@ public static class TagsCommand
             "tag already owns that key, the two are merged and the survivor is",
             "returned — there is no warning and no undo.",
             "",
-            "A tag that exists only on a folder is materialised first, so the new",
-            "display survives a rescan.",
-            "",
             "'/' and '\\' are rejected in the new display.");
         command.AddExamples(
             "grimoire-cli tags rename --tag gm-screen --display \"GM Screen\"",
@@ -184,9 +181,8 @@ public static class TagsCommand
             "carries it afterwards, so the merged tag can reappear in tags list.",
             "Use tags rename to move a folder-only tag.",
             "",
-            "404 when --tag has no item links at all, even if a folder carries",
-            "it. '/' and '\\' are rejected in --into but allowed in --tag, so a",
-            "tag that predates that rule can be merged out of trouble.");
+            "'/' and '\\' are rejected in --into but allowed in --tag, so a tag",
+            "that predates that rule can be merged out of trouble.");
         command.AddExamples("grimoire-cli tags merge --tag \"D&D\" --into dungeons-and-dragons");
         command.AddResponseExample<Generated.Models.TagRenamedResponse>();
         command.SetAction(async (parseResult, cancellationToken) =>
