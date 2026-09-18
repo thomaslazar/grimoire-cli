@@ -590,6 +590,7 @@ git commit -m "test: cover the tag writes in the smoke test"
 ### Task 4: Docs
 
 **Files:**
+- Modify: `src/GrimoireCli/Commands/TagsCommand.cs` (two wrong Notes lines — Step 0)
 - Modify: `README.md` (Commands table, the `tags` rows near line 304)
 - Modify: `tools/generate-api-coverage.py` (the `IMPLEMENTED` dict, near line 194)
 - Modify: `docs/grimoire-api-coverage.md` (regenerated, never hand-edited)
@@ -598,6 +599,46 @@ git commit -m "test: cover the tag writes in the smoke test"
 **Interfaces:**
 - Consumes: the command names from Task 2 and the two live findings from Task 3.
 - Produces: the PR-ready docs set.
+
+- [ ] **Step 0: Correct the two help lines Task 3 disproved**
+
+Task 3 ran `tags merge` against a tag carried only by a book folder and it
+**succeeded** (200, survivor returned), rather than the 404 the help text
+claims. The cause is in the source: every folder tag gets a catalog row —
+`register_folder_tags` calls `get_or_create_tag` (`services/tag_service/_folders.py:63`),
+and the `tags.json` scan goes through the same function (`indexer/tags.py:81`).
+So merge's 404 is about a missing catalog row, which a folder tag never has,
+and it is not about item links at all.
+
+In `CreateMergeCommand`, replace the third Notes paragraph:
+
+```csharp
+            "404 when --tag has no item links at all, even if a folder carries",
+            "it. '/' and '\\' are rejected in --into but allowed in --tag, so a",
+            "tag that predates that rule can be merged out of trouble.");
+```
+
+with:
+
+```csharp
+            "'/' and '\\' are rejected in --into but allowed in --tag, so a tag",
+            "that predates that rule can be merged out of trouble.");
+```
+
+In `CreateRenameCommand`, delete this paragraph and the blank line before it —
+a folder tag always has a catalog row, so there is nothing to materialise:
+
+```csharp
+            "",
+            "A tag that exists only on a folder is materialised first, so the new",
+            "display survives a rescan.",
+```
+
+Then `dotnet format GrimoireCli.sln` and run the suite:
+`dotnet test tests/GrimoireCli.Tests/GrimoireCli.Tests.csproj --filter TagsCommandTests`.
+`MergeWarnsThatFolderTagsAreLeftBehind` asserts only on "folder", which the
+surviving paragraph still carries, so it must still pass. If any test fails,
+stop and report rather than editing the test.
 
 - [ ] **Step 1: Add the README rows**
 
@@ -643,13 +684,15 @@ Add to `docs/grimoire-api-notes.md`, in the section its existing tag entries liv
   display whenever its lowercased form changes, folder `tags.json` entries are
   rewritten onto the new key, and if another tag already owns that key the two
   are **merged**, with the survivor returned
-  (`services/tag_service/_admin.py:68-113`, v1.7.1). A folder-only tag is
-  materialised into a catalog row first, so the rename survives a rescan.
+  (`services/tag_service/_admin.py:68-113`, v1.7.1).
 - `POST /api/tags/{internal}/merge` moves item links only. Folder tags are
-  untouched (`routers/tags/core.py:208-237`), so a source tag carried by a
-  folder reappears in `tags list` after the merge, and a tag with no catalog
-  row 404s even when a folder carries it. The target is created if missing; a
-  self-merge 400s.
+  untouched (`routers/tags/core.py:208-237`), so a tag carried by a folder is
+  still carried by it after the merge and reappears in `tags list`. The 404 is
+  about a missing catalog row, not about having no links: **merging a
+  folder-derived tag succeeds** — verified live against 1.7.1 — because every
+  folder tag gets a catalog row, both when written through the API and when
+  scanned from a `tags.json` (`services/tag_service/_folders.py:63`,
+  `indexer/tags.py:81`). The target is created if missing; a self-merge 400s.
 - `POST /api/tags` is idempotent by internal key and answers 201; `display`
   defaults to the value's own trimmed casing (`_catalog.py:22`).
 - `DELETE /api/tags/{internal}` answers 204 and strips folder associations as
@@ -665,7 +708,8 @@ Replace any of these lines with what Task 3 actually observed if the stack disag
 - [ ] **Step 5: Commit**
 
 ```bash
-git add README.md tools/generate-api-coverage.py docs/grimoire-api-coverage.md docs/grimoire-api-notes.md
+git add src/GrimoireCli/Commands/TagsCommand.cs README.md \
+        tools/generate-api-coverage.py docs/grimoire-api-coverage.md docs/grimoire-api-notes.md docs/plans/2026-09-18-tags-writes.md
 git commit -m "docs: record the tag write commands"
 ```
 
