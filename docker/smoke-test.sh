@@ -880,6 +880,11 @@ jq -e '.folder_path == "battlemaps"' "$WORK/mapget.out" >/dev/null \
   || fail "folder_path should exclude the maps/ root: $(cat "$WORK/mapget.out")"
 ok "maps get returns grid and folder context"
 
+"$CLI" maps thumbnail --id "$MAP_ID" --output "$WORK/mapthumb.webp" >/dev/null 2>&1 \
+  || fail "maps thumbnail exited non-zero"
+[ -s "$WORK/mapthumb.webp" ] || fail "maps thumbnail wrote no bytes"
+ok "maps thumbnail downloads the rendered image"
+
 echo '{"grid_px":70}' | "$CLI" maps update --id "$MAP_ID" --stdin >"$WORK/mapupd.out" 2>&1 \
   || fail "maps update exited non-zero"
 "$CLI" maps get --id "$MAP_ID" >"$WORK/mapget2.out" 2>&1

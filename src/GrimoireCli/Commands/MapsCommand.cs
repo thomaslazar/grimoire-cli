@@ -1,5 +1,6 @@
 using System.CommandLine;
 using GrimoireCli.Api;
+using GrimoireCli.Models;
 using GrimoireCli.Output;
 using GrimoireCli.Services;
 
@@ -14,6 +15,7 @@ public static class MapsCommand
         var command = new Command("maps", "Read and edit map metadata");
         command.Subcommands.Add(CreateListCommand());
         command.Subcommands.Add(CreateGetCommand());
+        command.Subcommands.Add(CreateThumbnailCommand());
         command.Subcommands.Add(CreateUpdateCommand());
         command.Subcommands.Add(CreateBatchUpdateCommand());
         command.Subcommands.Add(CreateBatchTagCommand());
@@ -79,6 +81,47 @@ public static class MapsCommand
             var service = new MapsService(client);
             var result = await service.GetAsync(parseResult.GetValue(idOption)!);
             ConsoleOutput.WriteRawJson(result);
+            return 0;
+        });
+        return command;
+    }
+
+    private static Command CreateThumbnailCommand()
+    {
+        var idOption = new Option<string>("--id") { Description = "Map ID", Required = true };
+        var outputOption = new Option<string>("--output")
+        {
+            Description = "Output file path, or '-' for binary to stdout",
+            Required = true,
+        };
+        var command = new Command("thumbnail", "Download the map's rendered thumbnail")
+        {
+            idOption, outputOption
+        };
+        command.AddHelpSection("Notes", HelpSectionPosition.Top,
+            "Pregenerated during a scan; 404 when has_thumbnail is false in maps",
+            "list.",
+            "",
+            "--output - writes the image to stdout; a path writes the file and",
+            "prints {path, bytes}.");
+        command.AddExamples(
+            "grimoire-cli maps thumbnail --id <id> --output tavern.webp",
+            "grimoire-cli maps thumbnail --id <id> --output - > tavern.webp");
+        command.AddResponseExample<SavedFile>();
+        command.SetAction(async (parseResult, cancellationToken) =>
+        {
+            var (client, _) = CommandHelper.BuildClient();
+            var service = new MapsService(client);
+            await using var stream = await service.ThumbnailAsync(parseResult.GetValue(idOption)!);
+            try
+            {
+                await ConsoleOutput.WriteStreamAsync(stream, parseResult.GetValue(outputOption)!);
+            }
+            catch (BodyInputException ex)
+            {
+                _logger.Error(ex.Message);
+                return 1;
+            }
             return 0;
         });
         return command;

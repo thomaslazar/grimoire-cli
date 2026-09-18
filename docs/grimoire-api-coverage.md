@@ -28,7 +28,7 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | logs | 1 / 1 |
 | lookups | 5 / 15 |
 | maintenance | 1 / 5 |
-| maps | 8 / 16 |
+| maps | 9 / 16 |
 | models | 9 / 10 |
 | saved-filters | 0 / 4 |
 | search | 2 / 2 |
@@ -39,7 +39,7 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | token-frames | 0 / 2 |
 | tokens | 9 / 10 |
 | users | 0 / 16 |
-| **Total** | **111 / 309** |
+| **Total** | **112 / 309** |
 
 2 operation(s) are internal-only (🔒) and excluded from covered counts.
 
@@ -359,7 +359,7 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | GET | `/api/maps/{map_id}/export.uvtt` | Export a map as Universal VTT |  | — |
 | GET | `/api/maps/{map_id}/file` | Download map file |  | — |
 | GET | `/api/maps/{map_id}/page/{page_num}` | Render a map page |  | — |
-| GET | `/api/maps/{map_id}/thumbnail` | Map thumbnail |  | — |
+| GET | `/api/maps/{map_id}/thumbnail` | Map thumbnail |  | `maps thumbnail` ✅ |
 | GET | `/api/maps/{map_id}/vtt/authoring` | Get authored Universal VTT geometry |  | — |
 | PUT | `/api/maps/{map_id}/vtt/authoring` | Replace authored Universal VTT geometry | gm or admin | — |
 | GET | `/api/maps/{map_id}/vtt/data` | Universal VTT grid and feature data |  | — |

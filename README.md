@@ -259,6 +259,7 @@ grimoire-cli config set server https://grimoire.example.com
 | `files folder contents --path <path>` | Report whether a folder holds content (admin) |
 | `maps list [--map-type <t>] [--folder <path>] [--limit <n>] [--offset <n>]` | List maps (defaults to 100 results) |
 | `maps get --id <id>` | Get one map, with its detected grid and any manual override |
+| `maps thumbnail --id <id> --output <path\|->` | Download a map's scan-generated thumbnail |
 | `maps update --id <id> {--input <file> \| --stdin}` | Update one map's metadata (gm or admin) |
 | `maps batch-update {--input <file> \| --stdin}` | Update many maps in one transaction; exit 3 if partial (gm or admin) |
 | `maps batch-tag {--input <file> \| --stdin}` | Add tags to many maps, additively; exit 3 if partial (gm or admin) |
