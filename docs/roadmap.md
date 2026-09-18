@@ -21,25 +21,18 @@ the library on request*. **Met as of v0.2.0.**
 What follows extends it to the rest of the library. Grimoire holds five
 collections, and the cross-cutting commands already reach all of them —
 `duplicates`, `tags items` and `search` all take every resource type, `files`
-manages every tree, `library rescan --scope` reaches every section. Books,
-maps and models have `list`/`get`/`update`; tokens and audio still stop short.
-Closing that asymmetry is the direction.
-
-The sharpest symptom, and where the collection work continues: the only way to
-set a tag on a token or audio file today is `duplicates
-merge-metadata --resource-type <type> --fields tags`, copying it off another
-item that already carries it.
+manages every tree, `library rescan --scope` reaches every section. Every
+collection now has `list`/`get`/`update`, plus batch-update, batch-tag and
+folder tagging.
 
 ## Next
 
-1. **[tokens per-item layer](https://github.com/thomaslazar/grimoire-cli/issues/40)** — mechanical, following the shape maps already settled.
-2. **[audio per-item layer](https://github.com/thomaslazar/grimoire-cli/issues/41)** — last of the four; thinnest update model, plus an optional cover block.
-3. **[tags writes](https://github.com/thomaslazar/grimoire-cli/issues/42)** — create, rename, delete, merge. Deliberately after the four collection layers: each collection that gains `batch-tag` makes the hygiene problem bigger, so this lands when it is most needed.
-4. **[vocabulary writes](https://github.com/thomaslazar/grimoire-cli/issues/43)** — completes the five lookups the shipped reads open.
+1. **[tags writes](https://github.com/thomaslazar/grimoire-cli/issues/42)** — create, rename, delete, merge. Deliberately after the four collection layers: each collection that gains `batch-tag` makes the hygiene problem bigger, so this lands when it is most needed.
+2. **[vocabulary writes](https://github.com/thomaslazar/grimoire-cli/issues/43)** — completes the five lookups the shipped reads open.
 
 **[Small completions](https://github.com/thomaslazar/grimoire-cli/issues/44)** —
-`library stats`, `systems cover from-source`, and the binary getters for each new
-collection. Too small to schedule; fold each into whichever block is in flight.
+`library stats` and `systems cover from-source`. Too small to schedule; fold
+each into whichever block is in flight.
 
 ## Later
 
