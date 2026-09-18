@@ -294,10 +294,20 @@ grimoire-cli config set server https://grimoire.example.com
 | `audio folders set {--input <file> \| --stdin}` | Replace one audio folder's tags (gm or admin) |
 | `audio folders batch-set {--input <file> \| --stdin}` | Set tags on many audio folders in one transaction (gm or admin) |
 | `genres list` | List the genre vocabulary (tiered via `parent_id`) |
+| `genres create --name <name> [--parent-id <id>]` | Create a genre (admin) |
+| `genres delete --id <id> [--force]` | Delete a genre and its children; no undo (admin) |
 | `licenses list` | List the license vocabulary |
+| `licenses create --name <name>` | Create a license (admin) |
+| `licenses delete --id <id> [--force]` | Delete a license; no undo (admin) |
 | `parent-systems list` | List the parent-system vocabulary (ships empty) |
+| `parent-systems create --name <name>` | Create a parent system (admin) |
+| `parent-systems delete --id <id> [--force]` | Delete a parent system; no undo (admin) |
 | `system-families list` | List the system-family vocabulary |
+| `system-families create --name <name>` | Create a system family (admin) |
+| `system-families delete --id <id> [--force]` | Delete a system family; no undo (admin) |
 | `dice-materials list` | List the dice/material vocabulary |
+| `dice-materials create --name <name> [--group <group>]` | Create a dice/material (admin) |
+| `dice-materials delete --id <id> [--force]` | Delete a dice/material; no undo (admin) |
 | `search --query <q> [--limit <1-200>] [--book-id <id>] [--system-id <id>]` | Search page text and metadata across the library |
 | `search fields` | The `field:` prefixes a search query accepts |
 | `logs [--level <l>] [--limit <n>] [--offset <n>] [--after-seq <n>]` | Read the server's application log (admin) |
