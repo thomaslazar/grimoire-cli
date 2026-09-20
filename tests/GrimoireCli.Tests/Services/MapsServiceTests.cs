@@ -162,4 +162,33 @@ public class MapsServiceTests
         Assert.EndsWith("/api/maps/abc/thumbnail",
             Uri(Client().Api.Api.Maps["abc"].Thumbnail.ToGetRequestInformation()));
     }
+
+    [Fact]
+    public void EachBinaryGetterResolvesToItsOwnPath()
+    {
+        var api = Client().Api.Api.Maps["m1"];
+        Assert.Contains("/api/maps/m1/file", Uri(api.File.ToGetRequestInformation()));
+        Assert.Contains("/api/maps/m1/page/2", Uri(api.Page[2].ToGetRequestInformation()));
+        Assert.Contains("/api/maps/m1/vtt/image", Uri(api.Vtt.Image.ToGetRequestInformation()));
+        Assert.Contains("/api/maps/m1/vtt/data", Uri(api.Vtt.Data.ToGetRequestInformation()));
+        Assert.Contains("/api/maps/m1/export.uvtt", Uri(api.ExportUvtt.ToGetRequestInformation()));
+    }
+
+    // width is the only query parameter these getters take; a regeneration that
+    // renamed it would silently render at the server's default instead.
+    [Fact]
+    public void PageSendsWidthAsAQueryParameter()
+    {
+        var info = Client().Api.Api.Maps["m1"].Page[2].ToGetRequestInformation(
+            c => c.QueryParameters.Width = 800);
+        Assert.Contains("width=800", Uri(info));
+    }
+
+    // An omitted --width must send no width at all, so the server applies its
+    // own default rather than the CLI pinning one.
+    [Fact]
+    public void OmittedWidthSendsNoQueryString()
+    {
+        Assert.DoesNotContain("width=", Uri(Client().Api.Api.Maps["m1"].Page[2].ToGetRequestInformation()));
+    }
 }

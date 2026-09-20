@@ -63,6 +63,14 @@ public class LibraryService
         return await _client.SendAsync(info, permissionHint: "the admin role");
     }
 
+    /// <summary>
+    /// GET /api/stats. Guarded by get_current_user, so it names no
+    /// permissionHint. total_size_mb is books only; library_size_mb covers every
+    /// collection (routers/library/_schemas.py:77-79).
+    /// </summary>
+    public async Task<string> StatsAsync()
+        => await _client.SendAsync(_client.Api.Api.Stats.ToGetRequestInformation());
+
     private static Generated.Models.RescanRequest_metadata_mode ParseMetadataMode(string metadataMode) => metadataMode switch
     {
         "new" => Generated.Models.RescanRequest_metadata_mode.New,
