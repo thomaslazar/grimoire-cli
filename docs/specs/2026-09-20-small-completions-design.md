@@ -59,11 +59,13 @@ with the `.uvtt` export, and leaves the obvious home for `vtt/authoring`
 - **`systems cover from-source` copies bytes in exactly as an upload does**, so a
   folder `cover.*`/`folder.*` still wins over what it sets
   (`routers/systems/covers.py:161-181`). `source_type` is validated against
-  `("map", "token", "book", "audio", "campaign_file")`
-  (`services/image_source.py:32`), but `campaign_file` additionally requires a
-  campaign id this endpoint never sends, so it always 400s here
-  (`image_source.py:120-122`). The four usable types go in the help text; no
-  client-side set mirrors the server's, which answers 400 with its own list.
+  `SystemCoverSourceIn.known_source`, which builds its allowed set as every
+  `services.image_source.SOURCE_TYPES` entry except `campaign_file` and raises
+  on anything else (`routers/systems/_schemas.py:298-306`), so `campaign_file`
+  422s here before the route body runs — the wider `SOURCE_TYPES` tuple in
+  `image_source.py:32` includes it only for callers (the banner) that do have a
+  campaign in context. The four usable types go in the help text; no
+  client-side set mirrors the server's, which answers 422 with its own list.
 
 ## Implementation
 
@@ -96,8 +98,8 @@ every getter is guarded by `get_current_user`, and `GET /api/stats` likewise.
 Smoke, against the fixtures the seeded stack actually has (3 maps, 2 tokens, 3
 models, 2 audio, confirmed live):
 
-- `library stats` returns the ten documented keys, and `total_size_mb` is not
-  greater than `library_size_mb`.
+- `library stats` has `game_systems`, `books`, `total_size_mb` and
+  `library_size_mb`, and `total_size_mb` is not greater than `library_size_mb`.
 - `maps file`, `tokens file`, `models file` and `audio file` each download to a
   path and report a non-zero byte count.
 - `maps page --page 1` renders; `maps vtt export` succeeds on a raster map.

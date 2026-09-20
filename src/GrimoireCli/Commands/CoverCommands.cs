@@ -139,10 +139,7 @@ public static class CoverCommands
             "against.",
             "",
             "Copies the bytes in as an upload does, so a folder cover.* or folder.*",
-            "image still wins over what this sets.",
-            "",
-            "Useful for a container system, which has no books of its own to take a",
-            "thumbnail from.");
+            "image still wins over what this sets.");
         command.AddExamples(
             "grimoire-cli systems cover from-source --id <system-id> --source-type book --source-id <book-id>");
         command.AddResponseExample<Generated.Models.SystemCoverResponse>();
