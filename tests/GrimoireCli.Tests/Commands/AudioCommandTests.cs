@@ -164,4 +164,71 @@ public class AudioCommandTests
         Assert.NotEmpty(AudioCommand.Create().Parse(["file", "--id", "a1"]).Errors);
         Assert.Empty(AudioCommand.Create().Parse(["file", "--id", "a1", "--output", "-"]).Errors);
     }
+
+    [Fact]
+    public void TheGroupHostsTheCoverSubgroup()
+    {
+        Assert.Contains("cover", AudioCommand.Create().Subcommands.Select(c => c.Name));
+    }
+
+    [Theory]
+    [InlineData("get")]
+    [InlineData("upload")]
+    [InlineData("delete")]
+    [InlineData("from-source")]
+    public void TheCoverSubgroupHostsItsFourVerbs(string leaf)
+    {
+        var cover = AudioCommand.Create().Subcommands.Single(c => c.Name == "cover");
+        Assert.Contains(leaf, cover.Subcommands.Select(c => c.Name));
+    }
+
+    [Fact]
+    public void OnlyCoverGetTakesAnOutput()
+    {
+        var audio = AudioCommand.Create();
+        Assert.NotEmpty(audio.Parse(["cover", "get", "--id", "a1"]).Errors);
+        Assert.Empty(audio.Parse(["cover", "get", "--id", "a1", "--output", "-"]).Errors);
+        Assert.NotEmpty(audio.Parse(["cover", "delete", "--id", "a1", "--output", "-"]).Errors);
+    }
+
+    [Fact]
+    public void CoverWritesRequireTheirFlags()
+    {
+        var audio = AudioCommand.Create();
+        Assert.NotEmpty(audio.Parse(["cover", "upload", "--id", "a1"]).Errors);
+        Assert.Empty(audio.Parse(["cover", "upload", "--id", "a1", "--file", "c.png"]).Errors);
+        Assert.NotEmpty(audio.Parse(["cover", "from-source", "--id", "a1", "--source-type", "book"]).Errors);
+        Assert.Empty(audio.Parse(
+            ["cover", "from-source", "--id", "a1", "--source-type", "book", "--source-id", "b1"]).Errors);
+        Assert.Empty(audio.Parse(["cover", "delete", "--id", "a1"]).Errors);
+    }
+
+    [Theory]
+    [InlineData("get")]
+    [InlineData("upload")]
+    [InlineData("delete")]
+    [InlineData("from-source")]
+    public void EveryCoverVerbDeclaresTheGmOrAdminRole(string leaf)
+    {
+        var help = HelpRenderer.Render(AudioCommand.Create(), ["audio", "cover", leaf], full: false);
+        Assert.Contains("Role required:", help);
+        Assert.Contains("gm or admin", help);
+    }
+
+    // The whole reason both exist: artwork resolves the precedence chain, cover
+    // get serves only what was deliberately set.
+    [Fact]
+    public void CoverGetDistinguishesItselfFromArtwork()
+    {
+        var help = HelpRenderer.Render(AudioCommand.Create(), ["audio", "cover", "get"], full: false);
+        Assert.Contains("audio artwork", help);
+    }
+
+    // Deleting the set cover does not necessarily leave the track without art.
+    [Fact]
+    public void CoverDeleteWarnsArtworkCanSurvive()
+    {
+        var help = HelpRenderer.Render(AudioCommand.Create(), ["audio", "cover", "delete"], full: false);
+        Assert.Contains("has_artwork", help);
+    }
 }

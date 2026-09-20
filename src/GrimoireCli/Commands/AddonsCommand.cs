@@ -17,6 +17,7 @@ public static class AddonsCommand
         command.Subcommands.Add(CreateUpgradeAllCommand());
         command.Subcommands.Add(CreateUninstallCommand());
         command.Subcommands.Add(CreateSettingsCommand());
+        command.Subcommands.Add(CreateVerifyIndexCommand());
         return command;
     }
 
@@ -213,6 +214,30 @@ public static class AddonsCommand
             var service = new AddonsService(client);
             var result = await service.SettingsAsync(
                 parseResult.GetValue(indexUrlOption), parseResult.GetValue(allowScriptsOption));
+            ConsoleOutput.WriteRawJson(result);
+            return 0;
+        });
+        return command;
+    }
+
+    private static Command CreateVerifyIndexCommand()
+    {
+        var urlOption = new Option<string>("--url") { Description = "The index URL to check", Required = true };
+        var command = new Command("verify-index", "Check whether an add-on index URL is trusted")
+        {
+            urlOption
+        };
+        command.AddHelpSection("Notes", HelpSectionPosition.Top,
+            "Both sides are normalized before comparing, so a URL differing only",
+            "in trailing slash still verifies — do not compare against",
+            "trusted_index_urls yourself.");
+        command.AddExamples("grimoire-cli addons verify-index --url https://example.test/index.json");
+        command.AddResponseExample<Generated.Models.VerifyIndexResponse>();
+        command.SetAction(async (parseResult, cancellationToken) =>
+        {
+            var (client, _) = CommandHelper.BuildClient();
+            var service = new AddonsService(client);
+            var result = await service.VerifyIndexAsync(parseResult.GetValue(urlOption)!);
             ConsoleOutput.WriteRawJson(result);
             return 0;
         });
