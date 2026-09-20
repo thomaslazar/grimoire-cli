@@ -1,5 +1,6 @@
 using System.Text;
 using GrimoireCli.Api;
+using GrimoireCli.Commands;
 
 namespace GrimoireCli.Services;
 
@@ -97,6 +98,83 @@ public class AudioService
     {
         var info = _client.Api.Api.AudioFolders.Bulk.ToPostRequestInformation(new Generated.Models.BulkFolderTags());
         info.SetStreamContent(new MemoryStream(Encoding.UTF8.GetBytes(rawBody)), "application/json");
+        return await _client.SendAsync(info, permissionHint: GmHint);
+    }
+
+    /// <summary>
+    /// GET /api/audio/{id}/cover. Serves only the deliberately-set cover and
+    /// 404s when there is none (routers/audio/covers.py:149-165); ArtworkAsync
+    /// is the one that resolves folder and embedded art too.
+    /// </summary>
+    public async Task<Stream> CoverAsync(string id)
+        => await _client.SendStreamAsync(
+            _client.Api.Api.Audio[id].Cover.ToGetRequestInformation(),
+            permissionHint: GmHint);
+
+    /// <summary>
+    /// DELETE /api/audio/{id}/cover. Clears the set cover, then recomputes
+    /// has_artwork from folder and embedded art, so a track can still serve
+    /// artwork afterwards (routers/audio/covers.py:128-146).
+    /// </summary>
+    public async Task<string> DeleteCoverAsync(string id)
+        => await _client.SendAsync(
+            _client.Api.Api.Audio[id].Cover.ToDeleteRequestInformation(),
+            permissionHint: GmHint);
+
+    /// <summary>POST /api/audio/{id}/cover. Multipart; the server checks the content type, then the size.</summary>
+    public async Task<string> UploadCoverAsync(string id, string filePath)
+    {
+        byte[] bytes;
+        try
+        {
+            bytes = await File.ReadAllBytesAsync(filePath);
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or ArgumentException or NotSupportedException)
+        {
+            throw new BodyInputException($"Could not read {filePath}: {ex.Message}");
+        }
+        var info = _client.Api.Api.Audio[id].Cover.ToPostRequestInformation(BuildCoverUploadBody(bytes, filePath));
+        return await _client.SendAsync(info, permissionHint: GmHint);
+    }
+
+    /// <summary>
+    /// Internal so a test can pin the part name the server reads the file from.
+    /// </summary>
+    internal static Microsoft.Kiota.Abstractions.MultipartBody BuildCoverUploadBody(byte[] bytes, string filePath)
+    {
+        var body = new Microsoft.Kiota.Abstractions.MultipartBody();
+        body.AddOrReplacePart("file", MimeForExtension(filePath), bytes, Path.GetFileName(filePath));
+        return body;
+    }
+
+    /// <summary>
+    /// The content type the server checks `file.content_type` against. Unknown
+    /// extensions send octet-stream and let the server refuse — which types are
+    /// acceptable is its policy, not ours. Internal so a test can pin the map.
+    /// </summary>
+    internal static string MimeForExtension(string path) => Path.GetExtension(path).ToLowerInvariant() switch
+    {
+        ".png" => "image/png",
+        ".jpg" or ".jpeg" => "image/jpeg",
+        ".webp" => "image/webp",
+        ".gif" => "image/gif",
+        _ => "application/octet-stream",
+    };
+
+    /// <summary>
+    /// POST /api/audio/{id}/cover/from-source. Same validator as the systems
+    /// verb: map, token, book or audio, with campaign_file excluded by the
+    /// route's own schema (routers/audio/_schemas.py:100-118), so sending it is
+    /// a 422.
+    /// </summary>
+    // No notFoundHint: this route has two independent 404 sources — the track
+    // lookup, and load_source_image's per-source messages ("Book not found",
+    // "That book has no cover thumbnail", etc.) — and a hint would replace the
+    // server's discriminating body with one that cannot tell them apart.
+    public async Task<string> CoverFromSourceAsync(string id, string sourceType, string sourceId)
+    {
+        var body = new Generated.Models.AudioCoverSourceIn { SourceType = sourceType, SourceId = sourceId };
+        var info = _client.Api.Api.Audio[id].Cover.FromSource.ToPostRequestInformation(body);
         return await _client.SendAsync(info, permissionHint: GmHint);
     }
 }

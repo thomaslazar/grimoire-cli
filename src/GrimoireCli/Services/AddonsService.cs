@@ -1,4 +1,5 @@
 using GrimoireCli.Api;
+using Microsoft.Kiota.Abstractions;
 
 namespace GrimoireCli.Services;
 
@@ -94,4 +95,17 @@ public class AddonsService
             body.AllowScripts = new Generated.Models.AddonSettingsUpdate.AddonSettingsUpdate_allow_scripts { Boolean = allowScripts.Value };
         return body;
     }
+
+    /// <summary>
+    /// GET /api/addons/verify-index. Guarded by get_current_user, so it names no
+    /// permissionHint. The server normalizes both the given URL and every
+    /// trusted URL before comparing (addons/constants.py:42-49), which is why
+    /// the CLI does not compare against addons list's trusted_index_urls itself.
+    /// </summary>
+    public async Task<string> VerifyIndexAsync(string url)
+        => await _client.SendAsync(VerifyIndexRequest(url));
+
+    /// <summary>Internal so a test can pin the query parameter's wire name.</summary>
+    internal RequestInformation VerifyIndexRequest(string url)
+        => _client.Api.Api.Addons.VerifyIndex.ToGetRequestInformation(c => c.QueryParameters.Url = url);
 }
