@@ -189,6 +189,10 @@ public class AudioCommandTests
         Assert.NotEmpty(audio.Parse(["cover", "get", "--id", "a1"]).Errors);
         Assert.Empty(audio.Parse(["cover", "get", "--id", "a1", "--output", "-"]).Errors);
         Assert.NotEmpty(audio.Parse(["cover", "delete", "--id", "a1", "--output", "-"]).Errors);
+        Assert.NotEmpty(audio.Parse(["cover", "upload", "--id", "a1", "--file", "c.png", "--output", "-"]).Errors);
+        Assert.NotEmpty(audio.Parse(
+            ["cover", "from-source", "--id", "a1", "--source-type", "book", "--source-id", "b1", "--output", "-"])
+            .Errors);
     }
 
     [Fact]

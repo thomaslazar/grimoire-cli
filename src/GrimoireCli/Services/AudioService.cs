@@ -5,7 +5,7 @@ using GrimoireCli.Commands;
 namespace GrimoireCli.Services;
 
 /// <summary>
-/// The nine endpoints behind `audio` and `audio folders`. The folder verbs live
+/// The fourteen endpoints behind `audio` and `audio folders`. The folder verbs live
 /// here rather than in their own service because they are one collection's
 /// endpoints, the way ModelsService carries `models folders`.
 /// </summary>

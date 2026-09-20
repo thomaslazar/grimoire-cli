@@ -71,8 +71,8 @@ public static class AudioCoverCommands
         command.AddRoleRequired("gm or admin");
         command.AddHelpSection("Notes", HelpSectionPosition.Top,
             "Replaces any cover already set. The server checks the content type",
-            "first, then the size, so an oversized image answers 413 and an",
-            "unsupported one 400.");
+            "first, then the size, so an oversized image (over 10 MB) answers 413",
+            "and an unsupported one 400.");
         command.AddExamples("grimoire-cli audio cover upload --id <audio-id> --file cover.png");
         command.AddResponseExample<Generated.Models.AudioCoverResponse>();
         command.SetAction(async (parseResult, cancellationToken) =>

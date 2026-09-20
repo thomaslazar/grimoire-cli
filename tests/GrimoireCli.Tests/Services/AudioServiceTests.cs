@@ -125,6 +125,8 @@ public class AudioServiceTests
         var api = Client().Api.Api.Audio["a1"];
         Assert.Contains("/api/audio/a1/cover", Uri(api.Cover.ToGetRequestInformation()));
         Assert.Contains("/api/audio/a1/cover", Uri(api.Cover.ToDeleteRequestInformation()));
+        Assert.Contains("/api/audio/a1/cover", Uri(api.Cover.ToPostRequestInformation(
+            AudioService.BuildCoverUploadBody(new byte[] { 1 }, "cover.png"))));
         Assert.Contains("/api/audio/a1/cover/from-source", Uri(api.Cover.FromSource.ToPostRequestInformation(
             new Generated.Models.AudioCoverSourceIn { SourceType = "book", SourceId = "b1" })));
     }
