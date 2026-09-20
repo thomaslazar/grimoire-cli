@@ -1954,4 +1954,85 @@ ok "genres create refuses an unknown --parent-id"
   && fail "deleting an entry that does not exist should fail"
 ok "vocabulary delete refuses an unknown id"
 
+# --- small completions -------------------------------------------------------
+# Downloads land in $WORK, a fresh mktemp dir per run, so nothing needs cleaning
+# up and a re-run starts from the same place.
+STATS_JSON=$("$CLI" library stats 2>"$WORK/cli.err") \
+  || { cat "$WORK/cli.err" >&2; fail "library stats exited non-zero"; }
+echo "$STATS_JSON" | jq -e 'has("game_systems") and has("books") and has("total_size_mb") and has("library_size_mb")' >/dev/null \
+  || fail "library stats is missing a documented key: $STATS_JSON"
+echo "$STATS_JSON" | jq -e '.total_size_mb <= .library_size_mb' >/dev/null \
+  || fail "total_size_mb is books only and cannot exceed library_size_mb: $STATS_JSON"
+echo "$STATS_JSON" | jq -e '.books > 0 and .maps > 0' >/dev/null \
+  || fail "the seeded fixtures should show books and maps: $STATS_JSON"
+ok "library stats reports both size fields"
+
+# The four asset downloads, one per collection.
+SC_MAP=$("$CLI" maps list 2>/dev/null | jq -r '.maps[0].id')
+SC_TOKEN=$("$CLI" tokens list 2>/dev/null | jq -r '.tokens[0].id')
+SC_MODEL=$("$CLI" models list 2>/dev/null | jq -r '.models[0].id')
+SC_AUDIO=$("$CLI" audio list 2>/dev/null | jq -r '.audio[0].id')
+for pair in "maps:$SC_MAP" "tokens:$SC_TOKEN" "models:$SC_MODEL" "audio:$SC_AUDIO"; do
+  GROUP=${pair%%:*}; ITEM=${pair#*:}
+  [ -n "$ITEM" ] && [ "$ITEM" != "null" ] || fail "no $GROUP fixture to download"
+  "$CLI" "$GROUP" file --id "$ITEM" --output "$WORK/$GROUP.bin" >"$WORK/dl.out" 2>"$WORK/cli.err" \
+    || { cat "$WORK/cli.err" >&2; fail "$GROUP file exited non-zero"; }
+  [ -s "$WORK/$GROUP.bin" ] || fail "$GROUP file wrote an empty file"
+  [ "$(jq -r .bytes "$WORK/dl.out")" -gt 0 ] \
+    || fail "$GROUP file should report a byte count: $(cat "$WORK/dl.out")"
+  ok "$GROUP file downloads the asset and reports its size"
+done
+
+"$CLI" maps page --id "$SC_MAP" --page 1 --output "$WORK/page1.webp" >/dev/null 2>"$WORK/cli.err" \
+  || { cat "$WORK/cli.err" >&2; fail "maps page exited non-zero"; }
+[ -s "$WORK/page1.webp" ] || fail "maps page wrote an empty file"
+ok "maps page renders page 1"
+
+# Every fixture map is a raster, so the export is the success path and the two
+# /vtt/ getters are the refusal path.
+"$CLI" maps vtt export --id "$SC_MAP" --output "$WORK/map.uvtt" >/dev/null 2>"$WORK/cli.err" \
+  || { cat "$WORK/cli.err" >&2; fail "maps vtt export exited non-zero"; }
+jq -e 'has("image") and has("resolution")' "$WORK/map.uvtt" >/dev/null \
+  || fail "a .uvtt export should carry an image and a resolution: $(head -c 200 "$WORK/map.uvtt")"
+ok "maps vtt export builds a Universal VTT file from a raster map"
+
+"$CLI" maps vtt data --id "$SC_MAP" >/dev/null 2>&1 \
+  && fail "maps vtt data should refuse a map that is not a Universal VTT"
+ok "maps vtt data refuses a non-VTT map"
+
+"$CLI" maps vtt image --id "$SC_MAP" --output - >/dev/null 2>&1 \
+  && fail "maps vtt image should refuse a map that is not a Universal VTT"
+ok "maps vtt image refuses a non-VTT map"
+
+# systems cover from-source. Das Schwarze Auge is a container system, confirmed
+# by hand to carry no uploaded cover and no folder cover.*/folder.* art, so
+# delete afterwards restores the exact prior state and a re-run converges.
+syslist
+COVER_SRC_SYS=$(echo "$LIST_JSON" | jq -r '.[] | select(.name == "Das Schwarze Auge") | .id')
+[ -n "$COVER_SRC_SYS" ] || fail "no Das Schwarze Auge fixture for cover from-source"
+booklist
+COVER_SRC_BOOK=$(echo "$LIST_JSON" | jq -r '.books[0].id')
+
+FROMSRC_JSON=$("$CLI" systems cover from-source --id "$COVER_SRC_SYS" --source-type book --source-id "$COVER_SRC_BOOK" 2>"$WORK/cli.err") \
+  || { cat "$WORK/cli.err" >&2; fail "systems cover from-source exited non-zero"; }
+echo "$FROMSRC_JSON" | jq -e '.cover_image | endswith(".webp")' >/dev/null \
+  || fail "from-source should report a .webp cover_image: $FROMSRC_JSON"
+ok "systems cover from-source copies a book's image onto the system"
+
+# campaign_file is declared in the spec, but this route never supplies a
+# campaign — verified by hand: the server rejects it with a 422 enum error
+# before reaching that logic, not the 400 a bare "unsupported source" would
+# suggest. Either way it is a non-zero exit.
+"$CLI" systems cover from-source --id "$COVER_SRC_SYS" --source-type campaign_file --source-id "$COVER_SRC_BOOK" \
+  >/dev/null 2>&1 \
+  && fail "systems cover from-source should refuse source-type campaign_file"
+ok "systems cover from-source refuses source-type campaign_file"
+
+"$CLI" systems cover delete --id "$COVER_SRC_SYS" >/dev/null 2>"$WORK/cli.err" \
+  || { cat "$WORK/cli.err" >&2; fail "systems cover delete exited non-zero"; }
+sysget --id "$COVER_SRC_SYS"
+[ "$(echo "$GET_JSON" | jq -r '.cover_image // ""')" = "" ] \
+  || fail "cover delete should restore the empty cover_image: $GET_JSON"
+ok "systems cover delete restores the empty cover_image, so the run converges"
+
 echo "smoke: all checks passed" >&2
