@@ -575,7 +575,7 @@ Verified against v1.5.6 by reading `backend/routers/maintenance/`, backing
 
 ## Controlled vocabularies
 
-Read from `backend/routers/lookups/` at tag `v1.6.0`.
+Read from `backend/routers/lookups/` at tag `v1.7.1`.
 
 - **Systems and books store the vocabulary `name`, not the `id`.** Every usage
   count in `_helpers.py` matches on `name`, case-insensitively and with
@@ -597,7 +597,26 @@ Read from `backend/routers/lookups/` at tag `v1.6.0`.
   and book carrying that name keeps it, because the value is a string rather than
   a foreign key. The response field is named `removed_usage` but reports the
   count that *would* have blocked the delete. Deleting a genre cascades to its
-  child genres.
+  child genres. Verified live against 1.7.1: a forced `licenses delete` against a
+  value one system carried returned `{"status":"ok","removed_usage":1}`, matching
+  the `usage_count` the unforced attempt's 409 had reported, and the system kept
+  the license string afterward.
+
+### Vocabulary writes
+
+- Built-in entries are deletable and not restorable — read from source, not
+  verified live: `create` always returns `is_default: false`, so there is no
+  way to construct an entry with `is_default: true` to delete and confirm
+  against. No delete handler checks `is_default`, and the defaults are seeded
+  by one-time migrations (`migrations/versions/0004_expand_metadata.py`,
+  `0006_parent_system_licenses.py`) rather than re-seeded on boot.
+- `create` matches an existing name case-insensitively (`ilike`) and 409s;
+  `genres create` 404s on an unknown `parent_id`; `dice-materials create`
+  coalesces a blank or omitted `group` to `"Custom"` (`core.py:278`).
+- Usage is counted by name, case-insensitively. Genres and licenses count
+  systems and books; system-families, parent-systems and dice-materials count
+  systems only — `Book` has no `system_family`, `parent_system` or
+  `dice_materials` column (`routers/lookups/_helpers.py:74-127`).
 
 ## Backups
 

@@ -22,13 +22,9 @@ What follows is tag and vocabulary hygiene across that library. The
 per-collection commands and the cross-cutting ones — `duplicates`, `tags items`
 and `search` take every resource type, `files` manages every tree, `library
 rescan --scope` reaches every section — already put tags and lookup values on
-everything Grimoire holds; what they cannot do yet is curate the vocabularies
-themselves, which is what makes a sweep repeatable rather than a pile of
-near-duplicate labels.
+everything Grimoire holds.
 
 ## Next
-
-1. **[vocabulary writes](https://github.com/thomaslazar/grimoire-cli/issues/43)** — completes the five lookups the shipped reads open.
 
 **[Small completions](https://github.com/thomaslazar/grimoire-cli/issues/44)** —
 `library stats`, `systems cover from-source`, and maps' remaining binary
