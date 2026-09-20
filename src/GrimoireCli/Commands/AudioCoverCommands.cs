@@ -35,7 +35,7 @@ public static class AudioCoverCommands
         command.AddHelpSection("Notes", HelpSectionPosition.Top,
             "Serves only a cover set through this group; 404 when the track has",
             "none, even if folder or embedded art exists. audio artwork resolves",
-            "all three instead.",
+            "all three instead. has_cover in audio list says whether one is set.",
             "",
             "--output - writes the image to stdout; a path writes the file and",
             "prints {path, bytes}.");

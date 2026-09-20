@@ -12,8 +12,8 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | Tag | Covered / Total |
 |-----|-----------------|
 | (untagged) | 0 / 1 |
-| addons | 7 / 8 |
-| audio | 10 / 14 |
+| addons | 8 / 8 |
+| audio | 14 / 14 |
 | audio-sets | 0 / 5 |
 | auth | 2 / 14 |
 | backups | 6 / 6 |
@@ -39,7 +39,7 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | token-frames | 0 / 2 |
 | tokens | 10 / 10 |
 | users | 0 / 16 |
-| **Total** | **136 / 309** |
+| **Total** | **141 / 309** |
 
 2 operation(s) are internal-only (🔒) and excluded from covered counts.
 
@@ -57,7 +57,7 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | POST | `/api/addons/refresh` | Refresh the add-on index | admin | `addons refresh` ✅ |
 | PATCH | `/api/addons/settings` | Update add-on settings | admin | `addons settings` ✅ |
 | POST | `/api/addons/update-all` | Update all add-ons | admin | `addons upgrade-all` ✅ |
-| GET | `/api/addons/verify-index` | Verify an add-on index URL |  | — |
+| GET | `/api/addons/verify-index` | Verify an add-on index URL |  | `addons verify-index` ✅ |
 | PATCH | `/api/addons/{addon_id}` | Enable, disable, or approve an add-on | admin | `addons update` ✅ |
 | DELETE | `/api/addons/{addon_id}` | Uninstall an add-on | admin | `addons uninstall` ✅ |
 | POST | `/api/addons/{addon_id}/install` | Install or update an add-on | admin | `addons install` ✅ |
@@ -75,10 +75,10 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | GET | `/api/audio/{audio_id}` | Get an audio track |  | `audio get` ✅ |
 | PATCH | `/api/audio/{audio_id}` | Update audio metadata | gm or admin | `audio update` ✅ |
 | GET | `/api/audio/{audio_id}/artwork` | Audio artwork |  | `audio artwork` ✅ |
-| GET | `/api/audio/{audio_id}/cover` | Audio cover image | gm or admin | — |
-| POST | `/api/audio/{audio_id}/cover` | Upload an audio cover | gm or admin | — |
-| DELETE | `/api/audio/{audio_id}/cover` | Remove an audio cover | gm or admin | — |
-| POST | `/api/audio/{audio_id}/cover/from-source` | Set an audio cover from an existing image | gm or admin | — |
+| GET | `/api/audio/{audio_id}/cover` | Audio cover image | gm or admin | `audio cover get` ✅ |
+| POST | `/api/audio/{audio_id}/cover` | Upload an audio cover | gm or admin | `audio cover upload` ✅ |
+| DELETE | `/api/audio/{audio_id}/cover` | Remove an audio cover | gm or admin | `audio cover delete` ✅ |
+| POST | `/api/audio/{audio_id}/cover/from-source` | Set an audio cover from an existing image | gm or admin | `audio cover from-source` ✅ |
 | GET | `/api/audio/{audio_id}/file` | Stream/download audio file |  | `audio file` ✅ |
 
 ## audio-sets
