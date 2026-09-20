@@ -15,6 +15,7 @@ public static class CoverCommands
         command.Subcommands.Add(CreateGetCommand());
         command.Subcommands.Add(CreateUploadCommand());
         command.Subcommands.Add(CreateDeleteCommand());
+        command.Subcommands.Add(CreateFromSourceCommand());
         return command;
     }
 
@@ -117,6 +118,43 @@ public static class CoverCommands
             var service = new SystemsService(client);
             var response = await service.DeleteCoverAsync(parseResult.GetValue(idOption)!);
             ConsoleOutput.WriteRawJson(response);
+            return 0;
+        });
+        return command;
+    }
+
+    private static Command CreateFromSourceCommand()
+    {
+        var idOption = new Option<string>("--id") { Description = "System ID", Required = true };
+        var sourceTypeOption = new Option<string>("--source-type") { Description = "The kind of library item to copy the image from", Required = true };
+        var sourceIdOption = new Option<string>("--source-id") { Description = "That item's ID", Required = true };
+        var command = new Command("from-source", "Set the system's cover from an image already in the library")
+        {
+            idOption, sourceTypeOption, sourceIdOption
+        };
+        command.AddRoleRequired("gm or admin");
+        command.AddHelpSection("Notes", HelpSectionPosition.Top,
+            "--source-type takes map, token, book or audio. The API also declares",
+            "campaign_file, which needs a campaign this route never sends, so it",
+            "always 400s here.",
+            "",
+            "Copies the bytes in as an upload does, so a folder cover.* or folder.*",
+            "image still wins over what this sets.",
+            "",
+            "Useful for a container system, which has no books of its own to take a",
+            "thumbnail from.");
+        command.AddExamples(
+            "grimoire-cli systems cover from-source --id <system-id> --source-type book --source-id <book-id>");
+        command.AddResponseExample<Generated.Models.SystemCoverResponse>();
+        command.SetAction(async (parseResult, cancellationToken) =>
+        {
+            var (client, _) = CommandHelper.BuildClient();
+            var service = new SystemsService(client);
+            var result = await service.CoverFromSourceAsync(
+                parseResult.GetValue(idOption)!,
+                parseResult.GetValue(sourceTypeOption)!,
+                parseResult.GetValue(sourceIdOption)!);
+            ConsoleOutput.WriteRawJson(result);
             return 0;
         });
         return command;

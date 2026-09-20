@@ -89,4 +89,26 @@ public class LibraryCommandTests
         Assert.Contains("\"removed\":", output);
         Assert.Contains("\"systems\":", output);
     }
+
+    [Fact]
+    public void TheGroupHostsStats()
+    {
+        Assert.Contains("stats", LibraryCommand.Create().Subcommands.Select(c => c.Name));
+    }
+
+    [Fact]
+    public void StatsParsesWithNoArgumentsAndDeclaresNoRole()
+    {
+        Assert.Empty(LibraryCommand.Create().Parse(["stats"]).Errors);
+        Assert.DoesNotContain("Role required:", RenderHelp(["library", "stats"], full: true));
+    }
+
+    // The two size fields differ and nothing in the response says so.
+    [Fact]
+    public void StatsExplainsTheTwoSizeFields()
+    {
+        var help = RenderHelp(["library", "stats"], full: false);
+        Assert.Contains("total_size_mb", help);
+        Assert.Contains("library_size_mb", help);
+    }
 }
