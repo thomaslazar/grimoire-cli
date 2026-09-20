@@ -16,6 +16,7 @@ public static class TokensCommand
         command.Subcommands.Add(CreateListCommand());
         command.Subcommands.Add(CreateGetCommand());
         command.Subcommands.Add(CreateThumbnailCommand());
+        command.Subcommands.Add(CreateFileCommand());
         command.Subcommands.Add(CreateUpdateCommand());
         command.Subcommands.Add(CreateBatchUpdateCommand());
         command.Subcommands.Add(CreateBatchTagCommand());
@@ -102,6 +103,47 @@ public static class TokensCommand
             var (client, _) = CommandHelper.BuildClient();
             var service = new TokensService(client);
             await using var stream = await service.ThumbnailAsync(parseResult.GetValue(idOption)!);
+            try
+            {
+                await ConsoleOutput.WriteStreamAsync(stream, parseResult.GetValue(outputOption)!);
+            }
+            catch (BodyInputException ex)
+            {
+                _logger.Error(ex.Message);
+                return 1;
+            }
+            return 0;
+        });
+        return command;
+    }
+
+    private static Command CreateFileCommand()
+    {
+        var idOption = new Option<string>("--id") { Description = "Token ID", Required = true };
+        var outputOption = new Option<string>("--output")
+        {
+            Description = "Output file path, or '-' for binary to stdout",
+            Required = true,
+        };
+        var command = new Command("file", "Download the token image as stored")
+        {
+            idOption, outputOption
+        };
+        command.AddHelpSection("Notes", HelpSectionPosition.Top,
+            "The original image, whatever its size — tokens thumbnail serves the",
+            "generated preview.",
+            "",
+            "--output - writes the image to stdout; a path writes it and prints",
+            "{path, bytes}.");
+        command.AddExamples(
+            "grimoire-cli tokens file --id <id> --output goblin.png",
+            "grimoire-cli tokens file --id <id> --output - > goblin.png");
+        command.AddResponseExample<SavedFile>();
+        command.SetAction(async (parseResult, cancellationToken) =>
+        {
+            var (client, _) = CommandHelper.BuildClient();
+            var service = new TokensService(client);
+            await using var stream = await service.FileAsync(parseResult.GetValue(idOption)!);
             try
             {
                 await ConsoleOutput.WriteStreamAsync(stream, parseResult.GetValue(outputOption)!);

@@ -176,4 +176,99 @@ public class MapsCommandTests
         Assert.NotEmpty(MapsCommand.Create().Parse(["thumbnail", "--output", "x.webp"]).Errors);
         Assert.Empty(MapsCommand.Create().Parse(["thumbnail", "--id", "x", "--output", "x.webp"]).Errors);
     }
+
+    [Fact]
+    public void TheGroupHostsTheNewGetters()
+    {
+        var names = MapsCommand.Create().Subcommands.Select(c => c.Name).ToArray();
+        Assert.Contains("file", names);
+        Assert.Contains("page", names);
+        Assert.Contains("vtt", names);
+    }
+
+    [Fact]
+    public void FileAndPageRequireAnOutput()
+    {
+        Assert.NotEmpty(MapsCommand.Create().Parse(["file", "--id", "m1"]).Errors);
+        Assert.Empty(MapsCommand.Create().Parse(["file", "--id", "m1", "--output", "m.png"]).Errors);
+        Assert.NotEmpty(MapsCommand.Create().Parse(["page", "--id", "m1", "--page", "1"]).Errors);
+        Assert.Empty(MapsCommand.Create().Parse(["page", "--id", "m1", "--page", "1", "--output", "-"]).Errors);
+    }
+
+    [Fact]
+    public void PageRequiresAPageNumberAndTakesAWidth()
+    {
+        Assert.NotEmpty(MapsCommand.Create().Parse(["page", "--id", "m1", "--output", "-"]).Errors);
+        Assert.Empty(MapsCommand.Create().Parse(
+            ["page", "--id", "m1", "--page", "2", "--width", "800", "--output", "-"]).Errors);
+    }
+
+    // An image map accepts page 1 only, and --width has a server-side ceiling;
+    // both are things a caller cannot read off the flags.
+    [Fact]
+    public void PageDocumentsTheImageMapAndWidthLimits()
+    {
+        var help = Help(["maps", "page"]);
+        Assert.Contains("page 1", help);
+        Assert.Contains("3000", help);
+    }
+
+    [Theory]
+    [InlineData("image")]
+    [InlineData("data")]
+    [InlineData("export")]
+    public void TheVttSubgroupHostsItsThreeVerbs(string leaf)
+    {
+        var vtt = MapsCommand.Create().Subcommands.Single(c => c.Name == "vtt");
+        Assert.Contains(leaf, vtt.Subcommands.Select(c => c.Name));
+    }
+
+    [Fact]
+    public void VttImageAndExportStreamButDataDoesNot()
+    {
+        var maps = MapsCommand.Create();
+        Assert.Empty(maps.Parse(["vtt", "image", "--id", "m1", "--output", "-"]).Errors);
+        Assert.Empty(maps.Parse(["vtt", "export", "--id", "m1", "--output", "-"]).Errors);
+        Assert.Empty(maps.Parse(["vtt", "data", "--id", "m1"]).Errors);
+        // data is JSON on stdout; an --output flag would imply a file it never writes.
+        Assert.NotEmpty(maps.Parse(["vtt", "data", "--id", "m1", "--output", "-"]).Errors);
+    }
+
+    // Both refuse a map that is not a Universal VTT, which is most maps.
+    [Theory]
+    [InlineData("image")]
+    [InlineData("data")]
+    public void TheVttGettersWarnTheyNeedAUniversalVttMap(string leaf)
+    {
+        var help = Help(["maps", "vtt", leaf]);
+        Assert.Contains("400", help);
+    }
+
+    [Fact]
+    public void VttExportDocumentsWhatItRefuses()
+    {
+        var help = Help(["maps", "vtt", "export"]);
+        Assert.Contains("PDF", help);
+    }
+
+    [Theory]
+    [InlineData(new object[] { new[] { "maps", "file" } })]
+    [InlineData(new object[] { new[] { "maps", "page" } })]
+    [InlineData(new object[] { new[] { "maps", "vtt", "image" } })]
+    [InlineData(new object[] { new[] { "maps", "vtt", "export" } })]
+    public void EveryStreamingGetterCarriesTheSavedFileShape(string[] path)
+    {
+        Assert.Contains("Response shape:", Help(path, full: true));
+    }
+
+    [Theory]
+    [InlineData(new object[] { new[] { "maps", "file" } })]
+    [InlineData(new object[] { new[] { "maps", "page" } })]
+    [InlineData(new object[] { new[] { "maps", "vtt", "image" } })]
+    [InlineData(new object[] { new[] { "maps", "vtt", "data" } })]
+    [InlineData(new object[] { new[] { "maps", "vtt", "export" } })]
+    public void NoNewMapGetterDeclaresARole(string[] path)
+    {
+        Assert.DoesNotContain("Role required:", Help(path, full: true));
+    }
 }

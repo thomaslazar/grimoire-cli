@@ -42,6 +42,10 @@ public class ModelsService
         return await _client.SendStreamAsync(info);
     }
 
+    /// <summary>GET /api/models/{id}/file. Streams the 3D model file as stored.</summary>
+    public async Task<Stream> FileAsync(string id)
+        => await _client.SendStreamAsync(_client.Api.Api.Models[id].File.ToGetRequestInformation());
+
     /// <summary>
     /// PATCH /api/models/{id}. The generated builder supplies the URL, method and
     /// path parameter only; the validated raw body replaces the content so it

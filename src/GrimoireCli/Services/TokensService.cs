@@ -42,6 +42,10 @@ public class TokensService
         return await _client.SendStreamAsync(info);
     }
 
+    /// <summary>GET /api/tokens/{id}/file. Streams the token image as stored.</summary>
+    public async Task<Stream> FileAsync(string id)
+        => await _client.SendStreamAsync(_client.Api.Api.Tokens[id].File.ToGetRequestInformation());
+
     /// <summary>
     /// PATCH /api/tokens/{id}. The generated builder supplies the URL, method and
     /// path parameter only; the validated raw body replaces the content so it

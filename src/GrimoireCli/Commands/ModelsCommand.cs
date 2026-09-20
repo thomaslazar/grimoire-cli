@@ -16,6 +16,7 @@ public static class ModelsCommand
         command.Subcommands.Add(CreateListCommand());
         command.Subcommands.Add(CreateGetCommand());
         command.Subcommands.Add(CreateThumbnailCommand());
+        command.Subcommands.Add(CreateFileCommand());
         command.Subcommands.Add(CreateUpdateCommand());
         command.Subcommands.Add(CreateBatchUpdateCommand());
         command.Subcommands.Add(CreateBatchTagCommand());
@@ -109,6 +110,47 @@ public static class ModelsCommand
             var (client, _) = CommandHelper.BuildClient();
             var service = new ModelsService(client);
             await using var stream = await service.ThumbnailAsync(parseResult.GetValue(idOption)!);
+            try
+            {
+                await ConsoleOutput.WriteStreamAsync(stream, parseResult.GetValue(outputOption)!);
+            }
+            catch (BodyInputException ex)
+            {
+                _logger.Error(ex.Message);
+                return 1;
+            }
+            return 0;
+        });
+        return command;
+    }
+
+    private static Command CreateFileCommand()
+    {
+        var idOption = new Option<string>("--id") { Description = "Model ID", Required = true };
+        var outputOption = new Option<string>("--output")
+        {
+            Description = "Output file path, or '-' for binary to stdout",
+            Required = true,
+        };
+        var command = new Command("file", "Download the 3D model file")
+        {
+            idOption, outputOption
+        };
+        command.AddHelpSection("Notes", HelpSectionPosition.Top,
+            "The original model file, whatever its format — models thumbnail",
+            "serves the rendered preview.",
+            "",
+            "--output - writes the file to stdout; a path writes it and prints",
+            "{path, bytes}.");
+        command.AddExamples(
+            "grimoire-cli models file --id <id> --output mini.stl",
+            "grimoire-cli models file --id <id> --output - > mini.stl");
+        command.AddResponseExample<SavedFile>();
+        command.SetAction(async (parseResult, cancellationToken) =>
+        {
+            var (client, _) = CommandHelper.BuildClient();
+            var service = new ModelsService(client);
+            await using var stream = await service.FileAsync(parseResult.GetValue(idOption)!);
             try
             {
                 await ConsoleOutput.WriteStreamAsync(stream, parseResult.GetValue(outputOption)!);

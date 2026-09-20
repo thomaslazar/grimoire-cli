@@ -1,9 +1,14 @@
+using GrimoireCli.Api;
+using GrimoireCli.Configuration;
 using GrimoireCli.Services;
 
 namespace GrimoireCli.Tests.Services;
 
 public class LibraryServiceTests
 {
+    private static GrimoireApiClient Client() =>
+        new(new AppConfig { Server = "http://example.test", AccessToken = "t" });
+
     // The generated RescanRequest constructor sets MetadataMode to New
     // unconditionally, unlike Scope which it leaves untouched. Pins that
     // BuildBody nulls it back out when --metadata-mode is omitted, so a client
@@ -36,5 +41,13 @@ public class LibraryServiceTests
     {
         var body = LibraryService.BuildBody(scope: "books/D&D 5e", metadataMode: null);
         Assert.Equal("books/D&D 5e", body.Scope?.String);
+    }
+
+    [Fact]
+    public void StatsResolvesToTheStatsPath()
+    {
+        var info = Client().Api.Api.Stats.ToGetRequestInformation();
+        info.PathParameters["baseurl"] = "http://example.test";
+        Assert.Equal("http://example.test/api/stats", info.URI.AbsoluteUri);
     }
 }
