@@ -26,11 +26,6 @@ everything Grimoire holds.
 
 ## Next
 
-**[Small completions](https://github.com/thomaslazar/grimoire-cli/issues/44)** —
-`library stats`, `systems cover from-source`, and maps' remaining binary
-getters (`page/{n}`, `vtt/image`, `vtt/data`, `export.uvtt`). Too small to
-schedule; fold each into whichever block is in flight.
-
 ## Later
 
 Decided, but not next.

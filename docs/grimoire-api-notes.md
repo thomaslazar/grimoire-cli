@@ -454,6 +454,21 @@ and `books thumbnail`.
   is scan-derived from the book file, not an uploaded image, and there is no
   corresponding upload or delete for it.
 
+### Cover from-source
+
+- **`POST /api/systems/{id}/cover/from-source` accepts `map`, `token`, `book`
+  or `audio`; `campaign_file` is rejected by the route's own request schema,
+  not by a downstream campaign lookup.** `SystemCoverSourceIn.known_source`
+  builds its allowed set as every `services.image_source.SOURCE_TYPES` entry
+  except `campaign_file` and raises on anything else
+  (`routers/systems/_schemas.py:298-306`), so sending `campaign_file` here is
+  a 422 validation error, never a 400 — the wider `SOURCE_TYPES` tuple in
+  `services/image_source.py:32` includes it only for the callers (the banner)
+  that do have a campaign in context. Verified live: `campaign_file` answered
+  422 with `"source_type must be one of map, token, book, audio"`.
+- The bytes are copied in exactly as an upload does, so folder cover art still
+  takes precedence (`routers/systems/covers.py:161-181`).
+
 ## Book folders
 
 Measured against `hunterreadca/grimoire:1.6.0` — the 1.6.0 RC, not the v1.5.6 the
@@ -558,6 +573,14 @@ Verified against v1.5.6 by reading `backend/routers/maintenance/`, backing
   answered `{"removed": {"books": 0, "maps": 0, "tokens": 0, "audio": 0,
   "systems": 0}}` with exit 0. The destructive path is not exercised there —
   every fixture file is present — so the removal counts are unverified live.
+
+## Library statistics
+
+- `GET /api/stats` carries two size fields that are not the same number:
+  `total_size_mb` is books only, while `library_size_mb` adds maps, tokens,
+  audio and models (`routers/library/_schemas.py:77-79`, `core.py:150`, v1.7.1).
+  Both scope the book portion to what the caller may see, so a restricted
+  book's bytes stay out of either total.
 
 ## First-run users
 
@@ -826,6 +849,27 @@ measured against the running 1.7.0 stack.
   bulk verb book folders have no counterpart for. `tag_service.upsert_folder_tags`
   inserts a row for any path string without checking the tree, so a typo'd path
   creates a row that nothing can ever remove.
+- **`GET /api/maps/{id}/page/{n}` streams an image map as stored; `--width` is
+  a no-op on it.** Verified live against a raster fixture map: page 1 with and
+  without `--width` produced byte-identical output. Width only affects
+  rendering a PDF page; page 2 on an image map 400s with `"Image maps have
+  only one page"`.
+
+### Universal VTT routes
+
+- `GET /api/maps/{id}/vtt/data` is JSON, not a download: it is registered with
+  `response_model=VttDataResponse` and returns the grid resolution and
+  wall/portal/light counts with the embedded image omitted
+  (`routers/maps/__init__.py:115-126`). Its sibling `vtt/image` serves the
+  picture. Both 400 unless the map is a `.uvtt`/`.dd2vtt`.
+- `GET /api/maps/{id}/export.uvtt` is a download whose payload is JSON: the
+  handler returns a `Response` carrying the image as base64 WebP plus the grid
+  and any authored geometry (`routers/maps/core.py:340-460`). A raster map is
+  the normal case — verified live, a plain PNG fixture map exported 200
+  `application/octet-stream` with top-level keys `format`, `resolution`,
+  `image`, `environment`, `lights`, `line_of_sight`, `objects_line_of_sight`,
+  `portals`. It 400s for PDF, video and archive maps, and for a raster already
+  linked to a Universal VTT sibling.
 
 ## Models
 

@@ -13,7 +13,7 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 |-----|-----------------|
 | (untagged) | 0 / 1 |
 | addons | 7 / 8 |
-| audio | 9 / 14 |
+| audio | 10 / 14 |
 | audio-sets | 0 / 5 |
 | auth | 2 / 14 |
 | backups | 6 / 6 |
@@ -24,22 +24,22 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | duplicates | 13 / 13 |
 | favorites | 0 / 3 |
 | files | 9 / 10 |
-| library | 3 / 7 |
+| library | 4 / 7 |
 | logs | 1 / 1 |
 | lookups | 15 / 15 |
 | maintenance | 1 / 5 |
-| maps | 9 / 16 |
-| models | 9 / 10 |
+| maps | 14 / 16 |
+| models | 10 / 10 |
 | saved-filters | 0 / 4 |
 | search | 2 / 2 |
 | settings | 0 / 5 |
-| systems | 14 / 15 |
+| systems | 15 / 15 |
 | tags | 6 / 6 |
 | themes | 0 / 7 |
 | token-frames | 0 / 2 |
-| tokens | 9 / 10 |
+| tokens | 10 / 10 |
 | users | 0 / 16 |
-| **Total** | **126 / 309** |
+| **Total** | **136 / 309** |
 
 2 operation(s) are internal-only (🔒) and excluded from covered counts.
 
@@ -79,7 +79,7 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | POST | `/api/audio/{audio_id}/cover` | Upload an audio cover | gm or admin | — |
 | DELETE | `/api/audio/{audio_id}/cover` | Remove an audio cover | gm or admin | — |
 | POST | `/api/audio/{audio_id}/cover/from-source` | Set an audio cover from an existing image | gm or admin | — |
-| GET | `/api/audio/{audio_id}/file` | Stream/download audio file |  | — |
+| GET | `/api/audio/{audio_id}/file` | Stream/download audio file |  | `audio file` ✅ |
 
 ## audio-sets
 
@@ -306,7 +306,7 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | GET | `/api/latest-release` | Latest published release |  | — |
 | POST | `/api/rescan` | Rescan and reindex library | admin | `library rescan` ✅ |
 | GET | `/api/scan-status` | Scan status | admin | `library scan-status` ✅ |
-| GET | `/api/stats` | Library statistics |  | — |
+| GET | `/api/stats` | Library statistics |  | `library stats` ✅ |
 
 ## logs
 
@@ -356,14 +356,14 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | POST | `/api/maps/bulk/tags` | Bulk add tags to maps | gm or admin | `maps batch-tag` ✅ |
 | GET | `/api/maps/{map_id}` | Get a map |  | `maps get` ✅ |
 | PATCH | `/api/maps/{map_id}` | Update map metadata | gm or admin | `maps update` ✅ |
-| GET | `/api/maps/{map_id}/export.uvtt` | Export a map as Universal VTT |  | — |
-| GET | `/api/maps/{map_id}/file` | Download map file |  | — |
-| GET | `/api/maps/{map_id}/page/{page_num}` | Render a map page |  | — |
+| GET | `/api/maps/{map_id}/export.uvtt` | Export a map as Universal VTT |  | `maps vtt export` ✅ |
+| GET | `/api/maps/{map_id}/file` | Download map file |  | `maps file` ✅ |
+| GET | `/api/maps/{map_id}/page/{page_num}` | Render a map page |  | `maps page` ✅ |
 | GET | `/api/maps/{map_id}/thumbnail` | Map thumbnail |  | `maps thumbnail` ✅ |
 | GET | `/api/maps/{map_id}/vtt/authoring` | Get authored Universal VTT geometry |  | — |
 | PUT | `/api/maps/{map_id}/vtt/authoring` | Replace authored Universal VTT geometry | gm or admin | — |
-| GET | `/api/maps/{map_id}/vtt/data` | Universal VTT grid and feature data |  | — |
-| GET | `/api/maps/{map_id}/vtt/image` | Universal VTT map image |  | — |
+| GET | `/api/maps/{map_id}/vtt/data` | Universal VTT grid and feature data |  | `maps vtt data` ✅ |
+| GET | `/api/maps/{map_id}/vtt/image` | Universal VTT map image |  | `maps vtt image` ✅ |
 
 ## models
 
@@ -377,7 +377,7 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | POST | `/api/models/bulk/tags` | Bulk add tags to models | gm or admin | `models batch-tag` ✅ |
 | GET | `/api/models/{model_id}` | Get a 3D model |  | `models get` ✅ |
 | PATCH | `/api/models/{model_id}` | Update model metadata | gm or admin | `models update` ✅ |
-| GET | `/api/models/{model_id}/file` | Download model file |  | — |
+| GET | `/api/models/{model_id}/file` | Download model file |  | `models file` ✅ |
 | GET | `/api/models/{model_id}/thumbnail` | Model thumbnail |  | `models thumbnail` ✅ |
 
 ## saved-filters
@@ -421,7 +421,7 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | GET | `/api/systems/{system_id}/cover` | System cover image |  | `systems cover get` ✅ |
 | POST | `/api/systems/{system_id}/cover` | Upload a system cover | gm or admin | `systems cover upload` ✅ |
 | DELETE | `/api/systems/{system_id}/cover` | Remove an uploaded system cover | gm or admin | `systems cover delete` ✅ |
-| POST | `/api/systems/{system_id}/cover/from-source` | Set a system cover from an existing image | gm or admin | — |
+| POST | `/api/systems/{system_id}/cover/from-source` | Set a system cover from an existing image | gm or admin | `systems cover from-source` ✅ |
 | POST | `/api/systems/{system_id}/metadata-fetch` | Fetch metadata for review | gm or admin | `systems metadata-fetch` ✅ |
 | POST | `/api/systems/{system_id}/metadata-search` | Search a metadata source | gm or admin | `systems metadata-search` ✅ |
 | GET | `/api/systems/{system_id}/metadata-sources` | List metadata sources | gm or admin | `systems metadata-sources` ✅ |
@@ -468,7 +468,7 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | POST | `/api/tokens/bulk/tags` | Bulk add tags to tokens | gm or admin | `tokens batch-tag` ✅ |
 | GET | `/api/tokens/{token_id}` | Get a token |  | `tokens get` ✅ |
 | PATCH | `/api/tokens/{token_id}` | Update token metadata | gm or admin | `tokens update` ✅ |
-| GET | `/api/tokens/{token_id}/file` | Download token file |  | — |
+| GET | `/api/tokens/{token_id}/file` | Download token file |  | `tokens file` ✅ |
 | GET | `/api/tokens/{token_id}/thumbnail` | Token thumbnail |  | `tokens thumbnail` ✅ |
 
 ## users
