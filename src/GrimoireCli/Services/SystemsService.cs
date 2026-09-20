@@ -144,6 +144,21 @@ public class SystemsService
     }
 
     /// <summary>
+    /// POST /api/systems/{id}/cover/from-source. Copies the chosen bytes in as
+    /// an upload does, so a folder cover.* still wins
+    /// (routers/systems/covers.py:161-181).
+    /// </summary>
+    public async Task<string> CoverFromSourceAsync(string id, string sourceType, string sourceId)
+    {
+        var body = new Generated.Models.SystemCoverSourceIn { SourceType = sourceType, SourceId = sourceId };
+        var info = _client.Api.Api.Systems[id].Cover.FromSource.ToPostRequestInformation(body);
+        return await _client.SendAsync(
+            info,
+            permissionHint: "the gm or admin role",
+            notFoundHint: "No system with that ID. List them with: grimoire-cli systems list");
+    }
+
+    /// <summary>
     /// GET /api/systems/{id}/book-folders. Lists folders that have been tagged;
     /// a folder on disk with no tags has no record and does not appear. Tags come
     /// back in display casing.

@@ -44,6 +44,40 @@ public class MapsService
         return await _client.SendStreamAsync(info);
     }
 
+    /// <summary>GET /api/maps/{id}/file. Streams the map file as stored.</summary>
+    public async Task<Stream> FileAsync(string id)
+        => await _client.SendStreamAsync(_client.Api.Api.Maps[id].File.ToGetRequestInformation());
+
+    /// <summary>
+    /// GET /api/maps/{id}/page/{n}. Renders a PDF page to WebP; an image map
+    /// streams as-is and accepts page 1 only. width is left unset when the flag
+    /// is omitted so the server applies its own default.
+    /// </summary>
+    public async Task<Stream> PageAsync(string id, int page, int? width)
+        => await _client.SendStreamAsync(
+            _client.Api.Api.Maps[id].Page[page].ToGetRequestInformation(c => c.QueryParameters.Width = width));
+
+    /// <summary>
+    /// GET /api/maps/{id}/vtt/image. Decodes the base64 battlemap out of a
+    /// .uvtt/.dd2vtt; 400 for any other map.
+    /// </summary>
+    public async Task<Stream> VttImageAsync(string id)
+        => await _client.SendStreamAsync(_client.Api.Api.Maps[id].Vtt.Image.ToGetRequestInformation());
+
+    /// <summary>
+    /// GET /api/maps/{id}/vtt/data. JSON, not a download: the grid and feature
+    /// counts with the embedded image omitted.
+    /// </summary>
+    public async Task<string> VttDataAsync(string id)
+        => await _client.SendAsync(_client.Api.Api.Maps[id].Vtt.Data.ToGetRequestInformation());
+
+    /// <summary>
+    /// GET /api/maps/{id}/export.uvtt. A download whose payload is JSON carrying
+    /// a base64 image, so it goes through the stream path like any other file.
+    /// </summary>
+    public async Task<Stream> VttExportAsync(string id)
+        => await _client.SendStreamAsync(_client.Api.Api.Maps[id].ExportUvtt.ToGetRequestInformation());
+
     /// <summary>
     /// PATCH /api/maps/{id}. The generated builder supplies the URL, method and
     /// path parameter only; the validated raw body replaces the content so it

@@ -45,6 +45,10 @@ public class AudioService
         return await _client.SendStreamAsync(info);
     }
 
+    /// <summary>GET /api/audio/{id}/file. Streams the audio file.</summary>
+    public async Task<Stream> FileAsync(string id)
+        => await _client.SendStreamAsync(_client.Api.Api.Audio[id].File.ToGetRequestInformation());
+
     /// <summary>
     /// PATCH /api/audio/{id}. The generated builder supplies the URL, method and
     /// path parameter only; the validated raw body replaces the content so it
