@@ -134,9 +134,9 @@ public static class CoverCommands
         };
         command.AddRoleRequired("gm or admin");
         command.AddHelpSection("Notes", HelpSectionPosition.Top,
-            "--source-type takes map, token, book or audio. The API also declares",
-            "campaign_file, which needs a campaign this route never sends, so it",
-            "always 400s here.",
+            "--source-type takes map, token, book or audio; campaign_file is not a",
+            "valid value here (422) since a system has no campaign to resolve it",
+            "against.",
             "",
             "Copies the bytes in as an upload does, so a folder cover.* or folder.*",
             "image still wins over what this sets.",
