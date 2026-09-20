@@ -2026,10 +2026,9 @@ echo "$FROMSRC_JSON" | jq -e '.cover_image | endswith(".webp")' >/dev/null \
   || fail "from-source should report a .webp cover_image: $FROMSRC_JSON"
 ok "systems cover from-source copies a book's image onto the system"
 
-# campaign_file is declared in the spec, but this route never supplies a
-# campaign — verified by hand: the server rejects it with a 422 enum error
-# before reaching that logic, not the 400 a bare "unsupported source" would
-# suggest. Either way it is a non-zero exit.
+# campaign_file is excluded from SystemCoverSourceIn.known_source, so the
+# server rejects it with a 422 validation error before the route body runs —
+# not the 400 a downstream campaign lookup would suggest.
 "$CLI" systems cover from-source --id "$COVER_SRC_SYS" --source-type campaign_file --source-id "$COVER_SRC_BOOK" \
   >/dev/null 2>&1 \
   && fail "systems cover from-source should refuse source-type campaign_file"

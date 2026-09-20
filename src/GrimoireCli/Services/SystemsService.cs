@@ -148,14 +148,18 @@ public class SystemsService
     /// an upload does, so a folder cover.* still wins
     /// (routers/systems/covers.py:161-181).
     /// </summary>
+    // No notFoundHint: this route has two independent 404 sources — the system
+    // lookup, and load_source_image's per-source-type messages ("Book not
+    // found", "That book has no cover thumbnail", etc.) — and a hint would
+    // replace the server's discriminating body with one that cannot tell them
+    // apart.
     public async Task<string> CoverFromSourceAsync(string id, string sourceType, string sourceId)
     {
         var body = new Generated.Models.SystemCoverSourceIn { SourceType = sourceType, SourceId = sourceId };
         var info = _client.Api.Api.Systems[id].Cover.FromSource.ToPostRequestInformation(body);
         return await _client.SendAsync(
             info,
-            permissionHint: "the gm or admin role",
-            notFoundHint: "No system with that ID. List them with: grimoire-cli systems list");
+            permissionHint: "the gm or admin role");
     }
 
     /// <summary>

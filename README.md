@@ -262,11 +262,11 @@ grimoire-cli config set server https://grimoire.example.com
 | `maps list [--map-type <t>] [--folder <path>] [--limit <n>] [--offset <n>]` | List maps (defaults to 100 results) |
 | `maps get --id <id>` | Get one map, with its detected grid and any manual override |
 | `maps thumbnail --id <id> --output <path\|->` | Download a map's scan-generated thumbnail |
-| `maps file --id <id> --output <path>` | Download the map file as stored |
-| `maps page --id <id> --page <n> [--width <px>] --output <path>` | Render one page of a PDF map as WebP |
-| `maps vtt image --id <id> --output <path>` | Download the battlemap inside a Universal VTT file |
+| `maps file --id <id> --output <path\|->` | Download the map file as stored |
+| `maps page --id <id> --page <n> [--width <px>] --output <path\|->` | Render one page of a PDF map as WebP |
+| `maps vtt image --id <id> --output <path\|->` | Download the battlemap inside a Universal VTT file |
 | `maps vtt data --id <id>` | Grid and feature counts from a Universal VTT file |
-| `maps vtt export --id <id> --output <path>` | Export a raster map as a Universal VTT file |
+| `maps vtt export --id <id> --output <path\|->` | Export a raster map as a Universal VTT file |
 | `maps update --id <id> {--input <file> \| --stdin}` | Update one map's metadata (gm or admin) |
 | `maps batch-update {--input <file> \| --stdin}` | Update many maps in one transaction; exit 3 if partial (gm or admin) |
 | `maps batch-tag {--input <file> \| --stdin}` | Add tags to many maps, additively; exit 3 if partial (gm or admin) |
@@ -276,7 +276,7 @@ grimoire-cli config set server https://grimoire.example.com
 | `models list [--limit <n>] [--offset <n>]` | List 3D models (defaults to 100 results) |
 | `models get --id <id>` | Get one model, with its derived support pair |
 | `models thumbnail --id <id> --output <path\|->` | Download a model's rendered thumbnail |
-| `models file --id <id> --output <path>` | Download the 3D model file |
+| `models file --id <id> --output <path\|->` | Download the 3D model file |
 | `models update --id <id> {--input <file> \| --stdin}` | Update one model's metadata (gm or admin) |
 | `models batch-update {--input <file> \| --stdin}` | Update many models in one transaction; exit 3 if partial (gm or admin) |
 | `models batch-tag {--input <file> \| --stdin}` | Add tags to many models, additively; exit 3 if partial (gm or admin) |
@@ -286,7 +286,7 @@ grimoire-cli config set server https://grimoire.example.com
 | `tokens list [--limit <n>] [--offset <n>]` | List tokens (defaults to 100 results) |
 | `tokens get --id <id>` | Get one token |
 | `tokens thumbnail --id <id> --output <path\|->` | Download a token's rendered thumbnail |
-| `tokens file --id <id> --output <path>` | Download the token image as stored |
+| `tokens file --id <id> --output <path\|->` | Download the token image as stored |
 | `tokens update --id <id> {--input <file> \| --stdin}` | Update one token's metadata (gm or admin) |
 | `tokens batch-update {--input <file> \| --stdin}` | Update many tokens in one transaction; exit 3 if partial (gm or admin) |
 | `tokens batch-tag {--input <file> \| --stdin}` | Add tags to many tokens, additively; exit 3 if partial (gm or admin) |
@@ -296,7 +296,7 @@ grimoire-cli config set server https://grimoire.example.com
 | `audio list [--limit <n>] [--offset <n>]` | List audio tracks (defaults to 100 results) |
 | `audio get --id <id>` | Get one audio track |
 | `audio artwork --id <id> --output <path\|->` | Download an audio track's artwork |
-| `audio file --id <id> --output <path>` | Download the audio file |
+| `audio file --id <id> --output <path\|->` | Download the audio file |
 | `audio update --id <id> {--input <file> \| --stdin}` | Update one audio track's metadata (gm or admin) |
 | `audio batch-update {--input <file> \| --stdin}` | Update many audio tracks in one transaction; exit 3 if partial (gm or admin) |
 | `audio batch-tag {--input <file> \| --stdin}` | Add tags to many audio tracks, additively; exit 3 if partial (gm or admin) |

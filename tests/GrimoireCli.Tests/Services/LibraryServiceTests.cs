@@ -1,7 +1,6 @@
 using GrimoireCli.Api;
 using GrimoireCli.Configuration;
 using GrimoireCli.Services;
-using Microsoft.Kiota.Abstractions;
 
 namespace GrimoireCli.Tests.Services;
 
@@ -9,12 +8,6 @@ public class LibraryServiceTests
 {
     private static GrimoireApiClient Client() =>
         new(new AppConfig { Server = "http://example.test", AccessToken = "t" });
-
-    private static string Uri(RequestInformation info)
-    {
-        info.PathParameters["baseurl"] = "http://example.test";
-        return info.URI.AbsoluteUri;
-    }
 
     // The generated RescanRequest constructor sets MetadataMode to New
     // unconditionally, unlike Scope which it leaves untouched. Pins that
