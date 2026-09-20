@@ -4,13 +4,20 @@ using Microsoft.Kiota.Abstractions;
 namespace GrimoireCli.Services;
 
 /// <summary>
-/// The `parent-systems` vocabulary. Its read is a parameterless GET guarded only by
-/// get_current_user (routers/lookups/core.py), so the send names no
-/// permissionHint, and the path carries no id, so it names no notFoundHint.
+/// The `parent-systems` vocabulary: list, create and delete. The read is a
+/// parameterless GET guarded only by get_current_user (routers/lookups/core.py),
+/// so it names no hints. Create is require_admin and its path carries no id, so
+/// it names only a permissionHint; delete carries the id and names a
+/// notFoundHint as well.
 /// </summary>
 public class ParentSystemsService
 {
     private readonly GrimoireApiClient _client;
+
+    private const string AdminHint = "the admin role";
+
+    private const string NotFoundHint =
+        "No parent system with that ID. List them with: grimoire-cli parent-systems list";
 
     public ParentSystemsService(GrimoireApiClient client) => _client = client;
 
@@ -23,4 +30,19 @@ public class ParentSystemsService
     /// silently move.
     /// </summary>
     internal RequestInformation ListRequest() => _client.Api.Api.ParentSystems.ToGetRequestInformation();
+
+    /// <summary>POST /api/parent-systems. 409s on a case-insensitive duplicate name.</summary>
+    public async Task<string> CreateAsync(string name)
+        => await _client.SendAsync(CreateRequest(name), permissionHint: AdminHint);
+
+    internal RequestInformation CreateRequest(string name)
+        => _client.Api.Api.ParentSystems.ToPostRequestInformation(
+            new Generated.Models.ParentSystemCreate { Name = name });
+
+    /// <summary>DELETE /api/parent-systems/{id}. 409s while the name is in use unless force.</summary>
+    public async Task<string> DeleteAsync(string id, bool force)
+        => await _client.SendAsync(DeleteRequest(id, force), permissionHint: AdminHint, notFoundHint: NotFoundHint);
+
+    internal RequestInformation DeleteRequest(string id, bool force)
+        => _client.Api.Api.ParentSystems[id].ToDeleteRequestInformation(c => c.QueryParameters.Force = force);
 }

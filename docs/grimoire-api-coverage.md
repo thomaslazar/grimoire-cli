@@ -26,7 +26,7 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | files | 9 / 10 |
 | library | 3 / 7 |
 | logs | 1 / 1 |
-| lookups | 5 / 15 |
+| lookups | 15 / 15 |
 | maintenance | 1 / 5 |
 | maps | 9 / 16 |
 | models | 9 / 10 |
@@ -39,7 +39,7 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | token-frames | 0 / 2 |
 | tokens | 9 / 10 |
 | users | 0 / 16 |
-| **Total** | **116 / 309** |
+| **Total** | **126 / 309** |
 
 2 operation(s) are internal-only (🔒) and excluded from covered counts.
 
@@ -319,20 +319,20 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | Method | Path | Description | Perm | CLI |
 |--------|------|-------------|------|-----|
 | GET | `/api/dice-materials` | List all dice/materials |  | `dice-materials list` ✅ |
-| POST | `/api/dice-materials` | Create a custom dice/material (admin) | admin | — |
-| DELETE | `/api/dice-materials/{material_id}` | Delete a dice/material (admin; blocked if in use unless force=true) | admin | — |
+| POST | `/api/dice-materials` | Create a custom dice/material (admin) | admin | `dice-materials create` ✅ |
+| DELETE | `/api/dice-materials/{material_id}` | Delete a dice/material (admin; blocked if in use unless force=true) | admin | `dice-materials delete` ✅ |
 | GET | `/api/genres` | List all genres (tiered) |  | `genres list` ✅ |
-| POST | `/api/genres` | Create a custom genre (admin) | admin | — |
-| DELETE | `/api/genres/{genre_id}` | Delete a genre (admin; blocked if in use unless force=true) | admin | — |
+| POST | `/api/genres` | Create a custom genre (admin) | admin | `genres create` ✅ |
+| DELETE | `/api/genres/{genre_id}` | Delete a genre (admin; blocked if in use unless force=true) | admin | `genres delete` ✅ |
 | GET | `/api/licenses` | List all licenses |  | `licenses list` ✅ |
-| POST | `/api/licenses` | Create a custom license (admin) | admin | — |
-| DELETE | `/api/licenses/{license_id}` | Delete a license (admin; blocked if in use unless force=true) | admin | — |
+| POST | `/api/licenses` | Create a custom license (admin) | admin | `licenses create` ✅ |
+| DELETE | `/api/licenses/{license_id}` | Delete a license (admin; blocked if in use unless force=true) | admin | `licenses delete` ✅ |
 | GET | `/api/parent-systems` | List all parent systems |  | `parent-systems list` ✅ |
-| POST | `/api/parent-systems` | Create a custom parent system (admin) | admin | — |
-| DELETE | `/api/parent-systems/{parent_id}` | Delete a parent system (admin; blocked if in use unless force=true) | admin | — |
+| POST | `/api/parent-systems` | Create a custom parent system (admin) | admin | `parent-systems create` ✅ |
+| DELETE | `/api/parent-systems/{parent_id}` | Delete a parent system (admin; blocked if in use unless force=true) | admin | `parent-systems delete` ✅ |
 | GET | `/api/system-families` | List all system families |  | `system-families list` ✅ |
-| POST | `/api/system-families` | Create a custom system family (admin) | admin | — |
-| DELETE | `/api/system-families/{family_id}` | Delete a system family (admin; blocked if in use unless force=true) | admin | — |
+| POST | `/api/system-families` | Create a custom system family (admin) | admin | `system-families create` ✅ |
+| DELETE | `/api/system-families/{family_id}` | Delete a system family (admin; blocked if in use unless force=true) | admin | `system-families delete` ✅ |
 
 ## maintenance
 
