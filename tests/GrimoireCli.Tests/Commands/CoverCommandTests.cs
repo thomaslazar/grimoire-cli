@@ -79,4 +79,38 @@ public class CoverCommandTests
         Assert.Contains("Could not read", ex.Message);
         Assert.Contains(missing, ex.Message);
     }
+
+    [Fact]
+    public void TheCoverGroupHostsFromSource()
+    {
+        Assert.Contains("from-source", CoverCommands.Create().Subcommands.Select(c => c.Name));
+    }
+
+    [Fact]
+    public void FromSourceRequiresBothSourceFlags()
+    {
+        var cover = CoverCommands.Create();
+        Assert.NotEmpty(cover.Parse(["from-source", "--id", "s1"]).Errors);
+        Assert.NotEmpty(cover.Parse(["from-source", "--id", "s1", "--source-type", "book"]).Errors);
+        Assert.Empty(cover.Parse(
+            ["from-source", "--id", "s1", "--source-type", "book", "--source-id", "b1"]).Errors);
+    }
+
+    [Fact]
+    public void FromSourceDeclaresTheGmOrAdminRole()
+    {
+        var help = Help("from-source", full: false);
+        Assert.Contains("Role required:", help);
+        Assert.Contains("gm or admin", help);
+    }
+
+    // Folder art wins over what this sets, and the API's fifth source type is
+    // unreachable here — neither is visible from the flags.
+    [Fact]
+    public void FromSourceDocumentsFolderPrecedenceAndItsUsableTypes()
+    {
+        var help = Help("from-source", full: false);
+        Assert.Contains("folder", help);
+        Assert.Contains("audio", help);
+    }
 }

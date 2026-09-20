@@ -131,4 +131,17 @@ public class TokensCommandTests
     {
         Assert.Contains("\"folder_tags\"", Help(["tokens", "get"], full: true));
     }
+
+    [Fact]
+    public void TheGroupHostsFile()
+    {
+        Assert.Contains("file", TokensCommand.Create().Subcommands.Select(c => c.Name));
+    }
+
+    [Fact]
+    public void FileRequiresAnOutput()
+    {
+        Assert.NotEmpty(TokensCommand.Create().Parse(["file", "--id", "t1"]).Errors);
+        Assert.Empty(TokensCommand.Create().Parse(["file", "--id", "t1", "--output", "-"]).Errors);
+    }
 }

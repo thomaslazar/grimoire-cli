@@ -16,6 +16,7 @@ public static class AudioCommand
         command.Subcommands.Add(CreateListCommand());
         command.Subcommands.Add(CreateGetCommand());
         command.Subcommands.Add(CreateArtworkCommand());
+        command.Subcommands.Add(CreateFileCommand());
         command.Subcommands.Add(CreateUpdateCommand());
         command.Subcommands.Add(CreateBatchUpdateCommand());
         command.Subcommands.Add(CreateBatchTagCommand());
@@ -101,6 +102,47 @@ public static class AudioCommand
             var (client, _) = CommandHelper.BuildClient();
             var service = new AudioService(client);
             await using var stream = await service.ArtworkAsync(parseResult.GetValue(idOption)!);
+            try
+            {
+                await ConsoleOutput.WriteStreamAsync(stream, parseResult.GetValue(outputOption)!);
+            }
+            catch (BodyInputException ex)
+            {
+                _logger.Error(ex.Message);
+                return 1;
+            }
+            return 0;
+        });
+        return command;
+    }
+
+    private static Command CreateFileCommand()
+    {
+        var idOption = new Option<string>("--id") { Description = "Audio ID", Required = true };
+        var outputOption = new Option<string>("--output")
+        {
+            Description = "Output file path, or '-' for binary to stdout",
+            Required = true,
+        };
+        var command = new Command("file", "Download the audio file")
+        {
+            idOption, outputOption
+        };
+        command.AddHelpSection("Notes", HelpSectionPosition.Top,
+            "The original track as stored — audio artwork serves the embedded",
+            "cover image instead.",
+            "",
+            "--output - writes the file to stdout; a path writes it and prints",
+            "{path, bytes}.");
+        command.AddExamples(
+            "grimoire-cli audio file --id <id> --output track.mp3",
+            "grimoire-cli audio file --id <id> --output - > track.mp3");
+        command.AddResponseExample<SavedFile>();
+        command.SetAction(async (parseResult, cancellationToken) =>
+        {
+            var (client, _) = CommandHelper.BuildClient();
+            var service = new AudioService(client);
+            await using var stream = await service.FileAsync(parseResult.GetValue(idOption)!);
             try
             {
                 await ConsoleOutput.WriteStreamAsync(stream, parseResult.GetValue(outputOption)!);

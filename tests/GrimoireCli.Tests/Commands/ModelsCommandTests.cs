@@ -145,4 +145,17 @@ public class ModelsCommandTests
     {
         Assert.Contains("\"is_supported\"", Help(["models", "update"], full: true));
     }
+
+    [Fact]
+    public void TheGroupHostsFile()
+    {
+        Assert.Contains("file", ModelsCommand.Create().Subcommands.Select(c => c.Name));
+    }
+
+    [Fact]
+    public void FileRequiresAnOutput()
+    {
+        Assert.NotEmpty(ModelsCommand.Create().Parse(["file", "--id", "md1"]).Errors);
+        Assert.Empty(ModelsCommand.Create().Parse(["file", "--id", "md1", "--output", "-"]).Errors);
+    }
 }

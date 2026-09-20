@@ -16,6 +16,9 @@ public static class MapsCommand
         command.Subcommands.Add(CreateListCommand());
         command.Subcommands.Add(CreateGetCommand());
         command.Subcommands.Add(CreateThumbnailCommand());
+        command.Subcommands.Add(CreateFileCommand());
+        command.Subcommands.Add(CreatePageCommand());
+        command.Subcommands.Add(MapVttCommands.Create());
         command.Subcommands.Add(CreateUpdateCommand());
         command.Subcommands.Add(CreateBatchUpdateCommand());
         command.Subcommands.Add(CreateBatchTagCommand());
@@ -113,6 +116,94 @@ public static class MapsCommand
             var (client, _) = CommandHelper.BuildClient();
             var service = new MapsService(client);
             await using var stream = await service.ThumbnailAsync(parseResult.GetValue(idOption)!);
+            try
+            {
+                await ConsoleOutput.WriteStreamAsync(stream, parseResult.GetValue(outputOption)!);
+            }
+            catch (BodyInputException ex)
+            {
+                _logger.Error(ex.Message);
+                return 1;
+            }
+            return 0;
+        });
+        return command;
+    }
+
+    private static Command CreateFileCommand()
+    {
+        var idOption = new Option<string>("--id") { Description = "Map ID", Required = true };
+        var outputOption = new Option<string>("--output")
+        {
+            Description = "Output file path, or '-' for binary to stdout",
+            Required = true,
+        };
+        var command = new Command("file", "Download the map file as stored")
+        {
+            idOption, outputOption
+        };
+        command.AddHelpSection("Notes", HelpSectionPosition.Top,
+            "The original file, whatever its format — use maps page to render a",
+            "PDF page as an image.",
+            "",
+            "--output - writes the file to stdout; a path writes it and prints",
+            "{path, bytes}.");
+        command.AddExamples(
+            "grimoire-cli maps file --id <id> --output tavern.png",
+            "grimoire-cli maps file --id <id> --output - > tavern.png");
+        command.AddResponseExample<SavedFile>();
+        command.SetAction(async (parseResult, cancellationToken) =>
+        {
+            var (client, _) = CommandHelper.BuildClient();
+            var service = new MapsService(client);
+            await using var stream = await service.FileAsync(parseResult.GetValue(idOption)!);
+            try
+            {
+                await ConsoleOutput.WriteStreamAsync(stream, parseResult.GetValue(outputOption)!);
+            }
+            catch (BodyInputException ex)
+            {
+                _logger.Error(ex.Message);
+                return 1;
+            }
+            return 0;
+        });
+        return command;
+    }
+
+    private static Command CreatePageCommand()
+    {
+        var idOption = new Option<string>("--id") { Description = "Map ID", Required = true };
+        var pageOption = new Option<int>("--page") { Description = "1-based page number", Required = true };
+        var widthOption = new Option<int?>("--width") { Description = "Target pixel width" };
+        var outputOption = new Option<string>("--output")
+        {
+            Description = "Output file path, or '-' for binary to stdout",
+            Required = true,
+        };
+        var command = new Command("page", "Render one page of a PDF map as WebP")
+        {
+            idOption, pageOption, widthOption, outputOption
+        };
+        command.AddHelpSection("Notes", HelpSectionPosition.Top,
+            "An image map is streamed as stored and accepts page 1 only.",
+            "",
+            "--width defaults to 1600 and is capped at 3000.",
+            "",
+            "--output - writes the image to stdout; a path writes it and prints",
+            "{path, bytes}.");
+        command.AddExamples(
+            "grimoire-cli maps page --id <id> --page 1 --output page1.webp",
+            "grimoire-cli maps page --id <id> --page 1 --width 800 --output -");
+        command.AddResponseExample<SavedFile>();
+        command.SetAction(async (parseResult, cancellationToken) =>
+        {
+            var (client, _) = CommandHelper.BuildClient();
+            var service = new MapsService(client);
+            await using var stream = await service.PageAsync(
+                parseResult.GetValue(idOption)!,
+                parseResult.GetValue(pageOption),
+                parseResult.GetValue(widthOption));
             try
             {
                 await ConsoleOutput.WriteStreamAsync(stream, parseResult.GetValue(outputOption)!);

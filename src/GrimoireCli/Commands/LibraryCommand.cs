@@ -16,6 +16,7 @@ public static class LibraryCommand
         command.Subcommands.Add(CreateScanStatusCommand());
         command.Subcommands.Add(CreateCancelScanCommand());
         command.Subcommands.Add(CreateCleanupMissingCommand());
+        command.Subcommands.Add(CreateStatsCommand());
         return command;
     }
 
@@ -120,6 +121,26 @@ public static class LibraryCommand
             var (client, _) = CommandHelper.BuildClient();
             var service = new LibraryService(client);
             var result = await service.CleanupMissingAsync();
+            ConsoleOutput.WriteRawJson(result);
+            return 0;
+        });
+        return command;
+    }
+
+    private static Command CreateStatsCommand()
+    {
+        var command = new Command("stats", "Counts and sizes across the whole library");
+        command.AddHelpSection("Notes", HelpSectionPosition.Top,
+            "total_size_mb is books only; library_size_mb adds maps, tokens,",
+            "audio and models. Both scope the book portion to what the caller",
+            "may see, so a restricted book's bytes stay out of the totals.");
+        command.AddExamples("grimoire-cli library stats");
+        command.AddResponseExample<Generated.Models.StatsResponse>();
+        command.SetAction(async (parseResult, cancellationToken) =>
+        {
+            var (client, _) = CommandHelper.BuildClient();
+            var service = new LibraryService(client);
+            var result = await service.StatsAsync();
             ConsoleOutput.WriteRawJson(result);
             return 0;
         });

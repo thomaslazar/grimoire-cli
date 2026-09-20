@@ -151,4 +151,17 @@ public class AudioCommandTests
     {
         Assert.Contains("\"folder_tags\"", Help(["audio", "get"], full: true));
     }
+
+    [Fact]
+    public void TheGroupHostsFile()
+    {
+        Assert.Contains("file", AudioCommand.Create().Subcommands.Select(c => c.Name));
+    }
+
+    [Fact]
+    public void FileRequiresAnOutput()
+    {
+        Assert.NotEmpty(AudioCommand.Create().Parse(["file", "--id", "a1"]).Errors);
+        Assert.Empty(AudioCommand.Create().Parse(["file", "--id", "a1", "--output", "-"]).Errors);
+    }
 }
