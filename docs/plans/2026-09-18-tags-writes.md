@@ -744,8 +744,6 @@ links only, so folder-derived carriers keep the source tag.
 - `dotnet format --verify-no-changes`, `build`, `test`, `docker/smoke-test.sh`: all pass
 - README Commands table and `grimoire-api-coverage.md` updated in this change
 - `grimoire-api-notes.md` records the rename and merge behaviour, cited to v1.7.1
-
-🤖 Generated with [Claude Code](https://claude.com/claude-code)
 EOF
 )"
 ```
