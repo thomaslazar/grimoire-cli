@@ -2004,12 +2004,19 @@ ok "maps vtt data refuses a non-VTT map"
   && fail "maps vtt image should refuse a map that is not a Universal VTT"
 ok "maps vtt image refuses a non-VTT map"
 
-# systems cover from-source. Das Schwarze Auge is a container system, confirmed
-# by hand to carry no uploaded cover and no folder cover.*/folder.* art, so
-# delete afterwards restores the exact prior state and a re-run converges.
+# systems cover from-source. Das Schwarze Auge is a container system that
+# carries no uploaded cover, so an unconditional delete afterwards restores
+# the exact prior state and a re-run converges — but only as long as that
+# stays true, so the precondition is checked here rather than just asserted
+# in a comment: a cover_image that were ever non-empty would mean this write
+# clobbers a real cover and the delete below would then destroy it instead of
+# restoring it.
 syslist
 COVER_SRC_SYS=$(echo "$LIST_JSON" | jq -r '.[] | select(.name == "Das Schwarze Auge") | .id')
 [ -n "$COVER_SRC_SYS" ] || fail "no Das Schwarze Auge fixture for cover from-source"
+sysget --id "$COVER_SRC_SYS"
+[ "$(echo "$GET_JSON" | jq -r '.cover_image // ""')" = "" ] \
+  || fail "Das Schwarze Auge already has an uploaded cover_image — the smoke fixture has drifted, pick a different system for cover from-source: $GET_JSON"
 booklist
 COVER_SRC_BOOK=$(echo "$LIST_JSON" | jq -r '.books[0].id')
 
