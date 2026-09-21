@@ -119,7 +119,7 @@ public class BooksService
     /// a comic archive's page as the image member it already is, and a
     /// single-page image book as stored (routers/books/pages.py:126-146). A
     /// missing file flips the book's is_missing to true before the 404, at
-    /// each of the three serving paths (pages.py:130-131, 139-140, 177-178).
+    /// each of the three serving paths (pages.py:130-131, 140-141, 179-180).
     /// width defaults to 1200 server-side, not the 1600 maps uses, and is
     /// left unset when the flag is omitted.
     /// </summary>

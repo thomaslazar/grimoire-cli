@@ -1124,8 +1124,8 @@ stack. Backs `books file`, `books page`, `books toc`, `books page-text` and
   unknown id and an unopenable format are indistinguishable from the response.
 - `GET /api/books/{id}/file` and `GET /api/books/{id}/page/{n}` both **write on
   a missing file**: they set the book's `is_missing` to true and commit before
-  raising 404 (`routers/books/core.py:388-392`; `pages.py:130-131, 139-140,
-  177-178`, the file route's one site and the page route's three). A read that
+  raising 404 (`routers/books/core.py:388-392`; `pages.py:130-131, 140-141,
+  179-180`, the file route's one site and the page route's three). A read that
   mutates is worth knowing about when a scripted sweep hits a library whose
   files have moved.
 - `GET /api/books/{id}/page/{n}` defaults `width` to **1200**, where the maps
