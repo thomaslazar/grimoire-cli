@@ -219,7 +219,7 @@ grimoire-cli config set server https://grimoire.example.com
 | `books reindex --id <id> [--ocr-dpi <n>]` | Re-run OCR on one book (gm or admin) |
 | `books rescan --id <id>` | Re-read one book from disk and rebuild its index (gm or admin) |
 | `books thumbnail --id <id> --output <path\|->` | Download a book's scan-generated cover thumbnail |
-| `books toc --id <id>` | The book's table of contents (PDF or EPUB) |
+| `books toc --id <id>` | The book's table of contents (PDF, EPUB or DjVu) |
 | `books page-text --id <id> --page <n>` | The text of one page |
 | `books page-words --id <id> --page <n>` | Word bounding boxes for one page |
 | `systems cover get --id <id> --output <path\|->` | Download a system's cover image |

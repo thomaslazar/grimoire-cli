@@ -124,12 +124,15 @@ public class BooksService
     /// <summary>
     /// GET /api/books/{id}/page/{n}/text. Reads the book_search row for that
     /// page and falls back to live extraction when there is none
-    /// (routers/books/pages.py:221-245), so a result depends on the book being
-    /// indexed. An out-of-range page is 400 with the real page count.
+    /// (routers/books/pages.py:221-245) — a scan's result depends on the book
+    /// being indexed, while a born-digital book extracts live with no index
+    /// row at all. An out-of-range page is 400 with the real page count.
     /// </summary>
-    // Two of this route's three 404s are bare (pages.py:219,241); the third
-    // carries "File not found on disk" (:232). The hint names the two bare
-    // causes, at the cost of masking that rarer one, which the help mentions.
+    // Four 404s in total: pages.py:60 ("Book not found") and :232 ("File not
+    // found on disk") carry detail; :219 and :241 are bare. The hint names
+    // the two bare causes — its own first clause already covers "Book not
+    // found", so nothing informative is lost there, and masking the rarer
+    // disk case is the accepted cost.
     public async Task<string> PageTextAsync(string id, int page)
     {
         var info = _client.Api.Api.Books[id].Page[page].Text.ToGetRequestInformation();
@@ -140,12 +143,15 @@ public class BooksService
 
     /// <summary>
     /// GET /api/books/{id}/page/{n}/words. Answers 200 with an empty overlay
-    /// for a book PyMuPDF cannot open, rather than 404 as its text sibling does
-    /// (routers/books/pages.py:256-259).
+    /// for any book outside the fitz format family (routers/books/pages.py:
+    /// 256-259). Only for the comic family does page-text 404 on the same
+    /// input — the text family is can_index, so page-text succeeds there
+    /// while this still returns the empty overlay.
     /// </summary>
-    // No notFoundHint: the only 404 this route can raise is "File not found on
-    // disk" (pages.py:263), which is the informative one — a hint would replace
-    // it with something less useful.
+    // No notFoundHint: both of this route's 404s carry a useful detail —
+    // "Book not found" (pages.py:60) and "File not found on disk" (:263) —
+    // which strengthens rather than weakens the case for leaving the
+    // server's own message alone.
     public async Task<string> PageWordsAsync(string id, int page)
     {
         var info = _client.Api.Api.Books[id].Page[page].Words.ToGetRequestInformation();

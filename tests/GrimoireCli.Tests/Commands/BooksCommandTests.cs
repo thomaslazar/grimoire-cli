@@ -207,7 +207,7 @@ public class BooksCommandTests
             HelpRenderer.Render(BooksCommand.Create(), ["books", leaf], full: true));
     }
 
-    // The asymmetry a caller cannot infer: the same unopenable book 404s on
+    // The asymmetry a caller cannot infer: an unopenable comic 404s on
     // page-text and answers 200 with an empty overlay here.
     [Fact]
     public void PageWordsWarnsAboutItsEmptyOverlay()

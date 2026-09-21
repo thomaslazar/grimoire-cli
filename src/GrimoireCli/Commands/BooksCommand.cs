@@ -353,9 +353,8 @@ public static class BooksCommand
             idOption
         };
         command.AddHelpSection("Notes", HelpSectionPosition.Top,
-            "PDF outlines and EPUB nav documents both work; 404 for a format",
-            "that cannot be opened, which is indistinguishable from an unknown",
-            "id.",
+            "PDF, EPUB and DjVu all work; 404 for a format that cannot be",
+            "opened, which is indistinguishable from an unknown id.",
             "",
             "Entries nest through children, and page is where the entry points.");
         command.AddExamples("grimoire-cli books toc --id <book-id>");
@@ -381,10 +380,11 @@ public static class BooksCommand
         };
         command.AddHelpSection("Notes", HelpSectionPosition.Top,
             "Served from the search index when the page has a row, else",
-            "extracted live — so a scan yields what OCR found, and nothing",
-            "until indexed is true in books get.",
+            "extracted live — a scan's result depends on indexed being true",
+            "in books get; a born-digital book extracts live with no index",
+            "row at all.",
             "",
-            "Plain-text and Markdown books are readable too, not just PDF.",
+            "Plain-text, Markdown and RTF books are readable too, not just PDF.",
             "",
             "A page outside the book is 400 with the real count; books get",
             "reports page_count. 404 also covers a file missing from disk.");

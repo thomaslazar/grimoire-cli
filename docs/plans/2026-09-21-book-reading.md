@@ -136,12 +136,15 @@ Place them after `ThumbnailAsync`. The existing book-not-found hint string appea
 
     /// <summary>
     /// GET /api/books/{id}/page/{n}/words. Answers 200 with an empty overlay
-    /// for a book PyMuPDF cannot open, rather than 404 as its text sibling does
-    /// (routers/books/pages.py:256-259).
+    /// for any book outside the fitz format family (routers/books/pages.py:
+    /// 256-259). Only for the comic family does page-text 404 on the same
+    /// input — the text family is can_index, so page-text succeeds there
+    /// while this still returns the empty overlay.
     /// </summary>
-    // No notFoundHint: the only 404 this route can raise is "File not found on
-    // disk" (pages.py:263), which is the informative one — a hint would replace
-    // it with something less useful.
+    // No notFoundHint: both of this route's 404s carry a useful detail —
+    // "Book not found" (pages.py:60) and "File not found on disk" (:263) —
+    // which strengthens rather than weakens the case for leaving the
+    // server's own message alone.
     public async Task<string> PageWordsAsync(string id, int page)
     {
         var info = _client.Api.Api.Books[id].Page[page].Words.ToGetRequestInformation();
@@ -229,7 +232,7 @@ Append to `tests/GrimoireCli.Tests/Commands/BooksCommandTests.cs`, using whateve
             HelpRenderer.Render(BooksCommand.Create(), ["books", leaf], full: true));
     }
 
-    // The asymmetry a caller cannot infer: the same unopenable book 404s on
+    // The asymmetry a caller cannot infer: an unopenable comic 404s on
     // page-text and answers 200 with an empty overlay here.
     [Fact]
     public void PageWordsWarnsAboutItsEmptyOverlay()
@@ -340,9 +343,9 @@ Add three `command.Subcommands.Add(...)` lines in `BooksCommand.Create()`, place
             "alongside them — for locating text on a rendered page, not for",
             "reading it. Use books page-text to read.",
             "",
-            "A book that cannot be opened answers 200 with width 0 and no",
-            "words, where page-text would 404, so an empty result does not",
-            "distinguish the two.");
+            "Only PDF, EPUB and DjVu carry word boxes. Anything else — a text",
+            "book, a comic — answers 200 with width 0 and no words, so an empty",
+            "result does not mean the page is blank.");
         command.AddExamples("grimoire-cli books page-words --id <book-id> --page 241");
         command.AddResponseExample<Generated.Models.PageWordsResponse>();
         command.SetAction(async (parseResult, cancellationToken) =>
@@ -547,10 +550,12 @@ Add to `docs/grimoire-api-notes.md`, matching the file's existing heading style 
   `application/` MIME prefix, so `text/plain` and `text/markdown` books are
   readable too (`:215-219`).
 - `GET /api/books/{id}/page/{n}/words` answers **200 with an empty overlay**
-  (`{"width": 0, "height": 0, "words": []}`) for a book PyMuPDF cannot open,
-  where its text sibling 404s (`pages.py:256-259`). An empty result therefore
-  does not distinguish "not a renderable document" from "no words on this
-  page"; `width` does.
+  (`{"width": 0, "height": 0, "words": []}`) for any book outside the `fitz`
+  format family (`pages.py:256-259`). Its `page-text` sibling only 404s for
+  the comic family — the text family is `can_index`, so `page-text` succeeds
+  there while `page-words` still returns the empty overlay. An empty result
+  therefore does not distinguish "not a renderable document" from "no words on
+  this page"; `width` does.
 - A page outside the book is **400 with the real page count** in the message,
   not 404 (`pages.py:237-238, 243-244, 270`).
 - `GET /api/books/{id}/toc` covers EPUB as well as PDF: the handler gates on

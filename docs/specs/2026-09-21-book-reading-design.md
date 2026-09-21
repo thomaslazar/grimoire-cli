@@ -46,19 +46,22 @@ page 241. `toc` supplies the structure and `page-text` the content.
   `{title, page, level, children}`.
 - **`page-text` prefers the search index.** It reads the `book_search` FTS row
   for that page and only falls back to live extraction when there is none
-  (`pages.py:221-245`), so a result depends on the book being indexed and, for
-  a scan, on OCR having run. `books get` reports `indexed` and `index_failed`,
-  which is the signal to check first.
+  (`pages.py:221-245`) — a scan's result depends on the book being indexed and
+  OCR having run, while a born-digital book extracts live with no index row
+  at all. `books get` reports `indexed` and `index_failed`, which is the
+  signal to check first for a scan.
 - **`page-text` serves text documents too.** The format gate is `can_index`,
   not an `application/` MIME prefix, so `text/plain` and `text/markdown` books
   are readable (`pages.py:215-219`).
-- **`page-words` answers 200 with an empty overlay where `page-text` 404s.**
-  For a book PyMuPDF cannot open — a comic, a text document, or an id that
-  resolves to nothing — it returns `{"width": 0, "height": 0, "words": []}`
-  rather than an error (`pages.py:256-259`). Its sibling 404s on the same
-  input. A caller therefore cannot tell "not a renderable document" from "no
-  words on this page" without checking `width`, and that is the caveat this
-  command's help exists to carry.
+- **`page-words` answers 200 with an empty overlay for any book outside the
+  `fitz` format family.** PDF, EPUB and DjVu are `fitz`; `.txt`/`.md`/`.rtf`
+  and the comic archives all get the empty overlay instead of an error
+  (`pages.py:256-259`, `indexer/formats.py:71-85`). Its `page-text` sibling
+  only 404s for the comic family — the text family is `can_index`, so
+  `page-text` succeeds there while `page-words` still returns the empty
+  overlay. A caller therefore cannot tell "not a renderable document" from
+  "no words on this page" without checking `width`, and that is the caveat
+  this command's help exists to carry.
 - **An out-of-range page is 400, not 404**, and the message carries the real
   page count (`pages.py:237-238, 243-244, 270`). `books get` reports
   `page_count`.
@@ -82,13 +85,15 @@ is right only where the server says nothing useful:
 - `toc` — its single 404 is bare (`pages.py:73`), so the caller otherwise sees
   `{"detail":"Not Found"}`. It gets a hint naming **both** causes: no such book,
   or a format PyMuPDF cannot open.
-- `page-text` — two of its three 404s are bare (`pages.py:219,241`) and the
-  third carries "File not found on disk" (`:232`). It gets a hint naming the two
-  bare causes; masking the rare disk case is the accepted cost, and the help
-  text mentions it.
-- `page-words` — the **only** 404 it can raise is "File not found on disk"
-  (`pages.py:263`), which is the informative one. It gets **no hint**, so that
-  message survives.
+- `page-text` — four 404s in total: `pages.py:60` ("Book not found") and
+  `:232` ("File not found on disk") carry detail; `:219` and `:241` are bare.
+  It gets a hint naming the two bare causes; the hint's own first clause
+  already covers the "Book not found" case, so nothing informative is lost
+  there, and masking the rarer disk case is the accepted cost the help text
+  mentions.
+- `page-words` — both of its 404s carry a useful detail: "Book not found"
+  (`pages.py:60`) and "File not found on disk" (`:263`). It gets **no hint**,
+  so those messages survive.
 
 Response examples: `TocResponse`, `PageTextResponse`, `PageWordsResponse`, all
 already generated.
