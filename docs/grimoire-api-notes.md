@@ -396,6 +396,15 @@ Verified against v1.5.6, backing the seven `addons` commands.
   reports per-index `errors` alongside its `count`. The CLI still sets one URL:
   `--index-url` writes the singular field, which is the whole list.
 
+### Trusted add-on index URLs
+
+- `GET /api/addons/verify-index` normalizes both the supplied URL and every
+  trusted URL before comparing (`addons/constants.py:42-49`), so a URL differing
+  only in normalization still verifies — which is why comparing against
+  `addons list`'s `trusted_index_urls` client-side gives the wrong answer. It is
+  guarded by `get_current_user` and carries no role; an omitted `url` yields
+  `verified: false` rather than an error.
+
 ## Metadata lookup
 
 Verified against v1.5.6, backing `systems metadata-sources` / `metadata-search`
@@ -942,6 +951,30 @@ hold unchanged on both; only the differences are recorded here.
   `relative_path` (`tokens/core.py:41`), so a page is a contiguous run of
   folders in display order, as `maps` does. `audio` orders by `filename`
   (`audio/core.py:58`), so a page can straddle folders.
+
+### Audio covers
+
+- `GET /api/audio/{id}/cover` serves only the deliberately-set cover and 404s
+  when there is none, even on a track with folder or embedded art
+  (`routers/audio/covers.py:149-165`, v1.7.1). `GET /api/audio/{id}/artwork` is
+  the one that resolves all three in order. The split is deliberate upstream: it
+  is how an editor tells "a cover was set here" apart from "the folder happens
+  to have one". `has_cover` is the read-side signal for whether a set cover
+  exists — `audio get`/`audio list` carry it, no `cover` request needed.
+- `DELETE /api/audio/{id}/cover` clears the set cover and then **recomputes**
+  `has_artwork` from folder art and embedded art (`covers.py:128-146`). As
+  observed live, this recompute does not always leave `has_artwork` true: on a
+  fixture track with no folder or embedded art, it went `false` → `true` (after
+  `from-source`) → `false` (after `delete`), tracking `has_cover` in lockstep.
+  That's consistent with the recompute being able to keep `has_artwork` true on
+  a track that does have folder or embedded art — this fixture didn't have any
+  to exercise that path.
+- `POST /api/audio/{id}/cover` checks `content_type` first, then the size
+  ceiling, then decodes: an unsupported type is 400, an oversized file 413, an
+  empty one 400 (`covers.py:91-109`).
+- `AudioCoverSourceIn` excludes `campaign_file` from its allowed set exactly as
+  `SystemCoverSourceIn` does (`routers/audio/_schemas.py:100-118`), so the two
+  `from-source` verbs behave identically, 422 included.
 
 ## Search
 

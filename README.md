@@ -244,6 +244,7 @@ grimoire-cli config set server https://grimoire.example.com
 | `addons upgrade-all` | Upgrade every installed add-on; exit 3 if partial (admin) |
 | `addons uninstall --id <addon-id>` | Remove one add-on (admin) |
 | `addons settings [--index-url <url>] [--allow-scripts true\|false]` | Set the add-on index URL and script switch (admin) |
+| `addons verify-index --url <url>` | Check whether an add-on index URL is trusted |
 | `backups list` | List backups, newest first, with the directory and total size (admin) |
 | `backups create` | Take a backup now; 409 if one is already running (admin) |
 | `backups delete --id <backup-id>` | Delete one archive; irreversible, no prompt (admin) |
@@ -296,6 +297,10 @@ grimoire-cli config set server https://grimoire.example.com
 | `audio list [--limit <n>] [--offset <n>]` | List audio tracks (defaults to 100 results) |
 | `audio get --id <id>` | Get one audio track |
 | `audio artwork --id <id> --output <path\|->` | Download an audio track's artwork |
+| `audio cover get --id <id> --output <path\|->` | Download the track's set cover image (gm or admin) |
+| `audio cover upload --id <id> --file <path>` | Upload a cover image for the track (gm or admin) |
+| `audio cover delete --id <id>` | Remove the track's set cover image (gm or admin) |
+| `audio cover from-source --id <id> --source-type <type> --source-id <id>` | Set a track cover from a library image (gm or admin) |
 | `audio file --id <id> --output <path\|->` | Download the audio file |
 | `audio update --id <id> {--input <file> \| --stdin}` | Update one audio track's metadata (gm or admin) |
 | `audio batch-update {--input <file> \| --stdin}` | Update many audio tracks in one transaction; exit 3 if partial (gm or admin) |

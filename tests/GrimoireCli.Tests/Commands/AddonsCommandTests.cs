@@ -98,4 +98,19 @@ public class AddonsCommandTests
         Assert.Contains("At least one flag is required.", output);
         Assert.Contains("does not refetch", output);
     }
+
+    [Fact]
+    public void TheGroupHostsVerifyIndex()
+    {
+        Assert.Contains("verify-index", AddonsCommand.Create().Subcommands.Select(c => c.Name));
+    }
+
+    [Fact]
+    public void VerifyIndexRequiresAUrlAndDeclaresNoRole()
+    {
+        Assert.NotEmpty(AddonsCommand.Create().Parse(["verify-index"]).Errors);
+        Assert.Empty(AddonsCommand.Create().Parse(["verify-index", "--url", "https://example.test/i.json"]).Errors);
+        Assert.DoesNotContain("Role required:",
+            HelpRenderer.Render(AddonsCommand.Create(), ["addons", "verify-index"], full: true));
+    }
 }

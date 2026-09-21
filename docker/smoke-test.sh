@@ -2041,4 +2041,62 @@ sysget --id "$COVER_SRC_SYS"
   || fail "cover delete should restore the empty cover_image: $GET_JSON"
 ok "systems cover delete restores the empty cover_image, so the run converges"
 
+# --- audio covers and verify-index -------------------------------------------
+# Audio tracks have no cover_image field at all (unlike systems) — has_cover
+# is the only signal for a deliberately-set cover, checked clean here rather
+# than assumed, and cleared again at the end so a re-run converges.
+SC_TRACK=$("$CLI" audio list 2>"$WORK/cli.err" | jq -r '.audio[0].id') \
+  || { cat "$WORK/cli.err" >&2; fail "audio list exited non-zero"; }
+[ -n "$SC_TRACK" ] && [ "$SC_TRACK" != "null" ] || fail "no audio fixture for the cover checks"
+"$CLI" audio get --id "$SC_TRACK" >"$WORK/track.out" 2>"$WORK/cli.err" \
+  || { cat "$WORK/cli.err" >&2; fail "audio get exited non-zero"; }
+[ "$(jq -r '.has_cover' "$WORK/track.out")" = "false" ] \
+  || fail "the audio fixture already has a set cover — the smoke fixture has drifted, pick another track: $(cat "$WORK/track.out")"
+
+"$CLI" audio cover get --id "$SC_TRACK" --output "$WORK/nocover.bin" >/dev/null 2>&1 \
+  && fail "audio cover get should 404 on a track with no set cover"
+ok "audio cover get refuses a track with no set cover"
+
+SC_BOOK=$("$CLI" books list 2>/dev/null | jq -r '.books[0].id')
+[ -n "$SC_BOOK" ] && [ "$SC_BOOK" != "null" ] || fail "no book fixture to copy a cover from"
+SET_JSON=$("$CLI" audio cover from-source --id "$SC_TRACK" --source-type book --source-id "$SC_BOOK" 2>"$WORK/cli.err") \
+  || { cat "$WORK/cli.err" >&2; fail "audio cover from-source exited non-zero"; }
+echo "$SET_JSON" | jq -e '.cover_image | endswith(".webp")' >/dev/null \
+  || fail "from-source should report a .webp cover_image: $SET_JSON"
+ok "audio cover from-source copies a book's image onto the track"
+
+"$CLI" audio cover get --id "$SC_TRACK" --output "$WORK/cover.bin" >/dev/null 2>"$WORK/cli.err" \
+  || { cat "$WORK/cli.err" >&2; fail "audio cover get exited non-zero after a cover was set"; }
+[ -s "$WORK/cover.bin" ] || fail "audio cover get wrote an empty file"
+ok "audio cover get serves the cover once one is set"
+
+# campaign_file is not in the server's source_type enum for a track (a track
+# has no campaign to resolve it against), so this 422s before any lookup.
+"$CLI" audio cover from-source --id "$SC_TRACK" --source-type campaign_file --source-id "$SC_BOOK" >/dev/null 2>&1 \
+  && fail "audio cover from-source should refuse source-type campaign_file"
+ok "audio cover from-source refuses source-type campaign_file"
+
+"$CLI" audio cover delete --id "$SC_TRACK" >"$WORK/coverdel.out" 2>"$WORK/cli.err" \
+  || { cat "$WORK/cli.err" >&2; fail "audio cover delete exited non-zero"; }
+"$CLI" audio get --id "$SC_TRACK" >"$WORK/track.out" 2>&1
+[ "$(jq -r '.has_cover' "$WORK/track.out")" = "false" ] \
+  || fail "the track's has_cover should clear again, so the run converges: $(cat "$WORK/track.out")"
+ok "audio cover delete clears has_cover, so the run converges"
+
+# Both sides are normalized server-side, so a client-side comparison against
+# trusted_index_urls is exactly what this endpoint exists to replace.
+VI_TRUSTED=$("$CLI" addons list 2>/dev/null | jq -r '.trusted_index_urls[0] // ""')
+[ -n "$VI_TRUSTED" ] || fail "no trusted_index_urls entry to verify against"
+VI_JSON=$("$CLI" addons verify-index --url "$VI_TRUSTED" 2>"$WORK/cli.err") \
+  || { cat "$WORK/cli.err" >&2; fail "addons verify-index exited non-zero"; }
+[ "$(echo "$VI_JSON" | jq -r .verified)" = "true" ] \
+  || fail "a trusted index URL should verify: $VI_JSON"
+ok "addons verify-index accepts a trusted index URL"
+
+VI_JSON=$("$CLI" addons verify-index --url "https://example.invalid/not-an-index.json" 2>"$WORK/cli.err") \
+  || { cat "$WORK/cli.err" >&2; fail "addons verify-index exited non-zero"; }
+[ "$(echo "$VI_JSON" | jq -r .verified)" = "false" ] \
+  || fail "an untrusted URL should not verify: $VI_JSON"
+ok "addons verify-index rejects an untrusted index URL"
+
 echo "smoke: all checks passed" >&2

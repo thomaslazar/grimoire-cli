@@ -16,6 +16,7 @@ public static class AudioCommand
         command.Subcommands.Add(CreateListCommand());
         command.Subcommands.Add(CreateGetCommand());
         command.Subcommands.Add(CreateArtworkCommand());
+        command.Subcommands.Add(AudioCoverCommands.Create());
         command.Subcommands.Add(CreateFileCommand());
         command.Subcommands.Add(CreateUpdateCommand());
         command.Subcommands.Add(CreateBatchUpdateCommand());

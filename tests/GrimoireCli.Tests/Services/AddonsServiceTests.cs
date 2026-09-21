@@ -1,9 +1,14 @@
+using GrimoireCli.Api;
+using GrimoireCli.Configuration;
 using GrimoireCli.Services;
 
 namespace GrimoireCli.Tests.Services;
 
 public class AddonsServiceTests
 {
+    private static GrimoireApiClient Client() =>
+        new(new AppConfig { Server = "http://example.test", AccessToken = "t" });
+
     // An omitted flag must stay absent from the PATCH body: the server ignores
     // what is not sent, and sending a value would clear or set a field the
     // caller never mentioned.
@@ -37,5 +42,13 @@ public class AddonsServiceTests
         var body = AddonsService.BuildSettingsBody("https://example.test/index.json", allowScripts: true);
         Assert.Equal("https://example.test/index.json", body.IndexUrl!.String);
         Assert.True(body.AllowScripts!.Boolean);
+    }
+
+    [Fact]
+    public void VerifyIndexSendsUrlAsAQueryParameter()
+    {
+        var info = new AddonsService(Client()).VerifyIndexRequest("https://example.test/index.json");
+        info.PathParameters["baseurl"] = "http://example.test";
+        Assert.Contains("url=", info.URI.AbsoluteUri);
     }
 }
