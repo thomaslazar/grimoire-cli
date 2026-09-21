@@ -198,6 +198,8 @@ IMPLEMENTED = {
     "PATCH /api/systems/{system_id}/book-folders": "`systems book-folders set` ✅",
     "DELETE /api/systems/{system_id}/book-folders": "`systems book-folders delete` ✅",
     "GET /api/books/{book_id}/thumbnail": "`books thumbnail` ✅",
+    "GET /api/books/{book_id}/file": "`books file` ✅",
+    "GET /api/books/{book_id}/page/{page_num}": "`books page` ✅",
     "GET /api/books/{book_id}/toc": "`books toc` ✅",
     "GET /api/books/{book_id}/page/{page_num}/text": "`books page-text` ✅",
     "GET /api/books/{book_id}/page/{page_num}/words": "`books page-words` ✅",
@@ -238,6 +240,7 @@ IMPLEMENTED = {
     "POST /api/duplicates/dismiss": "`duplicates dismiss` ✅",
     "GET /api/duplicates/dismissals": "`duplicates dismissals` ✅",
     "DELETE /api/duplicates/dismissals/{dismissal_id}": "`duplicates undismiss` ✅",
+    "GET /api/downloads/archive": "`downloads archive` ✅",
 }
 
 ROLE_LABEL = {

@@ -219,6 +219,8 @@ grimoire-cli config set server https://grimoire.example.com
 | `books reindex --id <id> [--ocr-dpi <n>]` | Re-run OCR on one book (gm or admin) |
 | `books rescan --id <id>` | Re-read one book from disk and rebuild its index (gm or admin) |
 | `books thumbnail --id <id> --output <path\|->` | Download a book's scan-generated cover thumbnail |
+| `books file --id <id> --output <path\|->` | Download the book file as stored |
+| `books page --id <id> --page <n> [--width <px>] --output <path\|->` | Render or extract one page as an image |
 | `books toc --id <id>` | The book's table of contents (PDF, EPUB or DjVu) |
 | `books page-text --id <id> --page <n>` | The text of one page |
 | `books page-words --id <id> --page <n>` | Word bounding boxes for one page |
@@ -240,6 +242,7 @@ grimoire-cli config set server https://grimoire.example.com
 | `library cancel-scan` | Stop the running scan (admin) |
 | `library cleanup-missing` | Remove DB entries for files no longer on disk (admin; deletes each book's bookmarks too) |
 | `library stats` | Counts and sizes across the whole library |
+| `downloads archive --type <type> [scope flags] [--fmt <fmt>] --output <path\|->` | Download a slice of the library as one archive |
 | `addons list` | List installed and available add-ons (admin) |
 | `addons refresh` | Fetch the add-on index (admin) |
 | `addons install --id <addon-id> [--approve-script]` | Install or upgrade one add-on (admin) |

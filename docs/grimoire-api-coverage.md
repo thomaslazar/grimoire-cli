@@ -18,9 +18,9 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | auth | 2 / 14 |
 | backups | 6 / 6 |
 | bookmarks | 0 / 4 |
-| books | 14 / 16 |
+| books | 16 / 16 |
 | campaigns | 0 / 93 |
-| downloads | 0 / 1 |
+| downloads | 1 / 1 |
 | duplicates | 13 / 13 |
 | favorites | 0 / 3 |
 | files | 9 / 10 |
@@ -39,7 +39,7 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | token-frames | 0 / 2 |
 | tokens | 10 / 10 |
 | users | 0 / 16 |
-| **Total** | **144 / 309** |
+| **Total** | **147 / 309** |
 
 2 operation(s) are internal-only (🔒) and excluded from covered counts.
 
@@ -139,11 +139,11 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | POST | `/api/books/bulk/tags` | Bulk add tags to books | gm or admin | `books batch-tag` ✅ |
 | GET | `/api/books/{book_id}` | Get a book |  | `books get` ✅ |
 | PATCH | `/api/books/{book_id}` | Update book metadata | gm or admin | `books update` ✅ |
-| GET | `/api/books/{book_id}/file` | Download book file |  | — |
+| GET | `/api/books/{book_id}/file` | Download book file |  | `books file` ✅ |
 | POST | `/api/books/{book_id}/metadata-fetch` | Fetch metadata for review | gm or admin | `books metadata-fetch` ✅ |
 | POST | `/api/books/{book_id}/metadata-search` | Search a metadata source | gm or admin | `books metadata-search` ✅ |
 | GET | `/api/books/{book_id}/metadata-sources` | List metadata sources | gm or admin | `books metadata-sources` ✅ |
-| GET | `/api/books/{book_id}/page/{page_num}` | Render a PDF page as WebP |  | — |
+| GET | `/api/books/{book_id}/page/{page_num}` | Render a PDF page as WebP |  | `books page` ✅ |
 | GET | `/api/books/{book_id}/page/{page_num}/text` | Get page text |  | `books page-text` ✅ |
 | GET | `/api/books/{book_id}/page/{page_num}/words` | Get page word bounding boxes |  | `books page-words` ✅ |
 | POST | `/api/books/{book_id}/reindex` | Re-run OCR on a book (optional DPI override) | gm or admin | `books reindex` ✅ |
@@ -253,7 +253,7 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 
 | Method | Path | Description | Perm | CLI |
 |--------|------|-------------|------|-----|
-| GET | `/api/downloads/archive` | Download an archive of files |  | — |
+| GET | `/api/downloads/archive` | Download an archive of files |  | `downloads archive` ✅ |
 
 ## duplicates
 

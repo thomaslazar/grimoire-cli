@@ -1099,7 +1099,8 @@ the running 1.6.2 stack.
 
 Read from `backend/routers/books/pages.py` and `backend/indexer/formats.py` at
 tag `v1.7.1`, the release the local stack runs, and verified against that
-stack. Backs `books toc`, `books page-text` and `books page-words`.
+stack. Backs `books file`, `books page`, `books toc`, `books page-text` and
+`books page-words`.
 
 - `GET /api/books/{id}/page/{n}/text` reads the `book_search` FTS row for that
   page and only extracts live when there is none
@@ -1121,3 +1122,38 @@ stack. Backs `books toc`, `books page-text` and `books page-words`.
   `is_fitz_mime`, and PyMuPDF exposes an EPUB's nav document through the same
   API as a PDF outline (`routers/books/pages.py:64-77`). Its 404 is bare, so an
   unknown id and an unopenable format are indistinguishable from the response.
+- `GET /api/books/{id}/file` and `GET /api/books/{id}/page/{n}` both **write on
+  a missing file**: they set the book's `is_missing` to true and commit before
+  raising 404 (`routers/books/core.py:388-392`; `pages.py:130-131, 139-140,
+  177-178`, the file route's one site and the page route's three). A read that
+  mutates is worth knowing about when a scripted sweep hits a library whose
+  files have moved.
+- `GET /api/books/{id}/page/{n}` defaults `width` to **1200**, where the maps
+  equivalent defaults to 1600; both cap at 3000 (`pages.py:106`). Measured live:
+  the same fixture page rendered at 8444 bytes with no `--width` and 1476 bytes
+  with `--width 400` — a genuine re-render, not a passthrough. It renders PDF,
+  EPUB and DjVu, serves a comic archive's page as the stored image member
+  without rendering (`pages.py:138-146`), and serves a single-page image book
+  as stored on page 1 only (`pages.py:126-134`). That makes it the one page
+  read that works on a comic.
+
+## Archive downloads
+
+Read from `backend/routers/downloads/` at tag `v1.7.1`, the release the local
+stack runs, and verified against that stack. Backs `downloads archive`.
+
+- `GET /api/downloads/archive` selects among eleven scopes through `type`, each
+  requiring a different combination of `id`, `category`, `tag`,
+  `resource_type` and `folder` (`routers/downloads/core.py:27-146`). A missing
+  one is 400 naming both the flag and the type.
+- `library_folder` is admin-only, checked inside the handler rather than on the
+  route, and reads a folder as it sits on disk — including files the scanner
+  never indexed, unfiltered by book visibility, because nothing in it resolves
+  through a book row (`core.py:131-141`).
+- `_archive_response` checks the files list **before** the format, so an empty
+  scope answers 404 even when `fmt` is invalid too — an unsupported format only
+  surfaces as its own 400 against a scope that resolves to at least one file
+  (`routers/downloads/_helpers.py:98-101`). An unknown `fmt` is 400 listing the
+  valid ones; an unknown `type` is a separate 400 from the handler itself.
+- The response streams as the archive is built, so the first byte does not wait
+  for the whole archive.
