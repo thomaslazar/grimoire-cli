@@ -233,4 +233,58 @@ public class BooksCommandTests
         Assert.Contains("EPUB",
             HelpRenderer.Render(BooksCommand.Create(), ["books", "toc"], full: false));
     }
+
+    [Theory]
+    [InlineData("file")]
+    [InlineData("page")]
+    public void TheGroupHostsTheBinaryGetters(string leaf)
+    {
+        Assert.Contains(leaf, BooksCommand.Create().Subcommands.Select(c => c.Name));
+    }
+
+    [Fact]
+    public void TheBinaryGettersRequireAnOutput()
+    {
+        var books = BooksCommand.Create();
+        Assert.NotEmpty(books.Parse(["file", "--id", "b1"]).Errors);
+        Assert.Empty(books.Parse(["file", "--id", "b1", "--output", "-"]).Errors);
+        Assert.NotEmpty(books.Parse(["page", "--id", "b1", "--page", "1"]).Errors);
+        Assert.Empty(books.Parse(["page", "--id", "b1", "--page", "1", "--output", "-"]).Errors);
+    }
+
+    [Fact]
+    public void BooksPageRequiresAPageAndTakesAWidth()
+    {
+        var books = BooksCommand.Create();
+        Assert.NotEmpty(books.Parse(["page", "--id", "b1", "--output", "-"]).Errors);
+        Assert.Empty(books.Parse(["page", "--id", "b1", "--page", "2", "--width", "800", "--output", "-"]).Errors);
+    }
+
+    // 1200, not the 1600 maps page uses — a caller who assumes parity gets a
+    // different image and no error.
+    [Fact]
+    public void BooksPageStatesItsOwnWidthDefault()
+    {
+        var help = HelpRenderer.Render(BooksCommand.Create(), ["books", "page"], full: false);
+        Assert.Contains("1200", help);
+        Assert.Contains("3000", help);
+    }
+
+    // The branch that makes this the complement to page-text and page-words.
+    [Fact]
+    public void BooksPageSaysItServesComics()
+    {
+        Assert.Contains("comic",
+            HelpRenderer.Render(BooksCommand.Create(), ["books", "page"], full: false));
+    }
+
+    // A GET that writes: both flip is_missing when the file is gone.
+    [Theory]
+    [InlineData("file")]
+    [InlineData("page")]
+    public void TheBinaryGettersWarnTheyMarkAMissingFile(string leaf)
+    {
+        Assert.Contains("is_missing",
+            HelpRenderer.Render(BooksCommand.Create(), ["books", leaf], full: false));
+    }
 }
