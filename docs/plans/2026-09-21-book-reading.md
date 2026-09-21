@@ -434,7 +434,7 @@ $CLI books list | jq -r '.books[] | "\(.mime_type)\t\(.id)\t\(.title)"'
 
 Record every exit code and body. Two findings decide what the smoke block can assert, and your report must state both:
 
-- whether any fixture book is a format PyMuPDF cannot open — if one exists, add an assertion that `page-words` answers 200 with `width == 0` on it while `page-text` fails, which is the asymmetry this block most wants to catch;
+- whether any fixture book is outside the `fitz` family (`.pdf`/`.epub`/`.djvu`) — if one exists, assert that `page-words` answers 200 with `width == 0` on it. Add the `page-text` half only for a **comic** (`.cbz`/`.cbr`/`.cb7`/`.cbt`), which is the one family `page-text` 404s on; a `.txt`/`.md`/`.rtf` book is `can_index`, so `page-text` reads it fine while `page-words` still returns the empty overlay;
 - what page 99 actually returns on each command, since the spec predicts 400 with the page count and that is unverified.
 
 - [ ] **Step 3: Append the smoke block**
