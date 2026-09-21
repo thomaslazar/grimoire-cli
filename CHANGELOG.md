@@ -3,6 +3,139 @@
 All notable changes to grimoire-cli are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## v0.3.0 — 2026-09-21
+
+The release that completes library management. Every collection Grimoire holds
+— systems, books, maps, tokens, models, audio — now has the same per-item read,
+write and binary surface, and the vocabularies and tags that describe them can
+finally be curated rather than only read. Also moves the supported server to
+the Grimoire 1.7 line.
+
+### Highlights
+
+- **Every collection is complete.** Maps, models, tokens and audio gained the
+  full per-item layer — list, get, update, batch-update, batch-tag, folder tags
+  and thumbnails — so an agent no longer has to know which collection it is
+  working in to know what it can do. Books closed its last gaps too, at 16/16.
+
+- **Tags and vocabularies became curatable.** `batch-tag` could already create
+  a mess at scale and nothing could clean it up. `tags merge` is the verb that
+  earns the release: a metadata sweep reliably leaves `Dungeons and Dragons`,
+  `dungeons-and-dragons` and `D&D` side by side, and merging them is the only
+  way back. The five lookup vocabularies gained `create` and `delete` alongside
+  their reads.
+
+- **Books can be read, not just catalogued.** `search` already returned page
+  hits with page numbers and there was no way to read the page. `books toc`,
+  `books page-text` and `books page-words` close that loop, and `books page`
+  renders the page — including a comic's, where the text reads cannot go.
+
+- **`downloads archive` exports a curated slice in one call.** Eleven scopes —
+  a system, a folder, or anything carrying a tag — as zip, tar, tar.gz or
+  tar.bz2. It is the one endpoint that turns "everything tagged session-prep"
+  into a single file.
+
+- **Verified behaviour is written down where it is used.** This release found
+  and documented a number of places where the server does not do what its docs
+  or its own naming suggest: a forced vocabulary delete strips nothing despite
+  the field being called `removed_usage`, `tags rename` silently merges on a key
+  collision, `page-words` answers 200 with an empty overlay for anything outside
+  the PDF/EPUB/DjVu family, and `downloads archive` buffers the whole archive
+  before sending rather than streaming it. Each caveat now sits in the help
+  text of the command it affects.
+
+- **Requires Grimoire 1.7.0 or 1.7.1.** The pin moved twice during this cycle
+  and the client was regenerated from the running stack each time, so the
+  generated surface is the record of what changed upstream.
+
+### Features
+
+- feat: add audio cover commands and addons verify-index
+- feat: add AudioService covering the nine audio endpoints
+- feat: add books file, books page and downloads archive
+- feat: add books toc, page-text and page-words
+- feat: add create and delete on all five vocabularies
+- feat: add library stats, cover from-source and the file getters
+- feat: add maps folders list, set and batch-set
+- feat: add maps list and maps get
+- feat: add MapsService covering the eight map endpoints
+- feat: add maps thumbnail
+- feat: add maps update, batch-update and batch-tag
+- feat: add models folders list, set and batch-set
+- feat: add models list, get and thumbnail
+- feat: add ModelsService covering the nine model endpoints
+- feat: add models update, batch-update and batch-tag
+- feat: add tags create, rename, delete and merge
+- feat: add the audio cover and verify-index sends
+- feat: add the audio per-item command group
+- feat: add the book file, page and archive sends
+- feat: add the book toc and page reading sends
+- feat: add the four tag write sends
+- feat: add the stats, cover-source and binary getter sends
+- feat: add the tokens per-item command group
+- feat: add the vocabulary create and delete sends
+- feat: add TokensService covering the nine token endpoints
+
+### Fixes
+
+- fix: correct claims the four collection layers copied between them
+- fix: correct the is_supported one-way claim across help and docs
+- fix: correct the maps help claims the server contradicts
+- fix: correct the page-words claim about text books
+- fix: drop the false built-in warning from parent-systems delete
+- fix: force a real is_supported transition every smoke run
+- fix: let the server explain a cover from-source 404
+- fix: resolve route roles through a path converter
+- fix: tighten maps --folder assertion and correct its help text
+
+### Tests
+
+- test: assert a real audio artwork download, not just a 404
+- test: cover client-side field refusal and the maps service itself
+- test: cover the audio cover commands in the smoke test
+- test: cover the binary endpoints in the smoke test
+- test: cover the book reading commands in the smoke test
+- test: cover the stats and binary getters in the smoke test
+- test: cover the tag writes in the smoke test
+- test: cover the vocabulary writes in the smoke test
+- test: seed map fixtures and cover the maps commands live
+- test: seed model fixtures and cover the models commands live
+- test: seed token and audio fixtures and cover both groups live
+- test: serialize the pipeline-sending tests with the NLog collection
+- test: verify the cover fixture is clean before writing to it
+
+### Chores
+
+- chore: bump the pinned Grimoire to 1.7.0
+- chore: bump the pinned Grimoire to 1.7.1
+- chore: bump version to 0.3.0
+
+### Docs
+
+- docs: add the maps per-item layer spec and plan
+- docs: add the models per-item layer spec and plan
+- docs: add the tokens and audio per-item layer spec and plan
+- docs: correct the archive streaming claim and stale citations
+- docs: correct the mark-missing call-site citations
+- docs: correct the vocabulary service doc comments
+- docs: drop the temporary commented-out wiring from the maps plan
+- docs: fix has_cover line citation in api-notes
+- docs: qualify the merge caveat and drop the shipped roadmap item
+- docs: re-aim roadmap prose past the maps per-item layer
+- docs: record the audio cover and verify-index commands
+- docs: record the binary endpoint commands
+- docs: record the book reading commands
+- docs: record the maps command group and its verified behaviour
+- docs: record the models command group and its verified behaviour
+- docs: record the stats and binary getter commands
+- docs: record the tag write commands
+- docs: record the tokens and audio command groups
+- docs: record the vocabulary write commands
+- docs: remove an attribution line from a plan's pr template
+- docs: scope the page-words asymmetry to comics and fix 404 counts
+- docs: scope the plan's page-words investigation to the comic family
+- docs: state the audio cover size ceiling and fix a stale count
+
 ## v0.2.1 — 2026-09-16
 
 A tidying release: one new command, and a round of corrections to things that
