@@ -2099,4 +2099,40 @@ VI_JSON=$("$CLI" addons verify-index --url "https://example.invalid/not-an-index
   || fail "an untrusted URL should not verify: $VI_JSON"
 ok "addons verify-index rejects an untrusted index URL"
 
+# --- book reading ------------------------------------------------------------
+# Reads only: nothing to restore, nothing to converge.
+BR_BOOK=$("$CLI" books list 2>"$WORK/cli.err" | jq -r '.books[0].id') \
+  || { cat "$WORK/cli.err" >&2; fail "books list exited non-zero"; }
+[ -n "$BR_BOOK" ] && [ "$BR_BOOK" != "null" ] || fail "no book fixture for the reading checks"
+
+TOC_JSON=$("$CLI" books toc --id "$BR_BOOK" 2>"$WORK/cli.err") \
+  || { cat "$WORK/cli.err" >&2; fail "books toc exited non-zero"; }
+echo "$TOC_JSON" | jq -e 'has("toc") and (.toc | type == "array")' >/dev/null \
+  || fail "books toc should answer a toc array: $TOC_JSON"
+ok "books toc answers a toc array"
+
+TEXT_JSON=$("$CLI" books page-text --id "$BR_BOOK" --page 1 2>"$WORK/cli.err") \
+  || { cat "$WORK/cli.err" >&2; fail "books page-text exited non-zero"; }
+[ -n "$(echo "$TEXT_JSON" | jq -r '.text // ""')" ] \
+  || fail "page 1 of the fixture book should carry text: $TEXT_JSON"
+ok "books page-text reads a page"
+
+WORDS_JSON=$("$CLI" books page-words --id "$BR_BOOK" --page 1 2>"$WORK/cli.err") \
+  || { cat "$WORK/cli.err" >&2; fail "books page-words exited non-zero"; }
+echo "$WORDS_JSON" | jq -e '.width > 0 and (.words | length) > 0' >/dev/null \
+  || fail "page 1 should report a page size and some words: $WORDS_JSON"
+echo "$WORDS_JSON" | jq -e '.words[0] | has("x0") and has("text")' >/dev/null \
+  || fail "each word should carry a box and its text: $WORDS_JSON"
+ok "books page-words reports boxed words"
+
+# The page bound is the server's, not the CLI's — it answers 400 with the real
+# count rather than silently clamping.
+"$CLI" books page-text --id "$BR_BOOK" --page 99 >/dev/null 2>&1 \
+  && fail "books page-text should refuse a page past the end"
+ok "books page-text refuses a page past the end"
+
+"$CLI" books page-words --id "$BR_BOOK" --page 99 >/dev/null 2>&1 \
+  && fail "books page-words should refuse a page past the end"
+ok "books page-words refuses a page past the end"
+
 echo "smoke: all checks passed" >&2

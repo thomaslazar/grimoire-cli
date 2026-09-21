@@ -21,6 +21,9 @@ public static class BooksCommand
         command.Subcommands.Add(CreateReindexCommand());
         command.Subcommands.Add(CreateRescanCommand());
         command.Subcommands.Add(CreateThumbnailCommand());
+        command.Subcommands.Add(CreateTocCommand());
+        command.Subcommands.Add(CreatePageTextCommand());
+        command.Subcommands.Add(CreatePageWordsCommand());
         foreach (var metadata in MetadataCommands.Create("books"))
             command.Subcommands.Add(metadata);
         return command;
@@ -337,6 +340,97 @@ public static class BooksCommand
                 _logger.Error(ex.Message);
                 return 1;
             }
+            return 0;
+        });
+        return command;
+    }
+
+    private static Command CreateTocCommand()
+    {
+        var idOption = new Option<string>("--id") { Description = "Book ID", Required = true };
+        var command = new Command("toc", "The book's table of contents")
+        {
+            idOption
+        };
+        command.AddHelpSection("Notes", HelpSectionPosition.Top,
+            "PDF, EPUB and DjVu all work; 404 for a format that cannot be",
+            "opened, which is indistinguishable from an unknown id.",
+            "",
+            "Entries nest through children, and page is where the entry points.");
+        command.AddExamples("grimoire-cli books toc --id <book-id>");
+        command.AddResponseExample<Generated.Models.TocResponse>();
+        command.SetAction(async (parseResult, cancellationToken) =>
+        {
+            var (client, _) = CommandHelper.BuildClient();
+            var service = new BooksService(client);
+            var result = await service.TocAsync(parseResult.GetValue(idOption)!);
+            ConsoleOutput.WriteRawJson(result);
+            return 0;
+        });
+        return command;
+    }
+
+    private static Command CreatePageTextCommand()
+    {
+        var idOption = new Option<string>("--id") { Description = "Book ID", Required = true };
+        var pageOption = new Option<int>("--page") { Description = "1-based page number", Required = true };
+        var command = new Command("page-text", "The text of one page")
+        {
+            idOption, pageOption
+        };
+        command.AddHelpSection("Notes", HelpSectionPosition.Top,
+            "Served from the search index when the page has a row, else",
+            "extracted live — a scan's result depends on indexed being true",
+            "in books get; a born-digital book extracts live with no index",
+            "row at all.",
+            "",
+            "Plain-text, Markdown and RTF books are readable too, not just PDF.",
+            "",
+            "A page outside the book is 400 with the real count; books get",
+            "reports page_count. 404 also covers a file missing from disk.");
+        command.AddExamples(
+            "grimoire-cli books page-text --id <book-id> --page 241",
+            "grimoire-cli search --query \"grappling\" | jq '.results[0].page_number'");
+        command.AddResponseExample<Generated.Models.PageTextResponse>();
+        command.SetAction(async (parseResult, cancellationToken) =>
+        {
+            var (client, _) = CommandHelper.BuildClient();
+            var service = new BooksService(client);
+            var result = await service.PageTextAsync(
+                parseResult.GetValue(idOption)!,
+                parseResult.GetValue(pageOption));
+            ConsoleOutput.WriteRawJson(result);
+            return 0;
+        });
+        return command;
+    }
+
+    private static Command CreatePageWordsCommand()
+    {
+        var idOption = new Option<string>("--id") { Description = "Book ID", Required = true };
+        var pageOption = new Option<int>("--page") { Description = "1-based page number", Required = true };
+        var command = new Command("page-words", "Word bounding boxes for one page")
+        {
+            idOption, pageOption
+        };
+        command.AddHelpSection("Notes", HelpSectionPosition.Top,
+            "Boxes are in PDF points against the width and height reported",
+            "alongside them — for locating text on a rendered page, not for",
+            "reading it. Use books page-text to read.",
+            "",
+            "Only PDF, EPUB and DjVu carry word boxes. Anything else — a text",
+            "book, a comic — answers 200 with width 0 and no words, so an empty",
+            "result does not mean the page is blank.");
+        command.AddExamples("grimoire-cli books page-words --id <book-id> --page 241");
+        command.AddResponseExample<Generated.Models.PageWordsResponse>();
+        command.SetAction(async (parseResult, cancellationToken) =>
+        {
+            var (client, _) = CommandHelper.BuildClient();
+            var service = new BooksService(client);
+            var result = await service.PageWordsAsync(
+                parseResult.GetValue(idOption)!,
+                parseResult.GetValue(pageOption));
+            ConsoleOutput.WriteRawJson(result);
             return 0;
         });
         return command;

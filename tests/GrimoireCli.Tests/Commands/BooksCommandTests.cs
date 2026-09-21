@@ -165,4 +165,72 @@ public class BooksCommandTests
     {
         Assert.DoesNotContain("Role required:", RenderHelp(["books", "thumbnail"], full: false));
     }
+
+    [Theory]
+    [InlineData("toc")]
+    [InlineData("page-text")]
+    [InlineData("page-words")]
+    public void TheGroupHostsTheReadingCommands(string leaf)
+    {
+        Assert.Contains(leaf, BooksCommand.Create().Subcommands.Select(c => c.Name));
+    }
+
+    [Fact]
+    public void OnlyThePageCommandsTakeAPage()
+    {
+        var books = BooksCommand.Create();
+        Assert.Empty(books.Parse(["toc", "--id", "b1"]).Errors);
+        Assert.NotEmpty(books.Parse(["toc", "--id", "b1", "--page", "1"]).Errors);
+        Assert.NotEmpty(books.Parse(["page-text", "--id", "b1"]).Errors);
+        Assert.Empty(books.Parse(["page-text", "--id", "b1", "--page", "1"]).Errors);
+        Assert.NotEmpty(books.Parse(["page-words", "--id", "b1"]).Errors);
+        Assert.Empty(books.Parse(["page-words", "--id", "b1", "--page", "1"]).Errors);
+    }
+
+    [Theory]
+    [InlineData("toc")]
+    [InlineData("page-text")]
+    [InlineData("page-words")]
+    public void NoReadingCommandDeclaresARole(string leaf)
+    {
+        Assert.DoesNotContain("Role required:",
+            HelpRenderer.Render(BooksCommand.Create(), ["books", leaf], full: true));
+    }
+
+    [Theory]
+    [InlineData("toc")]
+    [InlineData("page-text")]
+    [InlineData("page-words")]
+    public void EveryReadingCommandCarriesAResponseShape(string leaf)
+    {
+        Assert.Contains("Response shape:",
+            HelpRenderer.Render(BooksCommand.Create(), ["books", leaf], full: true));
+    }
+
+    // The asymmetry a caller cannot infer: an unopenable comic 404s on
+    // page-text and answers 200 with an empty overlay here.
+    [Fact]
+    public void PageWordsWarnsAboutItsEmptyOverlay()
+    {
+        var help = HelpRenderer.Render(BooksCommand.Create(), ["books", "page-words"], full: false);
+        Assert.Contains("width", help);
+        Assert.Contains("page-text", help);
+    }
+
+    // Page text comes from the search index when there is one, so whether the
+    // book is indexed changes the answer.
+    [Fact]
+    public void PageTextPointsAtTheIndexedFlag()
+    {
+        Assert.Contains("indexed",
+            HelpRenderer.Render(BooksCommand.Create(), ["books", "page-text"], full: false));
+    }
+
+    // EPUB support is the non-obvious half of toc.
+    [Fact]
+    public void TocSaysItCoversEpub()
+    {
+        Assert.Contains("EPUB",
+            HelpRenderer.Render(BooksCommand.Create(), ["books", "toc"], full: false));
+    }
 }

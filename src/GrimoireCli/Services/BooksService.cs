@@ -104,4 +104,57 @@ public class BooksService
         var info = _client.Api.Api.Books[id].Thumbnail.ToGetRequestInformation();
         return await _client.SendStreamAsync(info);
     }
+
+    /// <summary>
+    /// GET /api/books/{id}/toc. Works for EPUB as well as PDF — PyMuPDF exposes
+    /// an EPUB's nav document through the same API as a PDF outline, and the
+    /// handler gates on is_fitz_mime (routers/books/pages.py:64-77).
+    /// </summary>
+    // A hint here, unusually, improves on the server: this route's only 404 is
+    // bare (pages.py:73), so the caller would otherwise see {"detail":"Not
+    // Found"}. The hint names both causes the bare 404 hides.
+    public async Task<string> TocAsync(string id)
+    {
+        var info = _client.Api.Api.Books[id].Toc.ToGetRequestInformation();
+        return await _client.SendAsync(
+            info,
+            notFoundHint: "No book with that ID, or its format cannot be opened. Check mime_type with: grimoire-cli books get --id <id>");
+    }
+
+    /// <summary>
+    /// GET /api/books/{id}/page/{n}/text. Reads the book_search row for that
+    /// page and falls back to live extraction when there is none
+    /// (routers/books/pages.py:221-245) — a scan's result depends on the book
+    /// being indexed, while a born-digital book extracts live with no index
+    /// row at all. An out-of-range page is 400 with the real page count.
+    /// </summary>
+    // Four 404s in total: pages.py:60 ("Book not found") and :232 ("File not
+    // found on disk") carry detail; :219 and :241 are bare. The hint names
+    // the two bare causes — its own first clause already covers "Book not
+    // found", so nothing informative is lost there, and masking the rarer
+    // disk case is the accepted cost.
+    public async Task<string> PageTextAsync(string id, int page)
+    {
+        var info = _client.Api.Api.Books[id].Page[page].Text.ToGetRequestInformation();
+        return await _client.SendAsync(
+            info,
+            notFoundHint: "No book with that ID, or its format carries no readable text. Check mime_type with: grimoire-cli books get --id <id>");
+    }
+
+    /// <summary>
+    /// GET /api/books/{id}/page/{n}/words. Answers 200 with an empty overlay
+    /// for any book outside the fitz format family (routers/books/pages.py:
+    /// 256-259). Only for the comic family does page-text 404 on the same
+    /// input — the text family is can_index, so page-text succeeds there
+    /// while this still returns the empty overlay.
+    /// </summary>
+    // No notFoundHint: both of this route's 404s carry a useful detail —
+    // "Book not found" (pages.py:60) and "File not found on disk" (:263) —
+    // which strengthens rather than weakens the case for leaving the
+    // server's own message alone.
+    public async Task<string> PageWordsAsync(string id, int page)
+    {
+        var info = _client.Api.Api.Books[id].Page[page].Words.ToGetRequestInformation();
+        return await _client.SendAsync(info);
+    }
 }

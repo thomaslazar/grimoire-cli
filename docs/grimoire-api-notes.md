@@ -1094,3 +1094,30 @@ the running 1.6.2 stack.
   (`description`, `is_explicit`, `is_supported`, `tags`). The four existing
   collections' kind and mergeable sets are unchanged: 1.6.2 moved them into
   `models/collections.py` verbatim.
+
+## Book reading
+
+Read from `backend/routers/books/pages.py` and `backend/indexer/formats.py` at
+tag `v1.7.1`, the release the local stack runs, and verified against that
+stack. Backs `books toc`, `books page-text` and `books page-words`.
+
+- `GET /api/books/{id}/page/{n}/text` reads the `book_search` FTS row for that
+  page and only extracts live when there is none
+  (`routers/books/pages.py:221-245`). Its format gate is `can_index`, not an
+  `application/` MIME prefix, so `text/plain` and `text/markdown` books are
+  readable too (`:215-219`).
+- `GET /api/books/{id}/page/{n}/words` answers **200 with an empty overlay**
+  (`{"width": 0, "height": 0, "words": []}`) for any book outside the `fitz`
+  format family (`routers/books/pages.py:256-259`). Only PDF, EPUB and DjVu are
+  `fitz`; `.txt`/`.md`/`.rtf` and the comic archives all get the empty overlay
+  (`indexer/formats.py:71-85`). Its `page-text` sibling only 404s for the
+  comic family — the text family is `can_index`, so `page-text` succeeds there
+  while `page-words` still returns the empty overlay. An empty result
+  therefore does not distinguish "not a renderable document" from "no words on
+  this page"; `width` does.
+- A page outside the book is **400 with the real page count** in the message,
+  not 404 (`routers/books/pages.py:237-238, 243-244, 270`).
+- `GET /api/books/{id}/toc` covers EPUB as well as PDF: the handler gates on
+  `is_fitz_mime`, and PyMuPDF exposes an EPUB's nav document through the same
+  API as a PDF outline (`routers/books/pages.py:64-77`). Its 404 is bare, so an
+  unknown id and an unopenable format are indistinguishable from the response.

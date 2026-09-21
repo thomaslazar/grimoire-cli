@@ -18,7 +18,7 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | auth | 2 / 14 |
 | backups | 6 / 6 |
 | bookmarks | 0 / 4 |
-| books | 11 / 16 |
+| books | 14 / 16 |
 | campaigns | 0 / 93 |
 | downloads | 0 / 1 |
 | duplicates | 13 / 13 |
@@ -39,7 +39,7 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | token-frames | 0 / 2 |
 | tokens | 10 / 10 |
 | users | 0 / 16 |
-| **Total** | **141 / 309** |
+| **Total** | **144 / 309** |
 
 2 operation(s) are internal-only (🔒) and excluded from covered counts.
 
@@ -144,12 +144,12 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | POST | `/api/books/{book_id}/metadata-search` | Search a metadata source | gm or admin | `books metadata-search` ✅ |
 | GET | `/api/books/{book_id}/metadata-sources` | List metadata sources | gm or admin | `books metadata-sources` ✅ |
 | GET | `/api/books/{book_id}/page/{page_num}` | Render a PDF page as WebP |  | — |
-| GET | `/api/books/{book_id}/page/{page_num}/text` | Get page text |  | — |
-| GET | `/api/books/{book_id}/page/{page_num}/words` | Get page word bounding boxes |  | — |
+| GET | `/api/books/{book_id}/page/{page_num}/text` | Get page text |  | `books page-text` ✅ |
+| GET | `/api/books/{book_id}/page/{page_num}/words` | Get page word bounding boxes |  | `books page-words` ✅ |
 | POST | `/api/books/{book_id}/reindex` | Re-run OCR on a book (optional DPI override) | gm or admin | `books reindex` ✅ |
 | POST | `/api/books/{book_id}/rescan` | Re-read a book from disk and rebuild its search index | gm or admin | `books rescan` ✅ |
 | GET | `/api/books/{book_id}/thumbnail` | Book cover thumbnail |  | `books thumbnail` ✅ |
-| GET | `/api/books/{book_id}/toc` | PDF table of contents |  | — |
+| GET | `/api/books/{book_id}/toc` | PDF table of contents |  | `books toc` ✅ |
 
 ## campaigns
 
