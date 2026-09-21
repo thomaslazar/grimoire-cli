@@ -23,7 +23,7 @@ public static class DownloadsCommand
         var idOption = new Option<string?>("--id") { Description = "System ID" };
         var categoryOption = new Option<string?>("--category") { Description = "Book category slug" };
         var tagOption = new Option<string?>("--tag") { Description = "Tag internal key, from tags list" };
-        var resourceTypeOption = new Option<string?>("--resource-type") { Description = "Restrict a tag scope to one resource type" };
+        var resourceTypeOption = new Option<string?>("--resource-type") { Description = "Restrict a tag scope to this resource type (book | map | token | audio | model)" };
         var folderOption = new Option<string?>("--folder") { Description = "Folder path" };
         var outputOption = new Option<string>("--output")
         {
@@ -51,6 +51,9 @@ public static class DownloadsCommand
             "  tag_type          --tag --resource-type",
             "  tag_folder        --tag --resource-type --folder",
             "",
+            "For tag_folder, --folder is the group's path exactly as tags",
+            "items returned it, not a filesystem path.",
+            "",
             "A missing one is 400 naming the flag and the type.");
         command.AddHelpSection("Notes", HelpSectionPosition.Top,
             "--fmt takes zip, tar, tar.gz or tar.bz2.",
@@ -59,7 +62,10 @@ public static class DownloadsCommand
             "system that holds no books of its own.",
             "",
             "--output - writes the archive to stdout; a path writes it and",
-            "prints {path, bytes}.");
+            "prints {path, bytes}.",
+            "",
+            "The server builds the whole archive before sending anything but",
+            "headers, so a very large scope can exceed the client's request timeout.");
         command.AddExamples(
             "grimoire-cli downloads archive --type system --id <system-id> --output system.zip",
             "grimoire-cli downloads archive --type tag --tag session-prep --output prep.zip",

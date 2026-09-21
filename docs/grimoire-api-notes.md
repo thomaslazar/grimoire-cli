@@ -1155,5 +1155,8 @@ stack runs, and verified against that stack. Backs `downloads archive`.
   surfaces as its own 400 against a scope that resolves to at least one file
   (`routers/downloads/_helpers.py:98-101`). An unknown `fmt` is 400 listing the
   valid ones; an unknown `type` is a separate 400 from the handler itself.
-- The response streams as the archive is built, so the first byte does not wait
-  for the whole archive.
+- The archive is built entirely in memory before any of it is sent: `_stream_zip`
+  and `_stream_tar` write the whole thing into a `BytesIO`, then `seek(0)` and
+  yield it in 64 KiB chunks (`_helpers.py:72-91`). Only the headers go out
+  early — the client's request timeout covers the full server-side build, not
+  just the time to first byte.

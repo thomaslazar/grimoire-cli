@@ -30,14 +30,14 @@ information rather than supply it.
   (`routers/books/pages.py:106`).
 - **`books page` handles three document kinds.** It renders PDF, EPUB and DjVu
   to WebP; serves a **comic archive's** page as the image member it already is,
-  without rendering (`pages.py:148-156`); and serves a single-page image book
+  without rendering (`pages.py:138-146`); and serves a single-page image book
   as stored, page 1 only (`pages.py:126-134`). Anything else 404s
-  (`pages.py:158-159`). This is what makes it the complement to the reading
+  (`pages.py:148-149`). This is what makes it the complement to the reading
   commands: for a comic, `books page-text` 404s and `books page-words` returns
   an empty overlay, but `books page` returns the page.
 - **Both book commands mutate on a missing file.** When the file is gone from
   disk they set the book's `is_missing` to true and commit before raising 404
-  (`routers/books/core.py:388-392`, `pages.py:130,141`). A GET with a write
+  (`routers/books/core.py:388-392`, `pages.py:130, 140, 179`). A GET with a write
   side effect is worth stating in help.
 - **`books page` is ETag-cached**, keyed on a token over the file's contents
   plus the page and width, so a replaced file renders under a new key
@@ -52,8 +52,11 @@ information rather than supply it.
 - **An empty scope is 404** "No files found for the requested scope", and an
   unknown `fmt` is 400 listing the valid ones
   (`routers/downloads/_helpers.py:98-101`).
-- **Archives stream as they are built** (`StreamingResponse` over a generator),
-  so the first byte arrives without waiting for the whole archive.
+- **Archives are built entirely before any byte is sent.** `_stream_zip` and
+  `_stream_tar` write the whole archive into a `BytesIO`, then `seek(0)` and
+  yield 64 KiB chunks from the finished buffer (`_helpers.py:72-91`); only the
+  headers go out early. `StreamingResponse` is real, but it streams a
+  completed buffer, not a build in progress.
 
 ## The archive scope table
 
@@ -89,9 +92,12 @@ registered in `Program.cs`.
 what `docs/grimoire-api-coverage.md` groups by, so the table and the CLI stay
 aligned.
 
-No timeout override. The server streams the archive as it builds it, so the
-client's default 100-second budget covers the response headers rather than the
-body, and no service in this repo passes a custom timeout.
+No timeout override. The server builds the whole archive before sending
+anything but headers, so the client's default 100-second budget covers the
+full server-side build, not just the time to first byte. Left at the default
+anyway: no service in this repo passes a custom timeout, and there is no
+evidence of a problem on any reachable stack. Raising the budget for this
+command is a call for the maintainer to make if that changes.
 
 ## Testing
 

@@ -2192,8 +2192,8 @@ ok "downloads archive exports a system as a zip"
 ok "downloads archive exports a tag scope as a zip"
 
 "$CLI" downloads archive --type system --id "no-such-system" --output "$WORK/x.zip" >/dev/null 2>&1 \
-  && fail "an archive scope that resolves to nothing should fail"
-ok "downloads archive refuses an empty scope"
+  && fail "an archive scope with an unrecognized system id should fail"
+ok "downloads archive 404s an unrecognized system id"
 
 "$CLI" downloads archive --type system --id "$SR4" --fmt sausage --output "$WORK/x.zip" >/dev/null 2>&1 \
   && fail "downloads archive should refuse an unknown format"

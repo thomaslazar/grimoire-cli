@@ -822,13 +822,13 @@ Add to `docs/grimoire-api-notes.md`, matching the file's heading style and place
 ```markdown
 - `GET /api/books/{id}/file` and `GET /api/books/{id}/page/{n}` both **write on
   a missing file**: they set the book's `is_missing` to true and commit before
-  raising 404 (`routers/books/core.py:388-392`, `pages.py:130,141`, v1.7.1). A
-  read that mutates is worth knowing about when a scripted sweep hits a library
-  whose files have moved.
+  raising 404 (`routers/books/core.py:388-392`, `pages.py:130, 140, 179`,
+  v1.7.1). A read that mutates is worth knowing about when a scripted sweep
+  hits a library whose files have moved.
 - `GET /api/books/{id}/page/{n}` defaults `width` to **1200**, where the maps
   equivalent defaults to 1600; both cap at 3000 (`pages.py:106`). It renders
   PDF, EPUB and DjVu, serves a comic archive's page as the stored image member
-  without rendering (`pages.py:148-156`), and serves a single-page image book
+  without rendering (`pages.py:138-146`), and serves a single-page image book
   as stored on page 1 only (`pages.py:126-134`). That makes it the one page
   read that works on a comic.
 
@@ -844,8 +844,11 @@ Add to `docs/grimoire-api-notes.md`, matching the file's heading style and place
   through a book row (`core.py:131-141`).
 - An empty scope is 404 "No files found for the requested scope"; an unknown
   `fmt` is 400 listing the valid ones (`routers/downloads/_helpers.py:98-101`).
-- The response streams as the archive is built, so the first byte does not wait
-  for the whole archive.
+- The archive is built entirely in memory before any of it is sent:
+  `_stream_zip` and `_stream_tar` write the whole thing into a `BytesIO`, then
+  `seek(0)` and yield it in 64 KiB chunks (`_helpers.py:72-91`). Only the
+  headers go out early — the client's request timeout covers the full
+  server-side build, not just the time to first byte.
 ```
 
 Replace any line with what Task 3 actually observed if the stack disagrees, and say so in the PR body.
