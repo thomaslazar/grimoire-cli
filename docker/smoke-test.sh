@@ -2135,4 +2135,85 @@ ok "books page-text refuses a page past the end"
   && fail "books page-words should refuse a page past the end"
 ok "books page-words refuses a page past the end"
 
+# --- binary endpoints --------------------------------------------------------
+# Reads only; downloads land in $WORK, which is fresh each run.
+BE_BOOK=$("$CLI" books list 2>"$WORK/cli.err" | jq -r '.books[0].id') \
+  || { cat "$WORK/cli.err" >&2; fail "books list exited non-zero"; }
+[ -n "$BE_BOOK" ] && [ "$BE_BOOK" != "null" ] || fail "no book fixture for the binary checks"
+
+"$CLI" books file --id "$BE_BOOK" --output "$WORK/book.bin" >"$WORK/bookdl.out" 2>"$WORK/cli.err" \
+  || { cat "$WORK/cli.err" >&2; fail "books file exited non-zero"; }
+[ -s "$WORK/book.bin" ] || fail "books file wrote an empty file"
+[ "$(jq -r .bytes "$WORK/bookdl.out")" -gt 0 ] \
+  || fail "books file should report a byte count: $(cat "$WORK/bookdl.out")"
+ok "books file downloads the book and reports its size"
+
+"$CLI" books page --id "$BE_BOOK" --page 1 --output "$WORK/bookpage.webp" >/dev/null 2>"$WORK/cli.err" \
+  || { cat "$WORK/cli.err" >&2; fail "books page exited non-zero"; }
+[ -s "$WORK/bookpage.webp" ] || fail "books page wrote an empty file"
+ok "books page renders page 1"
+
+# --width re-renders rather than resizing client-side — a fixture page comes
+# back a different size, not just a smaller copy of the same bytes.
+"$CLI" books page --id "$BE_BOOK" --page 1 --width 400 --output "$WORK/bookpage-w.webp" >/dev/null 2>"$WORK/cli.err" \
+  || { cat "$WORK/cli.err" >&2; fail "books page --width exited non-zero"; }
+[ -s "$WORK/bookpage-w.webp" ] || fail "books page --width wrote an empty file"
+[ "$(wc -c <"$WORK/bookpage.webp")" -ne "$(wc -c <"$WORK/bookpage-w.webp")" ] \
+  || fail "--width should change the rendered byte count"
+ok "books page --width changes the rendered bytes"
+
+"$CLI" books page --id "$BE_BOOK" --page 99 --output "$WORK/nope.webp" >/dev/null 2>&1 \
+  && fail "books page should refuse a page past the end"
+ok "books page refuses a page past the end"
+
+# The archive is the one endpoint that exports a whole slice in a call.
+# $SR4 (Shadowrun 4 DE), not the first id off `systems list` — that can land on
+# a container system with no books of its own, which 404s (see below) rather
+# than archiving.
+"$CLI" downloads archive --type system --id "$SR4" --output "$WORK/sys.zip" >/dev/null 2>"$WORK/cli.err" \
+  || { cat "$WORK/cli.err" >&2; fail "downloads archive exited non-zero"; }
+[ -s "$WORK/sys.zip" ] || fail "downloads archive wrote an empty file"
+[ "$(head -c 2 "$WORK/sys.zip")" = "PK" ] \
+  || fail "a zip archive should start with the PK magic: $(head -c 16 "$WORK/sys.zip" | od -c | head -1)"
+unzip -l "$WORK/sys.zip" >"$WORK/syszip.list" 2>"$WORK/cli.err" \
+  || { cat "$WORK/cli.err" >&2; fail "unzip could not list downloads archive's output"; }
+grep -q "1 file\|files$" "$WORK/syszip.list" \
+  || fail "unzip -l should report the archive's members: $(cat "$WORK/syszip.list")"
+ok "downloads archive exports a system as a zip"
+
+# A tag with usage is created earlier in this run (books "batch-tag adds a tag
+# and leaves the existing one in place", above) and never removed, so it is
+# still attached by the time this block runs.
+"$CLI" downloads archive --type tag --tag "smoke-book-alpha" --output "$WORK/tag.zip" >/dev/null 2>"$WORK/cli.err" \
+  || { cat "$WORK/cli.err" >&2; fail "downloads archive --type tag exited non-zero"; }
+[ -s "$WORK/tag.zip" ] || fail "downloads archive --type tag wrote an empty file"
+[ "$(head -c 2 "$WORK/tag.zip")" = "PK" ] \
+  || fail "the tag archive should start with the PK magic: $(head -c 16 "$WORK/tag.zip" | od -c | head -1)"
+ok "downloads archive exports a tag scope as a zip"
+
+"$CLI" downloads archive --type system --id "no-such-system" --output "$WORK/x.zip" >/dev/null 2>&1 \
+  && fail "an archive scope with an unrecognized system id should fail"
+ok "downloads archive 404s an unrecognized system id"
+
+"$CLI" downloads archive --type system --id "$SR4" --fmt sausage --output "$WORK/x.zip" >/dev/null 2>&1 \
+  && fail "downloads archive should refuse an unknown format"
+ok "downloads archive refuses an unknown format"
+
+"$CLI" downloads archive --type sausage --output "$WORK/x.zip" >/dev/null 2>&1 \
+  && fail "downloads archive should refuse an unknown scope type"
+ok "downloads archive refuses an unknown scope type"
+
+# #48: a container system holding no books of its own 404s rather than
+# archiving its children. Das Schwarze Auge and Dungeons & Dragons are such
+# containers in the fixtures; assert on whichever book_count == 0 container
+# systems list --include-children still reports, rather than a hardcoded id.
+BE_CONTAINER=$("$CLI" systems list --include-children 2>/dev/null | jq -r '[.[] | select(.book_count == 0)][0].id')
+if [ -n "$BE_CONTAINER" ] && [ "$BE_CONTAINER" != "null" ]; then
+  "$CLI" downloads archive --type system --id "$BE_CONTAINER" --output "$WORK/x.zip" >/dev/null 2>&1 \
+    && fail "a container system with no books of its own should 404, not archive"
+  ok "downloads archive 404s a container system with no books of its own"
+else
+  ok "downloads archive container-404 check skipped — no book_count==0 container in this stack"
+fi
+
 echo "smoke: all checks passed" >&2

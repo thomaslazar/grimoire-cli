@@ -106,6 +106,28 @@ public class BooksService
     }
 
     /// <summary>
+    /// GET /api/books/{id}/file. Serves the book as stored. Both 404s carry a
+    /// detail ("Book not found", "File not found on disk"), so no notFoundHint.
+    /// A missing file also flips the book's is_missing to true before the 404
+    /// (routers/books/core.py:388-392).
+    /// </summary>
+    public async Task<Stream> FileAsync(string id)
+        => await _client.SendStreamAsync(_client.Api.Api.Books[id].File.ToGetRequestInformation());
+
+    /// <summary>
+    /// GET /api/books/{id}/page/{n}. Renders PDF, EPUB and DjVu to WebP; serves
+    /// a comic archive's page as the image member it already is, and a
+    /// single-page image book as stored (routers/books/pages.py:126-146). A
+    /// missing file flips the book's is_missing to true before the 404, at
+    /// each of the three serving paths (pages.py:130-131, 140-141, 179-180).
+    /// width defaults to 1200 server-side, not the 1600 maps uses, and is
+    /// left unset when the flag is omitted.
+    /// </summary>
+    public async Task<Stream> PageAsync(string id, int page, int? width)
+        => await _client.SendStreamAsync(
+            _client.Api.Api.Books[id].Page[page].ToGetRequestInformation(c => c.QueryParameters.Width = width));
+
+    /// <summary>
     /// GET /api/books/{id}/toc. Works for EPUB as well as PDF — PyMuPDF exposes
     /// an EPUB's nav document through the same API as a PDF outline, and the
     /// handler gates on is_fitz_mime (routers/books/pages.py:64-77).

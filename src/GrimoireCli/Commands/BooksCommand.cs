@@ -21,6 +21,8 @@ public static class BooksCommand
         command.Subcommands.Add(CreateReindexCommand());
         command.Subcommands.Add(CreateRescanCommand());
         command.Subcommands.Add(CreateThumbnailCommand());
+        command.Subcommands.Add(CreateFileCommand());
+        command.Subcommands.Add(CreatePageCommand());
         command.Subcommands.Add(CreateTocCommand());
         command.Subcommands.Add(CreatePageTextCommand());
         command.Subcommands.Add(CreatePageWordsCommand());
@@ -331,6 +333,104 @@ public static class BooksCommand
             var (client, _) = CommandHelper.BuildClient();
             var service = new BooksService(client);
             await using var stream = await service.ThumbnailAsync(parseResult.GetValue(idOption)!);
+            try
+            {
+                await ConsoleOutput.WriteStreamAsync(stream, parseResult.GetValue(outputOption)!);
+            }
+            catch (BodyInputException ex)
+            {
+                _logger.Error(ex.Message);
+                return 1;
+            }
+            return 0;
+        });
+        return command;
+    }
+
+    private static Command CreateFileCommand()
+    {
+        var idOption = new Option<string>("--id") { Description = "Book ID", Required = true };
+        var outputOption = new Option<string>("--output")
+        {
+            Description = "Output file path, or '-' for binary to stdout",
+            Required = true,
+        };
+        var command = new Command("file", "Download the book file as stored")
+        {
+            idOption, outputOption
+        };
+        command.AddHelpSection("Notes", HelpSectionPosition.Top,
+            "The original file in whatever format the library holds — use books",
+            "page to render a page as an image.",
+            "",
+            "A file missing from disk is 404, and the book's is_missing is set",
+            "to true on the way out.",
+            "",
+            "--output - writes the file to stdout; a path writes it and prints",
+            "{path, bytes}.");
+        command.AddExamples(
+            "grimoire-cli books file --id <book-id> --output handbook.pdf",
+            "grimoire-cli books file --id <book-id> --output - > handbook.pdf");
+        command.AddResponseExample<SavedFile>();
+        command.SetAction(async (parseResult, cancellationToken) =>
+        {
+            var (client, _) = CommandHelper.BuildClient();
+            var service = new BooksService(client);
+            await using var stream = await service.FileAsync(parseResult.GetValue(idOption)!);
+            try
+            {
+                await ConsoleOutput.WriteStreamAsync(stream, parseResult.GetValue(outputOption)!);
+            }
+            catch (BodyInputException ex)
+            {
+                _logger.Error(ex.Message);
+                return 1;
+            }
+            return 0;
+        });
+        return command;
+    }
+
+    private static Command CreatePageCommand()
+    {
+        var idOption = new Option<string>("--id") { Description = "Book ID", Required = true };
+        var pageOption = new Option<int>("--page") { Description = "1-based page number", Required = true };
+        var widthOption = new Option<int?>("--width") { Description = "Target pixel width" };
+        var outputOption = new Option<string>("--output")
+        {
+            Description = "Output file path, or '-' for binary to stdout",
+            Required = true,
+        };
+        var command = new Command("page", "Render or extract one page as an image")
+        {
+            idOption, pageOption, widthOption, outputOption
+        };
+        command.AddHelpSection("Notes", HelpSectionPosition.Top,
+            "PDF, EPUB and DjVu render to WebP. A comic archive's page is served",
+            "as the image it already is, and a single-page image book as stored,",
+            "page 1 only. Anything else is 404 — which makes this the one page",
+            "read that works on a comic, where page-text and page-words do not.",
+            "",
+            "--width defaults to 1200 and is capped at 3000. maps page defaults",
+            "to 1600, so the two are not interchangeable.",
+            "",
+            "A file missing from disk is 404, and the book's is_missing is set",
+            "to true on the way out.",
+            "",
+            "--output - writes the image to stdout; a path writes it and prints",
+            "{path, bytes}.");
+        command.AddExamples(
+            "grimoire-cli books page --id <book-id> --page 241 --output p241.webp",
+            "grimoire-cli books page --id <book-id> --page 1 --width 800 --output -");
+        command.AddResponseExample<SavedFile>();
+        command.SetAction(async (parseResult, cancellationToken) =>
+        {
+            var (client, _) = CommandHelper.BuildClient();
+            var service = new BooksService(client);
+            await using var stream = await service.PageAsync(
+                parseResult.GetValue(idOption)!,
+                parseResult.GetValue(pageOption),
+                parseResult.GetValue(widthOption));
             try
             {
                 await ConsoleOutput.WriteStreamAsync(stream, parseResult.GetValue(outputOption)!);

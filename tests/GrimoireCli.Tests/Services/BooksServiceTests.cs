@@ -39,4 +39,28 @@ public class BooksServiceTests
         Assert.DoesNotContain("?", uri);
         Assert.Contains("/page/7/", uri);
     }
+
+    [Fact]
+    public void TheBinaryGettersResolveToTheirOwnPaths()
+    {
+        var api = Client().Api.Api.Books["b1"];
+        Assert.Contains("/api/books/b1/file", Uri(api.File.ToGetRequestInformation()));
+        Assert.Contains("/api/books/b1/page/7", Uri(api.Page[7].ToGetRequestInformation()));
+    }
+
+    // width is the only query parameter books page takes; a rename would render
+    // at the server's default while the caller believes otherwise.
+    [Fact]
+    public void BooksPageSendsWidthAsAQueryParameter()
+    {
+        var info = Client().Api.Api.Books["b1"].Page[7].ToGetRequestInformation(
+            c => c.QueryParameters.Width = 900);
+        Assert.Contains("width=900", Uri(info));
+    }
+
+    [Fact]
+    public void OmittedWidthSendsNoQueryString()
+    {
+        Assert.DoesNotContain("width=", Uri(Client().Api.Api.Books["b1"].Page[7].ToGetRequestInformation()));
+    }
 }
