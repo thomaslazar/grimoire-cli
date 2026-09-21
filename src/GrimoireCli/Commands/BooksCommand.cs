@@ -418,9 +418,9 @@ public static class BooksCommand
             "alongside them — for locating text on a rendered page, not for",
             "reading it. Use books page-text to read.",
             "",
-            "A book that cannot be opened answers 200 with width 0 and no",
-            "words, where page-text would 404, so an empty result does not",
-            "distinguish the two.");
+            "Only PDF, EPUB and DjVu carry word boxes. Anything else — a text",
+            "book, a comic — answers 200 with width 0 and no words, so an empty",
+            "result does not mean the page is blank.");
         command.AddExamples("grimoire-cli books page-words --id <book-id> --page 241");
         command.AddResponseExample<Generated.Models.PageWordsResponse>();
         command.SetAction(async (parseResult, cancellationToken) =>
