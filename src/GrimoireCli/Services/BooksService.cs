@@ -104,4 +104,51 @@ public class BooksService
         var info = _client.Api.Api.Books[id].Thumbnail.ToGetRequestInformation();
         return await _client.SendStreamAsync(info);
     }
+
+    /// <summary>
+    /// GET /api/books/{id}/toc. Works for EPUB as well as PDF — PyMuPDF exposes
+    /// an EPUB's nav document through the same API as a PDF outline, and the
+    /// handler gates on is_fitz_mime (routers/books/pages.py:64-77).
+    /// </summary>
+    // A hint here, unusually, improves on the server: this route's only 404 is
+    // bare (pages.py:73), so the caller would otherwise see {"detail":"Not
+    // Found"}. The hint names both causes the bare 404 hides.
+    public async Task<string> TocAsync(string id)
+    {
+        var info = _client.Api.Api.Books[id].Toc.ToGetRequestInformation();
+        return await _client.SendAsync(
+            info,
+            notFoundHint: "No book with that ID, or its format cannot be opened. Check mime_type with: grimoire-cli books get --id <id>");
+    }
+
+    /// <summary>
+    /// GET /api/books/{id}/page/{n}/text. Reads the book_search row for that
+    /// page and falls back to live extraction when there is none
+    /// (routers/books/pages.py:221-245), so a result depends on the book being
+    /// indexed. An out-of-range page is 400 with the real page count.
+    /// </summary>
+    // Two of this route's three 404s are bare (pages.py:219,241); the third
+    // carries "File not found on disk" (:232). The hint names the two bare
+    // causes, at the cost of masking that rarer one, which the help mentions.
+    public async Task<string> PageTextAsync(string id, int page)
+    {
+        var info = _client.Api.Api.Books[id].Page[page].Text.ToGetRequestInformation();
+        return await _client.SendAsync(
+            info,
+            notFoundHint: "No book with that ID, or its format carries no readable text. Check mime_type with: grimoire-cli books get --id <id>");
+    }
+
+    /// <summary>
+    /// GET /api/books/{id}/page/{n}/words. Answers 200 with an empty overlay
+    /// for a book PyMuPDF cannot open, rather than 404 as its text sibling does
+    /// (routers/books/pages.py:256-259).
+    /// </summary>
+    // No notFoundHint: the only 404 this route can raise is "File not found on
+    // disk" (pages.py:263), which is the informative one — a hint would replace
+    // it with something less useful.
+    public async Task<string> PageWordsAsync(string id, int page)
+    {
+        var info = _client.Api.Api.Books[id].Page[page].Words.ToGetRequestInformation();
+        return await _client.SendAsync(info);
+    }
 }
