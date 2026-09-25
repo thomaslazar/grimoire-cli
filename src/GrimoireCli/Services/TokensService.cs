@@ -18,12 +18,13 @@ public class TokensService
     public TokensService(GrimoireApiClient client) => _client = client;
 
     /// <summary>GET /api/tokens. Variants and disallowed explicit rows are excluded server-side.</summary>
-    public async Task<string> ListAsync(int? limit, int? offset)
+    public async Task<string> ListAsync(int? limit, int? offset, string? sort)
     {
         var info = _client.Api.Api.Tokens.ToGetRequestInformation(c =>
         {
             c.QueryParameters.Limit = limit;
             c.QueryParameters.Offset = offset;
+            c.QueryParameters.Sort = sort;
         });
         return await _client.SendAsync(info);
     }

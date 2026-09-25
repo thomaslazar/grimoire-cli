@@ -48,6 +48,31 @@ public class MapsCommandTests
         Assert.NotEmpty(MapsCommand.Create().Parse(["list", "--offset", "-1"]).Errors);
     }
 
+    // The server's pattern makes an unknown value a 422, so the round-trip is
+    // spent to learn what the value set already says.
+    [Fact]
+    public void ListRejectsAnUnknownSortOrder()
+    {
+        Assert.NotEmpty(MapsCommand.Create().Parse(["list", "--sort", "filename"]).Errors);
+    }
+
+    [Fact]
+    public void ListAcceptsBothSortOrders()
+    {
+        Assert.Empty(MapsCommand.Create().Parse(["list", "--sort", "path"]).Errors);
+        Assert.Empty(MapsCommand.Create().Parse(["list", "--sort", "name"]).Errors);
+    }
+
+    // Which column each order sorts on decides whether a page is a run of
+    // folders or a slice of the whole tree.
+    [Fact]
+    public void ListSaysWhatEachSortOrderOrdersBy()
+    {
+        var output = Help(["maps", "list"]);
+        Assert.Contains("orders by relative_path", output);
+        Assert.Contains("name orders by filename", output);
+    }
+
     // The exact-match rule changes what a caller asks for, so it has to be said.
     [Fact]
     public void ListNotesThatFolderIsNotASubtree()

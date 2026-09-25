@@ -9,6 +9,7 @@ namespace GrimoireCli.Commands;
 public static class TokensCommand
 {
     private static readonly NLog.Logger _logger = NLog.LogManager.GetCurrentClassLogger();
+    private static readonly string[] SortOrders = ["path", "name"];
 
     public static Command Create()
     {
@@ -29,14 +30,18 @@ public static class TokensCommand
         var limitOption = OptionHelpers.Range("--limit", "Results per page (the server sets no maximum)", 1);
         limitOption.DefaultValueFactory = _ => 100;
         var offsetOption = OptionHelpers.Range("--offset", "Items to skip", 0);
+        var sortOption = OptionHelpers.Choice("--sort", "Row order; default path", SortOrders);
         var command = new Command("list", "List tokens")
         {
-            limitOption, offsetOption
+            limitOption, offsetOption, sortOption
         };
         command.AddHelpSection("Notes", HelpSectionPosition.Top,
             "Variants are hidden — only the main copy of a family is listed.",
             "",
             "The account's explicit permission filters the list server-side.",
+            "",
+            "--sort path orders by relative_path, so a page is a contiguous run of",
+            "folders; name orders by filename across the whole tree.",
             "",
             "Page with --offset against total in the response.");
         command.AddExamples(
@@ -49,7 +54,8 @@ public static class TokensCommand
             var service = new TokensService(client);
             var result = await service.ListAsync(
                 parseResult.GetValue(limitOption),
-                parseResult.GetValue(offsetOption));
+                parseResult.GetValue(offsetOption),
+                parseResult.GetValue(sortOption));
             ConsoleOutput.WriteRawJson(result);
             return 0;
         });

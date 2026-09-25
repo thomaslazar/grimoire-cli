@@ -18,7 +18,7 @@ public class MapsService
     public MapsService(GrimoireApiClient client) => _client = client;
 
     /// <summary>GET /api/maps. Variants are excluded server-side; only family mains are listed.</summary>
-    public async Task<string> ListAsync(string? mapType, string? folder, int? limit, int? offset)
+    public async Task<string> ListAsync(string? mapType, string? folder, int? limit, int? offset, string? sort)
     {
         var info = _client.Api.Api.Maps.ToGetRequestInformation(c =>
         {
@@ -26,6 +26,7 @@ public class MapsService
             c.QueryParameters.Folder = folder;
             c.QueryParameters.Limit = limit;
             c.QueryParameters.Offset = offset;
+            c.QueryParameters.Sort = sort;
         });
         return await _client.SendAsync(info);
     }

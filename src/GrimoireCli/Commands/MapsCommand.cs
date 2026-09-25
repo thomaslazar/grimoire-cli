@@ -9,6 +9,7 @@ namespace GrimoireCli.Commands;
 public static class MapsCommand
 {
     private static readonly NLog.Logger _logger = NLog.LogManager.GetCurrentClassLogger();
+    private static readonly string[] SortOrders = ["path", "name"];
 
     public static Command Create()
     {
@@ -33,9 +34,10 @@ public static class MapsCommand
         var limitOption = OptionHelpers.Range("--limit", "Results per page (the server sets no maximum)", 1);
         limitOption.DefaultValueFactory = _ => 100;
         var offsetOption = OptionHelpers.Range("--offset", "Items to skip", 0);
+        var sortOption = OptionHelpers.Choice("--sort", "Row order; default path", SortOrders);
         var command = new Command("list", "List maps")
         {
-            mapTypeOption, folderOption, limitOption, offsetOption
+            mapTypeOption, folderOption, limitOption, offsetOption, sortOption
         };
         command.AddHelpSection("Notes", HelpSectionPosition.Top,
             "--folder is an exact folder, not a subtree: battlemaps excludes",
@@ -43,6 +45,9 @@ public static class MapsCommand
             "relative_path — the maps/ collection root is stripped from folder_path.",
             "",
             "Variants are hidden — only the main copy of a family is listed.",
+            "",
+            "--sort path orders by relative_path, so a page is a contiguous run of",
+            "folders; name orders by filename across the whole tree.",
             "",
             "Page with --offset against total in the response.");
         command.AddExamples(
@@ -58,7 +63,8 @@ public static class MapsCommand
                 parseResult.GetValue(mapTypeOption),
                 parseResult.GetValue(folderOption),
                 parseResult.GetValue(limitOption),
-                parseResult.GetValue(offsetOption));
+                parseResult.GetValue(offsetOption),
+                parseResult.GetValue(sortOption));
             ConsoleOutput.WriteRawJson(result);
             return 0;
         });
