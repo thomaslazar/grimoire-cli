@@ -2,7 +2,7 @@
 
 Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any) that implements it.
 
-- **Reference:** spec fetched live from the pinned stack's `/api/openapi.json` (v1.7.1, 235 paths, 309 operations) and the upstream router source read from the same container. Tested range: `1.7.0`-`1.7.1` (`GrimoireApiClient.cs`).
+- **Reference:** spec fetched live from the pinned stack's `/api/openapi.json` (v1.7.2, 235 paths, 309 operations) and the upstream router source read from the same container. Tested range: `1.7.0`-`1.7.2` (`GrimoireApiClient.cs`).
 - **Perm** column uses Grimoire's roles (`admin` / `gm or admin` / `not guest`); blank = any authenticated user. `?` = a dependency this script could not resolve.
 - ✅ = covered by a CLI command · — = not implemented · 🔒 = internal-only (no user-facing verb); 🔒 rows never count as covered.
 - **Regenerate with `tools/generate-api-coverage.py`; update `IMPLEMENTED` there in the same PR as any change to which endpoints the CLI calls.**
@@ -229,7 +229,7 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | GET | `/api/campaigns/{campaign_id}/wiki` | List visible wiki pages |  | — |
 | POST | `/api/campaigns/{campaign_id}/wiki` | Create a wiki page |  | — |
 | GET | `/api/campaigns/{campaign_id}/wiki/export` | Export campaign wiki (md zip or json bundle) |  | — |
-| POST | `/api/campaigns/{campaign_id}/wiki/import` | Import wiki pages (markdown / json / LegendKeeper) |  | — |
+| POST | `/api/campaigns/{campaign_id}/wiki/import` | Import wiki pages from a file or a picked folder |  | — |
 | PUT | `/api/campaigns/{campaign_id}/wiki/reorder` | Reorder wiki pages (drag-and-drop) |  | — |
 | GET | `/api/campaigns/{campaign_id}/wiki/search` | Search wiki pages |  | — |
 | GET | `/api/campaigns/{campaign_id}/wiki/templates` | List the campaign's note templates |  | — |

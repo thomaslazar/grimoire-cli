@@ -79,7 +79,7 @@ public class BooksCommandTests
         var output = RenderHelp(["books", "update"], full: true);
         var expected = new GrimoireCli.Generated.Models.BookUpdate()
             .GetFieldDeserializers().Keys;
-        Assert.Equal(19, expected.Count);
+        Assert.Equal(20, expected.Count);
         Assert.Contains("Request shape:", output);
         foreach (var field in expected)
             Assert.Contains($"\"{field}\":", output);

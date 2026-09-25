@@ -193,6 +193,14 @@ namespace GrimoireCli.Generated.Models
 #else
         public global::GrimoireCli.Generated.Models.BookDetail.BookDetail_page_count PageCount { get; set; }
 #endif
+        /// <summary>The product_code property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public string? ProductCode { get; set; }
+#nullable restore
+#else
+        public string ProductCode { get; set; }
+#endif
         /// <summary>The publisher property</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
@@ -341,6 +349,7 @@ namespace GrimoireCli.Generated.Models
                 { "ocr_pages_skipped", n => { OcrPagesSkipped = n.GetIntValue(); } },
                 { "ocr_pending", n => { OcrPending = n.GetBoolValue(); } },
                 { "page_count", n => { PageCount = n.GetObjectValue<global::GrimoireCli.Generated.Models.BookDetail.BookDetail_page_count>(global::GrimoireCli.Generated.Models.BookDetail.BookDetail_page_count.CreateFromDiscriminatorValue); } },
+                { "product_code", n => { ProductCode = n.GetStringValue(); } },
                 { "publisher", n => { Publisher = n.GetObjectValue<global::GrimoireCli.Generated.Models.BookDetail.BookDetail_publisher>(global::GrimoireCli.Generated.Models.BookDetail.BookDetail_publisher.CreateFromDiscriminatorValue); } },
                 { "publisher_url", n => { PublisherUrl = n.GetObjectValue<global::GrimoireCli.Generated.Models.BookDetail.BookDetail_publisher_url>(global::GrimoireCli.Generated.Models.BookDetail.BookDetail_publisher_url.CreateFromDiscriminatorValue); } },
                 { "tags", n => { Tags = n.GetCollectionOfPrimitiveValues<string>()?.AsList(); } },
@@ -388,6 +397,7 @@ namespace GrimoireCli.Generated.Models
             writer.WriteIntValue("ocr_pages_skipped", OcrPagesSkipped);
             writer.WriteBoolValue("ocr_pending", OcrPending);
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.BookDetail.BookDetail_page_count>("page_count", PageCount);
+            writer.WriteStringValue("product_code", ProductCode);
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.BookDetail.BookDetail_publisher>("publisher", Publisher);
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.BookDetail.BookDetail_publisher_url>("publisher_url", PublisherUrl);
             writer.WriteCollectionOfPrimitiveValues<string>("tags", Tags);
