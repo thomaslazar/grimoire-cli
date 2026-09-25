@@ -59,6 +59,14 @@ namespace GrimoireCli.Generated.Models
 #endif
         /// <summary>The page_count property</summary>
         public int? PageCount { get; set; }
+        /// <summary>The product_code property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public string? ProductCode { get; set; }
+#nullable restore
+#else
+        public string ProductCode { get; set; }
+#endif
         /// <summary>The publisher property</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
@@ -123,6 +131,7 @@ namespace GrimoireCli.Generated.Models
                 { "has_thumbnail", n => { HasThumbnail = n.GetBoolValue(); } },
                 { "id", n => { Id = n.GetStringValue(); } },
                 { "page_count", n => { PageCount = n.GetIntValue(); } },
+                { "product_code", n => { ProductCode = n.GetStringValue(); } },
                 { "publisher", n => { Publisher = n.GetStringValue(); } },
                 { "tags", n => { Tags = n.GetCollectionOfPrimitiveValues<string>()?.AsList(); } },
                 { "title", n => { Title = n.GetStringValue(); } },
@@ -143,6 +152,7 @@ namespace GrimoireCli.Generated.Models
             writer.WriteBoolValue("has_thumbnail", HasThumbnail);
             writer.WriteStringValue("id", Id);
             writer.WriteIntValue("page_count", PageCount);
+            writer.WriteStringValue("product_code", ProductCode);
             writer.WriteStringValue("publisher", Publisher);
             writer.WriteCollectionOfPrimitiveValues<string>("tags", Tags);
             writer.WriteStringValue("title", Title);

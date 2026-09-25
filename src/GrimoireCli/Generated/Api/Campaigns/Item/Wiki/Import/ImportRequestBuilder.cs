@@ -34,7 +34,7 @@ namespace GrimoireCli.Generated.Api.Campaigns.Item.Wiki.Import
         {
         }
         /// <summary>
-        /// Import wiki pages from a markdown / JSON / LegendKeeper file (owner only).
+        /// Import wiki pages from a file, or from a whole picked folder (owner only).Two shapes, one endpoint. `file` is a single upload - markdown, a Grimoire orLegendKeeper JSON, or a zip. `files` (with a `paths` entry per file, thebrowser&apos;s `webkitRelativePath`) is a folder pick, which arrives as loosefiles because a browser has no archive step: the whole set is imported in onerequest so nesting and cross-links resolve together, the same as for a zip.
         /// </summary>
         /// <returns>A <see cref="global::GrimoireCli.Generated.Models.WikiImportOut"/></returns>
         /// <param name="body">The request body</param>
@@ -59,7 +59,7 @@ namespace GrimoireCli.Generated.Api.Campaigns.Item.Wiki.Import
             return await RequestAdapter.SendAsync<global::GrimoireCli.Generated.Models.WikiImportOut>(requestInfo, global::GrimoireCli.Generated.Models.WikiImportOut.CreateFromDiscriminatorValue, errorMapping, cancellationToken).ConfigureAwait(false);
         }
         /// <summary>
-        /// Import wiki pages from a markdown / JSON / LegendKeeper file (owner only).
+        /// Import wiki pages from a file, or from a whole picked folder (owner only).Two shapes, one endpoint. `file` is a single upload - markdown, a Grimoire orLegendKeeper JSON, or a zip. `files` (with a `paths` entry per file, thebrowser&apos;s `webkitRelativePath`) is a folder pick, which arrives as loosefiles because a browser has no archive step: the whole set is imported in onerequest so nesting and cross-links resolve together, the same as for a zip.
         /// </summary>
         /// <returns>A <see cref="RequestInformation"/></returns>
         /// <param name="body">The request body</param>
@@ -90,7 +90,7 @@ namespace GrimoireCli.Generated.Api.Campaigns.Item.Wiki.Import
             return new global::GrimoireCli.Generated.Api.Campaigns.Item.Wiki.Import.ImportRequestBuilder(rawUrl, RequestAdapter);
         }
         /// <summary>
-        /// Import wiki pages from a markdown / JSON / LegendKeeper file (owner only).
+        /// Import wiki pages from a file, or from a whole picked folder (owner only).Two shapes, one endpoint. `file` is a single upload - markdown, a Grimoire orLegendKeeper JSON, or a zip. `files` (with a `paths` entry per file, thebrowser&apos;s `webkitRelativePath`) is a folder pick, which arrives as loosefiles because a browser has no archive step: the whole set is imported in onerequest so nesting and cross-links resolve together, the same as for a zip.
         /// </summary>
         [global::System.CodeDom.Compiler.GeneratedCode("Kiota", "1.0.0")]
         public partial class ImportRequestBuilderPostQueryParameters 

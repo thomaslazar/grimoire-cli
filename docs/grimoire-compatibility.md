@@ -6,7 +6,7 @@
 |---|---|---|
 | 0.1.x | 1.5.6 | initial support, maintained on `support/grimoire-1.5.6` |
 | 0.2.x | 1.6.2 | superseded by 0.3.x |
-| 0.3.x | 1.7.0 – 1.7.1 | current, on `main` |
+| 0.3.x | 1.7.0 – 1.7.2 | current, on `main` |
 
 **The floor rises only when something forces it**, not on every server release.
 Each row above records a pairing that was necessary at the time — 1.5.6 → 1.6.0
@@ -68,7 +68,7 @@ plain `BaseModel`s with Pydantic's default `extra='ignore'`, so that flag's fiel
 is dropped and the folder is created with no marker and a 200. A silent no-op is
 what the floor warning is for; without the new flag this release would not have
 needed one.
-`docker/docker-compose.yml` pins the `1.7.1` release tag, so the spec cannot
+`docker/docker-compose.yml` pins the `1.7.2` release tag, so the spec cannot
 drift under the committed client between regenerations.
 
 **1.7.1 raised `MaxTestedVersion` and left the floor alone** — the first bump
@@ -93,10 +93,37 @@ is behaviour the CLI passes through:
   searchable: those pages exceeded `OCR_PAGE_TIMEOUT` and their text is missing.
   `books reindex` resets it to 0.
 
+**1.7.2 likewise raised `MaxTestedVersion` alone.** It adds one book field and
+one query parameter, both optional, so 1.7.0, 1.7.1 and 1.7.2 are all in range:
+
+- **`product_code` is a new book metadata field** — the publisher's catalogue
+  number (`PZO9001`, `TSR 9247`), the identifier most RPG PDFs carry instead of
+  an ISBN. It reads back on `books get`, `books list`, the book rows of
+  `systems get` and `search`, and `books update` / `books batch-update` accept
+  it because the generated model does. An older server drops it and answers 200.
+- **`search` gained the `code:` field**, aliased `sku` and `product_code`, and a
+  bare query now matches the product code alongside title and filename. Matching
+  is blind to spaces and hyphens on both sides, so `code:TSR9247` finds
+  `TSR 9247`. On 1.7.0 / 1.7.1 the prefix is unrecognised and searched
+  literally, which returns nothing rather than erroring — `search fields`
+  answers what the server in front of you actually takes.
+- **A quoted phrase is one FTS token**, so `"lucky feat"` and `text:"lucky
+  feat"` are phrase searches rather than an implicit AND. Same query, different
+  hits, across this upgrade.
+- **`GET /api/maps` and `GET /api/tokens` take `sort=path|name`.** Unexposed —
+  a `--sort` flag is what forces a floor, and `path` (the default, and what both
+  commands already get) is the order the CLI has always returned.
+- **Map and token thumbnails survive a rename.** Both routes now fall back to
+  the path hash when the filename-derived name misses, instead of 404ing for an
+  image that is on disk.
+- **An add-on update that needs a newer Grimoire is no longer offered.**
+  `addons list` reports `update_available: false` and omits the entry from
+  `available_in` where the build in the index requires a server past this one.
+
 ## Runtime check
 
 `src/GrimoireCli/Api/GrimoireApiClient.cs` defines `MinSupportedVersion` and
-`MaxTestedVersion`, currently `"1.7.0"` and `"1.7.1"`. A check runs before the first
+`MaxTestedVersion`, currently `"1.7.0"` and `"1.7.2"`. A check runs before the first
 request of any command, calling `GET /api/about` and comparing the reported
 version against that range. It is throttled to once every 24 hours — a
 config with a recent `lastVersionCheck` skips the probe entirely — and
