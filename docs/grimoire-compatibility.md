@@ -95,8 +95,8 @@ is behaviour the CLI passes through:
   searchable: those pages exceeded `OCR_PAGE_TIMEOUT` and their text is missing.
   `books reindex` resets it to 0.
 
-**1.7.2 likewise raised `MaxTestedVersion` alone.** It adds one book field and
-one query parameter, both optional, so 1.7.0, 1.7.1 and 1.7.2 are all in range:
+**1.7.2 adds one book field and one query parameter**, both optional on the
+wire. Carrying the parameter is what moved the floor (below):
 
 - **`product_code` is a new book metadata field** — the publisher's catalogue
   number (`PZO9001`, `TSR 9247`), the identifier most RPG PDFs carry instead of
