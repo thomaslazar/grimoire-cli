@@ -76,8 +76,8 @@ drift under the committed client between regenerations.
 **1.7.1 raised `MaxTestedVersion` and left the floor alone** — the first bump
 here to do so, and the shape a bump takes when nothing forces a floor. Its
 request surface is unchanged but for one additive response field, so the CLI
-reaches 1.7.0 and 1.7.1 alike and the supported range is both. What it changes
-is behaviour the CLI passes through:
+reached 1.7.0 and 1.7.1 alike and the supported range was both at the time. What
+it changes is behaviour the CLI passes through:
 
 - **`tags list` counts are live.** A tag's `count` now comes from the same
   resolution `/items` uses, so a tag whose carriers are gone reads 0 rather than

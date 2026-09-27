@@ -856,8 +856,8 @@ ok "maps list --limit bounds the page"
 
 # The two orders are distinguishable on the fixtures: by path the caves map comes
 # last (maps/battlemaps/* before maps/battlemaps/caves/*), by filename it comes
-# second. An unknown value is a 422 the CLI refuses first, so this proves the
-# parameter reaches the query string rather than that the server has a default.
+# second. Asserting both is what proves the flag reaches the query string — a
+# --sort that sent nothing would return the path order and fail the first check.
 "$CLI" maps list --sort name >"$WORK/maps-sort.out" 2>&1 \
   || fail "maps list --sort exited non-zero"
 jq -e '[.maps[].filename] == ["Crossroads.png", "Deep Cave.png", "Tavern.png"]' \
@@ -1065,8 +1065,8 @@ grep -q "is_suported" "$WORK/modeltypo.err" || fail "no offending field named: $
 ok "models update refuses an unknown field before any request"
 
 # ---- tokens -----------------------------------------------------------------
-# Requires docker/seed.sh to have run — two fixture tokens: Goblin.png directly
-# under Monsters, and Skeleton.png under Monsters/Undead.
+# Requires docker/seed.sh to have run — three fixture tokens: Goblin.png directly
+# under Monsters, and Ghoul.png and Skeleton.png under Monsters/Undead.
 "$CLI" tokens list >"$WORK/tokens.out" 2>"$WORK/tokens.err" \
   || { cat "$WORK/tokens.err" >&2; fail "tokens list exited non-zero"; }
 jq -e '.total >= 2 and (.tokens | length) >= 2' "$WORK/tokens.out" >/dev/null \
