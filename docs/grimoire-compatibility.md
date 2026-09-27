@@ -6,12 +6,14 @@
 |---|---|---|
 | 0.1.x | 1.5.6 | initial support, maintained on `support/grimoire-1.5.6` |
 | 0.2.x | 1.6.2 | superseded by 0.3.x |
-| 0.3.x | 1.7.0 – 1.7.2 | current, on `main` |
+| 0.3.x | 1.7.0 – 1.7.1 | last release for that line; no support branch |
+| unreleased | 1.7.2 | current, on `main` |
 
 **The floor rises only when something forces it**, not on every server release.
 Each row above records a pairing that was necessary at the time — 1.5.6 → 1.6.0
 because the 1.6.x line changed the token lifetime and made the library writable,
-1.7.0 because the CLI now offers a flag older servers silently drop (below).
+1.7.0 and then 1.7.2 because each added a flag older servers silently drop
+(below).
 Absent a reason like that, a bump raises `MaxTestedVersion` and leaves the floor
 where it is. Whoever stays on Grimoire 1.5.6 stays on grimoire-cli `0.1.x`, which
 is maintained on `support/grimoire-1.5.6` — fixes are made and released there,
@@ -23,7 +25,7 @@ an older Grimoire does not know is dropped by Pydantic rather than rejected, so
 the command answers 200 and does nothing — the one failure the version warning
 exists to catch.
 
-`main` targets Grimoire 1.7.0. Reaching 1.6.0 was more than a version bump: it
+`main` targets Grimoire 1.7.2. Reaching 1.6.0 was more than a version bump: it
 shortened the access token from 30 days to 30 minutes and made the library
 writable, which is why the CLI renews its own session
 ([authentication.md](authentication.md)) and why the `files` endpoints exist at
@@ -110,9 +112,10 @@ one query parameter, both optional, so 1.7.0, 1.7.1 and 1.7.2 are all in range:
 - **A quoted phrase is one FTS token**, so `"lucky feat"` and `text:"lucky
   feat"` are phrase searches rather than an implicit AND. Same query, different
   hits, across this upgrade.
-- **`GET /api/maps` and `GET /api/tokens` take `sort=path|name`.** Unexposed —
-  a `--sort` flag is what forces a floor, and `path` (the default, and what both
-  commands already get) is the order the CLI has always returned.
+- **`GET /api/maps` and `GET /api/tokens` take `sort=path|name`**, carried by
+  `maps list --sort` and `tokens list --sort`. Omitting the flag sends no
+  parameter and leaves the server on `path`, the order the CLI has always
+  returned. This is the flag that moved the floor (below).
 - **Map and token thumbnails survive a rename.** Both routes now fall back to
   the path hash when the filename-derived name misses, instead of 404ing for an
   image that is on disk.
@@ -120,10 +123,17 @@ one query parameter, both optional, so 1.7.0, 1.7.1 and 1.7.2 are all in range:
   `addons list` reports `update_available: false` and omits the entry from
   `available_in` where the build in the index requires a server past this one.
 
+**`MinSupportedVersion` moved to 1.7.2 for one reason: `--sort`.** Same shape as
+the 1.7.0 move. `sort` is an unknown query parameter on 1.7.0 and 1.7.1, and
+FastAPI ignores it rather than refusing the request, so `--sort name` there
+answers 200 with path-ordered rows — the silent no-op the floor warning exists
+to catch. Nothing else in 1.7.2 needed a floor: `product_code` rides the
+generated body model, and every other command still reaches 1.7.0.
+
 ## Runtime check
 
 `src/GrimoireCli/Api/GrimoireApiClient.cs` defines `MinSupportedVersion` and
-`MaxTestedVersion`, currently `"1.7.0"` and `"1.7.2"`. A check runs before the first
+`MaxTestedVersion`, currently `"1.7.2"` and `"1.7.2"`. A check runs before the first
 request of any command, calling `GET /api/about` and comparing the reported
 version against that range. It is throttled to once every 24 hours — a
 config with a recent `lastVersionCheck` skips the probe entirely — and
