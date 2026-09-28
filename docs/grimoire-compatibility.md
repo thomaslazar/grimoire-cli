@@ -53,8 +53,8 @@ fifth collection alongside books, maps, tokens and audio.
 - **The add-on index is a list.** `addons list` and `addons settings` answer with
   `index_urls` alongside the singular `index_url`, and each entry carries
   `available_in`, `changelog` and `source_url`. `addons refresh` reports
-  per-index `errors`. Setting more than one index, choosing which to install
-  from, and `GET /api/addons/verify-index` are unimplemented.
+  per-index `errors`. Setting more than one index and choosing which to install
+  from are unimplemented.
 - **`search` hits carry `variants`**, and `GET /api/changelog` and the map VTT
   authoring routes are new and unimplemented.
 
