@@ -1,4 +1,5 @@
 using System.CommandLine;
+using GrimoireCli.Api;
 using GrimoireCli.Output;
 using GrimoireCli.Services;
 
@@ -12,6 +13,7 @@ public static class SidecarsCommand
     {
         var command = new Command("sidecars", "Read and write metadata sidecar files beside each book");
         command.Subcommands.Add(CreateSettingsCommand());
+        command.Subcommands.Add(CreateExportCommand());
         return command;
     }
 
@@ -87,6 +89,38 @@ public static class SidecarsCommand
                 parseResult.GetValue(overwriteForeignOption));
             ConsoleOutput.WriteRawJson(result);
             return 0;
+        });
+        return command;
+    }
+
+    private static Command CreateExportCommand()
+    {
+        var command = new Command("export", "Backfill metadata sidecars for books that have none");
+        command.AddRoleRequired("admin");
+        command.AddHelpSection("Notes", HelpSectionPosition.Top,
+            "Writes only the sidecars that are missing and never rewrites one that",
+            "exists. No need to re-run after a metadata sweep: an edit",
+            "refreshes a book's existing sidecars on its own, and the scanner",
+            "writes them for new books.",
+            "",
+            "Books only — maps, tokens, audio and models get nothing.",
+            "",
+            "400 until a format is enabled: grimoire-cli sidecars settings set.",
+            "409 while a library scan is running. Runs inline, so there is no",
+            "status to poll.",
+            "",
+            "read_only true means the library mount is not writable.",
+            "",
+            "Exit 3 when errors is non-empty; stdout still carries the full JSON.");
+        command.AddExamples("grimoire-cli sidecars export");
+        command.AddResponseExample<Generated.Models.SidecarExportResponse>();
+        command.SetAction(async (parseResult, cancellationToken) =>
+        {
+            var (client, _) = CommandHelper.BuildClient();
+            var service = new SidecarsService(client);
+            var result = await service.ExportAsync();
+            ConsoleOutput.WriteRawJson(result);
+            return BulkExit.CodeFor(GrimoireApiClient.HasItems(result, "errors"));
         });
         return command;
     }

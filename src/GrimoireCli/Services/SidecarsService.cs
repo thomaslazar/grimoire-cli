@@ -38,4 +38,14 @@ public class SidecarsService
             _client.Api.Api.Maintenance.Sidecars.Settings.ToPutRequestInformation(body),
             permissionHint: AdminHint);
     }
+
+    /// <summary>
+    /// POST /api/maintenance/sidecars/export. Runs inline rather than in the
+    /// background, so the response carries the per-item outcome instead of a
+    /// status to poll. 400 when no format is enabled, 409 while a scan runs.
+    /// </summary>
+    public async Task<string> ExportAsync()
+        => await _client.SendAsync(
+            _client.Api.Api.Maintenance.Sidecars.Export.ToPostRequestInformation(),
+            permissionHint: AdminHint);
 }

@@ -76,4 +76,44 @@ public class SidecarsCommandTests
         Assert.Contains("Replaces the whole settings object", output);
         Assert.Contains("set false", output);
     }
+
+    [Fact]
+    public void ExportDeclaresTheAdminRole()
+    {
+        Assert.Contains("Role required:\n  admin\n", Help(["sidecars", "export"]));
+    }
+
+    [Fact]
+    public void ExportTakesNoOptions()
+    {
+        Assert.NotEmpty(SidecarsCommand.Create().Parse(["export", "--formats", "opf"]).Errors);
+    }
+
+    // The backfill is additive and the route cannot override that, so a caller
+    // expecting it to refresh stale sidecars would be wrong.
+    [Fact]
+    public void ExportSaysItNeverRewritesAnExistingSidecar()
+    {
+        var output = Help(["sidecars", "export"]);
+        Assert.Contains("only the sidecars that are missing", output);
+        Assert.Contains("never rewrites", output);
+    }
+
+    // Answers "do I re-run this after a metadata sweep?" — no.
+    [Fact]
+    public void ExportSaysEditsAndNewBooksMaintainThemselves()
+    {
+        Assert.Contains("refreshes a book's existing sidecars on its own", Help(["sidecars", "export"]));
+    }
+
+    [Fact]
+    public void ExportDocumentsItsRefusalsAndScope()
+    {
+        var output = Help(["sidecars", "export"]);
+        Assert.Contains("400 until a format is enabled", output);
+        Assert.Contains("409 while a library scan is running", output);
+        Assert.Contains("Books only", output);
+        Assert.Contains("read_only", output);
+        Assert.Contains("Exit 3", output);
+    }
 }

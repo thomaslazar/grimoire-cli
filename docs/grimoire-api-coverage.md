@@ -27,7 +27,7 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | library | 4 / 7 |
 | logs | 1 / 1 |
 | lookups | 15 / 15 |
-| maintenance | 3 / 5 |
+| maintenance | 4 / 5 |
 | maps | 14 / 16 |
 | models | 10 / 10 |
 | saved-filters | 0 / 4 |
@@ -39,7 +39,7 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | token-frames | 0 / 2 |
 | tokens | 10 / 10 |
 | users | 0 / 16 |
-| **Total** | **149 / 309** |
+| **Total** | **150 / 309** |
 
 2 operation(s) are internal-only (🔒) and excluded from covered counts.
 
@@ -340,7 +340,7 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 |--------|------|-------------|------|-----|
 | GET | `/api/health` | Liveness/readiness probe |  | — |
 | POST | `/api/maintenance/cleanup-missing` | Remove DB entries for missing files | admin | `library cleanup-missing` ✅ |
-| POST | `/api/maintenance/sidecars/export` | Write metadata sidecars for the whole library | admin | — |
+| POST | `/api/maintenance/sidecars/export` | Write metadata sidecars for the whole library | admin | `sidecars export` ✅ |
 | GET | `/api/maintenance/sidecars/settings` | Read metadata sidecar export settings | admin | `sidecars settings get` ✅ |
 | PUT | `/api/maintenance/sidecars/settings` | Configure metadata sidecar export | admin | `sidecars settings set` ✅ |
 
