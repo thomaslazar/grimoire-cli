@@ -26,7 +26,7 @@ everything Grimoire holds.
 
 ## Next
 
-- **[sidecar export](https://github.com/thomaslazar/grimoire-cli/issues/47)** — makes a metadata sweep survive the instance, and closes a loop `library rescan --metadata-mode` already half-owns. One endpoint in practice; the settings behind it are a one-time UI action.
+Nothing at present.
 
 ## Later
 
