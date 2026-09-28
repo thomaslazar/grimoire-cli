@@ -854,6 +854,20 @@ jq -e '(.maps | length) == 1' "$WORK/maps-limit.out" >/dev/null \
   || fail "--limit 1 should return one row: $(cat "$WORK/maps-limit.out")"
 ok "maps list --limit bounds the page"
 
+# The two orders are distinguishable on the fixtures: by path the caves map comes
+# last (maps/battlemaps/* before maps/battlemaps/caves/*), by filename it comes
+# second. Asserting both is what proves the flag reaches the query string — a
+# --sort that sent nothing would return the path order and fail the first check.
+"$CLI" maps list --sort name >"$WORK/maps-sort.out" 2>&1 \
+  || fail "maps list --sort exited non-zero"
+jq -e '[.maps[].filename] == ["Crossroads.png", "Deep Cave.png", "Tavern.png"]' \
+  "$WORK/maps-sort.out" >/dev/null \
+  || fail "--sort name should order by filename: $(cat "$WORK/maps-sort.out")"
+jq -e '[.maps[].filename] == ["Crossroads.png", "Tavern.png", "Deep Cave.png"]' \
+  "$WORK/maps.out" >/dev/null \
+  || fail "the default should order by path: $(cat "$WORK/maps.out")"
+ok "maps list --sort name orders by filename, not by path"
+
 # The exact-match rule: --folder takes the folder part of relative_path, which
 # excludes the maps/ root — folder_path on a map under maps/battlemaps reads
 # "battlemaps", not "maps/battlemaps" (verified via maps get below). The child
@@ -1051,8 +1065,8 @@ grep -q "is_suported" "$WORK/modeltypo.err" || fail "no offending field named: $
 ok "models update refuses an unknown field before any request"
 
 # ---- tokens -----------------------------------------------------------------
-# Requires docker/seed.sh to have run — two fixture tokens: Goblin.png directly
-# under Monsters, and Skeleton.png under Monsters/Undead.
+# Requires docker/seed.sh to have run — three fixture tokens: Goblin.png directly
+# under Monsters, and Ghoul.png and Skeleton.png under Monsters/Undead.
 "$CLI" tokens list >"$WORK/tokens.out" 2>"$WORK/tokens.err" \
   || { cat "$WORK/tokens.err" >&2; fail "tokens list exited non-zero"; }
 jq -e '.total >= 2 and (.tokens | length) >= 2' "$WORK/tokens.out" >/dev/null \
@@ -1064,6 +1078,18 @@ ok "tokens list returns the seeded tokens"
 jq -e '(.tokens | length) == 1' "$WORK/tokens-limit.out" >/dev/null \
   || fail "--limit 1 should return one row: $(cat "$WORK/tokens-limit.out")"
 ok "tokens list --limit bounds the page"
+
+# Goblin sits in Monsters/, Ghoul and Skeleton in Monsters/Undead/, so path order
+# and filename order disagree — see the maps check above.
+"$CLI" tokens list --sort name >"$WORK/tokens-sort.out" 2>&1 \
+  || fail "tokens list --sort exited non-zero"
+jq -e '[.tokens[].filename] == ["Ghoul.png", "Goblin.png", "Skeleton.png"]' \
+  "$WORK/tokens-sort.out" >/dev/null \
+  || fail "--sort name should order by filename: $(cat "$WORK/tokens-sort.out")"
+jq -e '[.tokens[].filename] == ["Goblin.png", "Ghoul.png", "Skeleton.png"]' \
+  "$WORK/tokens.out" >/dev/null \
+  || fail "the default should order by path: $(cat "$WORK/tokens.out")"
+ok "tokens list --sort name orders by filename, not by path"
 
 TOKEN_ID=$(jq -r '.tokens[] | select(.filename == "Goblin.png") | .id' "$WORK/tokens.out")
 [ -n "$TOKEN_ID" ] || fail "no Goblin.png fixture id: $(cat "$WORK/tokens.out")"

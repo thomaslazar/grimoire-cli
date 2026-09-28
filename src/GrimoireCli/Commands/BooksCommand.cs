@@ -264,7 +264,7 @@ public static class BooksCommand
             "",
             "books get reports ocr_pages_skipped: above 0 the book is indexed but",
             "only partly searchable, those pages having timed out. Re-running resets",
-            "the count and retries them. Requires Grimoire 1.7.1.");
+            "the count and retries them.");
         command.AddExamples("grimoire-cli books reindex --id <book-id>");
         command.SetAction(async (parseResult, cancellationToken) =>
         {

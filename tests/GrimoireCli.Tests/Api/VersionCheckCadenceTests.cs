@@ -34,7 +34,7 @@ public class VersionCheckCadenceTests
 
     [Fact]
     public void AnInRangeVersionWarnsAboutNothing()
-        => Assert.Null(GrimoireApiClient.VersionWarning("1.7.0", previous: "1.7.0"));
+        => Assert.Null(GrimoireApiClient.VersionWarning("1.7.2", previous: "1.7.2"));
 
     [Fact]
     public void AnUnknownVersionWarnsAboutNothing()
@@ -62,6 +62,16 @@ public class VersionCheckCadenceTests
         Assert.Contains("older", warning);
     }
 
+    // 1.7.1 is below the floor as of --sort, and the warning is what tells an
+    // operator their maps list --sort name was silently ignored.
+    [Fact]
+    public void TheLastPreSortServerIsBelowTheFloor()
+    {
+        var warning = GrimoireApiClient.VersionWarning("1.7.1", previous: null);
+        Assert.NotNull(warning);
+        Assert.Contains("older", warning);
+    }
+
     // The operator's real signal is that the server moved, so say so.
     [Fact]
     public void AChangedVersionSaysItMoved()
@@ -76,7 +86,7 @@ public class VersionCheckCadenceTests
     // An unchanged in-range version stays silent even across checks.
     [Fact]
     public void AnUnchangedInRangeVersionStaysSilent()
-        => Assert.Null(GrimoireApiClient.VersionWarning("1.7.0", previous: "1.7.0"));
+        => Assert.Null(GrimoireApiClient.VersionWarning("1.7.2", previous: "1.7.2"));
 
     // The bug this fixes: "nightly" parsed as 0.0.0 and so read as older than the
     // minimum supported version, which is a claim the string does not support.

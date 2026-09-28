@@ -266,7 +266,7 @@ grimoire-cli config set server https://grimoire.example.com
 | `files folder markers --path <path> [--container-kind <kind>] [--nsfw true\|false] [--frames-container true\|false]` | Set a folder's container/NSFW/frame markers (admin) |
 | `files folder scaffold --path <path>` | Create the standard category folders (admin) |
 | `files folder contents --path <path>` | Report whether a folder holds content (admin) |
-| `maps list [--map-type <t>] [--folder <path>] [--limit <n>] [--offset <n>]` | List maps (defaults to 100 results) |
+| `maps list [--map-type <t>] [--folder <path>] [--limit <n>] [--offset <n>] [--sort <path\|name>]` | List maps (defaults to 100 results) |
 | `maps get --id <id>` | Get one map, with its detected grid and any manual override |
 | `maps thumbnail --id <id> --output <path\|->` | Download a map's scan-generated thumbnail |
 | `maps file --id <id> --output <path\|->` | Download the map file as stored |
@@ -290,7 +290,7 @@ grimoire-cli config set server https://grimoire.example.com
 | `models folders list` | List tagged model folders |
 | `models folders set {--input <file> \| --stdin}` | Replace one model folder's tags (gm or admin) |
 | `models folders batch-set {--input <file> \| --stdin}` | Set tags on many model folders in one transaction (gm or admin) |
-| `tokens list [--limit <n>] [--offset <n>]` | List tokens (defaults to 100 results) |
+| `tokens list [--limit <n>] [--offset <n>] [--sort <path\|name>]` | List tokens (defaults to 100 results) |
 | `tokens get --id <id>` | Get one token |
 | `tokens thumbnail --id <id> --output <path\|->` | Download a token's rendered thumbnail |
 | `tokens file --id <id> --output <path\|->` | Download the token image as stored |
@@ -421,7 +421,7 @@ Verified API behaviour worth reading before designing a command: [docs/grimoire-
 
 ## Compatibility
 
-Requires Grimoire **v1.7.0 – v1.7.2**. The CLI warns on login if the server reports anything else. See [docs/grimoire-compatibility.md](docs/grimoire-compatibility.md) for the version matrix and the bump procedure.
+Requires Grimoire **v1.7.2**. The CLI warns on login if the server reports anything else. See [docs/grimoire-compatibility.md](docs/grimoire-compatibility.md) for the version matrix and the bump procedure.
 
 ## License
 
