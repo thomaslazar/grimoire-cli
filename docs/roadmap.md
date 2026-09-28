@@ -26,13 +26,11 @@ everything Grimoire holds.
 
 ## Next
 
+- **[sidecar export](https://github.com/thomaslazar/grimoire-cli/issues/47)** — makes a metadata sweep survive the instance, and closes a loop `library rescan --metadata-mode` already half-owns. One endpoint in practice; the settings behind it are a one-time UI action.
+
 ## Later
 
-Decided, but not next.
-
-- **[book reading](https://github.com/thomaslazar/grimoire-cli/issues/46)** — `toc`, page text, page words. Serves "look up the relevant section and explain it to me" rather than library management: a different axis, and cheap whenever it is wanted.
-- **[sidecar export](https://github.com/thomaslazar/grimoire-cli/issues/47)** — makes a metadata sweep survive the instance, and closes a loop `library rescan --metadata-mode` already half-owns. One endpoint in practice; the settings behind it are a one-time UI action.
-- **[remaining binary endpoints](https://github.com/thomaslazar/grimoire-cli/issues/48)** — book file, page render, and the archive download that can export a tag-scoped slice of the library in one call.
+Decided, but not next. Nothing at present.
 
 ## Open questions
 
@@ -41,3 +39,4 @@ Not intended work — decisions to make before any of it could be.
 - **[Per-user state](https://github.com/thomaslazar/grimoire-cli/issues/49)** — favorites, bookmarks, saved filters. A human's UI state; an agent writing to it either pollutes a real person's view or writes into a void.
 - **[Administration](https://github.com/thomaslazar/grimoire-cli/issues/50)** — users, the rest of auth, themes, settings. A different product from library management.
 - **[Campaigns](https://github.com/thomaslazar/grimoire-cli/issues/51)** — 91 operations, 30% of the API. The linking half touches the library; the play side is a separate tool.
+- **[VTT authoring geometry](https://github.com/thomaslazar/grimoire-cli/issues/70)** — the map routes that write walls, doors and lights. Reading a `.uvtt` already works; authoring one is map editing, not cataloguing.
