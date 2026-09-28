@@ -145,16 +145,20 @@ failures, 0 otherwise, with the full JSON still on stdout. It is the same
 situation the five endpoints already sharing that rule face — HTTP 200, some
 items did not land.
 
-It keys on `errors`, not on `failed`, because `GrimoireApiClient.HasItems` tests
-a non-empty array and `failed` is an integer here. The two are equivalent:
-`_record_failure` (`metadata/export.py:158-171`) increments `failed` and appends
-to `errors` in the same breath, so the first failure always lands a message.
-`errors` is deduplicated and capped at 20 entries, which does not affect the
-test — a capped list is still non-empty. This needs no new helper.
+It keys on `failed`, not on `errors`. The two are **not** equivalent:
+`export_book` (`metadata/export.py:220-230`) appends to `errors` both when
+`_record_failure` runs and when a sidecar is **skipped as foreign** — the
+comment there says explicitly that a foreign skip is a report, not a failure.
+So a library with hand-maintained `.opf` files can finish a fully successful
+backfill with `failed: 0`, a non-empty `errors`, and — under the wrong rule —
+a wrongly-nonzero exit code. `GrimoireApiClient.HasItems` tests a non-empty
+array and cannot read `failed`, which is a plain integer, so this needs a
+second helper (`IsPositive`) beside it.
 
 Skips are not failures. `skipped_foreign` is the server correctly declining to
 overwrite a hand-maintained `.opf`, and `skipped_missing` is a row whose file is
-gone; both leave the exit code at 0.
+gone; both leave `failed`, and so the exit code, at 0 — even though a foreign
+skip still lands a message in `errors`.
 
 ### Help text
 

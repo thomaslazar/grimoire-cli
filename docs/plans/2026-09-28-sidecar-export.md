@@ -491,8 +491,9 @@ git commit -m "feat: add sidecars settings set"
 
 **Interfaces:**
 - Consumes: `SidecarsService` and its `AdminHint` constant; `SidecarsCommand.Create()`.
-- Consumes: `BulkExit.CodeFor(bool hasFailures)` from `src/GrimoireCli/Commands/BulkExit.cs`, and `GrimoireApiClient.HasItems(string json, string property)`, which reports whether a top-level array property has at least one element.
+- Consumes: `BulkExit.CodeFor(bool hasFailures)` from `src/GrimoireCli/Commands/BulkExit.cs`.
 - Produces: `SidecarsService.ExportAsync()` returning `Task<string>`.
+- Produces: `GrimoireApiClient.IsPositive(string json, string property)` beside `HasItems`, reporting whether a top-level numeric property is above zero — `failed` is a count, not a list, so `HasItems` cannot read it.
 
 - [ ] **Step 1: Write the failing tests**
 
@@ -598,7 +599,8 @@ Then add the method:
             "",
             "read_only true means the library mount is not writable.",
             "",
-            "Exit 3 when errors is non-empty; stdout still carries the full JSON.");
+            "Exit 3 when failed is above 0; a foreign skip alone leaves it at 0.",
+            "stdout still carries the full JSON either way.");
         command.AddExamples("grimoire-cli sidecars export");
         command.AddResponseExample<Generated.Models.SidecarExportResponse>();
         command.SetAction(async (parseResult, cancellationToken) =>
@@ -607,13 +609,20 @@ Then add the method:
             var service = new SidecarsService(client);
             var result = await service.ExportAsync();
             ConsoleOutput.WriteRawJson(result);
-            return BulkExit.CodeFor(GrimoireApiClient.HasItems(result, "errors"));
+            return BulkExit.CodeFor(GrimoireApiClient.IsPositive(result, "failed"));
         });
         return command;
     }
 ```
 
-`HasItems` tests a non-empty array, and the response's `failed` is an integer, so the exit code keys on `errors`. The two are equivalent: the server increments `failed` and appends to `errors` in the same function, so the first failure always lands a message.
+`errors` and `failed` are **not** equivalent: `export_book`
+(`metadata/export.py:220-230`) appends to `errors` both on a real failure and
+when a sidecar is skipped as foreign, and the server's own comment there calls
+a foreign skip a report, not a failure. Keying on `HasItems(result, "errors")`
+would therefore exit 3 on a fully successful backfill over a library that
+already has hand-maintained `.opf` files — exactly the library this feature
+targets. The exit code must key on `failed`, a plain integer, so this needs a
+new `GrimoireApiClient.IsPositive(json, property)` helper beside `HasItems`.
 
 Add `using GrimoireCli.Api;` to the file's using block if `GrimoireApiClient` is not already in scope.
 

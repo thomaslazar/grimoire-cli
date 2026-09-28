@@ -11,7 +11,7 @@ public static class SidecarsCommand
 
     public static Command Create()
     {
-        var command = new Command("sidecars", "Read and write metadata sidecar files beside each book");
+        var command = new Command("sidecars", "Configure and backfill metadata sidecar files beside each book");
         command.Subcommands.Add(CreateSettingsCommand());
         command.Subcommands.Add(CreateExportCommand());
         return command;
@@ -63,7 +63,7 @@ public static class SidecarsCommand
         var coversOption = new Option<bool>("--covers") { Description = "Write the cover image beside the metadata file" };
         var overwriteForeignOption = new Option<bool>("--overwrite-foreign")
         {
-            Description = "Allow a backfill to replace sidecars Grimoire did not write",
+            Description = "With --covers, replace a foreign cover; sidecar files are never rewritten",
         };
         var command = new Command("set", "Configure which sidecar formats are written")
         {
@@ -74,7 +74,11 @@ public static class SidecarsCommand
             "Replaces the whole settings object: an omitted --covers or",
             "--overwrite-foreign is set false.",
             "",
-            "--overwrite-foreign lets a backfill replace hand-maintained .opf files.");
+            "--overwrite-foreign only affects export's --covers: a foreign cover can",
+            "be replaced. Metadata sidecar files are never rewritten by export,",
+            "regardless of this setting.",
+            "",
+            "--formats is required, so sidecar export cannot be disabled from the CLI.");
         command.AddExamples(
             "grimoire-cli sidecars settings set --formats opf",
             "grimoire-cli sidecars settings set --formats opf json --covers");
@@ -111,7 +115,8 @@ public static class SidecarsCommand
             "",
             "read_only true means the library mount is not writable.",
             "",
-            "Exit 3 when errors is non-empty; stdout still carries the full JSON.");
+            "Exit 3 when failed is above 0; a foreign skip alone leaves it at 0.",
+            "stdout still carries the full JSON either way.");
         command.AddExamples("grimoire-cli sidecars export");
         command.AddResponseExample<Generated.Models.SidecarExportResponse>();
         command.SetAction(async (parseResult, cancellationToken) =>
@@ -120,7 +125,7 @@ public static class SidecarsCommand
             var service = new SidecarsService(client);
             var result = await service.ExportAsync();
             ConsoleOutput.WriteRawJson(result);
-            return BulkExit.CodeFor(GrimoireApiClient.HasItems(result, "errors"));
+            return BulkExit.CodeFor(GrimoireApiClient.IsPositive(result, "failed"));
         });
         return command;
     }

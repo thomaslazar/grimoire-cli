@@ -1400,16 +1400,23 @@ set -e
 [ "$rc" -eq 1 ] || fail "settings set without --formats should exit 1, got $rc"
 ok "sidecars settings set refuses to run without --formats"
 
-# Asserted on shape and failed, never on written: the backfill is additive, so a
-# second run of this script writes nothing and a count assertion would not
-# converge.
-"$CLI" sidecars export >"$WORK/sidecars-export.out" 2>&1 \
-  || fail "sidecars export exited non-zero: $(cat "$WORK/sidecars-export.out")"
-jq -e 'has("written") and has("skipped_foreign") and has("skipped_missing")
-       and has("covers") and has("read_only") and (.failed == 0) and (.errors == [])' \
+# The fixture library carries one hand-maintained sidecar (docker/seed.sh,
+# Honey Heist.opf) that Grimoire correctly declines to overwrite: it lands in
+# skipped_foreign and in errors, with failed staying 0. That must exit 0, not
+# 3 — a foreign skip is a report, not a failure (metadata/export.py:220-230).
+# Asserted on shape, failed and the exit code, never on written or an exact
+# skipped_foreign count: the backfill is additive, so a second run of this
+# script writes nothing new, but the foreign sidecar stays foreign forever.
+set +e
+"$CLI" sidecars export >"$WORK/sidecars-export.out" 2>"$WORK/sidecars-export.err"; rc=$?
+set -e
+[ "$rc" -eq 0 ] \
+  || { cat "$WORK/sidecars-export.err" >&2; fail "sidecars export should exit 0 when it only skips a foreign sidecar, got $rc: $(cat "$WORK/sidecars-export.out")"; }
+jq -e 'has("written") and has("skipped_missing") and has("covers") and has("read_only")
+       and (.failed == 0) and (.skipped_foreign > 0)' \
   "$WORK/sidecars-export.out" >/dev/null \
-  || fail "sidecars export should report a clean run: $(cat "$WORK/sidecars-export.out")"
-ok "sidecars export backfills without failures"
+  || fail "sidecars export should report a clean run with a foreign sidecar skipped: $(cat "$WORK/sidecars-export.out")"
+ok "sidecars export exits 0 when it only skips a foreign sidecar"
 
 # --- addons ---------------------------------------------------------------
 # Installs from a local fixture index rather than the published community one:
