@@ -1374,6 +1374,50 @@ echo "$CLEANUP_JSON" | jq -e '[.removed[]] | add == 0' >/dev/null \
   || fail "a second cleanup should find nothing left to remove: $CLEANUP_JSON"
 ok "a second library cleanup-missing removes nothing"
 
+# ---- sidecars ---------------------------------------------------------------
+# Enabling a format is what switches on export, the refresh-on-edit hook and the
+# export-on-scan hook together. It cannot be switched off again from the CLI, so
+# this section leaves the fixture library with .opf files; the documented reset
+# removes them along with the library tree.
+"$CLI" sidecars settings get >"$WORK/sidecars-settings.out" 2>"$WORK/sidecars-settings.err" \
+  || { cat "$WORK/sidecars-settings.err" >&2; fail "sidecars settings get exited non-zero"; }
+jq -e 'has("formats") and has("covers") and has("overwrite_foreign")' \
+  "$WORK/sidecars-settings.out" >/dev/null \
+  || fail "sidecars settings get should carry the three fields: $(cat "$WORK/sidecars-settings.out")"
+ok "sidecars settings get reads the export configuration"
+
+"$CLI" sidecars settings set --formats opf >"$WORK/sidecars-set.out" 2>&1 \
+  || fail "sidecars settings set exited non-zero"
+jq -e '.formats == ["opf"]' "$WORK/sidecars-set.out" >/dev/null \
+  || fail "settings set should echo the stored formats: $(cat "$WORK/sidecars-set.out")"
+ok "sidecars settings set enables a format"
+
+# --formats is required precisely so this cannot send an empty list and switch
+# the whole feature off.
+set +e
+"$CLI" sidecars settings set --covers >/dev/null 2>"$WORK/sidecars-noformats.err"; rc=$?
+set -e
+[ "$rc" -eq 1 ] || fail "settings set without --formats should exit 1, got $rc"
+ok "sidecars settings set refuses to run without --formats"
+
+# The fixture library carries one hand-maintained sidecar (docker/seed.sh,
+# Honey Heist.opf) that Grimoire correctly declines to overwrite: it lands in
+# skipped_foreign and in errors, with failed staying 0. That must exit 0, not
+# 3 — a foreign skip is a report, not a failure (metadata/export.py:220-230).
+# Asserted on shape, failed and the exit code, never on written or an exact
+# skipped_foreign count: the backfill is additive, so a second run of this
+# script writes nothing new, but the foreign sidecar stays foreign forever.
+set +e
+"$CLI" sidecars export >"$WORK/sidecars-export.out" 2>"$WORK/sidecars-export.err"; rc=$?
+set -e
+[ "$rc" -eq 0 ] \
+  || { cat "$WORK/sidecars-export.err" >&2; fail "sidecars export should exit 0 when it only skips a foreign sidecar, got $rc: $(cat "$WORK/sidecars-export.out")"; }
+jq -e 'has("written") and has("skipped_missing") and has("covers") and has("read_only")
+       and (.failed == 0) and (.skipped_foreign > 0)' \
+  "$WORK/sidecars-export.out" >/dev/null \
+  || fail "sidecars export should report a clean run with a foreign sidecar skipped: $(cat "$WORK/sidecars-export.out")"
+ok "sidecars export exits 0 when it only skips a foreign sidecar"
+
 # --- addons ---------------------------------------------------------------
 # Installs from a local fixture index rather than the published community one:
 # pointing the smoke test at the real index would make every PR build depend

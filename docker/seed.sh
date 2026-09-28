@@ -103,6 +103,21 @@ mkdir -p "$LIBRARY/books/one-page-rpgs"
 python3 "$HERE/make-fixtures.py" "$LIBRARY/books/one-page-rpgs/Lasers and Feelings.pdf" 1
 python3 "$HERE/make-fixtures.py" "$LIBRARY/books/one-page-rpgs/Honey Heist.pdf" 1
 
+# A hand-maintained .opf beside one book, written after the book fixture so a
+# re-seed always restores it. It carries none of Grimoire's own sidecar
+# marker (metadata/formats.py: is_grimoire_generated), so it stays foreign
+# forever — this is what the smoke test's sidecars export section asserts
+# skipped_foreign against.
+cat > "$LIBRARY/books/one-page-rpgs/Honey Heist.opf" <<'OPF'
+<?xml version="1.0" encoding="UTF-8"?>
+<package>
+  <metadata>
+    <title>Honey Heist (hand-maintained, not written by Grimoire)</title>
+  </metadata>
+</package>
+OPF
+say "wrote a hand-maintained (non-Grimoire) sidecar for Honey Heist"
+
 EXPECTED_BOOKS=17
 say "wrote $EXPECTED_BOOKS fixture books"
 

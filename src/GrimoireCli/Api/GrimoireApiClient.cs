@@ -181,6 +181,26 @@ public class GrimoireApiClient
     }
 
     /// <summary>
+    /// Whether a top-level numeric property is above zero. The sidecar export
+    /// endpoint reports its failure count this way — <c>failed</c> is a count,
+    /// not a list, so <see cref="HasItems"/> cannot read it.
+    /// </summary>
+    internal static bool IsPositive(string json, string property)
+    {
+        try
+        {
+            using var doc = JsonDocument.Parse(json);
+            return doc.RootElement.TryGetProperty(property, out var el)
+                   && el.ValueKind == JsonValueKind.Number
+                   && el.GetDouble() > 0;
+        }
+        catch (JsonException)
+        {
+            return false;
+        }
+    }
+
+    /// <summary>
     /// Whether a body is JSON, or empty. A 204 or other bodiless success is
     /// legitimate and parses as nothing. Pure so both branches are testable —
     /// <see cref="EnsureJson"/> cannot be, because it exits.

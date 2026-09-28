@@ -34,6 +34,7 @@ public class ResponseShapeExitCodeAlignmentTests
             (AudioCommand.Create(), ["audio", "batch-tag"], "errors"),
             (AddonsCommand.Create(), ["addons", "upgrade-all"], "failed"),
             (LibraryCommand.Create(), ["library", "rescan"], "status"),
+            (SidecarsCommand.Create(), ["sidecars", "export"], "failed"),
         };
         foreach (var (command, path, property) in cases)
         {

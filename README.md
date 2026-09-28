@@ -257,6 +257,9 @@ grimoire-cli config set server https://grimoire.example.com
 | `backups download --id <backup-id> --output <path\|->` | Download one archive as zip; `-` for stdout (admin) |
 | `backups settings get` | Read the backup schedule and retention settings (admin) |
 | `backups settings set [--schedule off\|hourly\|daily\|weekly] [--hour <0-23>] [--minute <0-59>] [--weekday <0-6>] [--retention-count <n>] [--retention-gb <n>] [--dir <path>]` | Configure the schedule and retention (admin) |
+| `sidecars settings get` | Read the sidecar export configuration (admin) |
+| `sidecars settings set --formats <f...> [--covers] [--overwrite-foreign]` | Configure which sidecar formats are written (admin) |
+| `sidecars export` | Backfill metadata sidecars for books that have none (admin) |
 | `files browse [--path <path>] [--limit <1-2000>]` | List a library folder, merged with indexing state (admin) |
 | `files upload --destination <path> --file <path> [--relative-dir <path>] [--on-conflict skip\|rename]` | Upload one file; loop for many (admin) |
 | `files move --sources <path>... --destination <path> [--on-conflict skip\|rename]` | Move files or folders, keeping their metadata (admin) |

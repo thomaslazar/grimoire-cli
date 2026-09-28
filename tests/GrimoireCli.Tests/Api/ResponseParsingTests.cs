@@ -32,6 +32,15 @@ public class ResponseParsingTests
         => Assert.Equal(expected, GrimoireApiClient.HasItems(json, property));
 
     [Theory]
+    [InlineData("{\"failed\":1}", "failed", true)]
+    [InlineData("{\"failed\":0}", "failed", false)]
+    [InlineData("{}", "failed", false)]
+    [InlineData("{\"failed\":\"1\"}", "failed", false)]
+    [InlineData("not json at all", "failed", false)]
+    public void IsPositive_ReportsWhetherNumericPropertyIsAboveZero(string json, string property, bool expected)
+        => Assert.Equal(expected, GrimoireApiClient.IsPositive(json, property));
+
+    [Theory]
     [InlineData("{\"a\":1}", true)]
     [InlineData("[1,2,3]", true)]
     [InlineData("", true)]
