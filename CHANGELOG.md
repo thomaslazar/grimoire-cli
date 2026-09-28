@@ -3,6 +3,61 @@
 All notable changes to grimoire-cli are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## v0.3.1 — 2026-09-28
+
+A compatibility release. Grimoire 1.7.2 is now the supported server, and the one
+query parameter it added reaches the CLI as a flag — which is what moves the
+floor, since older servers accept the flag and quietly ignore it.
+
+### Highlights
+
+- **`maps list --sort` and `tokens list --sort`.** Grimoire 1.7.2 added
+  `sort=path|name` to both endpoints, and the CLI carries it. `path`, the
+  default, orders by `relative_path`, so a page is a contiguous run of folders;
+  `name` orders by filename across the whole tree. Omit the flag and nothing
+  changes — no parameter is sent, and the server's own default applies.
+- **The supported server is now 1.7.2 exactly, up from 1.7.0 – 1.7.1.** The new
+  parameter is unknown to 1.7.0 and 1.7.1, and FastAPI ignores an unrecognised
+  query parameter rather than refusing the request — so `--sort name` there
+  answers 200 with path-ordered rows. A silent no-op is the one failure the
+  version warning exists to catch, so the floor moved with the flag. Everything
+  else in the release reaches 1.7.0 unchanged; if you are on 1.7.0 or 1.7.1 and
+  do not need `--sort`, staying on 0.3.0 costs you nothing.
+- **`product_code` on books.** 1.7.2 adds the publisher's catalogue number
+  (`PZO9001`, `TSR 9247`) — the identifier most RPG PDFs carry instead of an
+  ISBN. It reads back on `books get`, `books list`, the book rows of
+  `systems get` and `search`, and `books update` / `books batch-update` accept
+  it, because the request body is validated against the generated model rather
+  than a hand-written field list.
+- **`search` gained `code:`.** Aliased `sku` and `product_code`, and a bare
+  query now matches the product code alongside title and filename. Matching
+  ignores spaces and hyphens on both sides, so `code:TSR9247` finds `TSR 9247`.
+- **A quoted phrase is now one search token.** `"lucky feat"` and
+  `text:"lucky feat"` are phrase searches rather than an implicit AND. Same
+  query, different hits, across this upgrade — server-side, nothing to opt into.
+
+### Features
+
+- feat: carry --sort on maps list and tokens list
+
+### Tests
+
+- test: assert --sort name orders maps and tokens by filename
+
+### Chores
+
+- chore: bump version to 0.3.1
+- chore: raise the supported grimoire floor to 1.7.2
+- chore: support grimoire 1.7.2
+
+### Docs
+
+- docs: drop the stale supported-range claim from the 1.7.2 section
+- docs: drop the stale verify-index unimplemented claim
+- docs: drop version annotations and stale fixture comments below the floor
+- docs: record the 0.3.1 and 1.7.2 pairing in the matrix
+- docs: repin the reference clone and image tag to 1.7.2 in CLAUDE.md
+
 ## v0.3.0 — 2026-09-21
 
 The release that completes library management. Every collection Grimoire holds

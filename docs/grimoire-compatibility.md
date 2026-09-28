@@ -6,8 +6,8 @@
 |---|---|---|
 | 0.1.x | 1.5.6 | initial support, maintained on `support/grimoire-1.5.6` |
 | 0.2.x | 1.6.2 | superseded by 0.3.x |
-| 0.3.x | 1.7.0 – 1.7.1 | last release for that line; no support branch |
-| unreleased | 1.7.2 | current, on `main` |
+| 0.3.0 | 1.7.0 – 1.7.1 | superseded by 0.3.1; no support branch |
+| 0.3.1 | 1.7.2 | current, on `main` |
 
 **The floor rises only when something forces it**, not on every server release.
 Each row above records a pairing that was necessary at the time — 1.5.6 → 1.6.0
