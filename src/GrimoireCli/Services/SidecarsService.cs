@@ -20,4 +20,22 @@ public class SidecarsService
         => await _client.SendAsync(
             _client.Api.Api.Maintenance.Sidecars.Settings.ToGetRequestInformation(),
             permissionHint: AdminHint);
+
+    /// <summary>
+    /// PUT /api/maintenance/sidecars/settings. A whole-object replace: the model
+    /// declares concrete defaults rather than Optional, so every field the body
+    /// omits is stored as false or empty.
+    /// </summary>
+    public async Task<string> SettingsSetAsync(string[] formats, bool covers, bool overwriteForeign)
+    {
+        var body = new Generated.Models.SidecarSettings
+        {
+            Formats = [.. formats],
+            Covers = covers,
+            OverwriteForeign = overwriteForeign,
+        };
+        return await _client.SendAsync(
+            _client.Api.Api.Maintenance.Sidecars.Settings.ToPutRequestInformation(body),
+            permissionHint: AdminHint);
+    }
 }

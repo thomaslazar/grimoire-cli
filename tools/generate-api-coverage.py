@@ -113,6 +113,7 @@ IMPLEMENTED = {
     "POST /api/cancel-scan": "`library cancel-scan` ✅",
     "POST /api/maintenance/cleanup-missing": "`library cleanup-missing` ✅",
     "GET /api/maintenance/sidecars/settings": "`sidecars settings get` ✅",
+    "PUT /api/maintenance/sidecars/settings": "`sidecars settings set` ✅",
     "GET /api/stats": "`library stats` ✅",
     "GET /api/addons": "`addons list` ✅",
     "POST /api/addons/refresh": "`addons refresh` ✅",
