@@ -53,6 +53,7 @@ rootCommand.Subcommands.Add(LibraryCommand.Create());
 rootCommand.Subcommands.Add(DownloadsCommand.Create());
 rootCommand.Subcommands.Add(AddonsCommand.Create());
 rootCommand.Subcommands.Add(BackupsCommand.Create());
+rootCommand.Subcommands.Add(SidecarsCommand.Create());
 rootCommand.Subcommands.Add(FilesCommand.Create());
 rootCommand.Subcommands.Add(MapsCommand.Create());
 rootCommand.Subcommands.Add(ModelsCommand.Create());

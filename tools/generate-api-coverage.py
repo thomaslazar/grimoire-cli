@@ -112,6 +112,7 @@ IMPLEMENTED = {
     "GET /api/scan-status": "`library scan-status` ✅",
     "POST /api/cancel-scan": "`library cancel-scan` ✅",
     "POST /api/maintenance/cleanup-missing": "`library cleanup-missing` ✅",
+    "GET /api/maintenance/sidecars/settings": "`sidecars settings get` ✅",
     "GET /api/stats": "`library stats` ✅",
     "GET /api/addons": "`addons list` ✅",
     "POST /api/addons/refresh": "`addons refresh` ✅",
