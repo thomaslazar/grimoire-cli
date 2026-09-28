@@ -206,10 +206,10 @@ Expected: build with 0 warnings and 0 errors; all tests pass.
 Find the Commands table section covering admin/maintenance verbs (near the `backups` rows). Add:
 
 ```markdown
-| `sidecars settings get` | Read the sidecar export configuration |
+| `sidecars settings get` | Read the sidecar export configuration (admin) |
 ```
 
-Match the surrounding rows' column layout exactly.
+Match the surrounding rows exactly, including the trailing `(admin)` in the description — every admin-gated row in that table carries it.
 
 - [ ] **Step 9: Update and regenerate the API coverage table**
 
@@ -444,7 +444,7 @@ Expected: 0 warnings, 0 errors, all tests pass.
 Add below the `sidecars settings get` row:
 
 ```markdown
-| `sidecars settings set --formats <f...> [--covers] [--overwrite-foreign]` | Configure which sidecar formats are written |
+| `sidecars settings set --formats <f...> [--covers] [--overwrite-foreign]` | Configure which sidecar formats are written (admin) |
 ```
 
 - [ ] **Step 7: Update and regenerate the API coverage table**
@@ -634,7 +634,7 @@ Expected: 0 warnings, 0 errors, all tests pass.
 Add below the `sidecars settings set` row:
 
 ```markdown
-| `sidecars export` | Backfill metadata sidecars for books that have none |
+| `sidecars export` | Backfill metadata sidecars for books that have none (admin) |
 ```
 
 - [ ] **Step 7: Update and regenerate the API coverage table**
