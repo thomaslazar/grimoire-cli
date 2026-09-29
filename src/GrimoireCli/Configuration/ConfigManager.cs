@@ -9,6 +9,13 @@ public class ConfigWriteException : Exception
     public ConfigWriteException(string message, Exception inner) : base(message, inner) { }
 }
 
+/// <summary>
+/// The config file in use and the tier that chose it: <c>env</c> for
+/// GRIMOIRE_CONFIG, <c>binary</c> for grimoire-cli.json beside the executable,
+/// <c>home</c> for ~/.grimoire-cli/config.json.
+/// </summary>
+public sealed record ConfigLocation(string Path, string Source);
+
 public class ConfigManager
 {
     private static readonly NLog.Logger _logger = NLog.LogManager.GetCurrentClassLogger();
@@ -21,10 +28,35 @@ public class ConfigManager
 
     public ConfigManager() : this(DefaultConfigPath()) { }
 
-    public static string DefaultConfigPath()
+    public static string DefaultConfigPath() => Locate().Path;
+
+    /// <summary>
+    /// Resolves the config file: GRIMOIRE_CONFIG if set; else grimoire-cli.json
+    /// beside the running executable, but only if it already exists, so an
+    /// install never claims a config it was not given; else the home default.
+    /// The token must live in a file the CLI can write renewals back to, which is
+    /// why the choice is of a file and never of a token.
+    /// </summary>
+    public static ConfigLocation Locate() => Locate(
+        Environment.GetEnvironmentVariable,
+        Environment.ProcessPath,
+        File.Exists,
+        Environment.GetFolderPath(Environment.SpecialFolder.UserProfile));
+
+    internal static ConfigLocation Locate(
+        Func<string, string?> envLookup, string? executablePath, Func<string, bool> fileExists, string home)
     {
-        var home = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
-        return Path.Combine(home, ".grimoire-cli", "config.json");
+        var fromEnv = envLookup("GRIMOIRE_CONFIG");
+        if (!string.IsNullOrWhiteSpace(fromEnv))
+            return new ConfigLocation(Path.GetFullPath(fromEnv), "env");
+        var exeDir = executablePath is null ? null : Path.GetDirectoryName(executablePath);
+        if (exeDir is not null)
+        {
+            var sibling = Path.Combine(exeDir, "grimoire-cli.json");
+            if (fileExists(sibling))
+                return new ConfigLocation(sibling, "binary");
+        }
+        return new ConfigLocation(Path.Combine(home, ".grimoire-cli", "config.json"), "home");
     }
 
     /// <summary>
