@@ -244,6 +244,23 @@ IMPLEMENTED = {
     "GET /api/duplicates/dismissals": "`duplicates dismissals` ✅",
     "DELETE /api/duplicates/dismissals/{dismissal_id}": "`duplicates undismiss` ✅",
     "GET /api/downloads/archive": "`downloads archive` ✅",
+    "GET /api/campaigns": "`campaigns list` ✅",
+    "POST /api/campaigns": "`campaigns create` ✅",
+    "GET /api/campaigns/{campaign_id}": "`campaigns get` ✅",
+    "PATCH /api/campaigns/{campaign_id}": "`campaigns update` ✅",
+    "GET /api/campaigns/{campaign_id}/resources": "`campaigns resources list` ✅",
+    "POST /api/campaigns/{campaign_id}/resources": "`campaigns resources add` ✅",
+    "POST /api/campaigns/{campaign_id}/resources/bulk": "`campaigns resources bulk` ✅",
+    "PATCH /api/campaigns/{campaign_id}/resources/{resource_id}": "`campaigns resources update` ✅",
+    "DELETE /api/campaigns/{campaign_id}/resources/{resource_id}": "`campaigns resources remove` ✅",
+    "PUT /api/campaigns/{campaign_id}/resources/reorder": "`campaigns resources reorder` ✅",
+    "GET /api/campaigns/{campaign_id}/categories": "`campaigns categories list` ✅",
+    "POST /api/campaigns/{campaign_id}/categories": "`campaigns categories create` ✅",
+    "PATCH /api/campaigns/{campaign_id}/categories/{category_id}": "`campaigns categories update` ✅",
+    "DELETE /api/campaigns/{campaign_id}/categories/{category_id}": "`campaigns categories delete` ✅",
+    "PUT /api/campaigns/{campaign_id}/categories/reorder": "`campaigns categories reorder` ✅",
+    "PUT /api/campaigns/{campaign_id}/resource-group-order": "`campaigns categories group-order` ✅",
+    "POST /api/campaigns/{campaign_id}/files": "`campaigns files upload` ✅",
 }
 
 ROLE_LABEL = {

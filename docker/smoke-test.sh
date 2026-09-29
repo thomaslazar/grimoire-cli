@@ -2310,4 +2310,79 @@ else
   ok "downloads archive container-404 check skipped — no book_count==0 container in this stack"
 fi
 
+# ---- campaigns --------------------------------------------------------------
+# Runs as the admin session, which owns what it creates. Fixed names and values
+# only: the campaign, category and book link are found or made, and the upload
+# is unlinked again, so a re-run converges.
+CAMPAIGN=$("$CLI" campaigns list 2>"$WORK/cli.err" | jq -r '[.[] | select(.name == "Smoke Campaign")][0].id') \
+  || { cat "$WORK/cli.err" >&2; fail "campaigns list exited non-zero"; }
+if [ -z "$CAMPAIGN" ] || [ "$CAMPAIGN" = "null" ]; then
+  CAMPAIGN=$(echo '{"name":"Smoke Campaign"}' | "$CLI" campaigns create --stdin 2>"$WORK/cli.err" | jq -r .id) \
+    || { cat "$WORK/cli.err" >&2; fail "campaigns create exited non-zero"; }
+fi
+[ -n "$CAMPAIGN" ] && [ "$CAMPAIGN" != "null" ] || fail "campaigns create should return an id"
+ok "campaigns list/create find or make the smoke campaign"
+
+CATEGORY=$("$CLI" campaigns categories list --id "$CAMPAIGN" 2>"$WORK/cli.err" \
+  | jq -r '[.[] | select(.name == "Smoke Handouts")][0].id') \
+  || { cat "$WORK/cli.err" >&2; fail "campaigns categories list exited non-zero"; }
+if [ -z "$CATEGORY" ] || [ "$CATEGORY" = "null" ]; then
+  CATEGORY=$("$CLI" campaigns categories create --id "$CAMPAIGN" --name "Smoke Handouts" 2>"$WORK/cli.err" | jq -r .id) \
+    || { cat "$WORK/cli.err" >&2; fail "campaigns categories create exited non-zero"; }
+fi
+[ -n "$CATEGORY" ] && [ "$CATEGORY" != "null" ] || fail "categories create should return an id"
+ok "campaigns categories list/create find or make the smoke category"
+
+CR_BOOK=$("$CLI" books list 2>"$WORK/cli.err" | jq -r '.books[0].id') \
+  || { cat "$WORK/cli.err" >&2; fail "books list exited non-zero"; }
+[ -n "$CR_BOOK" ] && [ "$CR_BOOK" != "null" ] || fail "no book fixture to link"
+# The first run links the book; every later run finds it linked, which the
+# client reports as exit 2 with the server's 409 on stderr.
+set +e
+"$CLI" campaigns resources add --id "$CAMPAIGN" --resource-type book --resource-id "$CR_BOOK" \
+  >"$WORK/cr-add.out" 2>"$WORK/cr-add.err"; rc=$?
+set -e
+[ "$rc" -eq 0 ] || { [ "$rc" -eq 2 ] && grep -q "409" "$WORK/cr-add.err"; } \
+  || fail "resources add should link or 409, got $rc: $(cat "$WORK/cr-add.err")"
+LINK=$("$CLI" campaigns resources list --id "$CAMPAIGN" 2>"$WORK/cli.err" \
+  | jq -r --arg b "$CR_BOOK" '[.[] | select(.resource_id == $b)][0].id') \
+  || { cat "$WORK/cli.err" >&2; fail "campaigns resources list exited non-zero"; }
+[ -n "$LINK" ] && [ "$LINK" != "null" ] || fail "resources list should show the linked book"
+"$CLI" campaigns resources update --id "$CAMPAIGN" --link-id "$LINK" --visibility public --category-id "$CATEGORY" \
+  >"$WORK/cr-update.out" 2>"$WORK/cr-update.err" \
+  || { cat "$WORK/cr-update.err" >&2; fail "campaigns resources update exited non-zero"; }
+jq -e --arg c "$CATEGORY" '.visibility == "public" and .category_id == $c' "$WORK/cr-update.out" >/dev/null \
+  || fail "resources update should set visibility and category: $(cat "$WORK/cr-update.out")"
+ok "campaigns resources add/list/update link and file a book"
+
+set +e
+echo "{\"resources\":[{\"resource_type\":\"book\",\"resource_id\":\"$CR_BOOK\"}]}" \
+  | "$CLI" campaigns resources bulk --id "$CAMPAIGN" --stdin >"$WORK/cr-bulk.out" 2>"$WORK/cr-bulk.err"; rc=$?
+set -e
+[ "$rc" -eq 3 ] || fail "resources bulk of an already-linked book should exit 3, got $rc: $(cat "$WORK/cr-bulk.err")"
+jq -e '. == []' "$WORK/cr-bulk.out" >/dev/null || fail "bulk should create nothing: $(cat "$WORK/cr-bulk.out")"
+ok "campaigns resources bulk exits 3 when it skips"
+
+"$CLI" campaigns categories group-order --id "$CAMPAIGN" --ordered-keys "cat:$CATEGORY" type:book type:model \
+  >"$WORK/cr-group.out" 2>"$WORK/cr-group.err" \
+  || { cat "$WORK/cr-group.err" >&2; fail "campaigns categories group-order exited non-zero"; }
+jq -e --arg c "cat:$CATEGORY" '.resource_group_order == [$c, "type:book"]' "$WORK/cr-group.out" >/dev/null \
+  || fail "group-order should keep the category and type:book and drop type:model: $(cat "$WORK/cr-group.out")"
+ok "campaigns categories group-order drops type:model"
+
+printf 'smoke handout\n' >"$WORK/smoke-handout.txt"
+"$CLI" campaigns files upload --id "$CAMPAIGN" --file "$WORK/smoke-handout.txt" --category-id "$CATEGORY" \
+  >"$WORK/cr-upload.out" 2>"$WORK/cr-upload.err" \
+  || { cat "$WORK/cr-upload.err" >&2; fail "campaigns files upload exited non-zero"; }
+jq -e --arg c "$CATEGORY" '.resource_type == "file" and .visibility == "gm" and .category_id == $c' \
+  "$WORK/cr-upload.out" >/dev/null \
+  || fail "files upload should link a gm file in the category: $(cat "$WORK/cr-upload.out")"
+UPLOAD_LINK=$(jq -r .id "$WORK/cr-upload.out")
+"$CLI" campaigns resources remove --id "$CAMPAIGN" --link-id "$UPLOAD_LINK" >/dev/null 2>"$WORK/cr-remove.err" \
+  || { cat "$WORK/cr-remove.err" >&2; fail "resources remove should unlink the upload"; }
+"$CLI" campaigns resources list --id "$CAMPAIGN" 2>/dev/null \
+  | jq -e --arg l "$UPLOAD_LINK" 'all(.[]; .id != $l)' >/dev/null \
+  || fail "the removed upload link should be gone"
+ok "campaigns files upload links a file, and remove takes it away again"
+
 echo "smoke: all checks passed" >&2

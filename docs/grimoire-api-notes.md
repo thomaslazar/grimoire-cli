@@ -1160,3 +1160,45 @@ stack runs, and verified against that stack. Backs `downloads archive`.
   yield it in 64 KiB chunks (`_helpers.py:72-91`). Only the headers go out
   early — the client's request timeout covers the full server-side build, not
   just the time to first byte.
+
+## Campaigns
+
+Read from `backend/routers/campaigns/` at tag `v1.7.2`, the release the local
+stack runs, and verified against that stack. Cites are relative to that
+directory. Backs `campaigns`, `campaigns resources`, `campaigns categories` and
+`campaigns files`.
+
+- **Writes are gated on ownership, not role.** Every write calls
+  `assert_can_manage` (`_helpers.py:304-317`): 403 unless the caller owns the
+  campaign — no admin override — and the owner's campaign access is enabled and
+  the campaign is not archived. None of it is a route dependency, so no
+  campaign command carries a role tag. The upload route's description says "GM
+  or admin role required" (`__init__.py:528`); the handler calls
+  `assert_can_manage` (`uploads.py:552`), so it is owner only.
+- `create` checks roles itself (`core.py:160-166`): guests are refused, and
+  `is_gm_campaign: true` needs gm or admin.
+- **An invalid `visibility` is silently `gm` on add and bulk**
+  (`resources.py:164,213`), but a 400 on update (`resources.py:252`). The CLI's
+  `--visibility` choice set catches it on add; bulk JSON does not.
+- **Bulk has no errors field.** It skips duplicates and unknown types silently
+  and returns only the rows it created (`resources.py:195-234`); the single add
+  409s on a duplicate instead (`resources.py:161-162`). `resources bulk` exits 3
+  when fewer rows come back than were sent.
+- **`GET /resources` sorts by visibility first** — public, private, gm — then
+  `sort_order`, then name (`resources.py:139`), so a manual order holds only
+  within one visibility bucket.
+- **Reorder skips and keeps.** `resources reorder` and `categories reorder`
+  renumber the ids given from 0, skip unknown ones, and leave unlisted rows at
+  their old `sort_order`, where they can collide (`resources.py:278-288`,
+  `categories.py:134-145`).
+- **`resource-group-order` drops what it does not know.** Its docstring says
+  unknown and type-group keys are "stored verbatim"; the code keeps only
+  `_TYPE_GROUP_KEYS` and this campaign's resource categories, dedupes, and
+  returns what it kept (`categories.py:155-183`). `type:model` is not in
+  `_TYPE_GROUP_KEYS` (`categories.py:27`), so the models group cannot be
+  placed. Verified live: `cat:<id> type:book type:model` stores
+  `["cat:<id>", "type:book"]`.
+- **`delete_items` orphans uploads.** Deleting a category with
+  `mode=delete_items` deletes its link rows directly (`categories.py:231-233`),
+  skipping the file cleanup that `DELETE /resources/{id}` does for a `file`
+  link (`resources.py:300-302`), so the upload stays on disk.
