@@ -9,13 +9,17 @@
 # (run `bash docker/seed.sh` first) — the seeded-data section below asserts on
 # the fixture set it creates.
 #
-# WARNING: it writes $HOME/.grimoire-cli/config.json. Harmless in the
+# WARNING: it writes $HOME/.grimoire-cli/config.json, and refuses to run
+# unless that home-tier file is in fact what resolves. Harmless in the
 # devcontainer (container HOME isn't the host's), but running this on a host
 # machine overwrites that host's saved grimoire-cli credentials.
 set -euo pipefail
 
 # GRIMOIRE_SERVER stays unexported: `systems list` must resolve the server from
 # the config file `login` wrote, so a login that persisted nothing still fails.
+# GRIMOIRE_CONFIG is unset outright: left exported, login would write there
+# instead of the home file this script assumes and asserts against below.
+unset GRIMOIRE_CONFIG
 SERVER="${GRIMOIRE_SERVER:-http://host.docker.internal:9481}"
 CLI="${CLI:-src/GrimoireCli/bin/Debug/net10.0/grimoire-cli}"
 CONFIG="$HOME/.grimoire-cli/config.json"
@@ -40,6 +44,17 @@ ok "health"
 # The version the stack is actually running, read from the stack rather than
 # hardcoded, so a Grimoire bump doesn't also require editing this number.
 EXPECTED_VERSION=$(curl -sf "$SERVER/api/openapi.json" | jq -r .info.version)
+
+# Refuse to run unless the home tier is what actually resolves: a developer's
+# own GRIMOIRE_CONFIG (unset above, but a sibling grimoire-cli.json cannot be
+# unset away) would otherwise have the login below overwrite that other file,
+# plausibly a real account, before anything here notices.
+CONFIG_LOCATION=$("$CLI" config get)
+echo "$CONFIG_LOCATION" | jq -e '.configSource == "home"' >/dev/null \
+  || fail "refusing to run: configSource is $(echo "$CONFIG_LOCATION" | jq -r .configSource), not home"
+echo "$CONFIG_LOCATION" | jq -e --arg config "$CONFIG" '.configPath == $config' >/dev/null \
+  || fail "refusing to run: configPath is $(echo "$CONFIG_LOCATION" | jq -r .configPath), not $CONFIG"
+ok "config resolves to the home tier"
 
 # Clear any stale config first: without this, a regressed ConfigManager.Save
 # that silently writes nothing would still leave a *previous* run's config
@@ -69,6 +84,15 @@ jq -e --arg s "$SERVER" '.server == $s' "$CONFIG" >/dev/null \
 jq -e '.accessToken | type == "string" and length > 0' "$CONFIG" >/dev/null \
   || fail "config holds no access token: $(cat "$CONFIG")"
 ok "config has server and token"
+
+# GRIMOIRE_CONFIG chooses the file outright, so config get must report that
+# path and not the home default — the answer to "why is this the wrong account".
+GRIMOIRE_CONFIG="$WORK/alt-config.json" "$CLI" config get >"$WORK/config-alt.out" 2>&1 \
+  || fail "config get under GRIMOIRE_CONFIG exited non-zero"
+jq -e --arg p "$WORK/alt-config.json" '.configPath == $p and .configSource == "env"' \
+  "$WORK/config-alt.out" >/dev/null \
+  || fail "config get should report the GRIMOIRE_CONFIG file: $(cat "$WORK/config-alt.out")"
+ok "GRIMOIRE_CONFIG chooses the config file"
 
 # 4. The token authenticates, and stdout is JSON with logs kept on stderr.
 # list.err is captured for diagnostics only (dumped on failure below) — nothing

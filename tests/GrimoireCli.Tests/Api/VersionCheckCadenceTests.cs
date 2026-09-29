@@ -110,8 +110,8 @@ public class VersionCheckCadenceTests
 
     // RecordServerVersion takes an injected ConfigManager (constructor parameter),
     // so this proves persistence lands on that path rather than silently falling
-    // back to ~/.grimoire-cli/config.json — the fallback exists only for call
-    // sites with no ConfigManager already in hand.
+    // back to the resolved default (ConfigManager.DefaultConfigPath()) — the
+    // fallback exists only for call sites with no ConfigManager already in hand.
     [Fact]
     public void RecordServerVersionPersistsThroughTheInjectedConfigManager()
     {

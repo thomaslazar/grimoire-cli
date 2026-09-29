@@ -2,7 +2,37 @@
 
 ## Config File
 
-Location: `~/.grimoire-cli/config.json`
+Location, resolved once per command, first match wins:
+
+| Tier | Path | Applies when |
+|---|---|---|
+| `env` | `$GRIMOIRE_CONFIG` | the variable is set and non-blank |
+| `binary` | `grimoire-cli.json` beside the executable | that file already exists |
+| `home` | `~/.grimoire-cli/config.json` | otherwise |
+
+`config get` reports the resolved file as `configPath` and the tier as
+`configSource`. Everything else on this page — the atomic write, the `0600`
+mode, the `.corrupt` copy-and-reset — applies at whichever path resolved.
+
+**Giving an install its own account.** The CLI never creates a `binary`-tier
+file; creating it is what opts an install in. For a harness that installs to
+`./bin/grimoire-cli`:
+
+```bash
+echo '{}' > bin/grimoire-cli.json
+./bin/grimoire-cli login --server https://grimoire.example.com
+```
+
+From then on `./bin/grimoire-cli` is that account, from any working directory,
+with nothing to export. The executable's directory comes from
+`Environment.ProcessPath`, which on Linux follows symlinks, so a symlinked binary
+looks beside the real file rather than beside the link.
+
+**There is no token environment variable, and there should not be one.** The
+access token lives 30 minutes and every renewal is written back to the config
+file ([authentication.md](authentication.md)). A token supplied through the
+environment would have nowhere to be renewed into and would die at the first
+expiry, which is why the choice is of a file, never of a token.
 
 ```json
 {
@@ -47,12 +77,15 @@ as absent rather than as an error.
 The file is `0600`, readable only by its owner, and stays that way across writes
 because the replacement carries the new file's mode.
 
-A config file that is not valid JSON is **moved to `config.json.corrupt`** and
-reported on stderr, then treated as absent. Moving it is what makes the token
-recoverable: the file usually still contains it, and the next write would
-otherwise replace the file wholesale. `GRIMOIRE_SERVER` still works in that
-state, but with the stored token gone the command fails on its own terms;
-`grimoire-cli login` writes a fresh config.
+A config file that is not valid JSON is **copied aside to `config.json.corrupt`
+and reset to an empty config** in place, reported on stderr. The copy is what
+makes the token recoverable: the file usually still contains it, and the next
+write would otherwise replace the file wholesale. Resetting rather than
+deleting keeps the path claimed, so a `binary`-tier install with its own
+account cannot fall back to another one's config once its file breaks.
+`GRIMOIRE_SERVER` still works in that state, but with the stored token gone
+the command fails on its own terms; `grimoire-cli login` writes a fresh
+config.
 
 A write that fails — a read-only home, a full disk — is reported as an error, and
 `login` and `config set` exit non-zero rather than claiming to have saved
@@ -64,7 +97,7 @@ failure there is a debug line and the check simply runs again next time.
 Highest wins (`ConfigManager.Resolve`):
 
 1. Environment variable — `GRIMOIRE_SERVER`
-2. Config file (`~/.grimoire-cli/config.json`)
+2. Config file (whichever one [resolved](#config-file))
 
 `login` is the exception: its `--server` writes straight to the file rather than
 going through this resolution, and falls back to `GRIMOIRE_SERVER` and then an
@@ -78,7 +111,7 @@ already belongs to.
 
 | Command | Description |
 |---------|-------------|
-| `grimoire-cli config get` | Shows current config (`accessToken` and `refreshToken` masked to `***`, plus `configPath`, `lastVersionCheck`, `lastServerVersion`) |
+| `grimoire-cli config get` | Shows current config (`accessToken` and `refreshToken` masked to `***`, plus `configPath`, `configSource`, `lastVersionCheck`, `lastServerVersion`) |
 | `grimoire-cli config set <key> <value>` | Sets a config value |
 
 `config set` accepts **only** `server` as a key — `ApplyConfigSet` in
@@ -101,13 +134,10 @@ split.)
 
 ## Deliberately absent
 
-- **No `--config` flag or `GRIMOIRE_CONFIG` env var.** abs-cli doesn't have
-  this either, but it's worth stating for grimoire-cli specifically: PR
-  builds are installed and tested against a real server rather than a
-  config-path override, and the dev container's `HOME` isn't the host's, so
-  a per-invocation config path wouldn't buy test isolation the way it might
-  elsewhere. If a real need for it shows up, it's a deliberate decision to
-  revisit, not an oversight.
+- **No `--config` flag.** The file is chosen by `GRIMOIRE_CONFIG` or a
+  `grimoire-cli.json` beside the binary (see [Config File](#config-file)). A
+  per-command flag would be one more thing an agent has to pass on every call,
+  and forgetting it would silently act as a different account.
 - **`GRIMOIRE_DEBUG=1`** is a config-adjacent environment variable but does
   not live in `AppConfig` — it's read directly in `Program.cs` and mirrors
   `--debug`. See [input-output.md](input-output.md).

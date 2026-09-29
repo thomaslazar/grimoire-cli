@@ -19,11 +19,21 @@ public static class ConfigCommand
     private static Command CreateGetCommand()
     {
         var command = new Command("get", "Show current configuration");
+        command.AddHelpSection("Notes", HelpSectionPosition.Top,
+            "configPath is the file in use, resolved in order: GRIMOIRE_CONFIG;",
+            "grimoire-cli.json beside the binary, if it exists;",
+            "~/.grimoire-cli/config.json.",
+            "",
+            "To give an install its own account, create the sibling file before",
+            "logging in — echo '{}' > bin/grimoire-cli.json — then login writes",
+            "into it.",
+            "",
+            "A symlinked binary resolves to the real file's directory.");
         command.AddExamples("grimoire-cli config get");
         command.SetAction(parseResult =>
         {
-            var configManager = new ConfigManager();
-            var config = configManager.Load();
+            var location = ConfigManager.Locate();
+            var config = new ConfigManager(location.Path).Load();
             var display = new Dictionary<string, string>
             {
                 ["server"] = config.Server ?? "(not set)",
@@ -31,7 +41,8 @@ public static class ConfigCommand
                 ["refreshToken"] = config.RefreshToken != null ? "***" : "(not set)",
                 ["lastVersionCheck"] = config.LastVersionCheck?.ToString("u") ?? "(never)",
                 ["lastServerVersion"] = config.LastServerVersion ?? "(unknown)",
-                ["configPath"] = ConfigManager.DefaultConfigPath()
+                ["configPath"] = location.Path,
+                ["configSource"] = location.Source
             };
             ConsoleOutput.WriteJson(display);
             return 0;
