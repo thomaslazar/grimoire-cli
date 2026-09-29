@@ -22,6 +22,7 @@ public static class CampaignsCommand
         command.Subcommands.Add(CreateUpdateCommand());
         command.Subcommands.Add(CampaignResourcesCommands.Create());
         command.Subcommands.Add(CampaignCategoriesCommands.Create());
+        command.Subcommands.Add(CampaignFilesCommands.Create());
         return command;
     }
 
