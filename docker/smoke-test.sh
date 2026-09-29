@@ -70,6 +70,15 @@ jq -e '.accessToken | type == "string" and length > 0' "$CONFIG" >/dev/null \
   || fail "config holds no access token: $(cat "$CONFIG")"
 ok "config has server and token"
 
+# GRIMOIRE_CONFIG chooses the file outright, so config get must report that
+# path and not the home default — the answer to "why is this the wrong account".
+GRIMOIRE_CONFIG="$WORK/alt-config.json" "$CLI" config get >"$WORK/config-alt.out" 2>&1 \
+  || fail "config get under GRIMOIRE_CONFIG exited non-zero"
+jq -e --arg p "$WORK/alt-config.json" '.configPath == $p and .configSource == "env"' \
+  "$WORK/config-alt.out" >/dev/null \
+  || fail "config get should report the GRIMOIRE_CONFIG file: $(cat "$WORK/config-alt.out")"
+ok "GRIMOIRE_CONFIG chooses the config file"
+
 # 4. The token authenticates, and stdout is JSON with logs kept on stderr.
 # list.err is captured for diagnostics only (dumped on failure below) — nothing
 # is asserted about its contents. At the default log level (LogSetup.cs sets

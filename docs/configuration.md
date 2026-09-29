@@ -2,7 +2,37 @@
 
 ## Config File
 
-Location: `~/.grimoire-cli/config.json`
+Location, resolved once per command, first match wins:
+
+| Tier | Path | Applies when |
+|---|---|---|
+| `env` | `$GRIMOIRE_CONFIG` | the variable is set and non-empty |
+| `binary` | `grimoire-cli.json` beside the executable | that file already exists |
+| `home` | `~/.grimoire-cli/config.json` | otherwise |
+
+`config get` reports the resolved file as `configPath` and the tier as
+`configSource`. Everything else on this page — the atomic write, the `0600`
+mode, the `.corrupt` rename — applies at whichever path resolved.
+
+**Giving an install its own account.** The CLI never creates a `binary`-tier
+file; creating it is what opts an install in. For a harness that installs to
+`./bin/grimoire-cli`:
+
+```bash
+echo '{}' > bin/grimoire-cli.json
+./bin/grimoire-cli login --server https://grimoire.example.com
+```
+
+From then on `./bin/grimoire-cli` is that account, from any working directory,
+with nothing to export. The executable's directory comes from
+`Environment.ProcessPath`, which on Linux follows symlinks, so a symlinked binary
+looks beside the real file rather than beside the link.
+
+**There is no token environment variable, and there should not be one.** The
+access token lives 30 minutes and every renewal is written back to the config
+file ([authentication.md](authentication.md)). A token supplied through the
+environment would have nowhere to be renewed into and would die at the first
+expiry, which is why the choice is of a file, never of a token.
 
 ```json
 {

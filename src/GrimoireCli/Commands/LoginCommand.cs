@@ -23,7 +23,8 @@ public static class LoginCommand
             "--password-stdin (reads the first line of stdin) for scripted use.",
             "The session refreshes itself; log in again only after 30 days idle,",
             "or if the session is revoked (password change, admin edit).",
-            "OIDC accounts cannot log in here — this is the local password path.");
+            "OIDC accounts cannot log in here — this is the local password path.",
+            "Writes the resolved config file; config get reports which one.");
         command.AddExamples(
             "grimoire-cli login --server https://grimoire.example.com",
             "grimoire-cli login --server https://grimoire.example.com --username agent --password-stdin <<<\"$GRIMOIRE_PW\"");

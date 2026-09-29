@@ -184,7 +184,7 @@ A batch verb is skip-and-continue: it exits 3 on a partial failure and names eac
 
 ## Configuration
 
-Config is stored at `~/.grimoire-cli/config.json`. Values resolve in this order:
+Config is stored at `$GRIMOIRE_CONFIG` if set, else `grimoire-cli.json` beside the binary if that file exists, else `~/.grimoire-cli/config.json`; `config get` reports which. Create the sibling file (`echo '{}' > bin/grimoire-cli.json`) before `login` to give one install its own account — see [docs/configuration.md](docs/configuration.md). Within the file, values resolve in this order:
 
 1. **Environment variables** (`GRIMOIRE_SERVER`)
 2. **Config file**
