@@ -357,7 +357,7 @@ grimoire-cli config set server https://grimoire.example.com
 | `campaigns list [--include-archived]` | List campaigns you own or have joined |
 | `campaigns get --id <campaign-id>` | Get one campaign |
 | `campaigns create {--input <file> \| --stdin}` | Create a campaign, optionally with resources linked |
-| `campaigns update --id <campaign-id> {--input <file> \| --stdin}` | Update a campaign's metadata |
+| `campaigns update --id <campaign-id> {--input <file> \| --stdin}` | Update a campaign's details |
 | `campaigns resources list --id <campaign-id>` | List a campaign's linked resources |
 | `campaigns resources add --id <campaign-id> --resource-type <t> --resource-id <item-id> [--visibility gm\|public\|private] [--category-id <id>]` | Link one library item; 409 if already linked |
 | `campaigns resources bulk --id <campaign-id> {--input <file> \| --stdin}` | Link many items; exit 3 if any were skipped |

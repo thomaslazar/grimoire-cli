@@ -1178,7 +1178,7 @@ directory. Backs `campaigns`, `campaigns resources`, `campaigns categories` and
 - `create` checks roles itself (`core.py:160-166`): guests are refused, and
   `is_gm_campaign: true` needs gm or admin.
 - **An invalid `visibility` is silently `gm` on add and bulk**
-  (`resources.py:164,213`), but a 400 on update (`resources.py:252`). The CLI's
+  (`resources.py:164,214`), but a 400 on update (`resources.py:252`). The CLI's
   `--visibility` choice set catches it on add; bulk JSON does not.
 - **Bulk has no errors field.** It skips duplicates and unknown types silently
   and returns only the rows it created (`resources.py:195-234`); the single add

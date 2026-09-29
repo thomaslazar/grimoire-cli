@@ -80,8 +80,7 @@ public static class CampaignResourcesCommands
             "A restricted book is forced to gm whatever --visibility says. private",
             "shows it to the owner alone; share lists go through bulk.",
             "",
-            "409 when the item is already linked. Uploaded files link themselves:",
-            "grimoire-cli campaigns files upload."]);
+            "409 when the item is already linked."]);
         command.AddExamples("grimoire-cli campaigns resources add --id <campaign-id> --resource-type book --resource-id <book-id> --visibility public");
         command.AddResponseExample<Generated.Models.LinkedResourceOut>();
         command.SetAction(async (parseResult, cancellationToken) =>
@@ -112,8 +111,9 @@ public static class CampaignResourcesCommands
             "response lists only the links created. Exit 3 when fewer come back than",
             "were sent; stdout still carries them.",
             "",
-            "A visibility outside gm|public|private becomes gm. file is not linkable",
-            "here. Item ids are not checked."]);
+            "A visibility outside gm|public|private becomes gm; a restricted book is",
+            "forced to gm regardless. Item ids are not checked. An invalid category_id",
+            "fails the whole call with 400."]);
         command.AddExamples("echo '{\"resources\":[{\"resource_type\":\"book\",\"resource_id\":\"<id>\"}]}' | grimoire-cli campaigns resources bulk --id <campaign-id> --stdin");
         command.AddRequestShape<Generated.Models.ResourceBulkAdd>();
         command.AddResponseExampleArray<Generated.Models.LinkedResourceOut>();
@@ -183,7 +183,7 @@ public static class CampaignResourcesCommands
             [.. OwnerOnly, "",
             "The library item is untouched, but removing a file link deletes the upload.",
             "",
-            "Answers 204: stdout carries no body."]);
+            "Answers 204: stdout carries no body. An unknown link id also answers 204."]);
         command.SetAction(async (parseResult, cancellationToken) =>
         {
             var (client, _) = CommandHelper.BuildClient();

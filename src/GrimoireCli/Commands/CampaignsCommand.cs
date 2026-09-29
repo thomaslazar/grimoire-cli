@@ -72,7 +72,8 @@ public static class CampaignsCommand
             "",
             "is_gm_campaign true needs the gm or admin role; guests cannot create.",
             "",
-            "resources links items at creation, as resources bulk does.");
+            "resources links items at creation, but unlike bulk a restricted book",
+            "keeps the visibility asked for and category_id is not accepted.");
         command.AddExamples(
             "grimoire-cli campaigns create --input campaign.json",
             "echo '{\"name\":\"Curse of Strahd\"}' | grimoire-cli campaigns create --stdin");
@@ -106,7 +107,7 @@ public static class CampaignsCommand
         var command = new Command("update", "Update a campaign's details") { idOption, inputOption, stdinOption };
         JsonBodyInput.RequireExactlyOneSource(command, inputOption, stdinOption);
         command.AddHelpSection("Notes", HelpSectionPosition.Top,
-            [.. OwnerOnly, "", "system_name \"\" clears it."]);
+            [.. OwnerOnly, "", "system_name, system_id and parent_campaign_id \"\" clear them."]);
         command.AddExamples("echo '{\"description\":\"Session zero\"}' | grimoire-cli campaigns update --id <id> --stdin");
         command.AddRequestShape<Generated.Models.CampaignUpdate>();
         command.AddResponseExample<Generated.Models.CampaignOut>();

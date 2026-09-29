@@ -37,9 +37,8 @@ public static class CampaignFilesCommands
         });
         command.AddHelpSection("Notes", HelpSectionPosition.Top,
             [.. OwnerOnly, "",
-            "Stored in the campaign, not the library, and linked at gm visibility;",
-            "change it with campaigns resources update. Removing the link deletes the",
-            "file.",
+            "Stored in the campaign, not the library, and linked at gm visibility.",
+            "Removing the link deletes the file.",
             "",
             "Max 200 MB. An admin may set lower per-file or per-campaign limits (413)",
             "or disable uploads (403); admins are exempt."]);

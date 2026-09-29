@@ -9,7 +9,8 @@ namespace GrimoireCli.Services;
 /// </summary>
 public class CampaignCategoriesService
 {
-    private const string NotFound = "No such campaign or category. List categories with: grimoire-cli campaigns categories list --id <campaign-id>";
+    private const string CampaignNotFound = "No campaign with that ID. List them with: grimoire-cli campaigns list";
+    private const string CategoryNotFound = "No such campaign or category. List categories with: grimoire-cli campaigns categories list --id <campaign-id>";
 
     private readonly GrimoireApiClient _client;
 
@@ -19,13 +20,13 @@ public class CampaignCategoriesService
     public async Task<string> ListAsync(string campaignId)
         => await _client.SendAsync(
             _client.Api.Api.Campaigns[campaignId].Categories.ToGetRequestInformation(c => c.QueryParameters.Kind = "resource"),
-            notFoundHint: NotFound);
+            notFoundHint: CampaignNotFound);
 
     /// <summary>POST /api/campaigns/{id}/categories.</summary>
     public async Task<string> CreateAsync(string campaignId, string name, string? icon, string? iconColor)
         => await _client.SendAsync(
             _client.Api.Api.Campaigns[campaignId].Categories.ToPostRequestInformation(BuildCreateBody(name, icon, iconColor)),
-            notFoundHint: NotFound);
+            notFoundHint: CampaignNotFound);
 
     internal static Generated.Models.CategoryCreate BuildCreateBody(string name, string? icon, string? iconColor)
     {
@@ -41,7 +42,7 @@ public class CampaignCategoriesService
     public async Task<string> UpdateAsync(string campaignId, string categoryId, string? name, string? icon, string? iconColor)
         => await _client.SendAsync(
             _client.Api.Api.Campaigns[campaignId].Categories[categoryId].ToPatchRequestInformation(BuildUpdateBody(name, icon, iconColor)),
-            notFoundHint: NotFound);
+            notFoundHint: CategoryNotFound);
 
     /// <summary>Only the flags given reach the body. Internal so a test can pin that.</summary>
     internal static Generated.Models.CategoryUpdate BuildUpdateBody(string? name, string? icon, string? iconColor)
@@ -60,14 +61,14 @@ public class CampaignCategoriesService
     public async Task<string> DeleteAsync(string campaignId, string categoryId, string? mode)
         => await _client.SendAsync(
             _client.Api.Api.Campaigns[campaignId].Categories[categoryId].ToDeleteRequestInformation(c => c.QueryParameters.Mode = mode),
-            notFoundHint: NotFound);
+            notFoundHint: CategoryNotFound);
 
     /// <summary>PUT /api/campaigns/{id}/categories/reorder. Unknown ids are skipped.</summary>
     public async Task<string> ReorderAsync(string campaignId, string[] orderedIds)
         => await _client.SendAsync(
             _client.Api.Api.Campaigns[campaignId].Categories.Reorder.ToPutRequestInformation(
                 new Generated.Models.CategoryReorder { OrderedIds = [.. orderedIds] }),
-            notFoundHint: NotFound);
+            notFoundHint: CampaignNotFound);
 
     /// <summary>
     /// PUT /api/campaigns/{id}/resource-group-order. Keeps only known type keys and
@@ -78,5 +79,5 @@ public class CampaignCategoriesService
         => await _client.SendAsync(
             _client.Api.Api.Campaigns[campaignId].ResourceGroupOrder.ToPutRequestInformation(
                 new Generated.Models.ResourceGroupOrder { OrderedKeys = [.. orderedKeys] }),
-            notFoundHint: NotFound);
+            notFoundHint: CampaignNotFound);
 }

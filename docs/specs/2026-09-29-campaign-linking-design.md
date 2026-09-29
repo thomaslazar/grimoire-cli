@@ -97,7 +97,7 @@ books with the core category flagged, which `books list --system-id` gives;
 - `model` has no name lookup either, so a model link's `name` is always its id
   (`resources.py:38-62`).
 - An invalid `visibility` silently becomes `gm` on both adds
-  (`resources.py:164,213`); `update` rejects it with 400 (`resources.py:252`).
+  (`resources.py:164,214`); `update` rejects it with 400 (`resources.py:252`).
 - A restricted book is clamped to `gm` whatever was asked
   (`_helpers.py:351-373`), on add and update.
 - An unknown `category_id` is a 400 (`resources.py:65-77`); `""` clears it on
