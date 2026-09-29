@@ -2,6 +2,10 @@ using GrimoireCli.Configuration;
 
 namespace GrimoireCli.Tests.Configuration;
 
+// One test here quarantines a corrupt config through Load, which warns, and
+// NLog's configuration is process-global — so this class must not run beside a
+// test asserting on log contents.
+[Collection("NLog")]
 public class ConfigLocationTests
 {
     private static readonly string Home = Path.Combine(Path.GetTempPath(), "home");
