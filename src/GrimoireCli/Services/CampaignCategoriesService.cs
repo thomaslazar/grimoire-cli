@@ -61,7 +61,7 @@ public class CampaignCategoriesService
     public async Task<string> DeleteAsync(string campaignId, string categoryId, string? mode)
         => await _client.SendAsync(
             _client.Api.Api.Campaigns[campaignId].Categories[categoryId].ToDeleteRequestInformation(c => c.QueryParameters.Mode = mode),
-            notFoundHint: CategoryNotFound);
+            notFoundHint: CampaignNotFound);
 
     /// <summary>PUT /api/campaigns/{id}/categories/reorder. Unknown ids are skipped.</summary>
     public async Task<string> ReorderAsync(string campaignId, string[] orderedIds)
