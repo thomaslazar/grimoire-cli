@@ -94,7 +94,7 @@ failure there is a debug line and the check simply runs again next time.
 Highest wins (`ConfigManager.Resolve`):
 
 1. Environment variable — `GRIMOIRE_SERVER`
-2. Config file (`~/.grimoire-cli/config.json`)
+2. Config file (whichever one [resolved](#config-file))
 
 `login` is the exception: its `--server` writes straight to the file rather than
 going through this resolution, and falls back to `GRIMOIRE_SERVER` and then an
@@ -108,7 +108,7 @@ already belongs to.
 
 | Command | Description |
 |---------|-------------|
-| `grimoire-cli config get` | Shows current config (`accessToken` and `refreshToken` masked to `***`, plus `configPath`, `lastVersionCheck`, `lastServerVersion`) |
+| `grimoire-cli config get` | Shows current config (`accessToken` and `refreshToken` masked to `***`, plus `configPath`, `configSource`, `lastVersionCheck`, `lastServerVersion`) |
 | `grimoire-cli config set <key> <value>` | Sets a config value |
 
 `config set` accepts **only** `server` as a key — `ApplyConfigSet` in
@@ -131,13 +131,10 @@ split.)
 
 ## Deliberately absent
 
-- **No `--config` flag or `GRIMOIRE_CONFIG` env var.** abs-cli doesn't have
-  this either, but it's worth stating for grimoire-cli specifically: PR
-  builds are installed and tested against a real server rather than a
-  config-path override, and the dev container's `HOME` isn't the host's, so
-  a per-invocation config path wouldn't buy test isolation the way it might
-  elsewhere. If a real need for it shows up, it's a deliberate decision to
-  revisit, not an oversight.
+- **No `--config` flag.** The file is chosen by `GRIMOIRE_CONFIG` or a
+  `grimoire-cli.json` beside the binary (see [Config File](#config-file)). A
+  per-command flag would be one more thing an agent has to pass on every call,
+  and forgetting it would silently act as a different account.
 - **`GRIMOIRE_DEBUG=1`** is a config-adjacent environment variable but does
   not live in `AppConfig` — it's read directly in `Program.cs` and mirrors
   `--debug`. See [input-output.md](input-output.md).
