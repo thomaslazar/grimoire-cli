@@ -91,26 +91,43 @@ public class ConfigManager
     }
 
     /// <summary>
-    /// Moves an unparseable config aside before anything can overwrite it. The refresh
-    /// token it holds is what keeps the session alive, and a file broken by a
-    /// hand-edit usually still contains it — but the next write would replace the file
-    /// wholesale, so leaving it in place would destroy on the following command what
-    /// the warning invites the operator to repair. Moving it also means the warning is
-    /// printed once rather than by every subsequent <see cref="Load"/> in the process.
+    /// Copies an unparseable config to <c>&lt;path&gt;.corrupt</c>, then resets the
+    /// original to an empty config through the same atomic write path <see cref="Save"/>
+    /// uses. The copy keeps a hand-edit's refresh token recoverable; resetting rather
+    /// than deleting keeps the warning to one print, since the next <see cref="Load"/>
+    /// then finds a valid, empty file rather than an absent one it would warn about
+    /// again. Leaving the path claimed is what matters for the sibling tier: an install
+    /// with its own grimoire-cli.json must fail "not authenticated" on its own account
+    /// rather than have the path disappear and fall back to the home config. For the
+    /// home and env tiers a reset file loads exactly as an absent one would, so this is
+    /// not a behaviour change there — only the sibling tier depends on the path staying
+    /// claimed.
     /// </summary>
     private void QuarantineUnparseableConfig(JsonException ex)
     {
         var quarantine = $"{_configPath}.corrupt";
         try
         {
-            File.Move(_configPath, quarantine, overwrite: true);
-            _logger.Warn($"{_configPath} is not valid JSON ({ex.Message}). Moved it to "
-                         + $"{quarantine} and continuing without it. Run: grimoire-cli login");
+            File.Copy(_configPath, quarantine, overwrite: true);
         }
-        catch (Exception moveFailure) when (moveFailure is IOException or UnauthorizedAccessException)
+        catch (Exception copyFailure) when (copyFailure is IOException or UnauthorizedAccessException)
         {
             _logger.Warn($"Ignoring {_configPath}: it is not valid JSON ({ex.Message}). "
-                         + $"Could not move it aside ({moveFailure.Message}). Run: grimoire-cli login");
+                         + $"Could not copy it aside ({copyFailure.Message}). Run: grimoire-cli login");
+            return;
+        }
+
+        try
+        {
+            WriteAtomic(JsonSerializer.Serialize(new AppConfig(), AppJsonContext.Default.AppConfig));
+            _logger.Warn($"{_configPath} is not valid JSON ({ex.Message}). Copied it to "
+                         + $"{quarantine} and reset it to an empty config. Run: grimoire-cli login");
+        }
+        catch (ConfigWriteException resetFailure)
+        {
+            _logger.Warn($"{_configPath} is not valid JSON ({ex.Message}). Copied it to "
+                         + $"{quarantine}, but could not reset it ({resetFailure.Message}). "
+                         + "Run: grimoire-cli login");
         }
     }
 
@@ -129,10 +146,12 @@ public class ConfigManager
     /// config set — must report this rather than claim success; the version-check
     /// cadence swallows it, because a diagnostic may not fail the command it precedes.
     /// </exception>
-    public void Save(AppConfig config)
+    public void Save(AppConfig config) =>
+        WriteAtomic(JsonSerializer.Serialize(config, AppJsonContext.Default.AppConfig));
+
+    private void WriteAtomic(string json)
     {
         var dir = Path.GetDirectoryName(_configPath);
-        var json = JsonSerializer.Serialize(config, AppJsonContext.Default.AppConfig);
         // Process id, not a random name: concurrent writers each get their own file,
         // and a leftover from a killed process is identifiable. Concurrent writes are
         // still last-one-wins as a whole — the replacement makes each write complete,

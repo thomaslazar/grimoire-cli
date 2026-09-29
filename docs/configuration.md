@@ -6,13 +6,13 @@ Location, resolved once per command, first match wins:
 
 | Tier | Path | Applies when |
 |---|---|---|
-| `env` | `$GRIMOIRE_CONFIG` | the variable is set and non-empty |
+| `env` | `$GRIMOIRE_CONFIG` | the variable is set and non-blank |
 | `binary` | `grimoire-cli.json` beside the executable | that file already exists |
 | `home` | `~/.grimoire-cli/config.json` | otherwise |
 
 `config get` reports the resolved file as `configPath` and the tier as
 `configSource`. Everything else on this page — the atomic write, the `0600`
-mode, the `.corrupt` rename — applies at whichever path resolved.
+mode, the `.corrupt` copy-and-reset — applies at whichever path resolved.
 
 **Giving an install its own account.** The CLI never creates a `binary`-tier
 file; creating it is what opts an install in. For a harness that installs to
@@ -77,12 +77,15 @@ as absent rather than as an error.
 The file is `0600`, readable only by its owner, and stays that way across writes
 because the replacement carries the new file's mode.
 
-A config file that is not valid JSON is **moved to `config.json.corrupt`** and
-reported on stderr, then treated as absent. Moving it is what makes the token
-recoverable: the file usually still contains it, and the next write would
-otherwise replace the file wholesale. `GRIMOIRE_SERVER` still works in that
-state, but with the stored token gone the command fails on its own terms;
-`grimoire-cli login` writes a fresh config.
+A config file that is not valid JSON is **copied aside to `config.json.corrupt`
+and reset to an empty config** in place, reported on stderr. The copy is what
+makes the token recoverable: the file usually still contains it, and the next
+write would otherwise replace the file wholesale. Resetting rather than
+deleting keeps the path claimed, so a `binary`-tier install with its own
+account cannot fall back to another one's config once its file breaks.
+`GRIMOIRE_SERVER` still works in that state, but with the stored token gone
+the command fails on its own terms; `grimoire-cli login` writes a fresh
+config.
 
 A write that fails — a read-only home, a full disk — is reported as an error, and
 `login` and `config set` exit non-zero rather than claiming to have saved

@@ -57,7 +57,7 @@ survives as an override, where forgetting it means "the normal thing happened".
 
 `DefaultConfigPath()` resolves in this order and returns a path:
 
-1. `GRIMOIRE_CONFIG`, if set and non-empty — the config file's full path.
+1. `GRIMOIRE_CONFIG`, if set and non-blank — the config file's full path.
 2. `grimoire-cli.json` in the directory holding the running executable, **if
    that file exists**.
 3. `~/.grimoire-cli/config.json` — unchanged.
@@ -71,13 +71,24 @@ CI and one-off runs, where moving files is the wrong lever.
 would implicitly claim a config beside itself, and the default path would change
 for everyone.
 
-**Resolution produces a path, and every existing behaviour then applies
-unchanged at it**: the atomic temp-file-and-replace write, the `0600` mode, the
-corrupt-file rename to `<name>.json.corrupt` beside it, and the token renewals.
-Nothing downstream of the path changes, so this is a change to one function. All
-five `new ConfigManager()` call sites — `CommandHelper`, `LoginCommand`,
-`ConfigCommand` (twice) and `GrimoireApiClient`'s fallback — pick it up without
-edit.
+**Resolution produces a path, and every existing behaviour then applies at
+it**: the atomic temp-file-and-replace write, the `0600` mode, and the token
+renewals. Nothing downstream of the path changes, so this is a change to one
+function. All five `new ConfigManager()` call sites — `CommandHelper`,
+`LoginCommand`, `ConfigCommand` (twice) and `GrimoireApiClient`'s fallback —
+pick it up without edit.
+
+One piece of existing behaviour could not stay unchanged: a corrupt config
+used to be *moved* to `<name>.json.corrupt`, which frees the original path. For
+tier 2 that is unsafe — the sibling disappearing makes the next command
+resolve to tier 3 and possibly succeed against the home account instead of
+failing on the install's own one. Quarantine now copies the file to
+`<name>.json.corrupt` and resets the original to an empty config through the
+same atomic write, so the path stays claimed: the next command still resolves
+to the sibling and fails "not authenticated" on the right account, rather than
+falling back to another one. A reset file loads identically to an absent one
+at every tier, so this changes behaviour only where tier 2's path staying
+claimed matters.
 
 The executable's directory comes from `Environment.ProcessPath`. That returns
 null in exotic hosting cases, which falls through to tier 3 rather than throwing.
@@ -162,16 +173,24 @@ than shipping a tier that silently never fires.
 ### Smoke
 
 One check: `GRIMOIRE_CONFIG` pointed at a scratch file, `config get` reporting
-that path. The existing config-file smoke assertions already use the environment
-tier, so this fits beside them. A tier-2 check is not added — it would require
-writing a file next to the binary under test, which the smoke test has no
-business doing.
+that path. The existing config-file smoke assertions read
+`$HOME/.grimoire-cli/config.json` directly, i.e. the home tier, not the
+environment tier, so this is the first assertion to exercise it. A tier-2
+check is not added — it would require writing a file next to the binary under
+test, which the smoke test has no business doing.
+
+Reading the home tier's file directly assumes it is in fact the one that
+resolved, which a developer's own `GRIMOIRE_CONFIG` or sibling file would
+break silently — the login would overwrite that other file instead. The smoke
+test therefore also unsets `GRIMOIRE_CONFIG` and asserts `config get` reports
+`configSource: "home"` before writing anything, so a sibling it cannot unset
+its way out of still fails loudly instead of clobbering another account.
 
 ## Documentation
 
 `docs/configuration.md` gains the precedence table and the bootstrap recipe;
-the README's Configuration section gains the same table in brief. Both currently
-state the single hardcoded location as fact.
+the README's Configuration section gains one sentence pointing at it. Both
+currently state the single hardcoded location as fact.
 
 ## Not in scope
 
@@ -179,5 +198,6 @@ state the single hardcoded location as fact.
   added later as an obvious-looking convenience.
 - **Working-directory discovery.**
 - **A `login --local` flag.**
-- **Any change to what the config file contains**, or to how it is read, written,
-  permissioned or repaired.
+- **Any change to what the config file contains**, or to how it is read,
+  written or permissioned. (How a corrupt file is quarantined did change — see
+  above — because the sibling tier made the old move-aside behaviour unsafe.)

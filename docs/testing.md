@@ -61,6 +61,11 @@ actual published artifact, on every RID, in CI — see the `build` job below.
 seeded with 7 top-level systems (16 including container children) and 15
 books:
 
+- Refuses to run unless `config get` reports the home tier (`configSource`
+  and `configPath` matching `~/.grimoire-cli/config.json`), so a developer's
+  own `GRIMOIRE_CONFIG` or sibling `grimoire-cli.json` cannot get overwritten
+  by the login below
+- `GRIMOIRE_CONFIG` is unset at the top of the script for the same reason
 - Health check, login, config persistence (server + token written to
   `~/.grimoire-cli/config.json`)
 - `systems list` returns valid JSON on stdout with logs on stderr

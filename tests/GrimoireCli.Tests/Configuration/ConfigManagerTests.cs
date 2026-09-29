@@ -185,7 +185,12 @@ public class ConfigManagerTests
             // The bytes are preserved beside the config: a hand-edit that broke the
             // refresh token must be recoverable, since losing it costs a login.
             Assert.Equal(content, File.ReadAllText($"{path}.corrupt"));
-            Assert.False(File.Exists(path));
+            // The path stays claimed — reset to an empty config, not removed — so a
+            // sibling-tier install cannot fall back to another account's file.
+            Assert.True(File.Exists(path));
+            var reloaded = new ConfigManager(path).Load();
+            Assert.Null(reloaded.Server);
+            Assert.Null(reloaded.AccessToken);
         }
         finally
         {

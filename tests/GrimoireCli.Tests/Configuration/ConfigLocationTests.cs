@@ -71,4 +71,27 @@ public class ConfigLocationTests
         var location = ConfigManager.Locate(Env(null), null, Exists(Sibling), Home);
         Assert.Equal(new ConfigLocation(HomeDefault, "home"), location);
     }
+
+    // Pins the reason quarantine copies-and-resets rather than moves: if it went
+    // back to moving the file, the sibling would vanish and this would resolve to
+    // home instead, silently switching the install to another account.
+    [Fact]
+    public void ASiblingQuarantinedByLoadStillResolvesAsTheSibling()
+    {
+        var dir = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
+        Directory.CreateDirectory(dir);
+        var sibling = Path.Combine(dir, "grimoire-cli.json");
+        var exe = Path.Combine(dir, "grimoire-cli");
+        try
+        {
+            File.WriteAllText(sibling, "{not json");
+            new ConfigManager(sibling).Load();
+            var location = ConfigManager.Locate(Env(null), exe, File.Exists, Home);
+            Assert.Equal(new ConfigLocation(sibling, "binary"), location);
+        }
+        finally
+        {
+            Directory.Delete(dir, recursive: true);
+        }
+    }
 }
