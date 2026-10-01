@@ -19,7 +19,7 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | backups | 6 / 6 |
 | bookmarks | 0 / 4 |
 | books | 16 / 16 |
-| campaigns | 0 / 93 |
+| campaigns | 17 / 93 |
 | downloads | 1 / 1 |
 | duplicates | 13 / 13 |
 | favorites | 0 / 3 |
@@ -39,7 +39,7 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | token-frames | 0 / 2 |
 | tokens | 10 / 10 |
 | users | 0 / 16 |
-| **Total** | **150 / 309** |
+| **Total** | **167 / 309** |
 
 2 operation(s) are internal-only (🔒) and excluded from covered counts.
 
@@ -155,8 +155,8 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 
 | Method | Path | Description | Perm | CLI |
 |--------|------|-------------|------|-----|
-| GET | `/api/campaigns` | List campaigns for the current user |  | — |
-| POST | `/api/campaigns` | Create a campaign |  | — |
+| GET | `/api/campaigns` | List campaigns for the current user |  | `campaigns list` ✅ |
+| POST | `/api/campaigns` | Create a campaign |  | `campaigns create` ✅ |
 | GET | `/api/campaigns/admin/by-user/{user_id}` | Admin: list campaigns owned by a user (read-only, minimal fields) | admin | — |
 | GET | `/api/campaigns/calendar/subscription` | Get the caller's calendar subscription URLs |  | — |
 | POST | `/api/campaigns/calendar/subscription` | Mint or rotate the caller's calendar feed token |  | — |
@@ -166,8 +166,8 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | GET | `/api/campaigns/invites` | List the current user's pending campaign invitations |  | — |
 | GET | `/api/campaigns/resources/search` | Search books, maps, and tokens by name |  | — |
 | GET | `/api/campaigns/resources/suggested/{system_id}` | Suggested resources (system books) for the create wizard |  | — |
-| GET | `/api/campaigns/{campaign_id}` | Get a campaign |  | — |
-| PATCH | `/api/campaigns/{campaign_id}` | Update a campaign |  | — |
+| GET | `/api/campaigns/{campaign_id}` | Get a campaign |  | `campaigns get` ✅ |
+| PATCH | `/api/campaigns/{campaign_id}` | Update a campaign |  | `campaigns update` ✅ |
 | DELETE | `/api/campaigns/{campaign_id}` | Delete a campaign |  | — |
 | PUT | `/api/campaigns/{campaign_id}/archive` | Archive or unarchive a campaign |  | — |
 | GET | `/api/campaigns/{campaign_id}/availability` | Get availability chart for upcoming sessions |  | — |
@@ -179,14 +179,14 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | PUT | `/api/campaigns/{campaign_id}/banner/focus` | Set the banner focal point |  | — |
 | POST | `/api/campaigns/{campaign_id}/banner/from-source` | Set the banner from an existing image |  | — |
 | GET | `/api/campaigns/{campaign_id}/calendar.ics` | Download a campaign's schedule as an .ics file |  | — |
-| GET | `/api/campaigns/{campaign_id}/categories` | List categories (optionally filtered by kind) |  | — |
-| POST | `/api/campaigns/{campaign_id}/categories` | Create a category |  | — |
-| PUT | `/api/campaigns/{campaign_id}/categories/reorder` | Reorder categories |  | — |
-| PATCH | `/api/campaigns/{campaign_id}/categories/{category_id}` | Rename a category |  | — |
-| DELETE | `/api/campaigns/{campaign_id}/categories/{category_id}` | Delete a category (mode: uncategorize \| delete_items) |  | — |
+| GET | `/api/campaigns/{campaign_id}/categories` | List categories (optionally filtered by kind) |  | `campaigns categories list` ✅ |
+| POST | `/api/campaigns/{campaign_id}/categories` | Create a category |  | `campaigns categories create` ✅ |
+| PUT | `/api/campaigns/{campaign_id}/categories/reorder` | Reorder categories |  | `campaigns categories reorder` ✅ |
+| PATCH | `/api/campaigns/{campaign_id}/categories/{category_id}` | Rename a category |  | `campaigns categories update` ✅ |
+| DELETE | `/api/campaigns/{campaign_id}/categories/{category_id}` | Delete a category (mode: uncategorize \| delete_items) |  | `campaigns categories delete` ✅ |
 | POST | `/api/campaigns/{campaign_id}/convert-to-group` | Convert a personal campaign into a GM-run group campaign |  | — |
 | GET | `/api/campaigns/{campaign_id}/eligible-members` | List users that can be invited |  | — |
-| POST | `/api/campaigns/{campaign_id}/files` | Upload a campaign file (GM); links it as a resource |  | — |
+| POST | `/api/campaigns/{campaign_id}/files` | Upload a campaign file (GM); links it as a resource |  | `campaigns files upload` ✅ |
 | GET | `/api/campaigns/{campaign_id}/files/{file_id}` | Download a campaign file (honours resource visibility) |  | — |
 | POST | `/api/campaigns/{campaign_id}/guests` | Create a guest invite code for a GM campaign |  | — |
 | GET | `/api/campaigns/{campaign_id}/guests` | List a campaign's guests and their invite codes |  | — |
@@ -207,13 +207,13 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | DELETE | `/api/campaigns/{campaign_id}/members/{member_id}/token` | Remove a member's character token |  | — |
 | PATCH | `/api/campaigns/{campaign_id}/members/{user_id}` | Accept or decline an invitation |  | — |
 | DELETE | `/api/campaigns/{campaign_id}/members/{user_id}` | Remove a member |  | — |
-| PUT | `/api/campaigns/{campaign_id}/resource-group-order` | Set the resource panel's group display order (categories + type groups) |  | — |
-| GET | `/api/campaigns/{campaign_id}/resources` | List linked resources |  | — |
-| POST | `/api/campaigns/{campaign_id}/resources` | Link a resource to a campaign |  | — |
-| POST | `/api/campaigns/{campaign_id}/resources/bulk` | Link many resources at once |  | — |
-| PUT | `/api/campaigns/{campaign_id}/resources/reorder` | Reorder resources (drag-and-drop) |  | — |
-| PATCH | `/api/campaigns/{campaign_id}/resources/{resource_id}` | Update resource visibility/category |  | — |
-| DELETE | `/api/campaigns/{campaign_id}/resources/{resource_id}` | Unlink a resource |  | — |
+| PUT | `/api/campaigns/{campaign_id}/resource-group-order` | Set the resource panel's group display order (categories + type groups) |  | `campaigns categories group-order` ✅ |
+| GET | `/api/campaigns/{campaign_id}/resources` | List linked resources |  | `campaigns resources list` ✅ |
+| POST | `/api/campaigns/{campaign_id}/resources` | Link a resource to a campaign |  | `campaigns resources add` ✅ |
+| POST | `/api/campaigns/{campaign_id}/resources/bulk` | Link many resources at once |  | `campaigns resources bulk` ✅ |
+| PUT | `/api/campaigns/{campaign_id}/resources/reorder` | Reorder resources (drag-and-drop) |  | `campaigns resources reorder` ✅ |
+| PATCH | `/api/campaigns/{campaign_id}/resources/{resource_id}` | Update resource visibility/category |  | `campaigns resources update` ✅ |
+| DELETE | `/api/campaigns/{campaign_id}/resources/{resource_id}` | Unlink a resource |  | `campaigns resources remove` ✅ |
 | GET | `/api/campaigns/{campaign_id}/schedule` | Get campaign schedule and next sessions |  | — |
 | PUT | `/api/campaigns/{campaign_id}/schedule` | Create or update campaign schedule |  | — |
 | DELETE | `/api/campaigns/{campaign_id}/schedule` | Remove campaign schedule |  | — |

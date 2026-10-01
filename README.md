@@ -354,6 +354,23 @@ grimoire-cli config set server https://grimoire.example.com
 | `duplicates dismiss --resource-type <t> --member-ids <id>... [--note <text>]` | Mark a group as not duplicates (admin) |
 | `duplicates dismissals [--resource-type <t>]` | List dismissed groups (admin) |
 | `duplicates undismiss --id <id>` | Undo a dismissal (admin) |
+| `campaigns list [--include-archived]` | List campaigns you own or have joined |
+| `campaigns get --id <campaign-id>` | Get one campaign |
+| `campaigns create {--input <file> \| --stdin}` | Create a campaign, optionally with resources linked |
+| `campaigns update --id <campaign-id> {--input <file> \| --stdin}` | Update a campaign's details |
+| `campaigns resources list --id <campaign-id>` | List a campaign's linked resources |
+| `campaigns resources add --id <campaign-id> --resource-type <t> --resource-id <item-id> [--visibility gm\|public\|private] [--category-id <id>]` | Link one library item; 409 if already linked |
+| `campaigns resources bulk --id <campaign-id> {--input <file> \| --stdin}` | Link many items; exit 3 if any were skipped |
+| `campaigns resources update --id <campaign-id> --link-id <link-id> [--visibility gm\|public\|private] [--category-id <id>]` | Change a link's visibility or category |
+| `campaigns resources remove --id <campaign-id> --link-id <link-id>` | Unlink one resource; a `file` link's upload is deleted |
+| `campaigns resources reorder --id <campaign-id> --ordered-ids <link-id>...` | Set the manual order of links |
+| `campaigns categories list --id <campaign-id>` | List a campaign's resource categories |
+| `campaigns categories create --id <campaign-id> --name <n> [--icon <i>] [--icon-color <c>]` | Create a resource category |
+| `campaigns categories update --id <campaign-id> --category-id <id> [--name <n>] [--icon <i>] [--icon-color <c>]` | Rename or restyle a category |
+| `campaigns categories delete --id <campaign-id> --category-id <id> [--mode uncategorize\|delete_items]` | Delete a category; `delete_items` unlinks its resources |
+| `campaigns categories reorder --id <campaign-id> --ordered-ids <category-id>...` | Set the order of categories |
+| `campaigns categories group-order --id <campaign-id> --ordered-keys <key>...` | Order the resource panel's type and category groups |
+| `campaigns files upload --id <campaign-id> --file <path> [--category-id <id> \| --new-category-name <n>]` | Upload a file and link it at `gm` visibility |
 | `self-test` | Verify binary integrity (AOT validation, no network required) |
 
 Every command supports `--help` with examples and caveats.

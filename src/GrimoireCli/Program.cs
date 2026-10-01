@@ -63,6 +63,7 @@ rootCommand.Subcommands.Add(SearchCommand.Create());
 rootCommand.Subcommands.Add(LogsCommand.Create());
 rootCommand.Subcommands.Add(TagsCommand.Create());
 rootCommand.Subcommands.Add(DuplicatesCommand.Create());
+rootCommand.Subcommands.Add(CampaignsCommand.Create());
 rootCommand.Subcommands.Add(GenresCommand.Create());
 rootCommand.Subcommands.Add(LicensesCommand.Create());
 rootCommand.Subcommands.Add(ParentSystemsCommand.Create());
