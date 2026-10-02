@@ -31,8 +31,10 @@ public static class LoginCommand
             "",
             "--api-key-stdin logs in with a Grimoire API key instead: no session to",
             "renew, limited to the key's permissions, and only until it expires.",
-            "Caveats: docs/authentication.md#api-keys. Per-command permissions:",
-            "docs/grimoire-api-coverage.md (Key column).");
+            "Caveats:",
+            "https://github.com/thomaslazar/grimoire-cli/blob/main/docs/authentication.md#api-keys",
+            "Permission each command needs (Key column):",
+            "https://github.com/thomaslazar/grimoire-cli/blob/main/docs/grimoire-api-coverage.md");
         command.AddExamples(
             "grimoire-cli login --server https://grimoire.example.com",
             "grimoire-cli login --server https://grimoire.example.com --username agent --password-stdin <<<\"$GRIMOIRE_PW\"",

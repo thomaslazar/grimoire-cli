@@ -1,3 +1,4 @@
+using GrimoireCli.Api;
 using GrimoireCli.Commands;
 
 namespace GrimoireCli.Tests.Commands;
@@ -40,6 +41,7 @@ public class LoginApiKeyTests
     {
         var output = HelpRenderer.Render(LoginCommand.Create(), ["login"], full: false);
         Assert.Contains("--api-key-stdin", output);
-        Assert.Contains("authentication.md#api-keys", output);
+        Assert.Contains("https://github.com/thomaslazar/grimoire-cli/blob/main/docs/authentication.md#api-keys", output);
+        Assert.Contains(GrimoireApiClient.KeyPermissionsUrl, output);
     }
 }
