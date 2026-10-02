@@ -18,7 +18,7 @@ public static class CommandHelper
             Environment.Exit(1);
         }
 
-        if (string.IsNullOrEmpty(config.AccessToken))
+        if (string.IsNullOrEmpty(config.AccessToken) && string.IsNullOrEmpty(config.ApiKey))
         {
             _logger.Error("Not authenticated. Run: grimoire-cli login");
             Environment.Exit(1);

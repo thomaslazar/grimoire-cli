@@ -13,6 +13,9 @@ public class AppConfig
     [JsonPropertyName("refreshToken")]
     public string? RefreshToken { get; set; }
 
+    [JsonPropertyName("apiKey")]
+    public string? ApiKey { get; set; }
+
     // Written by the CLI's version-check cadence, not by the operator: when the
     // server version was last checked, and what it was.
     [JsonPropertyName("lastVersionCheck")]
