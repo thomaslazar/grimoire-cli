@@ -10,6 +10,7 @@ the first release cut with it.
   attaches it to the release, and builds a deb for the two Linux RIDs.
 - An `update-homebrew` job refreshes a tap formula from
   `.github/homebrew/grimoire-cli.rb.template`.
+- A `checksums` job attaches a `SHA256SUMS` covering every release asset.
 - `install.sh` and `install.ps1` fetch a named or latest release.
 
 ## Standing prerequisites
@@ -28,9 +29,6 @@ The process below is automated by the `release` skill
 (`.claude/skills/release/SKILL.md`), which is invoked by name and never
 model-initiated. The prose is kept because a reader looking for the process
 should not have to know the skill exists.
-
-`install.sh` and `install.ps1` will not work until the first tag exists, since
-they resolve GitHub release assets.
 
 ### Creating the tap token
 

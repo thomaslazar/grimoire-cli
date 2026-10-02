@@ -164,6 +164,23 @@ jobs:
           dpkg-deb --build --root-owner-group "$PKG_DIR"
           gh release upload "${{ github.event.release.tag_name }}" "${PKG_DIR}.deb"
 
+  # The installers verify downloads against this file. It is built once every
+  # matrix leg has attached its assets, since no single leg sees them all.
+  checksums:
+    if: github.event_name == 'release'
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Publish SHA256SUMS
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          TAG="${{ github.event.release.tag_name }}"
+          gh release download "$TAG" -R thomaslazar/grimoire-cli -p 'grimoire-cli*' -D assets
+          cd assets
+          sha256sum grimoire-cli* > SHA256SUMS
+          gh release upload "$TAG" SHA256SUMS -R thomaslazar/grimoire-cli
+
   # Requires the `HOMEBREW_TAP_TOKEN` secret and the `thomaslazar/homebrew-grimoire-cli`
   # tap repo to exist — neither does yet. This job will fail on the first
   # release until both prerequisites are set up.
