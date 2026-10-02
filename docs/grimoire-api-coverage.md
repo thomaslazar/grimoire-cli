@@ -2,7 +2,7 @@
 
 Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any) that implements it.
 
-- **Reference:** spec fetched live from the pinned stack's `/api/openapi.json` (v1.7.2, 235 paths, 309 operations) and the upstream router source read from the same container. Tested range: `1.7.2` only (`GrimoireApiClient.cs`).
+- **Reference:** spec fetched live from the pinned stack's `/api/openapi.json` (v1.7.3, 237 paths, 313 operations) and the upstream router source read from the same container. Tested range: `1.7.2`-`1.7.3` (`GrimoireApiClient.cs`).
 - **Perm** column uses Grimoire's roles (`admin` / `gm or admin` / `not guest`); blank = any authenticated user. `?` = a dependency this script could not resolve.
 - ✅ = covered by a CLI command · — = not implemented · 🔒 = internal-only (no user-facing verb); 🔒 rows never count as covered.
 - **Regenerate with `tools/generate-api-coverage.py`; update `IMPLEMENTED` there in the same PR as any change to which endpoints the CLI calls.**
@@ -13,6 +13,7 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 |-----|-----------------|
 | (untagged) | 0 / 1 |
 | addons | 8 / 8 |
+| api-keys | 0 / 6 |
 | audio | 14 / 14 |
 | audio-sets | 0 / 5 |
 | auth | 2 / 14 |
@@ -27,19 +28,20 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | library | 4 / 7 |
 | logs | 1 / 1 |
 | lookups | 15 / 15 |
-| maintenance | 4 / 5 |
+| maintenance | 3 / 4 |
 | maps | 14 / 16 |
 | models | 10 / 10 |
 | saved-filters | 0 / 4 |
 | search | 2 / 2 |
-| settings | 0 / 5 |
+| settings | 0 / 3 |
+| stats | 1 / 1 |
 | systems | 15 / 15 |
 | tags | 6 / 6 |
 | themes | 0 / 7 |
 | token-frames | 0 / 2 |
 | tokens | 10 / 10 |
 | users | 0 / 16 |
-| **Total** | **167 / 309** |
+| **Total** | **167 / 313** |
 
 2 operation(s) are internal-only (🔒) and excluded from covered counts.
 
@@ -61,6 +63,17 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | PATCH | `/api/addons/{addon_id}` | Enable, disable, or approve an add-on | admin | `addons update` ✅ |
 | DELETE | `/api/addons/{addon_id}` | Uninstall an add-on | admin | `addons uninstall` ✅ |
 | POST | `/api/addons/{addon_id}/install` | Install or update an add-on | admin | `addons install` ✅ |
+
+## api-keys
+
+| Method | Path | Description | Perm | CLI |
+|--------|------|-------------|------|-----|
+| GET | `/api/api-keys` | List your API keys (never their secrets) |  | — |
+| POST | `/api/api-keys` | Create an API key that acts as you |  | — |
+| GET | `/api/api-keys/permissions` | List the permissions your keys can be granted |  | — |
+| PATCH | `/api/api-keys/{key_id}` | Rename a key or change its permissions or expiry |  | — |
+| DELETE | `/api/api-keys/{key_id}` | Revoke (delete) an API key |  | — |
+| POST | `/api/api-keys/{key_id}/regenerate` | Issue a new secret for a key |  | — |
 
 ## audio
 
@@ -304,9 +317,9 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | POST | `/api/cancel-scan` | Cancel running scan | admin | `library cancel-scan` ✅ |
 | GET | `/api/changelog` | Release changelog |  | — |
 | GET | `/api/latest-release` | Latest published release |  | — |
+| POST | `/api/maintenance/cleanup-missing` | Remove DB entries for missing files | admin | `library cleanup-missing` ✅ |
 | POST | `/api/rescan` | Rescan and reindex library | admin | `library rescan` ✅ |
 | GET | `/api/scan-status` | Scan status | admin | `library scan-status` ✅ |
-| GET | `/api/stats` | Library statistics |  | `library stats` ✅ |
 
 ## logs
 
@@ -339,7 +352,6 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | Method | Path | Description | Perm | CLI |
 |--------|------|-------------|------|-----|
 | GET | `/api/health` | Liveness/readiness probe |  | — |
-| POST | `/api/maintenance/cleanup-missing` | Remove DB entries for missing files | admin | `library cleanup-missing` ✅ |
 | POST | `/api/maintenance/sidecars/export` | Write metadata sidecars for the whole library | admin | `sidecars export` ✅ |
 | GET | `/api/maintenance/sidecars/settings` | Read metadata sidecar export settings | admin | `sidecars settings get` ✅ |
 | PUT | `/api/maintenance/sidecars/settings` | Configure metadata sidecar export | admin | `sidecars settings set` ✅ |
@@ -402,9 +414,13 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 |--------|------|-------------|------|-----|
 | GET | `/api/settings` | Get app settings | admin | — |
 | PATCH | `/api/settings` | Update app settings | admin | — |
-| DELETE | `/api/settings/api-key` | Revoke the stats API key | admin | — |
-| POST | `/api/settings/api-key/generate` | Generate a new stats API key | admin | — |
 | GET | `/api/settings/ui` | UI settings (any authenticated user) |  | — |
+
+## stats
+
+| Method | Path | Description | Perm | CLI |
+|--------|------|-------------|------|-----|
+| GET | `/api/stats` | Library statistics |  | `library stats` ✅ |
 
 ## systems
 

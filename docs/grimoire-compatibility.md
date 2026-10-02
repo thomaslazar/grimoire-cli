@@ -7,7 +7,8 @@
 | 0.1.x | 1.5.6 | initial support, maintained on `support/grimoire-1.5.6` |
 | 0.2.x | 1.6.2 | superseded by 0.3.x |
 | 0.3.0 | 1.7.0 – 1.7.1 | superseded by 0.3.1; no support branch |
-| 0.3.1 | 1.7.2 | current, on `main` |
+| 0.3.1 | 1.7.2 | latest release |
+| unreleased | 1.7.2 – 1.7.3 | current, on `main` |
 
 **The floor rises only when something forces it**, not on every server release.
 Each row above records a pairing that was necessary at the time — 1.5.6 → 1.6.0
@@ -25,7 +26,7 @@ an older Grimoire does not know is dropped by Pydantic rather than rejected, so
 the command answers 200 and does nothing — the one failure the version warning
 exists to catch.
 
-`main` targets Grimoire 1.7.2. Reaching 1.6.0 was more than a version bump: it
+`main` targets Grimoire 1.7.3. Reaching 1.6.0 was more than a version bump: it
 shortened the access token from 30 days to 30 minutes and made the library
 writable, which is why the CLI renews its own session
 ([authentication.md](authentication.md)) and why the `files` endpoints exist at
@@ -70,7 +71,7 @@ plain `BaseModel`s with Pydantic's default `extra='ignore'`, so that flag's fiel
 is dropped and the folder is created with no marker and a 200. A silent no-op is
 what the floor warning is for; without the new flag this release would not have
 needed one.
-`docker/docker-compose.yml` pins the `1.7.2` release tag, so the spec cannot
+`docker/docker-compose.yml` pins the `1.7.3` release tag, so the spec cannot
 drift under the committed client between regenerations.
 
 **1.7.1 raised `MaxTestedVersion` and left the floor alone** — the first bump
@@ -130,10 +131,30 @@ answers 200 with path-ordered rows — the silent no-op the floor warning exists
 to catch. Nothing else in 1.7.2 needed a floor: `product_code` rides the
 generated body model, and every other command still reaches 1.7.0.
 
+**1.7.3 raised `MaxTestedVersion` and left the floor alone.** Nothing the CLI
+sends changed. What moved is around it:
+
+- **API keys.** New `/api/api-keys` routes, and `get_current_user` accepts an
+  `X-API-Key` header ahead of any session (`auth.py:303`). A key acts as its
+  owner, narrowed to the permissions it was granted; `API_KEYS_ENABLED`
+  switches the feature off instance-wide. The CLI still authenticates with a
+  session, and the new routes are not implemented.
+- **The instance-wide stats key is gone.** `/api/settings/api-key` and
+  `settings.stats_api_key` are removed, and `GET /api/stats` now takes a session
+  or a key with the `stats` permission. `library stats` always sent a session,
+  so it is unaffected.
+- **`maintenance/cleanup-missing` is tagged `library`**, so a key's library
+  permission reaches it. It now lists under library in the coverage table.
+- **Moving a book keeps its search text.** On 1.7.2 a move, through `files
+  move` / `files rename` or one the scan detected on disk, deleted the book's
+  FTS rows but left it marked indexed, so its page text dropped out of `search`
+  for good (upstream #503). Migration 0037 re-queues the books earlier moves
+  emptied, so the first scan after upgrading may re-read or re-OCR some books.
+
 ## Runtime check
 
 `src/GrimoireCli/Api/GrimoireApiClient.cs` defines `MinSupportedVersion` and
-`MaxTestedVersion`, currently `"1.7.2"` and `"1.7.2"`. A check runs before the first
+`MaxTestedVersion`, currently `"1.7.2"` and `"1.7.3"`. A check runs before the first
 request of any command, calling `GET /api/about` and comparing the reported
 version against that range. It is throttled to once every 24 hours — a
 config with a recent `lastVersionCheck` skips the probe entirely — and

@@ -9,27 +9,27 @@ namespace GrimoireCli.Generated.Models
 {
     [global::System.CodeDom.Compiler.GeneratedCode("Kiota", "1.0.0")]
     #pragma warning disable CS1591
-    public partial class SettingsPatch_stats_api_keyMember1 : IAdditionalDataHolder, IParsable
+    public partial class ApiKeyOut_permissions : IAdditionalDataHolder, IParsable
     #pragma warning restore CS1591
     {
         /// <summary>Stores additional data not described in the OpenAPI description found when deserializing. Can be used for serialization as well.</summary>
         public IDictionary<string, object> AdditionalData { get; set; }
         /// <summary>
-        /// Instantiates a new <see cref="global::GrimoireCli.Generated.Models.SettingsPatch_stats_api_keyMember1"/> and sets the default values.
+        /// Instantiates a new <see cref="global::GrimoireCli.Generated.Models.ApiKeyOut_permissions"/> and sets the default values.
         /// </summary>
-        public SettingsPatch_stats_api_keyMember1()
+        public ApiKeyOut_permissions()
         {
             AdditionalData = new Dictionary<string, object>();
         }
         /// <summary>
         /// Creates a new instance of the appropriate class based on discriminator value
         /// </summary>
-        /// <returns>A <see cref="global::GrimoireCli.Generated.Models.SettingsPatch_stats_api_keyMember1"/></returns>
+        /// <returns>A <see cref="global::GrimoireCli.Generated.Models.ApiKeyOut_permissions"/></returns>
         /// <param name="parseNode">The parse node to use to read the discriminator value and create the object</param>
-        public static global::GrimoireCli.Generated.Models.SettingsPatch_stats_api_keyMember1 CreateFromDiscriminatorValue(IParseNode parseNode)
+        public static global::GrimoireCli.Generated.Models.ApiKeyOut_permissions CreateFromDiscriminatorValue(IParseNode parseNode)
         {
             if(ReferenceEquals(parseNode, null)) throw new ArgumentNullException(nameof(parseNode));
-            return new global::GrimoireCli.Generated.Models.SettingsPatch_stats_api_keyMember1();
+            return new global::GrimoireCli.Generated.Models.ApiKeyOut_permissions();
         }
         /// <summary>
         /// The deserialization information for the current model
