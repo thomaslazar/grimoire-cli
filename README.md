@@ -123,6 +123,9 @@ CI-built binaries stamp their origin into the version, so an installed one ident
 # Authenticate (prompts for anything you leave out)
 grimoire-cli login --server https://grimoire.example.com
 
+# Or authenticate with an API key instead of a session
+grimoire-cli login --server https://grimoire.example.com --api-key-stdin <<<"$GRIMOIRE_KEY"
+
 # List game systems
 grimoire-cli systems list | jq
 
@@ -198,11 +201,13 @@ grimoire-cli config set server https://grimoire.example.com
 
 `login` stores a 30-minute access token plus a 30-day refresh token, and the CLI renews the pair transparently — before a request when the access token is nearly out, and again if the server reports it expired. The renewed pair is written back to the config file. Once the refresh token is gone or the session is revoked, the next command reports `Session expired. Run: grimoire-cli login`.
 
+`login --api-key-stdin` logs in with a Grimoire API key instead of a session — no renewal, limited to the key's own permissions. See [docs/authentication.md#api-keys](docs/authentication.md#api-keys) for the differences and [docs/grimoire-api-coverage.md](docs/grimoire-api-coverage.md) for which permission each command needs.
+
 ## Commands
 
 | Command | Description |
 |---------|-------------|
-| `login [--server <url>] [--username <u>] [--password <pw> \| --password-stdin]` | Authenticate and store the JWT (flags fall back to interactive prompts) |
+| `login [--server <url>] [--username <u>] [--password <pw> \| --password-stdin \| --api-key-stdin]` | Authenticate and store the JWT or API key (flags fall back to interactive prompts) |
 | `me` | Show the authenticated account (id, username, role, flags) |
 | `config get` | Show current configuration |
 | `config set <key> <value>` | Set a configuration value (`server` is the only valid key) |

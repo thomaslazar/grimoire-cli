@@ -28,27 +28,34 @@ public static class ConfigCommand
             "logging in — echo '{}' > bin/grimoire-cli.json — then login writes",
             "into it.",
             "",
-            "A symlinked binary resolves to the real file's directory.");
+            "A symlinked binary resolves to the real file's directory.",
+            "",
+            "auth is api-key or session; login sets one and clears the other.");
         command.AddExamples("grimoire-cli config get");
         command.SetAction(parseResult =>
         {
             var location = ConfigManager.Locate();
             var config = new ConfigManager(location.Path).Load();
-            var display = new Dictionary<string, string>
-            {
-                ["server"] = config.Server ?? "(not set)",
-                ["accessToken"] = config.AccessToken != null ? "***" : "(not set)",
-                ["refreshToken"] = config.RefreshToken != null ? "***" : "(not set)",
-                ["lastVersionCheck"] = config.LastVersionCheck?.ToString("u") ?? "(never)",
-                ["lastServerVersion"] = config.LastServerVersion ?? "(unknown)",
-                ["configPath"] = location.Path,
-                ["configSource"] = location.Source
-            };
-            ConsoleOutput.WriteJson(display);
+            ConsoleOutput.WriteJson(Display(config, location));
             return 0;
         });
         return command;
     }
+
+    internal static Dictionary<string, string> Display(AppConfig config, ConfigLocation location) => new()
+    {
+        ["server"] = config.Server ?? "(not set)",
+        ["accessToken"] = config.AccessToken != null ? "***" : "(not set)",
+        ["refreshToken"] = config.RefreshToken != null ? "***" : "(not set)",
+        ["apiKey"] = config.ApiKey != null ? "***" : "(not set)",
+        ["auth"] = !string.IsNullOrEmpty(config.ApiKey) ? "api-key"
+            : !string.IsNullOrEmpty(config.AccessToken) ? "session"
+            : "(none)",
+        ["lastVersionCheck"] = config.LastVersionCheck?.ToString("u") ?? "(never)",
+        ["lastServerVersion"] = config.LastServerVersion ?? "(unknown)",
+        ["configPath"] = location.Path,
+        ["configSource"] = location.Source
+    };
 
     private static Command CreateSetCommand()
     {

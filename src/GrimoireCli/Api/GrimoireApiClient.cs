@@ -31,6 +31,14 @@ public class GrimoireApiClient
 
     public static readonly TimeSpan DefaultRequestTimeout = TimeSpan.FromSeconds(100);
 
+    internal const string ApiKeyHeader = "X-API-Key";
+
+    /// <summary>Where a key's required permission per command is listed.</summary>
+    internal const string KeyPermissionsUrl =
+        "https://github.com/thomaslazar/grimoire-cli/blob/main/docs/grimoire-api-coverage.md";
+
+    private bool ApiKeyMode => !string.IsNullOrEmpty(_config.ApiKey);
+
     public GrimoireApiClient(AppConfig config, ConfigManager? configManager = null,
         HttpMessageHandler? innerHandler = null)
     {
@@ -56,7 +64,11 @@ public class GrimoireApiClient
         };
         _http.DefaultRequestHeaders.UserAgent.ParseAdd($"grimoire-cli/{ClientVersion}");
 
-        if (config.AccessToken != null)
+        // A key replaces the session outright, so a stale access token left
+        // beside it is never sent.
+        if (ApiKeyMode)
+            _http.DefaultRequestHeaders.Add(ApiKeyHeader, config.ApiKey);
+        else if (config.AccessToken != null)
             _http.DefaultRequestHeaders.Authorization =
                 new AuthenticationHeaderValue("Bearer", config.AccessToken);
         _logger.Debug($"client base address: {_http.BaseAddress}");
@@ -328,7 +340,7 @@ public class GrimoireApiClient
         var request = await _adapter.ConvertToNativeRequestAsync<HttpRequestMessage>(info, cancellationToken)
             ?? throw new InvalidOperationException($"Failed to build request for {info.URI.AbsolutePath}");
         var response = await SendOrExitAsync(request, cancellationToken);
-        if (!ShouldRefreshOn401(response, HasRefreshToken)) return response;
+        if (!ShouldRefreshOn401(response, CanRefresh)) return response;
         if (info.Content is { CanSeek: false })
         {
             // Replaying needs the body back, and this one cannot be rewound. The
@@ -364,7 +376,11 @@ public class GrimoireApiClient
             ? $"{body[..maxChars]}... (truncated, {body.Length} chars total)"
             : body;
 
-    private bool HasRefreshToken => !string.IsNullOrEmpty(_config.RefreshToken);
+    /// <summary>
+    /// Whether a refresh is possible at all. A key cannot reach
+    /// /api/auth/refresh, so key mode never refreshes even with a stale cookie.
+    /// </summary>
+    internal bool CanRefresh => !ApiKeyMode && !string.IsNullOrEmpty(_config.RefreshToken);
 
     /// <summary>
     /// Exchanges the stored refresh cookie for a new token pair. The endpoint
@@ -431,7 +447,7 @@ public class GrimoireApiClient
     {
         var token = _http.DefaultRequestHeaders.Authorization?.Parameter;
         if (token == null) return;
-        if (ShouldRefreshProactively(token, HasRefreshToken))
+        if (ShouldRefreshProactively(token, CanRefresh))
         {
             _logger.Debug($"access token expiring in {TokenHelper.SecondsUntilExpiry(token)}s, refreshing");
             await RefreshAsync(cancellationToken);
@@ -450,7 +466,7 @@ public class GrimoireApiClient
     /// </summary>
     private async Task PreflightAsync(CancellationToken cancellationToken)
     {
-        await EnsureValidTokenAsync(cancellationToken);
+        if (!ApiKeyMode) await EnsureValidTokenAsync(cancellationToken);
         await EnsureVersionCheckedAsync();
     }
 
@@ -499,6 +515,30 @@ public class GrimoireApiClient
             // real command will report the outage a moment later if there is one.
             _logger.Debug($"version probe failed: {ex.Message}");
             return null;
+        }
+    }
+
+    /// <summary>
+    /// GET /api/about once, returning the status and body without exiting, for a
+    /// login that must classify the answer itself. Same short budget and no
+    /// preflight, as in <see cref="ProbeServerVersionAsync"/>. Status is null when
+    /// the server could not be reached.
+    /// </summary>
+    public async Task<(int? Status, string Body)> ProbeAboutAsync()
+    {
+        try
+        {
+            using var cts = new CancellationTokenSource(VersionProbeTimeout);
+            var info = Api.Api.About.ToGetRequestInformation();
+            var request = await _adapter.ConvertToNativeRequestAsync<HttpRequestMessage>(info, cts.Token);
+            if (request == null) return (null, "");
+            var response = await _http.SendAsync(request, cts.Token);
+            return ((int)response.StatusCode, await response.Content.ReadAsStringAsync(cts.Token));
+        }
+        catch (Exception ex)
+        {
+            _logger.Debug($"about probe failed: {ex.Message}");
+            return (null, "");
         }
     }
 
@@ -632,25 +672,41 @@ public class GrimoireApiClient
             .Select(p => int.TryParse(new string(p.TakeWhile(char.IsDigit).ToArray()), out var n) ? n : 0)
             .ToArray();
 
-    private static async Task EnsureSuccessAsync(
+    private async Task EnsureSuccessAsync(
         HttpResponseMessage response, string? permissionHint = null, string? notFoundHint = null)
     {
         if (response.IsSuccessStatusCode) return;
 
         var body = await response.Content.ReadAsStringAsync();
-        var status = (int)response.StatusCode;
+        _logger.Error(ErrorMessage((int)response.StatusCode, response.ReasonPhrase, body,
+            permissionHint, notFoundHint, ApiKeyMode));
+        Environment.Exit(2);
+    }
+
+    /// <summary>
+    /// The stderr line for a failed status. Pure so every branch is testable;
+    /// <see cref="EnsureSuccessAsync"/> exits. Under a key, a 401 or 403 ends
+    /// with where the per-command key permissions are listed.
+    /// </summary>
+    internal static string ErrorMessage(int status, string? reasonPhrase, string body,
+        string? permissionHint, string? notFoundHint, bool apiKeyMode)
+    {
+        var detail = string.IsNullOrWhiteSpace(body) ? "" : $" {body.Trim()}";
         var message = status switch
         {
+            401 when apiKeyMode => "API key invalid or expired. Run: grimoire-cli login --api-key-stdin",
             401 => "Not authenticated, or the token has expired. Run: grimoire-cli login",
-            403 when permissionHint != null => $"Permission denied. This operation requires {permissionHint}.",
-            403 => $"Permission denied.{(string.IsNullOrWhiteSpace(body) ? "" : $" {body.Trim()}")}",
-            400 => $"Bad request.{(string.IsNullOrWhiteSpace(body) ? "" : $" {body.Trim()}")}",
+            403 when permissionHint != null => $"Permission denied. This operation requires {permissionHint}.{detail}",
+            403 => $"Permission denied.{detail}",
+            400 => $"Bad request.{detail}",
             404 when notFoundHint != null => $"Not found. {notFoundHint}",
-            404 => $"Not found.{(string.IsNullOrWhiteSpace(body) ? "" : $" {body.Trim()}")}",
-            422 => $"Validation error.{(string.IsNullOrWhiteSpace(body) ? "" : $" {body.Trim()}")}",
-            _ => $"API request failed: {status} {response.ReasonPhrase}{(string.IsNullOrWhiteSpace(body) ? "" : $"\n{body.Trim()}")}"
+            404 => $"Not found.{detail}",
+            422 => $"Validation error.{detail}",
+            429 => $"Too many requests.{detail}",
+            _ => $"API request failed: {status} {reasonPhrase}{(string.IsNullOrWhiteSpace(body) ? "" : $"\n{body.Trim()}")}"
         };
-        _logger.Error(message);
-        Environment.Exit(2);
+        return apiKeyMode && status is 401 or 403
+            ? $"{message}\nKey permissions per command: {KeyPermissionsUrl}"
+            : message;
     }
 }

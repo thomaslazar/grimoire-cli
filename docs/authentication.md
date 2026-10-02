@@ -77,6 +77,68 @@ bulk commands send one batch request, not N — so a single invocation cannot
 refresh twice at once, and the consuming skills invoke the CLI serially.
 Recovery is one `login`.
 
+## API keys
+
+`grimoire-cli login --api-key-stdin <<<"$GRIMOIRE_KEY"` reads a key from the
+first line of stdin, probes it with `GET /api/about`, and on success writes
+`apiKey` to the config, clearing `accessToken` and `refreshToken` — a config
+holds one credential kind. Logging in with a password clears `apiKey` back
+out.
+
+API keys need Grimoire 1.7.3 or later; against 1.7.2 the login is rejected
+with a 401.
+
+`GRIMOIRE_SERVER` overrides the config's server, so the key is sent to
+whatever host it names.
+
+**What changes:**
+
+- Every request sends `X-API-Key` instead of `Authorization`, and a key wins
+  over any session on the same request (`auth.py:303`).
+- No renewal: a key has no access token and no refresh cookie, so there is
+  nothing to renew and no `X-Token-Expired` retry — a key can't reach
+  `/api/auth/refresh` anyway (below). Expiry is final: the fix is
+  `login --api-key-stdin` with a new key, not a retry.
+- A key acts as its owner, at the owner's **current** role, narrowed by the
+  key's own permissions (`api_keys.py` module docstring, `authenticate`) — a
+  demoted owner's keys lose what the demotion took away.
+
+**Who can have one:** a per-instance switch (`API_KEYS_ENABLED`, `config.py:322`)
+turns keys off for everyone, admins included. On, admins can always create
+keys; anyone else needs `api_keys_enabled` granted by an admin first; guests
+never (`user_keys_allowed`).
+
+**Unreachable with any key:**
+
+- Every `auth` route, including `GET /api/auth/me` and `POST /api/auth/refresh`
+  — `auth` is an excluded tag (`EXCLUDED_TAGS`, `api_keys.py`).
+- Key management itself (`/api/api-keys`) — same exclusion, reinforced at the
+  handler (`routers/api_keys/_helpers.py:14-24`): a key can never mint or widen
+  keys.
+- Routes marked `none` (own password, account deletion, OPDS and calendar
+  tokens) — logged-in-only, not key-reachable.
+
+**The version check:** `GET /api/about` is tagged `library`
+(`routers/library/core.py:162`), so a key needs `library` read to pass the
+login/daily version check. Without it, login still saves the key and warns;
+other commands only need whatever permission they call for.
+
+**Failures:**
+
+- 429 once a client IP has enough failed key attempts within the
+  `AUTH_RATE_LIMIT` window (10/minute by default) — only failures count, so a
+  working integration is never throttled, but while blocked even a correct key
+  is refused (`security.py`).
+- 401 `Invalid API key` / `API key has expired` — login discards the key and
+  exits 2; a later command prints `API key invalid or expired. Run:
+  grimoire-cli login --api-key-stdin`.
+- 403 `API keys are not enabled for your account`, or `This API key needs
+  'write' access to 'books' (it has 'read')` — the server names the missing
+  permission in the body, and the CLI appends it to the error line.
+- A key-mode 401 or 403 ends with a pointer to
+  [grimoire-api-coverage.md](grimoire-api-coverage.md) (the **Key** column),
+  where the per-command permission lives.
+
 ## Auth Commands
 
 | Command | Description |

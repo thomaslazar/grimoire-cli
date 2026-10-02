@@ -137,8 +137,10 @@ sends changed. What moved is around it:
 - **API keys.** New `/api/api-keys` routes, and `get_current_user` accepts an
   `X-API-Key` header ahead of any session (`auth.py:303`). A key acts as its
   owner, narrowed to the permissions it was granted; `API_KEYS_ENABLED`
-  switches the feature off instance-wide. The CLI still authenticates with a
-  session, and the new routes are not implemented.
+  switches the feature off instance-wide. `login --api-key-stdin` needs 1.7.3;
+  the floor stays at 1.7.2 because a key login there fails loudly with a 401
+  rather than silently doing nothing. The `/api/api-keys` routes are not
+  implemented.
 - **The instance-wide stats key is gone.** `/api/settings/api-key` and
   `settings.stats_api_key` are removed, and `GET /api/stats` now takes a session
   or a key with the `stats` permission. `library stats` always sent a session,

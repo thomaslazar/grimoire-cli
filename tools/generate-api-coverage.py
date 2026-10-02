@@ -348,6 +348,59 @@ def router_prefixes(tree: ast.Module) -> dict[str, str]:
     return found
 
 
+def api_key_permissions(source_root: Path) -> tuple[dict[str, str], frozenset[str]]:
+    """Tag -> permission name, and the excluded tags, read from ``api_keys.py``.
+
+    Reads ``PERMISSIONS`` (deriving the tag map ``TAG_PERMISSIONS`` is built
+    from) and ``EXCLUDED_TAGS`` with ``ast`` rather than an import, so the Key column is derived from the same source the Perm column
+    already reads roles from.
+    """
+    tree = ast.parse((source_root / "backend" / "api_keys.py").read_text(encoding="utf-8"))
+    tag_permissions: dict[str, str] = {}
+    excluded_tags: frozenset[str] = frozenset()
+    for node in ast.walk(tree):
+        if not isinstance(node, (ast.Assign, ast.AnnAssign)):
+            continue
+        targets = node.targets if isinstance(node, ast.Assign) else [node.target]
+        names = {t.id for t in targets if isinstance(t, ast.Name)}
+        if "PERMISSIONS" in names and isinstance(node.value, ast.Dict):
+            for key, value in zip(node.value.keys, node.value.values):
+                if not isinstance(key, ast.Constant) or not isinstance(value, ast.Call):
+                    continue
+                if not value.args or not isinstance(value.args[0], ast.Tuple):
+                    continue
+                for tag_node in value.args[0].elts:
+                    if isinstance(tag_node, ast.Constant):
+                        tag_permissions[tag_node.value] = key.value
+        elif "EXCLUDED_TAGS" in names and isinstance(node.value, ast.Call):
+            for arg in node.value.args:
+                if isinstance(arg, (ast.Set, ast.Tuple, ast.List)):
+                    excluded_tags = frozenset(
+                        e.value for e in arg.elts if isinstance(e, ast.Constant)
+                    )
+    return tag_permissions, excluded_tags
+
+
+def key_cell(op: dict, method: str, tag_permissions: dict[str, str], excluded_tags: frozenset[str]) -> str:
+    """The API key permission a route needs, mirroring ``route_permission`` /
+    ``required_level``: no tags, a ``none`` marker, an excluded or unmapped tag,
+    or tags spanning more than one permission all refuse a key outright.
+    """
+    tags = op.get("tags") or []
+    marker = op.get("x-api-key-access")
+    if not tags or marker == "none":
+        return "—"
+    perms = set()
+    for tag in tags:
+        if tag in excluded_tags or tag not in tag_permissions:
+            return "—"
+        perms.add(tag_permissions[tag])
+    if len(perms) != 1:
+        return "—"
+    level = "read" if method in ("GET", "HEAD") or marker == "read" else "write"
+    return f"{perms.pop()}: {level}"
+
+
 def resolve_roles(raw: dict[tuple[str, str], str], spec_paths: dict[str, dict]) -> dict[str, str]:
     """Attach extracted roles to full spec paths by matching on path suffix.
 
@@ -435,10 +488,11 @@ def main() -> int:
     source = router_source()
     try:
         roles = resolve_roles(dependency_roles(source), spec["paths"])
+        tag_permissions, excluded_tags = api_key_permissions(source)
     finally:
         shutil.rmtree(source, ignore_errors=True)
 
-    by_tag: dict[str, list[tuple[str, str, str, str, str]]] = {}
+    by_tag: dict[str, list[tuple[str, str, str, str, str, str]]] = {}
     total = covered = internal = 0
     for path, ops in sorted(spec["paths"].items()):
         for method, op in ops.items():
@@ -454,7 +508,10 @@ def main() -> int:
                 covered += 1
             elif "🔒" in cli:
                 internal += 1
-            by_tag.setdefault(tag, []).append((method, path, summary, roles.get(key, ""), cli))
+            by_tag.setdefault(tag, []).append((
+                method, path, summary, roles.get(key, ""),
+                key_cell(op, method, tag_permissions, excluded_tags), cli,
+            ))
 
     out = [
         "# Grimoire API coverage",
@@ -468,6 +525,8 @@ def main() -> int:
         f"(`GrimoireApiClient.cs`).",
         "- **Perm** column uses Grimoire's roles (`admin` / `gm or admin` / `not guest`); "
         "blank = any authenticated user. `?` = a dependency this script could not resolve.",
+        "- **Key** column is the API key permission a route needs (`—`: no key can call "
+        "it), derived from `backend/api_keys.py` in the same container.",
         "- ✅ = covered by a CLI command · — = not implemented · 🔒 = internal-only "
         "(no user-facing verb); 🔒 rows never count as covered.",
         "- **Regenerate with `tools/generate-api-coverage.py`; update `IMPLEMENTED` there "
@@ -479,18 +538,20 @@ def main() -> int:
         "|-----|-----------------|",
     ]
     for tag, rows in sorted(by_tag.items()):
-        n = sum(1 for r in rows if "✅" in r[4])
+        n = sum(1 for r in rows if "✅" in r[5])
         out.append(f"| {tag} | {n} / {len(rows)} |")
     out += [f"| **Total** | **{covered} / {total}** |", ""]
     if internal:
         out += [f"{internal} operation(s) are internal-only (🔒) and excluded from covered counts.", ""]
 
     for tag, rows in sorted(by_tag.items()):
-        out += [f"## {tag}", "", "| Method | Path | Description | Perm | CLI |",
-                "|--------|------|-------------|------|-----|"]
-        for method, path, summary, perm, cli in rows:
+        out += [f"## {tag}", "", "| Method | Path | Description | Perm | Key | CLI |",
+                "|--------|------|-------------|------|-----|-----|"]
+        for method, path, summary, perm, key_perm, cli in rows:
             # A pipe inside a summary would split the row into extra cells.
-            out.append(f"| {method} | `{path}` | {summary.replace('|', r'\|')} | {perm} | {cli} |")
+            out.append(
+                f"| {method} | `{path}` | {summary.replace('|', r'\|')} | {perm} | {key_perm} | {cli} |"
+            )
         out.append("")
 
     target = Path(sys.argv[1]) if len(sys.argv) > 1 else DEFAULT_OUT
