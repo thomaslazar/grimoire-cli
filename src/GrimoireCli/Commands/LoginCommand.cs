@@ -4,6 +4,8 @@ using GrimoireCli.Configuration;
 
 namespace GrimoireCli.Commands;
 
+public enum KeyLoginOutcome { Valid, ValidWithoutLibrary, Rejected }
+
 public static class LoginCommand
 {
     private static readonly NLog.Logger _logger = NLog.LogManager.GetCurrentClassLogger();
@@ -14,9 +16,10 @@ public static class LoginCommand
         var usernameOption = new Option<string?>("--username") { Description = "Username (prompts if omitted)" };
         var passwordOption = new Option<string?>("--password") { Description = "Password — visible in process list / shell history; prefer --password-stdin" };
         var passwordStdinOption = new Option<bool>("--password-stdin") { Description = "Read the password from the first line of stdin" };
+        var apiKeyStdinOption = new Option<bool>("--api-key-stdin") { Description = "Read an API key from the first line of stdin instead of a password" };
         var command = new Command("login", "Authenticate with a Grimoire server")
         {
-            serverOption, usernameOption, passwordOption, passwordStdinOption
+            serverOption, usernameOption, passwordOption, passwordStdinOption, apiKeyStdinOption
         };
         command.AddHelpSection("Notes", HelpSectionPosition.Top,
             "--password is visible in the process list and shell history. Prefer",
@@ -24,10 +27,16 @@ public static class LoginCommand
             "The session refreshes itself; log in again only after 30 days idle,",
             "or if the session is revoked (password change, admin edit).",
             "OIDC accounts cannot log in here — this is the local password path.",
-            "Writes the resolved config file; config get reports which one.");
+            "Writes the resolved config file; config get reports which one.",
+            "",
+            "--api-key-stdin logs in with a Grimoire API key instead: no session to",
+            "renew, limited to the key's permissions, and only until it expires.",
+            "Caveats: docs/authentication.md#api-keys. Per-command permissions:",
+            "docs/grimoire-api-coverage.md (Key column).");
         command.AddExamples(
             "grimoire-cli login --server https://grimoire.example.com",
-            "grimoire-cli login --server https://grimoire.example.com --username agent --password-stdin <<<\"$GRIMOIRE_PW\"");
+            "grimoire-cli login --server https://grimoire.example.com --username agent --password-stdin <<<\"$GRIMOIRE_PW\"",
+            "grimoire-cli login --server https://grimoire.example.com --api-key-stdin <<<\"$GRIMOIRE_KEY\"");
         command.SetAction(async (parseResult, cancellationToken) =>
         {
             // GRIMOIRE_SERVER before the prompt, so the variable that serves every
@@ -51,6 +60,16 @@ public static class LoginCommand
             var usernameFlag = parseResult.GetValue(usernameOption);
             var passwordFlag = parseResult.GetValue(passwordOption);
             var passwordStdin = parseResult.GetValue(passwordStdinOption);
+            if (parseResult.GetValue(apiKeyStdinOption))
+            {
+                var conflict = KeyFlagConflict(usernameFlag != null, passwordFlag != null, passwordStdin);
+                if (conflict != null)
+                {
+                    _logger.Error(conflict);
+                    Environment.Exit(1);
+                }
+                return await LoginWithKeyAsync(server!, configManager);
+            }
             if (passwordFlag != null && passwordStdin)
             {
                 _logger.Error("Provide --password or --password-stdin, not both.");
@@ -101,6 +120,7 @@ public static class LoginCommand
                 config = configManager.Load();
                 config.Server = server;
                 config.AccessToken = token;
+                config.ApiKey = null;
                 // A server that issues no refresh cookie must clear any stale one,
                 // so this is assigned unconditionally.
                 config.RefreshToken = refreshToken;
@@ -150,6 +170,63 @@ public static class LoginCommand
         });
         return command;
     }
+
+    private static async Task<int> LoginWithKeyAsync(string server, ConfigManager configManager)
+    {
+        var key = ReadPasswordFromStdin(Console.In).Trim();
+        if (key.Length == 0)
+        {
+            _logger.Error("No API key on stdin.");
+            Environment.Exit(1);
+        }
+        // The key is probed before anything is saved, so a rejected key leaves
+        // the existing login in place.
+        var (status, body) = await new GrimoireApiClient(new AppConfig { Server = server, ApiKey = key }).ProbeAboutAsync();
+        var outcome = ClassifyKeyProbe(status);
+        if (outcome == KeyLoginOutcome.Rejected)
+        {
+            _logger.Error(status == null
+                ? $"Cannot reach the Grimoire server at {server}."
+                : $"API key rejected: {status} {body}");
+            Environment.Exit(2);
+        }
+        var config = configManager.Load();
+        config.Server = server;
+        config.ApiKey = key;
+        config.AccessToken = null;
+        config.RefreshToken = null;
+        try
+        {
+            configManager.Save(config);
+        }
+        catch (ConfigWriteException ex)
+        {
+            _logger.Error(ex.Message);
+            Environment.Exit(1);
+        }
+        Console.Error.WriteLine($"Logged in to {server} with an API key");
+        if (outcome == KeyLoginOutcome.Valid)
+            new GrimoireApiClient(config, configManager).RecordServerVersion(GrimoireApiClient.ReadStringProperty(body, "version"));
+        else
+            _logger.Warn("Logged in, but this key cannot read library, so the server version is not checked.");
+        return 0;
+    }
+
+    /// <summary>
+    /// /api/about requires library read, so a 403 proves the key authenticated
+    /// even though it cannot report the version.
+    /// </summary>
+    internal static KeyLoginOutcome ClassifyKeyProbe(int? status) => status switch
+    {
+        200 => KeyLoginOutcome.Valid,
+        403 => KeyLoginOutcome.ValidWithoutLibrary,
+        _ => KeyLoginOutcome.Rejected
+    };
+
+    internal static string? KeyFlagConflict(bool username, bool password, bool passwordStdin) =>
+        username || password || passwordStdin
+            ? "Use --api-key-stdin on its own, without --username or a password."
+            : null;
 
     /// <summary>
     /// Read a password from stdin: the first line, stripped of a single

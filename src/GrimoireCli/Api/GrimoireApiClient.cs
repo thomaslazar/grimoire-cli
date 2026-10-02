@@ -519,6 +519,30 @@ public class GrimoireApiClient
     }
 
     /// <summary>
+    /// GET /api/about once, returning the status and body without exiting, for a
+    /// login that must classify the answer itself. Same short budget and no
+    /// preflight, as in <see cref="ProbeServerVersionAsync"/>. Status is null when
+    /// the server could not be reached.
+    /// </summary>
+    public async Task<(int? Status, string Body)> ProbeAboutAsync()
+    {
+        try
+        {
+            using var cts = new CancellationTokenSource(VersionProbeTimeout);
+            var info = Api.Api.About.ToGetRequestInformation();
+            var request = await _adapter.ConvertToNativeRequestAsync<HttpRequestMessage>(info, cts.Token);
+            if (request == null) return (null, "");
+            var response = await _http.SendAsync(request, cts.Token);
+            return ((int)response.StatusCode, await response.Content.ReadAsStringAsync(cts.Token));
+        }
+        catch (Exception ex)
+        {
+            _logger.Debug($"about probe failed: {ex.Message}");
+            return (null, "");
+        }
+    }
+
+    /// <summary>
     /// One place owns "a version was observed", so the daily probe and login warn
     /// and persist identically.
     /// </summary>
