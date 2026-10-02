@@ -1,8 +1,8 @@
 #!/bin/bash
 set -euo pipefail
 
-# Fetches from GitHub Releases. There are no releases yet (no tags cut), so
-# this script has nothing to install until the first `v*` release ships.
+# Fetches a release binary from GitHub Releases and verifies it against the
+# release's SHA256SUMS before installing.
 
 REPO="thomaslazar/grimoire-cli"
 INSTALL_DIR="${GRIMOIRE_CLI_INSTALL_DIR:-$HOME/.local/bin}"
@@ -26,6 +26,7 @@ case "$ARCH" in
 esac
 
 RID="${OS_RID}-${ARCH_RID}"
+ASSET="grimoire-cli-${RID}"
 
 # Resolve version
 if [ -z "$VERSION" ]; then
@@ -39,11 +40,53 @@ fi
 
 echo "Installing grimoire-cli ${VERSION} (${RID})..."
 
-# Download
-DOWNLOAD_URL="https://github.com/${REPO}/releases/download/${VERSION}/grimoire-cli-${RID}"
+BASE_URL="https://github.com/${REPO}/releases/download/${VERSION}"
+
+# Download into a temp dir first, so a failed or tampered download never
+# replaces a working install.
+TMP_DIR="$(mktemp -d)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+curl -fsSL "${BASE_URL}/${ASSET}" -o "${TMP_DIR}/${ASSET}"
+
+# macOS ships shasum rather than sha256sum.
+sha256_of() {
+  if command -v sha256sum >/dev/null 2>&1; then
+    sha256sum "$1" | awk '{print $1}'
+  elif command -v shasum >/dev/null 2>&1; then
+    shasum -a 256 "$1" | awk '{print $1}'
+  else
+    echo "Error: sha256sum or shasum is required to verify the download" >&2
+    exit 1
+  fi
+}
+
+# Verify
+if ! curl -fsSL "${BASE_URL}/SHA256SUMS" -o "${TMP_DIR}/SHA256SUMS"; then
+  echo "Error: Could not download SHA256SUMS for ${VERSION}." >&2
+  echo "Releases before checksums were added have none; download from the release page instead." >&2
+  exit 1
+fi
+# Lines are "<hash>  <file>"; a "*" before the file name marks binary mode.
+EXPECTED="$(awk -v name="$ASSET" \
+  '{ f = $2; sub(/^\*/, "", f); if (f == name) { print tolower($1); exit } }' \
+  "${TMP_DIR}/SHA256SUMS")"
+if [ -z "$EXPECTED" ]; then
+  echo "Error: SHA256SUMS has no entry for ${ASSET}" >&2
+  exit 1
+fi
+ACTUAL="$(sha256_of "${TMP_DIR}/${ASSET}" | tr 'A-F' 'a-f')"
+if [ "$EXPECTED" != "$ACTUAL" ]; then
+  echo "Error: Checksum mismatch for ${ASSET}" >&2
+  echo "  expected: ${EXPECTED}" >&2
+  echo "  actual:   ${ACTUAL}" >&2
+  exit 1
+fi
+echo "Checksum verified."
+
+# Install
 mkdir -p "$INSTALL_DIR"
-curl -fsSL "$DOWNLOAD_URL" -o "${INSTALL_DIR}/grimoire-cli"
-chmod +x "${INSTALL_DIR}/grimoire-cli"
+chmod +x "${TMP_DIR}/${ASSET}"
+mv -f "${TMP_DIR}/${ASSET}" "${INSTALL_DIR}/grimoire-cli"
 
 # PATH check
 case ":${PATH}:" in
