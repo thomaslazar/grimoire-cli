@@ -196,6 +196,7 @@ public class ConfigManager
         {
             Server = envLookup("GRIMOIRE_SERVER") ?? fileConfig.Server,
             AccessToken = fileConfig.AccessToken,
+            ApiKey = fileConfig.ApiKey,
             RefreshToken = fileConfig.RefreshToken,
             LastVersionCheck = fileConfig.LastVersionCheck,
             LastServerVersion = fileConfig.LastServerVersion

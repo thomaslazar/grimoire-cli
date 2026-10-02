@@ -74,6 +74,21 @@ public class ConfigManagerTests
         }
     }
 
+    [Fact]
+    public void ResolveCarriesTheApiKey()
+    {
+        var manager = InTempDir(out var path);
+        try
+        {
+            manager.Save(new AppConfig { Server = "https://file.invalid", ApiKey = "grim_key" });
+            Assert.Equal("grim_key", manager.Resolve(envLookup: _ => null).ApiKey);
+        }
+        finally
+        {
+            Directory.Delete(Path.GetDirectoryName(path)!, recursive: true);
+        }
+    }
+
     // Resolve must carry these through. If it drops them, LastVersionCheck arrives
     // null on every run and the CLI probes on every single invocation — the whole
     // point of the cadence, silently defeated, with no other test failing.
