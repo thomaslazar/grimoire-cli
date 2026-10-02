@@ -1,5 +1,4 @@
-# Fetches a release binary from GitHub Releases and verifies it against the
-# release's SHA256SUMS before installing.
+# Fetches a release binary from GitHub Releases and verifies it against the release's SHA256SUMS before installing.
 
 $ErrorActionPreference = "Stop"
 
@@ -26,8 +25,7 @@ Write-Host "Installing grimoire-cli $Version ($Rid)..."
 
 $BaseUrl = "https://github.com/$Repo/releases/download/$Version"
 
-# Download into a temp dir first, so a failed or tampered download never
-# replaces a working install.
+# Download into a temp dir first, so a failed or tampered download doesn't overwrite an existing file
 $TmpDir = Join-Path ([System.IO.Path]::GetTempPath()) ("grimoire-cli-" + [guid]::NewGuid())
 New-Item -ItemType Directory -Path $TmpDir | Out-Null
 try {
@@ -35,8 +33,6 @@ try {
     Invoke-WebRequest -Uri "$BaseUrl/$Asset" -OutFile $TmpBinary -UseBasicParsing
 
     # Verify
-    # Saved to a file rather than read from .Content: Windows PowerShell 5.1
-    # returns release assets (application/octet-stream) as a byte array.
     $SumsPath = Join-Path $TmpDir "SHA256SUMS"
     try {
         Invoke-WebRequest -Uri "$BaseUrl/SHA256SUMS" -OutFile $SumsPath -UseBasicParsing
@@ -44,7 +40,6 @@ try {
     catch {
         throw "Could not download SHA256SUMS for $Version. Releases before checksums were added have none; download from the release page instead."
     }
-    # Lines are "<hash>  <file>"; a "*" before the file name marks binary mode.
     $Expected = $null
     foreach ($Line in Get-Content -Path $SumsPath) {
         $Parts = $Line.Trim() -split '\s+', 2
@@ -57,7 +52,6 @@ try {
         throw "SHA256SUMS has no entry for $Asset"
     }
     $Actual = (Get-FileHash -Algorithm SHA256 -Path $TmpBinary).Hash
-    # -ne on strings is case-insensitive, so hex case does not matter.
     if ($Actual -ne $Expected) {
         throw "Checksum mismatch for $Asset`n  expected: $Expected`n  actual:   $Actual"
     }

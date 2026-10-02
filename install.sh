@@ -1,8 +1,7 @@
 #!/bin/bash
 set -euo pipefail
 
-# Fetches a release binary from GitHub Releases and verifies it against the
-# release's SHA256SUMS before installing.
+# Fetches a release binary from GitHub Releases and verifies it against the release's SHA256SUMS before installing.
 
 REPO="thomaslazar/grimoire-cli"
 INSTALL_DIR="${GRIMOIRE_CLI_INSTALL_DIR:-$HOME/.local/bin}"
@@ -42,8 +41,7 @@ echo "Installing grimoire-cli ${VERSION} (${RID})..."
 
 BASE_URL="https://github.com/${REPO}/releases/download/${VERSION}"
 
-# Download into a temp dir first, so a failed or tampered download never
-# replaces a working install.
+# Download into a temp dir first, so a failed or tampered download doesn't replaces a working install.
 TMP_DIR="$(mktemp -d)"
 trap 'rm -rf "$TMP_DIR"' EXIT
 curl -fsSL "${BASE_URL}/${ASSET}" -o "${TMP_DIR}/${ASSET}"
