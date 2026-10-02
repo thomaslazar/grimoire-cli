@@ -17,6 +17,8 @@ namespace GrimoireCli.Generated.Models
         public IDictionary<string, object> AdditionalData { get; set; }
         /// <summary>The allow_explicit property</summary>
         public bool? AllowExplicit { get; set; }
+        /// <summary>The api_keys_enabled property</summary>
+        public bool? ApiKeysEnabled { get; set; }
         /// <summary>The campaign_access property</summary>
         public bool? CampaignAccess { get; set; }
         /// <summary>The campaign_count property</summary>
@@ -97,6 +99,7 @@ namespace GrimoireCli.Generated.Models
             return new Dictionary<string, Action<IParseNode>>
             {
                 { "allow_explicit", n => { AllowExplicit = n.GetBoolValue(); } },
+                { "api_keys_enabled", n => { ApiKeysEnabled = n.GetBoolValue(); } },
                 { "campaign_access", n => { CampaignAccess = n.GetBoolValue(); } },
                 { "campaign_count", n => { CampaignCount = n.GetIntValue(); } },
                 { "created_at", n => { CreatedAt = n.GetObjectValue<global::GrimoireCli.Generated.Models.UserOut.UserOut_created_at>(global::GrimoireCli.Generated.Models.UserOut.UserOut_created_at.CreateFromDiscriminatorValue); } },
@@ -116,6 +119,7 @@ namespace GrimoireCli.Generated.Models
         {
             if(ReferenceEquals(writer, null)) throw new ArgumentNullException(nameof(writer));
             writer.WriteBoolValue("allow_explicit", AllowExplicit);
+            writer.WriteBoolValue("api_keys_enabled", ApiKeysEnabled);
             writer.WriteBoolValue("campaign_access", CampaignAccess);
             writer.WriteIntValue("campaign_count", CampaignCount);
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.UserOut.UserOut_created_at>("created_at", CreatedAt);

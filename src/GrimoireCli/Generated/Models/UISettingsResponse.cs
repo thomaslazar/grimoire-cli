@@ -15,6 +15,8 @@ namespace GrimoireCli.Generated.Models
     {
         /// <summary>Stores additional data not described in the OpenAPI description found when deserializing. Can be used for serialization as well.</summary>
         public IDictionary<string, object> AdditionalData { get; set; }
+        /// <summary>The api_keys_enabled property</summary>
+        public bool? ApiKeysEnabled { get; set; }
         /// <summary>The campaign_upload_max_file_mb property</summary>
         public int? CampaignUploadMaxFileMb { get; set; }
         /// <summary>The campaign_upload_max_total_mb property</summary>
@@ -78,6 +80,7 @@ namespace GrimoireCli.Generated.Models
         {
             return new Dictionary<string, Action<IParseNode>>
             {
+                { "api_keys_enabled", n => { ApiKeysEnabled = n.GetBoolValue(); } },
                 { "campaign_upload_max_file_mb", n => { CampaignUploadMaxFileMb = n.GetIntValue(); } },
                 { "campaign_upload_max_total_mb", n => { CampaignUploadMaxTotalMb = n.GetIntValue(); } },
                 { "campaign_uploads_disabled", n => { CampaignUploadsDisabled = n.GetBoolValue(); } },
@@ -106,6 +109,7 @@ namespace GrimoireCli.Generated.Models
         public virtual void Serialize(ISerializationWriter writer)
         {
             if(ReferenceEquals(writer, null)) throw new ArgumentNullException(nameof(writer));
+            writer.WriteBoolValue("api_keys_enabled", ApiKeysEnabled);
             writer.WriteIntValue("campaign_upload_max_file_mb", CampaignUploadMaxFileMb);
             writer.WriteIntValue("campaign_upload_max_total_mb", CampaignUploadMaxTotalMb);
             writer.WriteBoolValue("campaign_uploads_disabled", CampaignUploadsDisabled);

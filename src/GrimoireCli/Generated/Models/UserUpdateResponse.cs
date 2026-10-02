@@ -17,6 +17,8 @@ namespace GrimoireCli.Generated.Models
         public IDictionary<string, object> AdditionalData { get; set; }
         /// <summary>The allow_explicit property</summary>
         public bool? AllowExplicit { get; set; }
+        /// <summary>The api_keys_enabled property</summary>
+        public bool? ApiKeysEnabled { get; set; }
         /// <summary>The campaign_access property</summary>
         public bool? CampaignAccess { get; set; }
         /// <summary>The email property</summary>
@@ -77,6 +79,7 @@ namespace GrimoireCli.Generated.Models
             return new Dictionary<string, Action<IParseNode>>
             {
                 { "allow_explicit", n => { AllowExplicit = n.GetBoolValue(); } },
+                { "api_keys_enabled", n => { ApiKeysEnabled = n.GetBoolValue(); } },
                 { "campaign_access", n => { CampaignAccess = n.GetBoolValue(); } },
                 { "email", n => { Email = n.GetObjectValue<global::GrimoireCli.Generated.Models.UserUpdateResponse.UserUpdateResponse_email>(global::GrimoireCli.Generated.Models.UserUpdateResponse.UserUpdateResponse_email.CreateFromDiscriminatorValue); } },
                 { "id", n => { Id = n.GetStringValue(); } },
@@ -92,6 +95,7 @@ namespace GrimoireCli.Generated.Models
         {
             if(ReferenceEquals(writer, null)) throw new ArgumentNullException(nameof(writer));
             writer.WriteBoolValue("allow_explicit", AllowExplicit);
+            writer.WriteBoolValue("api_keys_enabled", ApiKeysEnabled);
             writer.WriteBoolValue("campaign_access", CampaignAccess);
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.UserUpdateResponse.UserUpdateResponse_email>("email", Email);
             writer.WriteStringValue("id", Id);

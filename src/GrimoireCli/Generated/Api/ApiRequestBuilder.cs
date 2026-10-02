@@ -2,6 +2,7 @@
 #pragma warning disable CS0618
 using GrimoireCli.Generated.Api.About;
 using GrimoireCli.Generated.Api.Addons;
+using GrimoireCli.Generated.Api.ApiKeys;
 using GrimoireCli.Generated.Api.Audio;
 using GrimoireCli.Generated.Api.AudioFolders;
 using GrimoireCli.Generated.Api.AudioSets;
@@ -65,6 +66,11 @@ namespace GrimoireCli.Generated.Api
         public global::GrimoireCli.Generated.Api.Addons.AddonsRequestBuilder Addons
         {
             get => new global::GrimoireCli.Generated.Api.Addons.AddonsRequestBuilder(PathParameters, RequestAdapter);
+        }
+        /// <summary>The apiKeys property</summary>
+        public global::GrimoireCli.Generated.Api.ApiKeys.ApiKeysRequestBuilder ApiKeys
+        {
+            get => new global::GrimoireCli.Generated.Api.ApiKeys.ApiKeysRequestBuilder(PathParameters, RequestAdapter);
         }
         /// <summary>The audio property</summary>
         public global::GrimoireCli.Generated.Api.Audio.AudioRequestBuilder Audio

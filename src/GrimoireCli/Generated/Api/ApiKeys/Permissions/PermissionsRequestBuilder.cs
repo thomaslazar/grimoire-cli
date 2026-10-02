@@ -9,68 +9,69 @@ using System.IO;
 using System.Threading.Tasks;
 using System.Threading;
 using System;
-namespace GrimoireCli.Generated.Api.Settings.ApiKey.Generate
+namespace GrimoireCli.Generated.Api.ApiKeys.Permissions
 {
     /// <summary>
-    /// Builds and executes requests for operations under \api\settings\api-key\generate
+    /// Builds and executes requests for operations under \api\api-keys\permissions
     /// </summary>
     [global::System.CodeDom.Compiler.GeneratedCode("Kiota", "1.0.0")]
-    public partial class GenerateRequestBuilder : BaseRequestBuilder
+    public partial class PermissionsRequestBuilder : BaseRequestBuilder
     {
         /// <summary>
-        /// Instantiates a new <see cref="global::GrimoireCli.Generated.Api.Settings.ApiKey.Generate.GenerateRequestBuilder"/> and sets the default values.
+        /// Instantiates a new <see cref="global::GrimoireCli.Generated.Api.ApiKeys.Permissions.PermissionsRequestBuilder"/> and sets the default values.
         /// </summary>
         /// <param name="pathParameters">Path parameters for the request</param>
         /// <param name="requestAdapter">The request adapter to use to execute the requests.</param>
-        public GenerateRequestBuilder(Dictionary<string, object> pathParameters, IRequestAdapter requestAdapter) : base(requestAdapter, "{+baseurl}/api/settings/api-key/generate{?token*}", pathParameters)
+        public PermissionsRequestBuilder(Dictionary<string, object> pathParameters, IRequestAdapter requestAdapter) : base(requestAdapter, "{+baseurl}/api/api-keys/permissions{?token*}", pathParameters)
         {
         }
         /// <summary>
-        /// Instantiates a new <see cref="global::GrimoireCli.Generated.Api.Settings.ApiKey.Generate.GenerateRequestBuilder"/> and sets the default values.
+        /// Instantiates a new <see cref="global::GrimoireCli.Generated.Api.ApiKeys.Permissions.PermissionsRequestBuilder"/> and sets the default values.
         /// </summary>
         /// <param name="rawUrl">The raw URL to use for the request builder.</param>
         /// <param name="requestAdapter">The request adapter to use to execute the requests.</param>
-        public GenerateRequestBuilder(string rawUrl, IRequestAdapter requestAdapter) : base(requestAdapter, "{+baseurl}/api/settings/api-key/generate{?token*}", rawUrl)
+        public PermissionsRequestBuilder(string rawUrl, IRequestAdapter requestAdapter) : base(requestAdapter, "{+baseurl}/api/api-keys/permissions{?token*}", rawUrl)
         {
         }
         /// <summary>
-        /// Generate a new stats API key
+        /// List the permissions your keys can be granted
         /// </summary>
-        /// <returns>A <see cref="global::GrimoireCli.Generated.Models.ApiKeyResponse"/></returns>
+        /// <returns>A List&lt;global::GrimoireCli.Generated.Models.ApiKeyPermissionOut&gt;</returns>
         /// <param name="cancellationToken">Cancellation token to use when cancelling requests</param>
         /// <param name="requestConfiguration">Configuration for the request such as headers, query parameters, and middleware options.</param>
         /// <exception cref="global::GrimoireCli.Generated.Models.HTTPValidationError">When receiving a 422 status code</exception>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
-        public async Task<global::GrimoireCli.Generated.Models.ApiKeyResponse?> PostAsync(Action<RequestConfiguration<global::GrimoireCli.Generated.Api.Settings.ApiKey.Generate.GenerateRequestBuilder.GenerateRequestBuilderPostQueryParameters>>? requestConfiguration = default, CancellationToken cancellationToken = default)
+        public async Task<List<global::GrimoireCli.Generated.Models.ApiKeyPermissionOut>?> GetAsync(Action<RequestConfiguration<global::GrimoireCli.Generated.Api.ApiKeys.Permissions.PermissionsRequestBuilder.PermissionsRequestBuilderGetQueryParameters>>? requestConfiguration = default, CancellationToken cancellationToken = default)
         {
 #nullable restore
 #else
-        public async Task<global::GrimoireCli.Generated.Models.ApiKeyResponse> PostAsync(Action<RequestConfiguration<global::GrimoireCli.Generated.Api.Settings.ApiKey.Generate.GenerateRequestBuilder.GenerateRequestBuilderPostQueryParameters>> requestConfiguration = default, CancellationToken cancellationToken = default)
+        public async Task<List<global::GrimoireCli.Generated.Models.ApiKeyPermissionOut>> GetAsync(Action<RequestConfiguration<global::GrimoireCli.Generated.Api.ApiKeys.Permissions.PermissionsRequestBuilder.PermissionsRequestBuilderGetQueryParameters>> requestConfiguration = default, CancellationToken cancellationToken = default)
         {
 #endif
-            var requestInfo = ToPostRequestInformation(requestConfiguration);
+            var requestInfo = ToGetRequestInformation(requestConfiguration);
             var errorMapping = new Dictionary<string, ParsableFactory<IParsable>>
             {
                 { "422", global::GrimoireCli.Generated.Models.HTTPValidationError.CreateFromDiscriminatorValue },
             };
-            return await RequestAdapter.SendAsync<global::GrimoireCli.Generated.Models.ApiKeyResponse>(requestInfo, global::GrimoireCli.Generated.Models.ApiKeyResponse.CreateFromDiscriminatorValue, errorMapping, cancellationToken).ConfigureAwait(false);
+            var collectionResult = await RequestAdapter.SendCollectionAsync<global::GrimoireCli.Generated.Models.ApiKeyPermissionOut>(requestInfo, global::GrimoireCli.Generated.Models.ApiKeyPermissionOut.CreateFromDiscriminatorValue, errorMapping, cancellationToken).ConfigureAwait(false);
+            return collectionResult?.AsList();
         }
         /// <summary>
-        /// Generate a new stats API key
+        /// List the permissions your keys can be granted
         /// </summary>
         /// <returns>A <see cref="RequestInformation"/></returns>
         /// <param name="requestConfiguration">Configuration for the request such as headers, query parameters, and middleware options.</param>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
-        public RequestInformation ToPostRequestInformation(Action<RequestConfiguration<global::GrimoireCli.Generated.Api.Settings.ApiKey.Generate.GenerateRequestBuilder.GenerateRequestBuilderPostQueryParameters>>? requestConfiguration = default)
+        public RequestInformation ToGetRequestInformation(Action<RequestConfiguration<global::GrimoireCli.Generated.Api.ApiKeys.Permissions.PermissionsRequestBuilder.PermissionsRequestBuilderGetQueryParameters>>? requestConfiguration = default)
         {
 #nullable restore
 #else
-        public RequestInformation ToPostRequestInformation(Action<RequestConfiguration<global::GrimoireCli.Generated.Api.Settings.ApiKey.Generate.GenerateRequestBuilder.GenerateRequestBuilderPostQueryParameters>> requestConfiguration = default)
+        public RequestInformation ToGetRequestInformation(Action<RequestConfiguration<global::GrimoireCli.Generated.Api.ApiKeys.Permissions.PermissionsRequestBuilder.PermissionsRequestBuilderGetQueryParameters>> requestConfiguration = default)
         {
 #endif
-            var requestInfo = new RequestInformation(Method.POST, UrlTemplate, PathParameters);
+            var requestInfo = new RequestInformation(Method.GET, UrlTemplate, PathParameters);
             requestInfo.Configure(requestConfiguration);
             requestInfo.Headers.TryAdd("Accept", "application/json");
             return requestInfo;
@@ -78,17 +79,17 @@ namespace GrimoireCli.Generated.Api.Settings.ApiKey.Generate
         /// <summary>
         /// Returns a request builder with the provided arbitrary URL. Using this method means any other path or query parameters are ignored.
         /// </summary>
-        /// <returns>A <see cref="global::GrimoireCli.Generated.Api.Settings.ApiKey.Generate.GenerateRequestBuilder"/></returns>
+        /// <returns>A <see cref="global::GrimoireCli.Generated.Api.ApiKeys.Permissions.PermissionsRequestBuilder"/></returns>
         /// <param name="rawUrl">The raw URL to use for the request builder.</param>
-        public global::GrimoireCli.Generated.Api.Settings.ApiKey.Generate.GenerateRequestBuilder WithUrl(string rawUrl)
+        public global::GrimoireCli.Generated.Api.ApiKeys.Permissions.PermissionsRequestBuilder WithUrl(string rawUrl)
         {
-            return new global::GrimoireCli.Generated.Api.Settings.ApiKey.Generate.GenerateRequestBuilder(rawUrl, RequestAdapter);
+            return new global::GrimoireCli.Generated.Api.ApiKeys.Permissions.PermissionsRequestBuilder(rawUrl, RequestAdapter);
         }
         /// <summary>
-        /// Generate a new stats API key
+        /// List the permissions your keys can be granted
         /// </summary>
         [global::System.CodeDom.Compiler.GeneratedCode("Kiota", "1.0.0")]
-        public partial class GenerateRequestBuilderPostQueryParameters 
+        public partial class PermissionsRequestBuilderGetQueryParameters 
         {
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
@@ -109,7 +110,7 @@ namespace GrimoireCli.Generated.Api.Settings.ApiKey.Generate
         /// </summary>
         [Obsolete("This class is deprecated. Please use the generic RequestConfiguration class generated by the generator.")]
         [global::System.CodeDom.Compiler.GeneratedCode("Kiota", "1.0.0")]
-        public partial class GenerateRequestBuilderPostRequestConfiguration : RequestConfiguration<global::GrimoireCli.Generated.Api.Settings.ApiKey.Generate.GenerateRequestBuilder.GenerateRequestBuilderPostQueryParameters>
+        public partial class PermissionsRequestBuilderGetRequestConfiguration : RequestConfiguration<global::GrimoireCli.Generated.Api.ApiKeys.Permissions.PermissionsRequestBuilder.PermissionsRequestBuilderGetQueryParameters>
         {
         }
     }

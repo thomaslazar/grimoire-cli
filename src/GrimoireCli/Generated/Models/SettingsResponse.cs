@@ -247,14 +247,6 @@ namespace GrimoireCli.Generated.Models
         public bool? ShowStatSystems { get; set; }
         /// <summary>The show_stat_tokens property</summary>
         public bool? ShowStatTokens { get; set; }
-        /// <summary>The stats_api_key property</summary>
-#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
-#nullable enable
-        public string? StatsApiKey { get; set; }
-#nullable restore
-#else
-        public string StatsApiKey { get; set; }
-#endif
         /// <summary>
         /// Instantiates a new <see cref="global::GrimoireCli.Generated.Models.SettingsResponse"/> and sets the default values.
         /// </summary>
@@ -345,7 +337,6 @@ namespace GrimoireCli.Generated.Models
                 { "show_stat_size", n => { ShowStatSize = n.GetBoolValue(); } },
                 { "show_stat_systems", n => { ShowStatSystems = n.GetBoolValue(); } },
                 { "show_stat_tokens", n => { ShowStatTokens = n.GetBoolValue(); } },
-                { "stats_api_key", n => { StatsApiKey = n.GetStringValue(); } },
             };
         }
         /// <summary>
@@ -420,7 +411,6 @@ namespace GrimoireCli.Generated.Models
             writer.WriteBoolValue("show_stat_size", ShowStatSize);
             writer.WriteBoolValue("show_stat_systems", ShowStatSystems);
             writer.WriteBoolValue("show_stat_tokens", ShowStatTokens);
-            writer.WriteStringValue("stats_api_key", StatsApiKey);
             writer.WriteAdditionalData(AdditionalData);
         }
     }

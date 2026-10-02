@@ -9,68 +9,68 @@ using System.IO;
 using System.Threading.Tasks;
 using System.Threading;
 using System;
-namespace GrimoireCli.Generated.Api.Stats
+namespace GrimoireCli.Generated.Api.ApiKeys.Item.Regenerate
 {
     /// <summary>
-    /// Builds and executes requests for operations under \api\stats
+    /// Builds and executes requests for operations under \api\api-keys\{key_id}\regenerate
     /// </summary>
     [global::System.CodeDom.Compiler.GeneratedCode("Kiota", "1.0.0")]
-    public partial class StatsRequestBuilder : BaseRequestBuilder
+    public partial class RegenerateRequestBuilder : BaseRequestBuilder
     {
         /// <summary>
-        /// Instantiates a new <see cref="global::GrimoireCli.Generated.Api.Stats.StatsRequestBuilder"/> and sets the default values.
+        /// Instantiates a new <see cref="global::GrimoireCli.Generated.Api.ApiKeys.Item.Regenerate.RegenerateRequestBuilder"/> and sets the default values.
         /// </summary>
         /// <param name="pathParameters">Path parameters for the request</param>
         /// <param name="requestAdapter">The request adapter to use to execute the requests.</param>
-        public StatsRequestBuilder(Dictionary<string, object> pathParameters, IRequestAdapter requestAdapter) : base(requestAdapter, "{+baseurl}/api/stats{?token*}", pathParameters)
+        public RegenerateRequestBuilder(Dictionary<string, object> pathParameters, IRequestAdapter requestAdapter) : base(requestAdapter, "{+baseurl}/api/api-keys/{key_id}/regenerate{?token*}", pathParameters)
         {
         }
         /// <summary>
-        /// Instantiates a new <see cref="global::GrimoireCli.Generated.Api.Stats.StatsRequestBuilder"/> and sets the default values.
+        /// Instantiates a new <see cref="global::GrimoireCli.Generated.Api.ApiKeys.Item.Regenerate.RegenerateRequestBuilder"/> and sets the default values.
         /// </summary>
         /// <param name="rawUrl">The raw URL to use for the request builder.</param>
         /// <param name="requestAdapter">The request adapter to use to execute the requests.</param>
-        public StatsRequestBuilder(string rawUrl, IRequestAdapter requestAdapter) : base(requestAdapter, "{+baseurl}/api/stats{?token*}", rawUrl)
+        public RegenerateRequestBuilder(string rawUrl, IRequestAdapter requestAdapter) : base(requestAdapter, "{+baseurl}/api/api-keys/{key_id}/regenerate{?token*}", rawUrl)
         {
         }
         /// <summary>
-        /// Returns library counts. Accepts a session, or an `X-API-Key` with the `stats` permission for external integrations such as Homepage.
+        /// Keeps the name and permissions. The old secret stops working at once.
         /// </summary>
-        /// <returns>A <see cref="global::GrimoireCli.Generated.Models.StatsResponse"/></returns>
+        /// <returns>A <see cref="global::GrimoireCli.Generated.Models.ApiKeyWithSecret"/></returns>
         /// <param name="cancellationToken">Cancellation token to use when cancelling requests</param>
         /// <param name="requestConfiguration">Configuration for the request such as headers, query parameters, and middleware options.</param>
         /// <exception cref="global::GrimoireCli.Generated.Models.HTTPValidationError">When receiving a 422 status code</exception>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
-        public async Task<global::GrimoireCli.Generated.Models.StatsResponse?> GetAsync(Action<RequestConfiguration<global::GrimoireCli.Generated.Api.Stats.StatsRequestBuilder.StatsRequestBuilderGetQueryParameters>>? requestConfiguration = default, CancellationToken cancellationToken = default)
+        public async Task<global::GrimoireCli.Generated.Models.ApiKeyWithSecret?> PostAsync(Action<RequestConfiguration<global::GrimoireCli.Generated.Api.ApiKeys.Item.Regenerate.RegenerateRequestBuilder.RegenerateRequestBuilderPostQueryParameters>>? requestConfiguration = default, CancellationToken cancellationToken = default)
         {
 #nullable restore
 #else
-        public async Task<global::GrimoireCli.Generated.Models.StatsResponse> GetAsync(Action<RequestConfiguration<global::GrimoireCli.Generated.Api.Stats.StatsRequestBuilder.StatsRequestBuilderGetQueryParameters>> requestConfiguration = default, CancellationToken cancellationToken = default)
+        public async Task<global::GrimoireCli.Generated.Models.ApiKeyWithSecret> PostAsync(Action<RequestConfiguration<global::GrimoireCli.Generated.Api.ApiKeys.Item.Regenerate.RegenerateRequestBuilder.RegenerateRequestBuilderPostQueryParameters>> requestConfiguration = default, CancellationToken cancellationToken = default)
         {
 #endif
-            var requestInfo = ToGetRequestInformation(requestConfiguration);
+            var requestInfo = ToPostRequestInformation(requestConfiguration);
             var errorMapping = new Dictionary<string, ParsableFactory<IParsable>>
             {
                 { "422", global::GrimoireCli.Generated.Models.HTTPValidationError.CreateFromDiscriminatorValue },
             };
-            return await RequestAdapter.SendAsync<global::GrimoireCli.Generated.Models.StatsResponse>(requestInfo, global::GrimoireCli.Generated.Models.StatsResponse.CreateFromDiscriminatorValue, errorMapping, cancellationToken).ConfigureAwait(false);
+            return await RequestAdapter.SendAsync<global::GrimoireCli.Generated.Models.ApiKeyWithSecret>(requestInfo, global::GrimoireCli.Generated.Models.ApiKeyWithSecret.CreateFromDiscriminatorValue, errorMapping, cancellationToken).ConfigureAwait(false);
         }
         /// <summary>
-        /// Returns library counts. Accepts a session, or an `X-API-Key` with the `stats` permission for external integrations such as Homepage.
+        /// Keeps the name and permissions. The old secret stops working at once.
         /// </summary>
         /// <returns>A <see cref="RequestInformation"/></returns>
         /// <param name="requestConfiguration">Configuration for the request such as headers, query parameters, and middleware options.</param>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
-        public RequestInformation ToGetRequestInformation(Action<RequestConfiguration<global::GrimoireCli.Generated.Api.Stats.StatsRequestBuilder.StatsRequestBuilderGetQueryParameters>>? requestConfiguration = default)
+        public RequestInformation ToPostRequestInformation(Action<RequestConfiguration<global::GrimoireCli.Generated.Api.ApiKeys.Item.Regenerate.RegenerateRequestBuilder.RegenerateRequestBuilderPostQueryParameters>>? requestConfiguration = default)
         {
 #nullable restore
 #else
-        public RequestInformation ToGetRequestInformation(Action<RequestConfiguration<global::GrimoireCli.Generated.Api.Stats.StatsRequestBuilder.StatsRequestBuilderGetQueryParameters>> requestConfiguration = default)
+        public RequestInformation ToPostRequestInformation(Action<RequestConfiguration<global::GrimoireCli.Generated.Api.ApiKeys.Item.Regenerate.RegenerateRequestBuilder.RegenerateRequestBuilderPostQueryParameters>> requestConfiguration = default)
         {
 #endif
-            var requestInfo = new RequestInformation(Method.GET, UrlTemplate, PathParameters);
+            var requestInfo = new RequestInformation(Method.POST, UrlTemplate, PathParameters);
             requestInfo.Configure(requestConfiguration);
             requestInfo.Headers.TryAdd("Accept", "application/json");
             return requestInfo;
@@ -78,17 +78,17 @@ namespace GrimoireCli.Generated.Api.Stats
         /// <summary>
         /// Returns a request builder with the provided arbitrary URL. Using this method means any other path or query parameters are ignored.
         /// </summary>
-        /// <returns>A <see cref="global::GrimoireCli.Generated.Api.Stats.StatsRequestBuilder"/></returns>
+        /// <returns>A <see cref="global::GrimoireCli.Generated.Api.ApiKeys.Item.Regenerate.RegenerateRequestBuilder"/></returns>
         /// <param name="rawUrl">The raw URL to use for the request builder.</param>
-        public global::GrimoireCli.Generated.Api.Stats.StatsRequestBuilder WithUrl(string rawUrl)
+        public global::GrimoireCli.Generated.Api.ApiKeys.Item.Regenerate.RegenerateRequestBuilder WithUrl(string rawUrl)
         {
-            return new global::GrimoireCli.Generated.Api.Stats.StatsRequestBuilder(rawUrl, RequestAdapter);
+            return new global::GrimoireCli.Generated.Api.ApiKeys.Item.Regenerate.RegenerateRequestBuilder(rawUrl, RequestAdapter);
         }
         /// <summary>
-        /// Returns library counts. Accepts a session, or an `X-API-Key` with the `stats` permission for external integrations such as Homepage.
+        /// Keeps the name and permissions. The old secret stops working at once.
         /// </summary>
         [global::System.CodeDom.Compiler.GeneratedCode("Kiota", "1.0.0")]
-        public partial class StatsRequestBuilderGetQueryParameters 
+        public partial class RegenerateRequestBuilderPostQueryParameters 
         {
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
@@ -109,7 +109,7 @@ namespace GrimoireCli.Generated.Api.Stats
         /// </summary>
         [Obsolete("This class is deprecated. Please use the generic RequestConfiguration class generated by the generator.")]
         [global::System.CodeDom.Compiler.GeneratedCode("Kiota", "1.0.0")]
-        public partial class StatsRequestBuilderGetRequestConfiguration : RequestConfiguration<global::GrimoireCli.Generated.Api.Stats.StatsRequestBuilder.StatsRequestBuilderGetQueryParameters>
+        public partial class RegenerateRequestBuilderPostRequestConfiguration : RequestConfiguration<global::GrimoireCli.Generated.Api.ApiKeys.Item.Regenerate.RegenerateRequestBuilder.RegenerateRequestBuilderPostQueryParameters>
         {
         }
     }
