@@ -3,6 +3,88 @@
 All notable changes to grimoire-cli are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## v0.4.0 — 2026-10-02
+
+A feature release. The CLI reaches campaigns for the first time, can log in
+with a Grimoire API key instead of a session, and supports Grimoire 1.7.3
+alongside 1.7.2.
+
+### Highlights
+
+- **API key login.** `login --api-key-stdin` stores a Grimoire 1.7.3 API key
+  in place of a session. For an unattended agent that means no 30-minute
+  token to renew and no 30-day refresh cookie to lose, and the key's own
+  permissions narrow what the agent can touch. When a key is refused, the
+  error carries the server's reason and links the new **Key** column in
+  `docs/grimoire-api-coverage.md`, which lists the permission each endpoint
+  needs. Keys need Grimoire 1.7.3; against 1.7.2 the login is rejected with
+  a 401 rather than quietly doing nothing.
+- **Campaign linking.** `campaigns`, with `resources`, `categories` and
+  `files upload`, covers 17 endpoints. An agent can create a campaign, link
+  books and other library items into it, file them under categories, set
+  their order and visibility, and upload campaign files. Writes are gated on
+  owning the campaign rather than on a role, so help lists the three reasons
+  a write is refused instead of a role tag. `resources bulk` exits 3 when the
+  server skipped something, since it drops duplicates silently. The play
+  side (wiki, sessions, members, calendar) is deferred.
+- **Per-install config.** A `grimoire-cli.json` beside the binary takes
+  precedence over `~/.grimoire-cli/config.json`, so one machine can run
+  separate installs as separate accounts, such as an agent harness logged in
+  as the GM. `config get` reports which file and which tier is in use.
+- **Metadata sidecars.** `sidecars settings get|set` and `sidecars export`
+  configure and backfill `.opf`, `.nfo`, `.grimoire.json` or `.yaml` files
+  beside each book, so curated metadata survives the instance. Export only
+  writes sidecars that are missing; edits keep existing ones current on
+  their own.
+- **Grimoire 1.7.3.** It is now the highest tested version, and the floor
+  stays at 1.7.2. Nothing the CLI sends changed between the two.
+
+### Features
+
+- feat: add campaigns categories commands
+- feat: add campaigns files upload
+- feat: add campaigns list, get, create and update
+- feat: add campaigns resources commands
+- feat: add sidecars export
+- feat: add sidecars settings get
+- feat: add sidecars settings set
+- feat: log in with an api key from stdin
+- feat: report the resolved config file in config get
+- feat: resolve the config file per install
+- feat: send an api key instead of a session when one is configured
+
+### Fixes
+
+- fix: correct campaign help caveats found in final review
+- fix: exit 0 when sidecars export only skips foreign sidecars
+- fix: give categories delete the campaign-only not-found hint
+- fix: keep a corrupt config's path claimed so an install cannot switch accounts
+- fix: keep the api key when resolving config
+- fix: link the api key docs by full url in login help
+- fix: reject key logins the server refuses for reasons other than library
+
+### Tests
+
+- test: cover the sidecars settings and export flow
+- test: describe each smoke-test step
+- test: serialise the config location tests with the nlog collection
+- test: smoke-test api key login and permission errors
+
+### Chores
+
+- chore: bump version to 0.4.0
+- chore: support grimoire 1.7.3
+
+### Docs
+
+- docs: document api key login and per-endpoint key permissions
+- docs: drop config-location claims the resolution rule replaced
+- docs: drop shipped items from the roadmap and queue sidecar export
+- docs: drop sidecar export from the roadmap now it ships
+- docs: record 0.4.0 in the compatibility matrix
+- docs: record campaign linking coverage, behaviour and smoke checks
+- docs: tag the sidecars settings get row as admin
+
 ## v0.3.1 — 2026-09-28
 
 A compatibility release. Grimoire 1.7.2 is now the supported server, and the one
