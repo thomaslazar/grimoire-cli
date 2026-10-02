@@ -2696,4 +2696,77 @@ UPLOAD_LINK=$(jq -r .id "$WORK/cr-upload.out")
   || fail "the removed upload link should be gone"
 ok "campaigns files upload links a file, and remove takes it away again"
 
+# ---- api keys ----
+# Key-mode calls use their own config file, so the admin session above is untouched.
+KEYCFG="$WORK/key-config.json"
+# logging in as admin with curl for a bearer token to manage keys with
+ADMIN_TOKEN=$(curl -sf -X POST "$SERVER/api/auth/login" -H 'Content-Type: application/json' \
+  -d '{"username":"admin","password":"admin"}' | jq -r .token)
+[ -n "$ADMIN_TOKEN" ] && [ "$ADMIN_TOKEN" != "null" ] || fail "admin curl login returned no token"
+# deleting any smoke keys a previous run left behind, so re-runs converge
+delete_smoke_keys() {
+  curl -sf "$SERVER/api/api-keys" -H "Authorization: Bearer $ADMIN_TOKEN" \
+    | jq -r '.[] | select(.name == "smoke-full" or .name == "smoke-books-read") | .id' \
+    | while read -r id; do
+        curl -sf -X DELETE "$SERVER/api/api-keys/$id" -H "Authorization: Bearer $ADMIN_TOKEN" >/dev/null \
+          || fail "could not delete api key $id"
+      done
+}
+delete_smoke_keys
+# creating a key with the given permissions and printing its secret
+create_key() {
+  curl -sf -X POST "$SERVER/api/api-keys" -H "Authorization: Bearer $ADMIN_TOKEN" \
+    -H 'Content-Type: application/json' -d "{\"name\":\"$1\",\"permissions\":$2}" | jq -r .key
+}
+FULL_KEY=$(create_key smoke-full '{"*":"write"}')
+READ_KEY=$(create_key smoke-books-read '{"books":"read"}')
+[ -n "$FULL_KEY" ] && [ "$FULL_KEY" != "null" ] || fail "no secret for smoke-full"
+[ -n "$READ_KEY" ] && [ "$READ_KEY" != "null" ] || fail "no secret for smoke-books-read"
+ok "api keys created"
+
+# logging in with the full key, expecting the key saved and the version recorded
+printf '%s' "$FULL_KEY" | GRIMOIRE_CONFIG="$KEYCFG" "$CLI" login --server "$SERVER" --api-key-stdin \
+  >"$WORK/key-login.out" 2>"$WORK/key-login.err" \
+  || { cat "$WORK/key-login.err" >&2; fail "api key login exited non-zero"; }
+grep -q "with an API key" "$WORK/key-login.err" || fail "key login should say so: $(cat "$WORK/key-login.err")"
+GRIMOIRE_CONFIG="$KEYCFG" "$CLI" config get | jq -e '.auth == "api-key"' >/dev/null \
+  || fail "config get should show auth api-key"
+jq -e --arg v "$EXPECTED_VERSION" '.lastServerVersion == $v' "$KEYCFG" >/dev/null \
+  || fail "key login should record server version $EXPECTED_VERSION: $(jq -c 'del(.apiKey)' "$KEYCFG")"
+# listing systems with the full key, expecting JSON
+GRIMOIRE_CONFIG="$KEYCFG" "$CLI" systems list 2>"$WORK/cli.err" | jq -e 'type == "array"' >/dev/null \
+  || { cat "$WORK/cli.err" >&2; fail "systems list under an api key failed"; }
+ok "api key login with a full key, then systems list"
+
+# logging in with the books-read key, expecting the cannot-read-library warning
+printf '%s' "$READ_KEY" | GRIMOIRE_CONFIG="$KEYCFG" "$CLI" login --server "$SERVER" --api-key-stdin \
+  >"$WORK/key-login.out" 2>"$WORK/key-login.err" \
+  || { cat "$WORK/key-login.err" >&2; fail "books-read key login exited non-zero"; }
+grep -q "cannot read library" "$WORK/key-login.err" \
+  || fail "books-read key login should warn it cannot read library: $(cat "$WORK/key-login.err")"
+# updating a book with the read-only key, expecting exit 2 naming books and write
+set +e
+echo '{"description":"smoke fixture book description"}' \
+  | GRIMOIRE_CONFIG="$KEYCFG" "$CLI" books update --id "$SR4_BOOK" --stdin >/dev/null 2>"$WORK/key-upd.err"; rc=$?
+set -e
+[ "$rc" -eq 2 ] || fail "books update under a read key should exit 2, got $rc: $(cat "$WORK/key-upd.err")"
+grep -q "'books'" "$WORK/key-upd.err" && grep -q "write" "$WORK/key-upd.err" \
+  && grep -q "Key permissions per command:" "$WORK/key-upd.err" \
+  || fail "the 403 should name books, write and the permissions list: $(cat "$WORK/key-upd.err")"
+ok "a books-read key logs in with a warning and is refused books update"
+
+# logging in with a garbage key, expecting exit 2 and the saved key left alone
+cp "$KEYCFG" "$WORK/key-config.before"
+set +e
+printf 'grim_not-a-real-key' | GRIMOIRE_CONFIG="$KEYCFG" "$CLI" login --server "$SERVER" --api-key-stdin \
+  >/dev/null 2>"$WORK/key-bad.err"; rc=$?
+set -e
+[ "$rc" -eq 2 ] || fail "a garbage key should exit 2, got $rc: $(cat "$WORK/key-bad.err")"
+cmp -s "$KEYCFG" "$WORK/key-config.before" || fail "a rejected key should leave the config file unchanged"
+ok "a rejected key exits 2 and overwrites nothing"
+
+# deleting the smoke keys again
+delete_smoke_keys
+ok "api keys deleted"
+
 echo "smoke: all checks passed" >&2
