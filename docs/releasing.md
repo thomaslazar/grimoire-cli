@@ -120,7 +120,11 @@ releases comparable.
 2. `### Highlights` — three to six bullets, each a **bold lead-in** followed by
    prose that says *why*, not only what. This is the section a reader actually
    reads and the only one allowed to explain itself.
-3. `### Changes`, split by conventional-commit type, **one bullet per commit
+3. `### Contributors` — one bullet per PR merged since the last tag whose
+   author is not the maintainer, bots excluded: `- @handle — title (#123)`.
+   Omitted when there are none. A bare `@handle` in the release body notifies
+   the contributor and adds their avatar to the release page.
+4. `### Changes`, split by conventional-commit type, **one bullet per commit
    with its prefix kept**, sorted alphabetically inside each group:
    `Features` (`feat:`), `Fixes` (`fix:`), `Refactors` (`refactor:`),
    `Tests` (`test:`), `Chores` (`chore:`, `ci:`), `Docs` (`docs:`). Groups with
