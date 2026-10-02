@@ -72,9 +72,13 @@ cannot reach `/api/auth/refresh`.
 Both are one `GET /api/about` sent with the key:
 
 - 200 — valid; the version is recorded as today.
-- 403 — valid, but without `library` read. Login saves the key and warns that
-  the version check needs `library` read; the daily probe logs it at debug only.
-- 401 — login saves nothing and exits 2 with the server's detail.
+- 403 naming the missing level (`This API key needs 'read' access to 'library'
+  (it has 'none')`, `api_keys.py:387`) — valid, but without `library` read.
+  Login saves the key and warns that the version check needs `library` read;
+  the daily probe logs it at debug only.
+- 401, or any other 403 (keys disabled, not enabled for the account, not
+  usable on this endpoint — `api_keys.py:351-352, 376-381`) — login saves
+  nothing and exits 2 with the server's detail.
 - 429, any other status or a transport failure — login saves nothing and exits
   2.
 
@@ -117,7 +121,7 @@ The message mapping (`EnsureSuccessAsync`) changes in both modes and in key mode
   - a `*: write` key logs in and runs `systems list`;
   - a `books: read` key gets a 403 on `books update` naming `books` and `write`,
     and logs in with the version-check warning;
-  - a garbage key exits 2 at login and leaves the file without `apiKey`.
+  - a garbage key exits 2 at login and leaves the file unchanged.
 
 ## Scope
 

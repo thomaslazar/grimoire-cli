@@ -85,6 +85,12 @@ first line of stdin, probes it with `GET /api/about`, and on success writes
 holds one credential kind. Logging in with a password clears `apiKey` back
 out.
 
+API keys need Grimoire 1.7.3 or later; against 1.7.2 the login is rejected
+with a 401.
+
+`GRIMOIRE_SERVER` overrides the config's server, so the key is sent to
+whatever host it names.
+
 **What changes:**
 
 - Every request sends `X-API-Key` instead of `Authorization`, and a key wins

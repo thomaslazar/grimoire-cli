@@ -182,12 +182,15 @@ public static class LoginCommand
         // The key is probed before anything is saved, so a rejected key leaves
         // the existing login in place.
         var (status, body) = await new GrimoireApiClient(new AppConfig { Server = server, ApiKey = key }).ProbeAboutAsync();
-        var outcome = ClassifyKeyProbe(status);
+        var outcome = ClassifyKeyProbe(status, body);
         if (outcome == KeyLoginOutcome.Rejected)
         {
-            _logger.Error(status == null
-                ? $"Cannot reach the Grimoire server at {server}."
-                : $"API key rejected: {status} {body}");
+            _logger.Error(status switch
+            {
+                null => $"Cannot reach the Grimoire server at {server}.",
+                401 or 403 => $"API key rejected: {status} {body}",
+                _ => $"API key check failed: {status} {body}"
+            });
             Environment.Exit(2);
         }
         var config = configManager.Load();
@@ -213,13 +216,14 @@ public static class LoginCommand
     }
 
     /// <summary>
-    /// /api/about requires library read, so a 403 proves the key authenticated
-    /// even though it cannot report the version.
+    /// /api/about requires library read, so a 403 naming that missing level
+    /// proves the key authenticated even though it cannot report the version.
+    /// Every other 403 (keys disabled, not allowed for the owner) is a refusal.
     /// </summary>
-    internal static KeyLoginOutcome ClassifyKeyProbe(int? status) => status switch
+    internal static KeyLoginOutcome ClassifyKeyProbe(int? status, string body) => status switch
     {
         200 => KeyLoginOutcome.Valid,
-        403 => KeyLoginOutcome.ValidWithoutLibrary,
+        403 when body.Contains("access to 'library'") => KeyLoginOutcome.ValidWithoutLibrary,
         _ => KeyLoginOutcome.Rejected
     };
 

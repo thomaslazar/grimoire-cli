@@ -5,15 +5,18 @@ namespace GrimoireCli.Tests.Commands;
 public class LoginApiKeyTests
 {
     [Theory]
-    [InlineData(200, KeyLoginOutcome.Valid)]
-    [InlineData(403, KeyLoginOutcome.ValidWithoutLibrary)]
-    [InlineData(401, KeyLoginOutcome.Rejected)]
-    [InlineData(429, KeyLoginOutcome.Rejected)]
-    [InlineData(500, KeyLoginOutcome.Rejected)]
-    [InlineData(null, KeyLoginOutcome.Rejected)]
-    public void ClassifiesTheProbeStatus(int? status, KeyLoginOutcome expected)
+    [InlineData(200, "{}", KeyLoginOutcome.Valid)]
+    [InlineData(403, "{\"detail\":\"This API key needs 'read' access to 'library' (it has 'none')\"}", KeyLoginOutcome.ValidWithoutLibrary)]
+    [InlineData(403, "{\"detail\":\"API keys are disabled on this server\"}", KeyLoginOutcome.Rejected)]
+    [InlineData(403, "{\"detail\":\"API keys are not enabled for your account\"}", KeyLoginOutcome.Rejected)]
+    [InlineData(403, "{\"detail\":\"API keys cannot be used for this endpoint\"}", KeyLoginOutcome.Rejected)]
+    [InlineData(401, "{}", KeyLoginOutcome.Rejected)]
+    [InlineData(429, "{}", KeyLoginOutcome.Rejected)]
+    [InlineData(500, "{}", KeyLoginOutcome.Rejected)]
+    [InlineData(null, "", KeyLoginOutcome.Rejected)]
+    public void ClassifiesTheProbeStatus(int? status, string body, KeyLoginOutcome expected)
     {
-        Assert.Equal(expected, LoginCommand.ClassifyKeyProbe(status));
+        Assert.Equal(expected, LoginCommand.ClassifyKeyProbe(status, body));
     }
 
     [Theory]

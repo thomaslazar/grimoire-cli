@@ -351,8 +351,8 @@ def router_prefixes(tree: ast.Module) -> dict[str, str]:
 def api_key_permissions(source_root: Path) -> tuple[dict[str, str], frozenset[str]]:
     """Tag -> permission name, and the excluded tags, read from ``api_keys.py``.
 
-    Mirrors ``TAG_PERMISSIONS`` / ``EXCLUDED_TAGS`` with ``ast`` rather than an
-    import, so the Key column is derived from the same source the Perm column
+    Reads ``PERMISSIONS`` (deriving the tag map ``TAG_PERMISSIONS`` is built
+    from) and ``EXCLUDED_TAGS`` with ``ast`` rather than an import, so the Key column is derived from the same source the Perm column
     already reads roles from.
     """
     tree = ast.parse((source_root / "backend" / "api_keys.py").read_text(encoding="utf-8"))
