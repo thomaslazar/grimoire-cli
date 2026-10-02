@@ -147,6 +147,19 @@ An opening paragraph naming the kind of release and its theme, then:
 **Highlights** — three to six bullets, each a **bold lead-in** followed by prose
 that says *why*, not only what. The only section allowed to explain itself.
 
+**Contributors** — one bullet per PR merged since the last tag whose author is
+not the maintainer, bots excluded. Omit the section when there are none:
+
+```bash
+SINCE=$(git log -1 --format=%cI "$LAST_TAG")
+gh pr list --state merged --base main --search "merged:>=$SINCE" --limit 200 \
+  --json number,title,author \
+  --jq '.[] | select(.author.login != "thomaslazar" and (.author.is_bot | not))
+        | "- @\(.author.login) — \(.title) (#\(.number))"'
+```
+
+A bare `@handle` notifies them and puts their avatar on the release page.
+
 **Changes** — every conventional commit since the last tag, one bullet each with
 its prefix kept, grouped by type in this order and sorted alphabetically within
 each group: `Features` (`feat:`), `Fixes` (`fix:`), `Refactors` (`refactor:`),
@@ -176,6 +189,12 @@ Write `temp/release-notes.md` in this format:
 ### Highlights
 
 - **Bold lead-in.** Why it matters, not only what changed.
+
+### Contributors
+
+Thanks to everyone who sent a pull request this release:
+
+- @handle — PR title (#123)
 
 ### Features
 
