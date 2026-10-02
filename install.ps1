@@ -1,4 +1,6 @@
-# Fetches a release binary from GitHub Releases and verifies it against the release's SHA256SUMS before installing.
+# Fetches a release binary from GitHub Releases and verifies it against the
+# release's SHA256SUMS before installing. Both come from the same release, so
+# this catches a corrupt or truncated download, not a compromised release.
 
 $ErrorActionPreference = "Stop"
 
@@ -25,7 +27,8 @@ Write-Host "Installing grimoire-cli $Version ($Rid)..."
 
 $BaseUrl = "https://github.com/$Repo/releases/download/$Version"
 
-# Download into a temp dir first, so a failed or tampered download doesn't overwrite an existing file
+# Download into a temp dir first, so a failed or corrupt download never
+# replaces a working install.
 $TmpDir = Join-Path ([System.IO.Path]::GetTempPath()) ("grimoire-cli-" + [guid]::NewGuid())
 New-Item -ItemType Directory -Path $TmpDir | Out-Null
 try {
