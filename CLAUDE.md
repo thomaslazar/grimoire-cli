@@ -136,7 +136,7 @@ These rules exist because help text sits on the hot path for the agents driving 
   # then generate straight from http://host.docker.internal:9481/api/openapi.json
   ```
 - **The pin is a release tag, and bumps are deliberate.** `docker/docker-compose.yml` pins `hunterreadca/grimoire:1.8.0`. A tag is immutable, so the spec cannot drift under the committed client between regenerations — which is what the prerelease channel could not offer, and why riding one was a temporary exception rather than the convention. Bumping the image and regenerating from it belong in the same commit, so the generated diff is the record of what changed; the full procedure is in [docs/grimoire-compatibility.md](docs/grimoire-compatibility.md#handling-a-grimoire-release).
-- **Released-version support lives on `support/grimoire-1.5.6`**, where the pin is the `1.5.6` tag. Fixes for 1.5.6 are made there and released from there, then cherry-picked forward — not merged, since `main` no longer has the DTO layer they were written against.
+- **Older server versions get no support branch.** A release targets the server range in the [compatibility matrix](docs/grimoire-compatibility.md#matrix); whoever stays on an older Grimoire stays on the CLI release that supported it. Upstream has no LTS line, so there is nothing for a backport to track.
 - **Generate with a .NET-native generator** — Kiota is the fit: a `dotnet tool`, handles the spec's OpenAPI 3.1, emits C#. No node or java is available in the devcontainer.
 - **What the spec gives you and what it does not.** Today's spec has 444 component schemas and 360 operations, 307 of whose success responses carry a schema — request bodies, paths, methods, query parameters and most response shapes all come from the generator and are trustworthy. The remainder are 204s or still type as `{}`. Neither gap matters for runtime deserialization any more: the CLI passes response bytes through unmodified rather than reading them into a typed model (see [docs/input-output.md](docs/input-output.md)). The generated response models are used only to render `--help` response samples, via `tools/GenerateJsonExamples`.
 - **On a Grimoire version bump, regenerate and diff.** That diff is the authoritative list of what changed in the API surface, and it replaces reading release notes and hoping. See [docs/grimoire-compatibility.md](docs/grimoire-compatibility.md).
@@ -149,7 +149,7 @@ These rules exist because help text sits on the hot path for the agents driving 
 
 The upstream source is the authoritative reference for **behaviour and response shapes** — the half the spec does not cover (see above). The published docs have been wrong before.
 
-- Expected location: `temp/grimoire/` (gitignored). **Pin it to the release the local stack runs**, never upstream `main`, which carries work no instance runs. That is `v1.8.0` here and the `1.5.6` tag on `support/grimoire-1.5.6`:
+- Expected location: `temp/grimoire/` (gitignored). **Pin it to the release the local stack runs**, never upstream `main`, which carries work no instance runs. That is `v1.8.0` here:
   ```bash
   git -C temp/grimoire fetch --depth 1 origin tag v1.8.0
   git -C temp/grimoire checkout v1.8.0

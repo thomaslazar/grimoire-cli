@@ -4,11 +4,11 @@
 
 | grimoire-cli | Grimoire | Status |
 |---|---|---|
-| 0.1.x | 1.5.6 | initial support, maintained on `support/grimoire-1.5.6` |
+| 0.1.x | 1.5.6 | superseded by 0.2.x |
 | 0.2.x | 1.6.2 | superseded by 0.3.x |
-| 0.3.0 | 1.7.0 – 1.7.1 | superseded by 0.3.1; no support branch |
-| 0.3.1 | 1.7.2 | superseded by 0.4.0; no support branch |
-| 0.4.0 | 1.7.2 – 1.7.3 | superseded by 0.5.0; no support branch |
+| 0.3.0 | 1.7.0 – 1.7.1 | superseded by 0.3.1 |
+| 0.3.1 | 1.7.2 | superseded by 0.4.0 |
+| 0.4.0 | 1.7.2 – 1.7.3 | superseded by 0.5.0 |
 | 0.5.0 | 1.8.0 | current, on `main` |
 
 **The floor rises only when something forces it**, not on every server release.
@@ -17,9 +17,9 @@ because the 1.6.x line changed the token lifetime and made the library writable,
 1.7.0, 1.7.2 and then 1.8.0 because each added a flag older servers silently
 drop (below).
 Absent a reason like that, a bump raises `MaxTestedVersion` and leaves the floor
-where it is. Whoever stays on Grimoire 1.5.6 stays on grimoire-cli `0.1.x`, which
-is maintained on `support/grimoire-1.5.6` — fixes are made and released there,
-then cherry-picked forward.
+where it is. Whoever stays on an older Grimoire stays on the grimoire-cli release
+its row names. Those releases get no further fixes: upstream has no LTS line, so
+there is no support branch for a backport to land on.
 
 **Adding a flag that an in-range server would ignore is what forces a floor, so
 it is a decision to take deliberately rather than a detail of a bump.** A field
