@@ -7,10 +7,11 @@ using System.IO;
 using System;
 namespace GrimoireCli.Generated.Models
 {
+    /// <summary>
+    /// A tag&apos;s summary plus one page of the items carrying it directly.
+    /// </summary>
     [global::System.CodeDom.Compiler.GeneratedCode("Kiota", "1.0.0")]
-    #pragma warning disable CS1591
     public partial class TagItemsResponse : IAdditionalDataHolder, IParsable
-    #pragma warning restore CS1591
     {
         /// <summary>Stores additional data not described in the OpenAPI description found when deserializing. Can be used for serialization as well.</summary>
         public IDictionary<string, object> AdditionalData { get; set; }
@@ -21,6 +22,14 @@ namespace GrimoireCli.Generated.Models
 #nullable restore
 #else
         public string Category { get; set; }
+#endif
+        /// <summary>The counts property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public global::GrimoireCli.Generated.Models.TagItemsResponse_counts? Counts { get; set; }
+#nullable restore
+#else
+        public global::GrimoireCli.Generated.Models.TagItemsResponse_counts Counts { get; set; }
 #endif
         /// <summary>The display property</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
@@ -54,6 +63,8 @@ namespace GrimoireCli.Generated.Models
 #else
         public List<global::GrimoireCli.Generated.Models.TagItemsResponse.TagItemsResponse_items> Items { get; set; }
 #endif
+        /// <summary>The total property</summary>
+        public int? Total { get; set; }
         /// <summary>
         /// Instantiates a new <see cref="global::GrimoireCli.Generated.Models.TagItemsResponse"/> and sets the default values.
         /// </summary>
@@ -80,10 +91,12 @@ namespace GrimoireCli.Generated.Models
             return new Dictionary<string, Action<IParseNode>>
             {
                 { "category", n => { Category = n.GetStringValue(); } },
+                { "counts", n => { Counts = n.GetObjectValue<global::GrimoireCli.Generated.Models.TagItemsResponse_counts>(global::GrimoireCli.Generated.Models.TagItemsResponse_counts.CreateFromDiscriminatorValue); } },
                 { "display", n => { Display = n.GetStringValue(); } },
                 { "folders", n => { Folders = n.GetCollectionOfObjectValues<global::GrimoireCli.Generated.Models.TaggedFolder>(global::GrimoireCli.Generated.Models.TaggedFolder.CreateFromDiscriminatorValue)?.AsList(); } },
                 { "internal", n => { Internal = n.GetStringValue(); } },
                 { "items", n => { Items = n.GetCollectionOfObjectValues<global::GrimoireCli.Generated.Models.TagItemsResponse.TagItemsResponse_items>(global::GrimoireCli.Generated.Models.TagItemsResponse.TagItemsResponse_items.CreateFromDiscriminatorValue)?.AsList(); } },
+                { "total", n => { Total = n.GetIntValue(); } },
             };
         }
         /// <summary>
@@ -94,10 +107,12 @@ namespace GrimoireCli.Generated.Models
         {
             if(ReferenceEquals(writer, null)) throw new ArgumentNullException(nameof(writer));
             writer.WriteStringValue("category", Category);
+            writer.WriteObjectValue<global::GrimoireCli.Generated.Models.TagItemsResponse_counts>("counts", Counts);
             writer.WriteStringValue("display", Display);
             writer.WriteCollectionOfObjectValues<global::GrimoireCli.Generated.Models.TaggedFolder>("folders", Folders);
             writer.WriteStringValue("internal", Internal);
             writer.WriteCollectionOfObjectValues<global::GrimoireCli.Generated.Models.TagItemsResponse.TagItemsResponse_items>("items", Items);
+            writer.WriteIntValue("total", Total);
             writer.WriteAdditionalData(AdditionalData);
         }
         /// <summary>

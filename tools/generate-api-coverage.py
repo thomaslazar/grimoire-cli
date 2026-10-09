@@ -226,6 +226,7 @@ IMPLEMENTED = {
     "GET /api/logs": "`logs` ✅",
     "GET /api/tags": "`tags list` ✅",
     "GET /api/tags/{internal}/items": "`tags items` ✅",
+    "GET /api/tags/{internal}/folder-items": "`tags folder-items` ✅",
     "POST /api/tags": "`tags create` ✅",
     "PATCH /api/tags/{internal}": "`tags rename` ✅",
     "DELETE /api/tags/{internal}": "`tags delete` ✅",

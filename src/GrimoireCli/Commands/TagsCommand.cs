@@ -11,6 +11,7 @@ public static class TagsCommand
         var command = new Command("tags", "Tags across every resource type");
         command.Subcommands.Add(CreateListCommand());
         command.Subcommands.Add(CreateItemsCommand());
+        command.Subcommands.Add(CreateFolderItemsCommand());
         command.Subcommands.Add(CreateCreateCommand());
         command.Subcommands.Add(CreateRenameCommand());
         command.Subcommands.Add(CreateDeleteCommand());
@@ -48,14 +49,22 @@ public static class TagsCommand
     {
         var tagOption = new Option<string>("--tag") { Description = "The tag's internal key, from tags list; matched case-insensitively", Required = true };
         var resourceTypeOption = new Option<string?>("--resource-type") { Description = "Restrict to this resource type (system | book | map | token | audio | model)" };
+        var limitOption = OptionHelpers.Range("--limit", "Directly-tagged items per page; 0 for counts and folders only", 0, 500);
+        limitOption.DefaultValueFactory = _ => 100;
+        var offsetOption = OptionHelpers.Range("--offset", "Items to skip", 0);
         var command = new Command("items", "Items and folders carrying a tag")
         {
-            tagOption, resourceTypeOption
+            tagOption, resourceTypeOption, limitOption, offsetOption
         };
         command.AddHelpSection("Notes", HelpSectionPosition.Top,
-            "Items carrying the tag directly are in items; those inheriting it",
-            "from a folder tag are under folders.");
-        command.AddExamples("grimoire-cli tags items --tag dungeon");
+            "items holds only items carrying the tag directly, paged across types",
+            "in the order system, book, map, token, audio, model; page with",
+            "--offset against total. folders lists each folder carrying the tag",
+            "with its count, not its contents — pass a folder's key to",
+            "tags folder-items. --resource-type narrows counts and folders too.");
+        command.AddExamples(
+            "grimoire-cli tags items --tag dungeon",
+            "grimoire-cli tags items --tag dungeon --resource-type map --offset 100");
         command.AddResponseExample<Generated.Models.TagItemsResponse>();
         AddTaggedItemShapes(command);
         command.SetAction(async (parseResult, cancellationToken) =>
@@ -64,7 +73,43 @@ public static class TagsCommand
             var service = new TagsService(client);
             var result = await service.ItemsAsync(
                 parseResult.GetValue(tagOption)!,
-                parseResult.GetValue(resourceTypeOption));
+                parseResult.GetValue(resourceTypeOption),
+                parseResult.GetValue(limitOption),
+                parseResult.GetValue(offsetOption));
+            ConsoleOutput.WriteRawJson(result);
+            return 0;
+        });
+        return command;
+    }
+
+    private static Command CreateFolderItemsCommand()
+    {
+        var tagOption = new Option<string>("--tag") { Description = "The tag's internal key, from tags list; matched case-insensitively", Required = true };
+        var resourceTypeOption = new Option<string>("--resource-type") { Description = "The folder's resource_type, from tags items", Required = true };
+        var folderOption = new Option<string>("--folder") { Description = "The folder's key, from tags items (not its path)", Required = true };
+        var limitOption = OptionHelpers.Range("--limit", "Items per page", 1, 500);
+        limitOption.DefaultValueFactory = _ => 100;
+        var offsetOption = OptionHelpers.Range("--offset", "Items to skip", 0);
+        var command = new Command("folder-items", "Contents of one folder carrying a tag")
+        {
+            tagOption, resourceTypeOption, folderOption, limitOption, offsetOption
+        };
+        command.AddHelpSection("Notes", HelpSectionPosition.Top,
+            "Lists everything under the folder, subfolders included, tagged or",
+            "not. 404 when that folder does not carry the tag.");
+        command.AddExamples("grimoire-cli tags folder-items --tag dungeon --resource-type map --folder <key>");
+        command.AddResponseExample<Generated.Models.TagFolderItemsResponse>();
+        AddTaggedItemShapes(command);
+        command.SetAction(async (parseResult, cancellationToken) =>
+        {
+            var (client, _) = CommandHelper.BuildClient();
+            var service = new TagsService(client);
+            var result = await service.FolderItemsAsync(
+                parseResult.GetValue(tagOption)!,
+                parseResult.GetValue(resourceTypeOption)!,
+                parseResult.GetValue(folderOption)!,
+                parseResult.GetValue(limitOption),
+                parseResult.GetValue(offsetOption));
             ConsoleOutput.WriteRawJson(result);
             return 0;
         });
@@ -209,7 +254,7 @@ public static class TagsCommand
     /// Spells out the six shapes the response's items arrays hold. The
     /// generated sample renders the union as a bare list of type names, which
     /// names the branches without showing any of their fields. Private rather
-    /// than a HelpExtensions helper: one command calls it.
+    /// than a HelpExtensions helper: only this group calls it.
     /// </summary>
     private static void AddTaggedItemShapes(Command command)
     {

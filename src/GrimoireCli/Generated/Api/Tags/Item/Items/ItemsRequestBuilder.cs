@@ -22,7 +22,7 @@ namespace GrimoireCli.Generated.Api.Tags.Item.Items
         /// </summary>
         /// <param name="pathParameters">Path parameters for the request</param>
         /// <param name="requestAdapter">The request adapter to use to execute the requests.</param>
-        public ItemsRequestBuilder(Dictionary<string, object> pathParameters, IRequestAdapter requestAdapter) : base(requestAdapter, "{+baseurl}/api/tags/{internal}/items{?resource_type*,token*}", pathParameters)
+        public ItemsRequestBuilder(Dictionary<string, object> pathParameters, IRequestAdapter requestAdapter) : base(requestAdapter, "{+baseurl}/api/tags/{internal}/items{?limit*,offset*,resource_type*,token*}", pathParameters)
         {
         }
         /// <summary>
@@ -30,11 +30,11 @@ namespace GrimoireCli.Generated.Api.Tags.Item.Items
         /// </summary>
         /// <param name="rawUrl">The raw URL to use for the request builder.</param>
         /// <param name="requestAdapter">The request adapter to use to execute the requests.</param>
-        public ItemsRequestBuilder(string rawUrl, IRequestAdapter requestAdapter) : base(requestAdapter, "{+baseurl}/api/tags/{internal}/items{?resource_type*,token*}", rawUrl)
+        public ItemsRequestBuilder(string rawUrl, IRequestAdapter requestAdapter) : base(requestAdapter, "{+baseurl}/api/tags/{internal}/items{?limit*,offset*,resource_type*,token*}", rawUrl)
         {
         }
         /// <summary>
-        /// Every item carrying the given tag, enriched like the favorites view.Includes items that carry the tag directly (shared tag) and items thatinherit it from a folder tag (``tags.json``/folder tagging).
+        /// Per-type counts and the folders carrying the tag, plus a page of the items carrying it directly (`limit`/`offset`, optionally one `resource_type`). A folder&apos;s contents come from `/folder-items` (issue #221).
         /// </summary>
         /// <returns>A <see cref="global::GrimoireCli.Generated.Models.TagItemsResponse"/></returns>
         /// <param name="cancellationToken">Cancellation token to use when cancelling requests</param>
@@ -57,7 +57,7 @@ namespace GrimoireCli.Generated.Api.Tags.Item.Items
             return await RequestAdapter.SendAsync<global::GrimoireCli.Generated.Models.TagItemsResponse>(requestInfo, global::GrimoireCli.Generated.Models.TagItemsResponse.CreateFromDiscriminatorValue, errorMapping, cancellationToken).ConfigureAwait(false);
         }
         /// <summary>
-        /// Every item carrying the given tag, enriched like the favorites view.Includes items that carry the tag directly (shared tag) and items thatinherit it from a folder tag (``tags.json``/folder tagging).
+        /// Per-type counts and the folders carrying the tag, plus a page of the items carrying it directly (`limit`/`offset`, optionally one `resource_type`). A folder&apos;s contents come from `/folder-items` (issue #221).
         /// </summary>
         /// <returns>A <see cref="RequestInformation"/></returns>
         /// <param name="requestConfiguration">Configuration for the request such as headers, query parameters, and middleware options.</param>
@@ -85,12 +85,19 @@ namespace GrimoireCli.Generated.Api.Tags.Item.Items
             return new global::GrimoireCli.Generated.Api.Tags.Item.Items.ItemsRequestBuilder(rawUrl, RequestAdapter);
         }
         /// <summary>
-        /// Every item carrying the given tag, enriched like the favorites view.Includes items that carry the tag directly (shared tag) and items thatinherit it from a folder tag (``tags.json``/folder tagging).
+        /// Per-type counts and the folders carrying the tag, plus a page of the items carrying it directly (`limit`/`offset`, optionally one `resource_type`). A folder&apos;s contents come from `/folder-items` (issue #221).
         /// </summary>
         [global::System.CodeDom.Compiler.GeneratedCode("Kiota", "1.0.0")]
         public partial class ItemsRequestBuilderGetQueryParameters 
         {
-            /// <summary>Restrict returned items to this resource type.</summary>
+            /// <summary>Directly-tagged items to return; 0 for just the counts and folders.</summary>
+            [QueryParameter("limit")]
+            public int? Limit { get; set; }
+            #pragma warning disable CS1591
+            [QueryParameter("offset")]
+            public int? Offset { get; set; }
+            #pragma warning restore CS1591
+            /// <summary>Restrict the counts, folders and item page to one resource type.</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
             [QueryParameter("resource_type")]

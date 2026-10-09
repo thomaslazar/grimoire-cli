@@ -34,7 +34,7 @@ namespace GrimoireCli.Generated.Api.Files.Upload
         {
         }
         /// <summary>
-        /// Multipart upload of one file. Send files individually so progress can be reported per file and failures retried in isolation.
+        /// Multipart upload of one file. Send files individually so progress can be reported per file and failures retried in isolation. `on_conflict` is `rename` (default), `skip`, or `replace`, which overwrites an indexed book&apos;s file and keeps its record (409 when the path is not an indexed book, or while a scan or OCR run is in progress).
         /// </summary>
         /// <returns>A <see cref="global::GrimoireCli.Generated.Models.UploadResponse"/></returns>
         /// <param name="body">The request body</param>
@@ -59,7 +59,7 @@ namespace GrimoireCli.Generated.Api.Files.Upload
             return await RequestAdapter.SendAsync<global::GrimoireCli.Generated.Models.UploadResponse>(requestInfo, global::GrimoireCli.Generated.Models.UploadResponse.CreateFromDiscriminatorValue, errorMapping, cancellationToken).ConfigureAwait(false);
         }
         /// <summary>
-        /// Multipart upload of one file. Send files individually so progress can be reported per file and failures retried in isolation.
+        /// Multipart upload of one file. Send files individually so progress can be reported per file and failures retried in isolation. `on_conflict` is `rename` (default), `skip`, or `replace`, which overwrites an indexed book&apos;s file and keeps its record (409 when the path is not an indexed book, or while a scan or OCR run is in progress).
         /// </summary>
         /// <returns>A <see cref="RequestInformation"/></returns>
         /// <param name="body">The request body</param>
@@ -90,7 +90,7 @@ namespace GrimoireCli.Generated.Api.Files.Upload
             return new global::GrimoireCli.Generated.Api.Files.Upload.UploadRequestBuilder(rawUrl, RequestAdapter);
         }
         /// <summary>
-        /// Multipart upload of one file. Send files individually so progress can be reported per file and failures retried in isolation.
+        /// Multipart upload of one file. Send files individually so progress can be reported per file and failures retried in isolation. `on_conflict` is `rename` (default), `skip`, or `replace`, which overwrites an indexed book&apos;s file and keeps its record (409 when the path is not an indexed book, or while a scan or OCR run is in progress).
         /// </summary>
         [global::System.CodeDom.Compiler.GeneratedCode("Kiota", "1.0.0")]
         public partial class UploadRequestBuilderPostQueryParameters 

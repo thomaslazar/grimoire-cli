@@ -58,7 +58,7 @@ public static class KiotaSampleWalker
         writer.WriteStartObject();
         foreach (var wireName in instance.GetFieldDeserializers().Keys.OrderBy(k => k, StringComparer.Ordinal))
         {
-            var property = Resolve(properties, wireName)
+            var property = Resolve(type, properties, wireName)
                 ?? throw new InvalidOperationException(
                     $"'{type.Name}' deserializes the wire field '{wireName}' but exposes no matching property, " +
                     "so the help text and JsonBodyInput.Validate would disagree about it.");
@@ -69,11 +69,18 @@ public static class KiotaSampleWalker
         path.Remove(type);
     }
 
-    /// <summary>Maps a snake_case wire name onto Kiota's PascalCase property.</summary>
-    private static PropertyInfo? Resolve(PropertyInfo[] properties, string wireName)
+    /// <summary>
+    /// Maps a snake_case wire name onto Kiota's PascalCase property. Kiota drops
+    /// a leading <c>$</c>, so <c>$schema</c> claims <c>Schema</c> and a plain
+    /// <c>schema</c> beside it is renamed with the type's name as a prefix.
+    /// </summary>
+    private static PropertyInfo? Resolve(Type type, PropertyInfo[] properties, string wireName)
     {
-        var target = wireName.Replace("_", "");
-        return properties.FirstOrDefault(p => string.Equals(p.Name, target, StringComparison.OrdinalIgnoreCase));
+        var target = wireName.TrimStart('$').Replace("_", "");
+        var candidates = wireName.StartsWith('$') ? [target] : new[] { type.Name + target, target };
+        return candidates
+            .Select(c => properties.FirstOrDefault(p => string.Equals(p.Name, c, StringComparison.OrdinalIgnoreCase)))
+            .FirstOrDefault(p => p != null);
     }
 
     private static void WriteValue(Utf8JsonWriter writer, Type type, int depth, HashSet<Type> path)

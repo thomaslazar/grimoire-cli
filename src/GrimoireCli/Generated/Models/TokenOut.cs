@@ -13,6 +13,14 @@ namespace GrimoireCli.Generated.Models
     [global::System.CodeDom.Compiler.GeneratedCode("Kiota", "1.0.0")]
     public partial class TokenOut : IAdditionalDataHolder, IParsable
     {
+        /// <summary>The added_at property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public global::GrimoireCli.Generated.Models.TokenOut.TokenOut_added_at? AddedAt { get; set; }
+#nullable restore
+#else
+        public global::GrimoireCli.Generated.Models.TokenOut.TokenOut_added_at AddedAt { get; set; }
+#endif
         /// <summary>Stores additional data not described in the OpenAPI description found when deserializing. Can be used for serialization as well.</summary>
         public IDictionary<string, object> AdditionalData { get; set; }
         /// <summary>The description property</summary>
@@ -113,6 +121,7 @@ namespace GrimoireCli.Generated.Models
         {
             return new Dictionary<string, Action<IParseNode>>
             {
+                { "added_at", n => { AddedAt = n.GetObjectValue<global::GrimoireCli.Generated.Models.TokenOut.TokenOut_added_at>(global::GrimoireCli.Generated.Models.TokenOut.TokenOut_added_at.CreateFromDiscriminatorValue); } },
                 { "description", n => { Description = n.GetObjectValue<global::GrimoireCli.Generated.Models.TokenOut.TokenOut_description>(global::GrimoireCli.Generated.Models.TokenOut.TokenOut_description.CreateFromDiscriminatorValue); } },
                 { "file_size", n => { FileSize = n.GetObjectValue<global::GrimoireCli.Generated.Models.TokenOut.TokenOut_file_size>(global::GrimoireCli.Generated.Models.TokenOut.TokenOut_file_size.CreateFromDiscriminatorValue); } },
                 { "filename", n => { Filename = n.GetStringValue(); } },
@@ -134,6 +143,7 @@ namespace GrimoireCli.Generated.Models
         public virtual void Serialize(ISerializationWriter writer)
         {
             if(ReferenceEquals(writer, null)) throw new ArgumentNullException(nameof(writer));
+            writer.WriteObjectValue<global::GrimoireCli.Generated.Models.TokenOut.TokenOut_added_at>("added_at", AddedAt);
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.TokenOut.TokenOut_description>("description", Description);
             writer.WriteStringValue("filename", Filename);
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.TokenOut.TokenOut_file_size>("file_size", FileSize);
@@ -147,6 +157,68 @@ namespace GrimoireCli.Generated.Models
             writer.WriteIntValue("variant_count", VariantCount);
             writer.WriteCollectionOfPrimitiveValues<string>("variant_kinds", VariantKinds);
             writer.WriteAdditionalData(AdditionalData);
+        }
+        /// <summary>
+        /// Composed type wrapper for classes <see cref="DateTimeOffset"/>, <see cref="global::GrimoireCli.Generated.Models.TokenOut_added_atMember1"/>
+        /// </summary>
+        [global::System.CodeDom.Compiler.GeneratedCode("Kiota", "1.0.0")]
+        public partial class TokenOut_added_at : IComposedTypeWrapper, IParsable
+        {
+            /// <summary>Composed type representation for type <see cref="DateTimeOffset"/></summary>
+            public DateTimeOffset? DateTimeOffset { get; set; }
+            /// <summary>Composed type representation for type <see cref="global::GrimoireCli.Generated.Models.TokenOut_added_atMember1"/></summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+            public global::GrimoireCli.Generated.Models.TokenOut_added_atMember1? TokenOutAddedAtMember1 { get; set; }
+#nullable restore
+#else
+            public global::GrimoireCli.Generated.Models.TokenOut_added_atMember1 TokenOutAddedAtMember1 { get; set; }
+#endif
+            /// <summary>
+            /// Creates a new instance of the appropriate class based on discriminator value
+            /// </summary>
+            /// <returns>A <see cref="global::GrimoireCli.Generated.Models.TokenOut.TokenOut_added_at"/></returns>
+            /// <param name="parseNode">The parse node to use to read the discriminator value and create the object</param>
+            public static global::GrimoireCli.Generated.Models.TokenOut.TokenOut_added_at CreateFromDiscriminatorValue(IParseNode parseNode)
+            {
+                if(ReferenceEquals(parseNode, null)) throw new ArgumentNullException(nameof(parseNode));
+                var result = new global::GrimoireCli.Generated.Models.TokenOut.TokenOut_added_at();
+                if(parseNode.GetDateTimeOffsetValue() is DateTimeOffset dateTimeOffsetValue)
+                {
+                    result.DateTimeOffset = dateTimeOffsetValue;
+                }
+                else {
+                    result.TokenOutAddedAtMember1 = new global::GrimoireCli.Generated.Models.TokenOut_added_atMember1();
+                }
+                return result;
+            }
+            /// <summary>
+            /// The deserialization information for the current model
+            /// </summary>
+            /// <returns>A IDictionary&lt;string, Action&lt;IParseNode&gt;&gt;</returns>
+            public virtual IDictionary<string, Action<IParseNode>> GetFieldDeserializers()
+            {
+                if(TokenOutAddedAtMember1 != null)
+                {
+                    return ParseNodeHelper.MergeDeserializersForIntersectionWrapper(TokenOutAddedAtMember1);
+                }
+                return new Dictionary<string, Action<IParseNode>>();
+            }
+            /// <summary>
+            /// Serializes information the current object
+            /// </summary>
+            /// <param name="writer">Serialization writer to use to serialize this model</param>
+            public virtual void Serialize(ISerializationWriter writer)
+            {
+                if(ReferenceEquals(writer, null)) throw new ArgumentNullException(nameof(writer));
+                if(DateTimeOffset != null)
+                {
+                    writer.WriteDateTimeOffsetValue(null, DateTimeOffset);
+                }
+                else {
+                    writer.WriteObjectValue<global::GrimoireCli.Generated.Models.TokenOut_added_atMember1>(null, TokenOutAddedAtMember1);
+                }
+            }
         }
         /// <summary>
         /// Composed type wrapper for classes <see cref="global::GrimoireCli.Generated.Models.TokenOut_descriptionMember1"/>, <see cref="string"/>

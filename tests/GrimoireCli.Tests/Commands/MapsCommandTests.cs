@@ -69,9 +69,21 @@ public class MapsCommandTests
     public void ListSaysWhatEachSortOrderOrdersBy()
     {
         var output = Help(["maps", "list"]);
-        Assert.Contains("orders by relative_path", output);
-        Assert.Contains("name orders by filename", output);
+        Assert.Contains("--sort path is folder then name", output);
+        Assert.Contains("name sorts across the whole tree", output);
     }
+
+    [Fact]
+    public void ListTeachesTheQueryAndTagFilterSyntax()
+    {
+        var output = Help(["maps", "list"]);
+        Assert.Contains("Query syntax", output);
+        Assert.Contains("__grim:none__", output);
+    }
+
+    [Fact]
+    public void ListRejectsAnUnknownOrder()
+        => Assert.NotEmpty(MapsCommand.Create().Parse(["list", "--order", "up"]).Errors);
 
     // The exact-match rule changes what a caller asks for, so it has to be said.
     [Fact]

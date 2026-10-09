@@ -14,6 +14,9 @@ public class TagsService
     private const string NotFoundHint =
         "No such tag. List the tags with: grimoire-cli tags list";
 
+    private const string FolderNotFoundHint =
+        "No such tag, or that folder does not carry it. List its folders with: grimoire-cli tags items";
+
     private const string GmOrAdminHint = "the gm or admin role";
 
     private readonly GrimoireApiClient _client;
@@ -28,12 +31,29 @@ public class TagsService
         return await _client.SendAsync(info);
     }
 
-    /// <summary>GET /api/tags/{internal}/items.</summary>
-    public async Task<string> ItemsAsync(string tag, string? resourceType)
+    /// <summary>GET /api/tags/{internal}/items. Pages only the directly-tagged items.</summary>
+    public async Task<string> ItemsAsync(string tag, string? resourceType, int? limit, int? offset)
     {
         var info = _client.Api.Api.Tags[tag].Items.ToGetRequestInformation(c =>
-            c.QueryParameters.ResourceType = resourceType);
+        {
+            c.QueryParameters.ResourceType = resourceType;
+            c.QueryParameters.Limit = limit;
+            c.QueryParameters.Offset = offset;
+        });
         return await _client.SendAsync(info, notFoundHint: NotFoundHint);
+    }
+
+    /// <summary>GET /api/tags/{internal}/folder-items. 404 when the folder does not carry the tag.</summary>
+    public async Task<string> FolderItemsAsync(string tag, string resourceType, string folder, int? limit, int? offset)
+    {
+        var info = _client.Api.Api.Tags[tag].FolderItems.ToGetRequestInformation(c =>
+        {
+            c.QueryParameters.ResourceType = resourceType;
+            c.QueryParameters.Folder = folder;
+            c.QueryParameters.Limit = limit;
+            c.QueryParameters.Offset = offset;
+        });
+        return await _client.SendAsync(info, notFoundHint: FolderNotFoundHint);
     }
 
     /// <summary>

@@ -41,7 +41,7 @@ namespace GrimoireCli.Generated.Api.Books
         /// </summary>
         /// <param name="pathParameters">Path parameters for the request</param>
         /// <param name="requestAdapter">The request adapter to use to execute the requests.</param>
-        public BooksRequestBuilder(Dictionary<string, object> pathParameters, IRequestAdapter requestAdapter) : base(requestAdapter, "{+baseurl}/api/books{?category*,limit*,offset*,system_id*,token*}", pathParameters)
+        public BooksRequestBuilder(Dictionary<string, object> pathParameters, IRequestAdapter requestAdapter) : base(requestAdapter, "{+baseurl}/api/books{?added_since*,category*,limit*,offset*,order*,sort*,system_id*,token*}", pathParameters)
         {
         }
         /// <summary>
@@ -49,11 +49,11 @@ namespace GrimoireCli.Generated.Api.Books
         /// </summary>
         /// <param name="rawUrl">The raw URL to use for the request builder.</param>
         /// <param name="requestAdapter">The request adapter to use to execute the requests.</param>
-        public BooksRequestBuilder(string rawUrl, IRequestAdapter requestAdapter) : base(requestAdapter, "{+baseurl}/api/books{?category*,limit*,offset*,system_id*,token*}", rawUrl)
+        public BooksRequestBuilder(string rawUrl, IRequestAdapter requestAdapter) : base(requestAdapter, "{+baseurl}/api/books{?added_since*,category*,limit*,offset*,order*,sort*,system_id*,token*}", rawUrl)
         {
         }
         /// <summary>
-        /// List books
+        /// Pages through the books the caller can see. `sort=added_at` lists newest first (pass `order=asc` for oldest first) and `added_since` (ISO-8601, UTC if no offset) keeps only books added at or after that moment - poll with both to find new additions. Books added before dates were tracked have a null `added_at`, sort last, and never match `added_since`.
         /// </summary>
         /// <returns>A <see cref="global::GrimoireCli.Generated.Models.BookListResponse"/></returns>
         /// <param name="cancellationToken">Cancellation token to use when cancelling requests</param>
@@ -76,7 +76,7 @@ namespace GrimoireCli.Generated.Api.Books
             return await RequestAdapter.SendAsync<global::GrimoireCli.Generated.Models.BookListResponse>(requestInfo, global::GrimoireCli.Generated.Models.BookListResponse.CreateFromDiscriminatorValue, errorMapping, cancellationToken).ConfigureAwait(false);
         }
         /// <summary>
-        /// List books
+        /// Pages through the books the caller can see. `sort=added_at` lists newest first (pass `order=asc` for oldest first) and `added_since` (ISO-8601, UTC if no offset) keeps only books added at or after that moment - poll with both to find new additions. Books added before dates were tracked have a null `added_at`, sort last, and never match `added_since`.
         /// </summary>
         /// <returns>A <see cref="RequestInformation"/></returns>
         /// <param name="requestConfiguration">Configuration for the request such as headers, query parameters, and middleware options.</param>
@@ -104,11 +104,24 @@ namespace GrimoireCli.Generated.Api.Books
             return new global::GrimoireCli.Generated.Api.Books.BooksRequestBuilder(rawUrl, RequestAdapter);
         }
         /// <summary>
-        /// List books
+        /// Pages through the books the caller can see. `sort=added_at` lists newest first (pass `order=asc` for oldest first) and `added_since` (ISO-8601, UTC if no offset) keeps only books added at or after that moment - poll with both to find new additions. Books added before dates were tracked have a null `added_at`, sort last, and never match `added_since`.
         /// </summary>
         [global::System.CodeDom.Compiler.GeneratedCode("Kiota", "1.0.0")]
         public partial class BooksRequestBuilderGetQueryParameters 
         {
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+            #pragma warning disable CS1591
+            [QueryParameter("added_since")]
+            public string? AddedSince { get; set; }
+            #pragma warning restore CS1591
+#nullable restore
+#else
+            #pragma warning disable CS1591
+            [QueryParameter("added_since")]
+            public string AddedSince { get; set; }
+            #pragma warning restore CS1591
+#endif
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
             #pragma warning disable CS1591
@@ -129,6 +142,37 @@ namespace GrimoireCli.Generated.Api.Books
             #pragma warning disable CS1591
             [QueryParameter("offset")]
             public int? Offset { get; set; }
+            #pragma warning restore CS1591
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+            #pragma warning disable CS1591
+            [QueryParameter("order")]
+            public string? Order { get; set; }
+            #pragma warning restore CS1591
+#nullable restore
+#else
+            #pragma warning disable CS1591
+            [QueryParameter("order")]
+            public string Order { get; set; }
+            #pragma warning restore CS1591
+#endif
+            [Obsolete("This property is deprecated, use SortAsGetSortQueryParameterType instead")]
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+            #pragma warning disable CS1591
+            [QueryParameter("sort")]
+            public string? Sort { get; set; }
+            #pragma warning restore CS1591
+#nullable restore
+#else
+            #pragma warning disable CS1591
+            [QueryParameter("sort")]
+            public string Sort { get; set; }
+            #pragma warning restore CS1591
+#endif
+            #pragma warning disable CS1591
+            [QueryParameter("sort")]
+            public global::GrimoireCli.Generated.Api.Books.GetSortQueryParameterType? SortAsGetSortQueryParameterType { get; set; }
             #pragma warning restore CS1591
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable

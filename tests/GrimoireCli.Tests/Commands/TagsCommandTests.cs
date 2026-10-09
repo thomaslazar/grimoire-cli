@@ -12,9 +12,23 @@ public class TagsCommandTests
     public void TheGroupHostsTheReadsThenTheWrites()
     {
         Assert.Equal(
-            ["list", "items", "create", "rename", "delete", "merge"],
+            ["list", "items", "folder-items", "create", "rename", "delete", "merge"],
             TagsCommand.Create().Subcommands.Select(c => c.Name).ToArray());
     }
+
+    [Theory]
+    [InlineData("-1")]
+    [InlineData("501")]
+    public void ItemsRejectsALimitOutsideTheServerRange(string limit)
+        => Assert.NotEmpty(TagsCommand.Create().Parse(["items", "--tag", "x", "--limit", limit]).Errors);
+
+    [Fact]
+    public void ItemsAcceptsAZeroLimitForCountsOnly()
+        => Assert.Empty(TagsCommand.Create().Parse(["items", "--tag", "x", "--limit", "0"]).Errors);
+
+    [Fact]
+    public void FolderItemsRequiresTheFolderAndItsType()
+        => Assert.NotEmpty(TagsCommand.Create().Parse(["folder-items", "--tag", "x"]).Errors);
 
     [Fact]
     public void ListParsesWithNoArguments()

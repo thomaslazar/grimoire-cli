@@ -74,9 +74,8 @@ public class FilesCommandTests
         Assert.Empty(FilesCommand.Create().Parse(["upload", "--destination", "books", "--file", "a.pdf"]).Errors);
     }
 
-    // upload's on_conflict is an unvalidated Form field upstream, and _dest_for
-    // treats anything that is not "skip" as rename — so an unknown value would
-    // silently rename and answer 200.
+    // The server 400s an unknown on_conflict, but the parser refuses it first
+    // and offers the valid set as completions.
     [Fact]
     public void UploadRejectsAnUnknownConflictPolicy()
     {
@@ -87,10 +86,19 @@ public class FilesCommandTests
     [Theory]
     [InlineData("skip")]
     [InlineData("rename")]
-    public void UploadAcceptsTheTwoConflictPolicies(string policy)
+    [InlineData("replace")]
+    public void UploadAcceptsTheThreeConflictPolicies(string policy)
     {
         Assert.Empty(FilesCommand.Create().Parse(
             ["upload", "--destination", "books", "--file", "a.pdf", "--on-conflict", policy]).Errors);
+    }
+
+    // move's body still pins on_conflict to skip|rename (files/_schemas.py).
+    [Fact]
+    public void MoveRejectsReplace()
+    {
+        Assert.NotEmpty(FilesCommand.Create().Parse(
+            ["move", "--sources", "a.pdf", "--destination", "books", "--on-conflict", "replace"]).Errors);
     }
 
     [Fact]

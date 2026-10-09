@@ -789,11 +789,15 @@ ok "systems book-folders list shows the written folder"
 # The point of the feature: a book below the path inherits the tag. This is the
 # round trip that upstream #357 broke — the server derived the folder's depth
 # differently for a container child, and Das Schwarze Auge 5 DE is one.
-# listing items for the errata-smoke tag expecting it to reach the book below the folder
+# listing items for the errata-smoke tag expecting the folder, then its contents to hold the book
 TAG_ITEMS=$("$CLI" tags items --tag errata-smoke 2>"$WORK/cli.err") \
   || { cat "$WORK/cli.err" >&2; fail "tags items exited non-zero"; }
-echo "$TAG_ITEMS" | jq -e '.folders[] | select(.path == "errata") | .items[] | select(.title == "DSA5 Errata")' >/dev/null \
-  || fail "the folder tag should reach the book below it: $TAG_ITEMS"
+FOLDER_KEY=$(echo "$TAG_ITEMS" | jq -r '.folders[] | select(.path == "errata") | .key')
+[ -n "$FOLDER_KEY" ] || fail "tags items should list the tagged folder: $TAG_ITEMS"
+FOLDER_ITEMS=$("$CLI" tags folder-items --tag errata-smoke --resource-type book --folder "$FOLDER_KEY" 2>"$WORK/cli.err") \
+  || { cat "$WORK/cli.err" >&2; fail "tags folder-items exited non-zero"; }
+echo "$FOLDER_ITEMS" | jq -e '.items[] | select(.title == "DSA5 Errata")' >/dev/null \
+  || fail "the folder tag should reach the book below it: $FOLDER_ITEMS"
 ok "a folder tag reaches the book below its path"
 
 # deleting the book folder's tags expecting a deleted status

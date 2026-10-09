@@ -88,9 +88,10 @@ public static class SystemsCommand
         var genreOption = new Option<string?>("--genre") { Description = "Keep only books with this genre" };
         var categoryOption = new Option<string?>("--category") { Description = "Keep only books in this category (core, supplement, adventure, …)" };
         var explicitOption = new Option<bool?>("--explicit") { Description = "Keep only books with this explicit flag (true | false)" };
+        var includeBooksOption = new Option<bool?>("--include-books") { Description = "false returns books empty (true | false); default true" };
         var command = new Command("get", "Get one game system, with its books")
         {
-            idOption, bookSortOption, bookDescOption, genreOption, categoryOption, explicitOption
+            idOption, bookSortOption, bookDescOption, genreOption, categoryOption, explicitOption, includeBooksOption
         };
         command.AddHelpSection("Notes", HelpSectionPosition.Top,
             "--genre, --category and --explicit filter the books, not the system;",
@@ -102,7 +103,10 @@ public static class SystemsCommand
             "and a book with no subfolder under a system-agnostic root is",
             "'uncategorized'.",
             "",
-            "--book-desc applies only to --book-sort title|page_count|year.");
+            "--book-desc applies only to --book-sort title|page_count|year.",
+            "",
+            "--include-books false ignores the book filters: book_count and",
+            "total_page_count then cover every book the account can see.");
         command.AddExamples(
             "grimoire-cli systems get --id <system-id>",
             "grimoire-cli systems get --id <system-id> --category core",
@@ -118,7 +122,8 @@ public static class SystemsCommand
                 parseResult.GetValue(bookDescOption),
                 parseResult.GetValue(genreOption),
                 parseResult.GetValue(categoryOption),
-                parseResult.GetValue(explicitOption));
+                parseResult.GetValue(explicitOption),
+                parseResult.GetValue(includeBooksOption));
             ConsoleOutput.WriteRawJson(result);
             return 0;
         });

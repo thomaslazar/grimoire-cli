@@ -53,9 +53,21 @@ public class TokensCommandTests
     public void ListSaysWhatEachSortOrderOrdersBy()
     {
         var output = Help(["tokens", "list"]);
-        Assert.Contains("orders by relative_path", output);
-        Assert.Contains("name orders by filename", output);
+        Assert.Contains("--sort path is folder then name", output);
+        Assert.Contains("name sorts across the whole tree", output);
     }
+
+    [Fact]
+    public void ListTeachesTheQueryAndTagFilterSyntax()
+    {
+        var output = Help(["tokens", "list"]);
+        Assert.Contains("Query syntax", output);
+        Assert.Contains("__grim:none__", output);
+    }
+
+    [Fact]
+    public void ListRejectsAnUnknownOrder()
+        => Assert.NotEmpty(TokensCommand.Create().Parse(["list", "--order", "up"]).Errors);
 
     [Theory]
     [InlineData("0")]

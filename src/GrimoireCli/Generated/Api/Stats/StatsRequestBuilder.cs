@@ -34,7 +34,7 @@ namespace GrimoireCli.Generated.Api.Stats
         {
         }
         /// <summary>
-        /// Returns library counts. Accepts a session, or an `X-API-Key` with the `stats` permission for external integrations such as Homepage.
+        /// Returns library counts. Accepts a session, or an `X-API-Key` with the `stats` permission for external integrations such as Homepage. Guests are refused: the counts describe the whole library.
         /// </summary>
         /// <returns>A <see cref="global::GrimoireCli.Generated.Models.StatsResponse"/></returns>
         /// <param name="cancellationToken">Cancellation token to use when cancelling requests</param>
@@ -57,7 +57,7 @@ namespace GrimoireCli.Generated.Api.Stats
             return await RequestAdapter.SendAsync<global::GrimoireCli.Generated.Models.StatsResponse>(requestInfo, global::GrimoireCli.Generated.Models.StatsResponse.CreateFromDiscriminatorValue, errorMapping, cancellationToken).ConfigureAwait(false);
         }
         /// <summary>
-        /// Returns library counts. Accepts a session, or an `X-API-Key` with the `stats` permission for external integrations such as Homepage.
+        /// Returns library counts. Accepts a session, or an `X-API-Key` with the `stats` permission for external integrations such as Homepage. Guests are refused: the counts describe the whole library.
         /// </summary>
         /// <returns>A <see cref="RequestInformation"/></returns>
         /// <param name="requestConfiguration">Configuration for the request such as headers, query parameters, and middleware options.</param>
@@ -85,7 +85,7 @@ namespace GrimoireCli.Generated.Api.Stats
             return new global::GrimoireCli.Generated.Api.Stats.StatsRequestBuilder(rawUrl, RequestAdapter);
         }
         /// <summary>
-        /// Returns library counts. Accepts a session, or an `X-API-Key` with the `stats` permission for external integrations such as Homepage.
+        /// Returns library counts. Accepts a session, or an `X-API-Key` with the `stats` permission for external integrations such as Homepage. Guests are refused: the counts describe the whole library.
         /// </summary>
         [global::System.CodeDom.Compiler.GeneratedCode("Kiota", "1.0.0")]
         public partial class StatsRequestBuilderGetQueryParameters 
