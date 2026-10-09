@@ -31,8 +31,7 @@ services:
   grimoire:
     # Pinned to a release tag. Version bumps are deliberate: bumping this and
     # regenerating the client from it belong in the same commit, so the generated
-    # diff is the record of what changed in the API surface. Support for released
-    # 1.5.6 lives on support/grimoire-1.5.6, where this file pins the 1.5.6 tag.
+    # diff is the record of what changed in the API surface.
     #
     # The tag is immutable, so the spec cannot drift under the committed client
     # between regenerations — which is what the prerelease channel could not offer.
