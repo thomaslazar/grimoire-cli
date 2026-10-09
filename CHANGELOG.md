@@ -3,6 +3,66 @@
 All notable changes to grimoire-cli are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## v0.5.0 — 2026-10-09
+
+A feature release that targets Grimoire 1.8.0 and exposes the server-side
+filtering, sorting and paging it introduced. The supported floor rises to
+1.8.0; stay on 0.4.0 for Grimoire 1.7.x.
+
+### Highlights
+
+- **Grimoire 1.8.0, and only 1.8.0.** Every new flag below is a query
+  parameter 1.7.x does not know, and FastAPI ignores unknown parameters with
+  a 200, so on an older server `maps list --query forest` would quietly
+  return every map. Raising the floor makes the version warning say so
+  instead.
+- **Filtered media lists.** `maps`, `tokens`, `audio` and `models list` take
+  `--query`, `--tags`, `--favorites`, `--added-since`, `--folder`, a wider
+  `--sort` and `--order`. An agent can now ask the server for "battlemaps
+  tagged forest, newest first" in one call rather than paging the whole
+  collection and filtering client-side. Help teaches the search syntax and
+  the JSON tag-filter groups.
+- **`tags items` is paged, and folder contents moved.** 1.8.0 returns 100
+  directly-tagged items unless told otherwise, and a tagged folder now
+  reports a count and a key rather than its items. `--limit`/`--offset` and
+  the new `tags folder-items` keep everything reachable that 0.4.0 returned
+  in one response.
+- **Replace a book's file in place.** `files upload --on-conflict replace`
+  overwrites an indexed book's file and keeps its id, so tags, bookmarks,
+  favorites and campaign links survive a corrected scan. `books list` gains
+  `--sort added_at`, `--order` and `--added-since` for "what's new" polling,
+  and `systems get --include-books false` fetches a system without its shelf.
+- **Verified installs.** Each release now publishes `SHA256SUMS`, and
+  `install.sh` / `install.ps1` check the download against it before
+  replacing the installed binary, so a corrupt or truncated download never
+  overwrites a working install.
+
+### Contributors
+
+Thanks to everyone who sent a pull request this release:
+
+- @BubbleMoth — Security/verify install checksums (#85)
+
+### Features
+
+- feat: target grimoire 1.8.0 and expose its new list parameters
+
+### Fixes
+
+- fix: verify release binary checksums during install
+
+### Chores
+
+- chore: bump version to 0.5.0
+- ci: publish SHA256SUMS with each release
+
+### Docs
+
+- docs: bring api notes current with grimoire 1.8.0
+- docs: clarify what the installer checksum check protects against
+- docs: credit outside contributors in release notes (#88)
+- docs: record 0.5.0 in the compatibility matrix
+
 ## v0.4.0 — 2026-10-02
 
 A feature release. The CLI reaches campaigns for the first time, can log in
