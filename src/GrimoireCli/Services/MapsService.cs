@@ -18,15 +18,22 @@ public class MapsService
     public MapsService(GrimoireApiClient client) => _client = client;
 
     /// <summary>GET /api/maps. Variants are excluded server-side; only family mains are listed.</summary>
-    public async Task<string> ListAsync(string? mapType, string? folder, int? limit, int? offset, string? sort)
+    public async Task<string> ListAsync(string? mapType, int? limit, int? offset, MediaBrowseFilter filter)
     {
         var info = _client.Api.Api.Maps.ToGetRequestInformation(c =>
         {
             c.QueryParameters.MapType = mapType;
-            c.QueryParameters.Folder = folder;
             c.QueryParameters.Limit = limit;
             c.QueryParameters.Offset = offset;
-            c.QueryParameters.Sort = sort;
+            c.QueryParameters.Q = filter.Query;
+            c.QueryParameters.Tags = filter.Tags;
+            c.QueryParameters.Favorites = filter.Favorites;
+            c.QueryParameters.AddedSince = filter.AddedSince;
+            c.QueryParameters.Folder = filter.Folder;
+            c.QueryParameters.Sort = filter.Sort;
+            if (filter.Order is not null)
+                c.QueryParameters.OrderAsGetOrderQueryParameterType =
+                    Enum.Parse<Generated.Api.Maps.GetOrderQueryParameterType>(filter.Order, true);
         });
         return await _client.SendAsync(info);
     }

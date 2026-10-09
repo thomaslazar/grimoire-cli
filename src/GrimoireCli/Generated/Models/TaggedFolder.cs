@@ -8,20 +8,22 @@ using System;
 namespace GrimoireCli.Generated.Models
 {
     /// <summary>
-    /// A media folder carrying the tag, rendered with everything inside it.
+    /// A folder carrying the tag, with how many items it holds.The items come a page at a time from ``/tags/{internal}/folder-items``,addressed by ``key`` (the folder record&apos;s own path; ``path`` is for display).
     /// </summary>
     [global::System.CodeDom.Compiler.GeneratedCode("Kiota", "1.0.0")]
     public partial class TaggedFolder : IAdditionalDataHolder, IParsable
     {
         /// <summary>Stores additional data not described in the OpenAPI description found when deserializing. Can be used for serialization as well.</summary>
         public IDictionary<string, object> AdditionalData { get; set; }
-        /// <summary>The items property</summary>
+        /// <summary>The count property</summary>
+        public int? Count { get; set; }
+        /// <summary>The key property</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
-        public List<global::GrimoireCli.Generated.Models.TaggedFolder.TaggedFolder_items>? Items { get; set; }
+        public string? Key { get; set; }
 #nullable restore
 #else
-        public List<global::GrimoireCli.Generated.Models.TaggedFolder.TaggedFolder_items> Items { get; set; }
+        public string Key { get; set; }
 #endif
         /// <summary>The path property</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
@@ -64,7 +66,8 @@ namespace GrimoireCli.Generated.Models
         {
             return new Dictionary<string, Action<IParseNode>>
             {
-                { "items", n => { Items = n.GetCollectionOfObjectValues<global::GrimoireCli.Generated.Models.TaggedFolder.TaggedFolder_items>(global::GrimoireCli.Generated.Models.TaggedFolder.TaggedFolder_items.CreateFromDiscriminatorValue)?.AsList(); } },
+                { "count", n => { Count = n.GetIntValue(); } },
+                { "key", n => { Key = n.GetStringValue(); } },
                 { "path", n => { Path = n.GetStringValue(); } },
                 { "resource_type", n => { ResourceType = n.GetStringValue(); } },
             };
@@ -76,165 +79,11 @@ namespace GrimoireCli.Generated.Models
         public virtual void Serialize(ISerializationWriter writer)
         {
             if(ReferenceEquals(writer, null)) throw new ArgumentNullException(nameof(writer));
-            writer.WriteCollectionOfObjectValues<global::GrimoireCli.Generated.Models.TaggedFolder.TaggedFolder_items>("items", Items);
+            writer.WriteIntValue("count", Count);
+            writer.WriteStringValue("key", Key);
             writer.WriteStringValue("path", Path);
             writer.WriteStringValue("resource_type", ResourceType);
             writer.WriteAdditionalData(AdditionalData);
-        }
-        /// <summary>
-        /// Composed type wrapper for classes <see cref="global::GrimoireCli.Generated.Models.TaggedAudioItem"/>, <see cref="global::GrimoireCli.Generated.Models.TaggedBookItem"/>, <see cref="global::GrimoireCli.Generated.Models.TaggedMapItem"/>, <see cref="global::GrimoireCli.Generated.Models.TaggedModelItem"/>, <see cref="global::GrimoireCli.Generated.Models.TaggedSystemItem"/>, <see cref="global::GrimoireCli.Generated.Models.TaggedTokenItem"/>
-        /// </summary>
-        [global::System.CodeDom.Compiler.GeneratedCode("Kiota", "1.0.0")]
-        public partial class TaggedFolder_items : IComposedTypeWrapper, IParsable
-        {
-            /// <summary>Composed type representation for type <see cref="global::GrimoireCli.Generated.Models.TaggedAudioItem"/></summary>
-#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
-#nullable enable
-            public global::GrimoireCli.Generated.Models.TaggedAudioItem? TaggedAudioItem { get; set; }
-#nullable restore
-#else
-            public global::GrimoireCli.Generated.Models.TaggedAudioItem TaggedAudioItem { get; set; }
-#endif
-            /// <summary>Composed type representation for type <see cref="global::GrimoireCli.Generated.Models.TaggedBookItem"/></summary>
-#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
-#nullable enable
-            public global::GrimoireCli.Generated.Models.TaggedBookItem? TaggedBookItem { get; set; }
-#nullable restore
-#else
-            public global::GrimoireCli.Generated.Models.TaggedBookItem TaggedBookItem { get; set; }
-#endif
-            /// <summary>Composed type representation for type <see cref="global::GrimoireCli.Generated.Models.TaggedMapItem"/></summary>
-#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
-#nullable enable
-            public global::GrimoireCli.Generated.Models.TaggedMapItem? TaggedMapItem { get; set; }
-#nullable restore
-#else
-            public global::GrimoireCli.Generated.Models.TaggedMapItem TaggedMapItem { get; set; }
-#endif
-            /// <summary>Composed type representation for type <see cref="global::GrimoireCli.Generated.Models.TaggedModelItem"/></summary>
-#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
-#nullable enable
-            public global::GrimoireCli.Generated.Models.TaggedModelItem? TaggedModelItem { get; set; }
-#nullable restore
-#else
-            public global::GrimoireCli.Generated.Models.TaggedModelItem TaggedModelItem { get; set; }
-#endif
-            /// <summary>Composed type representation for type <see cref="global::GrimoireCli.Generated.Models.TaggedSystemItem"/></summary>
-#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
-#nullable enable
-            public global::GrimoireCli.Generated.Models.TaggedSystemItem? TaggedSystemItem { get; set; }
-#nullable restore
-#else
-            public global::GrimoireCli.Generated.Models.TaggedSystemItem TaggedSystemItem { get; set; }
-#endif
-            /// <summary>Composed type representation for type <see cref="global::GrimoireCli.Generated.Models.TaggedTokenItem"/></summary>
-#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
-#nullable enable
-            public global::GrimoireCli.Generated.Models.TaggedTokenItem? TaggedTokenItem { get; set; }
-#nullable restore
-#else
-            public global::GrimoireCli.Generated.Models.TaggedTokenItem TaggedTokenItem { get; set; }
-#endif
-            /// <summary>
-            /// Creates a new instance of the appropriate class based on discriminator value
-            /// </summary>
-            /// <returns>A <see cref="global::GrimoireCli.Generated.Models.TaggedFolder.TaggedFolder_items"/></returns>
-            /// <param name="parseNode">The parse node to use to read the discriminator value and create the object</param>
-            public static global::GrimoireCli.Generated.Models.TaggedFolder.TaggedFolder_items CreateFromDiscriminatorValue(IParseNode parseNode)
-            {
-                if(ReferenceEquals(parseNode, null)) throw new ArgumentNullException(nameof(parseNode));
-                var mappingValue = parseNode.GetChildNode("item_type")?.GetStringValue();
-                var result = new global::GrimoireCli.Generated.Models.TaggedFolder.TaggedFolder_items();
-                if("audio".Equals(mappingValue, StringComparison.OrdinalIgnoreCase))
-                {
-                    result.TaggedAudioItem = new global::GrimoireCli.Generated.Models.TaggedAudioItem();
-                }
-                else if("book".Equals(mappingValue, StringComparison.OrdinalIgnoreCase))
-                {
-                    result.TaggedBookItem = new global::GrimoireCli.Generated.Models.TaggedBookItem();
-                }
-                else if("map".Equals(mappingValue, StringComparison.OrdinalIgnoreCase))
-                {
-                    result.TaggedMapItem = new global::GrimoireCli.Generated.Models.TaggedMapItem();
-                }
-                else if("model".Equals(mappingValue, StringComparison.OrdinalIgnoreCase))
-                {
-                    result.TaggedModelItem = new global::GrimoireCli.Generated.Models.TaggedModelItem();
-                }
-                else if("system".Equals(mappingValue, StringComparison.OrdinalIgnoreCase))
-                {
-                    result.TaggedSystemItem = new global::GrimoireCli.Generated.Models.TaggedSystemItem();
-                }
-                else if("token".Equals(mappingValue, StringComparison.OrdinalIgnoreCase))
-                {
-                    result.TaggedTokenItem = new global::GrimoireCli.Generated.Models.TaggedTokenItem();
-                }
-                return result;
-            }
-            /// <summary>
-            /// The deserialization information for the current model
-            /// </summary>
-            /// <returns>A IDictionary&lt;string, Action&lt;IParseNode&gt;&gt;</returns>
-            public virtual IDictionary<string, Action<IParseNode>> GetFieldDeserializers()
-            {
-                if(TaggedAudioItem != null)
-                {
-                    return TaggedAudioItem.GetFieldDeserializers();
-                }
-                else if(TaggedBookItem != null)
-                {
-                    return TaggedBookItem.GetFieldDeserializers();
-                }
-                else if(TaggedMapItem != null)
-                {
-                    return TaggedMapItem.GetFieldDeserializers();
-                }
-                else if(TaggedModelItem != null)
-                {
-                    return TaggedModelItem.GetFieldDeserializers();
-                }
-                else if(TaggedSystemItem != null)
-                {
-                    return TaggedSystemItem.GetFieldDeserializers();
-                }
-                else if(TaggedTokenItem != null)
-                {
-                    return TaggedTokenItem.GetFieldDeserializers();
-                }
-                return new Dictionary<string, Action<IParseNode>>();
-            }
-            /// <summary>
-            /// Serializes information the current object
-            /// </summary>
-            /// <param name="writer">Serialization writer to use to serialize this model</param>
-            public virtual void Serialize(ISerializationWriter writer)
-            {
-                if(ReferenceEquals(writer, null)) throw new ArgumentNullException(nameof(writer));
-                if(TaggedAudioItem != null)
-                {
-                    writer.WriteObjectValue<global::GrimoireCli.Generated.Models.TaggedAudioItem>(null, TaggedAudioItem);
-                }
-                else if(TaggedBookItem != null)
-                {
-                    writer.WriteObjectValue<global::GrimoireCli.Generated.Models.TaggedBookItem>(null, TaggedBookItem);
-                }
-                else if(TaggedMapItem != null)
-                {
-                    writer.WriteObjectValue<global::GrimoireCli.Generated.Models.TaggedMapItem>(null, TaggedMapItem);
-                }
-                else if(TaggedModelItem != null)
-                {
-                    writer.WriteObjectValue<global::GrimoireCli.Generated.Models.TaggedModelItem>(null, TaggedModelItem);
-                }
-                else if(TaggedSystemItem != null)
-                {
-                    writer.WriteObjectValue<global::GrimoireCli.Generated.Models.TaggedSystemItem>(null, TaggedSystemItem);
-                }
-                else if(TaggedTokenItem != null)
-                {
-                    writer.WriteObjectValue<global::GrimoireCli.Generated.Models.TaggedTokenItem>(null, TaggedTokenItem);
-                }
-            }
         }
     }
 }

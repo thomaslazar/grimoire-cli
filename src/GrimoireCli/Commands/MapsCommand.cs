@@ -9,7 +9,6 @@ namespace GrimoireCli.Commands;
 public static class MapsCommand
 {
     private static readonly NLog.Logger _logger = NLog.LogManager.GetCurrentClassLogger();
-    private static readonly string[] SortOrders = ["path", "name"];
 
     public static Command Create()
     {
@@ -30,30 +29,23 @@ public static class MapsCommand
     private static Command CreateListCommand()
     {
         var mapTypeOption = new Option<string?>("--map-type") { Description = "Filter by map type" };
-        var folderOption = new Option<string?>("--folder") { Description = "Filter by exact folder path" };
         var limitOption = OptionHelpers.Range("--limit", "Results per page (the server sets no maximum)", 1);
         limitOption.DefaultValueFactory = _ => 100;
         var offsetOption = OptionHelpers.Range("--offset", "Items to skip", 0);
-        var sortOption = OptionHelpers.Choice("--sort", "Row order; default path", SortOrders);
+        var browse = new MediaBrowseOptions();
         var command = new Command("list", "List maps")
         {
-            mapTypeOption, folderOption, limitOption, offsetOption, sortOption
+            mapTypeOption, limitOption, offsetOption
         };
+        browse.AddTo(command, "maps");
         command.AddHelpSection("Notes", HelpSectionPosition.Top,
-            "--folder is an exact folder, not a subtree: battlemaps excludes",
-            "battlemaps/caves. Its value is folder_path from maps get, not",
-            "relative_path — the maps/ collection root is stripped from folder_path.",
-            "",
             "Variants are hidden — only the main copy of a family is listed.",
-            "",
-            "--sort path orders by relative_path, so a page is a contiguous run of",
-            "folders; name orders by filename across the whole tree.",
             "",
             "Page with --offset against total in the response.");
         command.AddExamples(
             "grimoire-cli maps list",
             "grimoire-cli maps list --folder battlemaps --limit 20",
-            "grimoire-cli maps list --map-type battlemap --offset 100");
+            "grimoire-cli maps list --query \"tag:forest\" --sort added_at --order desc");
         command.AddResponseExample<Generated.Models.MapListResponse>();
         command.SetAction(async (parseResult, cancellationToken) =>
         {
@@ -61,10 +53,9 @@ public static class MapsCommand
             var service = new MapsService(client);
             var result = await service.ListAsync(
                 parseResult.GetValue(mapTypeOption),
-                parseResult.GetValue(folderOption),
                 parseResult.GetValue(limitOption),
                 parseResult.GetValue(offsetOption),
-                parseResult.GetValue(sortOption));
+                browse.Read(parseResult));
             ConsoleOutput.WriteRawJson(result);
             return 0;
         });

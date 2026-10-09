@@ -8,6 +8,9 @@ namespace GrimoireCli.Commands;
 
 public static class BooksCommand
 {
+    private static readonly string[] BookSorts = ["title", "added_at"];
+    private static readonly string[] Orders = ["asc", "desc"];
+
     private static readonly NLog.Logger _logger = NLog.LogManager.GetCurrentClassLogger();
 
     public static Command Create()
@@ -41,9 +44,12 @@ public static class BooksCommand
             DefaultValueFactory = _ => 100,
         };
         var offsetOption = new Option<int?>("--offset") { Description = "Items to skip" };
+        var sortOption = OptionHelpers.Choice("--sort", "Row order; default title", BookSorts);
+        var orderOption = OptionHelpers.Choice("--order", "Sort direction; default asc for title, desc for added_at", Orders);
+        var addedSinceOption = new Option<string?>("--added-since") { Description = "Only books added at or after this ISO 8601 time" };
         var command = new Command("list", "List books (defaults to 100 results)")
         {
-            systemIdOption, categoryOption, limitOption, offsetOption
+            systemIdOption, categoryOption, limitOption, offsetOption, sortOption, orderOption, addedSinceOption
         };
         command.AddHelpSection("Notes", HelpSectionPosition.Top,
             "Rows are a reduced shape — no tags, language, isbn, authors, artists,",
@@ -56,11 +62,15 @@ public static class BooksCommand
             "--category is the normalised value, not the folder name ('supplement',",
             "not 'supplements'), and is case-sensitive: Core matches nothing.",
             "",
+            "Undated books sort last under added_at either way, and never match",
+            "--added-since. A time without an offset is UTC.",
+            "",
             "The account's explicit permission filters the list server-side.");
         command.AddExamples(
             "grimoire-cli books list",
             "grimoire-cli books list --system-id <system-id> --category core",
-            "grimoire-cli books list --limit 500 --offset 500");
+            "grimoire-cli books list --limit 500 --offset 500",
+            "grimoire-cli books list --sort added_at --added-since 2026-10-01T00:00:00Z");
         command.AddResponseExample<Generated.Models.BookListResponse>();
         command.SetAction(async (parseResult, cancellationToken) =>
         {
@@ -70,7 +80,10 @@ public static class BooksCommand
                 parseResult.GetValue(systemIdOption),
                 parseResult.GetValue(categoryOption),
                 parseResult.GetValue(limitOption),
-                parseResult.GetValue(offsetOption));
+                parseResult.GetValue(offsetOption),
+                parseResult.GetValue(sortOption),
+                parseResult.GetValue(orderOption),
+                parseResult.GetValue(addedSinceOption));
             ConsoleOutput.WriteRawJson(result);
             return 0;
         });

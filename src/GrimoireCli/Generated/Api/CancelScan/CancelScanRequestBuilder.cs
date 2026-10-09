@@ -34,7 +34,7 @@ namespace GrimoireCli.Generated.Api.CancelScan
         {
         }
         /// <summary>
-        /// Requests a graceful stop of the currently running library scan or indexing job. Admin role required.
+        /// Requests a graceful stop of the currently running library scan or indexing job (`stop_requested`). A scan whose process died - its heartbeat has not moved for five minutes - is cleared outright instead (`cleared_stale`). Admin role required.
         /// </summary>
         /// <returns>A <see cref="global::GrimoireCli.Generated.Models.Backend__routers__library___schemas__StatusResponse"/></returns>
         /// <param name="cancellationToken">Cancellation token to use when cancelling requests</param>
@@ -57,7 +57,7 @@ namespace GrimoireCli.Generated.Api.CancelScan
             return await RequestAdapter.SendAsync<global::GrimoireCli.Generated.Models.Backend__routers__library___schemas__StatusResponse>(requestInfo, global::GrimoireCli.Generated.Models.Backend__routers__library___schemas__StatusResponse.CreateFromDiscriminatorValue, errorMapping, cancellationToken).ConfigureAwait(false);
         }
         /// <summary>
-        /// Requests a graceful stop of the currently running library scan or indexing job. Admin role required.
+        /// Requests a graceful stop of the currently running library scan or indexing job (`stop_requested`). A scan whose process died - its heartbeat has not moved for five minutes - is cleared outright instead (`cleared_stale`). Admin role required.
         /// </summary>
         /// <returns>A <see cref="RequestInformation"/></returns>
         /// <param name="requestConfiguration">Configuration for the request such as headers, query parameters, and middleware options.</param>
@@ -85,7 +85,7 @@ namespace GrimoireCli.Generated.Api.CancelScan
             return new global::GrimoireCli.Generated.Api.CancelScan.CancelScanRequestBuilder(rawUrl, RequestAdapter);
         }
         /// <summary>
-        /// Requests a graceful stop of the currently running library scan or indexing job. Admin role required.
+        /// Requests a graceful stop of the currently running library scan or indexing job (`stop_requested`). A scan whose process died - its heartbeat has not moved for five minutes - is cleared outright instead (`cleared_stale`). Admin role required.
         /// </summary>
         [global::System.CodeDom.Compiler.GeneratedCode("Kiota", "1.0.0")]
         public partial class CancelScanRequestBuilderPostQueryParameters 

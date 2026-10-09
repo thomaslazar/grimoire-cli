@@ -2,7 +2,7 @@
 
 Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any) that implements it.
 
-- **Reference:** spec fetched live from the pinned stack's `/api/openapi.json` (v1.7.3, 237 paths, 313 operations) and the upstream router source read from the same container. Tested range: `1.7.2`-`1.7.3` (`GrimoireApiClient.cs`).
+- **Reference:** spec fetched live from the pinned stack's `/api/openapi.json` (v1.8.0, 271 paths, 360 operations) and the upstream router source read from the same container. Tested range: `1.8.0` only (`GrimoireApiClient.cs`).
 - **Perm** column uses Grimoire's roles (`admin` / `gm or admin` / `not guest`); blank = any authenticated user. `?` = a dependency this script could not resolve.
 - **Key** column is the API key permission a route needs (`—`: no key can call it), derived from `backend/api_keys.py` in the same container.
 - ✅ = covered by a CLI command · — = not implemented · 🔒 = internal-only (no user-facing verb); 🔒 rows never count as covered.
@@ -15,13 +15,15 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | (untagged) | 0 / 1 |
 | addons | 8 / 8 |
 | api-keys | 0 / 6 |
-| audio | 14 / 14 |
+| audio | 14 / 15 |
 | audio-sets | 0 / 5 |
 | auth | 2 / 14 |
 | backups | 6 / 6 |
 | bookmarks | 0 / 4 |
 | books | 16 / 16 |
 | campaigns | 17 / 93 |
+| characters | 0 / 16 |
+| content | 0 / 6 |
 | downloads | 1 / 1 |
 | duplicates | 13 / 13 |
 | favorites | 0 / 3 |
@@ -30,19 +32,20 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | logs | 1 / 1 |
 | lookups | 15 / 15 |
 | maintenance | 3 / 4 |
-| maps | 14 / 16 |
-| models | 10 / 10 |
+| maps | 14 / 17 |
+| models | 10 / 11 |
+| rulesets | 0 / 17 |
 | saved-filters | 0 / 4 |
 | search | 2 / 2 |
 | settings | 0 / 3 |
 | stats | 1 / 1 |
-| systems | 15 / 15 |
-| tags | 6 / 6 |
+| systems | 15 / 18 |
+| tags | 7 / 7 |
 | themes | 0 / 7 |
 | token-frames | 0 / 2 |
-| tokens | 10 / 10 |
+| tokens | 10 / 11 |
 | users | 0 / 16 |
-| **Total** | **167 / 313** |
+| **Total** | **168 / 360** |
 
 2 operation(s) are internal-only (🔒) and excluded from covered counts.
 
@@ -86,6 +89,7 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | POST | `/api/audio-folders/bulk` | Bulk set audio folder tags | gm or admin | audio: write | `audio folders batch-set` ✅ |
 | POST | `/api/audio/bulk` | Bulk update audio tracks | gm or admin | audio: write | `audio batch-update` ✅ |
 | POST | `/api/audio/bulk/tags` | Bulk add tags to audio tracks | gm or admin | audio: write | `audio batch-tag` ✅ |
+| GET | `/api/audio/groups` | Folders holding matching audio tracks | not guest | audio: read | — |
 | GET | `/api/audio/{audio_id}` | Get an audio track |  | audio: read | `audio get` ✅ |
 | PATCH | `/api/audio/{audio_id}` | Update audio metadata | gm or admin | audio: write | `audio update` ✅ |
 | GET | `/api/audio/{audio_id}/artwork` | Audio artwork |  | audio: read | `audio artwork` ✅ |
@@ -263,11 +267,43 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | POST | `/api/campaigns/{campaign_id}/wiki/{page_id}/hide` | Hide a wiki page from your own view |  | campaigns: write | — |
 | DELETE | `/api/campaigns/{campaign_id}/wiki/{page_id}/hide` | Un-hide a wiki page you had hidden |  | campaigns: write | — |
 
+## characters
+
+| Method | Path | Description | Perm | Key | CLI |
+|--------|------|-------------|------|-----|-----|
+| GET | `/api/characters` | List the user's characters |  | characters: read | — |
+| POST | `/api/characters` | Create a character |  | characters: write | — |
+| POST | `/api/characters/import` | Import a character from an exported file |  | characters: write | — |
+| GET | `/api/characters/schemas` | List installed character schemas |  | characters: read | — |
+| POST | `/api/characters/schemas` | Install a pasted character schema |  | characters: write | — |
+| GET | `/api/characters/schemas/browse` | Browse the community sheet catalogue |  | characters: read | — |
+| POST | `/api/characters/schemas/install/{sheet_id}` | Install a sheet from the catalogue |  | characters: write | — |
+| GET | `/api/characters/schemas/{schema_id}` | Get a schema and its document |  | characters: read | — |
+| DELETE | `/api/characters/schemas/{schema_id}` | Uninstall a schema |  | characters: write | — |
+| GET | `/api/characters/{character_id}` | Get a character with computed values |  | characters: read | — |
+| PUT | `/api/characters/{character_id}` | Update a character |  | characters: write | — |
+| DELETE | `/api/characters/{character_id}` | Delete a character |  | characters: write | — |
+| GET | `/api/characters/{character_id}/export` | Export a character as a self-contained file |  | characters: read | — |
+| POST | `/api/characters/{character_id}/portrait` | Set a character's portrait |  | characters: write | — |
+| GET | `/api/characters/{character_id}/portrait` | A character's portrait image |  | characters: read | — |
+| DELETE | `/api/characters/{character_id}/portrait` | Remove a character's portrait |  | characters: write | — |
+
+## content
+
+| Method | Path | Description | Perm | Key | CLI |
+|--------|------|-------------|------|-----|-----|
+| GET | `/api/content/packs` | List installed content packs |  | characters: read | — |
+| POST | `/api/content/packs/reload` | Re-read content packs from disk (admin) | admin | characters: write | — |
+| GET | `/api/content/{schema_id}/resolve` | Resolve many entry references at once |  | characters: read | — |
+| GET | `/api/content/{schema_id}/types` | The content types a schema declares |  | characters: read | — |
+| GET | `/api/content/{schema_id}/{content_type}` | Browse a content type |  | characters: read | — |
+| GET | `/api/content/{schema_id}/{content_type}/{entry_id}` | One catalog entry |  | characters: read | — |
+
 ## downloads
 
 | Method | Path | Description | Perm | Key | CLI |
 |--------|------|-------------|------|-----|-----|
-| GET | `/api/downloads/archive` | Download an archive of files |  | downloads: read | `downloads archive` ✅ |
+| GET | `/api/downloads/archive` | Download an archive of files | not guest | downloads: read | `downloads archive` ✅ |
 
 ## duplicates
 
@@ -332,19 +368,19 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 
 | Method | Path | Description | Perm | Key | CLI |
 |--------|------|-------------|------|-----|-----|
-| GET | `/api/dice-materials` | List all dice/materials |  | lookups: read | `dice-materials list` ✅ |
+| GET | `/api/dice-materials` | List all dice/materials | not guest | lookups: read | `dice-materials list` ✅ |
 | POST | `/api/dice-materials` | Create a custom dice/material (admin) | admin | lookups: write | `dice-materials create` ✅ |
 | DELETE | `/api/dice-materials/{material_id}` | Delete a dice/material (admin; blocked if in use unless force=true) | admin | lookups: write | `dice-materials delete` ✅ |
-| GET | `/api/genres` | List all genres (tiered) |  | lookups: read | `genres list` ✅ |
+| GET | `/api/genres` | List all genres (tiered) | not guest | lookups: read | `genres list` ✅ |
 | POST | `/api/genres` | Create a custom genre (admin) | admin | lookups: write | `genres create` ✅ |
 | DELETE | `/api/genres/{genre_id}` | Delete a genre (admin; blocked if in use unless force=true) | admin | lookups: write | `genres delete` ✅ |
-| GET | `/api/licenses` | List all licenses |  | lookups: read | `licenses list` ✅ |
+| GET | `/api/licenses` | List all licenses | not guest | lookups: read | `licenses list` ✅ |
 | POST | `/api/licenses` | Create a custom license (admin) | admin | lookups: write | `licenses create` ✅ |
 | DELETE | `/api/licenses/{license_id}` | Delete a license (admin; blocked if in use unless force=true) | admin | lookups: write | `licenses delete` ✅ |
-| GET | `/api/parent-systems` | List all parent systems |  | lookups: read | `parent-systems list` ✅ |
+| GET | `/api/parent-systems` | List all parent systems | not guest | lookups: read | `parent-systems list` ✅ |
 | POST | `/api/parent-systems` | Create a custom parent system (admin) | admin | lookups: write | `parent-systems create` ✅ |
 | DELETE | `/api/parent-systems/{parent_id}` | Delete a parent system (admin; blocked if in use unless force=true) | admin | lookups: write | `parent-systems delete` ✅ |
-| GET | `/api/system-families` | List all system families |  | lookups: read | `system-families list` ✅ |
+| GET | `/api/system-families` | List all system families | not guest | lookups: read | `system-families list` ✅ |
 | POST | `/api/system-families` | Create a custom system family (admin) | admin | lookups: write | `system-families create` ✅ |
 | DELETE | `/api/system-families/{family_id}` | Delete a system family (admin; blocked if in use unless force=true) | admin | lookups: write | `system-families delete` ✅ |
 
@@ -367,6 +403,7 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | GET | `/api/maps` | List maps | not guest | maps: read | `maps list` ✅ |
 | POST | `/api/maps/bulk` | Bulk update maps | gm or admin | maps: write | `maps batch-update` ✅ |
 | POST | `/api/maps/bulk/tags` | Bulk add tags to maps | gm or admin | maps: write | `maps batch-tag` ✅ |
+| GET | `/api/maps/groups` | Folders holding matching maps | not guest | maps: read | — |
 | GET | `/api/maps/{map_id}` | Get a map |  | maps: read | `maps get` ✅ |
 | PATCH | `/api/maps/{map_id}` | Update map metadata | gm or admin | maps: write | `maps update` ✅ |
 | GET | `/api/maps/{map_id}/export.uvtt` | Export a map as Universal VTT |  | maps: read | `maps vtt export` ✅ |
@@ -388,10 +425,33 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | GET | `/api/models` | List 3D models | not guest | models: read | `models list` ✅ |
 | POST | `/api/models/bulk` | Bulk update models | gm or admin | models: write | `models batch-update` ✅ |
 | POST | `/api/models/bulk/tags` | Bulk add tags to models | gm or admin | models: write | `models batch-tag` ✅ |
+| GET | `/api/models/groups` | Folders holding matching 3D models | not guest | models: read | — |
 | GET | `/api/models/{model_id}` | Get a 3D model |  | models: read | `models get` ✅ |
 | PATCH | `/api/models/{model_id}` | Update model metadata | gm or admin | models: write | `models update` ✅ |
 | GET | `/api/models/{model_id}/file` | Download model file |  | models: read | `models file` ✅ |
 | GET | `/api/models/{model_id}/thumbnail` | Model thumbnail |  | models: read | `models thumbnail` ✅ |
+
+## rulesets
+
+| Method | Path | Description | Perm | Key | CLI |
+|--------|------|-------------|------|-----|-----|
+| GET | `/api/rulesets` | List rulesets this user can read |  | characters: read | — |
+| POST | `/api/rulesets` | Create a ruleset for a campaign, or for the server |  | characters: write | — |
+| GET | `/api/rulesets/installable` | Content packs that can be imported into a ruleset |  | characters: read | — |
+| GET | `/api/rulesets/packs/browse` | Browse the community catalogue of content packs |  | characters: read | — |
+| POST | `/api/rulesets/packs/install/{pack_id}` | Install a content pack from the catalogue (admin) |  | characters: write | — |
+| DELETE | `/api/rulesets/packs/{pack_id}` | Uninstall a content pack (admin) |  | characters: write | — |
+| GET | `/api/rulesets/{ruleset_id}` | One ruleset |  | characters: read | — |
+| PUT | `/api/rulesets/{ruleset_id}` | Rename a ruleset or change its credit |  | characters: write | — |
+| DELETE | `/api/rulesets/{ruleset_id}` | Delete a ruleset and its entries |  | characters: write | — |
+| GET | `/api/rulesets/{ruleset_id}/entries` | A ruleset's entries |  | characters: read | — |
+| POST | `/api/rulesets/{ruleset_id}/entries` | Write an entry |  | characters: write | — |
+| GET | `/api/rulesets/{ruleset_id}/entries/{entry_row_id}` | One entry |  | characters: read | — |
+| PUT | `/api/rulesets/{ruleset_id}/entries/{entry_row_id}` | Edit an entry |  | characters: write | — |
+| DELETE | `/api/rulesets/{ruleset_id}/entries/{entry_row_id}` | Delete an entry |  | characters: write | — |
+| GET | `/api/rulesets/{ruleset_id}/export` | Export a ruleset |  | characters: read | — |
+| POST | `/api/rulesets/{ruleset_id}/fork` | Copy a catalogue entry into this ruleset |  | characters: write | — |
+| POST | `/api/rulesets/{ruleset_id}/import` | Import content into a ruleset |  | characters: write | — |
 
 ## saved-filters
 
@@ -421,7 +481,7 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 
 | Method | Path | Description | Perm | Key | CLI |
 |--------|------|-------------|------|-----|-----|
-| GET | `/api/stats` | Library statistics |  | stats: read | `library stats` ✅ |
+| GET | `/api/stats` | Library statistics | not guest | stats: read | `library stats` ✅ |
 
 ## systems
 
@@ -432,10 +492,13 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | POST | `/api/systems/bulk/tags` | Bulk add tags to game systems | gm or admin | systems: write | `systems batch-tag` ✅ |
 | GET | `/api/systems/{system_id}` | Get a game system | not guest | systems: read | `systems get` ✅ |
 | PATCH | `/api/systems/{system_id}` | Update game system metadata | gm or admin | systems: write | `systems update` ✅ |
-| GET | `/api/systems/{system_id}/book-folders` | List book folders |  | systems: read | `systems book-folders list` ✅ |
+| GET | `/api/systems/{system_id}/book-facets` | Filter options for a system's shelf | not guest | systems: read | — |
+| GET | `/api/systems/{system_id}/book-folders` | List book folders | not guest | systems: read | `systems book-folders list` ✅ |
 | PATCH | `/api/systems/{system_id}/book-folders` | Set tags on a book folder | gm or admin | systems: write | `systems book-folders set` ✅ |
 | DELETE | `/api/systems/{system_id}/book-folders` | Delete a book folder | gm or admin | systems: write | `systems book-folders delete` ✅ |
-| GET | `/api/systems/{system_id}/cover` | System cover image |  | systems: read | `systems cover get` ✅ |
+| GET | `/api/systems/{system_id}/book-groups` | Folders on a system's shelf | not guest | systems: read | — |
+| GET | `/api/systems/{system_id}/books` | A page of a system's books | not guest | systems: read | — |
+| GET | `/api/systems/{system_id}/cover` | System cover image | not guest | systems: read | `systems cover get` ✅ |
 | POST | `/api/systems/{system_id}/cover` | Upload a system cover | gm or admin | systems: write | `systems cover upload` ✅ |
 | DELETE | `/api/systems/{system_id}/cover` | Remove an uploaded system cover | gm or admin | systems: write | `systems cover delete` ✅ |
 | POST | `/api/systems/{system_id}/cover/from-source` | Set a system cover from an existing image | gm or admin | systems: write | `systems cover from-source` ✅ |
@@ -447,11 +510,12 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 
 | Method | Path | Description | Perm | Key | CLI |
 |--------|------|-------------|------|-----|-----|
-| GET | `/api/tags` | List tags |  | tags: read | `tags list` ✅ |
+| GET | `/api/tags` | List tags | not guest | tags: read | `tags list` ✅ |
 | POST | `/api/tags` | Create a tag | gm or admin | tags: write | `tags create` ✅ |
 | PATCH | `/api/tags/{internal}` | Rename a tag's display value | gm or admin | tags: write | `tags rename` ✅ |
 | DELETE | `/api/tags/{internal}` | Delete a tag | gm or admin | tags: write | `tags delete` ✅ |
-| GET | `/api/tags/{internal}/items` | Items carrying a tag |  | tags: read | `tags items` ✅ |
+| GET | `/api/tags/{internal}/folder-items` | Items inside a tagged folder | not guest | tags: read | `tags folder-items` ✅ |
+| GET | `/api/tags/{internal}/items` | Items carrying a tag | not guest | tags: read | `tags items` ✅ |
 | POST | `/api/tags/{internal}/merge` | Merge a tag into another | gm or admin | tags: write | `tags merge` ✅ |
 
 ## themes
@@ -483,6 +547,7 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | GET | `/api/tokens` | List tokens | not guest | tokens: read | `tokens list` ✅ |
 | POST | `/api/tokens/bulk` | Bulk update tokens | gm or admin | tokens: write | `tokens batch-update` ✅ |
 | POST | `/api/tokens/bulk/tags` | Bulk add tags to tokens | gm or admin | tokens: write | `tokens batch-tag` ✅ |
+| GET | `/api/tokens/groups` | Folders holding matching tokens | not guest | tokens: read | — |
 | GET | `/api/tokens/{token_id}` | Get a token |  | tokens: read | `tokens get` ✅ |
 | PATCH | `/api/tokens/{token_id}` | Update token metadata | gm or admin | tokens: write | `tokens update` ✅ |
 | GET | `/api/tokens/{token_id}/file` | Download token file |  | tokens: read | `tokens file` ✅ |

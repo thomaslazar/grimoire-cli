@@ -9,7 +9,8 @@ public class BooksService
 
     public BooksService(GrimoireApiClient client) => _client = client;
 
-    public async Task<string> ListAsync(string? systemId, string? category, int limit, int? offset)
+    public async Task<string> ListAsync(
+        string? systemId, string? category, int limit, int? offset, string? sort, string? order, string? addedSince)
     {
         var info = _client.Api.Api.Books.ToGetRequestInformation(c =>
         {
@@ -17,6 +18,11 @@ public class BooksService
             c.QueryParameters.Category = category;
             c.QueryParameters.Limit = limit;
             c.QueryParameters.Offset = offset;
+            if (sort is not null)
+                c.QueryParameters.SortAsGetSortQueryParameterType =
+                    Enum.Parse<Generated.Api.Books.GetSortQueryParameterType>(sort, true);
+            c.QueryParameters.Order = order;
+            c.QueryParameters.AddedSince = addedSince;
         });
         return await _client.SendAsync(info);
     }

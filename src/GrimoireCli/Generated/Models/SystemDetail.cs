@@ -185,6 +185,14 @@ namespace GrimoireCli.Generated.Models
 #else
         public List<global::GrimoireCli.Generated.Models.PublisherRef> Publishers { get; set; }
 #endif
+        /// <summary>The scope_path property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public global::GrimoireCli.Generated.Models.SystemDetail.SystemDetail_scope_path? ScopePath { get; set; }
+#nullable restore
+#else
+        public global::GrimoireCli.Generated.Models.SystemDetail.SystemDetail_scope_path ScopePath { get; set; }
+#endif
         /// <summary>The slug property</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
@@ -281,6 +289,7 @@ namespace GrimoireCli.Generated.Models
                 { "parent_name", n => { ParentName = n.GetStringValue(); } },
                 { "parent_system", n => { ParentSystem = n.GetStringValue(); } },
                 { "publishers", n => { Publishers = n.GetCollectionOfObjectValues<global::GrimoireCli.Generated.Models.PublisherRef>(global::GrimoireCli.Generated.Models.PublisherRef.CreateFromDiscriminatorValue)?.AsList(); } },
+                { "scope_path", n => { ScopePath = n.GetObjectValue<global::GrimoireCli.Generated.Models.SystemDetail.SystemDetail_scope_path>(global::GrimoireCli.Generated.Models.SystemDetail.SystemDetail_scope_path.CreateFromDiscriminatorValue); } },
                 { "slug", n => { Slug = n.GetStringValue(); } },
                 { "system_family", n => { SystemFamily = n.GetStringValue(); } },
                 { "tags", n => { Tags = n.GetCollectionOfPrimitiveValues<string>()?.AsList(); } },
@@ -324,6 +333,7 @@ namespace GrimoireCli.Generated.Models
             writer.WriteStringValue("parent_name", ParentName);
             writer.WriteStringValue("parent_system", ParentSystem);
             writer.WriteCollectionOfObjectValues<global::GrimoireCli.Generated.Models.PublisherRef>("publishers", Publishers);
+            writer.WriteObjectValue<global::GrimoireCli.Generated.Models.SystemDetail.SystemDetail_scope_path>("scope_path", ScopePath);
             writer.WriteStringValue("slug", Slug);
             writer.WriteStringValue("system_family", SystemFamily);
             writer.WriteCollectionOfPrimitiveValues<string>("tags", Tags);
@@ -737,6 +747,74 @@ namespace GrimoireCli.Generated.Models
                 }
                 else {
                     writer.WriteObjectValue<global::GrimoireCli.Generated.Models.SystemDetail_parent_idMember1>(null, SystemDetailParentIdMember1);
+                }
+            }
+        }
+        /// <summary>
+        /// Composed type wrapper for classes <see cref="global::GrimoireCli.Generated.Models.SystemDetail_scope_pathMember1"/>, <see cref="string"/>
+        /// </summary>
+        [global::System.CodeDom.Compiler.GeneratedCode("Kiota", "1.0.0")]
+        public partial class SystemDetail_scope_path : IComposedTypeWrapper, IParsable
+        {
+            /// <summary>Composed type representation for type <see cref="string"/></summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+            public string? String { get; set; }
+#nullable restore
+#else
+            public string String { get; set; }
+#endif
+            /// <summary>Composed type representation for type <see cref="global::GrimoireCli.Generated.Models.SystemDetail_scope_pathMember1"/></summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+            public global::GrimoireCli.Generated.Models.SystemDetail_scope_pathMember1? SystemDetailScopePathMember1 { get; set; }
+#nullable restore
+#else
+            public global::GrimoireCli.Generated.Models.SystemDetail_scope_pathMember1 SystemDetailScopePathMember1 { get; set; }
+#endif
+            /// <summary>
+            /// Creates a new instance of the appropriate class based on discriminator value
+            /// </summary>
+            /// <returns>A <see cref="global::GrimoireCli.Generated.Models.SystemDetail.SystemDetail_scope_path"/></returns>
+            /// <param name="parseNode">The parse node to use to read the discriminator value and create the object</param>
+            public static global::GrimoireCli.Generated.Models.SystemDetail.SystemDetail_scope_path CreateFromDiscriminatorValue(IParseNode parseNode)
+            {
+                if(ReferenceEquals(parseNode, null)) throw new ArgumentNullException(nameof(parseNode));
+                var result = new global::GrimoireCli.Generated.Models.SystemDetail.SystemDetail_scope_path();
+                if(parseNode.GetStringValue() is string stringValue)
+                {
+                    result.String = stringValue;
+                }
+                else {
+                    result.SystemDetailScopePathMember1 = new global::GrimoireCli.Generated.Models.SystemDetail_scope_pathMember1();
+                }
+                return result;
+            }
+            /// <summary>
+            /// The deserialization information for the current model
+            /// </summary>
+            /// <returns>A IDictionary&lt;string, Action&lt;IParseNode&gt;&gt;</returns>
+            public virtual IDictionary<string, Action<IParseNode>> GetFieldDeserializers()
+            {
+                if(SystemDetailScopePathMember1 != null)
+                {
+                    return ParseNodeHelper.MergeDeserializersForIntersectionWrapper(SystemDetailScopePathMember1);
+                }
+                return new Dictionary<string, Action<IParseNode>>();
+            }
+            /// <summary>
+            /// Serializes information the current object
+            /// </summary>
+            /// <param name="writer">Serialization writer to use to serialize this model</param>
+            public virtual void Serialize(ISerializationWriter writer)
+            {
+                if(ReferenceEquals(writer, null)) throw new ArgumentNullException(nameof(writer));
+                if(String != null)
+                {
+                    writer.WriteStringValue(null, String);
+                }
+                else {
+                    writer.WriteObjectValue<global::GrimoireCli.Generated.Models.SystemDetail_scope_pathMember1>(null, SystemDetailScopePathMember1);
                 }
             }
         }

@@ -212,11 +212,11 @@ grimoire-cli config set server https://grimoire.example.com
 | `config get` | Show current configuration |
 | `config set <key> <value>` | Set a configuration value (`server` is the only valid key) |
 | `systems list [--sort name\|book_count\|page_count\|year] [--desc] [--genre <g>] [--family <f>] [--parent-system <p>] [--edition <e>] [--license <l>] [--explicit true\|false] [--parent-id <id>] [--include-children]` | List all game systems |
-| `systems get --id <id> [--book-sort category\|title\|page_count\|year] [--book-desc] [--genre <g>] [--category <c>] [--explicit true\|false]` | Get a single game system, with its books |
+| `systems get --id <id> [--book-sort category\|title\|page_count\|year] [--book-desc] [--genre <g>] [--category <c>] [--explicit true\|false] [--include-books true\|false]` | Get a single game system, with its books |
 | `systems update --id <id> {--input <file> \| --stdin}` | Update one system's metadata (gm or admin) |
 | `systems batch-update {--input <file> \| --stdin}` | Update many systems in one transaction; exit 3 if partial (gm or admin) |
 | `systems batch-tag {--input <file> \| --stdin}` | Add tags to many systems, additively; exit 3 if partial (gm or admin) |
-| `books list [--system-id <id>] [--category <c>] [--limit <n>] [--offset <n>]` | List books (defaults to 100 results) |
+| `books list [--system-id <id>] [--category <c>] [--limit <n>] [--offset <n>] [--sort title\|added_at] [--order asc\|desc] [--added-since <iso>]` | List books (defaults to 100 results) |
 | `books get --id <id>` | Get one book |
 | `books update --id <id> {--input <file> \| --stdin}` | Update one book's metadata (gm or admin) |
 | `books batch-update {--input <file> \| --stdin}` | Update many books in one transaction; exit 3 if partial (gm or admin) |
@@ -266,7 +266,7 @@ grimoire-cli config set server https://grimoire.example.com
 | `sidecars settings set --formats <f...> [--covers] [--overwrite-foreign]` | Configure which sidecar formats are written (admin) |
 | `sidecars export` | Backfill metadata sidecars for books that have none (admin) |
 | `files browse [--path <path>] [--limit <1-2000>]` | List a library folder, merged with indexing state (admin) |
-| `files upload --destination <path> --file <path> [--relative-dir <path>] [--on-conflict skip\|rename]` | Upload one file; loop for many (admin) |
+| `files upload --destination <path> --file <path> [--relative-dir <path>] [--on-conflict skip\|rename\|replace]` | Upload one file; loop for many (admin) |
 | `files move --sources <path>... --destination <path> [--on-conflict skip\|rename]` | Move files or folders, keeping their metadata (admin) |
 | `files rename --path <path> --new-name <name>` | Rename a file or folder on disk (admin) |
 | `files delete --path <path> [--confirm-name <name>] [--delete-files]` | Drop index entries; `--delete-files` also deletes the files, irreversibly (admin) |
@@ -274,7 +274,7 @@ grimoire-cli config set server https://grimoire.example.com
 | `files folder markers --path <path> [--container-kind <kind>] [--nsfw true\|false] [--frames-container true\|false]` | Set a folder's container/NSFW/frame markers (admin) |
 | `files folder scaffold --path <path>` | Create the standard category folders (admin) |
 | `files folder contents --path <path>` | Report whether a folder holds content (admin) |
-| `maps list [--map-type <t>] [--folder <path>] [--limit <n>] [--offset <n>] [--sort <path\|name>]` | List maps (defaults to 100 results) |
+| `maps list [--map-type <t>] [--limit <n>] [--offset <n>] [--query <q>] [--tags <json>] [--favorites] [--added-since <iso>] [--folder <path>] [--sort path\|name\|size\|added_at\|title\|duration] [--order asc\|desc]` | List maps (defaults to 100 results) |
 | `maps get --id <id>` | Get one map, with its detected grid and any manual override |
 | `maps thumbnail --id <id> --output <path\|->` | Download a map's scan-generated thumbnail |
 | `maps file --id <id> --output <path\|->` | Download the map file as stored |
@@ -288,7 +288,7 @@ grimoire-cli config set server https://grimoire.example.com
 | `maps folders list` | List tagged map folders |
 | `maps folders set {--input <file> \| --stdin}` | Replace one map folder's tags (gm or admin) |
 | `maps folders batch-set {--input <file> \| --stdin}` | Set tags on many map folders in one transaction (gm or admin) |
-| `models list [--limit <n>] [--offset <n>]` | List 3D models (defaults to 100 results) |
+| `models list [--limit <n>] [--offset <n>] [--query <q>] [--tags <json>] [--favorites] [--added-since <iso>] [--folder <path>] [--sort path\|name\|size\|added_at\|title\|duration] [--order asc\|desc]` | List 3D models (defaults to 100 results) |
 | `models get --id <id>` | Get one model, with its derived support pair |
 | `models thumbnail --id <id> --output <path\|->` | Download a model's rendered thumbnail |
 | `models file --id <id> --output <path\|->` | Download the 3D model file |
@@ -298,7 +298,7 @@ grimoire-cli config set server https://grimoire.example.com
 | `models folders list` | List tagged model folders |
 | `models folders set {--input <file> \| --stdin}` | Replace one model folder's tags (gm or admin) |
 | `models folders batch-set {--input <file> \| --stdin}` | Set tags on many model folders in one transaction (gm or admin) |
-| `tokens list [--limit <n>] [--offset <n>] [--sort <path\|name>]` | List tokens (defaults to 100 results) |
+| `tokens list [--limit <n>] [--offset <n>] [--query <q>] [--tags <json>] [--favorites] [--added-since <iso>] [--folder <path>] [--sort path\|name\|size\|added_at\|title\|duration] [--order asc\|desc]` | List tokens (defaults to 100 results) |
 | `tokens get --id <id>` | Get one token |
 | `tokens thumbnail --id <id> --output <path\|->` | Download a token's rendered thumbnail |
 | `tokens file --id <id> --output <path\|->` | Download the token image as stored |
@@ -308,7 +308,7 @@ grimoire-cli config set server https://grimoire.example.com
 | `tokens folders list` | List tagged token folders |
 | `tokens folders set {--input <file> \| --stdin}` | Replace one token folder's tags (gm or admin) |
 | `tokens folders batch-set {--input <file> \| --stdin}` | Set tags on many token folders in one transaction (gm or admin) |
-| `audio list [--limit <n>] [--offset <n>]` | List audio tracks (defaults to 100 results) |
+| `audio list [--limit <n>] [--offset <n>] [--query <q>] [--tags <json>] [--favorites] [--added-since <iso>] [--folder <path>] [--sort path\|name\|size\|added_at\|title\|duration] [--order asc\|desc]` | List audio tracks (defaults to 100 results) |
 | `audio get --id <id>` | Get one audio track |
 | `audio artwork --id <id> --output <path\|->` | Download an audio track's artwork |
 | `audio cover get --id <id> --output <path\|->` | Download the track's set cover image (gm or admin) |
@@ -341,7 +341,8 @@ grimoire-cli config set server https://grimoire.example.com
 | `search fields` | The `field:` prefixes a search query accepts |
 | `logs [--level <l>] [--limit <n>] [--offset <n>] [--after-seq <n>]` | Read the server's application log (admin) |
 | `tags list [--in-use-by <type>]` | List tags with their usage counts |
-| `tags items --tag <key> [--resource-type <type>]` | Items and folders carrying a tag |
+| `tags items --tag <key> [--resource-type <type>] [--limit <n>] [--offset <n>]` | Items and folders carrying a tag |
+| `tags folder-items --tag <key> --resource-type <type> --folder <key> [--limit <n>] [--offset <n>]` | Contents of one folder carrying a tag |
 | `tags create --value <value> [--display <text>]` | Create a tag up front; idempotent (gm or admin) |
 | `tags rename --tag <key> --display <text>` | Rename a tag; the key follows and may merge (gm or admin) |
 | `tags delete --tag <key>` | Delete a tag everywhere; no undo (gm or admin) |
@@ -446,7 +447,7 @@ Verified API behaviour worth reading before designing a command: [docs/grimoire-
 
 ## Compatibility
 
-Requires Grimoire **v1.7.2** to **v1.7.3**. The CLI warns on login if the server reports a version outside that range. See [docs/grimoire-compatibility.md](docs/grimoire-compatibility.md) for the version matrix and the bump procedure.
+Requires Grimoire **v1.8.0**. The CLI warns on login if the server reports any other version. See [docs/grimoire-compatibility.md](docs/grimoire-compatibility.md) for the version matrix and the bump procedure.
 
 ## License
 

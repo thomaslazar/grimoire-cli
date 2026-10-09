@@ -30,10 +30,12 @@ public static class AudioCommand
         var limitOption = OptionHelpers.Range("--limit", "Results per page (the server sets no maximum)", 1);
         limitOption.DefaultValueFactory = _ => 100;
         var offsetOption = OptionHelpers.Range("--offset", "Items to skip", 0);
+        var browse = new MediaBrowseOptions();
         var command = new Command("list", "List audio tracks")
         {
             limitOption, offsetOption
         };
+        browse.AddTo(command, "audio");
         command.AddHelpSection("Notes", HelpSectionPosition.Top,
             "Variants are hidden — only the main copy of a family is listed.",
             "",
@@ -48,7 +50,8 @@ public static class AudioCommand
             var service = new AudioService(client);
             var result = await service.ListAsync(
                 parseResult.GetValue(limitOption),
-                parseResult.GetValue(offsetOption));
+                parseResult.GetValue(offsetOption),
+                browse.Read(parseResult));
             ConsoleOutput.WriteRawJson(result);
             return 0;
         });

@@ -18,12 +18,21 @@ public class ModelsService
     public ModelsService(GrimoireApiClient client) => _client = client;
 
     /// <summary>GET /api/models. Variants and disallowed explicit rows are excluded server-side.</summary>
-    public async Task<string> ListAsync(int? limit, int? offset)
+    public async Task<string> ListAsync(int? limit, int? offset, MediaBrowseFilter filter)
     {
         var info = _client.Api.Api.Models.ToGetRequestInformation(c =>
         {
             c.QueryParameters.Limit = limit;
             c.QueryParameters.Offset = offset;
+            c.QueryParameters.Q = filter.Query;
+            c.QueryParameters.Tags = filter.Tags;
+            c.QueryParameters.Favorites = filter.Favorites;
+            c.QueryParameters.AddedSince = filter.AddedSince;
+            c.QueryParameters.Folder = filter.Folder;
+            c.QueryParameters.Sort = filter.Sort;
+            if (filter.Order is not null)
+                c.QueryParameters.OrderAsGetOrderQueryParameterType =
+                    Enum.Parse<Generated.Api.ModelsRequests.GetOrderQueryParameterType>(filter.Order, true);
         });
         return await _client.SendAsync(info);
     }

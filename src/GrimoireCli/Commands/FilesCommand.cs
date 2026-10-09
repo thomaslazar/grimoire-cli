@@ -8,6 +8,7 @@ public static class FilesCommand
 {
     private static readonly NLog.Logger _logger = NLog.LogManager.GetCurrentClassLogger();
     private static readonly string[] ConflictPolicies = ["skip", "rename"];
+    private static readonly string[] UploadConflictPolicies = ["skip", "rename", "replace"];
 
     public static Command Create()
     {
@@ -63,7 +64,7 @@ public static class FilesCommand
         var destinationOption = new Option<string>("--destination") { Description = "Library folder to upload into", Required = true };
         var fileOption = new Option<string>("--file") { Description = "Local file to upload", Required = true };
         var relativeDirOption = new Option<string?>("--relative-dir") { Description = "Sub-path under the destination, created if missing" };
-        var onConflictOption = OptionHelpers.Choice("--on-conflict", "Collision policy; default rename", ConflictPolicies);
+        var onConflictOption = OptionHelpers.Choice("--on-conflict", "Collision policy; default rename", UploadConflictPolicies);
         var command = new Command("upload", "Upload a single file into a library folder")
         {
             destinationOption, fileOption, relativeDirOption, onConflictOption
@@ -71,7 +72,11 @@ public static class FilesCommand
         command.AddRoleRequired("admin");
         command.AddHelpSection("Notes", HelpSectionPosition.Top,
             "The server refuses above 8 GiB with 413; this CLI reads the file into",
-            "memory, so in practice keep it under about 2 GiB.");
+            "memory, so in practice keep it under about 2 GiB.",
+            "",
+            "replace overwrites an indexed book's file in place and keeps its id",
+            "(record_id). 409 when the target is not an indexed book or while a",
+            "scan or OCR run is going; 404 when --relative-dir does not exist.");
         command.AddExamples(
             "grimoire-cli files upload --destination \"books/Call of Cthulhu/7e EN/core\" --file \"Keeper Rulebook.pdf\"");
         command.AddResponseExample<Generated.Models.UploadResponse>();

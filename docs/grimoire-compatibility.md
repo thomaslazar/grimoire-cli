@@ -13,8 +13,8 @@
 **The floor rises only when something forces it**, not on every server release.
 Each row above records a pairing that was necessary at the time — 1.5.6 → 1.6.0
 because the 1.6.x line changed the token lifetime and made the library writable,
-1.7.0 and then 1.7.2 because each added a flag older servers silently drop
-(below).
+1.7.0, 1.7.2 and then 1.8.0 because each added a flag older servers silently
+drop (below).
 Absent a reason like that, a bump raises `MaxTestedVersion` and leaves the floor
 where it is. Whoever stays on Grimoire 1.5.6 stays on grimoire-cli `0.1.x`, which
 is maintained on `support/grimoire-1.5.6` — fixes are made and released there,
@@ -26,7 +26,7 @@ an older Grimoire does not know is dropped by Pydantic rather than rejected, so
 the command answers 200 and does nothing — the one failure the version warning
 exists to catch.
 
-`main` targets Grimoire 1.7.3. Reaching 1.6.0 was more than a version bump: it
+`main` targets Grimoire 1.8.0. Reaching 1.6.0 was more than a version bump: it
 shortened the access token from 30 days to 30 minutes and made the library
 writable, which is why the CLI renews its own session
 ([authentication.md](authentication.md)) and why the `files` endpoints exist at
@@ -71,7 +71,7 @@ plain `BaseModel`s with Pydantic's default `extra='ignore'`, so that flag's fiel
 is dropped and the folder is created with no marker and a 200. A silent no-op is
 what the floor warning is for; without the new flag this release would not have
 needed one.
-`docker/docker-compose.yml` pins the `1.7.3` release tag, so the spec cannot
+`docker/docker-compose.yml` pins the `1.8.0` release tag, so the spec cannot
 drift under the committed client between regenerations.
 
 **1.7.1 raised `MaxTestedVersion` and left the floor alone** — the first bump
@@ -153,10 +153,40 @@ sends changed. What moved is around it:
   for good (upstream #503). Migration 0037 re-queues the books earlier moves
   emptied, so the first scan after upgrading may re-read or re-OCR some books.
 
+**`MinSupportedVersion` moved to 1.8.0 for the list filters.** 1.8.0 moved
+gallery filtering, sorting and folder grouping onto the server (upstream #221),
+and every new parameter is unknown to 1.7.3, which FastAPI ignores rather than
+refuses — `maps list --query forest` there answers 200 with every map. The floor
+is the only signal. What reaches the shipped commands:
+
+- **Media list filters.** `maps`, `tokens`, `audio` and `models list` share one
+  parameter set (`routers/_browse.py`): `--query`, `--tags`, `--favorites`,
+  `--added-since`, `--folder`, `--sort` (now `path|name|size|added_at|title|duration`)
+  and `--order`. `path` and `name` both order by a natural-sort key now, and
+  `audio` / `models list` default to `path` where they sorted by filename.
+- **`books list`** gains `--sort title|added_at`, `--order` and `--added-since`.
+- **`systems get`** gains `--include-books`, and the response gains `scope_path`.
+- **`tags items` is paged.** It returned every item; 1.8.0 returns 100 unless
+  `--limit` says otherwise, so the flag is what keeps the rest reachable.
+  `folders[]` now carries a count and a `key` rather than the items, which come
+  from the new `tags folder-items`.
+- **`files upload --on-conflict replace`** overwrites an indexed book's file and
+  keeps its id. An unknown value is now a 400 rather than a silent rename.
+- **`library cancel-scan`** answers `cleared_stale` for a scan whose heartbeat
+  stopped, and a stale flag no longer blocks `rescan`, `cleanup-missing` or
+  `duplicates scan`.
+- **Guests lose a few reads** — `stats`, `tags`, the lookup vocabularies and
+  the archive download now need a non-guest account. No role tag changes: the
+  default carries none.
+
+The `characters`, `content` and `rulesets` routes, the media `/groups` routes and
+the system shelf routes (`/books`, `/book-groups`, `/book-facets`) are new and not
+implemented.
+
 ## Runtime check
 
 `src/GrimoireCli/Api/GrimoireApiClient.cs` defines `MinSupportedVersion` and
-`MaxTestedVersion`, currently `"1.7.2"` and `"1.7.3"`. A check runs before the first
+`MaxTestedVersion`, currently both `"1.8.0"`. A check runs before the first
 request of any command, calling `GET /api/about` and comparing the reported
 version against that range. It is throttled to once every 24 hours — a
 config with a recent `lastVersionCheck` skips the probe entirely — and

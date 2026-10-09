@@ -8,7 +8,7 @@ using System;
 namespace GrimoireCli.Generated.Models
 {
     /// <summary>
-    /// Where an uploaded file landed. `name` may differ from what was sent whenthe conflict policy suffixed it.
+    /// Where an uploaded file landed. `name` may differ from what was sent whenthe conflict policy suffixed it. `record_id` and `replaced` are set when`on_conflict=replace` overwrote an indexed book, which keeps its id.
     /// </summary>
     [global::System.CodeDom.Compiler.GeneratedCode("Kiota", "1.0.0")]
     public partial class UploadResponse : IAdditionalDataHolder, IParsable
@@ -31,6 +31,16 @@ namespace GrimoireCli.Generated.Models
 #else
         public string Path { get; set; }
 #endif
+        /// <summary>The record_id property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public global::GrimoireCli.Generated.Models.UploadResponse.UploadResponse_record_id? RecordId { get; set; }
+#nullable restore
+#else
+        public global::GrimoireCli.Generated.Models.UploadResponse.UploadResponse_record_id RecordId { get; set; }
+#endif
+        /// <summary>The replaced property</summary>
+        public bool? Replaced { get; set; }
         /// <summary>The size property</summary>
         public int? Size { get; set; }
         /// <summary>
@@ -39,6 +49,7 @@ namespace GrimoireCli.Generated.Models
         public UploadResponse()
         {
             AdditionalData = new Dictionary<string, object>();
+            Replaced = false;
         }
         /// <summary>
         /// Creates a new instance of the appropriate class based on discriminator value
@@ -60,6 +71,8 @@ namespace GrimoireCli.Generated.Models
             {
                 { "name", n => { Name = n.GetStringValue(); } },
                 { "path", n => { Path = n.GetStringValue(); } },
+                { "record_id", n => { RecordId = n.GetObjectValue<global::GrimoireCli.Generated.Models.UploadResponse.UploadResponse_record_id>(global::GrimoireCli.Generated.Models.UploadResponse.UploadResponse_record_id.CreateFromDiscriminatorValue); } },
+                { "replaced", n => { Replaced = n.GetBoolValue(); } },
                 { "size", n => { Size = n.GetIntValue(); } },
             };
         }
@@ -72,8 +85,78 @@ namespace GrimoireCli.Generated.Models
             if(ReferenceEquals(writer, null)) throw new ArgumentNullException(nameof(writer));
             writer.WriteStringValue("name", Name);
             writer.WriteStringValue("path", Path);
+            writer.WriteObjectValue<global::GrimoireCli.Generated.Models.UploadResponse.UploadResponse_record_id>("record_id", RecordId);
+            writer.WriteBoolValue("replaced", Replaced);
             writer.WriteIntValue("size", Size);
             writer.WriteAdditionalData(AdditionalData);
+        }
+        /// <summary>
+        /// Composed type wrapper for classes <see cref="global::GrimoireCli.Generated.Models.UploadResponse_record_idMember1"/>, <see cref="string"/>
+        /// </summary>
+        [global::System.CodeDom.Compiler.GeneratedCode("Kiota", "1.0.0")]
+        public partial class UploadResponse_record_id : IComposedTypeWrapper, IParsable
+        {
+            /// <summary>Composed type representation for type <see cref="string"/></summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+            public string? String { get; set; }
+#nullable restore
+#else
+            public string String { get; set; }
+#endif
+            /// <summary>Composed type representation for type <see cref="global::GrimoireCli.Generated.Models.UploadResponse_record_idMember1"/></summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+            public global::GrimoireCli.Generated.Models.UploadResponse_record_idMember1? UploadResponseRecordIdMember1 { get; set; }
+#nullable restore
+#else
+            public global::GrimoireCli.Generated.Models.UploadResponse_record_idMember1 UploadResponseRecordIdMember1 { get; set; }
+#endif
+            /// <summary>
+            /// Creates a new instance of the appropriate class based on discriminator value
+            /// </summary>
+            /// <returns>A <see cref="global::GrimoireCli.Generated.Models.UploadResponse.UploadResponse_record_id"/></returns>
+            /// <param name="parseNode">The parse node to use to read the discriminator value and create the object</param>
+            public static global::GrimoireCli.Generated.Models.UploadResponse.UploadResponse_record_id CreateFromDiscriminatorValue(IParseNode parseNode)
+            {
+                if(ReferenceEquals(parseNode, null)) throw new ArgumentNullException(nameof(parseNode));
+                var result = new global::GrimoireCli.Generated.Models.UploadResponse.UploadResponse_record_id();
+                if(parseNode.GetStringValue() is string stringValue)
+                {
+                    result.String = stringValue;
+                }
+                else {
+                    result.UploadResponseRecordIdMember1 = new global::GrimoireCli.Generated.Models.UploadResponse_record_idMember1();
+                }
+                return result;
+            }
+            /// <summary>
+            /// The deserialization information for the current model
+            /// </summary>
+            /// <returns>A IDictionary&lt;string, Action&lt;IParseNode&gt;&gt;</returns>
+            public virtual IDictionary<string, Action<IParseNode>> GetFieldDeserializers()
+            {
+                if(UploadResponseRecordIdMember1 != null)
+                {
+                    return ParseNodeHelper.MergeDeserializersForIntersectionWrapper(UploadResponseRecordIdMember1);
+                }
+                return new Dictionary<string, Action<IParseNode>>();
+            }
+            /// <summary>
+            /// Serializes information the current object
+            /// </summary>
+            /// <param name="writer">Serialization writer to use to serialize this model</param>
+            public virtual void Serialize(ISerializationWriter writer)
+            {
+                if(ReferenceEquals(writer, null)) throw new ArgumentNullException(nameof(writer));
+                if(String != null)
+                {
+                    writer.WriteStringValue(null, String);
+                }
+                else {
+                    writer.WriteObjectValue<global::GrimoireCli.Generated.Models.UploadResponse_record_idMember1>(null, UploadResponseRecordIdMember1);
+                }
+            }
         }
     }
 }

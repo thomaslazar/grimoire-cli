@@ -83,8 +83,9 @@ public static class LibraryCommand
         var command = new Command("cancel-scan", "Stop the running scan");
         command.AddRoleRequired("admin");
         command.AddHelpSection("Notes", HelpSectionPosition.Top,
-            "Requests a graceful stop; the scan ends at its next checkpoint. Exits 0",
-            "whether or not one was running.");
+            "Requests a graceful stop; the scan ends at its next checkpoint. A scan",
+            "with no heartbeat for five minutes is cleared outright instead",
+            "(cleared_stale). Exits 0 whether or not one was running.");
         command.SetAction(async (parseResult, cancellationToken) =>
         {
             var (client, _) = CommandHelper.BuildClient();

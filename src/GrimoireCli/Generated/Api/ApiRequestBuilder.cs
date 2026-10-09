@@ -13,6 +13,8 @@ using GrimoireCli.Generated.Api.Books;
 using GrimoireCli.Generated.Api.Campaigns;
 using GrimoireCli.Generated.Api.CancelScan;
 using GrimoireCli.Generated.Api.Changelog;
+using GrimoireCli.Generated.Api.Characters;
+using GrimoireCli.Generated.Api.Content;
 using GrimoireCli.Generated.Api.DiceMaterials;
 using GrimoireCli.Generated.Api.Downloads;
 using GrimoireCli.Generated.Api.Duplicates;
@@ -30,6 +32,7 @@ using GrimoireCli.Generated.Api.ModelFolders;
 using GrimoireCli.Generated.Api.ModelsRequests;
 using GrimoireCli.Generated.Api.ParentSystems;
 using GrimoireCli.Generated.Api.Rescan;
+using GrimoireCli.Generated.Api.Rulesets;
 using GrimoireCli.Generated.Api.SavedFilters;
 using GrimoireCli.Generated.Api.ScanStatus;
 using GrimoireCli.Generated.Api.Search;
@@ -122,6 +125,16 @@ namespace GrimoireCli.Generated.Api
         {
             get => new global::GrimoireCli.Generated.Api.Changelog.ChangelogRequestBuilder(PathParameters, RequestAdapter);
         }
+        /// <summary>The characters property</summary>
+        public global::GrimoireCli.Generated.Api.Characters.CharactersRequestBuilder Characters
+        {
+            get => new global::GrimoireCli.Generated.Api.Characters.CharactersRequestBuilder(PathParameters, RequestAdapter);
+        }
+        /// <summary>The content property</summary>
+        public global::GrimoireCli.Generated.Api.Content.ContentRequestBuilder Content
+        {
+            get => new global::GrimoireCli.Generated.Api.Content.ContentRequestBuilder(PathParameters, RequestAdapter);
+        }
         /// <summary>The diceMaterials property</summary>
         public global::GrimoireCli.Generated.Api.DiceMaterials.DiceMaterialsRequestBuilder DiceMaterials
         {
@@ -206,6 +219,11 @@ namespace GrimoireCli.Generated.Api
         public global::GrimoireCli.Generated.Api.Rescan.RescanRequestBuilder Rescan
         {
             get => new global::GrimoireCli.Generated.Api.Rescan.RescanRequestBuilder(PathParameters, RequestAdapter);
+        }
+        /// <summary>The rulesets property</summary>
+        public global::GrimoireCli.Generated.Api.Rulesets.RulesetsRequestBuilder Rulesets
+        {
+            get => new global::GrimoireCli.Generated.Api.Rulesets.RulesetsRequestBuilder(PathParameters, RequestAdapter);
         }
         /// <summary>The savedFilters property</summary>
         public global::GrimoireCli.Generated.Api.SavedFilters.SavedFiltersRequestBuilder SavedFilters

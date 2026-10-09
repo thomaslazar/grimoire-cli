@@ -34,7 +34,7 @@ public class SystemsService
     }
 
     public async Task<string> GetAsync(
-        string id, string? bookSort, bool bookDesc, string? genre, string? category, bool? isExplicit)
+        string id, string? bookSort, bool bookDesc, string? genre, string? category, bool? isExplicit, bool? includeBooks)
     {
         var info = _client.Api.Api.Systems[id].ToGetRequestInformation(c =>
         {
@@ -43,6 +43,7 @@ public class SystemsService
             c.QueryParameters.Genre = genre;
             c.QueryParameters.Category = category;
             c.QueryParameters.Explicit = isExplicit;
+            c.QueryParameters.IncludeBooks = includeBooks;
         });
         return await _client.SendAsync(
             info,
