@@ -318,6 +318,21 @@ flags on `systems get`.
   `_count_eligible_files` doesn't apply the same skip, so it still counts the
   file toward `total_books` — any wait loop polling
   `scanned_books >= total_books` hangs forever with a loose file present.
+- **Some folder names map only as the whole name**, as of 1.8.0.
+  `CATEGORY_EXACT_NAMES` (`backend/indexer/constants.py:155`) maps `Player(s)`
+  and `GM(s)` / `Game Master(s)` to `core`, `Sheet(s)` to `character-sheet` and
+  `Source(s)` to `supplement`, checked before `CATEGORY_MAP`
+  (`categories.py:193`). As one word of a longer name they do nothing:
+  `Player Handouts` is still `handout`. `unofficial` joined `homebrew`'s
+  keywords (`constants.py:147`).
+- **The first import leaves `added_at` null**, as of 1.8.0
+  (`backend/indexer/added_dates.py`). Every item is dated when a scan inserts
+  it, except during the first import: until a full, unscoped scan has finished
+  over a non-empty library (`scan.py:301`) and no row carries a date
+  (`added_dates.py:42`), inserts stay undated, so a fresh install does not
+  badge its whole library as new. A freshly seeded local stack is therefore
+  entirely undated — `--added-since` matches nothing and `added_at` sorts are
+  name order — until something is added after that first scan.
 
 ### One-page collections
 
@@ -345,9 +360,9 @@ category labels. Any claim about this behaviour must name a version.
   (`supplements/`, `sourcebook/`, `guide/`, `companion/`, …) onto the canonical
   `core`, `supplement`, `adventure`, `character-sheet`, `map`, `handout`,
   `homebrew`, `starter-set`. A top-level folder that matches none of them
-  becomes its own category: `guess_category` (`categories.py:200-234`) falls
+  becomes its own category: `guess_category` (`categories.py:228-262`) falls
   back to the slugified folder name (`Extras/` → `extras`). System-agnostic
-  folders go through `agnostic_category` (`categories.py:237-249`) instead,
+  folders go through `agnostic_category` (`categories.py:265`) instead,
   which slugs the immediate subfolder and yields `uncategorized` for books with
   no subfolder at all. One-page folders no longer take this path in v1.5.5 —
   they're a container (see above), so each loose file gets ordinary category
@@ -1057,9 +1072,11 @@ hold unchanged on both; only the differences are recorded here.
 
 ## Search
 
-Read from `backend/routers/search/core.py`, `backend/routers/search/_query.py`,
-`backend/routers/search/_books.py` and `backend/routers/search/_helpers.py` at
-tag `v1.6.2`; the limit behaviour was verified against the running 1.6.1 stack.
+Read from `backend/routers/search/core.py`, `backend/routers/search/_books.py`,
+`backend/routers/search/_helpers.py` and the query parser at tag `v1.6.2`; the
+limit behaviour was verified against the running 1.6.1 stack. 1.8.0 moved the
+parser to `backend/services/search_query.py`, shared with the media lists'
+`q`.
 
 `GET /api/search` is not full-text-only. As of 1.6.2 it returns six
 independently-populated arrays — `results` (page text), `book_matches`, `maps`,
@@ -1083,12 +1100,10 @@ so a book matching by title *and* by page text is counted twice.
   forces it back.
 - **`campaigns/resources/search` has no command, deliberately.** It is a
   resource picker: `q` is optional so it enumerates a whole type, and its cap
-  is 20000 per type rather than 50. That makes it the only way to list maps,
-  tokens or audio without a search term — but those resource types have no
-  commands yet, and each will arrive with its own paginated `list`. For
-  books, `books list` already enumerates with `--offset` and `search` already
-  filters. Do not add a command for it on a coverage-gap sweep; revisit it
-  with the maps, tokens and audio blocks.
+  is 20000 per type rather than 50. Every type it covers already enumerates
+  through its own paginated `list` — `books`, `maps`, `tokens`, `audio` — and
+  the media lists take the same search syntax through `--query`. Do not add a
+  command for it on a coverage-gap sweep.
 
 ## Logs
 
@@ -1242,18 +1257,21 @@ Read from `backend/routers/downloads/` at tag `v1.7.1`, and verified against the
 ## Campaigns
 
 Read from `backend/routers/campaigns/` at tag `v1.7.2`, and verified against the
-1.7.2 stack. Cites are relative to that directory. Backs `campaigns`, `campaigns resources`, `campaigns categories` and
+1.7.2 stack; cites re-read at `v1.8.0`. Cites are relative to that directory. Backs `campaigns`, `campaigns resources`, `campaigns categories` and
 `campaigns files`.
 
 - **Writes are gated on ownership, not role.** Every write calls
-  `assert_can_manage` (`_helpers.py:304-317`): 403 unless the caller owns the
+  `assert_can_manage` (`_helpers.py:324-337`): 403 unless the caller owns the
   campaign — no admin override — and the owner's campaign access is enabled and
   the campaign is not archived. None of it is a route dependency, so no
   campaign command carries a role tag. The upload route's description says "GM
-  or admin role required" (`__init__.py:528`); the handler calls
-  `assert_can_manage` (`uploads.py:552`), so it is owner only.
-- `create` checks roles itself (`core.py:160-166`): guests are refused, and
+  or admin role required" (`__init__.py:530`); the handler calls
+  `assert_can_manage` (`uploads.py:551`), so it is owner only.
+- `create` checks roles itself (`core.py:160-163`): guests are refused, and
   `is_gm_campaign: true` needs gm or admin.
+- **`GET /campaigns/{id}` hides guest codes from everyone but the owner**, as
+  of 1.8.0: `members[].guest_code` is nulled for any other caller
+  (`core.py:233-239`), since a guest's code is their login.
 - **An invalid `visibility` is silently `gm` on add and bulk**
   (`resources.py:164,214`), but a 400 on update (`resources.py:252`). The CLI's
   `--visibility` choice set catches it on add; bulk JSON does not.
