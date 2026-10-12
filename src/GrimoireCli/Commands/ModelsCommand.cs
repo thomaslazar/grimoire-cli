@@ -14,6 +14,7 @@ public static class ModelsCommand
     {
         var command = new Command("models", "Read and edit 3D model metadata");
         command.Subcommands.Add(CreateListCommand());
+        command.Subcommands.Add(CreateFolderCountsCommand());
         command.Subcommands.Add(CreateGetCommand());
         command.Subcommands.Add(CreateThumbnailCommand());
         command.Subcommands.Add(CreateFileCommand());
@@ -56,6 +57,31 @@ public static class ModelsCommand
                 parseResult.GetValue(limitOption),
                 parseResult.GetValue(offsetOption),
                 browse.Read(parseResult));
+            ConsoleOutput.WriteRawJson(result);
+            return 0;
+        });
+        return command;
+    }
+
+    private static Command CreateFolderCountsCommand()
+    {
+        var browse = new MediaBrowseOptions();
+        var command = new Command("folder-counts", "Folders holding matching 3D models, with counts");
+        browse.AddTo(command, "models");
+        command.AddHelpSection("Notes", HelpSectionPosition.Top,
+            "Each count covers the models directly in that folder, not its subfolders.",
+            "path is relative to the models/ root; \"\" holds the root's own models.",
+            "",
+            "Folders come back in path order; --sort and --order change nothing today.");
+        command.AddExamples(
+            "grimoire-cli models folder-counts",
+            "grimoire-cli models folder-counts --tags '[\"__grim:none__\"]'");
+        command.AddResponseExample<Generated.Models.FolderGroupsResponse>();
+        command.SetAction(async (parseResult, cancellationToken) =>
+        {
+            var (client, _) = CommandHelper.BuildClient();
+            var service = new ModelsService(client);
+            var result = await service.FolderCountsAsync(browse.Read(parseResult));
             ConsoleOutput.WriteRawJson(result);
             return 0;
         });

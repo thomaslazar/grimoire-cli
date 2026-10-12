@@ -14,6 +14,7 @@ public static class AudioCommand
     {
         var command = new Command("audio", "Read and edit audio metadata");
         command.Subcommands.Add(CreateListCommand());
+        command.Subcommands.Add(CreateFolderCountsCommand());
         command.Subcommands.Add(CreateGetCommand());
         command.Subcommands.Add(CreateArtworkCommand());
         command.Subcommands.Add(AudioCoverCommands.Create());
@@ -52,6 +53,31 @@ public static class AudioCommand
                 parseResult.GetValue(limitOption),
                 parseResult.GetValue(offsetOption),
                 browse.Read(parseResult));
+            ConsoleOutput.WriteRawJson(result);
+            return 0;
+        });
+        return command;
+    }
+
+    private static Command CreateFolderCountsCommand()
+    {
+        var browse = new MediaBrowseOptions();
+        var command = new Command("folder-counts", "Folders holding matching audio tracks, with counts");
+        browse.AddTo(command, "audio");
+        command.AddHelpSection("Notes", HelpSectionPosition.Top,
+            "Each count covers the tracks directly in that folder, not its subfolders.",
+            "path is relative to the audio/ root; \"\" holds the root's own tracks.",
+            "",
+            "Folders come back in path order; --sort and --order change nothing today.");
+        command.AddExamples(
+            "grimoire-cli audio folder-counts",
+            "grimoire-cli audio folder-counts --tags '[\"__grim:none__\"]'");
+        command.AddResponseExample<Generated.Models.FolderGroupsResponse>();
+        command.SetAction(async (parseResult, cancellationToken) =>
+        {
+            var (client, _) = CommandHelper.BuildClient();
+            var service = new AudioService(client);
+            var result = await service.FolderCountsAsync(browse.Read(parseResult));
             ConsoleOutput.WriteRawJson(result);
             return 0;
         });

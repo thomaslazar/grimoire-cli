@@ -21,6 +21,9 @@ public class MediaFolderCountsServiceTests
     public static TheoryData<string, string> Requests() => new()
     {
         { "maps", "/api/maps/groups" },
+        { "tokens", "/api/tokens/groups" },
+        { "audio", "/api/audio/groups" },
+        { "models", "/api/models/groups" },
     };
 
     private static RequestInformation Request(string collection, MediaBrowseFilter filter)
@@ -29,6 +32,9 @@ public class MediaFolderCountsServiceTests
         return collection switch
         {
             "maps" => new MapsService(client).FolderCountsRequest(null, filter),
+            "tokens" => new TokensService(client).FolderCountsRequest(filter),
+            "audio" => new AudioService(client).FolderCountsRequest(filter),
+            "models" => new ModelsService(client).FolderCountsRequest(filter),
             _ => throw new ArgumentException($"Unknown collection '{collection}'.", nameof(collection)),
         };
     }

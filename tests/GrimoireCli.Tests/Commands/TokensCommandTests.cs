@@ -181,4 +181,29 @@ public class TokensCommandTests
         Assert.NotEmpty(TokensCommand.Create().Parse(["file", "--id", "t1"]).Errors);
         Assert.Empty(TokensCommand.Create().Parse(["file", "--id", "t1", "--output", "-"]).Errors);
     }
+
+    [Fact]
+    public void FolderCountsSitsRightAfterList()
+    {
+        var names = TokensCommand.Create().Subcommands.Select(c => c.Name).ToList();
+        Assert.Equal(names.IndexOf("list") + 1, names.IndexOf("folder-counts"));
+    }
+
+    [Fact]
+    public void FolderCountsTakesTheListFilters()
+    {
+        Assert.Empty(TokensCommand.Create().Parse(
+            ["folder-counts", "--query", "tag:forest", "--tags", "[\"x\"]", "--favorites",
+             "--added-since", "2026-01-01T00:00:00Z", "--folder", "a", "--sort", "name", "--order", "desc"]).Errors);
+    }
+
+    [Theory]
+    [InlineData("--sort", "bogus")]
+    [InlineData("--order", "up")]
+    public void FolderCountsRejectsAnUnknownSortOrOrder(string flag, string value)
+        => Assert.NotEmpty(TokensCommand.Create().Parse(["folder-counts", flag, value]).Errors);
+
+    [Fact]
+    public void FolderCountsSaysCountsAreDirectContentsOnly()
+        => Assert.Contains("not its subfolders", Help(["tokens", "folder-counts"]));
 }
