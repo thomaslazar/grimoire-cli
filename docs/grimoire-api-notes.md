@@ -895,6 +895,15 @@ measured against the running 1.7.0 stack; the list parameters re-read at
   `desc`, default `asc`). An unknown `sort` is a 422. `maps` adds `map_type`.
   A negative limit reaches SQLite as `LIMIT -1`, unlimited; the CLI refuses one
   with `OptionHelpers.Range(1)`.
+- **`/groups` counts a folder's own items, not its subtree**, as of 1.8.0.
+  `GET /api/{maps,tokens,audio,models}/groups` takes the list's parameters
+  (maps also `map_type`) and returns `{total, groups: [{path, count}]}`
+  (`services/browse/media.py:215-234`). `count` is the items directly in
+  `path` — the fixture's `battlemaps` reads 2 though three maps sit beneath it —
+  unlike `tags items`' `folders[].count`, which covers the subtree. `path` is
+  collection-relative, `""` for the root, and only folders with a match appear.
+  Groups come back in path order: `sort` and `order` are validated
+  (`routers/_browse.py:63`) but change nothing. Backs `<collection> folder-counts`.
 - **`sort` defaults to `path`: folder, then `sort_name`** — the natural-sort
   key, not the raw filename (`media.py:190-195`). `name` is `sort_name` first,
   then folder. `size`, `added_at`, `title` and `duration` tie-break on

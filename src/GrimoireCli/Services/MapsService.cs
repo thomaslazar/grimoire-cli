@@ -1,5 +1,6 @@
 using System.Text;
 using GrimoireCli.Api;
+using Microsoft.Kiota.Abstractions;
 
 namespace GrimoireCli.Services;
 
@@ -37,6 +38,26 @@ public class MapsService
         });
         return await _client.SendAsync(info);
     }
+
+    /// <summary>GET /api/maps/groups. Each folder holding matching maps, with its direct count.</summary>
+    public async Task<string> FolderCountsAsync(string? mapType, MediaBrowseFilter filter)
+        => await _client.SendAsync(FolderCountsRequest(mapType, filter));
+
+    /// <summary>Internal (not private) so a test can pin it to its own builder's path.</summary>
+    internal RequestInformation FolderCountsRequest(string? mapType, MediaBrowseFilter filter)
+        => _client.Api.Api.Maps.Groups.ToGetRequestInformation(c =>
+        {
+            c.QueryParameters.MapType = mapType;
+            c.QueryParameters.Q = filter.Query;
+            c.QueryParameters.Tags = filter.Tags;
+            c.QueryParameters.Favorites = filter.Favorites;
+            c.QueryParameters.AddedSince = filter.AddedSince;
+            c.QueryParameters.Folder = filter.Folder;
+            c.QueryParameters.Sort = filter.Sort;
+            if (filter.Order is not null)
+                c.QueryParameters.OrderAsGetOrderQueryParameterType =
+                    Enum.Parse<Generated.Api.Maps.Groups.GetOrderQueryParameterType>(filter.Order, true);
+        });
 
     /// <summary>GET /api/maps/{id}. Carries both the detected grid and the stored override.</summary>
     public async Task<string> GetAsync(string id)

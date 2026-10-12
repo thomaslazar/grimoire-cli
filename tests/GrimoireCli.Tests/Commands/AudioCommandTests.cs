@@ -235,4 +235,29 @@ public class AudioCommandTests
         var help = HelpRenderer.Render(AudioCommand.Create(), ["audio", "cover", "delete"], full: false);
         Assert.Contains("has_artwork", help);
     }
+
+    [Fact]
+    public void FolderCountsSitsRightAfterList()
+    {
+        var names = AudioCommand.Create().Subcommands.Select(c => c.Name).ToList();
+        Assert.Equal(names.IndexOf("list") + 1, names.IndexOf("folder-counts"));
+    }
+
+    [Fact]
+    public void FolderCountsTakesTheListFilters()
+    {
+        Assert.Empty(AudioCommand.Create().Parse(
+            ["folder-counts", "--query", "tag:forest", "--tags", "[\"x\"]", "--favorites",
+             "--added-since", "2026-01-01T00:00:00Z", "--folder", "a", "--sort", "name", "--order", "desc"]).Errors);
+    }
+
+    [Theory]
+    [InlineData("--sort", "bogus")]
+    [InlineData("--order", "up")]
+    public void FolderCountsRejectsAnUnknownSortOrOrder(string flag, string value)
+        => Assert.NotEmpty(AudioCommand.Create().Parse(["folder-counts", flag, value]).Errors);
+
+    [Fact]
+    public void FolderCountsSaysCountsAreDirectContentsOnly()
+        => Assert.Contains("not its subfolders", Help(["audio", "folder-counts"]));
 }

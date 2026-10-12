@@ -1021,6 +1021,25 @@ jq -e '[.maps[].relative_path] | all(startswith("maps/battlemaps/caves") | not)'
   || fail "--folder must not reach a subfolder: $(cat "$WORK/maps-folder.out")"
 ok "maps list --folder is an exact folder, not a subtree"
 
+# Counts are per folder, not per subtree: battlemaps holds three maps beneath it
+# but only two directly, so a 3 here would mean the server rolled caves up.
+# listing map folder counts expecting direct counts for battlemaps and its subfolder
+"$CLI" maps folder-counts >"$WORK/map-counts.out" 2>"$WORK/cli.err" \
+  || { cat "$WORK/cli.err" >&2; fail "maps folder-counts exited non-zero"; }
+jq -e '[.groups[] | {(.path): .count}] | add == {"battlemaps": 2, "battlemaps/caves": 1}' \
+  "$WORK/map-counts.out" >/dev/null \
+  || fail "maps folder-counts should count each folder's own maps: $(cat "$WORK/map-counts.out")"
+ok "maps folder-counts counts each folder's direct contents"
+
+# listing folder counts for the other three collections expecting at least one folder each
+for collection in tokens audio models; do
+  "$CLI" "$collection" folder-counts >"$WORK/$collection-counts.out" 2>"$WORK/cli.err" \
+    || { cat "$WORK/cli.err" >&2; fail "$collection folder-counts exited non-zero"; }
+  jq -e '(.groups | length) > 0 and .total > 0' "$WORK/$collection-counts.out" >/dev/null \
+    || fail "$collection folder-counts should list the seeded folders: $(cat "$WORK/$collection-counts.out")"
+done
+ok "tokens, audio and models folder-counts list their folders"
+
 # extracting the Tavern map's id from the list output for later steps
 MAP_ID=$(jq -r '.maps[] | select(.filename == "Tavern.png") | .id' "$WORK/maps.out")
 [ -n "$MAP_ID" ] || fail "no fixture map id found: $(cat "$WORK/maps.out")"

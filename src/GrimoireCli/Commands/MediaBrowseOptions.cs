@@ -4,9 +4,9 @@ using GrimoireCli.Services;
 namespace GrimoireCli.Commands;
 
 /// <summary>
-/// The filter and sort flags of maps, tokens, audio and models list. Shared
-/// because the server declares them once for all four, in
-/// <c>routers/_browse.py</c> (<c>media_browse_params</c>).
+/// The filter and sort flags of the maps, tokens, audio and models list and
+/// folder-counts commands. Shared because the server declares them once for all
+/// eight routes, in <c>routers/_browse.py</c> (<c>media_browse_params</c>).
 /// </summary>
 internal sealed class MediaBrowseOptions
 {
@@ -32,8 +32,9 @@ internal sealed class MediaBrowseOptions
         command.Options.Add(_sort);
         command.Options.Add(_order);
         command.AddHelpSection("Filters", HelpSectionPosition.Top,
-            $"--folder is one exact folder, not a subtree: folder_path from {collection} get,",
-            "relative to the collection root; \"\" is the root.",
+            "--folder is one exact folder, not a subtree, relative to the collection",
+            $"root: folder_path from {collection} get, or path from {collection} folder-counts.",
+            "\"\" is the root.",
             "",
             "--sort path is folder then name, so a page is a contiguous run of",
             "folders; name sorts across the whole tree. title and duration fall back",

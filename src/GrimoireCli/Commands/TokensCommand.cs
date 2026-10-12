@@ -14,6 +14,7 @@ public static class TokensCommand
     {
         var command = new Command("tokens", "Read and edit token metadata");
         command.Subcommands.Add(CreateListCommand());
+        command.Subcommands.Add(CreateFolderCountsCommand());
         command.Subcommands.Add(CreateGetCommand());
         command.Subcommands.Add(CreateThumbnailCommand());
         command.Subcommands.Add(CreateFileCommand());
@@ -53,6 +54,33 @@ public static class TokensCommand
                 parseResult.GetValue(limitOption),
                 parseResult.GetValue(offsetOption),
                 browse.Read(parseResult));
+            ConsoleOutput.WriteRawJson(result);
+            return 0;
+        });
+        return command;
+    }
+
+    private static Command CreateFolderCountsCommand()
+    {
+        var browse = new MediaBrowseOptions();
+        var command = new Command("folder-counts", "Folders holding matching tokens, with counts");
+        browse.AddTo(command, "tokens");
+        command.AddHelpSection("Notes", HelpSectionPosition.Top,
+            "Each count covers the tokens directly in that folder, not its subfolders.",
+            "path is relative to the tokens/ root; \"\" holds the root's own tokens.",
+            "",
+            "Folders come back in path order; --sort and --order change nothing today.",
+            "",
+            "The account's explicit permission filters the counts server-side.");
+        command.AddExamples(
+            "grimoire-cli tokens folder-counts",
+            "grimoire-cli tokens folder-counts --tags '[\"__grim:none__\"]'");
+        command.AddResponseExample<Generated.Models.FolderGroupsResponse>();
+        command.SetAction(async (parseResult, cancellationToken) =>
+        {
+            var (client, _) = CommandHelper.BuildClient();
+            var service = new TokensService(client);
+            var result = await service.FolderCountsAsync(browse.Read(parseResult));
             ConsoleOutput.WriteRawJson(result);
             return 0;
         });

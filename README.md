@@ -275,6 +275,7 @@ grimoire-cli config set server https://grimoire.example.com
 | `files folder scaffold --path <path>` | Create the standard category folders (admin) |
 | `files folder contents --path <path>` | Report whether a folder holds content (admin) |
 | `maps list [--map-type <t>] [--limit <n>] [--offset <n>] [--query <q>] [--tags <json>] [--favorites] [--added-since <iso>] [--folder <path>] [--sort path\|name\|size\|added_at\|title\|duration] [--order asc\|desc]` | List maps (defaults to 100 results) |
+| `maps folder-counts [--map-type <t>] [--query <q>] [--tags <json>] [--favorites] [--added-since <iso>] [--folder <path>] [--sort path\|name\|size\|added_at\|title\|duration] [--order asc\|desc]` | Folders holding matching maps, with direct counts |
 | `maps get --id <id>` | Get one map, with its detected grid and any manual override |
 | `maps thumbnail --id <id> --output <path\|->` | Download a map's scan-generated thumbnail |
 | `maps file --id <id> --output <path\|->` | Download the map file as stored |
@@ -289,6 +290,7 @@ grimoire-cli config set server https://grimoire.example.com
 | `maps folders set {--input <file> \| --stdin}` | Replace one map folder's tags (gm or admin) |
 | `maps folders batch-set {--input <file> \| --stdin}` | Set tags on many map folders in one transaction (gm or admin) |
 | `models list [--limit <n>] [--offset <n>] [--query <q>] [--tags <json>] [--favorites] [--added-since <iso>] [--folder <path>] [--sort path\|name\|size\|added_at\|title\|duration] [--order asc\|desc]` | List 3D models (defaults to 100 results) |
+| `models folder-counts [--query <q>] [--tags <json>] [--favorites] [--added-since <iso>] [--folder <path>] [--sort path\|name\|size\|added_at\|title\|duration] [--order asc\|desc]` | Folders holding matching 3D models, with direct counts |
 | `models get --id <id>` | Get one model, with its derived support pair |
 | `models thumbnail --id <id> --output <path\|->` | Download a model's rendered thumbnail |
 | `models file --id <id> --output <path\|->` | Download the 3D model file |
@@ -299,6 +301,7 @@ grimoire-cli config set server https://grimoire.example.com
 | `models folders set {--input <file> \| --stdin}` | Replace one model folder's tags (gm or admin) |
 | `models folders batch-set {--input <file> \| --stdin}` | Set tags on many model folders in one transaction (gm or admin) |
 | `tokens list [--limit <n>] [--offset <n>] [--query <q>] [--tags <json>] [--favorites] [--added-since <iso>] [--folder <path>] [--sort path\|name\|size\|added_at\|title\|duration] [--order asc\|desc]` | List tokens (defaults to 100 results) |
+| `tokens folder-counts [--query <q>] [--tags <json>] [--favorites] [--added-since <iso>] [--folder <path>] [--sort path\|name\|size\|added_at\|title\|duration] [--order asc\|desc]` | Folders holding matching tokens, with direct counts |
 | `tokens get --id <id>` | Get one token |
 | `tokens thumbnail --id <id> --output <path\|->` | Download a token's rendered thumbnail |
 | `tokens file --id <id> --output <path\|->` | Download the token image as stored |
@@ -309,6 +312,7 @@ grimoire-cli config set server https://grimoire.example.com
 | `tokens folders set {--input <file> \| --stdin}` | Replace one token folder's tags (gm or admin) |
 | `tokens folders batch-set {--input <file> \| --stdin}` | Set tags on many token folders in one transaction (gm or admin) |
 | `audio list [--limit <n>] [--offset <n>] [--query <q>] [--tags <json>] [--favorites] [--added-since <iso>] [--folder <path>] [--sort path\|name\|size\|added_at\|title\|duration] [--order asc\|desc]` | List audio tracks (defaults to 100 results) |
+| `audio folder-counts [--query <q>] [--tags <json>] [--favorites] [--added-since <iso>] [--folder <path>] [--sort path\|name\|size\|added_at\|title\|duration] [--order asc\|desc]` | Folders holding matching audio tracks, with direct counts |
 | `audio get --id <id>` | Get one audio track |
 | `audio artwork --id <id> --output <path\|->` | Download an audio track's artwork |
 | `audio cover get --id <id> --output <path\|->` | Download the track's set cover image (gm or admin) |

@@ -308,4 +308,36 @@ public class MapsCommandTests
     {
         Assert.DoesNotContain("Role required:", Help(path, full: true));
     }
+
+    [Fact]
+    public void FolderCountsSitsRightAfterList()
+    {
+        var names = MapsCommand.Create().Subcommands.Select(c => c.Name).ToList();
+        Assert.Equal(names.IndexOf("list") + 1, names.IndexOf("folder-counts"));
+    }
+
+    [Fact]
+    public void FolderCountsTakesTheListFiltersAndMapType()
+    {
+        Assert.Empty(MapsCommand.Create().Parse(
+            ["folder-counts", "--map-type", "battlemap", "--query", "tag:forest", "--tags", "[\"x\"]",
+             "--favorites", "--added-since", "2026-01-01T00:00:00Z", "--folder", "battlemaps",
+             "--sort", "name", "--order", "desc"]).Errors);
+    }
+
+    [Theory]
+    [InlineData("--sort", "bogus")]
+    [InlineData("--order", "up")]
+    public void FolderCountsRejectsAnUnknownSortOrOrder(string flag, string value)
+        => Assert.NotEmpty(MapsCommand.Create().Parse(["folder-counts", flag, value]).Errors);
+
+    // A count covers one folder's own items; reading it as a subtree total is
+    // the mistake a caller who knows tags items would make.
+    [Fact]
+    public void FolderCountsSaysCountsAreDirectContentsOnly()
+        => Assert.Contains("not its subfolders", Help(["maps", "folder-counts"]));
+
+    [Fact]
+    public void ListNamesFolderCountsAsASourceForFolder()
+        => Assert.Contains("path from maps folder-counts", Help(["maps", "list"]));
 }

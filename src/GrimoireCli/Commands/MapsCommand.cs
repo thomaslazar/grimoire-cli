@@ -14,6 +14,7 @@ public static class MapsCommand
     {
         var command = new Command("maps", "Read and edit map metadata");
         command.Subcommands.Add(CreateListCommand());
+        command.Subcommands.Add(CreateFolderCountsCommand());
         command.Subcommands.Add(CreateGetCommand());
         command.Subcommands.Add(CreateThumbnailCommand());
         command.Subcommands.Add(CreateFileCommand());
@@ -55,6 +56,37 @@ public static class MapsCommand
                 parseResult.GetValue(mapTypeOption),
                 parseResult.GetValue(limitOption),
                 parseResult.GetValue(offsetOption),
+                browse.Read(parseResult));
+            ConsoleOutput.WriteRawJson(result);
+            return 0;
+        });
+        return command;
+    }
+
+    private static Command CreateFolderCountsCommand()
+    {
+        var mapTypeOption = new Option<string?>("--map-type") { Description = "Filter by map type" };
+        var browse = new MediaBrowseOptions();
+        var command = new Command("folder-counts", "Folders holding matching maps, with counts")
+        {
+            mapTypeOption
+        };
+        browse.AddTo(command, "maps");
+        command.AddHelpSection("Notes", HelpSectionPosition.Top,
+            "Each count covers the maps directly in that folder, not its subfolders.",
+            "path is relative to the maps/ root; \"\" holds the root's own maps.",
+            "",
+            "Folders come back in path order; --sort and --order change nothing today.");
+        command.AddExamples(
+            "grimoire-cli maps folder-counts",
+            "grimoire-cli maps folder-counts --tags '[\"__grim:none__\"]'");
+        command.AddResponseExample<Generated.Models.FolderGroupsResponse>();
+        command.SetAction(async (parseResult, cancellationToken) =>
+        {
+            var (client, _) = CommandHelper.BuildClient();
+            var service = new MapsService(client);
+            var result = await service.FolderCountsAsync(
+                parseResult.GetValue(mapTypeOption),
                 browse.Read(parseResult));
             ConsoleOutput.WriteRawJson(result);
             return 0;

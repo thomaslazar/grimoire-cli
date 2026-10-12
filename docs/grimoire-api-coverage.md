@@ -15,7 +15,7 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | (untagged) | 0 / 1 |
 | addons | 8 / 8 |
 | api-keys | 0 / 6 |
-| audio | 14 / 15 |
+| audio | 15 / 15 |
 | audio-sets | 0 / 5 |
 | auth | 2 / 14 |
 | backups | 6 / 6 |
@@ -32,8 +32,8 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | logs | 1 / 1 |
 | lookups | 15 / 15 |
 | maintenance | 3 / 4 |
-| maps | 14 / 17 |
-| models | 10 / 11 |
+| maps | 15 / 17 |
+| models | 11 / 11 |
 | rulesets | 0 / 17 |
 | saved-filters | 0 / 4 |
 | search | 2 / 2 |
@@ -43,9 +43,9 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | tags | 7 / 7 |
 | themes | 0 / 7 |
 | token-frames | 0 / 2 |
-| tokens | 10 / 11 |
+| tokens | 11 / 11 |
 | users | 0 / 16 |
-| **Total** | **168 / 360** |
+| **Total** | **172 / 360** |
 
 2 operation(s) are internal-only (🔒) and excluded from covered counts.
 
@@ -89,7 +89,7 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | POST | `/api/audio-folders/bulk` | Bulk set audio folder tags | gm or admin | audio: write | `audio folders batch-set` ✅ |
 | POST | `/api/audio/bulk` | Bulk update audio tracks | gm or admin | audio: write | `audio batch-update` ✅ |
 | POST | `/api/audio/bulk/tags` | Bulk add tags to audio tracks | gm or admin | audio: write | `audio batch-tag` ✅ |
-| GET | `/api/audio/groups` | Folders holding matching audio tracks | not guest | audio: read | — |
+| GET | `/api/audio/groups` | Folders holding matching audio tracks | not guest | audio: read | `audio folder-counts` ✅ |
 | GET | `/api/audio/{audio_id}` | Get an audio track |  | audio: read | `audio get` ✅ |
 | PATCH | `/api/audio/{audio_id}` | Update audio metadata | gm or admin | audio: write | `audio update` ✅ |
 | GET | `/api/audio/{audio_id}/artwork` | Audio artwork |  | audio: read | `audio artwork` ✅ |
@@ -403,7 +403,7 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | GET | `/api/maps` | List maps | not guest | maps: read | `maps list` ✅ |
 | POST | `/api/maps/bulk` | Bulk update maps | gm or admin | maps: write | `maps batch-update` ✅ |
 | POST | `/api/maps/bulk/tags` | Bulk add tags to maps | gm or admin | maps: write | `maps batch-tag` ✅ |
-| GET | `/api/maps/groups` | Folders holding matching maps | not guest | maps: read | — |
+| GET | `/api/maps/groups` | Folders holding matching maps | not guest | maps: read | `maps folder-counts` ✅ |
 | GET | `/api/maps/{map_id}` | Get a map |  | maps: read | `maps get` ✅ |
 | PATCH | `/api/maps/{map_id}` | Update map metadata | gm or admin | maps: write | `maps update` ✅ |
 | GET | `/api/maps/{map_id}/export.uvtt` | Export a map as Universal VTT |  | maps: read | `maps vtt export` ✅ |
@@ -425,7 +425,7 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | GET | `/api/models` | List 3D models | not guest | models: read | `models list` ✅ |
 | POST | `/api/models/bulk` | Bulk update models | gm or admin | models: write | `models batch-update` ✅ |
 | POST | `/api/models/bulk/tags` | Bulk add tags to models | gm or admin | models: write | `models batch-tag` ✅ |
-| GET | `/api/models/groups` | Folders holding matching 3D models | not guest | models: read | — |
+| GET | `/api/models/groups` | Folders holding matching 3D models | not guest | models: read | `models folder-counts` ✅ |
 | GET | `/api/models/{model_id}` | Get a 3D model |  | models: read | `models get` ✅ |
 | PATCH | `/api/models/{model_id}` | Update model metadata | gm or admin | models: write | `models update` ✅ |
 | GET | `/api/models/{model_id}/file` | Download model file |  | models: read | `models file` ✅ |
@@ -547,7 +547,7 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | GET | `/api/tokens` | List tokens | not guest | tokens: read | `tokens list` ✅ |
 | POST | `/api/tokens/bulk` | Bulk update tokens | gm or admin | tokens: write | `tokens batch-update` ✅ |
 | POST | `/api/tokens/bulk/tags` | Bulk add tags to tokens | gm or admin | tokens: write | `tokens batch-tag` ✅ |
-| GET | `/api/tokens/groups` | Folders holding matching tokens | not guest | tokens: read | — |
+| GET | `/api/tokens/groups` | Folders holding matching tokens | not guest | tokens: read | `tokens folder-counts` ✅ |
 | GET | `/api/tokens/{token_id}` | Get a token |  | tokens: read | `tokens get` ✅ |
 | PATCH | `/api/tokens/{token_id}` | Update token metadata | gm or admin | tokens: write | `tokens update` ✅ |
 | GET | `/api/tokens/{token_id}/file` | Download token file |  | tokens: read | `tokens file` ✅ |
