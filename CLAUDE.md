@@ -8,6 +8,7 @@ be brief
 - **Ask before committing** after ad-hoc or exploratory changes — report what changed, then ask. Exception: when executing a pre-approved implementation plan whose tasks specify commit messages, commit per the plan without pausing each task (the plan is the approval). Never autonomous for amends, force pushes, or commits to `main`.
 - **Conventional Commits** format required: `type: subject`
 - Types: `feat`, `fix`, `docs`, `test`, `ci`, `refactor`, `chore`
+- **Breaking change:** `!` after the type (`refactor!: …`) and a `BREAKING CHANGE:` footer naming the old and the new form. The release skill reads both; see [docs/releasing.md](docs/releasing.md#versioning).
 - Subject line: imperative mood, lowercase, no period, max ~72 chars
 - Body (optional): explain *why*, not *what*. Wrap at 72 chars.
 - Do NOT include `Co-Authored-By:` lines in commit messages.
