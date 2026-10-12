@@ -66,6 +66,10 @@ public class SystemBookCommandTests
         => Assert.Contains("needs --category", Help(["systems", "books", "list"]));
 
     [Fact]
+    public void TagSentinelsAreTaught()
+        => Assert.Contains("match books with no tag", Help(["systems", "books", "list"]));
+
+    [Fact]
     public void TagsMatchOnlyTheBooksOwnTagsIsSaid()
         => Assert.Contains("book's own tags only", Help(["systems", "books", "list"]));
 

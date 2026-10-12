@@ -44,6 +44,8 @@ internal sealed class ShelfBrowseOptions
             "flat strings must all match, [\"core\",\"pdf\"]; groups OR their tags",
             "and must all hold, exclude meaning none of:",
             "[{\"mode\":\"include\",\"tags\":[\"a\",\"b\"]},{\"mode\":\"exclude\",\"tags\":[\"c\"]}]",
+            "__grim:none__ / __grim:any__ match books with no tag / any tag.",
+            "Malformed JSON is a 400.",
             "",
             "--genre (exact, case-insensitive) and --product-code (a prefix) also",
             "take __grim:none__ / __grim:any__ for books with none / any.",

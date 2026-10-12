@@ -42,10 +42,21 @@ public class SystemBooksServiceTests
     public void ListSendsPagingAndEveryFilter()
     {
         var uri = Uri(Service().ListRequest("sys-1", 50, 100, new ShelfBrowseFilter(
-            "kiesow", null, true, null, false, "fantasy", "PZO", "core", "errata", "product_code", "desc")));
-        foreach (var part in new[] { "limit=50", "offset=100", "q=kiesow", "favorites=true", "explicit=false",
+            "kiesow", "[\"x\"]", true, "2026-01-01T00:00:00Z", false, "fantasy", "PZO", "core", "errata", "product_code", "desc")));
+        foreach (var part in new[] { "limit=50", "offset=100", "q=kiesow", "tags=", "added_since=", "favorites=true", "explicit=false",
                      "genre=fantasy", "product_code=PZO", "category=core", "folder=errata",
                      "sort=product_code", "order=desc" })
+            Assert.Contains(part, uri);
+    }
+
+    [Fact]
+    public void FolderCountsSendsEveryFilter()
+    {
+        var uri = Uri(Service().FolderCountsRequest("sys-1", new ShelfBrowseFilter(
+            "kiesow", "[\"x\"]", true, "2026-01-01T00:00:00Z", false, "fantasy", "PZO", "core", "errata", "year", "desc")));
+        foreach (var part in new[] { "q=kiesow", "tags=", "favorites=true", "added_since=", "explicit=false",
+                     "genre=fantasy", "product_code=PZO", "category=core", "folder=errata",
+                     "sort=year", "order=desc" })
             Assert.Contains(part, uri);
     }
 

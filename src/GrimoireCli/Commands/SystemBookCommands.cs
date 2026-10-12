@@ -8,7 +8,7 @@ public static class SystemBookCommands
 {
     public static Command Create()
     {
-        var command = new Command("books", "A system's books, a page at a time");
+        var command = new Command("books", "A system's books: pages, folder counts, facets, folder tags");
         command.Subcommands.Add(CreateListCommand());
         command.Subcommands.Add(CreateFolderCountsCommand());
         command.Subcommands.Add(CreateFacetsCommand());
