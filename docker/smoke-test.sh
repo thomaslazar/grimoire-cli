@@ -814,6 +814,44 @@ FOLDERS_JSON=$("$CLI" systems books folders list --id "$DSA" 2>"$WORK/cli.err") 
   || fail "the folder should be gone after delete: $FOLDERS_JSON"
 ok "the deleted folder is no longer listed"
 
+# --- system shelf -------------------------------------------------------------
+# Read-only. Das Schwarze Auge 5 DE holds two books in core/ and DSA5 Errata in
+# core/errata/, so every count below is fixed by the fixture.
+# listing the system's shelf expecting all three books
+"$CLI" systems books list --id "$DSA" >"$WORK/shelf.out" 2>"$WORK/cli.err" \
+  || { cat "$WORK/cli.err" >&2; fail "systems books list exited non-zero"; }
+jq -e '.total == 3' "$WORK/shelf.out" >/dev/null \
+  || fail "systems books list should page all three books: $(cat "$WORK/shelf.out")"
+ok "systems books list pages the system's books"
+
+# listing one folder of the shelf expecting only the errata book
+"$CLI" systems books list --id "$DSA" --category core --folder errata >"$WORK/shelf-folder.out" 2>"$WORK/cli.err" \
+  || { cat "$WORK/cli.err" >&2; fail "systems books list --folder exited non-zero"; }
+jq -e '[.books[].title] == ["DSA5 Errata"]' "$WORK/shelf-folder.out" >/dev/null \
+  || fail "--category core --folder errata should list only DSA5 Errata: $(cat "$WORK/shelf-folder.out")"
+ok "systems books list --category with --folder lists one folder"
+
+# listing a folder without its category expecting the server's 400 as a non-zero exit
+if "$CLI" systems books list --id "$DSA" --folder errata >/dev/null 2>"$WORK/cli.err"; then
+  fail "--folder without --category should exit non-zero"
+fi
+ok "systems books list refuses --folder without --category"
+
+# counting the shelf's directories expecting direct counts per category and subfolder
+"$CLI" systems books folder-counts --id "$DSA" >"$WORK/shelf-counts.out" 2>"$WORK/cli.err" \
+  || { cat "$WORK/cli.err" >&2; fail "systems books folder-counts exited non-zero"; }
+jq -e '[.groups[] | {("\(.category)/\(.path)"): .count}] | add == {"core/": 2, "core/errata": 1}' \
+  "$WORK/shelf-counts.out" >/dev/null \
+  || fail "folder-counts should count each directory's own books: $(cat "$WORK/shelf-counts.out")"
+ok "systems books folder-counts counts each directory's direct books"
+
+# reading the shelf's facets expecting the one category the fixture uses
+"$CLI" systems books facets --id "$DSA" >"$WORK/shelf-facets.out" 2>"$WORK/cli.err" \
+  || { cat "$WORK/cli.err" >&2; fail "systems books facets exited non-zero"; }
+jq -e '.categories == ["core"]' "$WORK/shelf-facets.out" >/dev/null \
+  || fail "facets should list the core category: $(cat "$WORK/shelf-facets.out")"
+ok "systems books facets lists the shelf's categories"
+
 # --- system covers --------------------------------------------------------
 # A different system from Shadowrun 4 DE on purpose: that one already carries
 # the description write above and the metadata diff assertions below, and a

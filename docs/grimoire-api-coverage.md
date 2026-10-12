@@ -39,13 +39,13 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | search | 2 / 2 |
 | settings | 0 / 3 |
 | stats | 1 / 1 |
-| systems | 15 / 18 |
+| systems | 18 / 18 |
 | tags | 7 / 7 |
 | themes | 0 / 7 |
 | token-frames | 0 / 2 |
 | tokens | 11 / 11 |
 | users | 0 / 16 |
-| **Total** | **172 / 360** |
+| **Total** | **175 / 360** |
 
 2 operation(s) are internal-only (🔒) and excluded from covered counts.
 
@@ -492,12 +492,12 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | POST | `/api/systems/bulk/tags` | Bulk add tags to game systems | gm or admin | systems: write | `systems batch-tag` ✅ |
 | GET | `/api/systems/{system_id}` | Get a game system | not guest | systems: read | `systems get` ✅ |
 | PATCH | `/api/systems/{system_id}` | Update game system metadata | gm or admin | systems: write | `systems update` ✅ |
-| GET | `/api/systems/{system_id}/book-facets` | Filter options for a system's shelf | not guest | systems: read | — |
+| GET | `/api/systems/{system_id}/book-facets` | Filter options for a system's shelf | not guest | systems: read | `systems books facets` ✅ |
 | GET | `/api/systems/{system_id}/book-folders` | List book folders | not guest | systems: read | `systems books folders list` ✅ |
 | PATCH | `/api/systems/{system_id}/book-folders` | Set tags on a book folder | gm or admin | systems: write | `systems books folders set` ✅ |
 | DELETE | `/api/systems/{system_id}/book-folders` | Delete a book folder | gm or admin | systems: write | `systems books folders delete` ✅ |
-| GET | `/api/systems/{system_id}/book-groups` | Folders on a system's shelf | not guest | systems: read | — |
-| GET | `/api/systems/{system_id}/books` | A page of a system's books | not guest | systems: read | — |
+| GET | `/api/systems/{system_id}/book-groups` | Folders on a system's shelf | not guest | systems: read | `systems books folder-counts` ✅ |
+| GET | `/api/systems/{system_id}/books` | A page of a system's books | not guest | systems: read | `systems books list` ✅ |
 | GET | `/api/systems/{system_id}/cover` | System cover image | not guest | systems: read | `systems cover get` ✅ |
 | POST | `/api/systems/{system_id}/cover` | Upload a system cover | gm or admin | systems: write | `systems cover upload` ✅ |
 | DELETE | `/api/systems/{system_id}/cover` | Remove an uploaded system cover | gm or admin | systems: write | `systems cover delete` ✅ |

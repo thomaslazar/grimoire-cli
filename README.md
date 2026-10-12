@@ -233,6 +233,9 @@ grimoire-cli config set server https://grimoire.example.com
 | `systems cover upload --id <id> --file <path>` | Upload a system's cover image (gm or admin) |
 | `systems cover delete --id <id>` | Delete a system's uploaded cover image (gm or admin) |
 | `systems cover from-source --id <id> --source-type <type> --source-id <id>` | Set a system cover from a library image (gm or admin) |
+| `systems books list --id <id> [--limit <1-500>] [--offset <n>] [--query <q>] [--tags <json>] [--favorites] [--added-since <iso>] [--explicit true\|false] [--genre <g>] [--product-code <prefix>] [--category <c>] [--folder <path>] [--sort title\|year\|page_count\|size\|product_code\|added_at] [--order asc\|desc]` | A page of a system's books, with their metadata |
+| `systems books folder-counts --id <id> [--query <q>] [--tags <json>] [--favorites] [--added-since <iso>] [--explicit true\|false] [--genre <g>] [--product-code <prefix>] [--category <c>] [--folder <path>] [--sort title\|year\|page_count\|size\|product_code\|added_at] [--order asc\|desc]` | Directories holding a system's matching books, with direct counts |
+| `systems books facets --id <id>` | The categories, genres, code prefixes and tags a system's books use |
 | `systems books folders list --id <id>` | List a system's tagged subcategory folders |
 | `systems books folders set --id <id> {--input <file> \| --stdin}` | Replace a subcategory folder's tags (gm or admin) |
 | `systems books folders delete --id <id> --path <path>` | Remove a subcategory folder's record (gm or admin) |
