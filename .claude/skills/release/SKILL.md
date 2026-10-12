@@ -67,9 +67,9 @@ Determine the version number:
 - Find breaking changes — a `type!:` subject or a `BREAKING CHANGE:` footer:
 
   ```bash
-  LAST_TAG=$(git describe --tags --abbrev=0)
-  git log "${LAST_TAG}..HEAD" --format='%h %s' | grep -E '^[0-9a-f]+ [a-z]+(\([^)]*\))?!:'
-  git log "${LAST_TAG}..HEAD" --grep='^BREAKING CHANGE:' --format='%h %s%n%b'
+  LAST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
+  git log "${LAST_TAG:+${LAST_TAG}..}HEAD" --format='%h %s' | grep -E '^[0-9a-f]+ [a-z]+(\([^)]*\))?!:'
+  git log "${LAST_TAG:+${LAST_TAG}..}HEAD" --grep='^BREAKING CHANGE:' --format='%h %s%n%b'
   ```
 
 - Propose a version based on conventional commits:
