@@ -72,7 +72,9 @@ public static class ModelsCommand
             "Each count covers the models directly in that folder, not its subfolders.",
             "path is relative to the models/ root; \"\" holds the root's own models.",
             "",
-            "Folders come back in path order; --sort and --order change nothing today.");
+            "Folders come back in path order; --sort and --order change nothing today.",
+            "",
+            "The account's explicit permission filters the counts server-side.");
         command.AddExamples(
             "grimoire-cli models folder-counts",
             "grimoire-cli models folder-counts --tags '[\"__grim:none__\"]'");

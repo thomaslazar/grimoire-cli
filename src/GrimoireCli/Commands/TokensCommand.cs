@@ -69,7 +69,9 @@ public static class TokensCommand
             "Each count covers the tokens directly in that folder, not its subfolders.",
             "path is relative to the tokens/ root; \"\" holds the root's own tokens.",
             "",
-            "Folders come back in path order; --sort and --order change nothing today.");
+            "Folders come back in path order; --sort and --order change nothing today.",
+            "",
+            "The account's explicit permission filters the counts server-side.");
         command.AddExamples(
             "grimoire-cli tokens folder-counts",
             "grimoire-cli tokens folder-counts --tags '[\"__grim:none__\"]'");

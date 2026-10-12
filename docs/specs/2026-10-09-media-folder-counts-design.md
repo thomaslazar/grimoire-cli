@@ -74,6 +74,7 @@ them later. No role tag.
 - each count covers items directly in that folder, not its subfolders
 - `path` is relative to the collection root; `""` is the root
 - groups come back in path order; `--sort` and `--order` change nothing today
+- tokens and models only: the account's explicit permission filters the counts server-side (`routers/tokens/core.py:76-80`, `routers/models/core.py:82-85`)
 
 The shared Filters section's `--folder` line gains the second producer of a
 folder value: "folder_path from `<collection> get`, or path from

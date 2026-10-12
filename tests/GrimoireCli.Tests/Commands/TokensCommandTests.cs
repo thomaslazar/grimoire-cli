@@ -206,4 +206,8 @@ public class TokensCommandTests
     [Fact]
     public void FolderCountsSaysCountsAreDirectContentsOnly()
         => Assert.Contains("not its subfolders", Help(["tokens", "folder-counts"]));
+
+    [Fact]
+    public void FolderCountsSaysExplicitIsFilteredServerSide()
+        => Assert.Contains("explicit permission filters the counts", Help(["tokens", "folder-counts"]));
 }
