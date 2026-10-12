@@ -87,4 +87,12 @@ public class SystemBookCommandTests
     [InlineData("facets")]
     public void TheShelfCommandsCarryNoRoleTag(string name)
         => Assert.DoesNotContain("Role required:", Help(["systems", "books", name]));
+
+    [Fact]
+    public void TheBooksSubgroupHostsFolders()
+        => Assert.Contains("folders", Books().Subcommands.Select(c => c.Name));
+
+    [Fact]
+    public void SystemsNoLongerHostsBookFolders()
+        => Assert.DoesNotContain("book-folders", SystemsCommand.Create().Subcommands.Select(c => c.Name));
 }

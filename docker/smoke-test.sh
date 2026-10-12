@@ -765,7 +765,7 @@ ok "an unknown field inside a batch item exits 1"
 # Fixed path and fixed tags, so a second run converges. The fixture's only book
 # below a category directory lives here, which is what makes the inheritance
 # assertion below possible at all.
-# listing systems to find Das Schwarze Auge 5 DE's id for book-folders tests
+# listing systems to find Das Schwarze Auge 5 DE's id for book folder and shelf tests
 syslist --include-children
 DSA=$(echo "$LIST_JSON" | jq -r '.[] | select(.name == "Das Schwarze Auge 5 DE") | .id')
 [ -n "$DSA" ] || fail "no Das Schwarze Auge 5 DE fixture for book folders"
@@ -773,18 +773,18 @@ FOLDER_PATH="$DSA/core/errata"
 
 # setting tags on a book folder via stdin expecting the written path echoed back
 SET_JSON=$(printf '{"path":"%s","tags":["errata-smoke"]}' "$FOLDER_PATH" \
-  | "$CLI" systems book-folders set --id "$DSA" --stdin 2>"$WORK/cli.err") \
-  || { cat "$WORK/cli.err" >&2; fail "book-folders set exited non-zero"; }
+  | "$CLI" systems books folders set --id "$DSA" --stdin 2>"$WORK/cli.err") \
+  || { cat "$WORK/cli.err" >&2; fail "books folders set exited non-zero"; }
 [ "$(echo "$SET_JSON" | jq -r .path)" = "$FOLDER_PATH" ] \
   || fail "set should echo the path it wrote: $SET_JSON"
-ok "systems book-folders set writes a folder's tags"
+ok "systems books folders set writes a folder's tags"
 
 # listing book folders expecting the just-written folder to appear
-FOLDERS_JSON=$("$CLI" systems book-folders list --id "$DSA" 2>"$WORK/cli.err") \
-  || { cat "$WORK/cli.err" >&2; fail "book-folders list exited non-zero"; }
+FOLDERS_JSON=$("$CLI" systems books folders list --id "$DSA" 2>"$WORK/cli.err") \
+  || { cat "$WORK/cli.err" >&2; fail "books folders list exited non-zero"; }
 echo "$FOLDERS_JSON" | jq -e --arg p "$FOLDER_PATH" '.folders[] | select(.path == $p)' >/dev/null \
   || fail "the folder just written should be listed: $FOLDERS_JSON"
-ok "systems book-folders list shows the written folder"
+ok "systems books folders list shows the written folder"
 
 # The point of the feature: a book below the path inherits the tag. This is the
 # round trip that upstream #357 broke — the server derived the folder's depth
@@ -801,15 +801,15 @@ echo "$FOLDER_ITEMS" | jq -e '.items[] | select(.title == "DSA5 Errata")' >/dev/
 ok "a folder tag reaches the book below its path"
 
 # deleting the book folder's tags expecting a deleted status
-DEL_JSON=$("$CLI" systems book-folders delete --id "$DSA" --path "$FOLDER_PATH" 2>"$WORK/cli.err") \
-  || { cat "$WORK/cli.err" >&2; fail "book-folders delete exited non-zero"; }
+DEL_JSON=$("$CLI" systems books folders delete --id "$DSA" --path "$FOLDER_PATH" 2>"$WORK/cli.err") \
+  || { cat "$WORK/cli.err" >&2; fail "books folders delete exited non-zero"; }
 [ "$(echo "$DEL_JSON" | jq -r .status)" = "deleted" ] \
   || fail "delete should report the deletion: $DEL_JSON"
-ok "systems book-folders delete removes the folder"
+ok "systems books folders delete removes the folder"
 
 # listing book folders again expecting none remain after delete
-FOLDERS_JSON=$("$CLI" systems book-folders list --id "$DSA" 2>"$WORK/cli.err") \
-  || { cat "$WORK/cli.err" >&2; fail "book-folders list exited non-zero after delete"; }
+FOLDERS_JSON=$("$CLI" systems books folders list --id "$DSA" 2>"$WORK/cli.err") \
+  || { cat "$WORK/cli.err" >&2; fail "books folders list exited non-zero after delete"; }
 [ "$(echo "$FOLDERS_JSON" | jq '.folders | length')" -eq 0 ] \
   || fail "the folder should be gone after delete: $FOLDERS_JSON"
 ok "the deleted folder is no longer listed"

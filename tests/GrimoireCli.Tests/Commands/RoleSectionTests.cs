@@ -63,14 +63,14 @@ public class RoleSectionTests
     [InlineData("update")]
     [InlineData("batch-update")]
     [InlineData("batch-tag")]
-    [InlineData("book-folders set")]
-    [InlineData("book-folders delete")]
+    [InlineData("books folders set")]
+    [InlineData("books folders delete")]
     public void SystemsWriteCommandHasTheGmOrAdminRoleSection(string subcommand)
     {
         var root = new RootCommand { SystemsCommand.Create() };
         root.UseCustomHelpSections();
         var output = new StringWriter();
-        // Split so a nested group's subcommand ("book-folders set") parses too.
+        // Split so a nested group's subcommand ("books folders set") parses too.
         root.Parse(["systems", .. subcommand.Split(' '), "--help"])
             .Invoke(new InvocationConfiguration { Output = output });
         Assert.Contains("Role required:", output.ToString());

@@ -12,6 +12,7 @@ public static class SystemBookCommands
         command.Subcommands.Add(CreateListCommand());
         command.Subcommands.Add(CreateFolderCountsCommand());
         command.Subcommands.Add(CreateFacetsCommand());
+        command.Subcommands.Add(BookFolderCommands.Create());
         return command;
     }
 

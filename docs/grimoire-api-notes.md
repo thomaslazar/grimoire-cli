@@ -548,7 +548,7 @@ and `books thumbnail`.
 Measured against `hunterreadca/grimoire:1.6.0` — the 1.6.0 RC, not the v1.5.6 the
 rest of this file describes. Every claim below was observed against that build;
 source citations name the shipped backend inside the container. Backs
-`systems book-folders list|set|delete`.
+`systems books folders list|set|delete`.
 
 - **A book folder is a second tagging layer, addressed by path rather than by
   id.** Its path takes the form `{system_id}/{category}/{subfolder…}`; the model
@@ -593,7 +593,7 @@ source citations name the shipped backend inside the container. Backs
   (`tag_service.py:435`) reads only the `ResourceTag` join table; folder
   inheritance is resolved separately in `folder_tags_in_use` (`:565`), which
   serves the tag catalogue. Measured: with the folder tagged `errata-fixture`,
-  `GET /api/books/{id}` reported `"tags": []`. `book-folders list` and the tag
+  `GET /api/books/{id}` reported `"tags": []`. `systems books folders list` and the tag
   catalogue (`GET /api/tags`, `backend/routers/tags/core.py:35`) are the only
   places the tags surface.
 - **The subfolder depth is derived per system and handles nested containers.**
@@ -956,11 +956,11 @@ measured against the running 1.7.0 stack; the list parameters re-read at
   two and reads back as `folder_tags: []` on the map itself.
 - **Folder tags read and write differently.** `GET /api/map-folders` resolves to
   display casing; the PATCH and the bulk echo the stored internal keys. Same
-  asymmetry as `systems book-folders`.
+  asymmetry as `systems books folders`.
 - **Every batch body caps at 1000 and none may be empty.** `items`, `ids`,
   `folders` and `tags` each carry `min_length=1`, so an empty batch is a 422
   rather than a no-op.
-- **`map-folders` has no delete**, unlike `systems book-folders`, and gains a
+- **`map-folders` has no delete**, unlike `systems books folders`, and gains a
   bulk verb book folders have no counterpart for. `tag_service.upsert_folder_tags`
   inserts a row for any path string without checking the tree, so a typo'd path
   creates a row that nothing can ever remove.

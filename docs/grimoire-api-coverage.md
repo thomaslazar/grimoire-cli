@@ -493,9 +493,9 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | GET | `/api/systems/{system_id}` | Get a game system | not guest | systems: read | `systems get` ✅ |
 | PATCH | `/api/systems/{system_id}` | Update game system metadata | gm or admin | systems: write | `systems update` ✅ |
 | GET | `/api/systems/{system_id}/book-facets` | Filter options for a system's shelf | not guest | systems: read | — |
-| GET | `/api/systems/{system_id}/book-folders` | List book folders | not guest | systems: read | `systems book-folders list` ✅ |
-| PATCH | `/api/systems/{system_id}/book-folders` | Set tags on a book folder | gm or admin | systems: write | `systems book-folders set` ✅ |
-| DELETE | `/api/systems/{system_id}/book-folders` | Delete a book folder | gm or admin | systems: write | `systems book-folders delete` ✅ |
+| GET | `/api/systems/{system_id}/book-folders` | List book folders | not guest | systems: read | `systems books folders list` ✅ |
+| PATCH | `/api/systems/{system_id}/book-folders` | Set tags on a book folder | gm or admin | systems: write | `systems books folders set` ✅ |
+| DELETE | `/api/systems/{system_id}/book-folders` | Delete a book folder | gm or admin | systems: write | `systems books folders delete` ✅ |
 | GET | `/api/systems/{system_id}/book-groups` | Folders on a system's shelf | not guest | systems: read | — |
 | GET | `/api/systems/{system_id}/books` | A page of a system's books | not guest | systems: read | — |
 | GET | `/api/systems/{system_id}/cover` | System cover image | not guest | systems: read | `systems cover get` ✅ |
