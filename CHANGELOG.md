@@ -3,6 +3,78 @@
 All notable changes to grimoire-cli are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## v0.6.0 — 2026-10-13
+
+Minor release with one breaking change. It adds the folder and shelf views
+Grimoire 1.8.0 introduced for browsing large libraries, and gathers a system's
+books under one `systems books` group, which moves `systems book-folders`.
+
+### Breaking changes
+
+- `systems book-folders list|set|delete` is now
+  `systems books folders list|set|delete`; flags and behaviour are unchanged.
+  Scripts and agent prompts that call the old name must switch to the new one.
+
+### Highlights
+
+- **Folder counts for maps, tokens, audio and models.** `<collection>
+  folder-counts` returns every folder holding items that match the list
+  filters, with how many. One call such as `tokens folder-counts --tags
+  '["__grim:none__"]'` finds where untagged items cluster, so a whole folder
+  can be tagged at once rather than paging the full list and grouping it by
+  hand. Each count covers a folder's own items, not its subfolders.
+- **A system's books, a page at a time.** `systems books list` pages the full
+  book record with the shelf's own filters (genre, product-code prefix,
+  category and subfolder, explicit, book search fields), so a metadata sweep
+  over a very large system no longer needs `systems get` to return every book
+  at once. `systems books folder-counts` counts the books per directory, and
+  `systems books facets` names the categories, genres, product-code prefixes
+  and tags a system actually uses, ahead of a vocabulary clean-up.
+- **One home for a system's books.** The shelf commands and the moved
+  `folders` sit together under `systems books`, mirroring the media collections
+  (`maps list | folder-counts | folders`), which is why `book-folders` moved.
+- **Breaking changes are now called out by the release itself.** The release
+  process finds `type!:` commits and `BREAKING CHANGE:` footers, holds the
+  version to at least a minor, and lists each one here.
+- **A flaky test fixed at the root.** Six tests stamped the server-version
+  check with the current time; a wall clock stepping back by a fraction of a
+  millisecond made the client probe the server mid-test, failing about one full
+  run in forty. They now stamp an hour back.
+
+### Features
+
+- feat: add folder-counts to tokens, audio and models
+- feat: add maps folder-counts
+- feat: add systems books list, folder-counts and facets
+
+### Fixes
+
+- fix: note explicit filtering on tokens and models folder-counts
+- fix: teach tag sentinels and tighten systems books help and tests
+
+### Refactors
+
+- refactor!: move systems book-folders under systems books
+
+### Tests
+
+- test: stamp the version check an hour back so a clock step cannot probe
+
+### Chores
+
+- chore: bump version to 0.6.0
+
+### Docs
+
+- docs: design media folder counts
+- docs: design system shelf commands
+- docs: document folder-counts and cover it in the smoke test
+- docs: document the system shelf and cover it in the smoke test
+- docs: drop the support branch for grimoire 1.5.6
+- docs: record 0.6.0 in the compatibility matrix
+- docs: record the shelf naming and guard the release tag lookup
+- docs: surface breaking changes in the release process
+
 ## v0.5.0 — 2026-10-09
 
 A feature release that targets Grimoire 1.8.0 and exposes the server-side
