@@ -67,8 +67,11 @@ public class TokenRefreshTests
             Server = "http://grimoire.test",
             AccessToken = accessToken,
             RefreshToken = refreshToken,
-            // Keeps PreflightAsync from probing /api/about through the stub.
-            LastVersionCheck = DateTimeOffset.UtcNow,
+            // Keeps PreflightAsync from probing /api/about through the stub. An hour
+            // back, not now: a stamp later than the clock reads counts as the clock
+            // moving backwards and forces the probe, and a wall clock can step back
+            // by a fraction of a millisecond between here and the send.
+            LastVersionCheck = DateTimeOffset.UtcNow.AddHours(-1),
             LastServerVersion = "nightly"
         };
         manager.Save(config);
