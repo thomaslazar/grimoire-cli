@@ -10,7 +10,7 @@ public static class BookFolderCommands
 
     public static Command Create()
     {
-        var command = new Command("book-folders", "Subcategory folders and their tags");
+        var command = new Command("folders", "Subcategory folders and their tags");
         command.Subcommands.Add(CreateListCommand());
         command.Subcommands.Add(CreateSetCommand());
         command.Subcommands.Add(CreateDeleteCommand());
@@ -26,13 +26,13 @@ public static class BookFolderCommands
         };
         command.AddHelpSection("Notes", HelpSectionPosition.Top,
             "Folders that have been tagged, not the folders on disk — a record is",
-            "created only by book-folders set. Nothing enumerates the tree.",
+            "created only by folders set. Nothing enumerates the tree.",
             "",
             "A folder's tags apply to every book at or below its path and never",
             "appear in a book's own tags, so books get will not show them.",
             "",
             "Tags read back in display casing; set echoes internal keys.");
-        command.AddExamples("grimoire-cli systems book-folders list --id <system-id>");
+        command.AddExamples("grimoire-cli systems books folders list --id <system-id>");
         command.AddResponseExample<Generated.Models.BookFoldersResponse>();
         command.SetAction(async (parseResult, cancellationToken) =>
         {
@@ -58,7 +58,7 @@ public static class BookFolderCommands
         JsonBodyInput.RequireExactlyOneSource(command, inputOption, stdinOption);
         command.AddHelpSection("Notes", HelpSectionPosition.Top,
             "Replaces the folder's tag list; batch-tag adds. An empty tags array",
-            "clears the folder but keeps it — book-folders delete removes it.",
+            "clears the folder but keeps it — folders delete removes it.",
             "",
             "path is {system-id}/{category}/{subfolder}, where subfolder is the",
             "segments of a book's relative_path between the category directory and",
@@ -66,8 +66,8 @@ public static class BookFolderCommands
             "",
             "Creates the folder record if the path has none.");
         command.AddExamples(
-            "grimoire-cli systems book-folders set --id <system-id> --input folder.json",
-            "echo '{\"path\":\"<id>/core/errata\",\"tags\":[\"errata\"]}' | grimoire-cli systems book-folders set --id <system-id> --stdin");
+            "grimoire-cli systems books folders set --id <system-id> --input folder.json",
+            "echo '{\"path\":\"<id>/core/errata\",\"tags\":[\"errata\"]}' | grimoire-cli systems books folders set --id <system-id> --stdin");
         command.AddRequestShape<Generated.Models.BookFolderUpdate>();
         command.AddResponseExample<Generated.Models.BookFolderOut>();
         command.SetAction(async (parseResult, cancellationToken) =>
@@ -104,11 +104,11 @@ public static class BookFolderCommands
         command.AddRoleRequired("gm or admin");
         command.AddHelpSection("Notes", HelpSectionPosition.Top,
             "Removes the record, so the books below the path stop inheriting its",
-            "tags. Clearing the tags with book-folders set leaves the record.",
+            "tags. Clearing the tags with folders set leaves the record.",
             "",
             "A path with no record is a 404, so this is not repeatable.");
         command.AddExamples(
-            "grimoire-cli systems book-folders delete --id <system-id> --path <system-id>/core/errata");
+            "grimoire-cli systems books folders delete --id <system-id> --path <system-id>/core/errata");
         command.AddResponseExample<Generated.Models.Backend__routers__systems___schemas__StatusResponse>();
         command.SetAction(async (parseResult, cancellationToken) =>
         {

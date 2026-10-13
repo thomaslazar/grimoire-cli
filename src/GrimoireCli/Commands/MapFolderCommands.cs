@@ -6,7 +6,7 @@ namespace GrimoireCli.Commands;
 
 /// <summary>
 /// Folder tags under `maps`. A second tagging layer addressed by path, the way
-/// `systems book-folders` is — but keyed by the path in the body rather than by a
+/// `systems books folders` is — but keyed by the path in the body rather than by a
 /// parent id, and with a bulk verb book folders have no counterpart for. There is
 /// no delete: the collection offers none.
 /// </summary>

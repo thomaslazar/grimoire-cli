@@ -201,6 +201,6 @@ public class SystemsService
         return await _client.SendAsync(
             info,
             permissionHint: "the gm or admin role",
-            notFoundHint: "No book folder at that path. List them with: grimoire-cli systems book-folders list --id <id>");
+            notFoundHint: "No book folder at that path. List them with: grimoire-cli systems books folders list --id <id>");
     }
 }

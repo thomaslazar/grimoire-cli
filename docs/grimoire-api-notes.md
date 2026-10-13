@@ -543,12 +543,43 @@ and `books thumbnail`.
 - The bytes are copied in exactly as an upload does, so folder cover art still
   takes precedence (`routers/systems/covers.py:161-181`).
 
+## System shelf
+
+Read from `backend/routers/systems/books.py` at tag `v1.8.0` and verified against
+the 1.8.0 stack. Backs `systems books list`, `folder-counts` and `facets`.
+
+- **Three routes share one filter set**, `book_browse_params` (`books.py:73-127`):
+  `q`, `tags`, `favorites`, `added_since`, `explicit`, `genre`, `product_code`,
+  `category`, `folder`, `sort`, `order`. `/books` adds `limit` (1–500, default
+  100) and `offset` (`:401-402`); `/book-facets` takes none.
+- **Everything starts from the visible shelf** (`ShelfBrowser.base`, `:149-155`):
+  the system's books with variants hidden, explicit books dropped for an account
+  without explicit permission, access control applied. The system itself 404s
+  when hidden (`:385-396`).
+- **`folder` needs `category`** — a 400 otherwise (`:112`). It is the subfolder
+  below the category directory, `""` for the category's own.
+- **`tags` matches the book's own tags only** (`folder_tags=False`, `:218`),
+  unlike the media lists, where a folder's tags count for everything beneath it.
+- **`genre` is exact and case-insensitive, `product_code` a prefix**; both take
+  `__grim:none__` / `__grim:any__` (`:161-181`).
+- **Bare `q` text matches title, filename or product code**
+  (`routers/search/_books.py:137-149`); field prefixes are the book search
+  fields (`services/search_query.py:86-100`), `text:` ignored.
+- **`/book-groups` rows are directories, counted directly** (`:281-323`):
+  `{category, path, dir, count, first}`. Live on `Das Schwarze Auge 5 DE`:
+  `core`/`""` = 2, `core`/`errata` = 1. `first` is the active sort's value for
+  the folder's first book, null under `title`, so `sort`/`order` change this
+  response. Two directories can share a `(category, path)`.
+- **`/book-facets` ignores every filter** (`:338-380`): categories, genres,
+  upper-cased leading-letter product-code prefixes and tags, over the whole
+  visible shelf.
+
 ## Book folders
 
 Measured against `hunterreadca/grimoire:1.6.0` — the 1.6.0 RC, not the v1.5.6 the
 rest of this file describes. Every claim below was observed against that build;
 source citations name the shipped backend inside the container. Backs
-`systems book-folders list|set|delete`.
+`systems books folders list|set|delete`.
 
 - **A book folder is a second tagging layer, addressed by path rather than by
   id.** Its path takes the form `{system_id}/{category}/{subfolder…}`; the model
@@ -593,7 +624,7 @@ source citations name the shipped backend inside the container. Backs
   (`tag_service.py:435`) reads only the `ResourceTag` join table; folder
   inheritance is resolved separately in `folder_tags_in_use` (`:565`), which
   serves the tag catalogue. Measured: with the folder tagged `errata-fixture`,
-  `GET /api/books/{id}` reported `"tags": []`. `book-folders list` and the tag
+  `GET /api/books/{id}` reported `"tags": []`. `systems books folders list` and the tag
   catalogue (`GET /api/tags`, `backend/routers/tags/core.py:35`) are the only
   places the tags surface.
 - **The subfolder depth is derived per system and handles nested containers.**
@@ -956,11 +987,11 @@ measured against the running 1.7.0 stack; the list parameters re-read at
   two and reads back as `folder_tags: []` on the map itself.
 - **Folder tags read and write differently.** `GET /api/map-folders` resolves to
   display casing; the PATCH and the bulk echo the stored internal keys. Same
-  asymmetry as `systems book-folders`.
+  asymmetry as `systems books folders`.
 - **Every batch body caps at 1000 and none may be empty.** `items`, `ids`,
   `folders` and `tags` each carry `min_length=1`, so an empty batch is a 422
   rather than a no-op.
-- **`map-folders` has no delete**, unlike `systems book-folders`, and gains a
+- **`map-folders` has no delete**, unlike `systems books folders`, and gains a
   bulk verb book folders have no counterpart for. `tag_service.upsert_folder_tags`
   inserts a row for any path string without checking the tree, so a typo'd path
   creates a row that nothing can ever remove.

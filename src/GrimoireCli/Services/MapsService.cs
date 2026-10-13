@@ -7,7 +7,7 @@ namespace GrimoireCli.Services;
 /// <summary>
 /// The eight JSON endpoints behind `maps` and `maps folders`. The folder verbs
 /// live here rather than in their own service because they are one collection's
-/// endpoints, the way SystemsService carries `systems book-folders`.
+/// endpoints, the way SystemsService carries `systems books folders`.
 /// </summary>
 public class MapsService
 {

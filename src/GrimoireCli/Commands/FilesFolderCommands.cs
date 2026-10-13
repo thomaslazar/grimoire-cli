@@ -8,7 +8,7 @@ namespace GrimoireCli.Commands;
 /// Folder management under `files`. POST and DELETE share /api/files/folder, so
 /// the group nests; markers, scaffold and contents are sibling paths and stay
 /// flat leaves under it. Distinct from BookFolderCommands, which serves
-/// `systems book-folders` — a tagging layer, not the tree on disk.
+/// `systems books folders` — a tagging layer, not the tree on disk.
 /// </summary>
 public static class FilesFolderCommands
 {

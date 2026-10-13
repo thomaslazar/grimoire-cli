@@ -49,7 +49,7 @@ fifth collection alongside books, maps, tokens and audio.
   `accepts_frames_marker` and for the browsed folder as
   `children_accept_container_kind` / `children_accept_frames_marker`.
 - **Tags can no longer contain `/` or `\`** on any write path — `books update`,
-  the `batch-tag` commands and `systems book-folders set` all 422 on one. The
+  the `batch-tag` commands and `systems books folders set` all 422 on one. The
   tag routes took `{internal:path}` in exchange, so a slashed tag created before
   the rule is reachable by `tags items` rather than stranded.
 - **The add-on index is a list.** `addons list` and `addons settings` answer with

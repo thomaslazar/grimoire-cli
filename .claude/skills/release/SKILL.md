@@ -64,14 +64,25 @@ If any check fails, stop and report the issue. Do not proceed.
 Determine the version number:
 - Get the last tag: `git describe --tags --abbrev=0 2>/dev/null || echo "none"`
 - Read commits since last tag
+- Find breaking changes — a `type!:` subject or a `BREAKING CHANGE:` footer:
+
+  ```bash
+  LAST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
+  git log "${LAST_TAG:+${LAST_TAG}..}HEAD" --format='%h %s' | grep -E '^[0-9a-f]+ [a-z]+(\([^)]*\))?!:'
+  git log "${LAST_TAG:+${LAST_TAG}..}HEAD" --grep='^BREAKING CHANGE:' --format='%h %s%n%b'
+  ```
+
 - Propose a version based on conventional commits:
+  - Any breaking change → bump MINOR at least; pre-1.0 a breaking change never
+    ships in a patch
   - Any `feat:` commits → bump MINOR
   - Only `fix:`, `docs:`, `test:`, `ci:`, `chore:` → bump PATCH
   - Grimoire compatibility bumps with no CLI changes → PATCH
   - See `docs/releasing.md` for versioning rules
 
 **GATE: Ask the human to confirm the version number.** Show them the proposed
-version and the commit summary. Wait for their response.
+version, the commit summary, and every breaking change found — or say there
+are none. Wait for their response.
 
 ## Step 2: Create Release Branch and Bump Version
 
@@ -144,6 +155,11 @@ the summary is:
 
 An opening paragraph naming the kind of release and its theme, then:
 
+**Breaking changes** — only when Step 1 found any, and placed before
+Highlights: one bullet per breaking change, quoting its `BREAKING CHANGE:`
+footer (or, for a `!` subject with no footer, the subject). The opening
+paragraph then names the count — "Minor release with one breaking change."
+
 **Highlights** — three to six bullets, each a **bold lead-in** followed by prose
 that says *why*, not only what. The only section allowed to explain itself.
 
@@ -176,8 +192,10 @@ if [ -n "$LAST_TAG" ]; then
 else
     RANGE="HEAD"
 fi
-git log --oneline $RANGE --pretty="- %s" | grep -E "^- (feat|fix|refactor|docs|test|ci|chore):" | sort
+git log --oneline $RANGE --pretty="- %s" | grep -E "^- (feat|fix|refactor|docs|test|ci|chore)!?:" | sort
 ```
+
+A `type!:` commit groups with its type and keeps its `!`.
 
 Write `temp/release-notes.md` in this format:
 
@@ -185,6 +203,11 @@ Write `temp/release-notes.md` in this format:
 ## v{version} — YYYY-MM-DD
 
 {Kind of release, and its theme, in two or three lines.}
+
+### Breaking changes
+
+- `old form` is now `new form`; what a caller must change. (Only when Step 1
+  found breaking changes — omit the section otherwise.)
 
 ### Highlights
 

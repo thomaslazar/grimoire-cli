@@ -117,14 +117,19 @@ releases comparable.
 1. `## v{version} — YYYY-MM-DD`, then one short paragraph naming the kind of
    release and its theme — "Patch release. The server version check now runs
    once a day instead of only at login".
-2. `### Highlights` — three to six bullets, each a **bold lead-in** followed by
+2. `### Breaking changes` — only when the release carries one: a bullet per
+   breaking change quoting its `BREAKING CHANGE:` footer, before Highlights,
+   and the opening paragraph names the count ("Minor release with one
+   breaking change"). The release skill finds them; the reader should not
+   have to.
+3. `### Highlights` — three to six bullets, each a **bold lead-in** followed by
    prose that says *why*, not only what. This is the section a reader actually
    reads and the only one allowed to explain itself.
-3. `### Contributors` — one bullet per PR merged since the last tag whose
+4. `### Contributors` — one bullet per PR merged since the last tag whose
    author is not the maintainer, bots excluded: `- @handle — title (#123)`.
    Omitted when there are none. A bare `@handle` in the release body notifies
    the contributor and adds their avatar to the release page.
-4. `### Changes`, split by conventional-commit type, **one bullet per commit
+5. `### Changes`, split by conventional-commit type, **one bullet per commit
    with its prefix kept**, sorted alphabetically inside each group:
    `Features` (`feat:`), `Fixes` (`fix:`), `Refactors` (`refactor:`),
    `Tests` (`test:`), `Chores` (`chore:`, `ci:`), `Docs` (`docs:`). Groups with
@@ -146,3 +151,17 @@ Semantic versioning on the CLI's own surface — commands, flags, output shape �
 not on the Grimoire version it targets. Supporting a new server release is a
 minor bump when nothing about the CLI's surface changes, and the compatibility
 matrix records which server versions each CLI version was tested against.
+
+**Breaking changes** — anything that can break an existing caller: a renamed
+or removed command or flag, or a changed output shape. Pre-1.0 one ships only
+in a minor release, never a patch. Mark the commit with `!` after the type and
+a `BREAKING CHANGE:` footer naming the old and the new form, as abs-cli does:
+
+    refactor!: move systems book-folders under systems books
+
+    BREAKING CHANGE: systems book-folders list|set|delete is now
+    systems books folders list|set|delete; flags and behaviour are
+    unchanged.
+
+The release skill finds both markers, holds the version to at least a minor,
+and lists each under Breaking changes in the release notes.

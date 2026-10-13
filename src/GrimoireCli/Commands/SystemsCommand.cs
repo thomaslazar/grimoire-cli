@@ -20,7 +20,7 @@ public static class SystemsCommand
         command.Subcommands.Add(CreateBatchUpdateCommand());
         command.Subcommands.Add(CreateBatchTagCommand());
         command.Subcommands.Add(CoverCommands.Create());
-        command.Subcommands.Add(BookFolderCommands.Create());
+        command.Subcommands.Add(SystemBookCommands.Create());
         foreach (var metadata in MetadataCommands.Create("systems"))
             command.Subcommands.Add(metadata);
         return command;

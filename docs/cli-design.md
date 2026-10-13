@@ -203,9 +203,12 @@ is GET/POST/DELETE → `systems cover get|upload|delete`. `/books/{id}/thumbnail
 single GET with no verb set to host → the flat `books thumbnail`, never a
 one-verb group.
 
-(`/systems/{id}/book-folders` is GET/PATCH and would nest the same way as
-`cover`, but no command ships for it today — see
-[docs/roadmap.md](roadmap.md).)
+`/systems/{id}/book-folders` is GET/PATCH and nests the same way, as
+`systems books folders list|set|delete`. `systems books` is a deliberate exception to
+the leaf-mirrors-the-segment rule: its leaves mirror the media collections
+(`maps list | folder-counts | folders`, so `systems books list | folder-counts
+| folders`, plus `facets`), not the URL segments `/books`, `/book-groups`,
+`/book-facets` and `/book-folders`. Do not rename them to match the paths.
 
 A leaf can also host a child while keeping its own action: `/api/search` is a
 GET with its own verb, `search`, and `/api/search/fields` nests under it as
