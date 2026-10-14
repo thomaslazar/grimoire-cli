@@ -384,6 +384,16 @@ grimoire-cli config set server https://grimoire.example.com
 | `campaigns categories reorder --id <campaign-id> --ordered-ids <category-id>...` | Set the order of categories |
 | `campaigns categories group-order --id <campaign-id> --ordered-keys <key>...` | Order the resource panel's type and category groups |
 | `campaigns files upload --id <campaign-id> --file <path> [--category-id <id> \| --new-category-name <n>]` | Upload a file and link it at `gm` visibility |
+| `campaigns wiki list --id <campaign-id> [--mine] [--include-hidden]` | List the wiki pages you can see |
+| `campaigns wiki get --id <campaign-id> --page-id <page-id>` | Get one wiki page with its body and backlinks |
+| `campaigns wiki create --id <campaign-id> {--input <file> \| --stdin}` | Create a wiki page |
+| `campaigns wiki update --id <campaign-id> --page-id <page-id> {--input <file> \| --stdin}` | Update a wiki page |
+| `campaigns wiki delete --id <campaign-id> --page-id <page-id>` | Delete a wiki page (author only) |
+| `campaigns wiki search --id <campaign-id> --query <text>` | Search wiki page titles and bodies |
+| `campaigns wiki titles --id <campaign-id>` | Page ids, titles and headings for writing links |
+| `campaigns wiki reorder --id <campaign-id> --ordered-ids <page-id>...` | Set the manual order of wiki pages |
+| `campaigns wiki hide --id <campaign-id> --page-id <page-id>` | Hide a wiki page from your own view |
+| `campaigns wiki unhide --id <campaign-id> --page-id <page-id>` | Bring back a wiki page you hid |
 | `self-test` | Verify binary integrity (AOT validation, no network required) |
 
 Every command supports `--help` with examples and caveats.

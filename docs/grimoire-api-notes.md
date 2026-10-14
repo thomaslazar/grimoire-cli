@@ -1337,3 +1337,46 @@ Read from `backend/routers/campaigns/` at tag `v1.7.2`, and verified against the
   `mode=delete_items` deletes its link rows directly (`categories.py:231-233`),
   skipping the file cleanup that `DELETE /resources/{id}` does for a `file`
   link (`resources.py:300-302`), so the upload stays on disk.
+
+## Campaign wiki
+
+Read from `backend/routers/campaigns/wiki.py`, `_wiki_helpers.py`, `_helpers.py`
+and `wikilinks.py`, and from `frontend/src/components/campaigns/EmbedCard.jsx`,
+at tag `v1.8.0`; starred items verified against the 1.8.0 stack. Backs
+`campaigns wiki`.
+
+- **No route carries a role dependency**; access is decided per page in the
+  handlers. Reading needs campaign membership. Editing: the author; any member
+  for a `group` page; write-shared users for a `members` page — campaign
+  ownership alone grants nothing (`_wiki_helpers.py:67-87`). Deleting: the
+  author only (`:89-97`). Only the author changes `visibility` or sharing.
+- **A personal campaign stores every page as `gm`** whatever is sent, and
+  refuses `hide` with a 409 (`wiki.py:261-327`, `:518-552`).
+- **Archived campaigns refuse create, update, delete and reorder**
+  (`assert_not_archived`); hide and unhide still work.
+- **Saving re-parses the body.\*** An unknown *unpinned* `[[Title]]` (including
+  `[[Title|label]]`) creates an empty stub page, authored by the saver, with the
+  saving page's visibility (`_wiki_helpers.py:205-215`). A pinned
+  `[[T:id-<missing>]]` creates none. A prefix that is not reserved —
+  `[[npc:goblin]]` — is a title and gets a stub.
+- **Embeds are never links.\*** `[[book:<id>]]`, `[[book:<id>:<page>]]`,
+  `[[map:<id>]]`, `[[token:<id>]]`, `[[audio:<id>]]`, `[[model:<id>]]` take
+  library ids; `[[image:<file-id>]]` and `[[file:<file-id>]]` take campaign file
+  ids. The frontend renders them (`EmbedCard.jsx`); its picker offers only items
+  linked to the campaign (`GrimoireEmbedPicker.jsx:26-28`).
+- **A rename rewrites inbound `[[Old Title]]` links** in other pages
+  (`rewrite_inbound_titles`).
+- **Delete moves children up to the deleted page's parent**, and an unknown page
+  id is a silent 204 (`wiki.py:466-515`).
+- **`||text||` belongs to the campaign owner** (`_helpers.py:157-190`). `get`
+  strips it for anyone else, leaving no marker; a non-owner's `||…||` is stored
+  as literal text; a non-owner's save re-weaves stored secrets by position
+  (`merge_gm_secrets`, `:225`).
+- **Search is a plain case-insensitive substring** over title and body; hidden
+  pages are excluded, and non-owners do not match on secret text
+  (`wiki.py:578-617`). The query runs through SQL `ilike('%q%')`
+  (`wiki.py:587-592`), so for the campaign owner `%` and `_` in `--query` act
+  as wildcards; non-owners are re-filtered literally in Python.
+- **Reorder re-deals only the slots of pages the caller can edit**; unknown,
+  invisible and read-only ids are dropped and keep their slots
+  (`wiki.py:99-166`).
