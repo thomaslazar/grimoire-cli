@@ -311,10 +311,9 @@ public static class CampaignWikiCommands
         };
         var command = new Command("export", "Export the wiki pages you can see") { idOption, formatOption, outputOption };
         command.AddHelpSection("Notes", HelpSectionPosition.Top,
-            "md: a zip of one <slug>.md per page, frontmatter carrying title, visibility,",
-            "parent, icon, page_type and session_date. json: a Grimoire bundle. Both",
-            "re-import with the tree intact. mdfile: one markdown document for reading;",
-            "it re-imports as a single page.",
+            "md: a zip of one <slug>.md per page with metadata frontmatter. json: a",
+            "Grimoire bundle. Both re-import with the tree intact. mdfile: one markdown",
+            "document for reading; it re-imports as a single page.",
             "",
             "Holds only pages you can view; GM secrets are removed unless you own the",
             "campaign. Works on an archived campaign.",
@@ -355,8 +354,9 @@ public static class CampaignWikiCommands
             "Import never overwrites: every page in the file becomes a new page, so",
             "importing twice duplicates them. Unresolved [[links]] get stubs, as on create.",
             "",
-            "Reads .md/.markdown/.txt, Grimoire JSON, LegendKeeper JSON or .lk, or a .zip",
-            "of any of these. A zip's folders become nested pages; Places/Places.md or",
+            "Reads .md/.markdown/.txt, Grimoire JSON, or LegendKeeper JSON or .lk, or a",
+            ".zip of markdown or JSON files. A zip's folders become nested pages;",
+            "Places/Places.md or",
             "Places/index.md becomes the Places page itself. To import a folder, zip it.",
             "Max 25 MB.");
         command.AddExamples("grimoire-cli campaigns wiki import --id <campaign-id> --file vault.zip");

@@ -56,6 +56,10 @@ public class CampaignWikiService
     public async Task<string> HideAsync(string campaignId, string pageId)
         => await _client.SendAsync(HideRequest(campaignId, pageId), notFoundHint: PageNotFound);
 
+    /// <summary>DELETE /api/campaigns/{id}/wiki/{page}/hide.</summary>
+    public async Task<string> UnhideAsync(string campaignId, string pageId)
+        => await _client.SendAsync(UnhideRequest(campaignId, pageId), notFoundHint: CampaignNotFound);
+
     /// <summary>GET /api/campaigns/{id}/wiki/export. A zip, a markdown file or a JSON bundle, as bytes.</summary>
     public async Task<Stream> ExportAsync(string campaignId, string? format)
         => await _client.SendStreamAsync(ExportRequest(campaignId, format), notFoundHint: CampaignNotFound);
@@ -77,10 +81,6 @@ public class CampaignWikiService
         }
         return await _client.SendAsync(ImportRequest(campaignId, bytes, Path.GetFileName(filePath)), notFoundHint: CampaignNotFound);
     }
-
-    /// <summary>DELETE /api/campaigns/{id}/wiki/{page}/hide.</summary>
-    public async Task<string> UnhideAsync(string campaignId, string pageId)
-        => await _client.SendAsync(UnhideRequest(campaignId, pageId), notFoundHint: CampaignNotFound);
 
     internal RequestInformation ListRequest(string campaignId, bool mine, bool includeHidden)
         => _client.Api.Api.Campaigns[campaignId].Wiki.ToGetRequestInformation(c =>
