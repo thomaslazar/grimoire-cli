@@ -2832,6 +2832,26 @@ ok "campaigns wiki reorder, hide and unhide"
   || fail "deleting the parent should move the child to the top level"
 ok "campaigns wiki delete moves children up"
 
+# exporting the wiki as a JSON bundle expecting the remaining pages
+"$CLI" campaigns wiki export --id "$WIKI" --format json --output "$WORK/wiki.json" >/dev/null 2>"$WORK/cli.err" \
+  || { cat "$WORK/cli.err" >&2; fail "wiki export (json) exited non-zero"; }
+jq -e '[.pages[].title] | sort == ["Smoke Child", "Smoke Stub"]' "$WORK/wiki.json" >/dev/null \
+  || fail "the json export should hold the two remaining pages: $(cat "$WORK/wiki.json")"
+# exporting the wiki as a markdown zip to stdout expecting one file per page
+"$CLI" campaigns wiki export --id "$WIKI" --output - >"$WORK/wiki.zip" 2>"$WORK/cli.err" \
+  || { cat "$WORK/cli.err" >&2; fail "wiki export (md) exited non-zero"; }
+[ "$(unzip -Z1 "$WORK/wiki.zip" | wc -l)" -eq 2 ] \
+  || fail "the md export should be a zip of two files: $(unzip -Z1 "$WORK/wiki.zip" 2>&1)"
+ok "campaigns wiki export as json and as a markdown zip"
+
+# importing the JSON bundle back expecting two new pages beside the originals
+"$CLI" campaigns wiki import --id "$WIKI" --file "$WORK/wiki.json" 2>"$WORK/cli.err" \
+  | jq -e '.imported == 2 and .format == "grimoire-json"' >/dev/null \
+  || { cat "$WORK/cli.err" >&2; fail "wiki import should create two pages from the bundle"; }
+"$CLI" campaigns wiki list --id "$WIKI" | jq -e '[.[] | select(.title == "Smoke Child")] | length == 2' >/dev/null \
+  || fail "import should add pages, never overwrite"
+ok "campaigns wiki import adds pages from a bundle"
+
 # deleting the remaining pages expecting an empty wiki again
 for p in $("$CLI" campaigns wiki list --id "$WIKI" --include-hidden | jq -r '.[].id'); do
   "$CLI" campaigns wiki delete --id "$WIKI" --page-id "$p" >/dev/null 2>"$WORK/cli.err" \
