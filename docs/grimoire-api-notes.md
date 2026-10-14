@@ -1374,7 +1374,9 @@ at tag `v1.8.0`; starred items verified against the 1.8.0 stack. Backs
   (`merge_gm_secrets`, `:225`).
 - **Search is a plain case-insensitive substring** over title and body; hidden
   pages are excluded, and non-owners do not match on secret text
-  (`wiki.py:578-617`).
+  (`wiki.py:578-617`). The query runs through SQL `ilike('%q%')`
+  (`wiki.py:587-592`), so for the campaign owner `%` and `_` in `--query` act
+  as wildcards; non-owners are re-filtered literally in Python.
 - **Reorder re-deals only the slots of pages the caller can edit**; unknown,
   invisible and read-only ids are dropped and keep their slots
   (`wiki.py:99-166`).
