@@ -58,4 +58,77 @@ public class CampaignWikiCommandTests
     [InlineData("titles")]
     public void TheReadCommandsCarryNoRoleTag(string verb)
         => Assert.DoesNotContain("Role required:", Help(verb));
+
+    [Theory]
+    [InlineData("create")]
+    [InlineData("update")]
+    [InlineData("delete")]
+    [InlineData("reorder")]
+    [InlineData("hide")]
+    [InlineData("unhide")]
+    public void TheWikiSubgroupHostsTheWriteCommands(string verb)
+        => Assert.Contains(verb, CampaignsCommand.Create().Subcommands.Single(c => c.Name == "wiki").Subcommands.Select(c => c.Name));
+
+    [Fact]
+    public void CreateNeedsExactlyOneBodySource()
+    {
+        Assert.NotEmpty(Parse("create", "--id", "c").Errors);
+        Assert.NotEmpty(Parse("create", "--id", "c", "--stdin", "--input", "p.json").Errors);
+        Assert.Empty(Parse("create", "--id", "c", "--stdin").Errors);
+    }
+
+    [Fact]
+    public void UpdateNeedsThePageAndABody()
+    {
+        Assert.NotEmpty(Parse("update", "--id", "c", "--stdin").Errors);
+        Assert.Empty(Parse("update", "--id", "c", "--page-id", "p", "--stdin").Errors);
+    }
+
+    [Fact]
+    public void AnUnknownCreateFieldIsRejected()
+        => Assert.Throws<BodyInputException>(() =>
+            JsonBodyInput.Validate("{\"title\":\"T\",\"content\":\"x\"}",
+                Generated.Models.WikiPageCreate.CreateFromDiscriminatorValue, "pass it with --id"));
+
+    [Fact]
+    public void AnUnknownUpdateFieldIsRejected()
+        => Assert.Throws<BodyInputException>(() =>
+            JsonBodyInput.Validate("{\"name\":\"T\"}",
+                Generated.Models.WikiPageUpdate.CreateFromDiscriminatorValue, "pass it with --page-id"));
+
+    [Fact]
+    public void ReorderNeedsTheIds()
+        => Assert.NotEmpty(Parse("reorder", "--id", "c").Errors);
+
+    [Theory]
+    [InlineData("create")]
+    [InlineData("update")]
+    public void TheBodyCommandsTeachLinksEmbedsAndSecrets(string verb)
+    {
+        var help = Help(verb);
+        Assert.Contains("Page body:", help);
+        Assert.Contains("creates an empty stub", help);
+        Assert.Contains("[[model:<id>]]", help);
+        Assert.Contains("[[image:<file-id>]]", help);
+        Assert.Contains("||text|| is a GM secret", help);
+        Assert.Contains("Visibility:", help);
+    }
+
+    [Fact]
+    public void DeleteSaysChildrenMoveUp()
+        => Assert.Contains("children move up", Help("delete"));
+
+    [Fact]
+    public void HideSaysItIsRefusedInAPersonalCampaign()
+        => Assert.Contains("personal campaign", Help("hide"));
+
+    [Theory]
+    [InlineData("create")]
+    [InlineData("update")]
+    [InlineData("delete")]
+    [InlineData("reorder")]
+    [InlineData("hide")]
+    [InlineData("unhide")]
+    public void TheWriteCommandsCarryNoRoleTag(string verb)
+        => Assert.DoesNotContain("Role required:", Help(verb));
 }
