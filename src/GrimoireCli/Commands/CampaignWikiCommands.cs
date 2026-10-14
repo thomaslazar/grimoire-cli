@@ -1,4 +1,5 @@
 using System.CommandLine;
+using GrimoireCli.Models;
 using GrimoireCli.Output;
 using GrimoireCli.Services;
 
@@ -21,6 +22,8 @@ public static class CampaignWikiCommands
         command.Subcommands.Add(CreateReorderCommand());
         command.Subcommands.Add(CreateHideCommand());
         command.Subcommands.Add(CreateUnhideCommand());
+        command.Subcommands.Add(CreateExportCommand());
+        command.Subcommands.Add(CreateImportCommand());
         return command;
     }
 
@@ -292,6 +295,87 @@ public static class CampaignWikiCommands
             var (client, _) = CommandHelper.BuildClient();
             ConsoleOutput.WriteRawJson(await new CampaignWikiService(client).UnhideAsync(
                 parseResult.GetValue(idOption)!, parseResult.GetValue(pageIdOption)!));
+            return 0;
+        });
+        return command;
+    }
+
+    private static Command CreateExportCommand()
+    {
+        var idOption = CampaignIdOption();
+        var formatOption = OptionHelpers.Choice("--format", "Export shape; default md", ["md", "mdfile", "json"]);
+        var outputOption = new Option<string>("--output")
+        {
+            Description = "Output file path, or '-' for the bytes to stdout",
+            Required = true,
+        };
+        var command = new Command("export", "Export the wiki pages you can see") { idOption, formatOption, outputOption };
+        command.AddHelpSection("Notes", HelpSectionPosition.Top,
+            "md: a zip of one <slug>.md per page, frontmatter carrying title, visibility,",
+            "parent, icon, page_type and session_date. json: a Grimoire bundle. Both",
+            "re-import with the tree intact. mdfile: one markdown document for reading;",
+            "it re-imports as a single page.",
+            "",
+            "Holds only pages you can view; GM secrets are removed unless you own the",
+            "campaign. Works on an archived campaign.",
+            "",
+            "--output - writes the bytes to stdout; a path writes the file and prints",
+            "{path, bytes}.");
+        command.AddExamples(
+            "grimoire-cli campaigns wiki export --id <campaign-id> --output wiki.zip",
+            "grimoire-cli campaigns wiki export --id <campaign-id> --format json --output - > wiki.json");
+        command.AddResponseExample<SavedFile>();
+        command.SetAction(async (parseResult, cancellationToken) =>
+        {
+            var (client, _) = CommandHelper.BuildClient();
+            await using var stream = await new CampaignWikiService(client).ExportAsync(
+                parseResult.GetValue(idOption)!, parseResult.GetValue(formatOption));
+            try
+            {
+                await ConsoleOutput.WriteStreamAsync(stream, parseResult.GetValue(outputOption)!);
+            }
+            catch (BodyInputException ex)
+            {
+                _logger.Error(ex.Message);
+                return 1;
+            }
+            return 0;
+        });
+        return command;
+    }
+
+    private static Command CreateImportCommand()
+    {
+        var idOption = CampaignIdOption();
+        var fileOption = new Option<string>("--file") { Description = "Local file to import", Required = true };
+        var command = new Command("import", "Import pages from a markdown, zip or JSON file") { idOption, fileOption };
+        command.AddHelpSection("Notes", HelpSectionPosition.Top,
+            "Campaign owner only; an archived campaign answers 409.",
+            "",
+            "Import never overwrites: every page in the file becomes a new page, so",
+            "importing twice duplicates them. Unresolved [[links]] get stubs, as on create.",
+            "",
+            "Reads .md/.markdown/.txt, Grimoire JSON, LegendKeeper JSON or .lk, or a .zip",
+            "of any of these. A zip's folders become nested pages; Places/Places.md or",
+            "Places/index.md becomes the Places page itself. To import a folder, zip it.",
+            "Max 25 MB.");
+        command.AddExamples("grimoire-cli campaigns wiki import --id <campaign-id> --file vault.zip");
+        command.AddResponseExample<Generated.Models.WikiImportOut>();
+        command.SetAction(async (parseResult, cancellationToken) =>
+        {
+            var (client, _) = CommandHelper.BuildClient();
+            string result;
+            try
+            {
+                result = await new CampaignWikiService(client).ImportAsync(
+                    parseResult.GetValue(idOption)!, parseResult.GetValue(fileOption)!);
+            }
+            catch (BodyInputException ex)
+            {
+                _logger.Error(ex.Message);
+                return 1;
+            }
+            ConsoleOutput.WriteRawJson(result);
             return 0;
         });
         return command;

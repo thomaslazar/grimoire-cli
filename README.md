@@ -394,6 +394,8 @@ grimoire-cli config set server https://grimoire.example.com
 | `campaigns wiki reorder --id <campaign-id> --ordered-ids <page-id>...` | Set the manual order of wiki pages |
 | `campaigns wiki hide --id <campaign-id> --page-id <page-id>` | Hide a wiki page from your own view |
 | `campaigns wiki unhide --id <campaign-id> --page-id <page-id>` | Bring back a wiki page you hid |
+| `campaigns wiki export --id <campaign-id> [--format <md\|mdfile\|json>] --output <path\|->` | Export the wiki pages you can see |
+| `campaigns wiki import --id <campaign-id> --file <path>` | Import pages from a markdown, zip or JSON file |
 | `self-test` | Verify binary integrity (AOT validation, no network required) |
 
 Every command supports `--help` with examples and caveats.

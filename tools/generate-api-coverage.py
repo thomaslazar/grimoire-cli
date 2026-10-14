@@ -279,6 +279,8 @@ IMPLEMENTED = {
     "DELETE /api/campaigns/{campaign_id}/wiki/{page_id}": "`campaigns wiki delete` ✅",
     "POST /api/campaigns/{campaign_id}/wiki/{page_id}/hide": "`campaigns wiki hide` ✅",
     "DELETE /api/campaigns/{campaign_id}/wiki/{page_id}/hide": "`campaigns wiki unhide` ✅",
+    "GET /api/campaigns/{campaign_id}/wiki/export": "`campaigns wiki export` ✅",
+    "POST /api/campaigns/{campaign_id}/wiki/import": "`campaigns wiki import` ✅",
 }
 
 ROLE_LABEL = {
