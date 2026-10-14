@@ -21,7 +21,7 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | backups | 6 / 6 |
 | bookmarks | 0 / 4 |
 | books | 16 / 16 |
-| campaigns | 17 / 93 |
+| campaigns | 27 / 93 |
 | characters | 0 / 16 |
 | content | 0 / 6 |
 | downloads | 1 / 1 |
@@ -45,7 +45,7 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | token-frames | 0 / 2 |
 | tokens | 11 / 11 |
 | users | 0 / 16 |
-| **Total** | **175 / 360** |
+| **Total** | **185 / 360** |
 
 2 operation(s) are internal-only (🔒) and excluded from covered counts.
 
@@ -244,12 +244,12 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | PUT | `/api/campaigns/{campaign_id}/sessions/{session_id}/notes/gm` | Save GM notes (owner only) |  | campaigns: write | — |
 | PUT | `/api/campaigns/{campaign_id}/sessions/{session_id}/notes/player` | Save own player note |  | campaigns: write | — |
 | GET | `/api/campaigns/{campaign_id}/sheet-sources` | List blank sheets a member can duplicate |  | campaigns: read | — |
-| GET | `/api/campaigns/{campaign_id}/wiki` | List visible wiki pages |  | campaigns: read | — |
-| POST | `/api/campaigns/{campaign_id}/wiki` | Create a wiki page |  | campaigns: write | — |
+| GET | `/api/campaigns/{campaign_id}/wiki` | List visible wiki pages |  | campaigns: read | `campaigns wiki list` ✅ |
+| POST | `/api/campaigns/{campaign_id}/wiki` | Create a wiki page |  | campaigns: write | `campaigns wiki create` ✅ |
 | GET | `/api/campaigns/{campaign_id}/wiki/export` | Export campaign wiki (md zip or json bundle) |  | campaigns: read | — |
 | POST | `/api/campaigns/{campaign_id}/wiki/import` | Import wiki pages from a file or a picked folder |  | campaigns: write | — |
-| PUT | `/api/campaigns/{campaign_id}/wiki/reorder` | Reorder wiki pages (drag-and-drop) |  | campaigns: write | — |
-| GET | `/api/campaigns/{campaign_id}/wiki/search` | Search wiki pages |  | campaigns: read | — |
+| PUT | `/api/campaigns/{campaign_id}/wiki/reorder` | Reorder wiki pages (drag-and-drop) |  | campaigns: write | `campaigns wiki reorder` ✅ |
+| GET | `/api/campaigns/{campaign_id}/wiki/search` | Search wiki pages |  | campaigns: read | `campaigns wiki search` ✅ |
 | GET | `/api/campaigns/{campaign_id}/wiki/templates` | List the campaign's note templates |  | campaigns: read | — |
 | POST | `/api/campaigns/{campaign_id}/wiki/templates` | Write a new note template |  | campaigns: write | — |
 | GET | `/api/campaigns/{campaign_id}/wiki/templates/browse` | Browse the community note-template catalogue |  | campaigns: read | — |
@@ -260,12 +260,12 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | DELETE | `/api/campaigns/{campaign_id}/wiki/templates/{template_id}` | Delete a note template |  | campaigns: write | — |
 | GET | `/api/campaigns/{campaign_id}/wiki/templates/{template_id}/export` | Export a note template as a .zip folder |  | campaigns: read | — |
 | POST | `/api/campaigns/{campaign_id}/wiki/templates/{template_id}/use` | Create a wiki page from a note template |  | campaigns: write | — |
-| GET | `/api/campaigns/{campaign_id}/wiki/titles` | Wiki page titles for [[link]] autocomplete |  | campaigns: read | — |
-| GET | `/api/campaigns/{campaign_id}/wiki/{page_id}` | Get a wiki page |  | campaigns: read | — |
-| PATCH | `/api/campaigns/{campaign_id}/wiki/{page_id}` | Update a wiki page |  | campaigns: write | — |
-| DELETE | `/api/campaigns/{campaign_id}/wiki/{page_id}` | Delete a wiki page |  | campaigns: write | — |
-| POST | `/api/campaigns/{campaign_id}/wiki/{page_id}/hide` | Hide a wiki page from your own view |  | campaigns: write | — |
-| DELETE | `/api/campaigns/{campaign_id}/wiki/{page_id}/hide` | Un-hide a wiki page you had hidden |  | campaigns: write | — |
+| GET | `/api/campaigns/{campaign_id}/wiki/titles` | Wiki page titles for [[link]] autocomplete |  | campaigns: read | `campaigns wiki titles` ✅ |
+| GET | `/api/campaigns/{campaign_id}/wiki/{page_id}` | Get a wiki page |  | campaigns: read | `campaigns wiki get` ✅ |
+| PATCH | `/api/campaigns/{campaign_id}/wiki/{page_id}` | Update a wiki page |  | campaigns: write | `campaigns wiki update` ✅ |
+| DELETE | `/api/campaigns/{campaign_id}/wiki/{page_id}` | Delete a wiki page |  | campaigns: write | `campaigns wiki delete` ✅ |
+| POST | `/api/campaigns/{campaign_id}/wiki/{page_id}/hide` | Hide a wiki page from your own view |  | campaigns: write | `campaigns wiki hide` ✅ |
+| DELETE | `/api/campaigns/{campaign_id}/wiki/{page_id}/hide` | Un-hide a wiki page you had hidden |  | campaigns: write | `campaigns wiki unhide` ✅ |
 
 ## characters
 

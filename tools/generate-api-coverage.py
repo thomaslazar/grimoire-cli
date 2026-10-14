@@ -269,6 +269,16 @@ IMPLEMENTED = {
     "PUT /api/campaigns/{campaign_id}/categories/reorder": "`campaigns categories reorder` ✅",
     "PUT /api/campaigns/{campaign_id}/resource-group-order": "`campaigns categories group-order` ✅",
     "POST /api/campaigns/{campaign_id}/files": "`campaigns files upload` ✅",
+    "GET /api/campaigns/{campaign_id}/wiki": "`campaigns wiki list` ✅",
+    "POST /api/campaigns/{campaign_id}/wiki": "`campaigns wiki create` ✅",
+    "GET /api/campaigns/{campaign_id}/wiki/search": "`campaigns wiki search` ✅",
+    "GET /api/campaigns/{campaign_id}/wiki/titles": "`campaigns wiki titles` ✅",
+    "PUT /api/campaigns/{campaign_id}/wiki/reorder": "`campaigns wiki reorder` ✅",
+    "GET /api/campaigns/{campaign_id}/wiki/{page_id}": "`campaigns wiki get` ✅",
+    "PATCH /api/campaigns/{campaign_id}/wiki/{page_id}": "`campaigns wiki update` ✅",
+    "DELETE /api/campaigns/{campaign_id}/wiki/{page_id}": "`campaigns wiki delete` ✅",
+    "POST /api/campaigns/{campaign_id}/wiki/{page_id}/hide": "`campaigns wiki hide` ✅",
+    "DELETE /api/campaigns/{campaign_id}/wiki/{page_id}/hide": "`campaigns wiki unhide` ✅",
 }
 
 ROLE_LABEL = {

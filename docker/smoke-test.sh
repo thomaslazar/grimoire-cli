@@ -2757,6 +2757,90 @@ UPLOAD_LINK=$(jq -r .id "$WORK/cr-upload.out")
   || fail "the removed upload link should be gone"
 ok "campaigns files upload links a file, and remove takes it away again"
 
+# ---- campaign wiki ----------------------------------------------------------
+# A dedicated GM campaign: Smoke Campaign is personal, where every page is stored
+# as gm and hide is refused. Every page the section creates is deleted again, and
+# any page left by an interrupted run is cleared first, so a re-run converges.
+# listing campaigns to find, or creating, the Smoke Wiki GM campaign
+WIKI=$("$CLI" campaigns list 2>"$WORK/cli.err" | jq -r '[.[] | select(.name == "Smoke Wiki")][0].id') \
+  || { cat "$WORK/cli.err" >&2; fail "campaigns list exited non-zero"; }
+if [ -z "$WIKI" ] || [ "$WIKI" = "null" ]; then
+  WIKI=$(echo '{"name":"Smoke Wiki","is_gm_campaign":true}' | "$CLI" campaigns create --stdin 2>"$WORK/cli.err" | jq -r .id) \
+    || { cat "$WORK/cli.err" >&2; fail "creating the Smoke Wiki campaign exited non-zero"; }
+fi
+[ -n "$WIKI" ] && [ "$WIKI" != "null" ] || fail "no Smoke Wiki campaign id"
+# clearing pages an interrupted run left behind, expecting an empty wiki
+for p in $("$CLI" campaigns wiki list --id "$WIKI" --include-hidden | jq -r '.[].id'); do
+  "$CLI" campaigns wiki delete --id "$WIKI" --page-id "$p" >/dev/null 2>&1 || true
+done
+[ "$("$CLI" campaigns wiki list --id "$WIKI" --include-hidden | jq 'length')" -eq 0 ] \
+  || fail "the Smoke Wiki should start empty"
+WIKI_MAP=$(jq -r '.maps[0].id' "$WORK/maps.out")
+
+# creating a parent page, then a child under it that links a missing page and embeds a map
+PARENT=$(echo '{"title":"Smoke Lore","visibility":"group"}' \
+  | "$CLI" campaigns wiki create --id "$WIKI" --stdin 2>"$WORK/cli.err" | jq -r .id) \
+  || { cat "$WORK/cli.err" >&2; fail "wiki create (parent) exited non-zero"; }
+CHILD_BODY="Ward of [[Smoke Lore]], rival of [[Smoke Stub]]. smokeneedle [[map:$WIKI_MAP]]"
+CHILD=$(jq -n --arg b "$CHILD_BODY" --arg p "$PARENT" '{title:"Smoke Child",body:$b,visibility:"group",parent_id:$p}' \
+  | "$CLI" campaigns wiki create --id "$WIKI" --stdin 2>"$WORK/cli.err" | jq -r .id) \
+  || { cat "$WORK/cli.err" >&2; fail "wiki create (child) exited non-zero"; }
+"$CLI" campaigns wiki list --id "$WIKI" >"$WORK/wiki-list.out" 2>"$WORK/cli.err" \
+  || { cat "$WORK/cli.err" >&2; fail "wiki list exited non-zero"; }
+jq -e '[.[].title] | sort == ["Smoke Child", "Smoke Lore", "Smoke Stub"]' "$WORK/wiki-list.out" >/dev/null \
+  || fail "the unknown [[Smoke Stub]] link should create a stub, the map embed none: $(cat "$WORK/wiki-list.out")"
+ok "campaigns wiki create stubs an unknown link and leaves the embed alone"
+
+# reading the child back expecting its body unchanged
+"$CLI" campaigns wiki get --id "$WIKI" --page-id "$CHILD" \
+  | jq -e --arg b "$CHILD_BODY" --arg p "$PARENT" '.body == $b and .parent_id == $p' >/dev/null \
+  || fail "wiki get should return the child's body and parent"
+ok "campaigns wiki get round-trips the body"
+
+# searching for a word only the child holds, and listing titles
+"$CLI" campaigns wiki search --id "$WIKI" --query smokeneedle \
+  | jq -e '[.results[].title] == ["Smoke Child"]' >/dev/null \
+  || fail "wiki search should find only the child"
+"$CLI" campaigns wiki titles --id "$WIKI" | jq -e 'length == 3' >/dev/null \
+  || fail "wiki titles should list three pages"
+ok "campaigns wiki search and titles"
+
+# renaming the parent expecting the child's link to follow
+echo '{"title":"Smoke Lore Renamed"}' | "$CLI" campaigns wiki update --id "$WIKI" --page-id "$PARENT" --stdin >/dev/null 2>"$WORK/cli.err" \
+  || { cat "$WORK/cli.err" >&2; fail "wiki update exited non-zero"; }
+"$CLI" campaigns wiki get --id "$WIKI" --page-id "$CHILD" | jq -e '.body | contains("[[Smoke Lore Renamed]]")' >/dev/null \
+  || fail "renaming the parent should rewrite the child's link"
+ok "campaigns wiki update renames and rewrites inbound links"
+
+# reordering, then hiding and un-hiding the child
+"$CLI" campaigns wiki reorder --id "$WIKI" --ordered-ids "$CHILD" "$PARENT" | jq -e '.ok == true' >/dev/null \
+  || fail "wiki reorder should answer ok"
+"$CLI" campaigns wiki hide --id "$WIKI" --page-id "$CHILD" >/dev/null 2>"$WORK/cli.err" \
+  || { cat "$WORK/cli.err" >&2; fail "wiki hide exited non-zero"; }
+"$CLI" campaigns wiki list --id "$WIKI" | jq -e --arg c "$CHILD" 'all(.[]; .id != $c)' >/dev/null \
+  || fail "a hidden page should leave the default list"
+"$CLI" campaigns wiki unhide --id "$WIKI" --page-id "$CHILD" >/dev/null 2>"$WORK/cli.err" \
+  || { cat "$WORK/cli.err" >&2; fail "wiki unhide exited non-zero"; }
+"$CLI" campaigns wiki list --id "$WIKI" | jq -e --arg c "$CHILD" 'any(.[]; .id == $c)' >/dev/null \
+  || fail "an un-hidden page should be listed again"
+ok "campaigns wiki reorder, hide and unhide"
+
+# deleting the parent expecting the child to move to the top level
+"$CLI" campaigns wiki delete --id "$WIKI" --page-id "$PARENT" >/dev/null 2>"$WORK/cli.err" \
+  || { cat "$WORK/cli.err" >&2; fail "wiki delete exited non-zero"; }
+"$CLI" campaigns wiki get --id "$WIKI" --page-id "$CHILD" | jq -e '.parent_id == null' >/dev/null \
+  || fail "deleting the parent should move the child to the top level"
+ok "campaigns wiki delete moves children up"
+
+# deleting the remaining pages expecting an empty wiki again
+for p in $("$CLI" campaigns wiki list --id "$WIKI" --include-hidden | jq -r '.[].id'); do
+  "$CLI" campaigns wiki delete --id "$WIKI" --page-id "$p" >/dev/null 2>"$WORK/cli.err" \
+    || { cat "$WORK/cli.err" >&2; fail "wiki delete (cleanup) exited non-zero"; }
+done
+[ "$("$CLI" campaigns wiki list --id "$WIKI" --include-hidden | jq 'length')" -eq 0 ] \
+  || fail "the Smoke Wiki should be empty after cleanup"
+ok "campaigns wiki pages cleaned up"
+
 # ---- api keys ----
 # Key-mode calls use their own config file, so the admin session above is untouched.
 KEYCFG="$WORK/key-config.json"
