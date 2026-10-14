@@ -356,9 +356,8 @@ public static class CampaignWikiCommands
             "",
             "Reads .md/.markdown/.txt, Grimoire JSON, or LegendKeeper JSON or .lk, or a",
             ".zip of markdown or JSON files. A zip's folders become nested pages;",
-            "Places/Places.md or",
-            "Places/index.md becomes the Places page itself. To import a folder, zip it.",
-            "Max 25 MB.");
+            "Places/Places.md or Places/index.md becomes the Places page itself. To import",
+            "a folder, zip it. Max 25 MB.");
         command.AddExamples("grimoire-cli campaigns wiki import --id <campaign-id> --file vault.zip");
         command.AddResponseExample<Generated.Models.WikiImportOut>();
         command.SetAction(async (parseResult, cancellationToken) =>
