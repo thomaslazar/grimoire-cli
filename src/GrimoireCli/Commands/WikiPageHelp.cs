@@ -15,10 +15,14 @@ internal static class WikiPageHelp
         command.AddHelpSection("Page body", HelpSectionPosition.Top,
             "body is markdown. [[Title]] links a page; [[Title|label]] shows label;",
             "[[Title:#Heading]] jumps to a heading; [[Title:id-<page-id>]] pins the",
-            "page so the link survives renames (titles from campaigns wiki titles).",
-            "Saving creates an empty stub for each unknown unpinned [[Title]], with",
-            "this page's visibility; a pinned link to a missing page creates none.",
-            "Renaming a page rewrites links to its old title.",
+            "page so the link survives renames (titles from campaigns wiki titles);",
+            "combine as [[Title:id-<page-id>:#Heading]]. Links match by title slug,",
+            "so case and punctuation make no second page.",
+            "Saving creates an empty stub for each unpinned [[Title]] whose slug",
+            "matches no page, with this page's visibility; a pinned link to a missing",
+            "page creates none. Renaming a page rewrites links to its old title.",
+            "page_type is note or session (else note on create, ignored on update);",
+            "session_date is YYYY-MM-DD, \"\" clears it on update.",
             "",
             "Embeds are not links: [[book:<id>]], [[book:<id>:<page>]], [[map:<id>]],",
             "[[token:<id>]], [[audio:<id>]], [[model:<id>]] take library ids;",
@@ -32,7 +36,7 @@ internal static class WikiPageHelp
             "gm — the author alone (the GM's private pages, or a player's self-only",
             "note); group — every member, and every member can edit; members — the",
             "author plus shared_user_ids (read) and shared_write_user_ids (read and",
-            "write). Only the author changes visibility or sharing. A personal",
-            "campaign stores every page as gm.");
+            "write). Only the author changes visibility or sharing.",
+            "Omitted on create, it is gm. A personal campaign stores every page as gm.");
     }
 }

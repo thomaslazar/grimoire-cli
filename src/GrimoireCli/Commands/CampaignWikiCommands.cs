@@ -40,8 +40,7 @@ public static class CampaignWikiCommands
             idOption, mineOption, includeHiddenOption
         };
         command.AddHelpSection("Notes", HelpSectionPosition.Top,
-            "Ordered by the manual order, then title. Each row says whether you can",
-            "edit or delete it; nesting is by parent_id.");
+            "Ordered by the manual order, then title; nesting is by parent_id.");
         command.AddExamples(
             "grimoire-cli campaigns wiki list --id <campaign-id>",
             "grimoire-cli campaigns wiki list --id <campaign-id> --mine");

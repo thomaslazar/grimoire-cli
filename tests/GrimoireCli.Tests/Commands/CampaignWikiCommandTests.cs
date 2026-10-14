@@ -48,6 +48,14 @@ public class CampaignWikiCommandTests
         => Assert.Contains("GM secrets removed", Help("get"));
 
     [Fact]
+    public void CreateSaysOmittedVisibilityIsGm()
+        => Assert.Contains("Omitted on create, it is gm.", Help("create"));
+
+    [Fact]
+    public void TitlesShowsThePinnedLinkForm()
+        => Assert.Contains("[[Title:id-<page-id>]]", Help("titles"));
+
+    [Fact]
     public void SearchSaysItIsAPlainSubstring()
         => Assert.Contains("plain substring", Help("search"));
 
