@@ -2852,6 +2852,47 @@ ok "campaigns wiki export as json and as a markdown zip"
   || fail "import should add pages, never overwrite"
 ok "campaigns wiki import adds pages from a bundle"
 
+# clearing templates an interrupted run left behind, expecting none
+for t in $("$CLI" campaigns wiki templates list --id "$WIKI" | jq -r '.templates[].id'); do
+  "$CLI" campaigns wiki templates delete --id "$WIKI" --template-id "$t" >/dev/null 2>&1 || true
+done
+"$CLI" campaigns wiki templates list --id "$WIKI" | jq -e '.templates | length == 0' >/dev/null \
+  || fail "the Smoke Wiki should have no templates before the template checks"
+# creating a template with page defaults expecting them split out of the body
+TPL=$(echo '{"name":"Smoke NPC","body":"## Motives","defaults":{"title":"Smoke Villain","visibility":"group"}}' \
+  | "$CLI" campaigns wiki templates create --id "$WIKI" --stdin 2>"$WORK/cli.err" | jq -r .id) \
+  || { cat "$WORK/cli.err" >&2; fail "wiki templates create exited non-zero"; }
+"$CLI" campaigns wiki templates get --id "$WIKI" --template-id "$TPL" \
+  | jq -e '.body == "## Motives" and .defaults.title == "Smoke Villain" and .defaults.visibility == "group"' >/dev/null \
+  || fail "wiki templates get should return the body and its defaults apart"
+# updating only the body expecting the defaults kept
+echo '{"body":"## Motives\n\n## Secrets"}' | "$CLI" campaigns wiki templates update --id "$WIKI" --template-id "$TPL" --stdin \
+  | jq -e '.defaults.title == "Smoke Villain"' >/dev/null \
+  || fail "a body-only template update should keep the defaults"
+ok "campaigns wiki templates create, get and update"
+
+# using the template expecting a page carrying its defaults
+"$CLI" campaigns wiki templates use --id "$WIKI" --template-id "$TPL" 2>"$WORK/cli.err" \
+  | jq -e '.pages[0].title == "Smoke Villain" and .pages[0].visibility == "group"' >/dev/null \
+  || { cat "$WORK/cli.err" >&2; fail "wiki templates use should create a page from the defaults"; }
+ok "campaigns wiki templates use creates a page"
+
+# exporting the template and importing the zip back expecting its name kept
+"$CLI" campaigns wiki templates export --id "$WIKI" --template-id "$TPL" --output "$WORK/tpl.zip" >/dev/null 2>"$WORK/cli.err" \
+  || { cat "$WORK/cli.err" >&2; fail "wiki templates export exited non-zero"; }
+TPL2=$("$CLI" campaigns wiki templates import --id "$WIKI" --file "$WORK/tpl.zip" 2>"$WORK/cli.err" \
+  | jq -r 'select(.name == "Smoke NPC") | .id') \
+  || { cat "$WORK/cli.err" >&2; fail "wiki templates import exited non-zero"; }
+[ -n "$TPL2" ] || fail "the imported template should keep the name Smoke NPC"
+# deleting both templates expecting none left
+"$CLI" campaigns wiki templates delete --id "$WIKI" --template-id "$TPL" >/dev/null 2>"$WORK/cli.err" \
+  || { cat "$WORK/cli.err" >&2; fail "wiki templates delete exited non-zero"; }
+"$CLI" campaigns wiki templates delete --id "$WIKI" --template-id "$TPL2" >/dev/null 2>"$WORK/cli.err" \
+  || { cat "$WORK/cli.err" >&2; fail "wiki templates delete (import) exited non-zero"; }
+"$CLI" campaigns wiki templates list --id "$WIKI" | jq -e '.templates | length == 0' >/dev/null \
+  || fail "no templates should remain after the template checks"
+ok "campaigns wiki templates export, import and delete"
+
 # deleting the remaining pages expecting an empty wiki again
 for p in $("$CLI" campaigns wiki list --id "$WIKI" --include-hidden | jq -r '.[].id'); do
   "$CLI" campaigns wiki delete --id "$WIKI" --page-id "$p" >/dev/null 2>"$WORK/cli.err" \

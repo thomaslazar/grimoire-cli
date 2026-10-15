@@ -24,6 +24,7 @@ public static class CampaignWikiCommands
         command.Subcommands.Add(CreateUnhideCommand());
         command.Subcommands.Add(CreateExportCommand());
         command.Subcommands.Add(CreateImportCommand());
+        command.Subcommands.Add(CampaignWikiTemplateCommands.Create());
         return command;
     }
 

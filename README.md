@@ -396,6 +396,14 @@ grimoire-cli config set server https://grimoire.example.com
 | `campaigns wiki unhide --id <campaign-id> --page-id <page-id>` | Bring back a wiki page you hid |
 | `campaigns wiki export --id <campaign-id> [--format <md\|mdfile\|json>] --output <path\|->` | Export the wiki pages you can see |
 | `campaigns wiki import --id <campaign-id> --file <path>` | Import pages from a markdown, zip or JSON file |
+| `campaigns wiki templates list --id <campaign-id>` | List the campaign's note templates |
+| `campaigns wiki templates get --id <campaign-id> --template-id <template-id>` | Get one note template with its body |
+| `campaigns wiki templates create --id <campaign-id> {--input <file> \| --stdin}` | Write a new note template |
+| `campaigns wiki templates update --id <campaign-id> --template-id <template-id> {--input <file> \| --stdin}` | Edit a note template |
+| `campaigns wiki templates delete --id <campaign-id> --template-id <template-id>` | Delete a note template |
+| `campaigns wiki templates import --id <campaign-id> --file <path>` | Add a note template from a .md file or template .zip |
+| `campaigns wiki templates export --id <campaign-id> --template-id <template-id> --output <path\|->` | Export a note template as a .zip |
+| `campaigns wiki templates use --id <campaign-id> --template-id <template-id>` | Create a wiki page from a note template |
 | `self-test` | Verify binary integrity (AOT validation, no network required) |
 
 Every command supports `--help` with examples and caveats.
