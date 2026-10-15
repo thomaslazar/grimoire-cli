@@ -21,7 +21,7 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | backups | 6 / 6 |
 | bookmarks | 0 / 4 |
 | books | 16 / 16 |
-| campaigns | 27 / 93 |
+| campaigns | 29 / 93 |
 | characters | 0 / 16 |
 | content | 0 / 6 |
 | downloads | 1 / 1 |
@@ -45,7 +45,7 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | token-frames | 0 / 2 |
 | tokens | 11 / 11 |
 | users | 0 / 16 |
-| **Total** | **185 / 360** |
+| **Total** | **187 / 360** |
 
 2 operation(s) are internal-only (🔒) and excluded from covered counts.
 
@@ -246,8 +246,8 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | GET | `/api/campaigns/{campaign_id}/sheet-sources` | List blank sheets a member can duplicate |  | campaigns: read | — |
 | GET | `/api/campaigns/{campaign_id}/wiki` | List visible wiki pages |  | campaigns: read | `campaigns wiki list` ✅ |
 | POST | `/api/campaigns/{campaign_id}/wiki` | Create a wiki page |  | campaigns: write | `campaigns wiki create` ✅ |
-| GET | `/api/campaigns/{campaign_id}/wiki/export` | Export campaign wiki (md zip or json bundle) |  | campaigns: read | — |
-| POST | `/api/campaigns/{campaign_id}/wiki/import` | Import wiki pages from a file or a picked folder |  | campaigns: write | — |
+| GET | `/api/campaigns/{campaign_id}/wiki/export` | Export campaign wiki (md zip or json bundle) |  | campaigns: read | `campaigns wiki export` ✅ |
+| POST | `/api/campaigns/{campaign_id}/wiki/import` | Import wiki pages from a file or a picked folder |  | campaigns: write | `campaigns wiki import` ✅ |
 | PUT | `/api/campaigns/{campaign_id}/wiki/reorder` | Reorder wiki pages (drag-and-drop) |  | campaigns: write | `campaigns wiki reorder` ✅ |
 | GET | `/api/campaigns/{campaign_id}/wiki/search` | Search wiki pages |  | campaigns: read | `campaigns wiki search` ✅ |
 | GET | `/api/campaigns/{campaign_id}/wiki/templates` | List the campaign's note templates |  | campaigns: read | — |

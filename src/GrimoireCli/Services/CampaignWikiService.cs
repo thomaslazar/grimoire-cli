@@ -1,11 +1,12 @@
 using System.Text;
 using GrimoireCli.Api;
+using GrimoireCli.Commands;
 using Microsoft.Kiota.Abstractions;
 
 namespace GrimoireCli.Services;
 
 /// <summary>
-/// The ten routes behind `campaigns wiki`: a campaign's wiki pages. Each request
+/// The twelve routes behind `campaigns wiki`: a campaign's wiki pages. Each request
 /// is built by an internal method so a test can pin its route and method; the
 /// public methods send it. Access is checked inside the server's handlers, not by
 /// role, so no permission hint is passed — the server's own 403 detail explains.
@@ -59,6 +60,28 @@ public class CampaignWikiService
     public async Task<string> UnhideAsync(string campaignId, string pageId)
         => await _client.SendAsync(UnhideRequest(campaignId, pageId), notFoundHint: CampaignNotFound);
 
+    /// <summary>GET /api/campaigns/{id}/wiki/export. A zip, a markdown file or a JSON bundle, as bytes.</summary>
+    public async Task<Stream> ExportAsync(string campaignId, string? format)
+        => await _client.SendStreamAsync(ExportRequest(campaignId, format), notFoundHint: CampaignNotFound);
+
+    /// <summary>
+    /// POST /api/campaigns/{id}/wiki/import. The part's filename is the local
+    /// basename: the server picks its parser by extension.
+    /// </summary>
+    public async Task<string> ImportAsync(string campaignId, string filePath)
+    {
+        byte[] bytes;
+        try
+        {
+            bytes = await File.ReadAllBytesAsync(filePath);
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or ArgumentException or NotSupportedException)
+        {
+            throw new BodyInputException($"Could not read {filePath}: {ex.Message}");
+        }
+        return await _client.SendAsync(ImportRequest(campaignId, bytes, Path.GetFileName(filePath)), notFoundHint: CampaignNotFound);
+    }
+
     internal RequestInformation ListRequest(string campaignId, bool mine, bool includeHidden)
         => _client.Api.Api.Campaigns[campaignId].Wiki.ToGetRequestInformation(c =>
         {
@@ -102,4 +125,18 @@ public class CampaignWikiService
 
     internal RequestInformation UnhideRequest(string campaignId, string pageId)
         => _client.Api.Api.Campaigns[campaignId].Wiki[pageId].Hide.ToDeleteRequestInformation();
+
+    internal RequestInformation ExportRequest(string campaignId, string? format)
+        => _client.Api.Api.Campaigns[campaignId].Wiki.Export.ToGetRequestInformation(c =>
+        {
+            // Sent only when set: the server defaults to md.
+            if (format is not null) c.QueryParameters.Format = format;
+        });
+
+    internal RequestInformation ImportRequest(string campaignId, byte[] bytes, string fileName)
+    {
+        var body = new MultipartBody();
+        body.AddOrReplacePart("file", "application/octet-stream", bytes, fileName);
+        return _client.Api.Api.Campaigns[campaignId].Wiki.Import.ToPostRequestInformation(body);
+    }
 }

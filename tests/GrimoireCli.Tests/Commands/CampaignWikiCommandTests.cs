@@ -139,4 +139,24 @@ public class CampaignWikiCommandTests
     [InlineData("unhide")]
     public void TheWriteCommandsCarryNoRoleTag(string verb)
         => Assert.DoesNotContain("Role required:", Help(verb));
+
+    [Fact]
+    public void ExportNeedsAnOutput()
+        => Assert.NotEmpty(Parse("export", "--id", "c").Errors);
+
+    [Fact]
+    public void ExportRejectsAnUnknownFormat()
+        => Assert.NotEmpty(Parse("export", "--id", "c", "--format", "pdf", "--output", "-").Errors);
+
+    [Fact]
+    public void ExportTakesFormatAndOutput()
+        => Assert.Empty(Parse("export", "--id", "c", "--format", "mdfile", "--output", "-").Errors);
+
+    [Fact]
+    public void ImportNeedsAFile()
+        => Assert.NotEmpty(Parse("import", "--id", "c").Errors);
+
+    [Fact]
+    public void ImportSaysItNeverOverwrites()
+        => Assert.Contains("never overwrites", Help("import"));
 }
