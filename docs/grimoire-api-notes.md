@@ -1405,3 +1405,23 @@ restarting it. Why `campaigns` has no session-note commands.
 - **`session_creator.py` still auto-creates empty session notes** the day before
   a scheduled GM-campaign session (`:17-45`). The next startup drops them as
   empty.
+
+### Scheduling and calendar
+
+Read from `backend/routers/campaigns/schedule.py`, `calendar.py` and
+`_schemas.py` at tag `v1.8.0`; verified against the 1.8.0 stack.
+
+- **Cancelling a date is a toggle.** `PUT availability/{date}/cancel` flips
+  `is_cancelled` on every row for that date (`schedule.py:294-336`); a second
+  call undoes the first. It admits the owner or any admin, unlike the
+  campaign's other writes.
+- **`availability` `user_id` cannot work.** `AvailabilityUpdate.user_id` is
+  `Optional[int]` (`_schemas.py:177`) while user ids are UUID strings, so any
+  value is a 422 `int_parsing` and a GM cannot set another member's row.
+- **Calendar subscription is session only.** The three
+  `/calendar/subscription` routes carry `x-api-key-access: none`; minting
+  also needs `BASE_URL` (400 otherwise).
+- **The token feeds are not wrapped.** `/calendar/{token}/all.ics` and
+  `/calendar/{token}/{campaign_id}.ics` authenticate by the token in the path
+  for calendar apps; `subscription` returns their URLs, and
+  `{id}/calendar.ics` serves the same events to an authenticated caller.

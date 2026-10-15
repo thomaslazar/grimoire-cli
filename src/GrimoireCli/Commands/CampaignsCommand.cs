@@ -30,6 +30,7 @@ public static class CampaignsCommand
         command.Subcommands.Add(CampaignFilesCommands.Create());
         command.Subcommands.Add(CampaignBannerCommands.Create());
         command.Subcommands.Add(CampaignScheduleCommands.Create());
+        command.Subcommands.Add(CampaignCalendarCommands.Create());
         command.Subcommands.Add(CampaignAvailabilityCommands.Create());
         command.Subcommands.Add(CampaignWikiCommands.Create());
         return command;

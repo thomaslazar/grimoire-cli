@@ -21,7 +21,7 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | backups | 6 / 6 |
 | bookmarks | 0 / 4 |
 | books | 16 / 16 |
-| campaigns | 54 / 93 |
+| campaigns | 58 / 93 |
 | characters | 0 / 16 |
 | content | 0 / 6 |
 | downloads | 1 / 1 |
@@ -45,7 +45,7 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | token-frames | 0 / 2 |
 | tokens | 11 / 11 |
 | users | 0 / 16 |
-| **Total** | **212 / 360** |
+| **Total** | **216 / 360** |
 
 2 operation(s) are internal-only (🔒) and excluded from covered counts.
 
@@ -176,11 +176,11 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | GET | `/api/campaigns` | List campaigns for the current user |  | campaigns: read | `campaigns list` ✅ |
 | POST | `/api/campaigns` | Create a campaign |  | campaigns: write | `campaigns create` ✅ |
 | GET | `/api/campaigns/admin/by-user/{user_id}` | Admin: list campaigns owned by a user (read-only, minimal fields) | admin | campaigns: read | — |
-| GET | `/api/campaigns/calendar/subscription` | Get the caller's calendar subscription URLs |  | — | — |
-| POST | `/api/campaigns/calendar/subscription` | Mint or rotate the caller's calendar feed token |  | — | — |
-| DELETE | `/api/campaigns/calendar/subscription` | Revoke the caller's calendar feed token |  | — | — |
-| GET | `/api/campaigns/calendar/{token}/all.ics` | ICS feed of every campaign the token's user belongs to |  | campaigns: read | — |
-| GET | `/api/campaigns/calendar/{token}/{campaign_id}.ics` | ICS feed for a single campaign |  | campaigns: read | — |
+| GET | `/api/campaigns/calendar/subscription` | Get the caller's calendar subscription URLs |  | — | `campaigns calendar subscription get` ✅ |
+| POST | `/api/campaigns/calendar/subscription` | Mint or rotate the caller's calendar feed token |  | — | `campaigns calendar subscription create` ✅ |
+| DELETE | `/api/campaigns/calendar/subscription` | Revoke the caller's calendar feed token |  | — | `campaigns calendar subscription revoke` ✅ |
+| GET | `/api/campaigns/calendar/{token}/all.ics` | ICS feed of every campaign the token's user belongs to |  | campaigns: read | not wrapped: feeds for calendar apps; subscription returns the URLs |
+| GET | `/api/campaigns/calendar/{token}/{campaign_id}.ics` | ICS feed for a single campaign |  | campaigns: read | not wrapped: feeds for calendar apps; subscription returns the URLs |
 | GET | `/api/campaigns/invites` | List the current user's pending campaign invitations |  | campaigns: read | — |
 | GET | `/api/campaigns/resources/search` | Search books, maps, and tokens by name |  | campaigns: read | — |
 | GET | `/api/campaigns/resources/suggested/{system_id}` | Suggested resources (system books) for the create wizard |  | campaigns: read | — |
@@ -196,7 +196,7 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | DELETE | `/api/campaigns/{campaign_id}/banner` | Remove campaign banner |  | campaigns: write | `campaigns banner delete` ✅ |
 | PUT | `/api/campaigns/{campaign_id}/banner/focus` | Set the banner focal point |  | campaigns: write | `campaigns banner focus` ✅ |
 | POST | `/api/campaigns/{campaign_id}/banner/from-source` | Set the banner from an existing image |  | campaigns: write | `campaigns banner from-source` ✅ |
-| GET | `/api/campaigns/{campaign_id}/calendar.ics` | Download a campaign's schedule as an .ics file |  | campaigns: read | — |
+| GET | `/api/campaigns/{campaign_id}/calendar.ics` | Download a campaign's schedule as an .ics file |  | campaigns: read | `campaigns calendar download` ✅ |
 | GET | `/api/campaigns/{campaign_id}/categories` | List categories (optionally filtered by kind) |  | campaigns: read | `campaigns categories list` ✅ |
 | POST | `/api/campaigns/{campaign_id}/categories` | Create a category |  | campaigns: write | `campaigns categories create` ✅ |
 | PUT | `/api/campaigns/{campaign_id}/categories/reorder` | Reorder categories |  | campaigns: write | `campaigns categories reorder` ✅ |

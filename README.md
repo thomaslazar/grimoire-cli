@@ -400,6 +400,10 @@ grimoire-cli config set server https://grimoire.example.com
 | `campaigns availability get --id <campaign-id>` | Each member's availability for the next 10 sessions |
 | `campaigns availability set --id <campaign-id> --date <YYYY-MM-DD> --status <status> [--is-cancelled <bool>] [--user-id <id>]` | Set availability for one session date |
 | `campaigns availability toggle-cancel --id <campaign-id> --date <YYYY-MM-DD>` | Flip whether a session date is cancelled |
+| `campaigns calendar download --id <campaign-id> --output <path\|->` | Download the next 26 sessions as an .ics file |
+| `campaigns calendar subscription get [--id <campaign-id>]` | Show your calendar-feed URLs |
+| `campaigns calendar subscription create [--id <campaign-id>]` | Mint or rotate your calendar-feed token |
+| `campaigns calendar subscription revoke` | Revoke your calendar-feed token |
 | `campaigns wiki list --id <campaign-id> [--mine] [--include-hidden]` | List the wiki pages you can see |
 | `campaigns wiki get --id <campaign-id> --page-id <page-id>` | Get one wiki page with its body and backlinks |
 | `campaigns wiki create --id <campaign-id> {--input <file> \| --stdin}` | Create a wiki page |
