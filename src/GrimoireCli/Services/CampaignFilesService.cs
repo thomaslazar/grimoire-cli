@@ -37,6 +37,34 @@ public class CampaignFilesService
             notFoundHint: "No campaign with that ID. List them with: grimoire-cli campaigns list");
     }
 
+    /// <summary>POST /api/campaigns/{id}/images. As <see cref="UploadAsync"/>, image types only.</summary>
+    public async Task<string> UploadImageAsync(string campaignId, string filePath, string? categoryId, string? newCategoryName)
+    {
+        byte[] bytes;
+        try
+        {
+            bytes = await File.ReadAllBytesAsync(filePath);
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or ArgumentException or NotSupportedException)
+        {
+            throw new BodyInputException($"Could not read {filePath}: {ex.Message}");
+        }
+        return await _client.SendAsync(
+            UploadImageRequest(campaignId, bytes, filePath, categoryId, newCategoryName),
+            notFoundHint: "No campaign with that ID. List them with: grimoire-cli campaigns list");
+    }
+
+    internal Microsoft.Kiota.Abstractions.RequestInformation UploadImageRequest(string campaignId, byte[] bytes, string filePath, string? categoryId, string? newCategoryName)
+    {
+        var body = new Microsoft.Kiota.Abstractions.MultipartBody();
+        body.AddOrReplacePart("file", MimeForExtension(filePath), bytes, Path.GetFileName(filePath));
+        if (categoryId is not null)
+            body.AddOrReplacePart("category_id", "text/plain", categoryId);
+        if (newCategoryName is not null)
+            body.AddOrReplacePart("new_category_name", "text/plain", newCategoryName);
+        return _client.Api.Api.Campaigns[campaignId].Images.ToPostRequestInformation(body);
+    }
+
     /// <summary>
     /// The content type the server stores and derives is_image from. Unknown
     /// extensions send octet-stream. Internal so a test can pin the map.

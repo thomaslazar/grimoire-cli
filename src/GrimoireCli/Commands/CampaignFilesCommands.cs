@@ -17,6 +17,7 @@ public static class CampaignFilesCommands
     {
         var command = new Command("files", "Files uploaded into a campaign");
         command.Subcommands.Add(CreateUploadCommand());
+        command.Subcommands.Add(CreateUploadImageCommand());
         return command;
     }
 
@@ -51,6 +52,51 @@ public static class CampaignFilesCommands
             try
             {
                 result = await new CampaignFilesService(client).UploadAsync(
+                    parseResult.GetValue(idOption)!,
+                    parseResult.GetValue(fileOption)!,
+                    parseResult.GetValue(categoryIdOption),
+                    parseResult.GetValue(newCategoryNameOption));
+            }
+            catch (BodyInputException ex)
+            {
+                _logger.Error(ex.Message);
+                return 1;
+            }
+            ConsoleOutput.WriteRawJson(result);
+            return 0;
+        });
+        return command;
+    }
+
+    private static Command CreateUploadImageCommand()
+    {
+        var idOption = new Option<string>("--id") { Description = "Campaign ID", Required = true };
+        var fileOption = new Option<string>("--file") { Description = "Local image to upload", Required = true };
+        var categoryIdOption = new Option<string?>("--category-id") { Description = "Resource category to file it under" };
+        var newCategoryNameOption = new Option<string?>("--new-category-name") { Description = "Create a resource category and file it there" };
+        var command = new Command("upload-image", "Upload an image into a campaign and link it")
+        {
+            idOption, fileOption, categoryIdOption, newCategoryNameOption
+        };
+        command.Validators.Add(result =>
+        {
+            if (result.GetValue(categoryIdOption) is not null && result.GetValue(newCategoryNameOption) is not null)
+                result.AddError("Pass --category-id or --new-category-name, not both.");
+        });
+        command.AddHelpSection("Notes", HelpSectionPosition.Top,
+            [.. OwnerOnly, "",
+            "As upload, but only a real PNG, JPEG, WebP or GIF, max 5 MB. The",
+            "resource_id it returns is the file id [[image:<file-id>]] takes in a",
+            "wiki page."]);
+        command.AddExamples("grimoire-cli campaigns files upload-image --id <campaign-id> --file map.png");
+        command.AddResponseExample<Generated.Models.LinkedResourceOut>();
+        command.SetAction(async (parseResult, cancellationToken) =>
+        {
+            var (client, _) = CommandHelper.BuildClient();
+            string result;
+            try
+            {
+                result = await new CampaignFilesService(client).UploadImageAsync(
                     parseResult.GetValue(idOption)!,
                     parseResult.GetValue(fileOption)!,
                     parseResult.GetValue(categoryIdOption),
