@@ -21,7 +21,7 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | backups | 6 / 6 |
 | bookmarks | 0 / 4 |
 | books | 16 / 16 |
-| campaigns | 48 / 93 |
+| campaigns | 54 / 93 |
 | characters | 0 / 16 |
 | content | 0 / 6 |
 | downloads | 1 / 1 |
@@ -45,7 +45,7 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | token-frames | 0 / 2 |
 | tokens | 11 / 11 |
 | users | 0 / 16 |
-| **Total** | **206 / 360** |
+| **Total** | **212 / 360** |
 
 2 operation(s) are internal-only (🔒) and excluded from covered counts.
 
@@ -188,9 +188,9 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | PATCH | `/api/campaigns/{campaign_id}` | Update a campaign |  | campaigns: write | `campaigns update` ✅ |
 | DELETE | `/api/campaigns/{campaign_id}` | Delete a campaign |  | campaigns: write | `campaigns delete` ✅ |
 | PUT | `/api/campaigns/{campaign_id}/archive` | Archive or unarchive a campaign |  | campaigns: write | `campaigns archive` / `unarchive` ✅ |
-| GET | `/api/campaigns/{campaign_id}/availability` | Get availability chart for upcoming sessions |  | campaigns: read | — |
-| PUT | `/api/campaigns/{campaign_id}/availability/{session_date}` | Set availability for a session date |  | campaigns: write | — |
-| PUT | `/api/campaigns/{campaign_id}/availability/{session_date}/cancel` | GM: cancel or uncancel a session date |  | campaigns: write | — |
+| GET | `/api/campaigns/{campaign_id}/availability` | Get availability chart for upcoming sessions |  | campaigns: read | `campaigns availability get` ✅ |
+| PUT | `/api/campaigns/{campaign_id}/availability/{session_date}` | Set availability for a session date |  | campaigns: write | `campaigns availability set` ✅ |
+| PUT | `/api/campaigns/{campaign_id}/availability/{session_date}/cancel` | GM: cancel or uncancel a session date |  | campaigns: write | `campaigns availability toggle-cancel` ✅ |
 | POST | `/api/campaigns/{campaign_id}/banner` | Upload campaign banner |  | campaigns: write | `campaigns banner upload` ✅ |
 | GET | `/api/campaigns/{campaign_id}/banner` | Get campaign banner image |  | campaigns: read | `campaigns banner get` ✅ |
 | DELETE | `/api/campaigns/{campaign_id}/banner` | Remove campaign banner |  | campaigns: write | `campaigns banner delete` ✅ |
@@ -232,9 +232,9 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | PUT | `/api/campaigns/{campaign_id}/resources/reorder` | Reorder resources (drag-and-drop) |  | campaigns: write | `campaigns resources reorder` ✅ |
 | PATCH | `/api/campaigns/{campaign_id}/resources/{resource_id}` | Update resource visibility/category |  | campaigns: write | `campaigns resources update` ✅ |
 | DELETE | `/api/campaigns/{campaign_id}/resources/{resource_id}` | Unlink a resource |  | campaigns: write | `campaigns resources remove` ✅ |
-| GET | `/api/campaigns/{campaign_id}/schedule` | Get campaign schedule and next sessions |  | campaigns: read | — |
-| PUT | `/api/campaigns/{campaign_id}/schedule` | Create or update campaign schedule |  | campaigns: write | — |
-| DELETE | `/api/campaigns/{campaign_id}/schedule` | Remove campaign schedule |  | campaigns: write | — |
+| GET | `/api/campaigns/{campaign_id}/schedule` | Get campaign schedule and next sessions |  | campaigns: read | `campaigns schedule get` ✅ |
+| PUT | `/api/campaigns/{campaign_id}/schedule` | Create or update campaign schedule |  | campaigns: write | `campaigns schedule set` ✅ |
+| DELETE | `/api/campaigns/{campaign_id}/schedule` | Remove campaign schedule |  | campaigns: write | `campaigns schedule delete` ✅ |
 | GET | `/api/campaigns/{campaign_id}/sessions` | List session notes |  | campaigns: read | — |
 | POST | `/api/campaigns/{campaign_id}/sessions` | Create a session note |  | campaigns: write | — |
 | GET | `/api/campaigns/{campaign_id}/sessions/search` | Search session notes |  | campaigns: read | — |

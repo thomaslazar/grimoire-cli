@@ -394,6 +394,12 @@ grimoire-cli config set server https://grimoire.example.com
 | `campaigns banner delete --id <campaign-id>` | Remove the campaign banner |
 | `campaigns banner from-source --id <campaign-id> --source-type <type> --source-id <id>` | Set the banner from an image Grimoire already holds |
 | `campaigns banner focus --id <campaign-id> --focus-y <0-100>` | Set where the banner sits in its 2:1 frame |
+| `campaigns schedule get --id <campaign-id>` | Get the schedule and the next 10 session dates |
+| `campaigns schedule set --id <campaign-id> {--input <file> \| --stdin}` | Create or replace the schedule |
+| `campaigns schedule delete --id <campaign-id>` | Remove the schedule |
+| `campaigns availability get --id <campaign-id>` | Each member's availability for the next 10 sessions |
+| `campaigns availability set --id <campaign-id> --date <YYYY-MM-DD> --status <status> [--is-cancelled <bool>] [--user-id <id>]` | Set availability for one session date |
+| `campaigns availability toggle-cancel --id <campaign-id> --date <YYYY-MM-DD>` | Flip whether a session date is cancelled |
 | `campaigns wiki list --id <campaign-id> [--mine] [--include-hidden]` | List the wiki pages you can see |
 | `campaigns wiki get --id <campaign-id> --page-id <page-id>` | Get one wiki page with its body and backlinks |
 | `campaigns wiki create --id <campaign-id> {--input <file> \| --stdin}` | Create a wiki page |
