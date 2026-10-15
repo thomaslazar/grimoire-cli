@@ -21,7 +21,7 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | backups | 6 / 6 |
 | bookmarks | 0 / 4 |
 | books | 16 / 16 |
-| campaigns | 37 / 93 |
+| campaigns | 39 / 93 |
 | characters | 0 / 16 |
 | content | 0 / 6 |
 | downloads | 1 / 1 |
@@ -45,7 +45,7 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | token-frames | 0 / 2 |
 | tokens | 11 / 11 |
 | users | 0 / 16 |
-| **Total** | **195 / 360** |
+| **Total** | **197 / 360** |
 
 2 operation(s) are internal-only (🔒) and excluded from covered counts.
 
@@ -252,8 +252,8 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | GET | `/api/campaigns/{campaign_id}/wiki/search` | Search wiki pages |  | campaigns: read | `campaigns wiki search` ✅ |
 | GET | `/api/campaigns/{campaign_id}/wiki/templates` | List the campaign's note templates |  | campaigns: read | `campaigns wiki templates list` ✅ |
 | POST | `/api/campaigns/{campaign_id}/wiki/templates` | Write a new note template |  | campaigns: write | `campaigns wiki templates create` ✅ |
-| GET | `/api/campaigns/{campaign_id}/wiki/templates/browse` | Browse the community note-template catalogue |  | campaigns: read | — |
-| POST | `/api/campaigns/{campaign_id}/wiki/templates/download/{template_id}` | Download a community note template into the campaign |  | campaigns: write | — |
+| GET | `/api/campaigns/{campaign_id}/wiki/templates/browse` | Browse the community note-template catalogue |  | campaigns: read | `campaigns wiki templates catalogue` ✅ |
+| POST | `/api/campaigns/{campaign_id}/wiki/templates/download/{template_id}` | Download a community note template into the campaign |  | campaigns: write | `campaigns wiki templates install` ✅ |
 | POST | `/api/campaigns/{campaign_id}/wiki/templates/upload` | Add a note template from an uploaded .md file |  | campaigns: write | `campaigns wiki templates import` ✅ |
 | GET | `/api/campaigns/{campaign_id}/wiki/templates/{template_id}` | Get a note template incl. its body |  | campaigns: read | `campaigns wiki templates get` ✅ |
 | PATCH | `/api/campaigns/{campaign_id}/wiki/templates/{template_id}` | Edit a note template |  | campaigns: write | `campaigns wiki templates update` ✅ |

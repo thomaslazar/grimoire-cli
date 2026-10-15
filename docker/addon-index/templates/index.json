@@ -1,0 +1,20 @@
+{
+  "version": 1,
+  "folders": [
+    { "path": "generic", "name": "Generic" }
+  ],
+  "templates": [
+    {
+      "id": "smoke-note",
+      "name": "Smoke Note",
+      "version": "1.0.0",
+      "folder": "generic",
+      "body_path": "templates/generic/smoke-note/smoke-note.md",
+      "body_sha256": "7bf73799d64fdfbe18dcb1532d140dd03aca13d76a5f742f4446fa20dc4cb242",
+      "system": "",
+      "category": "General",
+      "description": "Smoke fixture note template",
+      "author": "grimoire-cli"
+    }
+  ]
+}
