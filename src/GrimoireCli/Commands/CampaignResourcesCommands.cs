@@ -11,7 +11,7 @@ public static class CampaignResourcesCommands
     private static readonly string[] OwnerOnly =
     [
         "Owner only, no admin override. 403 also when the owner's campaign",
-        "access is disabled or the campaign is archived.",
+        "access is disabled; 409 while the campaign is archived.",
     ];
     private static readonly string[] ResourceTypes = ["book", "map", "token", "audio", "model"];
     private static readonly string[] Visibilities = ["gm", "public", "private"];

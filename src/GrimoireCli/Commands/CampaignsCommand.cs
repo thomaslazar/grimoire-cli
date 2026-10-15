@@ -10,7 +10,7 @@ public static class CampaignsCommand
     private static readonly string[] OwnerOnly =
     [
         "Owner only, no admin override. 403 also when the owner's campaign",
-        "access is disabled or the campaign is archived.",
+        "access is disabled; 409 while the campaign is archived.",
     ];
 
     public static Command Create()
@@ -184,8 +184,11 @@ public static class CampaignsCommand
         command.AddHelpSection("Notes", HelpSectionPosition.Top,
             "Campaign owner only; works on an archived campaign.",
             "",
-            "Deletes its wiki, templates, resources, categories, files, members and",
-            "schedule with it. There is no undo.");
+            "Deletes its wiki, templates, resources, categories, files, members,",
+            "schedule, session notes and rulesets with it. There is no undo.",
+            "",
+            "Fails with a 500 while another campaign names it as parent_campaign_id;",
+            "clear that with campaigns update first.");
         command.AddExamples("grimoire-cli campaigns delete --id <campaign-id>");
         command.SetAction(async (parseResult, cancellationToken) =>
         {

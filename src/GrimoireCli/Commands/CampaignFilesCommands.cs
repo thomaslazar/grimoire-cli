@@ -10,7 +10,7 @@ public static class CampaignFilesCommands
     private static readonly string[] OwnerOnly =
     [
         "Owner only, no admin override. 403 also when the owner's campaign",
-        "access is disabled or the campaign is archived.",
+        "access is disabled; 409 while the campaign is archived.",
     ];
 
     public static Command Create()
@@ -85,9 +85,9 @@ public static class CampaignFilesCommands
         });
         command.AddHelpSection("Notes", HelpSectionPosition.Top,
             [.. OwnerOnly, "",
-            "As upload, but only a real PNG, JPEG, WebP or GIF, max 5 MB. The",
-            "resource_id it returns is the file id [[image:<file-id>]] takes in a",
-            "wiki page."]);
+            "A real PNG, JPEG, WebP or GIF, max 5 MB, linked at gm visibility. An admin",
+            "may set a lower per-file limit (413) or disable uploads (403); admins are",
+            "exempt. The resource_id it returns is the file id [[image:<file-id>]] takes."]);
         command.AddExamples("grimoire-cli campaigns files upload-image --id <campaign-id> --file map.png");
         command.AddResponseExample<Generated.Models.LinkedResourceOut>();
         command.SetAction(async (parseResult, cancellationToken) =>

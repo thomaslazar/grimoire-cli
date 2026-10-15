@@ -44,8 +44,11 @@ Everything marked *probed* was checked against the local stack.
 - **delete** (`delete_campaign`, `core.py:364`).
   - Owner only, and it works on an archived campaign.
   - Deletes the campaign and, by cascade, its wiki, templates, resources,
-    categories, files, members and schedule (`models/campaigns.py:67-102`).
-    There is no undo.
+    categories, files, members, schedule, session notes and rulesets
+    (`models/campaigns.py:67-102`). There is no undo.
+  - Fails with a 500 while another campaign names it as
+    `parent_campaign_id` (`models/campaigns.py:30` has no `ondelete`).
+    *Probed:* both rows survive.
   - No prompt and no `--yes`; see CLAUDE.md, "No confirm-gated command". The
     warning lives in the help text.
 

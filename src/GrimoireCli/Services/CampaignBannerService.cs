@@ -4,7 +4,7 @@ using Microsoft.Kiota.Abstractions;
 
 namespace GrimoireCli.Services;
 
-/// <summary>Campaign banner (routers/campaigns). Ownership-gated, so no call carries a permission hint.</summary>
+/// <summary>Campaign banner (routers/campaigns/uploads.py). Writes need ownership, get needs membership; no call carries a permission hint.</summary>
 public class CampaignBannerService
 {
     private const string NotFound = "No campaign with that ID. List them with: grimoire-cli campaigns list";
