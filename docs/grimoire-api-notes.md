@@ -1380,3 +1380,24 @@ at tag `v1.8.0`; starred items verified against the 1.8.0 stack. Backs
 - **Reorder re-deals only the slots of pages the caller can edit**; unknown,
   invisible and read-only ids are dropped and keep their slots
   (`wiki.py:99-166`).
+
+### Session notes are legacy
+
+Read from `backend/main.py`, `wiki_migration.py`, `session_creator.py` and
+`frontend/src/api.js` at tag `v1.8.0`, and verified against the 1.8.0 stack by
+restarting it. Why `campaigns` has no session-note commands.
+
+- **Every startup rolls session notes into wiki pages** and deletes them
+  (`main.py:254`, `wiki_migration.py:33-131`). GM internal notes become a `gm`
+  page "<title> - GM Notes", GM external notes a `group` page "<title>", and
+  each player's note a `group` page "<title> - <name>'s Notes" authored by that
+  player. All of them get `page_type: session` and `session_date`, filed under
+  a "Session Notes" parent page. Sessions with no notes are dropped. Verified:
+  a session with GM notes was gone from `GET /sessions` after a restart, with
+  those pages in its place.
+- **The web UI no longer calls the `/sessions` routes.** `api.js:244-254`
+  defines them, but no component uses them. The session log is session-type
+  wiki pages, which `campaigns wiki create` / `update` already write.
+- **`session_creator.py` still auto-creates empty session notes** the day before
+  a scheduled GM-campaign session (`:17-45`). The next startup drops them as
+  empty.
