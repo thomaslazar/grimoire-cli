@@ -2922,6 +2922,77 @@ done
   || fail "the Smoke Wiki should be empty after cleanup"
 ok "campaigns wiki pages cleaned up"
 
+# ---- campaign housekeeping --------------------------------------------------
+# Own throwaway campaign, swept by name first so a re-run converges.
+# deleting leftover Smoke Housekeeping campaigns, archived ones included
+for c in $("$CLI" campaigns list --include-archived 2>"$WORK/cli.err" | jq -r '.[] | select(.name == "Smoke Housekeeping") | .id'); do
+  "$CLI" campaigns delete --id "$c" >/dev/null 2>"$WORK/cli.err" \
+    || { cat "$WORK/cli.err" >&2; fail "campaigns delete (sweep) exited non-zero"; }
+done
+# creating the housekeeping campaign
+HK=$(echo '{"name":"Smoke Housekeeping"}' | "$CLI" campaigns create --stdin 2>"$WORK/cli.err" | jq -r .id) \
+  || { cat "$WORK/cli.err" >&2; fail "campaigns create (housekeeping) exited non-zero"; }
+[ -n "$HK" ] && [ "$HK" != "null" ] || fail "campaigns create should return an id"
+
+# converting to a group campaign, then again expecting a non-zero exit
+"$CLI" campaigns convert-to-group --id "$HK" 2>"$WORK/cli.err" | jq -e '.is_gm_campaign == true' >/dev/null \
+  || { cat "$WORK/cli.err" >&2; fail "convert-to-group should set is_gm_campaign"; }
+set +e
+"$CLI" campaigns convert-to-group --id "$HK" >/dev/null 2>"$WORK/cli.err"; rc=$?
+set -e
+[ "$rc" -ne 0 ] || fail "a second convert-to-group should exit non-zero"
+ok "campaigns convert-to-group converts once and refuses twice"
+
+# uploading an image file expecting is_image and a resource id
+IMG_JSON=$("$CLI" campaigns files upload-image --id "$HK" --file docker/fixture-cover.png 2>"$WORK/cli.err") \
+  || { cat "$WORK/cli.err" >&2; fail "files upload-image exited non-zero"; }
+echo "$IMG_JSON" | jq -e '.is_image == true' >/dev/null || fail "upload-image should report is_image: $IMG_JSON"
+IMG=$(echo "$IMG_JSON" | jq -r .resource_id)
+[ -n "$IMG" ] && [ "$IMG" != "null" ] || fail "upload-image should return a resource_id"
+ok "campaigns files upload-image stores an image"
+
+# setting the banner from the uploaded file, then focus, then fetching it
+"$CLI" campaigns banner from-source --id "$HK" --source-type campaign_file --source-id "$IMG" 2>"$WORK/cli.err" \
+  | jq -e '.banner_path | endswith(".webp")' >/dev/null \
+  || { cat "$WORK/cli.err" >&2; fail "banner from-source should set a .webp banner_path"; }
+"$CLI" campaigns banner focus --id "$HK" --focus-y 30 2>"$WORK/cli.err" | jq -e '.banner_focus_y == 30' >/dev/null \
+  || { cat "$WORK/cli.err" >&2; fail "banner focus should set banner_focus_y 30"; }
+"$CLI" campaigns banner get --id "$HK" --output "$WORK/banner.webp" >/dev/null 2>"$WORK/cli.err" \
+  || { cat "$WORK/cli.err" >&2; fail "banner get exited non-zero"; }
+[ -s "$WORK/banner.webp" ] || fail "banner get should write a non-empty file"
+ok "campaigns banner from-source, focus and get"
+
+# uploading then deleting a banner expecting banner get to fail afterwards
+"$CLI" campaigns banner upload --id "$HK" --file docker/fixture-cover.png >/dev/null 2>"$WORK/cli.err" \
+  || { cat "$WORK/cli.err" >&2; fail "banner upload exited non-zero"; }
+"$CLI" campaigns banner delete --id "$HK" >/dev/null 2>"$WORK/cli.err" \
+  || { cat "$WORK/cli.err" >&2; fail "banner delete exited non-zero"; }
+set +e
+"$CLI" campaigns banner get --id "$HK" --output "$WORK/none.webp" >/dev/null 2>"$WORK/cli.err"; rc=$?
+set -e
+[ "$rc" -ne 0 ] || fail "banner get after delete should exit non-zero"
+ok "campaigns banner upload and delete"
+
+# archiving expecting the campaign hidden from the default list only
+"$CLI" campaigns archive --id "$HK" >/dev/null 2>"$WORK/cli.err" \
+  || { cat "$WORK/cli.err" >&2; fail "campaigns archive exited non-zero"; }
+"$CLI" campaigns list | jq -e --arg id "$HK" '[.[] | select(.id == $id)] | length == 0' >/dev/null \
+  || fail "an archived campaign should be absent from campaigns list"
+"$CLI" campaigns list --include-archived | jq -e --arg id "$HK" '[.[] | select(.id == $id)] | length == 1' >/dev/null \
+  || fail "an archived campaign should appear with --include-archived"
+"$CLI" campaigns unarchive --id "$HK" 2>"$WORK/cli.err" | jq -e '.is_archived == false' >/dev/null \
+  || { cat "$WORK/cli.err" >&2; fail "unarchive should clear is_archived"; }
+ok "campaigns archive and unarchive"
+
+# deleting expecting the campaign gone
+"$CLI" campaigns delete --id "$HK" >/dev/null 2>"$WORK/cli.err" \
+  || { cat "$WORK/cli.err" >&2; fail "campaigns delete exited non-zero"; }
+set +e
+"$CLI" campaigns get --id "$HK" >/dev/null 2>"$WORK/cli.err"; rc=$?
+set -e
+[ "$rc" -ne 0 ] || fail "campaigns get after delete should exit non-zero"
+ok "campaigns delete removes the campaign"
+
 # ---- api keys ----
 # Key-mode calls use their own config file, so the admin session above is untouched.
 KEYCFG="$WORK/key-config.json"

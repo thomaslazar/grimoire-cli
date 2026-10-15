@@ -371,6 +371,10 @@ grimoire-cli config set server https://grimoire.example.com
 | `campaigns get --id <campaign-id>` | Get one campaign |
 | `campaigns create {--input <file> \| --stdin}` | Create a campaign, optionally with resources linked |
 | `campaigns update --id <campaign-id> {--input <file> \| --stdin}` | Update a campaign's details |
+| `campaigns archive --id <campaign-id>` | Archive a campaign |
+| `campaigns unarchive --id <campaign-id>` | Unarchive a campaign |
+| `campaigns convert-to-group --id <campaign-id> [--gm-title <title>]` | Turn a personal campaign into a GM-run group campaign |
+| `campaigns delete --id <campaign-id>` | Delete a campaign and everything in it |
 | `campaigns resources list --id <campaign-id>` | List a campaign's linked resources |
 | `campaigns resources add --id <campaign-id> --resource-type <t> --resource-id <item-id> [--visibility gm\|public\|private] [--category-id <id>]` | Link one library item; 409 if already linked |
 | `campaigns resources bulk --id <campaign-id> {--input <file> \| --stdin}` | Link many items; exit 3 if any were skipped |
@@ -384,6 +388,12 @@ grimoire-cli config set server https://grimoire.example.com
 | `campaigns categories reorder --id <campaign-id> --ordered-ids <category-id>...` | Set the order of categories |
 | `campaigns categories group-order --id <campaign-id> --ordered-keys <key>...` | Order the resource panel's type and category groups |
 | `campaigns files upload --id <campaign-id> --file <path> [--category-id <id> \| --new-category-name <n>]` | Upload a file and link it at `gm` visibility |
+| `campaigns files upload-image --id <campaign-id> --file <path> [--category-id <id> \| --new-category-name <name>]` | Upload an image into a campaign and link it |
+| `campaigns banner get --id <campaign-id> --output <path\|-> [--size <small\|full>]` | Download the campaign banner |
+| `campaigns banner upload --id <campaign-id> --file <path>` | Upload the campaign banner |
+| `campaigns banner delete --id <campaign-id>` | Remove the campaign banner |
+| `campaigns banner from-source --id <campaign-id> --source-type <type> --source-id <id>` | Set the banner from an image Grimoire already holds |
+| `campaigns banner focus --id <campaign-id> --focus-y <0-100>` | Set where the banner sits in its 2:1 frame |
 | `campaigns wiki list --id <campaign-id> [--mine] [--include-hidden]` | List the wiki pages you can see |
 | `campaigns wiki get --id <campaign-id> --page-id <page-id>` | Get one wiki page with its body and backlinks |
 | `campaigns wiki create --id <campaign-id> {--input <file> \| --stdin}` | Create a wiki page |

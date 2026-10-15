@@ -1337,6 +1337,10 @@ Read from `backend/routers/campaigns/` at tag `v1.7.2`, and verified against the
   `mode=delete_items` deletes its link rows directly (`categories.py:231-233`),
   skipping the file cleanup that `DELETE /resources/{id}` does for a `file`
   link (`resources.py:300-302`), so the upload stays on disk.
+- **Delete leaves files on disk.** `delete_campaign` removes rows only
+  (`core.py:364-376`): the banner (`<id>.webp`, `<id>_sm.webp`) and uploaded
+  files stay under `campaign_uploads/`. Verified against the 1.8.0 stack.
+- **Deleting a parent campaign is a 500.** `parent_campaign_id` has no `ondelete` (`models/campaigns.py:30`), so deleting a campaign another names as its parent fails on the foreign key and leaves both rows. Verified against the 1.8.0 stack.
 
 ## Campaign wiki
 

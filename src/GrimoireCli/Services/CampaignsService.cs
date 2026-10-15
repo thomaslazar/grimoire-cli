@@ -1,5 +1,6 @@
 using System.Text;
 using GrimoireCli.Api;
+using Microsoft.Kiota.Abstractions;
 
 namespace GrimoireCli.Services;
 
@@ -46,4 +47,29 @@ public class CampaignsService
         info.SetStreamContent(new MemoryStream(Encoding.UTF8.GetBytes(rawBody)), "application/json");
         return await _client.SendAsync(info, notFoundHint: NotFound);
     }
+
+    /// <summary>PUT /api/campaigns/{id}/archive. Owner only; archived is the target state.</summary>
+    public async Task<string> ArchiveAsync(string id, bool archived)
+        => await _client.SendAsync(ArchiveRequest(id, archived), notFoundHint: NotFound);
+
+    /// <summary>POST /api/campaigns/{id}/convert-to-group. Owner and gm or admin; checked in the handler.</summary>
+    public async Task<string> ConvertToGroupAsync(string id, string? gmTitle)
+        => await _client.SendAsync(ConvertToGroupRequest(id, gmTitle), notFoundHint: NotFound);
+
+    /// <summary>DELETE /api/campaigns/{id}. Owner only; 204.</summary>
+    public async Task<string> DeleteAsync(string id)
+        => await _client.SendAsync(DeleteRequest(id), notFoundHint: NotFound);
+
+    internal RequestInformation ArchiveRequest(string id, bool archived)
+        => _client.Api.Api.Campaigns[id].Archive.ToPutRequestInformation(new Generated.Models.CampaignArchive { Archived = archived });
+
+    internal RequestInformation ConvertToGroupRequest(string id, string? gmTitle)
+        => _client.Api.Api.Campaigns[id].ConvertToGroup.ToPostRequestInformation(new Generated.Models.CampaignConvert
+        {
+            // Left unset when absent so no gm_title key is sent.
+            GmTitle = gmTitle is null ? null : new Generated.Models.CampaignConvert.CampaignConvert_gm_title { String = gmTitle },
+        });
+
+    internal RequestInformation DeleteRequest(string id)
+        => _client.Api.Api.Campaigns[id].ToDeleteRequestInformation();
 }

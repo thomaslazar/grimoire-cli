@@ -21,7 +21,7 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | backups | 6 / 6 |
 | bookmarks | 0 / 4 |
 | books | 16 / 16 |
-| campaigns | 39 / 93 |
+| campaigns | 48 / 93 |
 | characters | 0 / 16 |
 | content | 0 / 6 |
 | downloads | 1 / 1 |
@@ -45,7 +45,7 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | token-frames | 0 / 2 |
 | tokens | 11 / 11 |
 | users | 0 / 16 |
-| **Total** | **197 / 360** |
+| **Total** | **206 / 360** |
 
 2 operation(s) are internal-only (🔒) and excluded from covered counts.
 
@@ -186,23 +186,23 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | GET | `/api/campaigns/resources/suggested/{system_id}` | Suggested resources (system books) for the create wizard |  | campaigns: read | — |
 | GET | `/api/campaigns/{campaign_id}` | Get a campaign |  | campaigns: read | `campaigns get` ✅ |
 | PATCH | `/api/campaigns/{campaign_id}` | Update a campaign |  | campaigns: write | `campaigns update` ✅ |
-| DELETE | `/api/campaigns/{campaign_id}` | Delete a campaign |  | campaigns: write | — |
-| PUT | `/api/campaigns/{campaign_id}/archive` | Archive or unarchive a campaign |  | campaigns: write | — |
+| DELETE | `/api/campaigns/{campaign_id}` | Delete a campaign |  | campaigns: write | `campaigns delete` ✅ |
+| PUT | `/api/campaigns/{campaign_id}/archive` | Archive or unarchive a campaign |  | campaigns: write | `campaigns archive` / `unarchive` ✅ |
 | GET | `/api/campaigns/{campaign_id}/availability` | Get availability chart for upcoming sessions |  | campaigns: read | — |
 | PUT | `/api/campaigns/{campaign_id}/availability/{session_date}` | Set availability for a session date |  | campaigns: write | — |
 | PUT | `/api/campaigns/{campaign_id}/availability/{session_date}/cancel` | GM: cancel or uncancel a session date |  | campaigns: write | — |
-| POST | `/api/campaigns/{campaign_id}/banner` | Upload campaign banner |  | campaigns: write | — |
-| GET | `/api/campaigns/{campaign_id}/banner` | Get campaign banner image |  | campaigns: read | — |
-| DELETE | `/api/campaigns/{campaign_id}/banner` | Remove campaign banner |  | campaigns: write | — |
-| PUT | `/api/campaigns/{campaign_id}/banner/focus` | Set the banner focal point |  | campaigns: write | — |
-| POST | `/api/campaigns/{campaign_id}/banner/from-source` | Set the banner from an existing image |  | campaigns: write | — |
+| POST | `/api/campaigns/{campaign_id}/banner` | Upload campaign banner |  | campaigns: write | `campaigns banner upload` ✅ |
+| GET | `/api/campaigns/{campaign_id}/banner` | Get campaign banner image |  | campaigns: read | `campaigns banner get` ✅ |
+| DELETE | `/api/campaigns/{campaign_id}/banner` | Remove campaign banner |  | campaigns: write | `campaigns banner delete` ✅ |
+| PUT | `/api/campaigns/{campaign_id}/banner/focus` | Set the banner focal point |  | campaigns: write | `campaigns banner focus` ✅ |
+| POST | `/api/campaigns/{campaign_id}/banner/from-source` | Set the banner from an existing image |  | campaigns: write | `campaigns banner from-source` ✅ |
 | GET | `/api/campaigns/{campaign_id}/calendar.ics` | Download a campaign's schedule as an .ics file |  | campaigns: read | — |
 | GET | `/api/campaigns/{campaign_id}/categories` | List categories (optionally filtered by kind) |  | campaigns: read | `campaigns categories list` ✅ |
 | POST | `/api/campaigns/{campaign_id}/categories` | Create a category |  | campaigns: write | `campaigns categories create` ✅ |
 | PUT | `/api/campaigns/{campaign_id}/categories/reorder` | Reorder categories |  | campaigns: write | `campaigns categories reorder` ✅ |
 | PATCH | `/api/campaigns/{campaign_id}/categories/{category_id}` | Rename a category |  | campaigns: write | `campaigns categories update` ✅ |
 | DELETE | `/api/campaigns/{campaign_id}/categories/{category_id}` | Delete a category (mode: uncategorize \| delete_items) |  | campaigns: write | `campaigns categories delete` ✅ |
-| POST | `/api/campaigns/{campaign_id}/convert-to-group` | Convert a personal campaign into a GM-run group campaign |  | campaigns: write | — |
+| POST | `/api/campaigns/{campaign_id}/convert-to-group` | Convert a personal campaign into a GM-run group campaign |  | campaigns: write | `campaigns convert-to-group` ✅ |
 | GET | `/api/campaigns/{campaign_id}/eligible-members` | List users that can be invited |  | campaigns: read | — |
 | POST | `/api/campaigns/{campaign_id}/files` | Upload a campaign file (GM); links it as a resource |  | campaigns: write | `campaigns files upload` ✅ |
 | GET | `/api/campaigns/{campaign_id}/files/{file_id}` | Download a campaign file (honours resource visibility) |  | campaigns: read | — |
@@ -211,7 +211,7 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | DELETE | `/api/campaigns/{campaign_id}/guests/{member_id}` | Remove a guest (deletes the guest account) |  | campaigns: write | — |
 | POST | `/api/campaigns/{campaign_id}/guests/{member_id}/regenerate` | Regenerate a guest's invite code |  | campaigns: write | — |
 | GET | `/api/campaigns/{campaign_id}/guests/{member_id}/share-template` | Get share text and links for a guest invite code |  | campaigns: read | — |
-| POST | `/api/campaigns/{campaign_id}/images` | Upload an image (GM); links it as an image resource for note embedding |  | campaigns: write | — |
+| POST | `/api/campaigns/{campaign_id}/images` | Upload an image (GM); links it as an image resource for note embedding |  | campaigns: write | `campaigns files upload-image` ✅ |
 | POST | `/api/campaigns/{campaign_id}/invite` | Invite a player to a GM campaign |  | campaigns: write | — |
 | POST | `/api/campaigns/{campaign_id}/members/{member_id}/art` | Upload a member's character art |  | campaigns: write | — |
 | GET | `/api/campaigns/{campaign_id}/members/{member_id}/art` | Get a member's character art |  | campaigns: read | — |

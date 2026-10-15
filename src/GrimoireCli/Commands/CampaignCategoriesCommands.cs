@@ -9,7 +9,7 @@ public static class CampaignCategoriesCommands
     private static readonly string[] OwnerOnly =
     [
         "Owner only, no admin override. 403 also when the owner's campaign",
-        "access is disabled or the campaign is archived.",
+        "access is disabled; 409 while the campaign is archived.",
     ];
     private static readonly string[] DeleteModes = ["uncategorize", "delete_items"];
 

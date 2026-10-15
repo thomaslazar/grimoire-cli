@@ -29,4 +29,29 @@ public class CampaignsCommandTests
     [Fact]
     public void UpdateRequiresId()
         => Assert.NotEmpty(CampaignsCommand.Create().Parse(["update", "--stdin"]).Errors);
+
+    [Theory]
+    [InlineData("archive")]
+    [InlineData("unarchive")]
+    [InlineData("convert-to-group")]
+    [InlineData("delete")]
+    public void LifecycleCommandsExistAndRequireId(string verb)
+    {
+        Assert.Contains(CampaignsCommand.Create().Subcommands, c => c.Name == verb);
+        Assert.NotEmpty(CampaignsCommand.Create().Parse([verb]).Errors);
+        Assert.Empty(CampaignsCommand.Create().Parse([verb, "--id", "c"]).Errors);
+        Assert.DoesNotContain("Role required:", RenderHelp(["campaigns", verb]));
+    }
+
+    [Fact]
+    public void ConvertAcceptsGmTitle()
+        => Assert.Empty(CampaignsCommand.Create().Parse(["convert-to-group", "--id", "c", "--gm-title", "Dungeon Master"]).Errors);
+
+    [Fact]
+    public void DeleteSaysThereIsNoUndo()
+        => Assert.Contains("no undo", RenderHelp(["campaigns", "delete"]));
+
+    [Fact]
+    public void ConvertSaysItIsOneWay()
+        => Assert.Contains("One-way", RenderHelp(["campaigns", "convert-to-group"]));
 }
