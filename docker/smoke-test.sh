@@ -2993,6 +2993,50 @@ set -e
 [ "$rc" -ne 0 ] || fail "campaigns get after delete should exit non-zero"
 ok "campaigns delete removes the campaign"
 
+# ---- campaign scheduling ----------------------------------------------------
+# Runs on the Smoke Wiki campaign and leaves it unscheduled, so a re-run converges.
+# setting a weekly schedule expecting upcoming sessions
+SCHED=$(echo '{"frequency":"weekly","days":[2],"time_local":"19:30","timezone":"Europe/Berlin"}' \
+  | "$CLI" campaigns schedule set --id "$WIKI" --stdin 2>"$WORK/cli.err") \
+  || { cat "$WORK/cli.err" >&2; fail "schedule set exited non-zero"; }
+echo "$SCHED" | jq -e '.next_sessions | length > 0' >/dev/null || fail "schedule set should return next_sessions: $SCHED"
+D=$(echo "$SCHED" | jq -r '.next_sessions[0]')
+# reading the schedule back
+"$CLI" campaigns schedule get --id "$WIKI" 2>"$WORK/cli.err" | jq -e '.definition.frequency == "weekly"' >/dev/null \
+  || { cat "$WORK/cli.err" >&2; fail "schedule get should report the weekly definition"; }
+ok "campaigns schedule set and get round-trip a weekly schedule"
+
+# answering tentative for the first session, then reading the owner row
+"$CLI" campaigns availability set --id "$WIKI" --date "$D" --status tentative 2>"$WORK/cli.err" \
+  | jq -e '.status == "tentative"' >/dev/null \
+  || { cat "$WORK/cli.err" >&2; fail "availability set should echo tentative"; }
+"$CLI" campaigns availability get --id "$WIKI" 2>"$WORK/cli.err" \
+  | jq -e --arg d "$D" '[.rows[] | select(.is_owner)][0].dates[$d].status == "tentative"' >/dev/null \
+  || { cat "$WORK/cli.err" >&2; fail "availability get should show tentative on the owner row"; }
+ok "campaigns availability set is visible in availability get"
+
+# toggling cancellation twice expecting true then false
+"$CLI" campaigns availability toggle-cancel --id "$WIKI" --date "$D" 2>"$WORK/cli.err" | jq -e '.is_cancelled == true' >/dev/null \
+  || { cat "$WORK/cli.err" >&2; fail "first toggle-cancel should cancel"; }
+"$CLI" campaigns availability toggle-cancel --id "$WIKI" --date "$D" 2>"$WORK/cli.err" | jq -e '.is_cancelled == false' >/dev/null \
+  || { cat "$WORK/cli.err" >&2; fail "second toggle-cancel should uncancel"; }
+ok "campaigns availability toggle-cancel flips and restores"
+
+# downloading the calendar expecting an iCalendar file, then the subscription state
+"$CLI" campaigns calendar download --id "$WIKI" --output "$WORK/smoke.ics" >/dev/null 2>"$WORK/cli.err" \
+  || { cat "$WORK/cli.err" >&2; fail "calendar download exited non-zero"; }
+[ "$(head -n1 "$WORK/smoke.ics" | tr -d '\r')" = "BEGIN:VCALENDAR" ] || fail "calendar download should write a VCALENDAR file"
+"$CLI" campaigns calendar subscription get --id "$WIKI" 2>"$WORK/cli.err" | jq -e '.has_token | type == "boolean"' >/dev/null \
+  || { cat "$WORK/cli.err" >&2; fail "subscription get should report has_token"; }
+ok "campaigns calendar download writes an .ics and subscription get reports has_token"
+
+# deleting the schedule expecting a null definition
+"$CLI" campaigns schedule delete --id "$WIKI" >/dev/null 2>"$WORK/cli.err" \
+  || { cat "$WORK/cli.err" >&2; fail "schedule delete exited non-zero"; }
+"$CLI" campaigns schedule get --id "$WIKI" 2>"$WORK/cli.err" | jq -e '.definition == null' >/dev/null \
+  || { cat "$WORK/cli.err" >&2; fail "schedule get should show no definition after delete"; }
+ok "campaigns schedule delete clears the schedule"
+
 # ---- api keys ----
 # Key-mode calls use their own config file, so the admin session above is untouched.
 KEYCFG="$WORK/key-config.json"
