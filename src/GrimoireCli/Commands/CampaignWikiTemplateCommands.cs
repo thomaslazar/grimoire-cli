@@ -170,7 +170,8 @@ public static class CampaignWikiTemplateCommands
             [.. OwnerOnly, "",
             "Reads .md/.markdown/.txt, or a .zip holding one .md and an optional .yml",
             "manifest — what export writes. The name comes from the manifest, else",
-            "the frontmatter title, else the file name. Max 512 KB."]);
+            "the frontmatter title, else the first # heading, else the file name.",
+            "Max 512 KB."]);
         command.AddExamples("grimoire-cli campaigns wiki templates import --id <campaign-id> --file npc.zip");
         command.AddResponseExample<Generated.Models.WikiTemplateDetailOut>();
         command.SetAction(async (parseResult, cancellationToken) =>
@@ -240,8 +241,8 @@ public static class CampaignWikiTemplateCommands
             "Every use creates a new page; nothing is overwritten. Title: defaults",
             "title, else the body's first # heading, else the template name; a",
             "repeated title gets a suffixed slug. session_date is never set, even",
-            "for a session page. Unresolved [[links]] get stubs, as on create.",
-            "Rename the page with campaigns wiki update."]);
+            "for a session page. Unresolved [[links]] get stubs, as on campaigns wiki",
+            "create. Rename the page with campaigns wiki update."]);
         command.AddExamples("grimoire-cli campaigns wiki templates use --id <campaign-id> --template-id <template-id>");
         command.AddResponseExample<Generated.Models.WikiTemplateUseOut>();
         command.SetAction(async (parseResult, cancellationToken) =>

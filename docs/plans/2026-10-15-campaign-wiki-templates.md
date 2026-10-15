@@ -109,7 +109,8 @@
         ```
         Reads .md/.markdown/.txt, or a .zip holding one .md and an optional .yml
         manifest — what export writes. The name comes from the manifest, else
-        the frontmatter title, else the file name. Max 512 KB.
+        the frontmatter title, else the first # heading, else the file name.
+        Max 512 KB.
         ```
     - `export`: "Export a note template as a .zip".
       - Notes:

@@ -76,7 +76,7 @@ All of these are verified in source and probed on the local stack.
     holds its first `.md` and an optional `.yml` manifest (:366), so an export
     re-imports. Probed the round trip.
   - The name comes from the manifest, else the frontmatter title, else the
-    filename (:412, :416).
+    first `# heading`, else the filename (:412, :416).
   - Maximum size is 512 KB (`_MAX_UPLOAD_BYTES`, :61).
 - **`export`.** A zip of `<slug>/<slug>.yml` and `<slug>/<slug>.md` (:425).
   Probed `npc/npc.yml` and `npc/npc.md`.
