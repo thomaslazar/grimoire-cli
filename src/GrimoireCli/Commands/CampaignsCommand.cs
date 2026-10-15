@@ -20,6 +20,11 @@ public static class CampaignsCommand
         command.Subcommands.Add(CreateGetCommand());
         command.Subcommands.Add(CreateCreateCommand());
         command.Subcommands.Add(CreateUpdateCommand());
+        command.Subcommands.Add(CreateArchiveCommand("archive", "Archive a campaign", true,
+            "Campaign owner only.", "", "Hides it from every member's list unless --include-archived, and freezes", "it read-only for everyone, owner included."));
+        command.Subcommands.Add(CreateArchiveCommand("unarchive", "Unarchive a campaign", false, "Campaign owner only."));
+        command.Subcommands.Add(CreateConvertCommand());
+        command.Subcommands.Add(CreateDeleteCommand());
         command.Subcommands.Add(CampaignResourcesCommands.Create());
         command.Subcommands.Add(CampaignCategoriesCommands.Create());
         command.Subcommands.Add(CampaignFilesCommands.Create());
@@ -127,6 +132,64 @@ public static class CampaignsCommand
             }
             var (client, _) = CommandHelper.BuildClient();
             ConsoleOutput.WriteRawJson(await new CampaignsService(client).UpdateAsync(parseResult.GetValue(idOption)!, body));
+            return 0;
+        });
+        return command;
+    }
+
+    private static Command CreateArchiveCommand(string name, string description, bool archived, params string[] notes)
+    {
+        var idOption = new Option<string>("--id") { Description = "Campaign ID", Required = true };
+        var command = new Command(name, description) { idOption };
+        command.AddHelpSection("Notes", HelpSectionPosition.Top, notes);
+        command.AddExamples($"grimoire-cli campaigns {name} --id <campaign-id>");
+        command.AddResponseExample<Generated.Models.CampaignOut>();
+        command.SetAction(async (parseResult, cancellationToken) =>
+        {
+            var (client, _) = CommandHelper.BuildClient();
+            ConsoleOutput.WriteRawJson(await new CampaignsService(client).ArchiveAsync(parseResult.GetValue(idOption)!, archived));
+            return 0;
+        });
+        return command;
+    }
+
+    private static Command CreateConvertCommand()
+    {
+        var idOption = new Option<string>("--id") { Description = "Campaign ID", Required = true };
+        var titleOption = new Option<string?>("--gm-title") { Description = "The GM's title shown to the table" };
+        var command = new Command("convert-to-group", "Turn a personal campaign into a GM-run group campaign") { idOption, titleOption };
+        command.AddHelpSection("Notes", HelpSectionPosition.Top,
+            "Campaign owner only; refused while the campaign is archived. Also needs",
+            "the gm or admin role (403).",
+            "",
+            "One-way; 409 if it is already a group campaign. Members, guests and the",
+            "schedule start empty; resources and the wiki carry over.");
+        command.AddExamples("grimoire-cli campaigns convert-to-group --id <campaign-id> --gm-title \"Dungeon Master\"");
+        command.AddResponseExample<Generated.Models.CampaignOut>();
+        command.SetAction(async (parseResult, cancellationToken) =>
+        {
+            var (client, _) = CommandHelper.BuildClient();
+            ConsoleOutput.WriteRawJson(await new CampaignsService(client).ConvertToGroupAsync(
+                parseResult.GetValue(idOption)!, parseResult.GetValue(titleOption)));
+            return 0;
+        });
+        return command;
+    }
+
+    private static Command CreateDeleteCommand()
+    {
+        var idOption = new Option<string>("--id") { Description = "Campaign ID", Required = true };
+        var command = new Command("delete", "Delete a campaign and everything in it") { idOption };
+        command.AddHelpSection("Notes", HelpSectionPosition.Top,
+            "Campaign owner only; works on an archived campaign.",
+            "",
+            "Deletes its wiki, templates, resources, categories, files, members and",
+            "schedule with it. There is no undo.");
+        command.AddExamples("grimoire-cli campaigns delete --id <campaign-id>");
+        command.SetAction(async (parseResult, cancellationToken) =>
+        {
+            var (client, _) = CommandHelper.BuildClient();
+            ConsoleOutput.WriteRawJson(await new CampaignsService(client).DeleteAsync(parseResult.GetValue(idOption)!));
             return 0;
         });
         return command;

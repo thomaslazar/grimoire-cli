@@ -371,6 +371,10 @@ grimoire-cli config set server https://grimoire.example.com
 | `campaigns get --id <campaign-id>` | Get one campaign |
 | `campaigns create {--input <file> \| --stdin}` | Create a campaign, optionally with resources linked |
 | `campaigns update --id <campaign-id> {--input <file> \| --stdin}` | Update a campaign's details |
+| `campaigns archive --id <campaign-id>` | Archive a campaign |
+| `campaigns unarchive --id <campaign-id>` | Unarchive a campaign |
+| `campaigns convert-to-group --id <campaign-id> [--gm-title <title>]` | Turn a personal campaign into a GM-run group campaign |
+| `campaigns delete --id <campaign-id>` | Delete a campaign and everything in it |
 | `campaigns resources list --id <campaign-id>` | List a campaign's linked resources |
 | `campaigns resources add --id <campaign-id> --resource-type <t> --resource-id <item-id> [--visibility gm\|public\|private] [--category-id <id>]` | Link one library item; 409 if already linked |
 | `campaigns resources bulk --id <campaign-id> {--input <file> \| --stdin}` | Link many items; exit 3 if any were skipped |
