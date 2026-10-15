@@ -281,6 +281,14 @@ IMPLEMENTED = {
     "DELETE /api/campaigns/{campaign_id}/wiki/{page_id}/hide": "`campaigns wiki unhide` ✅",
     "GET /api/campaigns/{campaign_id}/wiki/export": "`campaigns wiki export` ✅",
     "POST /api/campaigns/{campaign_id}/wiki/import": "`campaigns wiki import` ✅",
+    "GET /api/campaigns/{campaign_id}/wiki/templates": "`campaigns wiki templates list` ✅",
+    "POST /api/campaigns/{campaign_id}/wiki/templates": "`campaigns wiki templates create` ✅",
+    "POST /api/campaigns/{campaign_id}/wiki/templates/upload": "`campaigns wiki templates import` ✅",
+    "GET /api/campaigns/{campaign_id}/wiki/templates/{template_id}": "`campaigns wiki templates get` ✅",
+    "PATCH /api/campaigns/{campaign_id}/wiki/templates/{template_id}": "`campaigns wiki templates update` ✅",
+    "DELETE /api/campaigns/{campaign_id}/wiki/templates/{template_id}": "`campaigns wiki templates delete` ✅",
+    "GET /api/campaigns/{campaign_id}/wiki/templates/{template_id}/export": "`campaigns wiki templates export` ✅",
+    "POST /api/campaigns/{campaign_id}/wiki/templates/{template_id}/use": "`campaigns wiki templates use` ✅",
 }
 
 ROLE_LABEL = {

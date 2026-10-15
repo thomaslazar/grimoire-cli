@@ -21,7 +21,7 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | backups | 6 / 6 |
 | bookmarks | 0 / 4 |
 | books | 16 / 16 |
-| campaigns | 29 / 93 |
+| campaigns | 37 / 93 |
 | characters | 0 / 16 |
 | content | 0 / 6 |
 | downloads | 1 / 1 |
@@ -45,7 +45,7 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | token-frames | 0 / 2 |
 | tokens | 11 / 11 |
 | users | 0 / 16 |
-| **Total** | **187 / 360** |
+| **Total** | **195 / 360** |
 
 2 operation(s) are internal-only (🔒) and excluded from covered counts.
 
@@ -250,16 +250,16 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | POST | `/api/campaigns/{campaign_id}/wiki/import` | Import wiki pages from a file or a picked folder |  | campaigns: write | `campaigns wiki import` ✅ |
 | PUT | `/api/campaigns/{campaign_id}/wiki/reorder` | Reorder wiki pages (drag-and-drop) |  | campaigns: write | `campaigns wiki reorder` ✅ |
 | GET | `/api/campaigns/{campaign_id}/wiki/search` | Search wiki pages |  | campaigns: read | `campaigns wiki search` ✅ |
-| GET | `/api/campaigns/{campaign_id}/wiki/templates` | List the campaign's note templates |  | campaigns: read | — |
-| POST | `/api/campaigns/{campaign_id}/wiki/templates` | Write a new note template |  | campaigns: write | — |
+| GET | `/api/campaigns/{campaign_id}/wiki/templates` | List the campaign's note templates |  | campaigns: read | `campaigns wiki templates list` ✅ |
+| POST | `/api/campaigns/{campaign_id}/wiki/templates` | Write a new note template |  | campaigns: write | `campaigns wiki templates create` ✅ |
 | GET | `/api/campaigns/{campaign_id}/wiki/templates/browse` | Browse the community note-template catalogue |  | campaigns: read | — |
 | POST | `/api/campaigns/{campaign_id}/wiki/templates/download/{template_id}` | Download a community note template into the campaign |  | campaigns: write | — |
-| POST | `/api/campaigns/{campaign_id}/wiki/templates/upload` | Add a note template from an uploaded .md file |  | campaigns: write | — |
-| GET | `/api/campaigns/{campaign_id}/wiki/templates/{template_id}` | Get a note template incl. its body |  | campaigns: read | — |
-| PATCH | `/api/campaigns/{campaign_id}/wiki/templates/{template_id}` | Edit a note template |  | campaigns: write | — |
-| DELETE | `/api/campaigns/{campaign_id}/wiki/templates/{template_id}` | Delete a note template |  | campaigns: write | — |
-| GET | `/api/campaigns/{campaign_id}/wiki/templates/{template_id}/export` | Export a note template as a .zip folder |  | campaigns: read | — |
-| POST | `/api/campaigns/{campaign_id}/wiki/templates/{template_id}/use` | Create a wiki page from a note template |  | campaigns: write | — |
+| POST | `/api/campaigns/{campaign_id}/wiki/templates/upload` | Add a note template from an uploaded .md file |  | campaigns: write | `campaigns wiki templates import` ✅ |
+| GET | `/api/campaigns/{campaign_id}/wiki/templates/{template_id}` | Get a note template incl. its body |  | campaigns: read | `campaigns wiki templates get` ✅ |
+| PATCH | `/api/campaigns/{campaign_id}/wiki/templates/{template_id}` | Edit a note template |  | campaigns: write | `campaigns wiki templates update` ✅ |
+| DELETE | `/api/campaigns/{campaign_id}/wiki/templates/{template_id}` | Delete a note template |  | campaigns: write | `campaigns wiki templates delete` ✅ |
+| GET | `/api/campaigns/{campaign_id}/wiki/templates/{template_id}/export` | Export a note template as a .zip folder |  | campaigns: read | `campaigns wiki templates export` ✅ |
+| POST | `/api/campaigns/{campaign_id}/wiki/templates/{template_id}/use` | Create a wiki page from a note template |  | campaigns: write | `campaigns wiki templates use` ✅ |
 | GET | `/api/campaigns/{campaign_id}/wiki/titles` | Wiki page titles for [[link]] autocomplete |  | campaigns: read | `campaigns wiki titles` ✅ |
 | GET | `/api/campaigns/{campaign_id}/wiki/{page_id}` | Get a wiki page |  | campaigns: read | `campaigns wiki get` ✅ |
 | PATCH | `/api/campaigns/{campaign_id}/wiki/{page_id}` | Update a wiki page |  | campaigns: write | `campaigns wiki update` ✅ |
