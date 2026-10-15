@@ -6,13 +6,14 @@ using Microsoft.Kiota.Abstractions;
 namespace GrimoireCli.Services;
 
 /// <summary>
-/// The eight routes behind `campaigns wiki templates`: a campaign's note templates
+/// The ten routes behind `campaigns wiki templates`: a campaign's note templates
 /// (routers/campaigns/wiki_templates.py). Every route is owner-only, checked by the
 /// server, so no permission hint is passed.
 /// </summary>
 public class CampaignWikiTemplateService
 {
     private const string CampaignNotFound = "No campaign with that ID. List them with: grimoire-cli campaigns list";
+    private const string EntryNotFound = "No such campaign or catalogue entry. List entries with: grimoire-cli campaigns wiki templates catalogue --id <campaign-id>";
     private const string TemplateNotFound = "No such campaign or template. List templates with: grimoire-cli campaigns wiki templates list --id <campaign-id>";
 
     private readonly GrimoireApiClient _client;
@@ -65,6 +66,14 @@ public class CampaignWikiTemplateService
     public async Task<string> UseAsync(string campaignId, string templateId)
         => await _client.SendAsync(UseRequest(campaignId, templateId), notFoundHint: TemplateNotFound);
 
+    /// <summary>GET /api/campaigns/{id}/wiki/templates/browse. Entries carry no body.</summary>
+    public async Task<string> CatalogueAsync(string campaignId, bool refresh)
+        => await _client.SendAsync(CatalogueRequest(campaignId, refresh), notFoundHint: CampaignNotFound);
+
+    /// <summary>POST /api/campaigns/{id}/wiki/templates/download/{source}. Always makes a new template.</summary>
+    public async Task<string> InstallAsync(string campaignId, string sourceId, string? indexUrl)
+        => await _client.SendAsync(InstallRequest(campaignId, sourceId, indexUrl), notFoundHint: EntryNotFound);
+
     internal RequestInformation ListRequest(string campaignId)
         => _client.Api.Api.Campaigns[campaignId].Wiki.Templates.ToGetRequestInformation();
 
@@ -100,4 +109,22 @@ public class CampaignWikiTemplateService
         body.AddOrReplacePart("file", "application/octet-stream", bytes, fileName);
         return _client.Api.Api.Campaigns[campaignId].Wiki.Templates.Upload.ToPostRequestInformation(body);
     }
+
+    internal RequestInformation CatalogueRequest(string campaignId, bool refresh)
+        => _client.Api.Api.Campaigns[campaignId].Wiki.Templates.Browse.ToGetRequestInformation(c =>
+        {
+            if (refresh)
+            {
+                c.QueryParameters.Refresh = true;
+            }
+        });
+
+    internal RequestInformation InstallRequest(string campaignId, string sourceId, string? indexUrl)
+        => _client.Api.Api.Campaigns[campaignId].Wiki.Templates.Download[sourceId].ToPostRequestInformation(c =>
+        {
+            if (indexUrl is not null)
+            {
+                c.QueryParameters.IndexUrl = indexUrl;
+            }
+        });
 }

@@ -22,6 +22,8 @@ public static class CampaignWikiTemplateCommands
         command.Subcommands.Add(CreateImportCommand());
         command.Subcommands.Add(CreateExportCommand());
         command.Subcommands.Add(CreateUseCommand());
+        command.Subcommands.Add(CreateCatalogueCommand());
+        command.Subcommands.Add(CreateInstallCommand());
         return command;
     }
 
@@ -250,6 +252,57 @@ public static class CampaignWikiTemplateCommands
             var (client, _) = CommandHelper.BuildClient();
             ConsoleOutput.WriteRawJson(await new CampaignWikiTemplateService(client).UseAsync(
                 parseResult.GetValue(idOption)!, parseResult.GetValue(templateIdOption)!));
+            return 0;
+        });
+        return command;
+    }
+
+    private static Command CreateCatalogueCommand()
+    {
+        var idOption = CampaignIdOption();
+        var refreshOption = new Option<bool>("--refresh") { Description = "Re-fetch the catalogue instead of using the server's cache" };
+        var command = new Command("catalogue", "Browse the community note-template catalogue") { idOption, refreshOption };
+        command.AddHelpSection("Notes", HelpSectionPosition.Top,
+            [.. OwnerOnly, "",
+            "Sources are the add-on index URLs (addons settings --index-url, admin);",
+            "each is read as a template index, else as <its dir>/templates/index.json.",
+            "Entries carry no template body; it is only readable once installed.",
+            "",
+            "403 when the server disables external installs; 502 when the only source",
+            "fails (with several, failing ones are skipped)."]);
+        command.AddExamples("grimoire-cli campaigns wiki templates catalogue --id <campaign-id>");
+        command.AddResponseExample<Generated.Models.WikiTemplateBrowseOut>();
+        command.SetAction(async (parseResult, cancellationToken) =>
+        {
+            var (client, _) = CommandHelper.BuildClient();
+            ConsoleOutput.WriteRawJson(await new CampaignWikiTemplateService(client).CatalogueAsync(
+                parseResult.GetValue(idOption)!, parseResult.GetValue(refreshOption)));
+            return 0;
+        });
+        return command;
+    }
+
+    private static Command CreateInstallCommand()
+    {
+        var idOption = CampaignIdOption();
+        var sourceIdOption = new Option<string>("--source-id") { Description = "Catalogue template id", Required = true };
+        var indexUrlOption = new Option<string?>("--index-url") { Description = "Source to take it from, when several list the id" };
+        var command = new Command("install", "Copy a catalogue template into the campaign") { idOption, sourceIdOption, indexUrlOption };
+        command.AddHelpSection("Notes", HelpSectionPosition.Top,
+            [.. OwnerOnly, "",
+            "--index-url takes an available_in[].index_url from catalogue; any other",
+            "value answers 404, as an unknown id does. Installing again makes",
+            "another copy.",
+            "",
+            "403 when the server disables external installs; 502 when the catalogue or",
+            "the body can't be fetched, or the body fails its sha256 check."]);
+        command.AddExamples("grimoire-cli campaigns wiki templates install --id <campaign-id> --source-id session-recap");
+        command.AddResponseExample<Generated.Models.WikiTemplateDetailOut>();
+        command.SetAction(async (parseResult, cancellationToken) =>
+        {
+            var (client, _) = CommandHelper.BuildClient();
+            ConsoleOutput.WriteRawJson(await new CampaignWikiTemplateService(client).InstallAsync(
+                parseResult.GetValue(idOption)!, parseResult.GetValue(sourceIdOption)!, parseResult.GetValue(indexUrlOption)));
             return 0;
         });
         return command;

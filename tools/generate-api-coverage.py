@@ -283,6 +283,8 @@ IMPLEMENTED = {
     "POST /api/campaigns/{campaign_id}/wiki/import": "`campaigns wiki import` ✅",
     "GET /api/campaigns/{campaign_id}/wiki/templates": "`campaigns wiki templates list` ✅",
     "POST /api/campaigns/{campaign_id}/wiki/templates": "`campaigns wiki templates create` ✅",
+    "GET /api/campaigns/{campaign_id}/wiki/templates/browse": "`campaigns wiki templates catalogue` ✅",
+    "POST /api/campaigns/{campaign_id}/wiki/templates/download/{template_id}": "`campaigns wiki templates install` ✅",
     "POST /api/campaigns/{campaign_id}/wiki/templates/upload": "`campaigns wiki templates import` ✅",
     "GET /api/campaigns/{campaign_id}/wiki/templates/{template_id}": "`campaigns wiki templates get` ✅",
     "PATCH /api/campaigns/{campaign_id}/wiki/templates/{template_id}": "`campaigns wiki templates update` ✅",

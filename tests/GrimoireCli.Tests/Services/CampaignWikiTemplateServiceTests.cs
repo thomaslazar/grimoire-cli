@@ -6,7 +6,7 @@ using Microsoft.Kiota.Abstractions;
 namespace GrimoireCli.Tests.Services;
 
 /// <summary>
-/// Pins each of the eight template requests to its route and method. Get, update
+/// Pins each of the ten template requests to its route and method. Get, update
 /// and delete share a path and differ only in method.
 /// </summary>
 public class CampaignWikiTemplateServiceTests
@@ -32,6 +32,8 @@ public class CampaignWikiTemplateServiceTests
         { "import", "POST", Base + "/upload" },
         { "export", "GET", Base + "/t-1/export" },
         { "use", "POST", Base + "/t-1/use" },
+        { "catalogue", "GET", Base + "/browse" },
+        { "install", "POST", Base + "/download/smoke-note" },
     };
 
     private static RequestInformation Request(string verb)
@@ -47,6 +49,8 @@ public class CampaignWikiTemplateServiceTests
             "import" => s.ImportRequest("c-1", [1], "npc.zip"),
             "export" => s.ExportRequest("c-1", "t-1"),
             "use" => s.UseRequest("c-1", "t-1"),
+            "catalogue" => s.CatalogueRequest("c-1", false),
+            "install" => s.InstallRequest("c-1", "smoke-note", null),
             _ => throw new ArgumentException($"Unknown verb '{verb}'.", nameof(verb)),
         };
     }
@@ -72,5 +76,19 @@ public class CampaignWikiTemplateServiceTests
         var body = reader.ReadToEnd();
         Assert.Contains("name=\"file\"", body);
         Assert.Contains("filename=\"npc.zip\"", body);
+    }
+
+    [Fact]
+    public void CatalogueSendsRefreshOnlyWhenSet()
+    {
+        Assert.DoesNotContain("?", Of(Service().CatalogueRequest("c-1", false)).Uri);
+        Assert.EndsWith("/browse?refresh=true", Of(Service().CatalogueRequest("c-1", true)).Uri);
+    }
+
+    [Fact]
+    public void InstallSendsIndexUrlOnlyWhenSet()
+    {
+        Assert.DoesNotContain("?", Of(Service().InstallRequest("c-1", "smoke-note", null)).Uri);
+        Assert.Contains("index_url=http", Of(Service().InstallRequest("c-1", "smoke-note", "http://x.test/templates/index.json")).Uri);
     }
 }

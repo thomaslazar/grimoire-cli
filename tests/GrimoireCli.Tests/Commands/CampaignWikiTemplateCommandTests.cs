@@ -11,12 +11,12 @@ public class CampaignWikiTemplateCommandTests
         CampaignsCommand.Create().Parse(["wiki", "templates", .. args]);
 
     [Fact]
-    public void TheTemplatesSubgroupHoldsTheEightCommands()
+    public void TheTemplatesSubgroupHoldsTheTemplateCommands()
     {
         var wiki = CampaignsCommand.Create().Subcommands.Single(c => c.Name == "wiki");
         var templates = wiki.Subcommands.Single(c => c.Name == "templates");
         Assert.Equal(
-            new[] { "create", "delete", "export", "get", "import", "list", "update", "use" },
+            new[] { "catalogue", "create", "delete", "export", "get", "import", "install", "list", "update", "use" },
             templates.Subcommands.Select(c => c.Name).Order());
     }
 
@@ -64,4 +64,23 @@ public class CampaignWikiTemplateCommandTests
     [Fact]
     public void ImportSaysTheSizeCap()
         => Assert.Contains("Max 512 KB", Help("import"));
+
+    [Fact]
+    public void InstallNeedsASourceId()
+    {
+        Assert.NotEmpty(Parse("install", "--id", "c").Errors);
+        Assert.Empty(Parse("install", "--id", "c", "--source-id", "smoke-note", "--index-url", "http://x/templates/index.json").Errors);
+    }
+
+    [Fact]
+    public void CatalogueTakesRefresh()
+        => Assert.Empty(Parse("catalogue", "--id", "c", "--refresh").Errors);
+
+    [Fact]
+    public void CatalogueSaysEntriesCarryNoBody()
+        => Assert.Contains("Entries carry no template body", Help("catalogue"));
+
+    [Fact]
+    public void InstallSaysItMakesAnotherCopy()
+        => Assert.Contains("another copy", Help("install"));
 }

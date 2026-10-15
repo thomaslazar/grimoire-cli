@@ -404,6 +404,8 @@ grimoire-cli config set server https://grimoire.example.com
 | `campaigns wiki templates import --id <campaign-id> --file <path>` | Add a note template from a .md file or template .zip |
 | `campaigns wiki templates export --id <campaign-id> --template-id <template-id> --output <path\|->` | Export a note template as a .zip |
 | `campaigns wiki templates use --id <campaign-id> --template-id <template-id>` | Create a wiki page from a note template |
+| `campaigns wiki templates catalogue --id <campaign-id> [--refresh]` | Browse the community note-template catalogue |
+| `campaigns wiki templates install --id <campaign-id> --source-id <catalogue-id> [--index-url <url>]` | Copy a catalogue template into the campaign |
 | `self-test` | Verify binary integrity (AOT validation, no network required) |
 
 Every command supports `--help` with examples and caveats.

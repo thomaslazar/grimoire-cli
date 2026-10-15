@@ -2892,6 +2892,26 @@ TPL2=$("$CLI" campaigns wiki templates import --id "$WIKI" --file "$WORK/tpl.zip
 "$CLI" campaigns wiki templates list --id "$WIKI" | jq -e '.templates | length == 0' >/dev/null \
   || fail "no templates should remain after the template checks"
 ok "campaigns wiki templates export, import and delete"
+# pointing the add-on index at the fixture so the template catalogue is served offline
+"$CLI" addons settings --index-url "$FIXTURE_INDEX" >/dev/null 2>"$WORK/cli.err" \
+  || { cat "$WORK/cli.err" >&2; fail "addons settings (catalogue fixture) exited non-zero"; }
+# browsing the catalogue expecting the fixture template and no body
+"$CLI" campaigns wiki templates catalogue --id "$WIKI" --refresh 2>"$WORK/cli.err" \
+  | jq -e '[.folders[].templates[] | select(.id == "smoke-note")] | length == 1 and (.[0] | has("body") | not)' >/dev/null \
+  || { cat "$WORK/cli.err" >&2; fail "wiki templates catalogue should list smoke-note without a body"; }
+# installing the fixture template expecting its catalogue id recorded and its body verified
+CAT=$("$CLI" campaigns wiki templates install --id "$WIKI" --source-id smoke-note 2>"$WORK/cli.err" \
+  | jq -r 'select(.source_id == "smoke-note" and .name == "Smoke Note") | .id') \
+  || { cat "$WORK/cli.err" >&2; fail "wiki templates install exited non-zero"; }
+[ -n "$CAT" ] || fail "the installed template should record source_id smoke-note"
+"$CLI" campaigns wiki templates catalogue --id "$WIKI" | jq -e '.downloaded_ids == ["smoke-note"]' >/dev/null \
+  || fail "catalogue should report smoke-note as downloaded"
+# deleting the installed template and restoring the published add-on index
+"$CLI" campaigns wiki templates delete --id "$WIKI" --template-id "$CAT" >/dev/null 2>"$WORK/cli.err" \
+  || { cat "$WORK/cli.err" >&2; fail "wiki templates delete (installed) exited non-zero"; }
+"$CLI" addons settings --index-url "$DEFAULT_INDEX_URL" >/dev/null 2>"$WORK/cli.err" \
+  || { cat "$WORK/cli.err" >&2; fail "addons settings restore (catalogue) exited non-zero"; }
+ok "campaigns wiki templates catalogue and install from the fixture catalogue"
 
 # deleting the remaining pages expecting an empty wiki again
 for p in $("$CLI" campaigns wiki list --id "$WIKI" --include-hidden | jq -r '.[].id'); do
