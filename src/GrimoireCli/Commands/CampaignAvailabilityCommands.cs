@@ -43,7 +43,7 @@ public static class CampaignAvailabilityCommands
         var dateOption = DateOption("Session date, YYYY-MM-DD");
         var statusOption = OptionHelpers.Choice("--status", "Your answer for that date", ["available", "tentative", "unavailable"]);
         statusOption.Required = true;
-        var cancelledOption = new Option<bool?>("--is-cancelled") { Description = "Mark the date cancelled on the target's row" };
+        var cancelledOption = new Option<bool?>("--is-cancelled") { Description = "Mark the date cancelled on the target's row (true | false)" };
         var userIdOption = new Option<string?>("--user-id") { Description = "Set another member's row instead of your own" };
         var command = new Command("set", "Set availability for one session date") { idOption, dateOption, statusOption, cancelledOption, userIdOption };
         command.AddHelpSection("Notes", HelpSectionPosition.Top,
