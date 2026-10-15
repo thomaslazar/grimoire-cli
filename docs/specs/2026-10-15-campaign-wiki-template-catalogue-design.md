@@ -20,9 +20,10 @@ catalogue.
   is. Otherwise it tries `<same dir>/templates/index.json` (`svc:100`, `svc:112`).
 - With the default add-on index, this resolves to
   `grimoire-codex/community-add-ons/main/templates/index.json`.
-- With `DISABLE_EXTERNAL_ADD_ON_INSTALL` set, both routes answer 403. A source
-  that can't be reached, or isn't usable, answers 502 with the reason
-  (:543, :548, :585, :594).
+- With `DISABLE_EXTERNAL_ADD_ON_INSTALL` set, both routes answer 403. With one
+  source, a failure answers 502 with the reason; with several, failing sources
+  are skipped silently, and the catalogue can come back empty (svc:112,
+  `fetch_catalogue`).
 
 ## Commands
 
@@ -55,6 +56,7 @@ Calls `POST /api/campaigns/{id}/wiki/templates/download/{template_id}[?index_url
 - The result is an ordinary template that records `source_id`, `source_url` (the
   templates index) and `source_version`. The body is checked against the
   catalogue's `body_sha256` (`svc:326`).
+- A body that can't be fetched or fails `body_sha256` answers 502 (svc:326).
 - Installing the same id again makes a second copy (docstring, :577).
 
 ### Shared
@@ -70,15 +72,16 @@ Calls `POST /api/campaigns/{id}/wiki/templates/download/{template_id}[?index_url
 - `catalogue`:
   - Sources are the add-on index URLs (`addons settings --index-url`, admin).
     This cross-reference is needed to change what the command lists.
-  - It answers 403 when the server disables external installs, and 502 when a
-    source fails.
+  - It answers 403 when the server disables external installs; 502 when the only source
+    fails (with several, failing ones are skipped).
   - "Entries carry no template body; it is only readable once installed." Only
     this caveat is given, with no recipe naming other commands.
 - `install`:
   - `--index-url` takes an `available_in[].index_url` value.
   - A non-matching URL answers 404, the same as an unknown id.
   - Installing again makes another copy.
-  - The 403 and 502 cases are the same as for `catalogue`.
+  - It answers 403 when the server disables external installs; 502 when the
+    catalogue or the body can't be fetched, or the body fails its sha256 check.
 
 ## Smoke fixture
 

@@ -283,14 +283,14 @@ IMPLEMENTED = {
     "POST /api/campaigns/{campaign_id}/wiki/import": "`campaigns wiki import` ✅",
     "GET /api/campaigns/{campaign_id}/wiki/templates": "`campaigns wiki templates list` ✅",
     "POST /api/campaigns/{campaign_id}/wiki/templates": "`campaigns wiki templates create` ✅",
+    "GET /api/campaigns/{campaign_id}/wiki/templates/browse": "`campaigns wiki templates catalogue` ✅",
+    "POST /api/campaigns/{campaign_id}/wiki/templates/download/{template_id}": "`campaigns wiki templates install` ✅",
     "POST /api/campaigns/{campaign_id}/wiki/templates/upload": "`campaigns wiki templates import` ✅",
     "GET /api/campaigns/{campaign_id}/wiki/templates/{template_id}": "`campaigns wiki templates get` ✅",
     "PATCH /api/campaigns/{campaign_id}/wiki/templates/{template_id}": "`campaigns wiki templates update` ✅",
     "DELETE /api/campaigns/{campaign_id}/wiki/templates/{template_id}": "`campaigns wiki templates delete` ✅",
     "GET /api/campaigns/{campaign_id}/wiki/templates/{template_id}/export": "`campaigns wiki templates export` ✅",
     "POST /api/campaigns/{campaign_id}/wiki/templates/{template_id}/use": "`campaigns wiki templates use` ✅",
-    "GET /api/campaigns/{campaign_id}/wiki/templates/browse": "`campaigns wiki templates catalogue` ✅",
-    "POST /api/campaigns/{campaign_id}/wiki/templates/download/{template_id}": "`campaigns wiki templates install` ✅",
 }
 
 ROLE_LABEL = {

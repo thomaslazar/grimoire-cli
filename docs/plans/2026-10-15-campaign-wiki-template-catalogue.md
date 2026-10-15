@@ -84,7 +84,8 @@
       each is read as a template index, else as <its dir>/templates/index.json.
       Entries carry no template body; it is only readable once installed.
 
-      403 when the server disables external installs; 502 when a source fails.
+      403 when the server disables external installs; 502 when the only source
+      fails (with several, failing ones are skipped).
       ```
     - Example: `grimoire-cli campaigns wiki templates catalogue --id <campaign-id>`.
     - `AddResponseExample<Generated.Models.WikiTemplateBrowseOut>()`.
@@ -99,7 +100,8 @@
       value answers 404, as an unknown id does. Installing again makes another
       copy.
 
-      403 when the server disables external installs; 502 when a source fails.
+      403 when the server disables external installs; 502 when the catalogue or
+      the body can't be fetched, or the body fails its sha256 check.
       ```
     - Example: `grimoire-cli campaigns wiki templates install --id <campaign-id> --source-id session-recap`.
     - `AddResponseExample<Generated.Models.WikiTemplateDetailOut>()`.
