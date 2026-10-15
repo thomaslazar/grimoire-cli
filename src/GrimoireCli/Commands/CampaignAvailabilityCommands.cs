@@ -52,8 +52,8 @@ public static class CampaignAvailabilityCommands
             "",
             "--is-cancelled needs the owner or an admin and sets only the target's row,",
             "so it cannot reliably uncancel a date toggle-cancel cancelled.",
-            "--user-id currently always answers 422: the server types user_id as an",
-            "integer, and user ids are strings."]);
+            "--user-id answers 422 for any real user id: the server types user_id as",
+            "an integer, and user ids are strings."]);
         command.AddExamples("grimoire-cli campaigns availability set --id <campaign-id> --date 2026-10-21 --status tentative");
         command.AddResponseExample<Generated.Models.AvailabilitySetOut>();
         command.SetAction(async (parseResult, cancellationToken) =>
@@ -75,8 +75,9 @@ public static class CampaignAvailabilityCommands
         command.AddHelpSection("Notes", HelpSectionPosition.Top,
             ["Campaign owner or an admin; refused while the campaign is archived.",
             "",
-            "Flips the date for every member, so calling it twice undoes it;",
-            "is_cancelled in the response is the new state."]);
+            "Sets every member's row to the opposite of your own row's state, so a",
+            "second call undoes it; is_cancelled in the response is the new state. With",
+            "no answer of your own for the date, it records you as available."]);
         command.AddExamples("grimoire-cli campaigns availability toggle-cancel --id <campaign-id> --date 2026-10-21");
         command.AddResponseExample<Generated.Models.SessionDateCancelOut>();
         command.SetAction(async (parseResult, cancellationToken) =>

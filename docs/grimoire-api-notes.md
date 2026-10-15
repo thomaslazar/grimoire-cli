@@ -1413,11 +1413,13 @@ Read from `backend/routers/campaigns/schedule.py`, `calendar.py` and
 
 - **Cancelling a date is a toggle.** `PUT availability/{date}/cancel` flips
   `is_cancelled` on every row for that date (`schedule.py:294-336`); a second
-  call undoes the first. It admits the owner or any admin, unlike the
+  call undoes the first. It flips the caller's own row and copies that value
+  to the rest; a caller with no row for the date is first recorded as
+  available (`schedule.py:309-333`). It admits the owner or any admin, unlike the
   campaign's other writes.
 - **`availability` `user_id` cannot work.** `AvailabilityUpdate.user_id` is
   `Optional[int]` (`_schemas.py:177`) while user ids are UUID strings, so any
-  value is a 422 `int_parsing` and a GM cannot set another member's row.
+  real user id is a 422 `int_parsing` and a GM cannot set another member's row.
 - **Calendar subscription is session only.** The three
   `/calendar/subscription` routes carry `x-api-key-access: none`; minting
   also needs `BASE_URL` (400 otherwise).

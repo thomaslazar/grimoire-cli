@@ -37,10 +37,10 @@ Server facts were read at `v1.8.0`. Line references are to
   - `time_local` is `HH:MM` in that zone. `time_utc` is a legacy alias that the
     server converts.
   - `biweekly` uses `biweekly_reference` (YYYY-MM-DD, default today).
-  - `monthly` uses `monthly_week` (1-4, or -1 for the last week; default 1).
+  - `monthly` uses `days[0]` and `monthly_week` (1-4, or -1 for the last week; default 1).
   - `custom` uses only `custom_dates`.
   - `enabled: false` keeps the definition but produces no sessions.
-  - `next_sessions` (10 dates) counts from yesterday on (`_helpers.py:559`).
+  - `next_sessions` (10 dates) may include yesterday (`_helpers.py:559`).
   - *Probed:* weekly, `days [2]`, `19:30` Europe/Berlin gave Wednesdays.
 - **`delete`**
   - Needs ownership.
@@ -67,14 +67,15 @@ Server facts were read at `v1.8.0`. Line references are to
   - `--is-cancelled` is for the GM only (owner or admin; 403 otherwise). It sets
     only the target's own row, so it can't reliably uncancel a date that
     `toggle-cancel` cancelled.
-  - `--user-id` currently always answers 422. The server types `user_id` as an
+  - `--user-id` answers 422 for any real user id. The server types `user_id` as an
     integer (`_schemas.py:177`), but user ids are UUID strings. *Probed:* 422
     `int_parsing`.
 - **`toggle-cancel`**
   - Needs the owner or an admin. This is an admin override, unlike the
     campaign's other writes. Refused with 409 while archived.
-  - It **flips** the date's cancelled state for every row, so a second call
-    undoes it. The response's `is_cancelled` is the new state.
+  - It sets every row to the opposite of the caller's own row, so a second
+    call undoes it; a caller with no row for the date is first recorded as
+    `available` (`schedule.py:309-333`). The response's `is_cancelled` is the new state.
   - *Probed:* the first call answered `true`, the second `false`.
 
 ## `campaigns calendar`: `CampaignCalendarCommands.cs` / `CampaignCalendarService.cs`

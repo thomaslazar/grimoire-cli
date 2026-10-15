@@ -3015,6 +3015,11 @@ ok "campaigns schedule set and get round-trip a weekly schedule"
   || { cat "$WORK/cli.err" >&2; fail "availability get should show tentative on the owner row"; }
 ok "campaigns availability set is visible in availability get"
 
+# clearing a cancellation an interrupted earlier run may have left on the date
+"$CLI" campaigns availability get --id "$WIKI" 2>"$WORK/cli.err" | jq -e --arg d "$D" '(.cancelled_dates // []) | index($d) | not' >/dev/null \
+  || "$CLI" campaigns availability toggle-cancel --id "$WIKI" --date "$D" >/dev/null 2>"$WORK/cli.err" \
+  || { cat "$WORK/cli.err" >&2; fail "pre-clean toggle-cancel exited non-zero"; }
+
 # toggling cancellation twice expecting true then false
 "$CLI" campaigns availability toggle-cancel --id "$WIKI" --date "$D" 2>"$WORK/cli.err" | jq -e '.is_cancelled == true' >/dev/null \
   || { cat "$WORK/cli.err" >&2; fail "first toggle-cancel should cancel"; }

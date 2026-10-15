@@ -40,6 +40,6 @@ public class CampaignAvailabilityCommandTests
         => Assert.Empty(Parse("availability", "set", "--id", "c", "--date", "2026-10-21", "--status", "available", "--is-cancelled", cancelled, "--user-id", "u").Errors);
 
     [Fact]
-    public void ToggleCancelHelpSaysItFlips()
-        => Assert.Contains("flips", HelpRenderer.Render(CampaignsCommand.Create(), ["campaigns", "availability", "toggle-cancel"], full: false), StringComparison.OrdinalIgnoreCase);
+    public void ToggleCancelHelpSaysItUndoes()
+        => Assert.Contains("undoes it", HelpRenderer.Render(CampaignsCommand.Create(), ["campaigns", "availability", "toggle-cancel"], full: false), StringComparison.OrdinalIgnoreCase);
 }

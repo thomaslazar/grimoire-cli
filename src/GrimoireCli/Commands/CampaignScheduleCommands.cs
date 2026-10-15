@@ -51,9 +51,10 @@ public static class CampaignScheduleCommands
             "Replaces the whole schedule; omitted fields take their defaults. days are",
             "0 (Monday) to 6 (Sunday) and time_local is HH:MM, both in timezone (an IANA",
             "name). biweekly uses biweekly_reference (YYYY-MM-DD, default today);",
-            "monthly uses monthly_week (1-4, -1 = last, default 1); custom uses only",
-            "custom_dates. time_utc is a legacy alias. enabled false keeps the",
-            "definition but yields no sessions. next_sessions counts from yesterday."]);
+            "monthly uses days[0] and monthly_week (1-4, -1 = last, default 1); custom",
+            "uses only custom_dates. time_utc is a legacy alias. enabled false keeps",
+            "the definition but yields no sessions. next_sessions may include",
+            "yesterday."]);
         command.AddExamples(
             "echo '{\"frequency\":\"weekly\",\"days\":[2],\"time_local\":\"19:30\",\"timezone\":\"Europe/Berlin\"}' | grimoire-cli campaigns schedule set --id <campaign-id> --stdin");
         command.AddRequestShape<Generated.Models.ScheduleUpsert>();
