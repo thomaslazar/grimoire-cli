@@ -21,7 +21,7 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | backups | 6 / 6 |
 | bookmarks | 0 / 4 |
 | books | 16 / 16 |
-| campaigns | 63 / 93 |
+| campaigns | 68 / 93 |
 | characters | 0 / 16 |
 | content | 0 / 6 |
 | downloads | 1 / 1 |
@@ -45,7 +45,7 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | token-frames | 0 / 2 |
 | tokens | 11 / 11 |
 | users | 0 / 16 |
-| **Total** | **221 / 360** |
+| **Total** | **226 / 360** |
 
 2 operation(s) are internal-only (🔒) and excluded from covered counts.
 
@@ -206,11 +206,11 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | GET | `/api/campaigns/{campaign_id}/eligible-members` | List users that can be invited |  | campaigns: read | `campaigns members eligible` ✅ |
 | POST | `/api/campaigns/{campaign_id}/files` | Upload a campaign file (GM); links it as a resource |  | campaigns: write | `campaigns files upload` ✅ |
 | GET | `/api/campaigns/{campaign_id}/files/{file_id}` | Download a campaign file (honours resource visibility) |  | campaigns: read | — |
-| POST | `/api/campaigns/{campaign_id}/guests` | Create a guest invite code for a GM campaign |  | campaigns: write | — |
-| GET | `/api/campaigns/{campaign_id}/guests` | List a campaign's guests and their invite codes |  | campaigns: read | — |
-| DELETE | `/api/campaigns/{campaign_id}/guests/{member_id}` | Remove a guest (deletes the guest account) |  | campaigns: write | — |
-| POST | `/api/campaigns/{campaign_id}/guests/{member_id}/regenerate` | Regenerate a guest's invite code |  | campaigns: write | — |
-| GET | `/api/campaigns/{campaign_id}/guests/{member_id}/share-template` | Get share text and links for a guest invite code |  | campaigns: read | — |
+| POST | `/api/campaigns/{campaign_id}/guests` | Create a guest invite code for a GM campaign |  | campaigns: write | `campaigns guests create` ✅ |
+| GET | `/api/campaigns/{campaign_id}/guests` | List a campaign's guests and their invite codes |  | campaigns: read | `campaigns guests list` ✅ |
+| DELETE | `/api/campaigns/{campaign_id}/guests/{member_id}` | Remove a guest (deletes the guest account) |  | campaigns: write | `campaigns guests remove` ✅ |
+| POST | `/api/campaigns/{campaign_id}/guests/{member_id}/regenerate` | Regenerate a guest's invite code |  | campaigns: write | `campaigns guests regenerate` ✅ |
+| GET | `/api/campaigns/{campaign_id}/guests/{member_id}/share-template` | Get share text and links for a guest invite code |  | campaigns: read | `campaigns guests share` ✅ |
 | POST | `/api/campaigns/{campaign_id}/images` | Upload an image (GM); links it as an image resource for note embedding |  | campaigns: write | `campaigns files upload-image` ✅ |
 | POST | `/api/campaigns/{campaign_id}/invite` | Invite a player to a GM campaign |  | campaigns: write | `campaigns members invite` ✅ |
 | POST | `/api/campaigns/{campaign_id}/members/{member_id}/art` | Upload a member's character art |  | campaigns: write | — |

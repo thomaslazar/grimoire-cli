@@ -53,6 +53,8 @@ services:
       - OPDS_ENABLED=false
       # The smoke test logs in several times; the default is 10/minute.
       - RATE_LIMIT_ENABLED=false
+      # Guest invite codes are off by default; the smoke test creates guests.
+      - GUEST_ACCESS_ENABLED=true
     volumes:
       # Read-write because the files API needs it: Grimoire probes writability
       # with os.access (services/library_fs/paths.py) and answers 409 on a
