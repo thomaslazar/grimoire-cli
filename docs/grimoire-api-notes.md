@@ -246,7 +246,7 @@ Verified against v1.5.6, backing `systems update`, `systems batch-update`,
   (`services/bulk_service.py:157-161`).
 - **`GET /api/auth/me` sets a session cookie as a side effect** when called
   with a bearer token and no existing cookie, reusing that token rather than
-  minting a new one (`routers/auth/core.py:169-172`) — a bare read has a
+  minting a new one (`routers/auth/core.py:284-287`) — a bare read has a
   write side effect on the client's cookie jar.
 
 ## Content and rescan
@@ -1288,8 +1288,8 @@ tag `v1.7.1`, and verified against the 1.7.1 stack. Backs `books file`,
   unknown id and an unopenable format are indistinguishable from the response.
 - `GET /api/books/{id}/file` and `GET /api/books/{id}/page/{n}` both **write on
   a missing file**: they set the book's `is_missing` to true and commit before
-  raising 404 (`routers/books/core.py:390-394`; `pages.py:130-131, 140-141,
-  179-180`, the file route's one site and the page route's three). A read that
+  raising 404 (`routers/books/core.py:440-444`; `pages.py:133, 143,
+  182`, the file route's one site and the page route's three). A read that
   mutates is worth knowing about when a scripted sweep hits a library whose
   files have moved.
 - `GET /api/books/{id}/page/{n}` defaults `width` to **1200**, where the maps
