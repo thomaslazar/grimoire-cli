@@ -26,15 +26,16 @@ public static class MetadataCommands
     private static Command CreateSourcesCommand(string resource)
     {
         var idOption = IdOption(resource);
-        var command = new Command("metadata-sources", "List add-ons that can supply metadata")
+        var command = new Command("metadata-sources", "List sources that can supply metadata")
         {
             idOption
         };
         command.AddRoleRequired("gm or admin");
         command.AddHelpSection("Notes", HelpSectionPosition.Top,
-            "Add-ons that can answer for this resource. Empty until one is installed,",
-            "enabled and runnable (addons list) and targets this resource type — a",
-            "book source never appears here for a system.",
+            "Grimoire Codex DB (id grimoire-codex) first, while the server sets",
+            "GRIMOIRE_CODEX_DB_API_TOKEN; then add-ons that are installed, enabled and",
+            "runnable (addons list) and target this resource type — a book source",
+            "never appears here for a system.",
             "",
             "supports_paste false means metadata-fetch --paste is a 400 for that",
             "source; search for an identity instead.");
@@ -56,11 +57,11 @@ public static class MetadataCommands
         var idOption = IdOption(resource);
         var sourceIdOption = new Option<string>("--source-id")
         {
-            Description = "Source add-on ID, from metadata-sources",
+            Description = "Source ID, from metadata-sources",
             Required = true,
         };
         var queryOption = new Option<string?>("--query") { Description = $"Search text; defaults to the {fallback}" };
-        var command = new Command("metadata-search", "Search one add-on for candidates")
+        var command = new Command("metadata-search", "Search one source for candidates")
         {
             idOption, sourceIdOption, queryOption
         };
@@ -71,7 +72,8 @@ public static class MetadataCommands
             "",
             $"An omitted --query defaults to the {fallback}; query echoes back what was",
             "actually searched. Pass the same value to metadata-fetch: search-backed",
-            "sources answer per query, not from a catalogue.",
+            "sources answer per query, not from a catalogue. Grimoire Codex DB matches",
+            "a book on everything known about it, not on the query alone.",
             "",
             "[] means the source matched nothing. 502 means it could not be reached",
             "or returned junk; 400 a configuration one, such as an unknown --source-id.");
@@ -96,7 +98,7 @@ public static class MetadataCommands
         var idOption = IdOption(resource);
         var sourceIdOption = new Option<string>("--source-id")
         {
-            Description = "Source add-on ID, from metadata-sources",
+            Description = "Source ID, from metadata-sources",
             Required = true,
         };
         var identityOption = new Option<string?>("--identity") { Description = "Candidate identity, from metadata-search" };

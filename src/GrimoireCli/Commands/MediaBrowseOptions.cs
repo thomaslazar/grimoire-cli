@@ -10,7 +10,7 @@ namespace GrimoireCli.Commands;
 /// </summary>
 internal sealed class MediaBrowseOptions
 {
-    private static readonly string[] Sorts = ["path", "name", "size", "added_at", "title", "duration"];
+    private static readonly string[] Sorts = ["path", "name", "size", "added_at", "title", "duration", "track"];
     private static readonly string[] Orders = ["asc", "desc"];
 
     private readonly Option<string?> _query = new("--query") { Description = "Search text; see Query syntax" };
@@ -37,9 +37,11 @@ internal sealed class MediaBrowseOptions
             "\"\" is the root.",
             "",
             "--sort path is folder then name, so a page is a contiguous run of",
-            "folders; name sorts across the whole tree. title and duration fall back",
-            "to name outside audio. Undated items sort last under added_at either",
-            "way, and never match --added-since. A time without an offset is UTC.");
+            "folders; name sorts across the whole tree. track is album order within",
+            "each folder: disc, track number, then name; untagged first under asc.",
+            "Outside audio, title and duration fall back to name, track to path.",
+            "Undated items sort last under added_at either way, and never match",
+            "--added-since. A time without an offset is UTC.");
         command.AddHelpSection("Query syntax", HelpSectionPosition.Top,
             "Bare text matches the name, the folder path, or a tag (own or a",
             "parent folder's). Fields, aliases in parens: title (name) and",

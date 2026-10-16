@@ -145,7 +145,8 @@ public static class SystemsCommand
             "Renaming is permanent: setting name marks it custom, and the scanner",
             "never re-derives it from the folder again.",
             "",
-            "Clear a field with \"\"; an explicit null does nothing.",
+            "Clear a field with \"\"; an explicit null does nothing. codex_id cannot",
+            "be cleared: \"\" is a 422.",
             "",
             "Prefer genres and character_builder_urls; the singles are legacy.",
             "",
@@ -201,8 +202,8 @@ public static class SystemsCommand
             "Exit 3 is HTTP 200 with a non-empty errors list — a partial write.",
             "updated lists the ids that resolved, not the fields that changed.",
             "",
-            "Renaming is permanent and \"\" not null clears a field — see",
-            "systems update.");
+            "Renaming is permanent and \"\" not null clears a field, codex_id aside —",
+            "see systems update.");
         command.AddExamples(
             "grimoire-cli systems batch-update --input items.json",
             "jq -c '{items: .}' edits.json | grimoire-cli systems batch-update --stdin");

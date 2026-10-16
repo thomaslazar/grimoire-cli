@@ -2,6 +2,7 @@
 #pragma warning disable CS0618
 using GrimoireCli.Generated.Api.Duplicates.CancelScan;
 using GrimoireCli.Generated.Api.Duplicates.Compare;
+using GrimoireCli.Generated.Api.Duplicates.Describe;
 using GrimoireCli.Generated.Api.Duplicates.Dismiss;
 using GrimoireCli.Generated.Api.Duplicates.Dismissals;
 using GrimoireCli.Generated.Api.Duplicates.Groups;
@@ -35,6 +36,11 @@ namespace GrimoireCli.Generated.Api.Duplicates
         public global::GrimoireCli.Generated.Api.Duplicates.Compare.CompareRequestBuilder Compare
         {
             get => new global::GrimoireCli.Generated.Api.Duplicates.Compare.CompareRequestBuilder(PathParameters, RequestAdapter);
+        }
+        /// <summary>The describe property</summary>
+        public global::GrimoireCli.Generated.Api.Duplicates.Describe.DescribeRequestBuilder Describe
+        {
+            get => new global::GrimoireCli.Generated.Api.Duplicates.Describe.DescribeRequestBuilder(PathParameters, RequestAdapter);
         }
         /// <summary>The dismiss property</summary>
         public global::GrimoireCli.Generated.Api.Duplicates.Dismiss.DismissRequestBuilder Dismiss

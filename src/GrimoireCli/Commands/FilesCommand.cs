@@ -41,7 +41,11 @@ public static class FilesCommand
             "",
             "Dotfiles are excluded, as are sidecars (.opf, .nfo, .grimoire.yaml, an",
             "exported cover) sitting beside content with the same stem — and total is",
-            "counted after that filter, so neither reports them.");
+            "counted after that filter, so neither reports them.",
+            "",
+            "unreadable_name: the name on disk is not UTF-8. name and path carry",
+            "U+FFFD per bad byte, so path addresses nothing; the scan skips the",
+            "entry until it is renamed on disk.");
         command.AddExamples(
             "grimoire-cli files browse",
             "grimoire-cli files browse --path \"books/Dungeons & Dragons/5e EN\" --limit 100");

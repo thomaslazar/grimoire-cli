@@ -63,6 +63,46 @@ namespace GrimoireCli.Generated.Models
         public bool? OidcAutoRegister { get; set; }
         /// <summary>The oidc_auto_register_env_locked property</summary>
         public bool? OidcAutoRegisterEnvLocked { get; set; }
+        /// <summary>The oidc_button_bg_color property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public string? OidcButtonBgColor { get; set; }
+#nullable restore
+#else
+        public string OidcButtonBgColor { get; set; }
+#endif
+        /// <summary>The oidc_button_bg_color_env_locked property</summary>
+        public bool? OidcButtonBgColorEnvLocked { get; set; }
+        /// <summary>The oidc_button_border_color property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public string? OidcButtonBorderColor { get; set; }
+#nullable restore
+#else
+        public string OidcButtonBorderColor { get; set; }
+#endif
+        /// <summary>The oidc_button_border_color_env_locked property</summary>
+        public bool? OidcButtonBorderColorEnvLocked { get; set; }
+        /// <summary>The oidc_button_icon_env_locked property</summary>
+        public bool? OidcButtonIconEnvLocked { get; set; }
+        /// <summary>The oidc_button_icon_url property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public string? OidcButtonIconUrl { get; set; }
+#nullable restore
+#else
+        public string OidcButtonIconUrl { get; set; }
+#endif
+        /// <summary>The oidc_button_radius property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public string? OidcButtonRadius { get; set; }
+#nullable restore
+#else
+        public string OidcButtonRadius { get; set; }
+#endif
+        /// <summary>The oidc_button_radius_env_locked property</summary>
+        public bool? OidcButtonRadiusEnvLocked { get; set; }
         /// <summary>The oidc_button_text property</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
@@ -71,6 +111,16 @@ namespace GrimoireCli.Generated.Models
 #else
         public string OidcButtonText { get; set; }
 #endif
+        /// <summary>The oidc_button_text_color property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public string? OidcButtonTextColor { get; set; }
+#nullable restore
+#else
+        public string OidcButtonTextColor { get; set; }
+#endif
+        /// <summary>The oidc_button_text_color_env_locked property</summary>
+        public bool? OidcButtonTextColorEnvLocked { get; set; }
         /// <summary>The oidc_button_text_env_locked property</summary>
         public bool? OidcButtonTextEnvLocked { get; set; }
         /// <summary>The oidc_client_id property</summary>
@@ -229,6 +279,12 @@ namespace GrimoireCli.Generated.Models
 #else
         public global::GrimoireCli.Generated.Models.SettingsResponse_restricted_categories RestrictedCategories { get; set; }
 #endif
+        /// <summary>The share_links_enabled property</summary>
+        public bool? ShareLinksEnabled { get; set; }
+        /// <summary>The share_links_role_gm property</summary>
+        public bool? ShareLinksRoleGm { get; set; }
+        /// <summary>The share_links_role_player property</summary>
+        public bool? ShareLinksRolePlayer { get; set; }
         /// <summary>The show_stat_audio property</summary>
         public bool? ShowStatAudio { get; set; }
         /// <summary>The show_stat_books property</summary>
@@ -290,7 +346,17 @@ namespace GrimoireCli.Generated.Models
                 { "oidc_auto_launch_env_locked", n => { OidcAutoLaunchEnvLocked = n.GetBoolValue(); } },
                 { "oidc_auto_register", n => { OidcAutoRegister = n.GetBoolValue(); } },
                 { "oidc_auto_register_env_locked", n => { OidcAutoRegisterEnvLocked = n.GetBoolValue(); } },
+                { "oidc_button_bg_color", n => { OidcButtonBgColor = n.GetStringValue(); } },
+                { "oidc_button_bg_color_env_locked", n => { OidcButtonBgColorEnvLocked = n.GetBoolValue(); } },
+                { "oidc_button_border_color", n => { OidcButtonBorderColor = n.GetStringValue(); } },
+                { "oidc_button_border_color_env_locked", n => { OidcButtonBorderColorEnvLocked = n.GetBoolValue(); } },
+                { "oidc_button_icon_env_locked", n => { OidcButtonIconEnvLocked = n.GetBoolValue(); } },
+                { "oidc_button_icon_url", n => { OidcButtonIconUrl = n.GetStringValue(); } },
+                { "oidc_button_radius", n => { OidcButtonRadius = n.GetStringValue(); } },
+                { "oidc_button_radius_env_locked", n => { OidcButtonRadiusEnvLocked = n.GetBoolValue(); } },
                 { "oidc_button_text", n => { OidcButtonText = n.GetStringValue(); } },
+                { "oidc_button_text_color", n => { OidcButtonTextColor = n.GetStringValue(); } },
+                { "oidc_button_text_color_env_locked", n => { OidcButtonTextColorEnvLocked = n.GetBoolValue(); } },
                 { "oidc_button_text_env_locked", n => { OidcButtonTextEnvLocked = n.GetBoolValue(); } },
                 { "oidc_client_id", n => { OidcClientId = n.GetStringValue(); } },
                 { "oidc_client_id_env_locked", n => { OidcClientIdEnvLocked = n.GetBoolValue(); } },
@@ -328,6 +394,9 @@ namespace GrimoireCli.Generated.Models
                 { "rescan_schedule_minute", n => { RescanScheduleMinute = n.GetIntValue(); } },
                 { "rescan_schedule_weekday", n => { RescanScheduleWeekday = n.GetIntValue(); } },
                 { "restricted_categories", n => { RestrictedCategories = n.GetObjectValue<global::GrimoireCli.Generated.Models.SettingsResponse_restricted_categories>(global::GrimoireCli.Generated.Models.SettingsResponse_restricted_categories.CreateFromDiscriminatorValue); } },
+                { "share_links_enabled", n => { ShareLinksEnabled = n.GetBoolValue(); } },
+                { "share_links_role_gm", n => { ShareLinksRoleGm = n.GetBoolValue(); } },
+                { "share_links_role_player", n => { ShareLinksRolePlayer = n.GetBoolValue(); } },
                 { "show_stat_audio", n => { ShowStatAudio = n.GetBoolValue(); } },
                 { "show_stat_books", n => { ShowStatBooks = n.GetBoolValue(); } },
                 { "show_stat_library_size", n => { ShowStatLibrarySize = n.GetBoolValue(); } },
@@ -364,7 +433,17 @@ namespace GrimoireCli.Generated.Models
             writer.WriteBoolValue("oidc_auto_launch_env_locked", OidcAutoLaunchEnvLocked);
             writer.WriteBoolValue("oidc_auto_register", OidcAutoRegister);
             writer.WriteBoolValue("oidc_auto_register_env_locked", OidcAutoRegisterEnvLocked);
+            writer.WriteStringValue("oidc_button_bg_color", OidcButtonBgColor);
+            writer.WriteBoolValue("oidc_button_bg_color_env_locked", OidcButtonBgColorEnvLocked);
+            writer.WriteStringValue("oidc_button_border_color", OidcButtonBorderColor);
+            writer.WriteBoolValue("oidc_button_border_color_env_locked", OidcButtonBorderColorEnvLocked);
+            writer.WriteBoolValue("oidc_button_icon_env_locked", OidcButtonIconEnvLocked);
+            writer.WriteStringValue("oidc_button_icon_url", OidcButtonIconUrl);
+            writer.WriteStringValue("oidc_button_radius", OidcButtonRadius);
+            writer.WriteBoolValue("oidc_button_radius_env_locked", OidcButtonRadiusEnvLocked);
             writer.WriteStringValue("oidc_button_text", OidcButtonText);
+            writer.WriteStringValue("oidc_button_text_color", OidcButtonTextColor);
+            writer.WriteBoolValue("oidc_button_text_color_env_locked", OidcButtonTextColorEnvLocked);
             writer.WriteBoolValue("oidc_button_text_env_locked", OidcButtonTextEnvLocked);
             writer.WriteStringValue("oidc_client_id", OidcClientId);
             writer.WriteBoolValue("oidc_client_id_env_locked", OidcClientIdEnvLocked);
@@ -402,6 +481,9 @@ namespace GrimoireCli.Generated.Models
             writer.WriteIntValue("rescan_schedule_minute", RescanScheduleMinute);
             writer.WriteIntValue("rescan_schedule_weekday", RescanScheduleWeekday);
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.SettingsResponse_restricted_categories>("restricted_categories", RestrictedCategories);
+            writer.WriteBoolValue("share_links_enabled", ShareLinksEnabled);
+            writer.WriteBoolValue("share_links_role_gm", ShareLinksRoleGm);
+            writer.WriteBoolValue("share_links_role_player", ShareLinksRolePlayer);
             writer.WriteBoolValue("show_stat_audio", ShowStatAudio);
             writer.WriteBoolValue("show_stat_books", ShowStatBooks);
             writer.WriteBoolValue("show_stat_library_size", ShowStatLibrarySize);

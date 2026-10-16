@@ -47,6 +47,14 @@ namespace GrimoireCli.Generated.Models
 #else
         public global::GrimoireCli.Generated.Models.AudioDetailResponse.AudioDetailResponse_description Description { get; set; }
 #endif
+        /// <summary>The disc_number property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public global::GrimoireCli.Generated.Models.AudioDetailResponse.AudioDetailResponse_disc_number? DiscNumber { get; set; }
+#nullable restore
+#else
+        public global::GrimoireCli.Generated.Models.AudioDetailResponse.AudioDetailResponse_disc_number DiscNumber { get; set; }
+#endif
         /// <summary>The duration property</summary>
         public double? Duration { get; set; }
         /// <summary>The filename property</summary>
@@ -121,6 +129,14 @@ namespace GrimoireCli.Generated.Models
 #else
         public string Title { get; set; }
 #endif
+        /// <summary>The track_number property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public global::GrimoireCli.Generated.Models.AudioDetailResponse.AudioDetailResponse_track_number? TrackNumber { get; set; }
+#nullable restore
+#else
+        public global::GrimoireCli.Generated.Models.AudioDetailResponse.AudioDetailResponse_track_number TrackNumber { get; set; }
+#endif
         /// <summary>The variant_count property</summary>
         public int? VariantCount { get; set; }
         /// <summary>The variant_kind property</summary>
@@ -147,6 +163,14 @@ namespace GrimoireCli.Generated.Models
 #else
         public string VariantLabel { get; set; }
 #endif
+        /// <summary>The variant_main_filename property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public string? VariantMainFilename { get; set; }
+#nullable restore
+#else
+        public string VariantMainFilename { get; set; }
+#endif
         /// <summary>The variant_main_id property</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
@@ -154,6 +178,22 @@ namespace GrimoireCli.Generated.Models
 #nullable restore
 #else
         public global::GrimoireCli.Generated.Models.AudioDetailResponse.AudioDetailResponse_variant_main_id VariantMainId { get; set; }
+#endif
+        /// <summary>The variant_main_kind property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public string? VariantMainKind { get; set; }
+#nullable restore
+#else
+        public string VariantMainKind { get; set; }
+#endif
+        /// <summary>The variant_main_label property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public string? VariantMainLabel { get; set; }
+#nullable restore
+#else
+        public string VariantMainLabel { get; set; }
 #endif
         /// <summary>The variant_parent_id property</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
@@ -202,6 +242,7 @@ namespace GrimoireCli.Generated.Models
                 { "album", n => { Album = n.GetStringValue(); } },
                 { "artist", n => { Artist = n.GetStringValue(); } },
                 { "description", n => { Description = n.GetObjectValue<global::GrimoireCli.Generated.Models.AudioDetailResponse.AudioDetailResponse_description>(global::GrimoireCli.Generated.Models.AudioDetailResponse.AudioDetailResponse_description.CreateFromDiscriminatorValue); } },
+                { "disc_number", n => { DiscNumber = n.GetObjectValue<global::GrimoireCli.Generated.Models.AudioDetailResponse.AudioDetailResponse_disc_number>(global::GrimoireCli.Generated.Models.AudioDetailResponse.AudioDetailResponse_disc_number.CreateFromDiscriminatorValue); } },
                 { "duration", n => { Duration = n.GetDoubleValue(); } },
                 { "file_size", n => { FileSize = n.GetObjectValue<global::GrimoireCli.Generated.Models.AudioDetailResponse.AudioDetailResponse_file_size>(global::GrimoireCli.Generated.Models.AudioDetailResponse.AudioDetailResponse_file_size.CreateFromDiscriminatorValue); } },
                 { "filename", n => { Filename = n.GetStringValue(); } },
@@ -215,11 +256,15 @@ namespace GrimoireCli.Generated.Models
                 { "relative_path", n => { RelativePath = n.GetStringValue(); } },
                 { "tags", n => { Tags = n.GetCollectionOfPrimitiveValues<string>()?.AsList(); } },
                 { "title", n => { Title = n.GetStringValue(); } },
+                { "track_number", n => { TrackNumber = n.GetObjectValue<global::GrimoireCli.Generated.Models.AudioDetailResponse.AudioDetailResponse_track_number>(global::GrimoireCli.Generated.Models.AudioDetailResponse.AudioDetailResponse_track_number.CreateFromDiscriminatorValue); } },
                 { "variant_count", n => { VariantCount = n.GetIntValue(); } },
                 { "variant_kind", n => { VariantKind = n.GetStringValue(); } },
                 { "variant_kinds", n => { VariantKinds = n.GetCollectionOfPrimitiveValues<string>()?.AsList(); } },
                 { "variant_label", n => { VariantLabel = n.GetStringValue(); } },
+                { "variant_main_filename", n => { VariantMainFilename = n.GetStringValue(); } },
                 { "variant_main_id", n => { VariantMainId = n.GetObjectValue<global::GrimoireCli.Generated.Models.AudioDetailResponse.AudioDetailResponse_variant_main_id>(global::GrimoireCli.Generated.Models.AudioDetailResponse.AudioDetailResponse_variant_main_id.CreateFromDiscriminatorValue); } },
+                { "variant_main_kind", n => { VariantMainKind = n.GetStringValue(); } },
+                { "variant_main_label", n => { VariantMainLabel = n.GetStringValue(); } },
                 { "variant_parent_id", n => { VariantParentId = n.GetObjectValue<global::GrimoireCli.Generated.Models.AudioDetailResponse.AudioDetailResponse_variant_parent_id>(global::GrimoireCli.Generated.Models.AudioDetailResponse.AudioDetailResponse_variant_parent_id.CreateFromDiscriminatorValue); } },
                 { "variants", n => { Variants = n.GetCollectionOfObjectValues<global::GrimoireCli.Generated.Models.VariantEntry>(global::GrimoireCli.Generated.Models.VariantEntry.CreateFromDiscriminatorValue)?.AsList(); } },
             };
@@ -235,6 +280,7 @@ namespace GrimoireCli.Generated.Models
             writer.WriteStringValue("album", Album);
             writer.WriteStringValue("artist", Artist);
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.AudioDetailResponse.AudioDetailResponse_description>("description", Description);
+            writer.WriteObjectValue<global::GrimoireCli.Generated.Models.AudioDetailResponse.AudioDetailResponse_disc_number>("disc_number", DiscNumber);
             writer.WriteDoubleValue("duration", Duration);
             writer.WriteStringValue("filename", Filename);
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.AudioDetailResponse.AudioDetailResponse_file_size>("file_size", FileSize);
@@ -248,11 +294,15 @@ namespace GrimoireCli.Generated.Models
             writer.WriteStringValue("relative_path", RelativePath);
             writer.WriteCollectionOfPrimitiveValues<string>("tags", Tags);
             writer.WriteStringValue("title", Title);
+            writer.WriteObjectValue<global::GrimoireCli.Generated.Models.AudioDetailResponse.AudioDetailResponse_track_number>("track_number", TrackNumber);
             writer.WriteIntValue("variant_count", VariantCount);
             writer.WriteStringValue("variant_kind", VariantKind);
             writer.WriteCollectionOfPrimitiveValues<string>("variant_kinds", VariantKinds);
             writer.WriteStringValue("variant_label", VariantLabel);
+            writer.WriteStringValue("variant_main_filename", VariantMainFilename);
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.AudioDetailResponse.AudioDetailResponse_variant_main_id>("variant_main_id", VariantMainId);
+            writer.WriteStringValue("variant_main_kind", VariantMainKind);
+            writer.WriteStringValue("variant_main_label", VariantMainLabel);
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.AudioDetailResponse.AudioDetailResponse_variant_parent_id>("variant_parent_id", VariantParentId);
             writer.WriteCollectionOfObjectValues<global::GrimoireCli.Generated.Models.VariantEntry>("variants", Variants);
             writer.WriteAdditionalData(AdditionalData);
@@ -388,6 +438,68 @@ namespace GrimoireCli.Generated.Models
             }
         }
         /// <summary>
+        /// Composed type wrapper for classes <see cref="global::GrimoireCli.Generated.Models.AudioDetailResponse_disc_numberMember1"/>, <see cref="int"/>
+        /// </summary>
+        [global::System.CodeDom.Compiler.GeneratedCode("Kiota", "1.0.0")]
+        public partial class AudioDetailResponse_disc_number : IComposedTypeWrapper, IParsable
+        {
+            /// <summary>Composed type representation for type <see cref="global::GrimoireCli.Generated.Models.AudioDetailResponse_disc_numberMember1"/></summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+            public global::GrimoireCli.Generated.Models.AudioDetailResponse_disc_numberMember1? AudioDetailResponseDiscNumberMember1 { get; set; }
+#nullable restore
+#else
+            public global::GrimoireCli.Generated.Models.AudioDetailResponse_disc_numberMember1 AudioDetailResponseDiscNumberMember1 { get; set; }
+#endif
+            /// <summary>Composed type representation for type <see cref="int"/></summary>
+            public int? Integer { get; set; }
+            /// <summary>
+            /// Creates a new instance of the appropriate class based on discriminator value
+            /// </summary>
+            /// <returns>A <see cref="global::GrimoireCli.Generated.Models.AudioDetailResponse.AudioDetailResponse_disc_number"/></returns>
+            /// <param name="parseNode">The parse node to use to read the discriminator value and create the object</param>
+            public static global::GrimoireCli.Generated.Models.AudioDetailResponse.AudioDetailResponse_disc_number CreateFromDiscriminatorValue(IParseNode parseNode)
+            {
+                if(ReferenceEquals(parseNode, null)) throw new ArgumentNullException(nameof(parseNode));
+                var result = new global::GrimoireCli.Generated.Models.AudioDetailResponse.AudioDetailResponse_disc_number();
+                if(parseNode.GetIntValue() is int integerValue)
+                {
+                    result.Integer = integerValue;
+                }
+                else {
+                    result.AudioDetailResponseDiscNumberMember1 = new global::GrimoireCli.Generated.Models.AudioDetailResponse_disc_numberMember1();
+                }
+                return result;
+            }
+            /// <summary>
+            /// The deserialization information for the current model
+            /// </summary>
+            /// <returns>A IDictionary&lt;string, Action&lt;IParseNode&gt;&gt;</returns>
+            public virtual IDictionary<string, Action<IParseNode>> GetFieldDeserializers()
+            {
+                if(AudioDetailResponseDiscNumberMember1 != null)
+                {
+                    return ParseNodeHelper.MergeDeserializersForIntersectionWrapper(AudioDetailResponseDiscNumberMember1);
+                }
+                return new Dictionary<string, Action<IParseNode>>();
+            }
+            /// <summary>
+            /// Serializes information the current object
+            /// </summary>
+            /// <param name="writer">Serialization writer to use to serialize this model</param>
+            public virtual void Serialize(ISerializationWriter writer)
+            {
+                if(ReferenceEquals(writer, null)) throw new ArgumentNullException(nameof(writer));
+                if(Integer != null)
+                {
+                    writer.WriteIntValue(null, Integer);
+                }
+                else {
+                    writer.WriteObjectValue<global::GrimoireCli.Generated.Models.AudioDetailResponse_disc_numberMember1>(null, AudioDetailResponseDiscNumberMember1);
+                }
+            }
+        }
+        /// <summary>
         /// Composed type wrapper for classes <see cref="global::GrimoireCli.Generated.Models.AudioDetailResponse_file_sizeMember1"/>, <see cref="int"/>
         /// </summary>
         [global::System.CodeDom.Compiler.GeneratedCode("Kiota", "1.0.0")]
@@ -446,6 +558,68 @@ namespace GrimoireCli.Generated.Models
                 }
                 else {
                     writer.WriteObjectValue<global::GrimoireCli.Generated.Models.AudioDetailResponse_file_sizeMember1>(null, AudioDetailResponseFileSizeMember1);
+                }
+            }
+        }
+        /// <summary>
+        /// Composed type wrapper for classes <see cref="global::GrimoireCli.Generated.Models.AudioDetailResponse_track_numberMember1"/>, <see cref="int"/>
+        /// </summary>
+        [global::System.CodeDom.Compiler.GeneratedCode("Kiota", "1.0.0")]
+        public partial class AudioDetailResponse_track_number : IComposedTypeWrapper, IParsable
+        {
+            /// <summary>Composed type representation for type <see cref="global::GrimoireCli.Generated.Models.AudioDetailResponse_track_numberMember1"/></summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+            public global::GrimoireCli.Generated.Models.AudioDetailResponse_track_numberMember1? AudioDetailResponseTrackNumberMember1 { get; set; }
+#nullable restore
+#else
+            public global::GrimoireCli.Generated.Models.AudioDetailResponse_track_numberMember1 AudioDetailResponseTrackNumberMember1 { get; set; }
+#endif
+            /// <summary>Composed type representation for type <see cref="int"/></summary>
+            public int? Integer { get; set; }
+            /// <summary>
+            /// Creates a new instance of the appropriate class based on discriminator value
+            /// </summary>
+            /// <returns>A <see cref="global::GrimoireCli.Generated.Models.AudioDetailResponse.AudioDetailResponse_track_number"/></returns>
+            /// <param name="parseNode">The parse node to use to read the discriminator value and create the object</param>
+            public static global::GrimoireCli.Generated.Models.AudioDetailResponse.AudioDetailResponse_track_number CreateFromDiscriminatorValue(IParseNode parseNode)
+            {
+                if(ReferenceEquals(parseNode, null)) throw new ArgumentNullException(nameof(parseNode));
+                var result = new global::GrimoireCli.Generated.Models.AudioDetailResponse.AudioDetailResponse_track_number();
+                if(parseNode.GetIntValue() is int integerValue)
+                {
+                    result.Integer = integerValue;
+                }
+                else {
+                    result.AudioDetailResponseTrackNumberMember1 = new global::GrimoireCli.Generated.Models.AudioDetailResponse_track_numberMember1();
+                }
+                return result;
+            }
+            /// <summary>
+            /// The deserialization information for the current model
+            /// </summary>
+            /// <returns>A IDictionary&lt;string, Action&lt;IParseNode&gt;&gt;</returns>
+            public virtual IDictionary<string, Action<IParseNode>> GetFieldDeserializers()
+            {
+                if(AudioDetailResponseTrackNumberMember1 != null)
+                {
+                    return ParseNodeHelper.MergeDeserializersForIntersectionWrapper(AudioDetailResponseTrackNumberMember1);
+                }
+                return new Dictionary<string, Action<IParseNode>>();
+            }
+            /// <summary>
+            /// Serializes information the current object
+            /// </summary>
+            /// <param name="writer">Serialization writer to use to serialize this model</param>
+            public virtual void Serialize(ISerializationWriter writer)
+            {
+                if(ReferenceEquals(writer, null)) throw new ArgumentNullException(nameof(writer));
+                if(Integer != null)
+                {
+                    writer.WriteIntValue(null, Integer);
+                }
+                else {
+                    writer.WriteObjectValue<global::GrimoireCli.Generated.Models.AudioDetailResponse_track_numberMember1>(null, AudioDetailResponseTrackNumberMember1);
                 }
             }
         }

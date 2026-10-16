@@ -37,6 +37,10 @@ namespace GrimoireCli.Generated.Models
         public bool? HideTokens { get; set; }
         /// <summary>The library_writable property</summary>
         public bool? LibraryWritable { get; set; }
+        /// <summary>The mcp_enabled property</summary>
+        public bool? McpEnabled { get; set; }
+        /// <summary>The share_links_enabled property</summary>
+        public bool? ShareLinksEnabled { get; set; }
         /// <summary>The show_stat_audio property</summary>
         public bool? ShowStatAudio { get; set; }
         /// <summary>The show_stat_books property</summary>
@@ -91,6 +95,8 @@ namespace GrimoireCli.Generated.Models
                 { "hide_models", n => { HideModels = n.GetBoolValue(); } },
                 { "hide_tokens", n => { HideTokens = n.GetBoolValue(); } },
                 { "library_writable", n => { LibraryWritable = n.GetBoolValue(); } },
+                { "mcp_enabled", n => { McpEnabled = n.GetBoolValue(); } },
+                { "share_links_enabled", n => { ShareLinksEnabled = n.GetBoolValue(); } },
                 { "show_stat_audio", n => { ShowStatAudio = n.GetBoolValue(); } },
                 { "show_stat_books", n => { ShowStatBooks = n.GetBoolValue(); } },
                 { "show_stat_library_size", n => { ShowStatLibrarySize = n.GetBoolValue(); } },
@@ -120,6 +126,8 @@ namespace GrimoireCli.Generated.Models
             writer.WriteBoolValue("hide_models", HideModels);
             writer.WriteBoolValue("hide_tokens", HideTokens);
             writer.WriteBoolValue("library_writable", LibraryWritable);
+            writer.WriteBoolValue("mcp_enabled", McpEnabled);
+            writer.WriteBoolValue("share_links_enabled", ShareLinksEnabled);
             writer.WriteBoolValue("show_stat_audio", ShowStatAudio);
             writer.WriteBoolValue("show_stat_books", ShowStatBooks);
             writer.WriteBoolValue("show_stat_library_size", ShowStatLibrarySize);

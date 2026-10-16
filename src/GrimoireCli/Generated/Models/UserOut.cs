@@ -65,6 +65,24 @@ namespace GrimoireCli.Generated.Models
 #else
         public global::GrimoireCli.Generated.Models.UserOut.UserOut_role Role { get; set; }
 #endif
+        /// <summary>The share_links property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public string? ShareLinks { get; set; }
+#nullable restore
+#else
+        public string ShareLinks { get; set; }
+#endif
+        /// <summary>The share_links_allowed property</summary>
+        public bool? ShareLinksAllowed { get; set; }
+        /// <summary>The share_links_source property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public string? ShareLinksSource { get; set; }
+#nullable restore
+#else
+        public string ShareLinksSource { get; set; }
+#endif
         /// <summary>The username property</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
@@ -79,6 +97,9 @@ namespace GrimoireCli.Generated.Models
         public UserOut()
         {
             AdditionalData = new Dictionary<string, object>();
+            ShareLinks = "role";
+            ShareLinksAllowed = false;
+            ShareLinksSource = "role";
         }
         /// <summary>
         /// Creates a new instance of the appropriate class based on discriminator value
@@ -108,6 +129,9 @@ namespace GrimoireCli.Generated.Models
                 { "id", n => { Id = n.GetStringValue(); } },
                 { "oidc_linked", n => { OidcLinked = n.GetBoolValue(); } },
                 { "role", n => { Role = n.GetObjectValue<global::GrimoireCli.Generated.Models.UserOut.UserOut_role>(global::GrimoireCli.Generated.Models.UserOut.UserOut_role.CreateFromDiscriminatorValue); } },
+                { "share_links", n => { ShareLinks = n.GetStringValue(); } },
+                { "share_links_allowed", n => { ShareLinksAllowed = n.GetBoolValue(); } },
+                { "share_links_source", n => { ShareLinksSource = n.GetStringValue(); } },
                 { "username", n => { Username = n.GetStringValue(); } },
             };
         }
@@ -128,6 +152,9 @@ namespace GrimoireCli.Generated.Models
             writer.WriteStringValue("id", Id);
             writer.WriteBoolValue("oidc_linked", OidcLinked);
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.UserOut.UserOut_role>("role", Role);
+            writer.WriteStringValue("share_links", ShareLinks);
+            writer.WriteBoolValue("share_links_allowed", ShareLinksAllowed);
+            writer.WriteStringValue("share_links_source", ShareLinksSource);
             writer.WriteStringValue("username", Username);
             writer.WriteAdditionalData(AdditionalData);
         }

@@ -37,6 +37,9 @@ public static class DuplicatesCommand
         command.AddHelpSection("Notes", HelpSectionPosition.Top,
             "At most 20 children. Each requires id and kind; label is optional.",
             "",
+            "parent_kind and parent_label describe the parent itself; both \"\" is",
+            "\"Main version\", omitted leaves it. Applied only if a child linked.",
+            "",
             "Per child: a rejected one lands in errors and the rest are linked, so a",
             "partial exits 3. Re-sending a fixed batch re-reports the children that",
             "already linked.",
@@ -99,7 +102,8 @@ public static class DuplicatesCommand
         command.AddHelpSection("Notes", HelpSectionPosition.Top,
             "One indivisible change: the old parent and every child move together.",
             "--new-parent-id must not already be a variant of something else, and",
-            "--old-parent-id must not itself be a variant.");
+            "--old-parent-id must not itself be a variant. The promoted copy keeps its",
+            "own kind and label, which now describe the main version.");
         command.AddExamples(
             "grimoire-cli duplicates promote --resource-type book --new-parent-id <id> --old-parent-id <id> --kind version --label \"2015 printing\"");
         command.AddResponseExample<Generated.Models.PromoteResult>();

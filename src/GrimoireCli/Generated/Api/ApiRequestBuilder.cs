@@ -14,6 +14,7 @@ using GrimoireCli.Generated.Api.Campaigns;
 using GrimoireCli.Generated.Api.CancelScan;
 using GrimoireCli.Generated.Api.Changelog;
 using GrimoireCli.Generated.Api.Characters;
+using GrimoireCli.Generated.Api.Codex;
 using GrimoireCli.Generated.Api.Content;
 using GrimoireCli.Generated.Api.DiceMaterials;
 using GrimoireCli.Generated.Api.Downloads;
@@ -37,6 +38,8 @@ using GrimoireCli.Generated.Api.SavedFilters;
 using GrimoireCli.Generated.Api.ScanStatus;
 using GrimoireCli.Generated.Api.Search;
 using GrimoireCli.Generated.Api.Settings;
+using GrimoireCli.Generated.Api.Share;
+using GrimoireCli.Generated.Api.ShareLinks;
 using GrimoireCli.Generated.Api.Stats;
 using GrimoireCli.Generated.Api.SystemFamilies;
 using GrimoireCli.Generated.Api.Systems;
@@ -129,6 +132,11 @@ namespace GrimoireCli.Generated.Api
         public global::GrimoireCli.Generated.Api.Characters.CharactersRequestBuilder Characters
         {
             get => new global::GrimoireCli.Generated.Api.Characters.CharactersRequestBuilder(PathParameters, RequestAdapter);
+        }
+        /// <summary>The codex property</summary>
+        public global::GrimoireCli.Generated.Api.Codex.CodexRequestBuilder Codex
+        {
+            get => new global::GrimoireCli.Generated.Api.Codex.CodexRequestBuilder(PathParameters, RequestAdapter);
         }
         /// <summary>The content property</summary>
         public global::GrimoireCli.Generated.Api.Content.ContentRequestBuilder Content
@@ -244,6 +252,16 @@ namespace GrimoireCli.Generated.Api
         public global::GrimoireCli.Generated.Api.Settings.SettingsRequestBuilder Settings
         {
             get => new global::GrimoireCli.Generated.Api.Settings.SettingsRequestBuilder(PathParameters, RequestAdapter);
+        }
+        /// <summary>The share property</summary>
+        public global::GrimoireCli.Generated.Api.Share.ShareRequestBuilder Share
+        {
+            get => new global::GrimoireCli.Generated.Api.Share.ShareRequestBuilder(PathParameters, RequestAdapter);
+        }
+        /// <summary>The shareLinks property</summary>
+        public global::GrimoireCli.Generated.Api.ShareLinks.ShareLinksRequestBuilder ShareLinks
+        {
+            get => new global::GrimoireCli.Generated.Api.ShareLinks.ShareLinksRequestBuilder(PathParameters, RequestAdapter);
         }
         /// <summary>The stats property</summary>
         public global::GrimoireCli.Generated.Api.Stats.StatsRequestBuilder Stats
