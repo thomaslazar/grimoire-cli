@@ -3042,6 +3042,72 @@ ok "campaigns calendar download writes an .ics and subscription get reports has_
   || { cat "$WORK/cli.err" >&2; fail "schedule get should show no definition after delete"; }
 ok "campaigns schedule delete clears the schedule"
 
+# ---- campaign membership ----------------------------------------------------
+# Own throwaway group campaign owned by admin; player is the invitee.
+PCFG="$WORK/player-config.json"
+# deleting leftover Smoke Table campaigns, archived ones included
+for c in $("$CLI" campaigns list --include-archived 2>"$WORK/cli.err" | jq -r '.[] | select(.name == "Smoke Table") | .id'); do
+  "$CLI" campaigns delete --id "$c" >/dev/null 2>"$WORK/cli.err" \
+    || { cat "$WORK/cli.err" >&2; fail "campaigns delete (sweep) exited non-zero"; }
+done
+# creating the group campaign
+TBL=$(echo '{"name":"Smoke Table","is_gm_campaign":true}' | "$CLI" campaigns create --stdin 2>"$WORK/cli.err" | jq -r .id) \
+  || { cat "$WORK/cli.err" >&2; fail "campaigns create (table) exited non-zero"; }
+[ -n "$TBL" ] && [ "$TBL" != "null" ] || fail "campaigns create should return an id"
+# logging in as player into a scratch config
+GRIMOIRE_CONFIG="$PCFG" "$CLI" login --server "$SERVER" --username player --password player >/dev/null 2>"$WORK/cli.err" \
+  || { cat "$WORK/cli.err" >&2; fail "player login exited non-zero"; }
+
+# listing eligible users expecting player
+PID=$("$CLI" campaigns members eligible --id "$TBL" 2>"$WORK/cli.err" | jq -r '[.[] | select(.username == "player")][0].id') \
+  || { cat "$WORK/cli.err" >&2; fail "members eligible exited non-zero"; }
+[ -n "$PID" ] && [ "$PID" != "null" ] || fail "members eligible should list player"
+
+# inviting player, who sees the invite and accepts
+"$CLI" campaigns members invite --id "$TBL" --user-id "$PID" 2>"$WORK/cli.err" | jq -e '.status == "invited"' >/dev/null \
+  || { cat "$WORK/cli.err" >&2; fail "members invite should report status invited"; }
+GRIMOIRE_CONFIG="$PCFG" "$CLI" campaigns invites 2>"$WORK/cli.err" \
+  | jq -e --arg id "$TBL" '[.[] | select(.campaign_id == $id)] | length == 1' >/dev/null \
+  || { cat "$WORK/cli.err" >&2; fail "player campaigns invites should list the campaign"; }
+GRIMOIRE_CONFIG="$PCFG" "$CLI" campaigns members update --id "$TBL" --user-id "$PID" --status accepted 2>"$WORK/cli.err" \
+  | jq -e '.status == "accepted"' >/dev/null \
+  || { cat "$WORK/cli.err" >&2; fail "player members update should accept the invite"; }
+ok "campaigns members invite and campaigns invites reach the player, who accepts"
+
+# naming the character as owner, then removing the member
+"$CLI" campaigns members update --id "$TBL" --user-id "$PID" --character-name "Smoke Vex" 2>"$WORK/cli.err" \
+  | jq -e '.character_name == "Smoke Vex"' >/dev/null \
+  || { cat "$WORK/cli.err" >&2; fail "members update should set character_name"; }
+"$CLI" campaigns members remove --id "$TBL" --user-id "$PID" >/dev/null 2>"$WORK/cli.err" \
+  || { cat "$WORK/cli.err" >&2; fail "members remove exited non-zero"; }
+ok "campaigns members update sets the character and remove drops the member"
+
+# creating a guest, expecting a 10-character code in list and share
+G=$("$CLI" campaigns guests create --id "$TBL" --nickname "Smoke Guest" 2>"$WORK/cli.err") \
+  || { cat "$WORK/cli.err" >&2; fail "guests create exited non-zero"; }
+GM_ID=$(echo "$G" | jq -r .id)
+CODE=$(echo "$G" | jq -r .guest_code)
+[ "${#CODE}" -eq 10 ] || fail "guests create should return a 10-character guest_code: $G"
+"$CLI" campaigns guests list --id "$TBL" 2>"$WORK/cli.err" \
+  | jq -e --arg id "$GM_ID" --arg c "$CODE" '[.[] | select(.id == $id)][0].guest_code == $c' >/dev/null \
+  || { cat "$WORK/cli.err" >&2; fail "guests list should show the guest's code"; }
+"$CLI" campaigns guests share --id "$TBL" --member-id "$GM_ID" 2>"$WORK/cli.err" | jq -e --arg c "$CODE" '.code == $c' >/dev/null \
+  || { cat "$WORK/cli.err" >&2; fail "guests share should return the guest code"; }
+ok "campaigns guests create, list and share agree on the code"
+
+# regenerating the code, then removing the guest
+"$CLI" campaigns guests regenerate --id "$TBL" --member-id "$GM_ID" 2>"$WORK/cli.err" | jq -e --arg c "$CODE" '.guest_code != $c' >/dev/null \
+  || { cat "$WORK/cli.err" >&2; fail "guests regenerate should change the code"; }
+"$CLI" campaigns guests remove --id "$TBL" --member-id "$GM_ID" >/dev/null 2>"$WORK/cli.err" \
+  || { cat "$WORK/cli.err" >&2; fail "guests remove exited non-zero"; }
+"$CLI" campaigns guests list --id "$TBL" 2>"$WORK/cli.err" | jq -e 'length == 0' >/dev/null \
+  || { cat "$WORK/cli.err" >&2; fail "guests list should be empty after remove"; }
+ok "campaigns guests regenerate and remove"
+
+# deleting the throwaway campaign
+"$CLI" campaigns delete --id "$TBL" >/dev/null 2>"$WORK/cli.err" \
+  || { cat "$WORK/cli.err" >&2; fail "campaigns delete (table) exited non-zero"; }
+
 # ---- api keys ----
 # Key-mode calls use their own config file, so the admin session above is untouched.
 KEYCFG="$WORK/key-config.json"
