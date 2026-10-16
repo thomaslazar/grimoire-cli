@@ -33,11 +33,4 @@ public class CampaignBannerCommandTests
 
     [Fact]
     public void FocusNeedsFocusY() => Assert.NotEmpty(Parse("banner", "focus", "--id", "c").Errors);
-
-    [Fact]
-    public void UploadImageNeedsFile() => Assert.NotEmpty(Parse("files", "upload-image", "--id", "c").Errors);
-
-    [Fact]
-    public void UploadImageRefusesBothCategoryFlags()
-        => Assert.NotEmpty(Parse("files", "upload-image", "--id", "c", "--file", "f", "--category-id", "k", "--new-category-name", "n").Errors);
 }

@@ -389,6 +389,7 @@ grimoire-cli config set server https://grimoire.example.com
 | `campaigns categories group-order --id <campaign-id> --ordered-keys <key>...` | Order the resource panel's type and category groups |
 | `campaigns files upload --id <campaign-id> --file <path> [--category-id <id> \| --new-category-name <n>]` | Upload a file and link it at `gm` visibility |
 | `campaigns files upload-image --id <campaign-id> --file <path> [--category-id <id> \| --new-category-name <name>]` | Upload an image into a campaign and link it |
+| `campaigns files get --id <campaign-id> --file-id <file-id> --output <path\|->` | Download a campaign file |
 | `campaigns banner get --id <campaign-id> --output <path\|-> [--size <small\|full>]` | Download the campaign banner |
 | `campaigns banner upload --id <campaign-id> --file <path>` | Upload the campaign banner |
 | `campaigns banner delete --id <campaign-id>` | Remove the campaign banner |

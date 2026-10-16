@@ -3154,6 +3154,11 @@ printf '%%PDF-1.4\n1 0 obj<</Type/Catalog/Pages 2 0 R>>endobj\n2 0 obj<</Type/Pa
 FID=$("$CLI" campaigns files upload --id "$AST" --file "$WORK/smoke-sheet.pdf" 2>"$WORK/cli.err" | jq -r .resource_id) \
   || { cat "$WORK/cli.err" >&2; fail "campaigns files upload (sheet pdf) exited non-zero"; }
 [ -n "$FID" ] && [ "$FID" != "null" ] || fail "campaigns files upload should return a resource_id"
+# downloading the uploaded PDF expecting identical bytes
+"$CLI" campaigns files get --id "$AST" --file-id "$FID" --output "$WORK/got-sheet.pdf" >/dev/null 2>"$WORK/cli.err" \
+  || { cat "$WORK/cli.err" >&2; fail "campaigns files get exited non-zero"; }
+cmp -s "$WORK/smoke-sheet.pdf" "$WORK/got-sheet.pdf" || fail "campaigns files get should return the uploaded bytes"
+ok "campaigns files get returns the uploaded file"
 "$CLI" campaigns members sheet sources --id "$AST" 2>"$WORK/cli.err" \
   | jq -e --arg id "$FID" '[.files[] | select(.id == $id)] | length == 1' >/dev/null \
   || { cat "$WORK/cli.err" >&2; fail "sheet sources should list the uploaded campaign file"; }
