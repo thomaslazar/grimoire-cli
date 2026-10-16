@@ -404,6 +404,16 @@ grimoire-cli config set server https://grimoire.example.com
 | `campaigns calendar subscription get [--id <campaign-id>]` | Show your calendar-feed URLs |
 | `campaigns calendar subscription create [--id <campaign-id>]` | Mint or rotate your calendar-feed token |
 | `campaigns calendar subscription revoke` | Revoke your calendar-feed token |
+| `campaigns invites` | Your pending campaign invitations |
+| `campaigns members eligible --id <campaign-id>` | Users who can be invited |
+| `campaigns members invite --id <campaign-id> --user-id <user-id>` | Invite a user to the campaign |
+| `campaigns members update --id <campaign-id> --user-id <user-id> [--status <accepted\|declined>] [--character-name <name>] [--character-sheet-url <url>]` | Answer an invitation or set a member's character |
+| `campaigns members remove --id <campaign-id> --user-id <user-id>` | Remove a member, or leave |
+| `campaigns guests list --id <campaign-id>` | List the campaign's guests and their codes |
+| `campaigns guests create --id <campaign-id> [--nickname <name>]` | Create a guest and their invite code |
+| `campaigns guests regenerate --id <campaign-id> --member-id <member-id>` | Replace a guest's invite code |
+| `campaigns guests remove --id <campaign-id> --member-id <member-id>` | Remove a guest and delete their account |
+| `campaigns guests share --id <campaign-id> --member-id <member-id>` | Invite text and link carrying a guest's code |
 | `campaigns wiki list --id <campaign-id> [--mine] [--include-hidden]` | List the wiki pages you can see |
 | `campaigns wiki get --id <campaign-id> --page-id <page-id>` | Get one wiki page with its body and backlinks |
 | `campaigns wiki create --id <campaign-id> {--input <file> \| --stdin}` | Create a wiki page |
