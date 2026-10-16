@@ -159,7 +159,7 @@ grimoire-cli is a set of sharp primitives that AI agents compose into workflows.
 
 You point an agent at a system whose metadata is thin. The agent:
 
-1. Checks that a source can answer for it (`grimoire-cli systems metadata-sources --id <id>`) — the list is empty until an add-on is installed, enabled and *runnable*, which `grimoire-cli addons list` diagnoses
+1. Checks that a source can answer for it (`grimoire-cli systems metadata-sources --id <id>`) — it lists Grimoire Codex DB while the server sets `GRIMOIRE_CODEX_DB_API_TOKEN`, plus any add-on that is installed, enabled and *runnable*, which `grimoire-cli addons list` diagnoses
 2. Searches it (`grimoire-cli systems metadata-search --id <id> --source-id <src>`), letting the omitted `--query` default to the system's own name
 3. Picks a candidate from the ranked results and fetches its diff (`grimoire-cli systems metadata-fetch --id <id> --source-id <src> --identity <identity>`), passing back the same `--query` the candidate came from
 4. Reads the per-field diff: `only_incoming` is a safe fill-in, `differs` is a decision, `same` is nothing to do — `current` sits beside `incoming`, so nothing is overwritten blind
@@ -239,11 +239,11 @@ grimoire-cli config set server https://grimoire.example.com
 | `systems books folders list --id <id>` | List a system's tagged subcategory folders |
 | `systems books folders set --id <id> {--input <file> \| --stdin}` | Replace a subcategory folder's tags (gm or admin) |
 | `systems books folders delete --id <id> --path <path>` | Remove a subcategory folder's record (gm or admin) |
-| `systems metadata-sources --id <id>` | Add-ons that can supply metadata for this system (gm or admin) |
-| `systems metadata-search --id <id> --source-id <src> [--query]` | Ranked candidates from one add-on (gm or admin) |
+| `systems metadata-sources --id <id>` | Sources that can supply metadata for this system (gm or admin) |
+| `systems metadata-search --id <id> --source-id <src> [--query]` | Ranked candidates from one source (gm or admin) |
 | `systems metadata-fetch --id <id> --source-id <src> {--identity <i> \| --paste <url>} [--query]` | Diff a candidate against the system; writes nothing (gm or admin) |
-| `books metadata-sources --id <id>` | Add-ons that can supply metadata for this book (gm or admin) |
-| `books metadata-search --id <id> --source-id <src> [--query]` | Ranked candidates from one add-on (gm or admin) |
+| `books metadata-sources --id <id>` | Sources that can supply metadata for this book (gm or admin) |
+| `books metadata-search --id <id> --source-id <src> [--query]` | Ranked candidates from one source (gm or admin) |
 | `books metadata-fetch --id <id> --source-id <src> {--identity <i> \| --paste <url>} [--query]` | Diff a candidate against the book; writes nothing (gm or admin) |
 | `library rescan [--scope <path>] [--metadata-mode new\|missing\|replace]` | Scan the library for new and changed files; exit 3 if already running (admin) |
 | `library scan-status` | Show the running scan's progress (admin) |
@@ -277,8 +277,8 @@ grimoire-cli config set server https://grimoire.example.com
 | `files folder markers --path <path> [--container-kind <kind>] [--nsfw true\|false] [--frames-container true\|false]` | Set a folder's container/NSFW/frame markers (admin) |
 | `files folder scaffold --path <path>` | Create the standard category folders (admin) |
 | `files folder contents --path <path>` | Report whether a folder holds content (admin) |
-| `maps list [--map-type <t>] [--limit <n>] [--offset <n>] [--query <q>] [--tags <json>] [--favorites] [--added-since <iso>] [--folder <path>] [--sort path\|name\|size\|added_at\|title\|duration] [--order asc\|desc]` | List maps (defaults to 100 results) |
-| `maps folder-counts [--map-type <t>] [--query <q>] [--tags <json>] [--favorites] [--added-since <iso>] [--folder <path>] [--sort path\|name\|size\|added_at\|title\|duration] [--order asc\|desc]` | Folders holding matching maps, with direct counts |
+| `maps list [--map-type <t>] [--limit <n>] [--offset <n>] [--query <q>] [--tags <json>] [--favorites] [--added-since <iso>] [--folder <path>] [--sort path\|name\|size\|added_at\|title\|duration\|track] [--order asc\|desc]` | List maps (defaults to 100 results) |
+| `maps folder-counts [--map-type <t>] [--query <q>] [--tags <json>] [--favorites] [--added-since <iso>] [--folder <path>] [--sort path\|name\|size\|added_at\|title\|duration\|track] [--order asc\|desc]` | Folders holding matching maps, with direct counts |
 | `maps get --id <id>` | Get one map, with its detected grid and any manual override |
 | `maps thumbnail --id <id> --output <path\|->` | Download a map's scan-generated thumbnail |
 | `maps file --id <id> --output <path\|->` | Download the map file as stored |
@@ -292,8 +292,8 @@ grimoire-cli config set server https://grimoire.example.com
 | `maps folders list` | List tagged map folders |
 | `maps folders set {--input <file> \| --stdin}` | Replace one map folder's tags (gm or admin) |
 | `maps folders batch-set {--input <file> \| --stdin}` | Set tags on many map folders in one transaction (gm or admin) |
-| `models list [--limit <n>] [--offset <n>] [--query <q>] [--tags <json>] [--favorites] [--added-since <iso>] [--folder <path>] [--sort path\|name\|size\|added_at\|title\|duration] [--order asc\|desc]` | List 3D models (defaults to 100 results) |
-| `models folder-counts [--query <q>] [--tags <json>] [--favorites] [--added-since <iso>] [--folder <path>] [--sort path\|name\|size\|added_at\|title\|duration] [--order asc\|desc]` | Folders holding matching 3D models, with direct counts |
+| `models list [--limit <n>] [--offset <n>] [--query <q>] [--tags <json>] [--favorites] [--added-since <iso>] [--folder <path>] [--sort path\|name\|size\|added_at\|title\|duration\|track] [--order asc\|desc]` | List 3D models (defaults to 100 results) |
+| `models folder-counts [--query <q>] [--tags <json>] [--favorites] [--added-since <iso>] [--folder <path>] [--sort path\|name\|size\|added_at\|title\|duration\|track] [--order asc\|desc]` | Folders holding matching 3D models, with direct counts |
 | `models get --id <id>` | Get one model, with its derived support pair |
 | `models thumbnail --id <id> --output <path\|->` | Download a model's rendered thumbnail |
 | `models file --id <id> --output <path\|->` | Download the 3D model file |
@@ -303,8 +303,8 @@ grimoire-cli config set server https://grimoire.example.com
 | `models folders list` | List tagged model folders |
 | `models folders set {--input <file> \| --stdin}` | Replace one model folder's tags (gm or admin) |
 | `models folders batch-set {--input <file> \| --stdin}` | Set tags on many model folders in one transaction (gm or admin) |
-| `tokens list [--limit <n>] [--offset <n>] [--query <q>] [--tags <json>] [--favorites] [--added-since <iso>] [--folder <path>] [--sort path\|name\|size\|added_at\|title\|duration] [--order asc\|desc]` | List tokens (defaults to 100 results) |
-| `tokens folder-counts [--query <q>] [--tags <json>] [--favorites] [--added-since <iso>] [--folder <path>] [--sort path\|name\|size\|added_at\|title\|duration] [--order asc\|desc]` | Folders holding matching tokens, with direct counts |
+| `tokens list [--limit <n>] [--offset <n>] [--query <q>] [--tags <json>] [--favorites] [--added-since <iso>] [--folder <path>] [--sort path\|name\|size\|added_at\|title\|duration\|track] [--order asc\|desc]` | List tokens (defaults to 100 results) |
+| `tokens folder-counts [--query <q>] [--tags <json>] [--favorites] [--added-since <iso>] [--folder <path>] [--sort path\|name\|size\|added_at\|title\|duration\|track] [--order asc\|desc]` | Folders holding matching tokens, with direct counts |
 | `tokens get --id <id>` | Get one token |
 | `tokens thumbnail --id <id> --output <path\|->` | Download a token's rendered thumbnail |
 | `tokens file --id <id> --output <path\|->` | Download the token image as stored |
@@ -314,8 +314,8 @@ grimoire-cli config set server https://grimoire.example.com
 | `tokens folders list` | List tagged token folders |
 | `tokens folders set {--input <file> \| --stdin}` | Replace one token folder's tags (gm or admin) |
 | `tokens folders batch-set {--input <file> \| --stdin}` | Set tags on many token folders in one transaction (gm or admin) |
-| `audio list [--limit <n>] [--offset <n>] [--query <q>] [--tags <json>] [--favorites] [--added-since <iso>] [--folder <path>] [--sort path\|name\|size\|added_at\|title\|duration] [--order asc\|desc]` | List audio tracks (defaults to 100 results) |
-| `audio folder-counts [--query <q>] [--tags <json>] [--favorites] [--added-since <iso>] [--folder <path>] [--sort path\|name\|size\|added_at\|title\|duration] [--order asc\|desc]` | Folders holding matching audio tracks, with direct counts |
+| `audio list [--limit <n>] [--offset <n>] [--query <q>] [--tags <json>] [--favorites] [--added-since <iso>] [--folder <path>] [--sort path\|name\|size\|added_at\|title\|duration\|track] [--order asc\|desc]` | List audio tracks (defaults to 100 results) |
+| `audio folder-counts [--query <q>] [--tags <json>] [--favorites] [--added-since <iso>] [--folder <path>] [--sort path\|name\|size\|added_at\|title\|duration\|track] [--order asc\|desc]` | Folders holding matching audio tracks, with direct counts |
 | `audio get --id <id>` | Get one audio track |
 | `audio artwork --id <id> --output <path\|->` | Download an audio track's artwork |
 | `audio cover get --id <id> --output <path\|->` | Download the track's set cover image (gm or admin) |

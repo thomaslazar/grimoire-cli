@@ -39,7 +39,8 @@ public class MetadataCommandTests
     {
         var output = SystemsHelp("metadata-sources", full: false);
         Assert.Contains("addons list", output);
-        Assert.Contains("targets this resource type", output);
+        Assert.Contains("GRIMOIRE_CODEX_DB_API_TOKEN", output);
+        Assert.Contains("target this resource type", output);
         Assert.Contains("supports_paste", output);
     }
 

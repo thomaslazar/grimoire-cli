@@ -251,6 +251,18 @@ public class AudioCommandTests
              "--added-since", "2026-01-01T00:00:00Z", "--folder", "a", "--sort", "name", "--order", "desc"]).Errors);
     }
 
+    // Mirrors SORTS in services/browse/media.py, which all eight media routes share.
+    [Theory]
+    [InlineData("path")]
+    [InlineData("name")]
+    [InlineData("size")]
+    [InlineData("added_at")]
+    [InlineData("title")]
+    [InlineData("duration")]
+    [InlineData("track")]
+    public void ListAcceptsEveryServerSort(string sort)
+        => Assert.Empty(AudioCommand.Create().Parse(["list", "--sort", sort]).Errors);
+
     [Theory]
     [InlineData("--sort", "bogus")]
     [InlineData("--order", "up")]

@@ -126,8 +126,8 @@ public static class BooksCommand
         command.AddHelpSection("Notes", HelpSectionPosition.Top,
             "Clear a field with \"\"; an explicit null does nothing.",
             "",
-            "year, month and day cannot be cleared at all: null is dropped and \"\"",
-            "fails coercion with a 422.",
+            "year, month, day and codex_id cannot be cleared at all: null is dropped",
+            "and \"\" is a 422.",
             "",
             "tags replace the set. To add without removing, use batch-tag.",
             "",
@@ -181,8 +181,8 @@ public static class BooksCommand
             "Exit 3 is HTTP 200 with a non-empty errors list — a partial write.",
             "updated lists the ids that resolved, not the fields that changed.",
             "",
-            "\"\" not null clears a field, and year/month/day cannot be cleared — see",
-            "books update.");
+            "\"\" not null clears a field, and year/month/day/codex_id cannot be",
+            "cleared — see books update.");
         command.AddExamples(
             "grimoire-cli books batch-update --input items.json",
             "jq -c '{items: .}' edits.json | grimoire-cli books batch-update --stdin");

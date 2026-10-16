@@ -67,7 +67,7 @@ public class BooksCommandTests
         var output = RenderHelp(["books", "update"], full: true);
         Assert.Contains("Request shape:", output);
         Assert.Contains("\"title\":", output);
-        Assert.Contains("year, month and day cannot be cleared", output);
+        Assert.Contains("year, month, day and codex_id cannot be cleared", output);
     }
 
     // The block is rendered from the generated model, so this is also the guard on
