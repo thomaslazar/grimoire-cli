@@ -108,7 +108,8 @@ public static class CampaignMemberTokenCommands
         };
         command.AddHelpSection("Notes", HelpSectionPosition.Top,
             "The member themselves or the campaign owner; 409 while the campaign is",
-            "archived. The owner has no slot of their own.");
+            "archived. The owner has no slot of their own.",
+            "A no-op when the slot is empty.");
         command.AddExamples("grimoire-cli campaigns members token delete --id <campaign-id> --member-id <member-id>");
         command.SetAction(async (parseResult, cancellationToken) =>
         {

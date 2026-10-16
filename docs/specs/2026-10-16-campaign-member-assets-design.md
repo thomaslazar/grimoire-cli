@@ -53,7 +53,6 @@ These slots hold files only. The schema-driven character builder is a separate f
   - Accepts a PDF or one of those image types, max 15 MB (`_SHEET_TYPES`, `_MAX_SHEET_BYTES`).
   - Image bytes are checked.
   - Clears any sheet link. A link set with `members update --character-sheet-url` clears the uploaded file in turn.
-  - The download keeps the uploaded filename.
   - A `.pdf` extension sends `application/pdf`, so the sheet service maps `.pdf` itself on top of the image map.
 - **`from-source`:**
   - The body is `{"source_type": "book"|"file", "source_id": …}` (embedded `Body` parameters).
@@ -63,7 +62,7 @@ These slots hold files only. The schema-driven character builder is a separate f
   - `--source-type` is a choice option with the server's values `book` and `file`.
 - **`sources`:**
   - Allowed for any campaign member.
-  - Lists library books in the `character-sheet` category that the caller can read, limited to the campaign's system when it has one. It also lists campaign PDF files the caller can read (s:37-65).
+  - Lists library PDFs in the `character-sheet` category that the caller can read, limited to the campaign's system when it has one. It also lists campaign PDF files the caller can read (s:37-65).
 - **Delete:** a slot delete is 204 even when the slot is already empty.
 
 ## Shared

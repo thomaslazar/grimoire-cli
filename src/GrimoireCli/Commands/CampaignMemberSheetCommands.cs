@@ -40,7 +40,6 @@ public static class CampaignMemberSheetCommands
         };
         command.AddHelpSection("Notes", HelpSectionPosition.Top,
             "Any campaign member. 404 when the slot is empty.",
-            "The file keeps the name it was uploaded with.",
             "",
             "--output - writes the bytes to stdout; a path writes the file and prints",
             "{path, bytes}.");
@@ -113,7 +112,8 @@ public static class CampaignMemberSheetCommands
         };
         command.AddHelpSection("Notes", HelpSectionPosition.Top,
             "The member themselves or the campaign owner; 409 while the campaign is",
-            "archived. The owner has no slot of their own.");
+            "archived. The owner has no slot of their own.",
+            "A no-op when the slot is empty.");
         command.AddExamples("grimoire-cli campaigns members sheet delete --id <campaign-id> --member-id <member-id>");
         command.SetAction(async (parseResult, cancellationToken) =>
         {
@@ -160,7 +160,7 @@ public static class CampaignMemberSheetCommands
         var idOption = IdOption();
         var command = new Command("sources", "Blank sheets you can copy into a slot") { idOption };
         command.AddHelpSection("Notes", HelpSectionPosition.Top,
-            "Any campaign member. Library books in the character-sheet category that",
+            "Any campaign member. Library PDFs in the character-sheet category that",
             "you can read, limited to the campaign's system when it has one, and",
             "campaign PDF files you can read.");
         command.AddExamples("grimoire-cli campaigns members sheet sources --id <campaign-id>");
