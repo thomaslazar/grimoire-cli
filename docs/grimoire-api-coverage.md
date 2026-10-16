@@ -21,7 +21,7 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | backups | 6 / 6 |
 | bookmarks | 0 / 4 |
 | books | 16 / 16 |
-| campaigns | 58 / 93 |
+| campaigns | 63 / 93 |
 | characters | 0 / 16 |
 | content | 0 / 6 |
 | downloads | 1 / 1 |
@@ -45,7 +45,7 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | token-frames | 0 / 2 |
 | tokens | 11 / 11 |
 | users | 0 / 16 |
-| **Total** | **216 / 360** |
+| **Total** | **221 / 360** |
 
 2 operation(s) are internal-only (🔒) and excluded from covered counts.
 
@@ -181,7 +181,7 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | DELETE | `/api/campaigns/calendar/subscription` | Revoke the caller's calendar feed token |  | — | `campaigns calendar subscription revoke` ✅ |
 | GET | `/api/campaigns/calendar/{token}/all.ics` | ICS feed of every campaign the token's user belongs to |  | campaigns: read | not wrapped: feeds for calendar apps; subscription returns the URLs |
 | GET | `/api/campaigns/calendar/{token}/{campaign_id}.ics` | ICS feed for a single campaign |  | campaigns: read | not wrapped: feeds for calendar apps; subscription returns the URLs |
-| GET | `/api/campaigns/invites` | List the current user's pending campaign invitations |  | campaigns: read | — |
+| GET | `/api/campaigns/invites` | List the current user's pending campaign invitations |  | campaigns: read | `campaigns invites` ✅ |
 | GET | `/api/campaigns/resources/search` | Search books, maps, and tokens by name |  | campaigns: read | — |
 | GET | `/api/campaigns/resources/suggested/{system_id}` | Suggested resources (system books) for the create wizard |  | campaigns: read | — |
 | GET | `/api/campaigns/{campaign_id}` | Get a campaign |  | campaigns: read | `campaigns get` ✅ |
@@ -203,7 +203,7 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | PATCH | `/api/campaigns/{campaign_id}/categories/{category_id}` | Rename a category |  | campaigns: write | `campaigns categories update` ✅ |
 | DELETE | `/api/campaigns/{campaign_id}/categories/{category_id}` | Delete a category (mode: uncategorize \| delete_items) |  | campaigns: write | `campaigns categories delete` ✅ |
 | POST | `/api/campaigns/{campaign_id}/convert-to-group` | Convert a personal campaign into a GM-run group campaign |  | campaigns: write | `campaigns convert-to-group` ✅ |
-| GET | `/api/campaigns/{campaign_id}/eligible-members` | List users that can be invited |  | campaigns: read | — |
+| GET | `/api/campaigns/{campaign_id}/eligible-members` | List users that can be invited |  | campaigns: read | `campaigns members eligible` ✅ |
 | POST | `/api/campaigns/{campaign_id}/files` | Upload a campaign file (GM); links it as a resource |  | campaigns: write | `campaigns files upload` ✅ |
 | GET | `/api/campaigns/{campaign_id}/files/{file_id}` | Download a campaign file (honours resource visibility) |  | campaigns: read | — |
 | POST | `/api/campaigns/{campaign_id}/guests` | Create a guest invite code for a GM campaign |  | campaigns: write | — |
@@ -212,7 +212,7 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | POST | `/api/campaigns/{campaign_id}/guests/{member_id}/regenerate` | Regenerate a guest's invite code |  | campaigns: write | — |
 | GET | `/api/campaigns/{campaign_id}/guests/{member_id}/share-template` | Get share text and links for a guest invite code |  | campaigns: read | — |
 | POST | `/api/campaigns/{campaign_id}/images` | Upload an image (GM); links it as an image resource for note embedding |  | campaigns: write | `campaigns files upload-image` ✅ |
-| POST | `/api/campaigns/{campaign_id}/invite` | Invite a player to a GM campaign |  | campaigns: write | — |
+| POST | `/api/campaigns/{campaign_id}/invite` | Invite a player to a GM campaign |  | campaigns: write | `campaigns members invite` ✅ |
 | POST | `/api/campaigns/{campaign_id}/members/{member_id}/art` | Upload a member's character art |  | campaigns: write | — |
 | GET | `/api/campaigns/{campaign_id}/members/{member_id}/art` | Get a member's character art |  | campaigns: read | — |
 | DELETE | `/api/campaigns/{campaign_id}/members/{member_id}/art` | Remove a member's character art |  | campaigns: write | — |
@@ -223,8 +223,8 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | POST | `/api/campaigns/{campaign_id}/members/{member_id}/token` | Upload a member's character token |  | campaigns: write | — |
 | GET | `/api/campaigns/{campaign_id}/members/{member_id}/token` | Get a member's character token |  | campaigns: read | — |
 | DELETE | `/api/campaigns/{campaign_id}/members/{member_id}/token` | Remove a member's character token |  | campaigns: write | — |
-| PATCH | `/api/campaigns/{campaign_id}/members/{user_id}` | Accept or decline an invitation |  | campaigns: write | — |
-| DELETE | `/api/campaigns/{campaign_id}/members/{user_id}` | Remove a member |  | campaigns: write | — |
+| PATCH | `/api/campaigns/{campaign_id}/members/{user_id}` | Accept or decline an invitation |  | campaigns: write | `campaigns members update` ✅ |
+| DELETE | `/api/campaigns/{campaign_id}/members/{user_id}` | Remove a member |  | campaigns: write | `campaigns members remove` ✅ |
 | PUT | `/api/campaigns/{campaign_id}/resource-group-order` | Set the resource panel's group display order (categories + type groups) |  | campaigns: write | `campaigns categories group-order` ✅ |
 | GET | `/api/campaigns/{campaign_id}/resources` | List linked resources |  | campaigns: read | `campaigns resources list` ✅ |
 | POST | `/api/campaigns/{campaign_id}/resources` | Link a resource to a campaign |  | campaigns: write | `campaigns resources add` ✅ |

@@ -33,6 +33,8 @@ public static class CampaignsCommand
         command.Subcommands.Add(CampaignCalendarCommands.Create());
         command.Subcommands.Add(CampaignAvailabilityCommands.Create());
         command.Subcommands.Add(CampaignWikiCommands.Create());
+        command.Subcommands.Add(CampaignMembersCommands.Create());
+        command.Subcommands.Add(CreateInvitesCommand());
         return command;
     }
 
@@ -49,6 +51,21 @@ public static class CampaignsCommand
         {
             var (client, _) = CommandHelper.BuildClient();
             ConsoleOutput.WriteRawJson(await new CampaignsService(client).ListAsync(parseResult.GetValue(archivedOption)));
+            return 0;
+        });
+        return command;
+    }
+
+    private static Command CreateInvitesCommand()
+    {
+        var command = new Command("invites", "Your pending campaign invitations");
+        command.AddHelpSection("Notes", HelpSectionPosition.Top, "Archived campaigns are left out until they are unarchived.");
+        command.AddExamples("grimoire-cli campaigns invites");
+        command.AddResponseExampleArray<Generated.Models.CampaignInviteOut>();
+        command.SetAction(async (parseResult, cancellationToken) =>
+        {
+            var (client, _) = CommandHelper.BuildClient();
+            ConsoleOutput.WriteRawJson(await new CampaignsService(client).InvitesAsync());
             return 0;
         });
         return command;

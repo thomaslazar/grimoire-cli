@@ -60,6 +60,11 @@ public class CampaignsService
     public async Task<string> DeleteAsync(string id)
         => await _client.SendAsync(DeleteRequest(id), notFoundHint: NotFound);
 
+    /// <summary>GET /api/campaigns/invites.</summary>
+    public async Task<string> InvitesAsync() => await _client.SendAsync(InvitesRequest());
+
+    internal RequestInformation InvitesRequest() => _client.Api.Api.Campaigns.Invites.ToGetRequestInformation();
+
     internal RequestInformation ArchiveRequest(string id, bool archived)
         => _client.Api.Api.Campaigns[id].Archive.ToPutRequestInformation(new Generated.Models.CampaignArchive { Archived = archived });
 
