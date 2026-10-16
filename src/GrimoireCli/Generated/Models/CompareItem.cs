@@ -109,6 +109,22 @@ namespace GrimoireCli.Generated.Models
 #else
         public string RelativePath { get; set; }
 #endif
+        /// <summary>The suggested_kind property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public string? SuggestedKind { get; set; }
+#nullable restore
+#else
+        public string SuggestedKind { get; set; }
+#endif
+        /// <summary>The suggested_label property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public string? SuggestedLabel { get; set; }
+#nullable restore
+#else
+        public string SuggestedLabel { get; set; }
+#endif
         /// <summary>The tags property</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
@@ -132,6 +148,14 @@ namespace GrimoireCli.Generated.Models
 #nullable restore
 #else
         public string VariantKind { get; set; }
+#endif
+        /// <summary>The variant_label property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public string? VariantLabel { get; set; }
+#nullable restore
+#else
+        public string VariantLabel { get; set; }
 #endif
         /// <summary>The variant_main property</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
@@ -198,9 +222,12 @@ namespace GrimoireCli.Generated.Models
                 { "page_count", n => { PageCount = n.GetObjectValue<global::GrimoireCli.Generated.Models.CompareItem.CompareItem_page_count>(global::GrimoireCli.Generated.Models.CompareItem.CompareItem_page_count.CreateFromDiscriminatorValue); } },
                 { "reference_counts", n => { ReferenceCounts = n.GetObjectValue<global::GrimoireCli.Generated.Models.CompareItem_reference_counts>(global::GrimoireCli.Generated.Models.CompareItem_reference_counts.CreateFromDiscriminatorValue); } },
                 { "relative_path", n => { RelativePath = n.GetStringValue(); } },
+                { "suggested_kind", n => { SuggestedKind = n.GetStringValue(); } },
+                { "suggested_label", n => { SuggestedLabel = n.GetStringValue(); } },
                 { "tags", n => { Tags = n.GetCollectionOfPrimitiveValues<string>()?.AsList(); } },
                 { "title", n => { Title = n.GetObjectValue<global::GrimoireCli.Generated.Models.CompareItem.CompareItem_title>(global::GrimoireCli.Generated.Models.CompareItem.CompareItem_title.CreateFromDiscriminatorValue); } },
                 { "variant_kind", n => { VariantKind = n.GetStringValue(); } },
+                { "variant_label", n => { VariantLabel = n.GetStringValue(); } },
                 { "variant_main", n => { VariantMain = n.GetObjectValue<global::GrimoireCli.Generated.Models.VariantMain>(global::GrimoireCli.Generated.Models.VariantMain.CreateFromDiscriminatorValue); } },
                 { "variant_parent_id", n => { VariantParentId = n.GetObjectValue<global::GrimoireCli.Generated.Models.CompareItem.CompareItem_variant_parent_id>(global::GrimoireCli.Generated.Models.CompareItem.CompareItem_variant_parent_id.CreateFromDiscriminatorValue); } },
                 { "variants", n => { Variants = n.GetCollectionOfObjectValues<global::GrimoireCli.Generated.Models.VariantEntry>(global::GrimoireCli.Generated.Models.VariantEntry.CreateFromDiscriminatorValue)?.AsList(); } },
@@ -227,9 +254,12 @@ namespace GrimoireCli.Generated.Models
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.CompareItem.CompareItem_page_count>("page_count", PageCount);
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.CompareItem_reference_counts>("reference_counts", ReferenceCounts);
             writer.WriteStringValue("relative_path", RelativePath);
+            writer.WriteStringValue("suggested_kind", SuggestedKind);
+            writer.WriteStringValue("suggested_label", SuggestedLabel);
             writer.WriteCollectionOfPrimitiveValues<string>("tags", Tags);
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.CompareItem.CompareItem_title>("title", Title);
             writer.WriteStringValue("variant_kind", VariantKind);
+            writer.WriteStringValue("variant_label", VariantLabel);
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.VariantMain>("variant_main", VariantMain);
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.CompareItem.CompareItem_variant_parent_id>("variant_parent_id", VariantParentId);
             writer.WriteCollectionOfObjectValues<global::GrimoireCli.Generated.Models.VariantEntry>("variants", Variants);

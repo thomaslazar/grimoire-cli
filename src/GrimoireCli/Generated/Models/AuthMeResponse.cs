@@ -54,6 +54,8 @@ namespace GrimoireCli.Generated.Models
 #else
         public global::GrimoireCli.Generated.Models.AuthMeResponse.AuthMeResponse_role Role { get; set; }
 #endif
+        /// <summary>The share_links_allowed property</summary>
+        public bool? ShareLinksAllowed { get; set; }
         /// <summary>The username property</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
@@ -68,6 +70,7 @@ namespace GrimoireCli.Generated.Models
         public AuthMeResponse()
         {
             AdditionalData = new Dictionary<string, object>();
+            ShareLinksAllowed = false;
         }
         /// <summary>
         /// Creates a new instance of the appropriate class based on discriminator value
@@ -95,6 +98,7 @@ namespace GrimoireCli.Generated.Models
                 { "id", n => { Id = n.GetStringValue(); } },
                 { "oidc_linked", n => { OidcLinked = n.GetBoolValue(); } },
                 { "role", n => { Role = n.GetObjectValue<global::GrimoireCli.Generated.Models.AuthMeResponse.AuthMeResponse_role>(global::GrimoireCli.Generated.Models.AuthMeResponse.AuthMeResponse_role.CreateFromDiscriminatorValue); } },
+                { "share_links_allowed", n => { ShareLinksAllowed = n.GetBoolValue(); } },
                 { "username", n => { Username = n.GetStringValue(); } },
             };
         }
@@ -113,6 +117,7 @@ namespace GrimoireCli.Generated.Models
             writer.WriteStringValue("id", Id);
             writer.WriteBoolValue("oidc_linked", OidcLinked);
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.AuthMeResponse.AuthMeResponse_role>("role", Role);
+            writer.WriteBoolValue("share_links_allowed", ShareLinksAllowed);
             writer.WriteStringValue("username", Username);
             writer.WriteAdditionalData(AdditionalData);
         }

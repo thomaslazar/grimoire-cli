@@ -62,6 +62,14 @@ namespace GrimoireCli.Generated.Models
 #else
         public global::GrimoireCli.Generated.Models.UserUpdate.UserUpdate_role Role { get; set; }
 #endif
+        /// <summary>The share_links property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public global::GrimoireCli.Generated.Models.UserUpdate.UserUpdate_share_links? ShareLinks { get; set; }
+#nullable restore
+#else
+        public global::GrimoireCli.Generated.Models.UserUpdate.UserUpdate_share_links ShareLinks { get; set; }
+#endif
         /// <summary>
         /// Instantiates a new <see cref="global::GrimoireCli.Generated.Models.UserUpdate"/> and sets the default values.
         /// </summary>
@@ -93,6 +101,7 @@ namespace GrimoireCli.Generated.Models
                 { "email", n => { Email = n.GetObjectValue<global::GrimoireCli.Generated.Models.UserUpdate.UserUpdate_email>(global::GrimoireCli.Generated.Models.UserUpdate.UserUpdate_email.CreateFromDiscriminatorValue); } },
                 { "password", n => { Password = n.GetObjectValue<global::GrimoireCli.Generated.Models.UserUpdate.UserUpdate_password>(global::GrimoireCli.Generated.Models.UserUpdate.UserUpdate_password.CreateFromDiscriminatorValue); } },
                 { "role", n => { Role = n.GetObjectValue<global::GrimoireCli.Generated.Models.UserUpdate.UserUpdate_role>(global::GrimoireCli.Generated.Models.UserUpdate.UserUpdate_role.CreateFromDiscriminatorValue); } },
+                { "share_links", n => { ShareLinks = n.GetObjectValue<global::GrimoireCli.Generated.Models.UserUpdate.UserUpdate_share_links>(global::GrimoireCli.Generated.Models.UserUpdate.UserUpdate_share_links.CreateFromDiscriminatorValue); } },
             };
         }
         /// <summary>
@@ -108,6 +117,7 @@ namespace GrimoireCli.Generated.Models
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.UserUpdate.UserUpdate_email>("email", Email);
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.UserUpdate.UserUpdate_password>("password", Password);
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.UserUpdate.UserUpdate_role>("role", Role);
+            writer.WriteObjectValue<global::GrimoireCli.Generated.Models.UserUpdate.UserUpdate_share_links>("share_links", ShareLinks);
             writer.WriteAdditionalData(AdditionalData);
         }
         /// <summary>
@@ -497,6 +507,74 @@ namespace GrimoireCli.Generated.Models
                 }
                 else {
                     writer.WriteObjectValue<global::GrimoireCli.Generated.Models.UserUpdate_roleMember1>(null, UserUpdateRoleMember1);
+                }
+            }
+        }
+        /// <summary>
+        /// Composed type wrapper for classes <see cref="global::GrimoireCli.Generated.Models.UserUpdate_share_linksMember1"/>, <see cref="string"/>
+        /// </summary>
+        [global::System.CodeDom.Compiler.GeneratedCode("Kiota", "1.0.0")]
+        public partial class UserUpdate_share_links : IComposedTypeWrapper, IParsable
+        {
+            /// <summary>Composed type representation for type <see cref="string"/></summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+            public string? String { get; set; }
+#nullable restore
+#else
+            public string String { get; set; }
+#endif
+            /// <summary>Composed type representation for type <see cref="global::GrimoireCli.Generated.Models.UserUpdate_share_linksMember1"/></summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+            public global::GrimoireCli.Generated.Models.UserUpdate_share_linksMember1? UserUpdateShareLinksMember1 { get; set; }
+#nullable restore
+#else
+            public global::GrimoireCli.Generated.Models.UserUpdate_share_linksMember1 UserUpdateShareLinksMember1 { get; set; }
+#endif
+            /// <summary>
+            /// Creates a new instance of the appropriate class based on discriminator value
+            /// </summary>
+            /// <returns>A <see cref="global::GrimoireCli.Generated.Models.UserUpdate.UserUpdate_share_links"/></returns>
+            /// <param name="parseNode">The parse node to use to read the discriminator value and create the object</param>
+            public static global::GrimoireCli.Generated.Models.UserUpdate.UserUpdate_share_links CreateFromDiscriminatorValue(IParseNode parseNode)
+            {
+                if(ReferenceEquals(parseNode, null)) throw new ArgumentNullException(nameof(parseNode));
+                var result = new global::GrimoireCli.Generated.Models.UserUpdate.UserUpdate_share_links();
+                if(parseNode.GetStringValue() is string stringValue)
+                {
+                    result.String = stringValue;
+                }
+                else {
+                    result.UserUpdateShareLinksMember1 = new global::GrimoireCli.Generated.Models.UserUpdate_share_linksMember1();
+                }
+                return result;
+            }
+            /// <summary>
+            /// The deserialization information for the current model
+            /// </summary>
+            /// <returns>A IDictionary&lt;string, Action&lt;IParseNode&gt;&gt;</returns>
+            public virtual IDictionary<string, Action<IParseNode>> GetFieldDeserializers()
+            {
+                if(UserUpdateShareLinksMember1 != null)
+                {
+                    return ParseNodeHelper.MergeDeserializersForIntersectionWrapper(UserUpdateShareLinksMember1);
+                }
+                return new Dictionary<string, Action<IParseNode>>();
+            }
+            /// <summary>
+            /// Serializes information the current object
+            /// </summary>
+            /// <param name="writer">Serialization writer to use to serialize this model</param>
+            public virtual void Serialize(ISerializationWriter writer)
+            {
+                if(ReferenceEquals(writer, null)) throw new ArgumentNullException(nameof(writer));
+                if(String != null)
+                {
+                    writer.WriteStringValue(null, String);
+                }
+                else {
+                    writer.WriteObjectValue<global::GrimoireCli.Generated.Models.UserUpdate_share_linksMember1>(null, UserUpdateShareLinksMember1);
                 }
             }
         }

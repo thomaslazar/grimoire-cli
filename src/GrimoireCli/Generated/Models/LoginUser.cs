@@ -41,6 +41,8 @@ namespace GrimoireCli.Generated.Models
 #else
         public global::GrimoireCli.Generated.Models.LoginUser.LoginUser_role Role { get; set; }
 #endif
+        /// <summary>The share_links_allowed property</summary>
+        public bool? ShareLinksAllowed { get; set; }
         /// <summary>The username property</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
@@ -56,6 +58,7 @@ namespace GrimoireCli.Generated.Models
         {
             AdditionalData = new Dictionary<string, object>();
             ApiKeysAllowed = false;
+            ShareLinksAllowed = false;
         }
         /// <summary>
         /// Creates a new instance of the appropriate class based on discriminator value
@@ -79,6 +82,7 @@ namespace GrimoireCli.Generated.Models
                 { "display_name", n => { DisplayName = n.GetObjectValue<global::GrimoireCli.Generated.Models.LoginUser.LoginUser_display_name>(global::GrimoireCli.Generated.Models.LoginUser.LoginUser_display_name.CreateFromDiscriminatorValue); } },
                 { "id", n => { Id = n.GetStringValue(); } },
                 { "role", n => { Role = n.GetObjectValue<global::GrimoireCli.Generated.Models.LoginUser.LoginUser_role>(global::GrimoireCli.Generated.Models.LoginUser.LoginUser_role.CreateFromDiscriminatorValue); } },
+                { "share_links_allowed", n => { ShareLinksAllowed = n.GetBoolValue(); } },
                 { "username", n => { Username = n.GetStringValue(); } },
             };
         }
@@ -93,6 +97,7 @@ namespace GrimoireCli.Generated.Models
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.LoginUser.LoginUser_display_name>("display_name", DisplayName);
             writer.WriteStringValue("id", Id);
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.LoginUser.LoginUser_role>("role", Role);
+            writer.WriteBoolValue("share_links_allowed", ShareLinksAllowed);
             writer.WriteStringValue("username", Username);
             writer.WriteAdditionalData(AdditionalData);
         }

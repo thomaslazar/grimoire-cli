@@ -55,6 +55,22 @@ namespace GrimoireCli.Generated.Models
 #else
         public string Subtitle { get; set; }
 #endif
+        /// <summary>The variant_kind property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public string? VariantKind { get; set; }
+#nullable restore
+#else
+        public string VariantKind { get; set; }
+#endif
+        /// <summary>The variant_label property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public string? VariantLabel { get; set; }
+#nullable restore
+#else
+        public string VariantLabel { get; set; }
+#endif
         /// <summary>The variants property</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
@@ -93,6 +109,8 @@ namespace GrimoireCli.Generated.Models
                 { "resource_id", n => { ResourceId = n.GetStringValue(); } },
                 { "resource_type", n => { ResourceType = n.GetStringValue(); } },
                 { "subtitle", n => { Subtitle = n.GetStringValue(); } },
+                { "variant_kind", n => { VariantKind = n.GetStringValue(); } },
+                { "variant_label", n => { VariantLabel = n.GetStringValue(); } },
                 { "variants", n => { Variants = n.GetCollectionOfObjectValues<global::GrimoireCli.Generated.Models.ResourceSearchVariant>(global::GrimoireCli.Generated.Models.ResourceSearchVariant.CreateFromDiscriminatorValue)?.AsList(); } },
             };
         }
@@ -108,6 +126,8 @@ namespace GrimoireCli.Generated.Models
             writer.WriteStringValue("resource_id", ResourceId);
             writer.WriteStringValue("resource_type", ResourceType);
             writer.WriteStringValue("subtitle", Subtitle);
+            writer.WriteStringValue("variant_kind", VariantKind);
+            writer.WriteStringValue("variant_label", VariantLabel);
             writer.WriteCollectionOfObjectValues<global::GrimoireCli.Generated.Models.ResourceSearchVariant>("variants", Variants);
             writer.WriteAdditionalData(AdditionalData);
         }

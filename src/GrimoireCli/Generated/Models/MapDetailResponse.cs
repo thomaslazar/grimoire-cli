@@ -197,6 +197,14 @@ namespace GrimoireCli.Generated.Models
 #else
         public string VariantLabel { get; set; }
 #endif
+        /// <summary>The variant_main_filename property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public string? VariantMainFilename { get; set; }
+#nullable restore
+#else
+        public string VariantMainFilename { get; set; }
+#endif
         /// <summary>The variant_main_id property</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
@@ -204,6 +212,22 @@ namespace GrimoireCli.Generated.Models
 #nullable restore
 #else
         public global::GrimoireCli.Generated.Models.MapDetailResponse.MapDetailResponse_variant_main_id VariantMainId { get; set; }
+#endif
+        /// <summary>The variant_main_kind property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public string? VariantMainKind { get; set; }
+#nullable restore
+#else
+        public string VariantMainKind { get; set; }
+#endif
+        /// <summary>The variant_main_label property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public string? VariantMainLabel { get; set; }
+#nullable restore
+#else
+        public string VariantMainLabel { get; set; }
 #endif
         /// <summary>The variant_parent_id property</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
@@ -272,7 +296,10 @@ namespace GrimoireCli.Generated.Models
                 { "tags", n => { Tags = n.GetCollectionOfPrimitiveValues<string>()?.AsList(); } },
                 { "variant_kind", n => { VariantKind = n.GetStringValue(); } },
                 { "variant_label", n => { VariantLabel = n.GetStringValue(); } },
+                { "variant_main_filename", n => { VariantMainFilename = n.GetStringValue(); } },
                 { "variant_main_id", n => { VariantMainId = n.GetObjectValue<global::GrimoireCli.Generated.Models.MapDetailResponse.MapDetailResponse_variant_main_id>(global::GrimoireCli.Generated.Models.MapDetailResponse.MapDetailResponse_variant_main_id.CreateFromDiscriminatorValue); } },
+                { "variant_main_kind", n => { VariantMainKind = n.GetStringValue(); } },
+                { "variant_main_label", n => { VariantMainLabel = n.GetStringValue(); } },
                 { "variant_parent_id", n => { VariantParentId = n.GetObjectValue<global::GrimoireCli.Generated.Models.MapDetailResponse.MapDetailResponse_variant_parent_id>(global::GrimoireCli.Generated.Models.MapDetailResponse.MapDetailResponse_variant_parent_id.CreateFromDiscriminatorValue); } },
                 { "variants", n => { Variants = n.GetCollectionOfObjectValues<global::GrimoireCli.Generated.Models.VariantEntry>(global::GrimoireCli.Generated.Models.VariantEntry.CreateFromDiscriminatorValue)?.AsList(); } },
             };
@@ -309,7 +336,10 @@ namespace GrimoireCli.Generated.Models
             writer.WriteCollectionOfPrimitiveValues<string>("tags", Tags);
             writer.WriteStringValue("variant_kind", VariantKind);
             writer.WriteStringValue("variant_label", VariantLabel);
+            writer.WriteStringValue("variant_main_filename", VariantMainFilename);
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.MapDetailResponse.MapDetailResponse_variant_main_id>("variant_main_id", VariantMainId);
+            writer.WriteStringValue("variant_main_kind", VariantMainKind);
+            writer.WriteStringValue("variant_main_label", VariantMainLabel);
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.MapDetailResponse.MapDetailResponse_variant_parent_id>("variant_parent_id", VariantParentId);
             writer.WriteCollectionOfObjectValues<global::GrimoireCli.Generated.Models.VariantEntry>("variants", Variants);
             writer.WriteAdditionalData(AdditionalData);

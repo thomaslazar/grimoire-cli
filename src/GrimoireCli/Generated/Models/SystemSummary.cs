@@ -37,6 +37,14 @@ namespace GrimoireCli.Generated.Models
 #endif
         /// <summary>The child_count property</summary>
         public int? ChildCount { get; set; }
+        /// <summary>The codex_id property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public global::GrimoireCli.Generated.Models.SystemSummary.SystemSummary_codex_id? CodexId { get; set; }
+#nullable restore
+#else
+        public global::GrimoireCli.Generated.Models.SystemSummary.SystemSummary_codex_id CodexId { get; set; }
+#endif
         /// <summary>The container_kind property</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
@@ -242,6 +250,7 @@ namespace GrimoireCli.Generated.Models
                 { "character_builder_url", n => { CharacterBuilderUrl = n.GetObjectValue<global::GrimoireCli.Generated.Models.SystemSummary.SystemSummary_character_builder_url>(global::GrimoireCli.Generated.Models.SystemSummary.SystemSummary_character_builder_url.CreateFromDiscriminatorValue); } },
                 { "character_builder_urls", n => { CharacterBuilderUrls = n.GetCollectionOfObjectValues<global::GrimoireCli.Generated.Models.Backend__routers__systems___schemas__LinkEntry>(global::GrimoireCli.Generated.Models.Backend__routers__systems___schemas__LinkEntry.CreateFromDiscriminatorValue)?.AsList(); } },
                 { "child_count", n => { ChildCount = n.GetIntValue(); } },
+                { "codex_id", n => { CodexId = n.GetObjectValue<global::GrimoireCli.Generated.Models.SystemSummary.SystemSummary_codex_id>(global::GrimoireCli.Generated.Models.SystemSummary.SystemSummary_codex_id.CreateFromDiscriminatorValue); } },
                 { "container_kind", n => { ContainerKind = n.GetStringValue(); } },
                 { "cover_book_id", n => { CoverBookId = n.GetObjectValue<global::GrimoireCli.Generated.Models.SystemSummary.SystemSummary_cover_book_id>(global::GrimoireCli.Generated.Models.SystemSummary.SystemSummary_cover_book_id.CreateFromDiscriminatorValue); } },
                 { "cover_image", n => { CoverImage = n.GetObjectValue<global::GrimoireCli.Generated.Models.SystemSummary.SystemSummary_cover_image>(global::GrimoireCli.Generated.Models.SystemSummary.SystemSummary_cover_image.CreateFromDiscriminatorValue); } },
@@ -283,6 +292,7 @@ namespace GrimoireCli.Generated.Models
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.SystemSummary.SystemSummary_character_builder_url>("character_builder_url", CharacterBuilderUrl);
             writer.WriteCollectionOfObjectValues<global::GrimoireCli.Generated.Models.Backend__routers__systems___schemas__LinkEntry>("character_builder_urls", CharacterBuilderUrls);
             writer.WriteIntValue("child_count", ChildCount);
+            writer.WriteObjectValue<global::GrimoireCli.Generated.Models.SystemSummary.SystemSummary_codex_id>("codex_id", CodexId);
             writer.WriteStringValue("container_kind", ContainerKind);
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.SystemSummary.SystemSummary_cover_book_id>("cover_book_id", CoverBookId);
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.SystemSummary.SystemSummary_cover_image>("cover_image", CoverImage);
@@ -377,6 +387,74 @@ namespace GrimoireCli.Generated.Models
                 }
                 else {
                     writer.WriteObjectValue<global::GrimoireCli.Generated.Models.SystemSummary_character_builder_urlMember1>(null, SystemSummaryCharacterBuilderUrlMember1);
+                }
+            }
+        }
+        /// <summary>
+        /// Composed type wrapper for classes <see cref="global::GrimoireCli.Generated.Models.SystemSummary_codex_idMember1"/>, <see cref="string"/>
+        /// </summary>
+        [global::System.CodeDom.Compiler.GeneratedCode("Kiota", "1.0.0")]
+        public partial class SystemSummary_codex_id : IComposedTypeWrapper, IParsable
+        {
+            /// <summary>Composed type representation for type <see cref="string"/></summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+            public string? String { get; set; }
+#nullable restore
+#else
+            public string String { get; set; }
+#endif
+            /// <summary>Composed type representation for type <see cref="global::GrimoireCli.Generated.Models.SystemSummary_codex_idMember1"/></summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+            public global::GrimoireCli.Generated.Models.SystemSummary_codex_idMember1? SystemSummaryCodexIdMember1 { get; set; }
+#nullable restore
+#else
+            public global::GrimoireCli.Generated.Models.SystemSummary_codex_idMember1 SystemSummaryCodexIdMember1 { get; set; }
+#endif
+            /// <summary>
+            /// Creates a new instance of the appropriate class based on discriminator value
+            /// </summary>
+            /// <returns>A <see cref="global::GrimoireCli.Generated.Models.SystemSummary.SystemSummary_codex_id"/></returns>
+            /// <param name="parseNode">The parse node to use to read the discriminator value and create the object</param>
+            public static global::GrimoireCli.Generated.Models.SystemSummary.SystemSummary_codex_id CreateFromDiscriminatorValue(IParseNode parseNode)
+            {
+                if(ReferenceEquals(parseNode, null)) throw new ArgumentNullException(nameof(parseNode));
+                var result = new global::GrimoireCli.Generated.Models.SystemSummary.SystemSummary_codex_id();
+                if(parseNode.GetStringValue() is string stringValue)
+                {
+                    result.String = stringValue;
+                }
+                else {
+                    result.SystemSummaryCodexIdMember1 = new global::GrimoireCli.Generated.Models.SystemSummary_codex_idMember1();
+                }
+                return result;
+            }
+            /// <summary>
+            /// The deserialization information for the current model
+            /// </summary>
+            /// <returns>A IDictionary&lt;string, Action&lt;IParseNode&gt;&gt;</returns>
+            public virtual IDictionary<string, Action<IParseNode>> GetFieldDeserializers()
+            {
+                if(SystemSummaryCodexIdMember1 != null)
+                {
+                    return ParseNodeHelper.MergeDeserializersForIntersectionWrapper(SystemSummaryCodexIdMember1);
+                }
+                return new Dictionary<string, Action<IParseNode>>();
+            }
+            /// <summary>
+            /// Serializes information the current object
+            /// </summary>
+            /// <param name="writer">Serialization writer to use to serialize this model</param>
+            public virtual void Serialize(ISerializationWriter writer)
+            {
+                if(ReferenceEquals(writer, null)) throw new ArgumentNullException(nameof(writer));
+                if(String != null)
+                {
+                    writer.WriteStringValue(null, String);
+                }
+                else {
+                    writer.WriteObjectValue<global::GrimoireCli.Generated.Models.SystemSummary_codex_idMember1>(null, SystemSummaryCodexIdMember1);
                 }
             }
         }

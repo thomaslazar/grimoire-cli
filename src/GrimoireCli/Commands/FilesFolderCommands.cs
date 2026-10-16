@@ -121,7 +121,7 @@ public static class FilesFolderCommands
         command.AddRoleRequired("admin");
         command.AddHelpSection("Notes", HelpSectionPosition.Top,
             "Creates Core, Supplements, Adventures, Character Sheets, Maps, Handouts,",
-            "Homebrew and Starter Sets. Re-running is safe.",
+            "Homebrew, Starter Sets and Magazines. Re-running is safe.",
             "",
             "--path must be a system folder: books/ itself and container folders",
             "hold systems, not categories, and are refused with 400. files browse",

@@ -883,7 +883,7 @@ tag `v1.7.0`; the upload conflict policy re-read at `v1.8.0`.
   nothing about how the children relate, so it is reported and set separately
   from `container_kind` on `create`, `markers` and every `browse` row.
 - **`scaffold` is idempotent**, creating Core, Supplements, Adventures, Character
-  Sheets, Maps, Handouts, Homebrew and Starter Sets, and reporting `created` and
+  Sheets, Maps, Handouts, Homebrew, Starter Sets and Magazines (nine as of 1.9.0, `library_fs/constants.py:48`), and reporting `created` and
   `existing`.
 - **`scaffold` takes a system folder, not a container.** As of 1.6.2 the guard is
   `is_category_host` rather than a depth test: under `books/`, at least one level

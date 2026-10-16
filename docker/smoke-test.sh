@@ -215,11 +215,11 @@ jq -e '.has_content == false' "$WORK/fcontents.out" >/dev/null \
   || fail "a new folder should report has_content false: $(cat "$WORK/fcontents.out")"
 ok "files folder contents reports an empty folder"
 
-# scaffolding the folder expecting the eight category folders created
+# scaffolding the folder expecting the nine category folders created
 "$CLI" files folder scaffold --path "books/$SMOKE_DIR" >"$WORK/fscaffold.out" 2>"$WORK/fscaffold.err" \
   || { cat "$WORK/fscaffold.err" >&2; fail "files folder scaffold exited non-zero"; }
-jq -e '.created | length == 8' "$WORK/fscaffold.out" >/dev/null \
-  || fail "scaffold should create the eight category folders: $(cat "$WORK/fscaffold.out")"
+jq -e '.created | length == 9' "$WORK/fscaffold.out" >/dev/null \
+  || fail "scaffold should create the nine category folders: $(cat "$WORK/fscaffold.out")"
 ok "files folder scaffold created the category folders"
 
 # setting the nsfw marker true expecting it echoed back

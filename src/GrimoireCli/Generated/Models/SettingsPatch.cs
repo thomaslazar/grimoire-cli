@@ -142,6 +142,30 @@ namespace GrimoireCli.Generated.Models
 #else
         public global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_oidc_auto_register OidcAutoRegister { get; set; }
 #endif
+        /// <summary>The oidc_button_bg_color property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_oidc_button_bg_color? OidcButtonBgColor { get; set; }
+#nullable restore
+#else
+        public global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_oidc_button_bg_color OidcButtonBgColor { get; set; }
+#endif
+        /// <summary>The oidc_button_border_color property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_oidc_button_border_color? OidcButtonBorderColor { get; set; }
+#nullable restore
+#else
+        public global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_oidc_button_border_color OidcButtonBorderColor { get; set; }
+#endif
+        /// <summary>The oidc_button_radius property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_oidc_button_radius? OidcButtonRadius { get; set; }
+#nullable restore
+#else
+        public global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_oidc_button_radius OidcButtonRadius { get; set; }
+#endif
         /// <summary>The oidc_button_text property</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
@@ -149,6 +173,14 @@ namespace GrimoireCli.Generated.Models
 #nullable restore
 #else
         public global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_oidc_button_text OidcButtonText { get; set; }
+#endif
+        /// <summary>The oidc_button_text_color property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_oidc_button_text_color? OidcButtonTextColor { get; set; }
+#nullable restore
+#else
+        public global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_oidc_button_text_color OidcButtonTextColor { get; set; }
 #endif
         /// <summary>The oidc_client_id property</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
@@ -310,6 +342,22 @@ namespace GrimoireCli.Generated.Models
 #else
         public UntypedNode RestrictedCategories { get; set; }
 #endif
+        /// <summary>The share_links_role_gm property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_share_links_role_gm? ShareLinksRoleGm { get; set; }
+#nullable restore
+#else
+        public global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_share_links_role_gm ShareLinksRoleGm { get; set; }
+#endif
+        /// <summary>The share_links_role_player property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_share_links_role_player? ShareLinksRolePlayer { get; set; }
+#nullable restore
+#else
+        public global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_share_links_role_player ShareLinksRolePlayer { get; set; }
+#endif
         /// <summary>The show_stat_audio property</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
@@ -423,7 +471,11 @@ namespace GrimoireCli.Generated.Models
                 { "oidc_authorization_endpoint", n => { OidcAuthorizationEndpoint = n.GetObjectValue<global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_oidc_authorization_endpoint>(global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_oidc_authorization_endpoint.CreateFromDiscriminatorValue); } },
                 { "oidc_auto_launch", n => { OidcAutoLaunch = n.GetObjectValue<global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_oidc_auto_launch>(global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_oidc_auto_launch.CreateFromDiscriminatorValue); } },
                 { "oidc_auto_register", n => { OidcAutoRegister = n.GetObjectValue<global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_oidc_auto_register>(global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_oidc_auto_register.CreateFromDiscriminatorValue); } },
+                { "oidc_button_bg_color", n => { OidcButtonBgColor = n.GetObjectValue<global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_oidc_button_bg_color>(global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_oidc_button_bg_color.CreateFromDiscriminatorValue); } },
+                { "oidc_button_border_color", n => { OidcButtonBorderColor = n.GetObjectValue<global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_oidc_button_border_color>(global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_oidc_button_border_color.CreateFromDiscriminatorValue); } },
+                { "oidc_button_radius", n => { OidcButtonRadius = n.GetObjectValue<global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_oidc_button_radius>(global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_oidc_button_radius.CreateFromDiscriminatorValue); } },
                 { "oidc_button_text", n => { OidcButtonText = n.GetObjectValue<global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_oidc_button_text>(global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_oidc_button_text.CreateFromDiscriminatorValue); } },
+                { "oidc_button_text_color", n => { OidcButtonTextColor = n.GetObjectValue<global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_oidc_button_text_color>(global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_oidc_button_text_color.CreateFromDiscriminatorValue); } },
                 { "oidc_client_id", n => { OidcClientId = n.GetObjectValue<global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_oidc_client_id>(global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_oidc_client_id.CreateFromDiscriminatorValue); } },
                 { "oidc_client_secret", n => { OidcClientSecret = n.GetObjectValue<global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_oidc_client_secret>(global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_oidc_client_secret.CreateFromDiscriminatorValue); } },
                 { "oidc_enabled", n => { OidcEnabled = n.GetObjectValue<global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_oidc_enabled>(global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_oidc_enabled.CreateFromDiscriminatorValue); } },
@@ -444,6 +496,8 @@ namespace GrimoireCli.Generated.Models
                 { "rescan_schedule_minute", n => { RescanScheduleMinute = n.GetObjectValue<global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_rescan_schedule_minute>(global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_rescan_schedule_minute.CreateFromDiscriminatorValue); } },
                 { "rescan_schedule_weekday", n => { RescanScheduleWeekday = n.GetObjectValue<global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_rescan_schedule_weekday>(global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_rescan_schedule_weekday.CreateFromDiscriminatorValue); } },
                 { "restricted_categories", n => { RestrictedCategories = n.GetObjectValue<UntypedNode>(UntypedNode.CreateFromDiscriminatorValue); } },
+                { "share_links_role_gm", n => { ShareLinksRoleGm = n.GetObjectValue<global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_share_links_role_gm>(global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_share_links_role_gm.CreateFromDiscriminatorValue); } },
+                { "share_links_role_player", n => { ShareLinksRolePlayer = n.GetObjectValue<global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_share_links_role_player>(global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_share_links_role_player.CreateFromDiscriminatorValue); } },
                 { "show_stat_audio", n => { ShowStatAudio = n.GetObjectValue<global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_show_stat_audio>(global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_show_stat_audio.CreateFromDiscriminatorValue); } },
                 { "show_stat_books", n => { ShowStatBooks = n.GetObjectValue<global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_show_stat_books>(global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_show_stat_books.CreateFromDiscriminatorValue); } },
                 { "show_stat_library_size", n => { ShowStatLibrarySize = n.GetObjectValue<global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_show_stat_library_size>(global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_show_stat_library_size.CreateFromDiscriminatorValue); } },
@@ -478,7 +532,11 @@ namespace GrimoireCli.Generated.Models
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_oidc_authorization_endpoint>("oidc_authorization_endpoint", OidcAuthorizationEndpoint);
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_oidc_auto_launch>("oidc_auto_launch", OidcAutoLaunch);
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_oidc_auto_register>("oidc_auto_register", OidcAutoRegister);
+            writer.WriteObjectValue<global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_oidc_button_bg_color>("oidc_button_bg_color", OidcButtonBgColor);
+            writer.WriteObjectValue<global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_oidc_button_border_color>("oidc_button_border_color", OidcButtonBorderColor);
+            writer.WriteObjectValue<global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_oidc_button_radius>("oidc_button_radius", OidcButtonRadius);
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_oidc_button_text>("oidc_button_text", OidcButtonText);
+            writer.WriteObjectValue<global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_oidc_button_text_color>("oidc_button_text_color", OidcButtonTextColor);
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_oidc_client_id>("oidc_client_id", OidcClientId);
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_oidc_client_secret>("oidc_client_secret", OidcClientSecret);
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_oidc_enabled>("oidc_enabled", OidcEnabled);
@@ -499,6 +557,8 @@ namespace GrimoireCli.Generated.Models
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_rescan_schedule_minute>("rescan_schedule_minute", RescanScheduleMinute);
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_rescan_schedule_weekday>("rescan_schedule_weekday", RescanScheduleWeekday);
             writer.WriteObjectValue<UntypedNode>("restricted_categories", RestrictedCategories);
+            writer.WriteObjectValue<global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_share_links_role_gm>("share_links_role_gm", ShareLinksRoleGm);
+            writer.WriteObjectValue<global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_share_links_role_player>("share_links_role_player", ShareLinksRolePlayer);
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_show_stat_audio>("show_stat_audio", ShowStatAudio);
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_show_stat_books>("show_stat_books", ShowStatBooks);
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_show_stat_library_size>("show_stat_library_size", ShowStatLibrarySize);
@@ -1515,6 +1575,210 @@ namespace GrimoireCli.Generated.Models
             }
         }
         /// <summary>
+        /// Composed type wrapper for classes <see cref="global::GrimoireCli.Generated.Models.SettingsPatch_oidc_button_bg_colorMember1"/>, <see cref="string"/>
+        /// </summary>
+        [global::System.CodeDom.Compiler.GeneratedCode("Kiota", "1.0.0")]
+        public partial class SettingsPatch_oidc_button_bg_color : IComposedTypeWrapper, IParsable
+        {
+            /// <summary>Composed type representation for type <see cref="global::GrimoireCli.Generated.Models.SettingsPatch_oidc_button_bg_colorMember1"/></summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+            public global::GrimoireCli.Generated.Models.SettingsPatch_oidc_button_bg_colorMember1? SettingsPatchOidcButtonBgColorMember1 { get; set; }
+#nullable restore
+#else
+            public global::GrimoireCli.Generated.Models.SettingsPatch_oidc_button_bg_colorMember1 SettingsPatchOidcButtonBgColorMember1 { get; set; }
+#endif
+            /// <summary>Composed type representation for type <see cref="string"/></summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+            public string? String { get; set; }
+#nullable restore
+#else
+            public string String { get; set; }
+#endif
+            /// <summary>
+            /// Creates a new instance of the appropriate class based on discriminator value
+            /// </summary>
+            /// <returns>A <see cref="global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_oidc_button_bg_color"/></returns>
+            /// <param name="parseNode">The parse node to use to read the discriminator value and create the object</param>
+            public static global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_oidc_button_bg_color CreateFromDiscriminatorValue(IParseNode parseNode)
+            {
+                if(ReferenceEquals(parseNode, null)) throw new ArgumentNullException(nameof(parseNode));
+                var result = new global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_oidc_button_bg_color();
+                if(parseNode.GetStringValue() is string stringValue)
+                {
+                    result.String = stringValue;
+                }
+                else {
+                    result.SettingsPatchOidcButtonBgColorMember1 = new global::GrimoireCli.Generated.Models.SettingsPatch_oidc_button_bg_colorMember1();
+                }
+                return result;
+            }
+            /// <summary>
+            /// The deserialization information for the current model
+            /// </summary>
+            /// <returns>A IDictionary&lt;string, Action&lt;IParseNode&gt;&gt;</returns>
+            public virtual IDictionary<string, Action<IParseNode>> GetFieldDeserializers()
+            {
+                if(SettingsPatchOidcButtonBgColorMember1 != null)
+                {
+                    return ParseNodeHelper.MergeDeserializersForIntersectionWrapper(SettingsPatchOidcButtonBgColorMember1);
+                }
+                return new Dictionary<string, Action<IParseNode>>();
+            }
+            /// <summary>
+            /// Serializes information the current object
+            /// </summary>
+            /// <param name="writer">Serialization writer to use to serialize this model</param>
+            public virtual void Serialize(ISerializationWriter writer)
+            {
+                if(ReferenceEquals(writer, null)) throw new ArgumentNullException(nameof(writer));
+                if(String != null)
+                {
+                    writer.WriteStringValue(null, String);
+                }
+                else {
+                    writer.WriteObjectValue<global::GrimoireCli.Generated.Models.SettingsPatch_oidc_button_bg_colorMember1>(null, SettingsPatchOidcButtonBgColorMember1);
+                }
+            }
+        }
+        /// <summary>
+        /// Composed type wrapper for classes <see cref="global::GrimoireCli.Generated.Models.SettingsPatch_oidc_button_border_colorMember1"/>, <see cref="string"/>
+        /// </summary>
+        [global::System.CodeDom.Compiler.GeneratedCode("Kiota", "1.0.0")]
+        public partial class SettingsPatch_oidc_button_border_color : IComposedTypeWrapper, IParsable
+        {
+            /// <summary>Composed type representation for type <see cref="global::GrimoireCli.Generated.Models.SettingsPatch_oidc_button_border_colorMember1"/></summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+            public global::GrimoireCli.Generated.Models.SettingsPatch_oidc_button_border_colorMember1? SettingsPatchOidcButtonBorderColorMember1 { get; set; }
+#nullable restore
+#else
+            public global::GrimoireCli.Generated.Models.SettingsPatch_oidc_button_border_colorMember1 SettingsPatchOidcButtonBorderColorMember1 { get; set; }
+#endif
+            /// <summary>Composed type representation for type <see cref="string"/></summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+            public string? String { get; set; }
+#nullable restore
+#else
+            public string String { get; set; }
+#endif
+            /// <summary>
+            /// Creates a new instance of the appropriate class based on discriminator value
+            /// </summary>
+            /// <returns>A <see cref="global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_oidc_button_border_color"/></returns>
+            /// <param name="parseNode">The parse node to use to read the discriminator value and create the object</param>
+            public static global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_oidc_button_border_color CreateFromDiscriminatorValue(IParseNode parseNode)
+            {
+                if(ReferenceEquals(parseNode, null)) throw new ArgumentNullException(nameof(parseNode));
+                var result = new global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_oidc_button_border_color();
+                if(parseNode.GetStringValue() is string stringValue)
+                {
+                    result.String = stringValue;
+                }
+                else {
+                    result.SettingsPatchOidcButtonBorderColorMember1 = new global::GrimoireCli.Generated.Models.SettingsPatch_oidc_button_border_colorMember1();
+                }
+                return result;
+            }
+            /// <summary>
+            /// The deserialization information for the current model
+            /// </summary>
+            /// <returns>A IDictionary&lt;string, Action&lt;IParseNode&gt;&gt;</returns>
+            public virtual IDictionary<string, Action<IParseNode>> GetFieldDeserializers()
+            {
+                if(SettingsPatchOidcButtonBorderColorMember1 != null)
+                {
+                    return ParseNodeHelper.MergeDeserializersForIntersectionWrapper(SettingsPatchOidcButtonBorderColorMember1);
+                }
+                return new Dictionary<string, Action<IParseNode>>();
+            }
+            /// <summary>
+            /// Serializes information the current object
+            /// </summary>
+            /// <param name="writer">Serialization writer to use to serialize this model</param>
+            public virtual void Serialize(ISerializationWriter writer)
+            {
+                if(ReferenceEquals(writer, null)) throw new ArgumentNullException(nameof(writer));
+                if(String != null)
+                {
+                    writer.WriteStringValue(null, String);
+                }
+                else {
+                    writer.WriteObjectValue<global::GrimoireCli.Generated.Models.SettingsPatch_oidc_button_border_colorMember1>(null, SettingsPatchOidcButtonBorderColorMember1);
+                }
+            }
+        }
+        /// <summary>
+        /// Composed type wrapper for classes <see cref="global::GrimoireCli.Generated.Models.SettingsPatch_oidc_button_radiusMember1"/>, <see cref="string"/>
+        /// </summary>
+        [global::System.CodeDom.Compiler.GeneratedCode("Kiota", "1.0.0")]
+        public partial class SettingsPatch_oidc_button_radius : IComposedTypeWrapper, IParsable
+        {
+            /// <summary>Composed type representation for type <see cref="global::GrimoireCli.Generated.Models.SettingsPatch_oidc_button_radiusMember1"/></summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+            public global::GrimoireCli.Generated.Models.SettingsPatch_oidc_button_radiusMember1? SettingsPatchOidcButtonRadiusMember1 { get; set; }
+#nullable restore
+#else
+            public global::GrimoireCli.Generated.Models.SettingsPatch_oidc_button_radiusMember1 SettingsPatchOidcButtonRadiusMember1 { get; set; }
+#endif
+            /// <summary>Composed type representation for type <see cref="string"/></summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+            public string? String { get; set; }
+#nullable restore
+#else
+            public string String { get; set; }
+#endif
+            /// <summary>
+            /// Creates a new instance of the appropriate class based on discriminator value
+            /// </summary>
+            /// <returns>A <see cref="global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_oidc_button_radius"/></returns>
+            /// <param name="parseNode">The parse node to use to read the discriminator value and create the object</param>
+            public static global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_oidc_button_radius CreateFromDiscriminatorValue(IParseNode parseNode)
+            {
+                if(ReferenceEquals(parseNode, null)) throw new ArgumentNullException(nameof(parseNode));
+                var result = new global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_oidc_button_radius();
+                if(parseNode.GetStringValue() is string stringValue)
+                {
+                    result.String = stringValue;
+                }
+                else {
+                    result.SettingsPatchOidcButtonRadiusMember1 = new global::GrimoireCli.Generated.Models.SettingsPatch_oidc_button_radiusMember1();
+                }
+                return result;
+            }
+            /// <summary>
+            /// The deserialization information for the current model
+            /// </summary>
+            /// <returns>A IDictionary&lt;string, Action&lt;IParseNode&gt;&gt;</returns>
+            public virtual IDictionary<string, Action<IParseNode>> GetFieldDeserializers()
+            {
+                if(SettingsPatchOidcButtonRadiusMember1 != null)
+                {
+                    return ParseNodeHelper.MergeDeserializersForIntersectionWrapper(SettingsPatchOidcButtonRadiusMember1);
+                }
+                return new Dictionary<string, Action<IParseNode>>();
+            }
+            /// <summary>
+            /// Serializes information the current object
+            /// </summary>
+            /// <param name="writer">Serialization writer to use to serialize this model</param>
+            public virtual void Serialize(ISerializationWriter writer)
+            {
+                if(ReferenceEquals(writer, null)) throw new ArgumentNullException(nameof(writer));
+                if(String != null)
+                {
+                    writer.WriteStringValue(null, String);
+                }
+                else {
+                    writer.WriteObjectValue<global::GrimoireCli.Generated.Models.SettingsPatch_oidc_button_radiusMember1>(null, SettingsPatchOidcButtonRadiusMember1);
+                }
+            }
+        }
+        /// <summary>
         /// Composed type wrapper for classes <see cref="global::GrimoireCli.Generated.Models.SettingsPatch_oidc_button_textMember1"/>, <see cref="string"/>
         /// </summary>
         [global::System.CodeDom.Compiler.GeneratedCode("Kiota", "1.0.0")]
@@ -1579,6 +1843,74 @@ namespace GrimoireCli.Generated.Models
                 }
                 else {
                     writer.WriteObjectValue<global::GrimoireCli.Generated.Models.SettingsPatch_oidc_button_textMember1>(null, SettingsPatchOidcButtonTextMember1);
+                }
+            }
+        }
+        /// <summary>
+        /// Composed type wrapper for classes <see cref="global::GrimoireCli.Generated.Models.SettingsPatch_oidc_button_text_colorMember1"/>, <see cref="string"/>
+        /// </summary>
+        [global::System.CodeDom.Compiler.GeneratedCode("Kiota", "1.0.0")]
+        public partial class SettingsPatch_oidc_button_text_color : IComposedTypeWrapper, IParsable
+        {
+            /// <summary>Composed type representation for type <see cref="global::GrimoireCli.Generated.Models.SettingsPatch_oidc_button_text_colorMember1"/></summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+            public global::GrimoireCli.Generated.Models.SettingsPatch_oidc_button_text_colorMember1? SettingsPatchOidcButtonTextColorMember1 { get; set; }
+#nullable restore
+#else
+            public global::GrimoireCli.Generated.Models.SettingsPatch_oidc_button_text_colorMember1 SettingsPatchOidcButtonTextColorMember1 { get; set; }
+#endif
+            /// <summary>Composed type representation for type <see cref="string"/></summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+            public string? String { get; set; }
+#nullable restore
+#else
+            public string String { get; set; }
+#endif
+            /// <summary>
+            /// Creates a new instance of the appropriate class based on discriminator value
+            /// </summary>
+            /// <returns>A <see cref="global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_oidc_button_text_color"/></returns>
+            /// <param name="parseNode">The parse node to use to read the discriminator value and create the object</param>
+            public static global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_oidc_button_text_color CreateFromDiscriminatorValue(IParseNode parseNode)
+            {
+                if(ReferenceEquals(parseNode, null)) throw new ArgumentNullException(nameof(parseNode));
+                var result = new global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_oidc_button_text_color();
+                if(parseNode.GetStringValue() is string stringValue)
+                {
+                    result.String = stringValue;
+                }
+                else {
+                    result.SettingsPatchOidcButtonTextColorMember1 = new global::GrimoireCli.Generated.Models.SettingsPatch_oidc_button_text_colorMember1();
+                }
+                return result;
+            }
+            /// <summary>
+            /// The deserialization information for the current model
+            /// </summary>
+            /// <returns>A IDictionary&lt;string, Action&lt;IParseNode&gt;&gt;</returns>
+            public virtual IDictionary<string, Action<IParseNode>> GetFieldDeserializers()
+            {
+                if(SettingsPatchOidcButtonTextColorMember1 != null)
+                {
+                    return ParseNodeHelper.MergeDeserializersForIntersectionWrapper(SettingsPatchOidcButtonTextColorMember1);
+                }
+                return new Dictionary<string, Action<IParseNode>>();
+            }
+            /// <summary>
+            /// Serializes information the current object
+            /// </summary>
+            /// <param name="writer">Serialization writer to use to serialize this model</param>
+            public virtual void Serialize(ISerializationWriter writer)
+            {
+                if(ReferenceEquals(writer, null)) throw new ArgumentNullException(nameof(writer));
+                if(String != null)
+                {
+                    writer.WriteStringValue(null, String);
+                }
+                else {
+                    writer.WriteObjectValue<global::GrimoireCli.Generated.Models.SettingsPatch_oidc_button_text_colorMember1>(null, SettingsPatchOidcButtonTextColorMember1);
                 }
             }
         }
@@ -2835,6 +3167,130 @@ namespace GrimoireCli.Generated.Models
                 }
                 else {
                     writer.WriteObjectValue<global::GrimoireCli.Generated.Models.SettingsPatch_rescan_schedule_weekdayMember1>(null, SettingsPatchRescanScheduleWeekdayMember1);
+                }
+            }
+        }
+        /// <summary>
+        /// Composed type wrapper for classes <see cref="bool"/>, <see cref="global::GrimoireCli.Generated.Models.SettingsPatch_share_links_role_gmMember1"/>
+        /// </summary>
+        [global::System.CodeDom.Compiler.GeneratedCode("Kiota", "1.0.0")]
+        public partial class SettingsPatch_share_links_role_gm : IComposedTypeWrapper, IParsable
+        {
+            /// <summary>Composed type representation for type <see cref="bool"/></summary>
+            public bool? Boolean { get; set; }
+            /// <summary>Composed type representation for type <see cref="global::GrimoireCli.Generated.Models.SettingsPatch_share_links_role_gmMember1"/></summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+            public global::GrimoireCli.Generated.Models.SettingsPatch_share_links_role_gmMember1? SettingsPatchShareLinksRoleGmMember1 { get; set; }
+#nullable restore
+#else
+            public global::GrimoireCli.Generated.Models.SettingsPatch_share_links_role_gmMember1 SettingsPatchShareLinksRoleGmMember1 { get; set; }
+#endif
+            /// <summary>
+            /// Creates a new instance of the appropriate class based on discriminator value
+            /// </summary>
+            /// <returns>A <see cref="global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_share_links_role_gm"/></returns>
+            /// <param name="parseNode">The parse node to use to read the discriminator value and create the object</param>
+            public static global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_share_links_role_gm CreateFromDiscriminatorValue(IParseNode parseNode)
+            {
+                if(ReferenceEquals(parseNode, null)) throw new ArgumentNullException(nameof(parseNode));
+                var result = new global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_share_links_role_gm();
+                if(parseNode.GetBoolValue() is bool booleanValue)
+                {
+                    result.Boolean = booleanValue;
+                }
+                else {
+                    result.SettingsPatchShareLinksRoleGmMember1 = new global::GrimoireCli.Generated.Models.SettingsPatch_share_links_role_gmMember1();
+                }
+                return result;
+            }
+            /// <summary>
+            /// The deserialization information for the current model
+            /// </summary>
+            /// <returns>A IDictionary&lt;string, Action&lt;IParseNode&gt;&gt;</returns>
+            public virtual IDictionary<string, Action<IParseNode>> GetFieldDeserializers()
+            {
+                if(SettingsPatchShareLinksRoleGmMember1 != null)
+                {
+                    return ParseNodeHelper.MergeDeserializersForIntersectionWrapper(SettingsPatchShareLinksRoleGmMember1);
+                }
+                return new Dictionary<string, Action<IParseNode>>();
+            }
+            /// <summary>
+            /// Serializes information the current object
+            /// </summary>
+            /// <param name="writer">Serialization writer to use to serialize this model</param>
+            public virtual void Serialize(ISerializationWriter writer)
+            {
+                if(ReferenceEquals(writer, null)) throw new ArgumentNullException(nameof(writer));
+                if(Boolean != null)
+                {
+                    writer.WriteBoolValue(null, Boolean);
+                }
+                else {
+                    writer.WriteObjectValue<global::GrimoireCli.Generated.Models.SettingsPatch_share_links_role_gmMember1>(null, SettingsPatchShareLinksRoleGmMember1);
+                }
+            }
+        }
+        /// <summary>
+        /// Composed type wrapper for classes <see cref="bool"/>, <see cref="global::GrimoireCli.Generated.Models.SettingsPatch_share_links_role_playerMember1"/>
+        /// </summary>
+        [global::System.CodeDom.Compiler.GeneratedCode("Kiota", "1.0.0")]
+        public partial class SettingsPatch_share_links_role_player : IComposedTypeWrapper, IParsable
+        {
+            /// <summary>Composed type representation for type <see cref="bool"/></summary>
+            public bool? Boolean { get; set; }
+            /// <summary>Composed type representation for type <see cref="global::GrimoireCli.Generated.Models.SettingsPatch_share_links_role_playerMember1"/></summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+            public global::GrimoireCli.Generated.Models.SettingsPatch_share_links_role_playerMember1? SettingsPatchShareLinksRolePlayerMember1 { get; set; }
+#nullable restore
+#else
+            public global::GrimoireCli.Generated.Models.SettingsPatch_share_links_role_playerMember1 SettingsPatchShareLinksRolePlayerMember1 { get; set; }
+#endif
+            /// <summary>
+            /// Creates a new instance of the appropriate class based on discriminator value
+            /// </summary>
+            /// <returns>A <see cref="global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_share_links_role_player"/></returns>
+            /// <param name="parseNode">The parse node to use to read the discriminator value and create the object</param>
+            public static global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_share_links_role_player CreateFromDiscriminatorValue(IParseNode parseNode)
+            {
+                if(ReferenceEquals(parseNode, null)) throw new ArgumentNullException(nameof(parseNode));
+                var result = new global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_share_links_role_player();
+                if(parseNode.GetBoolValue() is bool booleanValue)
+                {
+                    result.Boolean = booleanValue;
+                }
+                else {
+                    result.SettingsPatchShareLinksRolePlayerMember1 = new global::GrimoireCli.Generated.Models.SettingsPatch_share_links_role_playerMember1();
+                }
+                return result;
+            }
+            /// <summary>
+            /// The deserialization information for the current model
+            /// </summary>
+            /// <returns>A IDictionary&lt;string, Action&lt;IParseNode&gt;&gt;</returns>
+            public virtual IDictionary<string, Action<IParseNode>> GetFieldDeserializers()
+            {
+                if(SettingsPatchShareLinksRolePlayerMember1 != null)
+                {
+                    return ParseNodeHelper.MergeDeserializersForIntersectionWrapper(SettingsPatchShareLinksRolePlayerMember1);
+                }
+                return new Dictionary<string, Action<IParseNode>>();
+            }
+            /// <summary>
+            /// Serializes information the current object
+            /// </summary>
+            /// <param name="writer">Serialization writer to use to serialize this model</param>
+            public virtual void Serialize(ISerializationWriter writer)
+            {
+                if(ReferenceEquals(writer, null)) throw new ArgumentNullException(nameof(writer));
+                if(Boolean != null)
+                {
+                    writer.WriteBoolValue(null, Boolean);
+                }
+                else {
+                    writer.WriteObjectValue<global::GrimoireCli.Generated.Models.SettingsPatch_share_links_role_playerMember1>(null, SettingsPatchShareLinksRolePlayerMember1);
                 }
             }
         }

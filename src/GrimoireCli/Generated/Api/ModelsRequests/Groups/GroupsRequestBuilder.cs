@@ -141,7 +141,7 @@ namespace GrimoireCli.Generated.Api.ModelsRequests.Groups
             [QueryParameter("q")]
             public string Q { get; set; }
 #endif
-            /// <summary>One of: added_at, duration, name, path, size, title. `path` is folder order.</summary>
+            /// <summary>One of: added_at, duration, name, path, size, title, track. `path` is folder order.</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
             [QueryParameter("sort")]

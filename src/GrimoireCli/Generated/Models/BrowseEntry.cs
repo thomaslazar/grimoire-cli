@@ -95,6 +95,8 @@ namespace GrimoireCli.Generated.Models
 #else
         public global::GrimoireCli.Generated.Models.BrowseEntry.BrowseEntry_title Title { get; set; }
 #endif
+        /// <summary>The unreadable_name property</summary>
+        public bool? UnreadableName { get; set; }
         /// <summary>
         /// Instantiates a new <see cref="global::GrimoireCli.Generated.Models.BrowseEntry"/> and sets the default values.
         /// </summary>
@@ -108,6 +110,7 @@ namespace GrimoireCli.Generated.Models
             HasThumbnail = false;
             IsMissing = false;
             Nsfw = false;
+            UnreadableName = false;
         }
         /// <summary>
         /// Creates a new instance of the appropriate class based on discriminator value
@@ -143,6 +146,7 @@ namespace GrimoireCli.Generated.Models
                 { "record_id", n => { RecordId = n.GetObjectValue<global::GrimoireCli.Generated.Models.BrowseEntry.BrowseEntry_record_id>(global::GrimoireCli.Generated.Models.BrowseEntry.BrowseEntry_record_id.CreateFromDiscriminatorValue); } },
                 { "size", n => { Size = n.GetObjectValue<global::GrimoireCli.Generated.Models.BrowseEntry.BrowseEntry_size>(global::GrimoireCli.Generated.Models.BrowseEntry.BrowseEntry_size.CreateFromDiscriminatorValue); } },
                 { "title", n => { Title = n.GetObjectValue<global::GrimoireCli.Generated.Models.BrowseEntry.BrowseEntry_title>(global::GrimoireCli.Generated.Models.BrowseEntry.BrowseEntry_title.CreateFromDiscriminatorValue); } },
+                { "unreadable_name", n => { UnreadableName = n.GetBoolValue(); } },
             };
         }
         /// <summary>
@@ -168,6 +172,7 @@ namespace GrimoireCli.Generated.Models
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.BrowseEntry.BrowseEntry_record_id>("record_id", RecordId);
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.BrowseEntry.BrowseEntry_size>("size", Size);
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.BrowseEntry.BrowseEntry_title>("title", Title);
+            writer.WriteBoolValue("unreadable_name", UnreadableName);
             writer.WriteAdditionalData(AdditionalData);
         }
         /// <summary>

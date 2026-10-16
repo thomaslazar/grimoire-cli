@@ -28,6 +28,38 @@ namespace GrimoireCli.Generated.Models
         public bool? GuestAccessEnabled { get; set; }
         /// <summary>The oidc_auto_launch property</summary>
         public bool? OidcAutoLaunch { get; set; }
+        /// <summary>The oidc_button_bg_color property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public string? OidcButtonBgColor { get; set; }
+#nullable restore
+#else
+        public string OidcButtonBgColor { get; set; }
+#endif
+        /// <summary>The oidc_button_border_color property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public string? OidcButtonBorderColor { get; set; }
+#nullable restore
+#else
+        public string OidcButtonBorderColor { get; set; }
+#endif
+        /// <summary>The oidc_button_icon_url property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public string? OidcButtonIconUrl { get; set; }
+#nullable restore
+#else
+        public string OidcButtonIconUrl { get; set; }
+#endif
+        /// <summary>The oidc_button_radius property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public global::GrimoireCli.Generated.Models.AuthConfigResponse.AuthConfigResponse_oidc_button_radius? OidcButtonRadius { get; set; }
+#nullable restore
+#else
+        public global::GrimoireCli.Generated.Models.AuthConfigResponse.AuthConfigResponse_oidc_button_radius OidcButtonRadius { get; set; }
+#endif
         /// <summary>The oidc_button_text property</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
@@ -35,6 +67,14 @@ namespace GrimoireCli.Generated.Models
 #nullable restore
 #else
         public string OidcButtonText { get; set; }
+#endif
+        /// <summary>The oidc_button_text_color property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public string? OidcButtonTextColor { get; set; }
+#nullable restore
+#else
+        public string OidcButtonTextColor { get; set; }
 #endif
         /// <summary>The oidc_enabled property</summary>
         public bool? OidcEnabled { get; set; }
@@ -69,7 +109,12 @@ namespace GrimoireCli.Generated.Models
                 { "custom_login_message_enabled", n => { CustomLoginMessageEnabled = n.GetBoolValue(); } },
                 { "guest_access_enabled", n => { GuestAccessEnabled = n.GetBoolValue(); } },
                 { "oidc_auto_launch", n => { OidcAutoLaunch = n.GetBoolValue(); } },
+                { "oidc_button_bg_color", n => { OidcButtonBgColor = n.GetStringValue(); } },
+                { "oidc_button_border_color", n => { OidcButtonBorderColor = n.GetStringValue(); } },
+                { "oidc_button_icon_url", n => { OidcButtonIconUrl = n.GetStringValue(); } },
+                { "oidc_button_radius", n => { OidcButtonRadius = n.GetObjectValue<global::GrimoireCli.Generated.Models.AuthConfigResponse.AuthConfigResponse_oidc_button_radius>(global::GrimoireCli.Generated.Models.AuthConfigResponse.AuthConfigResponse_oidc_button_radius.CreateFromDiscriminatorValue); } },
                 { "oidc_button_text", n => { OidcButtonText = n.GetStringValue(); } },
+                { "oidc_button_text_color", n => { OidcButtonTextColor = n.GetStringValue(); } },
                 { "oidc_enabled", n => { OidcEnabled = n.GetBoolValue(); } },
                 { "password_auth_enabled", n => { PasswordAuthEnabled = n.GetBoolValue(); } },
             };
@@ -85,10 +130,77 @@ namespace GrimoireCli.Generated.Models
             writer.WriteBoolValue("custom_login_message_enabled", CustomLoginMessageEnabled);
             writer.WriteBoolValue("guest_access_enabled", GuestAccessEnabled);
             writer.WriteBoolValue("oidc_auto_launch", OidcAutoLaunch);
+            writer.WriteStringValue("oidc_button_bg_color", OidcButtonBgColor);
+            writer.WriteStringValue("oidc_button_border_color", OidcButtonBorderColor);
+            writer.WriteStringValue("oidc_button_icon_url", OidcButtonIconUrl);
+            writer.WriteObjectValue<global::GrimoireCli.Generated.Models.AuthConfigResponse.AuthConfigResponse_oidc_button_radius>("oidc_button_radius", OidcButtonRadius);
             writer.WriteStringValue("oidc_button_text", OidcButtonText);
+            writer.WriteStringValue("oidc_button_text_color", OidcButtonTextColor);
             writer.WriteBoolValue("oidc_enabled", OidcEnabled);
             writer.WriteBoolValue("password_auth_enabled", PasswordAuthEnabled);
             writer.WriteAdditionalData(AdditionalData);
+        }
+        /// <summary>
+        /// Composed type wrapper for classes <see cref="global::GrimoireCli.Generated.Models.AuthConfigResponse_oidc_button_radiusMember1"/>, <see cref="int"/>
+        /// </summary>
+        [global::System.CodeDom.Compiler.GeneratedCode("Kiota", "1.0.0")]
+        public partial class AuthConfigResponse_oidc_button_radius : IComposedTypeWrapper, IParsable
+        {
+            /// <summary>Composed type representation for type <see cref="global::GrimoireCli.Generated.Models.AuthConfigResponse_oidc_button_radiusMember1"/></summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+            public global::GrimoireCli.Generated.Models.AuthConfigResponse_oidc_button_radiusMember1? AuthConfigResponseOidcButtonRadiusMember1 { get; set; }
+#nullable restore
+#else
+            public global::GrimoireCli.Generated.Models.AuthConfigResponse_oidc_button_radiusMember1 AuthConfigResponseOidcButtonRadiusMember1 { get; set; }
+#endif
+            /// <summary>Composed type representation for type <see cref="int"/></summary>
+            public int? Integer { get; set; }
+            /// <summary>
+            /// Creates a new instance of the appropriate class based on discriminator value
+            /// </summary>
+            /// <returns>A <see cref="global::GrimoireCli.Generated.Models.AuthConfigResponse.AuthConfigResponse_oidc_button_radius"/></returns>
+            /// <param name="parseNode">The parse node to use to read the discriminator value and create the object</param>
+            public static global::GrimoireCli.Generated.Models.AuthConfigResponse.AuthConfigResponse_oidc_button_radius CreateFromDiscriminatorValue(IParseNode parseNode)
+            {
+                if(ReferenceEquals(parseNode, null)) throw new ArgumentNullException(nameof(parseNode));
+                var result = new global::GrimoireCli.Generated.Models.AuthConfigResponse.AuthConfigResponse_oidc_button_radius();
+                if(parseNode.GetIntValue() is int integerValue)
+                {
+                    result.Integer = integerValue;
+                }
+                else {
+                    result.AuthConfigResponseOidcButtonRadiusMember1 = new global::GrimoireCli.Generated.Models.AuthConfigResponse_oidc_button_radiusMember1();
+                }
+                return result;
+            }
+            /// <summary>
+            /// The deserialization information for the current model
+            /// </summary>
+            /// <returns>A IDictionary&lt;string, Action&lt;IParseNode&gt;&gt;</returns>
+            public virtual IDictionary<string, Action<IParseNode>> GetFieldDeserializers()
+            {
+                if(AuthConfigResponseOidcButtonRadiusMember1 != null)
+                {
+                    return ParseNodeHelper.MergeDeserializersForIntersectionWrapper(AuthConfigResponseOidcButtonRadiusMember1);
+                }
+                return new Dictionary<string, Action<IParseNode>>();
+            }
+            /// <summary>
+            /// Serializes information the current object
+            /// </summary>
+            /// <param name="writer">Serialization writer to use to serialize this model</param>
+            public virtual void Serialize(ISerializationWriter writer)
+            {
+                if(ReferenceEquals(writer, null)) throw new ArgumentNullException(nameof(writer));
+                if(Integer != null)
+                {
+                    writer.WriteIntValue(null, Integer);
+                }
+                else {
+                    writer.WriteObjectValue<global::GrimoireCli.Generated.Models.AuthConfigResponse_oidc_button_radiusMember1>(null, AuthConfigResponseOidcButtonRadiusMember1);
+                }
+            }
         }
     }
 }

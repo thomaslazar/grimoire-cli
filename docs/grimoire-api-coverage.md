@@ -2,7 +2,7 @@
 
 Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any) that implements it.
 
-- **Reference:** spec fetched live from the pinned stack's `/api/openapi.json` (v1.8.0, 271 paths, 360 operations) and the upstream router source read from the same container. Tested range: `1.8.0` only (`GrimoireApiClient.cs`).
+- **Reference:** spec fetched live from the pinned stack's `/api/openapi.json` (v1.9.0, 306 paths, 399 operations) and the upstream router source read from the same container. Tested range: `1.8.0` only (`GrimoireApiClient.cs`).
 - **Perm** column uses Grimoire's roles (`admin` / `gm or admin` / `not guest`); blank = any authenticated user. `?` = a dependency this script could not resolve.
 - **Key** column is the API key permission a route needs (`—`: no key can call it), derived from `backend/api_keys.py` in the same container.
 - ✅ = covered by a CLI command · — = not implemented · 🔒 = internal-only (no user-facing verb); 🔒 rows never count as covered.
@@ -15,29 +15,32 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | (untagged) | 0 / 1 |
 | addons | 8 / 8 |
 | api-keys | 0 / 6 |
-| audio | 15 / 15 |
+| audio | 15 / 16 |
 | audio-sets | 0 / 5 |
-| auth | 2 / 14 |
+| auth | 2 / 15 |
 | backups | 6 / 6 |
 | bookmarks | 0 / 4 |
-| books | 16 / 16 |
+| books | 16 / 20 |
 | campaigns | 80 / 93 |
-| characters | 0 / 16 |
+| characters | 0 / 20 |
+| codex | 0 / 8 |
 | content | 0 / 6 |
 | downloads | 1 / 1 |
-| duplicates | 13 / 13 |
+| duplicates | 13 / 14 |
 | favorites | 0 / 3 |
 | files | 9 / 10 |
 | library | 4 / 7 |
 | logs | 1 / 1 |
 | lookups | 15 / 15 |
 | maintenance | 3 / 4 |
-| maps | 15 / 17 |
+| maps | 15 / 23 |
 | models | 11 / 11 |
 | rulesets | 0 / 17 |
 | saved-filters | 0 / 4 |
 | search | 2 / 2 |
-| settings | 0 / 3 |
+| settings | 0 / 5 |
+| share | 0 / 4 |
+| share-links | 0 / 8 |
 | stats | 1 / 1 |
 | systems | 18 / 18 |
 | tags | 7 / 7 |
@@ -45,7 +48,7 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | token-frames | 0 / 2 |
 | tokens | 11 / 11 |
 | users | 0 / 16 |
-| **Total** | **238 / 360** |
+| **Total** | **238 / 399** |
 
 2 operation(s) are internal-only (🔒) and excluded from covered counts.
 
@@ -93,6 +96,7 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | GET | `/api/audio/{audio_id}` | Get an audio track |  | audio: read | `audio get` ✅ |
 | PATCH | `/api/audio/{audio_id}` | Update audio metadata | gm or admin | audio: write | `audio update` ✅ |
 | GET | `/api/audio/{audio_id}/artwork` | Audio artwork |  | audio: read | `audio artwork` ✅ |
+| GET | `/api/audio/{audio_id}/chapters` | Audio chapter markers |  | audio: read | — |
 | GET | `/api/audio/{audio_id}/cover` | Audio cover image | gm or admin | audio: read | `audio cover get` ✅ |
 | POST | `/api/audio/{audio_id}/cover` | Upload an audio cover | gm or admin | audio: write | `audio cover upload` ✅ |
 | DELETE | `/api/audio/{audio_id}/cover` | Remove an audio cover | gm or admin | audio: write | `audio cover delete` ✅ |
@@ -118,6 +122,7 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | POST | `/api/auth/login` | Log in |  | — | `login` ✅ |
 | POST | `/api/auth/logout` | Log out |  | — | — |
 | GET | `/api/auth/me` | Get current user |  | — | `me` ✅ |
+| GET | `/api/auth/openid/button-icon` | OIDC login-button icon |  | — | — |
 | GET | `/api/auth/openid/callback` | OIDC callback |  | — | — |
 | POST | `/api/auth/openid/discover` | Fetch OIDC discovery document | admin | — | — |
 | GET | `/api/auth/openid/login` | Start an OIDC login |  | — | — |
@@ -157,11 +162,15 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | POST | `/api/books/bulk/tags` | Bulk add tags to books | gm or admin | books: write | `books batch-tag` ✅ |
 | GET | `/api/books/{book_id}` | Get a book |  | books: read | `books get` ✅ |
 | PATCH | `/api/books/{book_id}` | Update book metadata | gm or admin | books: write | `books update` ✅ |
+| POST | `/api/books/{book_id}/export` | Export pages or cut-outs |  | books: read | — |
+| POST | `/api/books/{book_id}/export/save` | Save an export into the library | admin | books: write | — |
 | GET | `/api/books/{book_id}/file` | Download book file |  | books: read | `books file` ✅ |
 | POST | `/api/books/{book_id}/metadata-fetch` | Fetch metadata for review | gm or admin | books: read | `books metadata-fetch` ✅ |
 | POST | `/api/books/{book_id}/metadata-search` | Search a metadata source | gm or admin | books: read | `books metadata-search` ✅ |
 | GET | `/api/books/{book_id}/metadata-sources` | List metadata sources | gm or admin | books: read | `books metadata-sources` ✅ |
 | GET | `/api/books/{book_id}/page/{page_num}` | Render a PDF page as WebP |  | books: read | `books page` ✅ |
+| GET | `/api/books/{book_id}/page/{page_num}/shapes` | Suggest cut-outs on a page |  | books: read | — |
+| GET | `/api/books/{book_id}/page/{page_num}/size` | Get a page's size |  | books: read | — |
 | GET | `/api/books/{book_id}/page/{page_num}/text` | Get page text |  | books: read | `books page-text` ✅ |
 | GET | `/api/books/{book_id}/page/{page_num}/words` | Get page word bounding boxes |  | books: read | `books page-words` ✅ |
 | POST | `/api/books/{book_id}/reindex` | Re-run OCR on a book (optional DPI override) | gm or admin | books: write | `books reindex` ✅ |
@@ -274,6 +283,10 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | GET | `/api/characters` | List the user's characters |  | characters: read | — |
 | POST | `/api/characters` | Create a character |  | characters: write | — |
 | POST | `/api/characters/import` | Import a character from an exported file |  | characters: write | — |
+| POST | `/api/characters/import/external` | Import a character from another tool's file or link |  | characters: write | — |
+| GET | `/api/characters/importers` | List installed character importers |  | characters: read | — |
+| DELETE | `/api/characters/importers/{importer_id}` | Remove a character importer you installed |  | characters: write | — |
+| POST | `/api/characters/importers/{importer_id}/install` | Install a file-only character importer for yourself |  | characters: write | — |
 | GET | `/api/characters/schemas` | List installed character schemas |  | characters: read | — |
 | POST | `/api/characters/schemas` | Install a pasted character schema |  | characters: write | — |
 | GET | `/api/characters/schemas/browse` | Browse the community sheet catalogue |  | characters: read | — |
@@ -287,6 +300,19 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | POST | `/api/characters/{character_id}/portrait` | Set a character's portrait |  | characters: write | — |
 | GET | `/api/characters/{character_id}/portrait` | A character's portrait image |  | characters: read | — |
 | DELETE | `/api/characters/{character_id}/portrait` | Remove a character's portrait |  | characters: write | — |
+
+## codex
+
+| Method | Path | Description | Perm | Key | CLI |
+|--------|------|-------------|------|-----|-----|
+| DELETE | `/api/codex/books/{book_id}/link` | Unlink a book from Grimoire Codex DB | gm or admin | codex: write | — |
+| POST | `/api/codex/books/{book_id}/submit` | Send a book to Grimoire Codex DB | gm or admin | codex: write | — |
+| GET | `/api/codex/settings` | Get Grimoire Codex DB settings | admin | codex: read | — |
+| PUT | `/api/codex/settings` | Update Grimoire Codex DB settings | admin | codex: write | — |
+| GET | `/api/codex/status` | Grimoire Codex DB status | not guest | codex: read | — |
+| DELETE | `/api/codex/systems/{system_id}/link` | Unlink a game system from Grimoire Codex DB | gm or admin | codex: write | — |
+| POST | `/api/codex/systems/{system_id}/submit` | Send a game system to Grimoire Codex DB | gm or admin | codex: write | — |
+| POST | `/api/codex/test` | Test the Grimoire Codex DB connection | admin | codex: write | — |
 
 ## content
 
@@ -311,6 +337,7 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 |--------|------|-------------|------|-----|-----|
 | POST | `/api/duplicates/cancel-scan` | Stop a running duplicate scan | admin | duplicates: write | `duplicates cancel-scan` ✅ |
 | GET | `/api/duplicates/compare` | Side-by-side comparison of two to four items | admin | duplicates: read | `duplicates compare` ✅ |
+| POST | `/api/duplicates/describe` | Set the kind and label one version shows in the picker | admin | duplicates: write | — |
 | POST | `/api/duplicates/dismiss` | Mark a group as not duplicates | admin | duplicates: write | `duplicates dismiss` ✅ |
 | GET | `/api/duplicates/dismissals` | List dismissed groups | admin | duplicates: read | `duplicates dismissals` ✅ |
 | DELETE | `/api/duplicates/dismissals/{dismissal_id}` | Undo a dismissal | admin | duplicates: write | `duplicates undismiss` ✅ |
@@ -406,9 +433,15 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | GET | `/api/maps/groups` | Folders holding matching maps | not guest | maps: read | `maps folder-counts` ✅ |
 | GET | `/api/maps/{map_id}` | Get a map |  | maps: read | `maps get` ✅ |
 | PATCH | `/api/maps/{map_id}` | Update map metadata | gm or admin | maps: write | `maps update` ✅ |
+| POST | `/api/maps/{map_id}/export` | Export map pages or cut-outs |  | maps: read | — |
 | GET | `/api/maps/{map_id}/export.uvtt` | Export a map as Universal VTT |  | maps: read | `maps vtt export` ✅ |
+| POST | `/api/maps/{map_id}/export/save` | Save a map export into the library | admin | maps: write | — |
 | GET | `/api/maps/{map_id}/file` | Download map file |  | maps: read | `maps file` ✅ |
+| GET | `/api/maps/{map_id}/otfbm` | OTFBM setup for a map |  | maps: read | — |
+| GET | `/api/maps/{map_id}/otfbm/image` | Export a map as an OTFBM background |  | maps: read | — |
 | GET | `/api/maps/{map_id}/page/{page_num}` | Render a map page |  | maps: read | `maps page` ✅ |
+| GET | `/api/maps/{map_id}/page/{page_num}/shapes` | Suggest cut-outs on a map page |  | maps: read | — |
+| GET | `/api/maps/{map_id}/page/{page_num}/size` | Get a map page's size |  | maps: read | — |
 | GET | `/api/maps/{map_id}/thumbnail` | Map thumbnail |  | maps: read | `maps thumbnail` ✅ |
 | GET | `/api/maps/{map_id}/vtt/authoring` | Get authored Universal VTT geometry |  | maps: read | — |
 | PUT | `/api/maps/{map_id}/vtt/authoring` | Replace authored Universal VTT geometry | gm or admin | maps: write | — |
@@ -475,7 +508,31 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 |--------|------|-------------|------|-----|-----|
 | GET | `/api/settings` | Get app settings | admin | settings: read | — |
 | PATCH | `/api/settings` | Update app settings | admin | settings: write | — |
+| POST | `/api/settings/oidc-button-icon` | Upload the OIDC login-button icon | admin | settings: write | — |
+| DELETE | `/api/settings/oidc-button-icon` | Remove the OIDC login-button icon | admin | settings: write | — |
 | GET | `/api/settings/ui` | UI settings (any authenticated user) |  | settings: read | — |
+
+## share
+
+| Method | Path | Description | Perm | Key | CLI |
+|--------|------|-------------|------|-----|-----|
+| GET | `/api/share/{token}` | Fetch a shared item |  | — | — |
+| GET | `/api/share/{token}/meta` | Describe a share link |  | — | — |
+| POST | `/api/share/{token}/unlock` | Unlock a password-protected share link |  | — | — |
+| GET | `/api/share/{token}/{filename}` | Fetch a shared item by filename |  | — | — |
+
+## share-links
+
+| Method | Path | Description | Perm | Key | CLI |
+|--------|------|-------------|------|-----|-----|
+| GET | `/api/share-links` | List my share links | not guest | share-links: read | — |
+| POST | `/api/share-links` | Create a share link | not guest | share-links: write | — |
+| GET | `/api/share-links/all` | List every share link | admin | share-links: read | — |
+| GET | `/api/share-links/permission` | Whether I may create share links | not guest | share-links: read | — |
+| GET | `/api/share-links/users/{user_id}` | List a user's share links | admin | share-links: read | — |
+| PATCH | `/api/share-links/{link_id}` | Change a share link | not guest | share-links: write | — |
+| DELETE | `/api/share-links/{link_id}` | Delete a share link | not guest | share-links: write | — |
+| POST | `/api/share-links/{link_id}/revoke` | Revoke a share link | not guest | share-links: write | — |
 
 ## stats
 
