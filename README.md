@@ -415,6 +415,11 @@ grimoire-cli config set server https://grimoire.example.com
 | `campaigns members token get --id <campaign-id> --member-id <member-id> --output <path\|->` | Download a member's character token |
 | `campaigns members token upload --id <campaign-id> --member-id <member-id> --file <path>` | Upload a member's character token |
 | `campaigns members token delete --id <campaign-id> --member-id <member-id>` | Remove a member's character token |
+| `campaigns members sheet get --id <campaign-id> --member-id <member-id> --output <path\|->` | Download a member's character sheet |
+| `campaigns members sheet upload --id <campaign-id> --member-id <member-id> --file <path>` | Upload a member's character sheet |
+| `campaigns members sheet delete --id <campaign-id> --member-id <member-id>` | Remove a member's character sheet |
+| `campaigns members sheet from-source --id <campaign-id> --member-id <member-id> --source-type <book\|file> --source-id <id>` | Copy a blank sheet PDF into a member's slot |
+| `campaigns members sheet sources --id <campaign-id>` | Blank sheets you can copy into a slot |
 | `campaigns guests list --id <campaign-id>` | List the campaign's guests and their codes |
 | `campaigns guests create --id <campaign-id> [--nickname <name>]` | Create a guest and their invite code |
 | `campaigns guests regenerate --id <campaign-id> --member-id <member-id>` | Replace a guest's invite code |

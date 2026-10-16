@@ -16,6 +16,7 @@ public static class CampaignMembersCommands
         command.Subcommands.Add(CreateRemoveCommand());
         command.Subcommands.Add(CampaignMemberArtCommands.Create());
         command.Subcommands.Add(CampaignMemberTokenCommands.Create());
+        command.Subcommands.Add(CampaignMemberSheetCommands.Create());
         return command;
     }
 

@@ -9,7 +9,7 @@ public class CampaignMembersCommandTests
 
     [Fact]
     public void TheGroupHoldsTheMemberCommands()
-        => Assert.Equal(new[] { "art", "eligible", "invite", "remove", "token", "update" },
+        => Assert.Equal(new[] { "art", "eligible", "invite", "remove", "sheet", "token", "update" },
             CampaignsCommand.Create().Subcommands.Single(c => c.Name == "members").Subcommands.Select(c => c.Name).Order());
 
     [Fact]
