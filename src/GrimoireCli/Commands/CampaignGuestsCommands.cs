@@ -7,7 +7,7 @@ namespace GrimoireCli.Commands;
 
 public static class CampaignGuestsCommands
 {
-    private const string Owned = "Campaign owner only; group campaigns only (400).";
+    private const string Owned = "Campaign owner only; group campaigns only (400); 409 while archived.";
     private const string Code = "The code is the guest's login; anyone holding it is that guest.";
 
     public static Command Create()

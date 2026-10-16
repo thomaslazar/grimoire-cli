@@ -28,7 +28,7 @@ marked *probed* was checked against the local stack.
 | `remove --id --user-id` | `DELETE /campaigns/{id}/members/{user_id}` (:115) |
 
 - **`eligible`**
-  - Owner only (`assert_can_manage`).
+  - Owner only (`assert_can_manage`); 409 while the campaign is archived.
   - Lists every registered user except the owner and guests, with
     `already_invited` and `campaign_access`.
 - **`invite`**
@@ -38,8 +38,9 @@ marked *probed* was checked against the local stack.
 - **`update`**
   - Usable on yourself, or by the owner on anyone. Refused with 409 while the
     campaign is archived.
-  - `--status` is a choice option (`accepted` or `declined`). Accepting needs
-    your campaign access (403).
+  - `--status` is a choice option (`accepted` or `declined`); the owner may
+    set any member's status. Accepting needs the member's campaign access
+    (403).
   - `--character-name` and `--character-sheet-url`: `""` clears the value. A
     sheet link replaces any uploaded sheet file.
   - Each flag is sent only when given. The body is the generated
@@ -48,7 +49,7 @@ marked *probed* was checked against the local stack.
 - **`remove`**
   - Usable on yourself (leaving, which works even while the campaign is
     archived) or by the owner.
-  - Removing a guest this way also deletes their account (`delete_guest_user`).
+  - Removing a guest this way also deletes their account and data (`delete_guest_user`).
   - An unknown user is a silent 204 (*probed*).
 
 ## `campaigns invites`: `CampaignsCommand.cs` / `CampaignsService.cs`
@@ -68,7 +69,8 @@ are unarchived. *Probed:* it lists the invited campaign for the player.
 | `share --id --member-id` | `GET /campaigns/{id}/guests/{member_id}/share-template` (g:192) |
 
 - **Access.** Every command is owner only, on group campaigns only (400
-  otherwise; `_get_managed_campaign`, g:84).
+  otherwise; `_get_managed_campaign`, g:84), and 409 while the campaign is
+  archived (`assert_can_manage`).
 - **`create` and `regenerate`** answer 403 when guest access is off on the
   server, which is the default (`_assert_guest_access`, g:38).
 - **The code is a credential.** `create`, `list`, `regenerate` and `share`

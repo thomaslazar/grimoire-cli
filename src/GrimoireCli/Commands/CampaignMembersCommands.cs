@@ -27,7 +27,8 @@ public static class CampaignMembersCommands
     {
         var idOption = CampaignIdOption();
         var command = new Command("eligible", "Users who can be invited") { idOption };
-        command.AddHelpSection("Notes", HelpSectionPosition.Top, ["Campaign owner only. Registered users other than you; guests are never listed."]);
+        command.AddHelpSection("Notes", HelpSectionPosition.Top, ["Campaign owner only; 409 while the campaign is archived. Registered users",
+            "other than you; guests are never listed."]);
         command.AddExamples("grimoire-cli campaigns members eligible --id <campaign-id>");
         command.AddResponseExampleArray<Generated.Models.EligibleMemberOut>();
         command.SetAction(async (parseResult, cancellationToken) =>
@@ -64,15 +65,15 @@ public static class CampaignMembersCommands
     {
         var idOption = CampaignIdOption();
         var userIdOption = UserIdOption();
-        var statusOption = OptionHelpers.Choice("--status", "Your answer to the invitation", ["accepted", "declined"]);
+        var statusOption = OptionHelpers.Choice("--status", "Answer to the invitation", ["accepted", "declined"]);
         var nameOption = new Option<string?>("--character-name") { Description = "Character name" };
         var sheetOption = new Option<string?>("--character-sheet-url") { Description = "Link to the character sheet" };
         var command = new Command("update", "Answer an invitation or set a member's character") { idOption, userIdOption, statusOption, nameOption, sheetOption };
         command.AddHelpSection("Notes", HelpSectionPosition.Top,
             ["Yourself, or the campaign owner for anyone; refused while the campaign",
             "is archived. Send only what changes; \"\" clears a name or link. A sheet",
-            "link replaces any uploaded sheet file. Accepting needs your campaign",
-            "access (403)."]);
+            "link replaces any uploaded sheet file. Accepting needs the member's",
+            "campaign access (403)."]);
         command.AddExamples(
             "grimoire-cli campaigns members update --id <campaign-id> --user-id <user-id> --status accepted",
             "grimoire-cli campaigns members update --id <campaign-id> --user-id <user-id> --character-name \"Aria\"");
@@ -95,8 +96,8 @@ public static class CampaignMembersCommands
         var command = new Command("remove", "Remove a member, or leave") { idOption, userIdOption };
         command.AddHelpSection("Notes", HelpSectionPosition.Top,
             ["Yourself, which works even while the campaign is archived, or the",
-            "campaign owner for anyone. Removing a guest also deletes their account.",
-            "An unknown user is a silent 204."]);
+            "campaign owner for anyone. Removing a guest also deletes their account",
+            "and data. An unknown user is a silent 204."]);
         command.AddExamples("grimoire-cli campaigns members remove --id <campaign-id> --user-id <user-id>");
         command.SetAction(async (parseResult, cancellationToken) =>
         {
