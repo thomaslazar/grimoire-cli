@@ -21,7 +21,7 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | backups | 6 / 6 |
 | bookmarks | 0 / 4 |
 | books | 16 / 16 |
-| campaigns | 68 / 93 |
+| campaigns | 79 / 93 |
 | characters | 0 / 16 |
 | content | 0 / 6 |
 | downloads | 1 / 1 |
@@ -45,7 +45,7 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | token-frames | 0 / 2 |
 | tokens | 11 / 11 |
 | users | 0 / 16 |
-| **Total** | **226 / 360** |
+| **Total** | **237 / 360** |
 
 2 operation(s) are internal-only (🔒) and excluded from covered counts.
 
@@ -213,16 +213,16 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | GET | `/api/campaigns/{campaign_id}/guests/{member_id}/share-template` | Get share text and links for a guest invite code |  | campaigns: read | `campaigns guests share` ✅ |
 | POST | `/api/campaigns/{campaign_id}/images` | Upload an image (GM); links it as an image resource for note embedding |  | campaigns: write | `campaigns files upload-image` ✅ |
 | POST | `/api/campaigns/{campaign_id}/invite` | Invite a player to a GM campaign |  | campaigns: write | `campaigns members invite` ✅ |
-| POST | `/api/campaigns/{campaign_id}/members/{member_id}/art` | Upload a member's character art |  | campaigns: write | — |
-| GET | `/api/campaigns/{campaign_id}/members/{member_id}/art` | Get a member's character art |  | campaigns: read | — |
-| DELETE | `/api/campaigns/{campaign_id}/members/{member_id}/art` | Remove a member's character art |  | campaigns: write | — |
-| POST | `/api/campaigns/{campaign_id}/members/{member_id}/sheet` | Upload a member's character sheet |  | campaigns: write | — |
-| GET | `/api/campaigns/{campaign_id}/members/{member_id}/sheet` | Download a member's character sheet |  | campaigns: read | — |
-| DELETE | `/api/campaigns/{campaign_id}/members/{member_id}/sheet` | Remove a member's character sheet |  | campaigns: write | — |
-| POST | `/api/campaigns/{campaign_id}/members/{member_id}/sheet/duplicate` | Duplicate a blank sheet into a member's slot |  | campaigns: write | — |
-| POST | `/api/campaigns/{campaign_id}/members/{member_id}/token` | Upload a member's character token |  | campaigns: write | — |
-| GET | `/api/campaigns/{campaign_id}/members/{member_id}/token` | Get a member's character token |  | campaigns: read | — |
-| DELETE | `/api/campaigns/{campaign_id}/members/{member_id}/token` | Remove a member's character token |  | campaigns: write | — |
+| POST | `/api/campaigns/{campaign_id}/members/{member_id}/art` | Upload a member's character art |  | campaigns: write | `campaigns members art upload` ✅ |
+| GET | `/api/campaigns/{campaign_id}/members/{member_id}/art` | Get a member's character art |  | campaigns: read | `campaigns members art get` ✅ |
+| DELETE | `/api/campaigns/{campaign_id}/members/{member_id}/art` | Remove a member's character art |  | campaigns: write | `campaigns members art delete` ✅ |
+| POST | `/api/campaigns/{campaign_id}/members/{member_id}/sheet` | Upload a member's character sheet |  | campaigns: write | `campaigns members sheet upload` ✅ |
+| GET | `/api/campaigns/{campaign_id}/members/{member_id}/sheet` | Download a member's character sheet |  | campaigns: read | `campaigns members sheet get` ✅ |
+| DELETE | `/api/campaigns/{campaign_id}/members/{member_id}/sheet` | Remove a member's character sheet |  | campaigns: write | `campaigns members sheet delete` ✅ |
+| POST | `/api/campaigns/{campaign_id}/members/{member_id}/sheet/duplicate` | Duplicate a blank sheet into a member's slot |  | campaigns: write | `campaigns members sheet from-source` ✅ |
+| POST | `/api/campaigns/{campaign_id}/members/{member_id}/token` | Upload a member's character token |  | campaigns: write | `campaigns members token upload` ✅ |
+| GET | `/api/campaigns/{campaign_id}/members/{member_id}/token` | Get a member's character token |  | campaigns: read | `campaigns members token get` ✅ |
+| DELETE | `/api/campaigns/{campaign_id}/members/{member_id}/token` | Remove a member's character token |  | campaigns: write | `campaigns members token delete` ✅ |
 | PATCH | `/api/campaigns/{campaign_id}/members/{user_id}` | Accept or decline an invitation |  | campaigns: write | `campaigns members update` ✅ |
 | DELETE | `/api/campaigns/{campaign_id}/members/{user_id}` | Remove a member |  | campaigns: write | `campaigns members remove` ✅ |
 | PUT | `/api/campaigns/{campaign_id}/resource-group-order` | Set the resource panel's group display order (categories + type groups) |  | campaigns: write | `campaigns categories group-order` ✅ |
@@ -243,7 +243,7 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | DELETE | `/api/campaigns/{campaign_id}/sessions/{session_id}` | Delete a session note |  | campaigns: write | — |
 | PUT | `/api/campaigns/{campaign_id}/sessions/{session_id}/notes/gm` | Save GM notes (owner only) |  | campaigns: write | — |
 | PUT | `/api/campaigns/{campaign_id}/sessions/{session_id}/notes/player` | Save own player note |  | campaigns: write | — |
-| GET | `/api/campaigns/{campaign_id}/sheet-sources` | List blank sheets a member can duplicate |  | campaigns: read | — |
+| GET | `/api/campaigns/{campaign_id}/sheet-sources` | List blank sheets a member can duplicate |  | campaigns: read | `campaigns members sheet sources` ✅ |
 | GET | `/api/campaigns/{campaign_id}/wiki` | List visible wiki pages |  | campaigns: read | `campaigns wiki list` ✅ |
 | POST | `/api/campaigns/{campaign_id}/wiki` | Create a wiki page |  | campaigns: write | `campaigns wiki create` ✅ |
 | GET | `/api/campaigns/{campaign_id}/wiki/export` | Export campaign wiki (md zip or json bundle) |  | campaigns: read | `campaigns wiki export` ✅ |

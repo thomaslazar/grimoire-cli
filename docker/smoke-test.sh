@@ -3108,6 +3108,73 @@ ok "campaigns guests regenerate and remove"
 "$CLI" campaigns delete --id "$TBL" >/dev/null 2>"$WORK/cli.err" \
   || { cat "$WORK/cli.err" >&2; fail "campaigns delete (table) exited non-zero"; }
 
+# ---- campaign member assets -------------------------------------------------
+# Admin owns the campaign; a guest member holds the slots, so no second login is needed.
+# deleting leftover Smoke Assets campaigns, archived ones included
+for c in $("$CLI" campaigns list --include-archived 2>"$WORK/cli.err" | jq -r '.[] | select(.name == "Smoke Assets") | .id'); do
+  "$CLI" campaigns delete --id "$c" >/dev/null 2>"$WORK/cli.err" \
+    || { cat "$WORK/cli.err" >&2; fail "campaigns delete (assets sweep) exited non-zero"; }
+done
+# creating the campaign and a guest member to hold the slots
+AST=$(echo '{"name":"Smoke Assets","is_gm_campaign":true}' | "$CLI" campaigns create --stdin 2>"$WORK/cli.err" | jq -r .id) \
+  || { cat "$WORK/cli.err" >&2; fail "campaigns create (assets) exited non-zero"; }
+[ -n "$AST" ] && [ "$AST" != "null" ] || fail "campaigns create should return an id"
+MID=$("$CLI" campaigns guests create --id "$AST" --nickname "Smoke Holder" 2>"$WORK/cli.err" | jq -r .id) \
+  || { cat "$WORK/cli.err" >&2; fail "guests create (assets) exited non-zero"; }
+[ -n "$MID" ] && [ "$MID" != "null" ] || fail "guests create should return an id"
+
+# uploading, downloading and deleting art then token, expecting the slot to be empty afterwards
+for kind in art token; do
+  "$CLI" campaigns members "$kind" upload --id "$AST" --member-id "$MID" --file docker/fixture-cover.png 2>"$WORK/cli.err" \
+    | jq -e --arg f "character_${kind}_path" '.[$f] | type == "string"' >/dev/null \
+    || { cat "$WORK/cli.err" >&2; fail "members $kind upload should set character_${kind}_path"; }
+  "$CLI" campaigns members "$kind" get --id "$AST" --member-id "$MID" --output "$WORK/$kind.img" >/dev/null 2>"$WORK/cli.err" \
+    || { cat "$WORK/cli.err" >&2; fail "members $kind get exited non-zero"; }
+  [ -s "$WORK/$kind.img" ] || fail "members $kind get should write a non-empty file"
+  "$CLI" campaigns members "$kind" delete --id "$AST" --member-id "$MID" >/dev/null 2>"$WORK/cli.err" \
+    || { cat "$WORK/cli.err" >&2; fail "members $kind delete exited non-zero"; }
+  set +e
+  "$CLI" campaigns members "$kind" get --id "$AST" --member-id "$MID" --output "$WORK/$kind.gone" >/dev/null 2>"$WORK/cli.err"; rc=$?
+  set -e
+  [ "$rc" -ne 0 ] || fail "members $kind get after delete should exit non-zero"
+done
+ok "campaigns members art and token upload, get and delete"
+
+# uploading and downloading a sheet
+"$CLI" campaigns members sheet upload --id "$AST" --member-id "$MID" --file docker/fixture-cover.png 2>"$WORK/cli.err" \
+  | jq -e '.character_sheet_filename == "fixture-cover.png"' >/dev/null \
+  || { cat "$WORK/cli.err" >&2; fail "members sheet upload should set character_sheet_filename"; }
+"$CLI" campaigns members sheet get --id "$AST" --member-id "$MID" --output "$WORK/sheet.img" >/dev/null 2>"$WORK/cli.err" \
+  || { cat "$WORK/cli.err" >&2; fail "members sheet get exited non-zero"; }
+[ -s "$WORK/sheet.img" ] || fail "members sheet get should write a non-empty file"
+ok "campaigns members sheet upload and get"
+
+# copying a campaign PDF into the slot via sheet sources
+printf '%%PDF-1.4\n1 0 obj<</Type/Catalog/Pages 2 0 R>>endobj\n2 0 obj<</Type/Pages/Kids[]/Count 0>>endobj\ntrailer<</Root 1 0 R>>\n%%%%EOF\n' > "$WORK/smoke-sheet.pdf"
+FID=$("$CLI" campaigns files upload --id "$AST" --file "$WORK/smoke-sheet.pdf" 2>"$WORK/cli.err" | jq -r .resource_id) \
+  || { cat "$WORK/cli.err" >&2; fail "campaigns files upload (sheet pdf) exited non-zero"; }
+[ -n "$FID" ] && [ "$FID" != "null" ] || fail "campaigns files upload should return a resource_id"
+"$CLI" campaigns members sheet sources --id "$AST" 2>"$WORK/cli.err" \
+  | jq -e --arg id "$FID" '[.files[] | select(.id == $id)] | length == 1' >/dev/null \
+  || { cat "$WORK/cli.err" >&2; fail "sheet sources should list the uploaded campaign file"; }
+"$CLI" campaigns members sheet from-source --id "$AST" --member-id "$MID" --source-type file --source-id "$FID" 2>"$WORK/cli.err" \
+  | jq -e '.character_sheet_filename == "smoke-sheet.pdf"' >/dev/null \
+  || { cat "$WORK/cli.err" >&2; fail "sheet from-source should set character_sheet_filename"; }
+ok "campaigns members sheet sources and from-source"
+
+# deleting the sheet, expecting the slot to be empty afterwards
+"$CLI" campaigns members sheet delete --id "$AST" --member-id "$MID" >/dev/null 2>"$WORK/cli.err" \
+  || { cat "$WORK/cli.err" >&2; fail "members sheet delete exited non-zero"; }
+set +e
+"$CLI" campaigns members sheet get --id "$AST" --member-id "$MID" --output "$WORK/sheet.gone" >/dev/null 2>"$WORK/cli.err"; rc=$?
+set -e
+[ "$rc" -ne 0 ] || fail "members sheet get after delete should exit non-zero"
+ok "campaigns members sheet delete empties the slot"
+
+# deleting the throwaway campaign
+"$CLI" campaigns delete --id "$AST" >/dev/null 2>"$WORK/cli.err" \
+  || { cat "$WORK/cli.err" >&2; fail "campaigns delete (assets) exited non-zero"; }
+
 # ---- api keys ----
 # Key-mode calls use their own config file, so the admin session above is untouched.
 KEYCFG="$WORK/key-config.json"
