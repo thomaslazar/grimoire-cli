@@ -1,4 +1,5 @@
 using System.CommandLine;
+using GrimoireCli.Models;
 using GrimoireCli.Output;
 using GrimoireCli.Services;
 
@@ -16,8 +17,53 @@ public static class CampaignFilesCommands
     public static Command Create()
     {
         var command = new Command("files", "Files uploaded into a campaign");
+        command.Subcommands.Add(CreateGetCommand());
         command.Subcommands.Add(CreateUploadCommand());
         command.Subcommands.Add(CreateUploadImageCommand());
+        return command;
+    }
+
+    private static Command CreateGetCommand()
+    {
+        var idOption = new Option<string>("--id") { Description = "Campaign ID", Required = true };
+        var fileIdOption = new Option<string>("--file-id")
+        {
+            Description = "File ID: resource_id from files upload or a file row in resources list",
+            Required = true,
+        };
+        var outputOption = new Option<string>("--output")
+        {
+            Description = "Output file path, or '-' for the bytes to stdout",
+            Required = true,
+        };
+        var command = new Command("get", "Download a campaign file")
+        {
+            idOption, fileIdOption, outputOption
+        };
+        command.AddHelpSection("Notes", HelpSectionPosition.Top,
+            "Any campaign member. Anyone but the owner reads only files whose link is",
+            "public, or private and shared with them; gm or unlinked files are 403.",
+            "",
+            "--output - writes the bytes to stdout; a path writes the file and prints",
+            "{path, bytes}.");
+        command.AddExamples("grimoire-cli campaigns files get --id <campaign-id> --file-id <file-id> --output handout.pdf");
+        command.AddResponseExample<SavedFile>();
+        command.SetAction(async (parseResult, cancellationToken) =>
+        {
+            var (client, _) = CommandHelper.BuildClient();
+            await using var stream = await new CampaignFilesService(client).GetAsync(
+                parseResult.GetValue(idOption)!, parseResult.GetValue(fileIdOption)!);
+            try
+            {
+                await ConsoleOutput.WriteStreamAsync(stream, parseResult.GetValue(outputOption)!);
+            }
+            catch (BodyInputException ex)
+            {
+                _logger.Error(ex.Message);
+                return 1;
+            }
+            return 0;
+        });
         return command;
     }
 

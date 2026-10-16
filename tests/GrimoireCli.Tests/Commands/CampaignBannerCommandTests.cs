@@ -40,4 +40,12 @@ public class CampaignBannerCommandTests
     [Fact]
     public void UploadImageRefusesBothCategoryFlags()
         => Assert.NotEmpty(Parse("files", "upload-image", "--id", "c", "--file", "f", "--category-id", "k", "--new-category-name", "n").Errors);
+
+    [Fact]
+    public void FilesGetNeedsFileIdAndOutput()
+    {
+        Assert.NotEmpty(Parse("files", "get", "--id", "c", "--output", "-").Errors);
+        Assert.NotEmpty(Parse("files", "get", "--id", "c", "--file-id", "f").Errors);
+        Assert.Empty(Parse("files", "get", "--id", "c", "--file-id", "f", "--output", "-").Errors);
+    }
 }

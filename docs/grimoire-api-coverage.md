@@ -21,7 +21,7 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | backups | 6 / 6 |
 | bookmarks | 0 / 4 |
 | books | 16 / 16 |
-| campaigns | 79 / 93 |
+| campaigns | 80 / 93 |
 | characters | 0 / 16 |
 | content | 0 / 6 |
 | downloads | 1 / 1 |
@@ -45,7 +45,7 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | token-frames | 0 / 2 |
 | tokens | 11 / 11 |
 | users | 0 / 16 |
-| **Total** | **237 / 360** |
+| **Total** | **238 / 360** |
 
 2 operation(s) are internal-only (🔒) and excluded from covered counts.
 
@@ -182,8 +182,8 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | GET | `/api/campaigns/calendar/{token}/all.ics` | ICS feed of every campaign the token's user belongs to |  | campaigns: read | not wrapped: feeds for calendar apps; subscription returns the URLs |
 | GET | `/api/campaigns/calendar/{token}/{campaign_id}.ics` | ICS feed for a single campaign |  | campaigns: read | not wrapped: feeds for calendar apps; subscription returns the URLs |
 | GET | `/api/campaigns/invites` | List the current user's pending campaign invitations |  | campaigns: read | `campaigns invites` ✅ |
-| GET | `/api/campaigns/resources/search` | Search books, maps, and tokens by name |  | campaigns: read | — |
-| GET | `/api/campaigns/resources/suggested/{system_id}` | Suggested resources (system books) for the create wizard |  | campaigns: read | — |
+| GET | `/api/campaigns/resources/search` | Search books, maps, and tokens by name |  | campaigns: read | not wrapped: `search` finds the same items; their ids are what `resources add` takes |
+| GET | `/api/campaigns/resources/suggested/{system_id}` | Suggested resources (system books) for the create wizard |  | campaigns: read | not wrapped: `systems books list --category core` gives the same set |
 | GET | `/api/campaigns/{campaign_id}` | Get a campaign |  | campaigns: read | `campaigns get` ✅ |
 | PATCH | `/api/campaigns/{campaign_id}` | Update a campaign |  | campaigns: write | `campaigns update` ✅ |
 | DELETE | `/api/campaigns/{campaign_id}` | Delete a campaign |  | campaigns: write | `campaigns delete` ✅ |
@@ -205,7 +205,7 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | POST | `/api/campaigns/{campaign_id}/convert-to-group` | Convert a personal campaign into a GM-run group campaign |  | campaigns: write | `campaigns convert-to-group` ✅ |
 | GET | `/api/campaigns/{campaign_id}/eligible-members` | List users that can be invited |  | campaigns: read | `campaigns members eligible` ✅ |
 | POST | `/api/campaigns/{campaign_id}/files` | Upload a campaign file (GM); links it as a resource |  | campaigns: write | `campaigns files upload` ✅ |
-| GET | `/api/campaigns/{campaign_id}/files/{file_id}` | Download a campaign file (honours resource visibility) |  | campaigns: read | — |
+| GET | `/api/campaigns/{campaign_id}/files/{file_id}` | Download a campaign file (honours resource visibility) |  | campaigns: read | `campaigns files get` ✅ |
 | POST | `/api/campaigns/{campaign_id}/guests` | Create a guest invite code for a GM campaign |  | campaigns: write | `campaigns guests create` ✅ |
 | GET | `/api/campaigns/{campaign_id}/guests` | List a campaign's guests and their invite codes |  | campaigns: read | `campaigns guests list` ✅ |
 | DELETE | `/api/campaigns/{campaign_id}/guests/{member_id}` | Remove a guest (deletes the guest account) |  | campaigns: write | `campaigns guests remove` ✅ |
@@ -235,14 +235,14 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | GET | `/api/campaigns/{campaign_id}/schedule` | Get campaign schedule and next sessions |  | campaigns: read | `campaigns schedule get` ✅ |
 | PUT | `/api/campaigns/{campaign_id}/schedule` | Create or update campaign schedule |  | campaigns: write | `campaigns schedule set` ✅ |
 | DELETE | `/api/campaigns/{campaign_id}/schedule` | Remove campaign schedule |  | campaigns: write | `campaigns schedule delete` ✅ |
-| GET | `/api/campaigns/{campaign_id}/sessions` | List session notes |  | campaigns: read | — |
-| POST | `/api/campaigns/{campaign_id}/sessions` | Create a session note |  | campaigns: write | — |
-| GET | `/api/campaigns/{campaign_id}/sessions/search` | Search session notes |  | campaigns: read | — |
-| GET | `/api/campaigns/{campaign_id}/sessions/{session_id}` | Get a session note with all notes |  | campaigns: read | — |
-| PATCH | `/api/campaigns/{campaign_id}/sessions/{session_id}` | Update session title |  | campaigns: write | — |
-| DELETE | `/api/campaigns/{campaign_id}/sessions/{session_id}` | Delete a session note |  | campaigns: write | — |
-| PUT | `/api/campaigns/{campaign_id}/sessions/{session_id}/notes/gm` | Save GM notes (owner only) |  | campaigns: write | — |
-| PUT | `/api/campaigns/{campaign_id}/sessions/{session_id}/notes/player` | Save own player note |  | campaigns: write | — |
+| GET | `/api/campaigns/{campaign_id}/sessions` | List session notes |  | campaigns: read | not wrapped: legacy; rolled into session wiki pages on startup |
+| POST | `/api/campaigns/{campaign_id}/sessions` | Create a session note |  | campaigns: write | not wrapped: legacy; rolled into session wiki pages on startup |
+| GET | `/api/campaigns/{campaign_id}/sessions/search` | Search session notes |  | campaigns: read | not wrapped: legacy; rolled into session wiki pages on startup |
+| GET | `/api/campaigns/{campaign_id}/sessions/{session_id}` | Get a session note with all notes |  | campaigns: read | not wrapped: legacy; rolled into session wiki pages on startup |
+| PATCH | `/api/campaigns/{campaign_id}/sessions/{session_id}` | Update session title |  | campaigns: write | not wrapped: legacy; rolled into session wiki pages on startup |
+| DELETE | `/api/campaigns/{campaign_id}/sessions/{session_id}` | Delete a session note |  | campaigns: write | not wrapped: legacy; rolled into session wiki pages on startup |
+| PUT | `/api/campaigns/{campaign_id}/sessions/{session_id}/notes/gm` | Save GM notes (owner only) |  | campaigns: write | not wrapped: legacy; rolled into session wiki pages on startup |
+| PUT | `/api/campaigns/{campaign_id}/sessions/{session_id}/notes/player` | Save own player note |  | campaigns: write | not wrapped: legacy; rolled into session wiki pages on startup |
 | GET | `/api/campaigns/{campaign_id}/sheet-sources` | List blank sheets a member can duplicate |  | campaigns: read | `campaigns members sheet sources` ✅ |
 | GET | `/api/campaigns/{campaign_id}/wiki` | List visible wiki pages |  | campaigns: read | `campaigns wiki list` ✅ |
 | POST | `/api/campaigns/{campaign_id}/wiki` | Create a wiki page |  | campaigns: write | `campaigns wiki create` ✅ |

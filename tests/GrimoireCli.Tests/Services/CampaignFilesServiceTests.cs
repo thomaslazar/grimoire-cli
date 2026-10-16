@@ -1,3 +1,5 @@
+using GrimoireCli.Api;
+using GrimoireCli.Configuration;
 using GrimoireCli.Services;
 
 namespace GrimoireCli.Tests.Services;
@@ -14,4 +16,12 @@ public class CampaignFilesServiceTests
     [InlineData("scene.uvtt", "application/octet-stream")]
     public void MimeForExtension(string path, string expected)
         => Assert.Equal(expected, CampaignFilesService.MimeForExtension(path));
+
+    [Fact]
+    public void GetHitsItsRoute()
+    {
+        var info = new CampaignFilesService(new GrimoireApiClient(new AppConfig { Server = "http://example.test", AccessToken = "t" })).GetRequest("c-1", "f-1");
+        info.PathParameters["baseurl"] = "http://example.test";
+        Assert.Equal(("GET", "http://example.test/api/campaigns/c-1/files/f-1"), (info.HttpMethod.ToString().ToUpperInvariant(), info.URI.AbsoluteUri));
+    }
 }

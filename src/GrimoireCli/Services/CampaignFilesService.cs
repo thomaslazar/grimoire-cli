@@ -10,6 +10,13 @@ public class CampaignFilesService
 
     public CampaignFilesService(GrimoireApiClient client) => _client = client;
 
+    internal Microsoft.Kiota.Abstractions.RequestInformation GetRequest(string campaignId, string fileId)
+        => _client.Api.Api.Campaigns[campaignId].Files[fileId].ToGetRequestInformation();
+
+    /// <summary>GET /api/campaigns/{id}/files/{file_id}. Raw bytes.</summary>
+    public async Task<Stream> GetAsync(string campaignId, string fileId)
+        => await _client.SendStreamAsync(GetRequest(campaignId, fileId));
+
     /// <summary>
     /// POST /api/campaigns/{id}/files. Stores the file in the campaign, not the
     /// library, and links it as a `file` resource in the same call. Form fields
