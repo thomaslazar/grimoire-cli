@@ -3,6 +3,122 @@
 All notable changes to grimoire-cli are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## v0.7.0 — 2026-10-16
+
+Minor release that covers the campaign play side: the wiki, note templates,
+housekeeping, scheduling, membership and guests, and each member's art, token
+and sheet. It also moves the supported server to Grimoire 1.9.0, which is now
+the only version it supports.
+
+### Highlights
+
+- **A campaign wiki an agent can keep.**
+  - `campaigns wiki` lists, reads, searches, writes, reorders and hides
+    pages. `titles` hands back the pinned `[[Title:id-…]]` form, so links
+    survive renames.
+  - `wiki export` / `wiki import` move a whole wiki as a markdown zip or a
+    JSON bundle, and import an Obsidian vault or a LegendKeeper export.
+  - The help documents the link, embed and GM-secret syntax, and the stub
+    pages that unresolved links create, so pages come out right the first
+    time.
+- **Note templates, including the community catalogue.**
+  `campaigns wiki templates` writes, imports and exports templates, and `use`
+  stamps a new page from one. `catalogue` and `install` pull from the
+  community catalogue. The help states what a template's page defaults do on
+  update and use, which the web editor otherwise hides.
+- **Running the table.**
+  - `campaigns members` and `campaigns guests` cover invitations, accepting,
+    removing, and guest invite codes. A code is the guest's login, so it is
+    printed as the server returns it, with that warning in the help.
+  - `campaigns schedule`, `availability` and `calendar` cover recurring or
+    custom session dates, who can make them, cancelling a date, and the `.ics`
+    feed links. `toggle-cancel` is named for what the server does: a second
+    call undoes the first.
+  - `members art`, `token` and `sheet` manage each member's files, and copy a
+    blank sheet in from the library.
+- **Campaign housekeeping.**
+  - `archive`, `unarchive`, `convert-to-group` and `delete` handle a campaign
+    whose game ended, or a solo prep that became a real game.
+  - `campaigns banner` sets the header image, also from a map or book already
+    in the library.
+  - `files get` downloads what `files upload` put in.
+  - Deleting a campaign that another names as its parent fails with a 500.
+    That server bug is called out in the help.
+- **Grimoire 1.9.0.** The CLI is regenerated against 1.9.0, and media `--sort`
+  gains `track` (album order for audio).
+  - `books` and `systems update` now accept `codex_id`, and `duplicates link`
+    accepts `parent_kind` / `parent_label`. 1.8.0 would silently drop those,
+    so the supported floor rises to 1.9.0, and anyone still on 1.8.0 stays on
+    v0.6.0.
+  - The help and API notes are re-verified against the 1.9.0 source.
+  - 1.9.0's new areas are tracked for later releases: share links, Codex DB,
+    export and cut-outs, and character importers.
+
+### Features
+
+- feat: add campaigns archive, unarchive, convert-to-group and delete
+- feat: add campaigns banner commands and files upload-image
+- feat: add campaigns calendar commands
+- feat: add campaigns files get and note unwrapped campaign routes
+- feat: add campaigns guests commands
+- feat: add campaigns members and invites commands
+- feat: add campaigns members art and token commands
+- feat: add campaigns members sheet commands
+- feat: add campaigns schedule and availability commands
+- feat: add campaigns wiki create, update, delete, reorder, hide and unhide
+- feat: add campaigns wiki export and import
+- feat: add campaigns wiki list, get, search and titles
+- feat: add campaigns wiki templates
+- feat: add campaigns wiki templates catalogue and install
+- feat: target grimoire 1.9.0
+
+### Fixes
+
+- fix: complete the template import name chain in help
+- fix: correct housekeeping help against the server
+- fix: document wiki page defaults and link matching in help
+- fix: mirror grimoire 1.9.0 option values and update help
+- fix: rewrap wiki import help
+- fix: show the is-cancelled value set and split availability tests
+- fix: state archived refusals and owner-side member updates in help
+- fix: state what toggle-cancel writes and tighten schedule help
+- fix: state when the template catalogue answers 502
+- fix: tighten member asset help
+- fix: tighten wiki import and export help
+
+### Tests
+
+- test: cover campaign housekeeping in the smoke test
+- test: cover campaign member assets in the smoke test
+- test: cover campaign membership and guests in the smoke test
+- test: cover campaign scheduling in the smoke test
+- test: cover campaigns wiki export and import in the smoke test
+- test: cover campaigns wiki templates in the smoke test
+- test: cover the note-template catalogue in the smoke test
+- test: keep campaign files tests in their own file
+
+### Chores
+
+- chore: bump version to 0.7.0
+
+### Docs
+
+- docs: design campaign wiki page commands
+- docs: document campaigns wiki and cover it in the smoke test
+- docs: fix moved citations and tighten the track sort note
+- docs: note search wildcards for the campaign owner
+- docs: record that session notes are rolled into wiki pages on startup
+- docs: regenerate api coverage with the 1.9.0 tested range
+- docs: spec and plan campaign file download
+- docs: spec and plan campaign housekeeping
+- docs: spec and plan campaign member assets
+- docs: spec and plan campaign membership and guests
+- docs: spec and plan campaign scheduling
+- docs: spec and plan campaign wiki import and export
+- docs: spec and plan campaign wiki note templates
+- docs: spec and plan the grimoire 1.9.0 bump
+- docs: spec and plan the note-template catalogue
+
 ## v0.6.0 — 2026-10-13
 
 Minor release with one breaking change. It adds the folder and shelf views
