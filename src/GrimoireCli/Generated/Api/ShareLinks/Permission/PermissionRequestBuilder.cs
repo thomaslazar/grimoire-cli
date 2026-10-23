@@ -22,7 +22,7 @@ namespace GrimoireCli.Generated.Api.ShareLinks.Permission
         /// </summary>
         /// <param name="pathParameters">Path parameters for the request</param>
         /// <param name="requestAdapter">The request adapter to use to execute the requests.</param>
-        public PermissionRequestBuilder(Dictionary<string, object> pathParameters, IRequestAdapter requestAdapter) : base(requestAdapter, "{+baseurl}/api/share-links/permission{?token*}", pathParameters)
+        public PermissionRequestBuilder(Dictionary<string, object> pathParameters, IRequestAdapter requestAdapter) : base(requestAdapter, "{+baseurl}/api/share-links/permission", pathParameters)
         {
         }
         /// <summary>
@@ -30,7 +30,7 @@ namespace GrimoireCli.Generated.Api.ShareLinks.Permission
         /// </summary>
         /// <param name="rawUrl">The raw URL to use for the request builder.</param>
         /// <param name="requestAdapter">The request adapter to use to execute the requests.</param>
-        public PermissionRequestBuilder(string rawUrl, IRequestAdapter requestAdapter) : base(requestAdapter, "{+baseurl}/api/share-links/permission{?token*}", rawUrl)
+        public PermissionRequestBuilder(string rawUrl, IRequestAdapter requestAdapter) : base(requestAdapter, "{+baseurl}/api/share-links/permission", rawUrl)
         {
         }
         /// <summary>
@@ -42,11 +42,11 @@ namespace GrimoireCli.Generated.Api.ShareLinks.Permission
         /// <exception cref="global::GrimoireCli.Generated.Models.HTTPValidationError">When receiving a 422 status code</exception>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
-        public async Task<global::GrimoireCli.Generated.Models.ShareLinkPermission?> GetAsync(Action<RequestConfiguration<global::GrimoireCli.Generated.Api.ShareLinks.Permission.PermissionRequestBuilder.PermissionRequestBuilderGetQueryParameters>>? requestConfiguration = default, CancellationToken cancellationToken = default)
+        public async Task<global::GrimoireCli.Generated.Models.ShareLinkPermission?> GetAsync(Action<RequestConfiguration<DefaultQueryParameters>>? requestConfiguration = default, CancellationToken cancellationToken = default)
         {
 #nullable restore
 #else
-        public async Task<global::GrimoireCli.Generated.Models.ShareLinkPermission> GetAsync(Action<RequestConfiguration<global::GrimoireCli.Generated.Api.ShareLinks.Permission.PermissionRequestBuilder.PermissionRequestBuilderGetQueryParameters>> requestConfiguration = default, CancellationToken cancellationToken = default)
+        public async Task<global::GrimoireCli.Generated.Models.ShareLinkPermission> GetAsync(Action<RequestConfiguration<DefaultQueryParameters>> requestConfiguration = default, CancellationToken cancellationToken = default)
         {
 #endif
             var requestInfo = ToGetRequestInformation(requestConfiguration);
@@ -63,11 +63,11 @@ namespace GrimoireCli.Generated.Api.ShareLinks.Permission
         /// <param name="requestConfiguration">Configuration for the request such as headers, query parameters, and middleware options.</param>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
-        public RequestInformation ToGetRequestInformation(Action<RequestConfiguration<global::GrimoireCli.Generated.Api.ShareLinks.Permission.PermissionRequestBuilder.PermissionRequestBuilderGetQueryParameters>>? requestConfiguration = default)
+        public RequestInformation ToGetRequestInformation(Action<RequestConfiguration<DefaultQueryParameters>>? requestConfiguration = default)
         {
 #nullable restore
 #else
-        public RequestInformation ToGetRequestInformation(Action<RequestConfiguration<global::GrimoireCli.Generated.Api.ShareLinks.Permission.PermissionRequestBuilder.PermissionRequestBuilderGetQueryParameters>> requestConfiguration = default)
+        public RequestInformation ToGetRequestInformation(Action<RequestConfiguration<DefaultQueryParameters>> requestConfiguration = default)
         {
 #endif
             var requestInfo = new RequestInformation(Method.GET, UrlTemplate, PathParameters);
@@ -85,31 +85,11 @@ namespace GrimoireCli.Generated.Api.ShareLinks.Permission
             return new global::GrimoireCli.Generated.Api.ShareLinks.Permission.PermissionRequestBuilder(rawUrl, RequestAdapter);
         }
         /// <summary>
-        /// Your effective permission and which layer decided it (instance, role or override).
-        /// </summary>
-        [global::System.CodeDom.Compiler.GeneratedCode("Kiota", "1.0.0")]
-        public partial class PermissionRequestBuilderGetQueryParameters 
-        {
-#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
-#nullable enable
-            #pragma warning disable CS1591
-            [QueryParameter("token")]
-            public string? Token { get; set; }
-            #pragma warning restore CS1591
-#nullable restore
-#else
-            #pragma warning disable CS1591
-            [QueryParameter("token")]
-            public string Token { get; set; }
-            #pragma warning restore CS1591
-#endif
-        }
-        /// <summary>
         /// Configuration for the request such as headers, query parameters, and middleware options.
         /// </summary>
         [Obsolete("This class is deprecated. Please use the generic RequestConfiguration class generated by the generator.")]
         [global::System.CodeDom.Compiler.GeneratedCode("Kiota", "1.0.0")]
-        public partial class PermissionRequestBuilderGetRequestConfiguration : RequestConfiguration<global::GrimoireCli.Generated.Api.ShareLinks.Permission.PermissionRequestBuilder.PermissionRequestBuilderGetQueryParameters>
+        public partial class PermissionRequestBuilderGetRequestConfiguration : RequestConfiguration<DefaultQueryParameters>
         {
         }
     }

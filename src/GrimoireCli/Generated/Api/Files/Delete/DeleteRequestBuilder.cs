@@ -22,7 +22,7 @@ namespace GrimoireCli.Generated.Api.Files.Delete
         /// </summary>
         /// <param name="pathParameters">Path parameters for the request</param>
         /// <param name="requestAdapter">The request adapter to use to execute the requests.</param>
-        public DeleteRequestBuilder(Dictionary<string, object> pathParameters, IRequestAdapter requestAdapter) : base(requestAdapter, "{+baseurl}/api/files/delete{?token*}", pathParameters)
+        public DeleteRequestBuilder(Dictionary<string, object> pathParameters, IRequestAdapter requestAdapter) : base(requestAdapter, "{+baseurl}/api/files/delete", pathParameters)
         {
         }
         /// <summary>
@@ -30,7 +30,7 @@ namespace GrimoireCli.Generated.Api.Files.Delete
         /// </summary>
         /// <param name="rawUrl">The raw URL to use for the request builder.</param>
         /// <param name="requestAdapter">The request adapter to use to execute the requests.</param>
-        public DeleteRequestBuilder(string rawUrl, IRequestAdapter requestAdapter) : base(requestAdapter, "{+baseurl}/api/files/delete{?token*}", rawUrl)
+        public DeleteRequestBuilder(string rawUrl, IRequestAdapter requestAdapter) : base(requestAdapter, "{+baseurl}/api/files/delete", rawUrl)
         {
         }
         /// <summary>
@@ -43,11 +43,11 @@ namespace GrimoireCli.Generated.Api.Files.Delete
         /// <exception cref="global::GrimoireCli.Generated.Models.HTTPValidationError">When receiving a 422 status code</exception>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
-        public async Task<global::GrimoireCli.Generated.Models.DeleteResponse?> PostAsync(global::GrimoireCli.Generated.Models.DeleteRequest body, Action<RequestConfiguration<global::GrimoireCli.Generated.Api.Files.Delete.DeleteRequestBuilder.DeleteRequestBuilderPostQueryParameters>>? requestConfiguration = default, CancellationToken cancellationToken = default)
+        public async Task<global::GrimoireCli.Generated.Models.DeleteResponse?> PostAsync(global::GrimoireCli.Generated.Models.DeleteRequest body, Action<RequestConfiguration<DefaultQueryParameters>>? requestConfiguration = default, CancellationToken cancellationToken = default)
         {
 #nullable restore
 #else
-        public async Task<global::GrimoireCli.Generated.Models.DeleteResponse> PostAsync(global::GrimoireCli.Generated.Models.DeleteRequest body, Action<RequestConfiguration<global::GrimoireCli.Generated.Api.Files.Delete.DeleteRequestBuilder.DeleteRequestBuilderPostQueryParameters>> requestConfiguration = default, CancellationToken cancellationToken = default)
+        public async Task<global::GrimoireCli.Generated.Models.DeleteResponse> PostAsync(global::GrimoireCli.Generated.Models.DeleteRequest body, Action<RequestConfiguration<DefaultQueryParameters>> requestConfiguration = default, CancellationToken cancellationToken = default)
         {
 #endif
             if(ReferenceEquals(body, null)) throw new ArgumentNullException(nameof(body));
@@ -66,11 +66,11 @@ namespace GrimoireCli.Generated.Api.Files.Delete
         /// <param name="requestConfiguration">Configuration for the request such as headers, query parameters, and middleware options.</param>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
-        public RequestInformation ToPostRequestInformation(global::GrimoireCli.Generated.Models.DeleteRequest body, Action<RequestConfiguration<global::GrimoireCli.Generated.Api.Files.Delete.DeleteRequestBuilder.DeleteRequestBuilderPostQueryParameters>>? requestConfiguration = default)
+        public RequestInformation ToPostRequestInformation(global::GrimoireCli.Generated.Models.DeleteRequest body, Action<RequestConfiguration<DefaultQueryParameters>>? requestConfiguration = default)
         {
 #nullable restore
 #else
-        public RequestInformation ToPostRequestInformation(global::GrimoireCli.Generated.Models.DeleteRequest body, Action<RequestConfiguration<global::GrimoireCli.Generated.Api.Files.Delete.DeleteRequestBuilder.DeleteRequestBuilderPostQueryParameters>> requestConfiguration = default)
+        public RequestInformation ToPostRequestInformation(global::GrimoireCli.Generated.Models.DeleteRequest body, Action<RequestConfiguration<DefaultQueryParameters>> requestConfiguration = default)
         {
 #endif
             if(ReferenceEquals(body, null)) throw new ArgumentNullException(nameof(body));
@@ -90,31 +90,11 @@ namespace GrimoireCli.Generated.Api.Files.Delete
             return new global::GrimoireCli.Generated.Api.Files.Delete.DeleteRequestBuilder(rawUrl, RequestAdapter);
         }
         /// <summary>
-        /// Soft by default: removes the indexed record and everything keyed to it while leaving the files alone, so a rescan re-adds whatever is still present and not excluded. Set `delete_files` to also unlink the files, which is irreversible. Non-empty folders require `confirm_name`.
-        /// </summary>
-        [global::System.CodeDom.Compiler.GeneratedCode("Kiota", "1.0.0")]
-        public partial class DeleteRequestBuilderPostQueryParameters 
-        {
-#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
-#nullable enable
-            #pragma warning disable CS1591
-            [QueryParameter("token")]
-            public string? Token { get; set; }
-            #pragma warning restore CS1591
-#nullable restore
-#else
-            #pragma warning disable CS1591
-            [QueryParameter("token")]
-            public string Token { get; set; }
-            #pragma warning restore CS1591
-#endif
-        }
-        /// <summary>
         /// Configuration for the request such as headers, query parameters, and middleware options.
         /// </summary>
         [Obsolete("This class is deprecated. Please use the generic RequestConfiguration class generated by the generator.")]
         [global::System.CodeDom.Compiler.GeneratedCode("Kiota", "1.0.0")]
-        public partial class DeleteRequestBuilderPostRequestConfiguration : RequestConfiguration<global::GrimoireCli.Generated.Api.Files.Delete.DeleteRequestBuilder.DeleteRequestBuilderPostQueryParameters>
+        public partial class DeleteRequestBuilderPostRequestConfiguration : RequestConfiguration<DefaultQueryParameters>
         {
         }
     }

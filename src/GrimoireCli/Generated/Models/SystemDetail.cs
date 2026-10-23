@@ -38,10 +38,10 @@ namespace GrimoireCli.Generated.Models
         /// <summary>The character_builder_urls property</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
-        public List<global::GrimoireCli.Generated.Models.Backend__routers__systems___schemas__LinkEntry>? CharacterBuilderUrls { get; set; }
+        public List<global::GrimoireCli.Generated.Models.LinkRef>? CharacterBuilderUrls { get; set; }
 #nullable restore
 #else
-        public List<global::GrimoireCli.Generated.Models.Backend__routers__systems___schemas__LinkEntry> CharacterBuilderUrls { get; set; }
+        public List<global::GrimoireCli.Generated.Models.LinkRef> CharacterBuilderUrls { get; set; }
 #endif
         /// <summary>The child_count property</summary>
         public int? ChildCount { get; set; }
@@ -230,10 +230,10 @@ namespace GrimoireCli.Generated.Models
         /// <summary>The urls property</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
-        public List<global::GrimoireCli.Generated.Models.Backend__routers__systems___schemas__LinkEntry>? Urls { get; set; }
+        public List<global::GrimoireCli.Generated.Models.LinkRef>? Urls { get; set; }
 #nullable restore
 #else
-        public List<global::GrimoireCli.Generated.Models.Backend__routers__systems___schemas__LinkEntry> Urls { get; set; }
+        public List<global::GrimoireCli.Generated.Models.LinkRef> Urls { get; set; }
 #endif
         /// <summary>The year property</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
@@ -273,7 +273,7 @@ namespace GrimoireCli.Generated.Models
                 { "books", n => { Books = n.GetCollectionOfObjectValues<global::GrimoireCli.Generated.Models.BookOut>(global::GrimoireCli.Generated.Models.BookOut.CreateFromDiscriminatorValue)?.AsList(); } },
                 { "category_depth", n => { CategoryDepth = n.GetIntValue(); } },
                 { "character_builder_url", n => { CharacterBuilderUrl = n.GetObjectValue<global::GrimoireCli.Generated.Models.SystemDetail.SystemDetail_character_builder_url>(global::GrimoireCli.Generated.Models.SystemDetail.SystemDetail_character_builder_url.CreateFromDiscriminatorValue); } },
-                { "character_builder_urls", n => { CharacterBuilderUrls = n.GetCollectionOfObjectValues<global::GrimoireCli.Generated.Models.Backend__routers__systems___schemas__LinkEntry>(global::GrimoireCli.Generated.Models.Backend__routers__systems___schemas__LinkEntry.CreateFromDiscriminatorValue)?.AsList(); } },
+                { "character_builder_urls", n => { CharacterBuilderUrls = n.GetCollectionOfObjectValues<global::GrimoireCli.Generated.Models.LinkRef>(global::GrimoireCli.Generated.Models.LinkRef.CreateFromDiscriminatorValue)?.AsList(); } },
                 { "child_count", n => { ChildCount = n.GetIntValue(); } },
                 { "children", n => { Children = n.GetCollectionOfObjectValues<global::GrimoireCli.Generated.Models.SystemSummary>(global::GrimoireCli.Generated.Models.SystemSummary.CreateFromDiscriminatorValue)?.AsList(); } },
                 { "codex_id", n => { CodexId = n.GetObjectValue<global::GrimoireCli.Generated.Models.SystemDetail.SystemDetail_codex_id>(global::GrimoireCli.Generated.Models.SystemDetail.SystemDetail_codex_id.CreateFromDiscriminatorValue); } },
@@ -303,7 +303,7 @@ namespace GrimoireCli.Generated.Models
                 { "system_family", n => { SystemFamily = n.GetStringValue(); } },
                 { "tags", n => { Tags = n.GetCollectionOfPrimitiveValues<string>()?.AsList(); } },
                 { "total_page_count", n => { TotalPageCount = n.GetIntValue(); } },
-                { "urls", n => { Urls = n.GetCollectionOfObjectValues<global::GrimoireCli.Generated.Models.Backend__routers__systems___schemas__LinkEntry>(global::GrimoireCli.Generated.Models.Backend__routers__systems___schemas__LinkEntry.CreateFromDiscriminatorValue)?.AsList(); } },
+                { "urls", n => { Urls = n.GetCollectionOfObjectValues<global::GrimoireCli.Generated.Models.LinkRef>(global::GrimoireCli.Generated.Models.LinkRef.CreateFromDiscriminatorValue)?.AsList(); } },
                 { "year", n => { Year = n.GetObjectValue<global::GrimoireCli.Generated.Models.SystemDetail.SystemDetail_year>(global::GrimoireCli.Generated.Models.SystemDetail.SystemDetail_year.CreateFromDiscriminatorValue); } },
             };
         }
@@ -318,7 +318,7 @@ namespace GrimoireCli.Generated.Models
             writer.WriteCollectionOfObjectValues<global::GrimoireCli.Generated.Models.BookOut>("books", Books);
             writer.WriteIntValue("category_depth", CategoryDepth);
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.SystemDetail.SystemDetail_character_builder_url>("character_builder_url", CharacterBuilderUrl);
-            writer.WriteCollectionOfObjectValues<global::GrimoireCli.Generated.Models.Backend__routers__systems___schemas__LinkEntry>("character_builder_urls", CharacterBuilderUrls);
+            writer.WriteCollectionOfObjectValues<global::GrimoireCli.Generated.Models.LinkRef>("character_builder_urls", CharacterBuilderUrls);
             writer.WriteIntValue("child_count", ChildCount);
             writer.WriteCollectionOfObjectValues<global::GrimoireCli.Generated.Models.SystemSummary>("children", Children);
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.SystemDetail.SystemDetail_codex_id>("codex_id", CodexId);
@@ -348,7 +348,7 @@ namespace GrimoireCli.Generated.Models
             writer.WriteStringValue("system_family", SystemFamily);
             writer.WriteCollectionOfPrimitiveValues<string>("tags", Tags);
             writer.WriteIntValue("total_page_count", TotalPageCount);
-            writer.WriteCollectionOfObjectValues<global::GrimoireCli.Generated.Models.Backend__routers__systems___schemas__LinkEntry>("urls", Urls);
+            writer.WriteCollectionOfObjectValues<global::GrimoireCli.Generated.Models.LinkRef>("urls", Urls);
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.SystemDetail.SystemDetail_year>("year", Year);
             writer.WriteAdditionalData(AdditionalData);
         }

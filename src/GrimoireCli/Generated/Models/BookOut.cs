@@ -250,10 +250,10 @@ namespace GrimoireCli.Generated.Models
         /// <summary>The urls property</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
-        public List<global::GrimoireCli.Generated.Models.Backend__routers__systems___schemas__LinkEntry>? Urls { get; set; }
+        public List<global::GrimoireCli.Generated.Models.LinkRef>? Urls { get; set; }
 #nullable restore
 #else
-        public List<global::GrimoireCli.Generated.Models.Backend__routers__systems___schemas__LinkEntry> Urls { get; set; }
+        public List<global::GrimoireCli.Generated.Models.LinkRef> Urls { get; set; }
 #endif
         /// <summary>The variant_count property</summary>
         public int? VariantCount { get; set; }
@@ -340,7 +340,7 @@ namespace GrimoireCli.Generated.Models
                 { "relative_path", n => { RelativePath = n.GetStringValue(); } },
                 { "tags", n => { Tags = n.GetCollectionOfPrimitiveValues<string>()?.AsList(); } },
                 { "title", n => { Title = n.GetStringValue(); } },
-                { "urls", n => { Urls = n.GetCollectionOfObjectValues<global::GrimoireCli.Generated.Models.Backend__routers__systems___schemas__LinkEntry>(global::GrimoireCli.Generated.Models.Backend__routers__systems___schemas__LinkEntry.CreateFromDiscriminatorValue)?.AsList(); } },
+                { "urls", n => { Urls = n.GetCollectionOfObjectValues<global::GrimoireCli.Generated.Models.LinkRef>(global::GrimoireCli.Generated.Models.LinkRef.CreateFromDiscriminatorValue)?.AsList(); } },
                 { "variant_count", n => { VariantCount = n.GetIntValue(); } },
                 { "variant_kinds", n => { VariantKinds = n.GetCollectionOfPrimitiveValues<string>()?.AsList(); } },
                 { "version", n => { Version = n.GetStringValue(); } },
@@ -386,7 +386,7 @@ namespace GrimoireCli.Generated.Models
             writer.WriteStringValue("relative_path", RelativePath);
             writer.WriteCollectionOfPrimitiveValues<string>("tags", Tags);
             writer.WriteStringValue("title", Title);
-            writer.WriteCollectionOfObjectValues<global::GrimoireCli.Generated.Models.Backend__routers__systems___schemas__LinkEntry>("urls", Urls);
+            writer.WriteCollectionOfObjectValues<global::GrimoireCli.Generated.Models.LinkRef>("urls", Urls);
             writer.WriteIntValue("variant_count", VariantCount);
             writer.WriteCollectionOfPrimitiveValues<string>("variant_kinds", VariantKinds);
             writer.WriteStringValue("version", Version);

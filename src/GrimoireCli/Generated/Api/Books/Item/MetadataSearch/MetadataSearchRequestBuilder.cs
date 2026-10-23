@@ -22,7 +22,7 @@ namespace GrimoireCli.Generated.Api.Books.Item.MetadataSearch
         /// </summary>
         /// <param name="pathParameters">Path parameters for the request</param>
         /// <param name="requestAdapter">The request adapter to use to execute the requests.</param>
-        public MetadataSearchRequestBuilder(Dictionary<string, object> pathParameters, IRequestAdapter requestAdapter) : base(requestAdapter, "{+baseurl}/api/books/{book_id}/metadata-search{?token*}", pathParameters)
+        public MetadataSearchRequestBuilder(Dictionary<string, object> pathParameters, IRequestAdapter requestAdapter) : base(requestAdapter, "{+baseurl}/api/books/{book_id}/metadata-search", pathParameters)
         {
         }
         /// <summary>
@@ -30,7 +30,7 @@ namespace GrimoireCli.Generated.Api.Books.Item.MetadataSearch
         /// </summary>
         /// <param name="rawUrl">The raw URL to use for the request builder.</param>
         /// <param name="requestAdapter">The request adapter to use to execute the requests.</param>
-        public MetadataSearchRequestBuilder(string rawUrl, IRequestAdapter requestAdapter) : base(requestAdapter, "{+baseurl}/api/books/{book_id}/metadata-search{?token*}", rawUrl)
+        public MetadataSearchRequestBuilder(string rawUrl, IRequestAdapter requestAdapter) : base(requestAdapter, "{+baseurl}/api/books/{book_id}/metadata-search", rawUrl)
         {
         }
         /// <summary>
@@ -43,11 +43,11 @@ namespace GrimoireCli.Generated.Api.Books.Item.MetadataSearch
         /// <exception cref="global::GrimoireCli.Generated.Models.HTTPValidationError">When receiving a 422 status code</exception>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
-        public async Task<global::GrimoireCli.Generated.Models.MetadataSearchResponse?> PostAsync(global::GrimoireCli.Generated.Models.Backend__routers__books___schemas__MetadataSearch body, Action<RequestConfiguration<global::GrimoireCli.Generated.Api.Books.Item.MetadataSearch.MetadataSearchRequestBuilder.MetadataSearchRequestBuilderPostQueryParameters>>? requestConfiguration = default, CancellationToken cancellationToken = default)
+        public async Task<global::GrimoireCli.Generated.Models.MetadataSearchResponse?> PostAsync(global::GrimoireCli.Generated.Models.Backend__routers__books___schemas__MetadataSearch body, Action<RequestConfiguration<DefaultQueryParameters>>? requestConfiguration = default, CancellationToken cancellationToken = default)
         {
 #nullable restore
 #else
-        public async Task<global::GrimoireCli.Generated.Models.MetadataSearchResponse> PostAsync(global::GrimoireCli.Generated.Models.Backend__routers__books___schemas__MetadataSearch body, Action<RequestConfiguration<global::GrimoireCli.Generated.Api.Books.Item.MetadataSearch.MetadataSearchRequestBuilder.MetadataSearchRequestBuilderPostQueryParameters>> requestConfiguration = default, CancellationToken cancellationToken = default)
+        public async Task<global::GrimoireCli.Generated.Models.MetadataSearchResponse> PostAsync(global::GrimoireCli.Generated.Models.Backend__routers__books___schemas__MetadataSearch body, Action<RequestConfiguration<DefaultQueryParameters>> requestConfiguration = default, CancellationToken cancellationToken = default)
         {
 #endif
             if(ReferenceEquals(body, null)) throw new ArgumentNullException(nameof(body));
@@ -66,11 +66,11 @@ namespace GrimoireCli.Generated.Api.Books.Item.MetadataSearch
         /// <param name="requestConfiguration">Configuration for the request such as headers, query parameters, and middleware options.</param>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
-        public RequestInformation ToPostRequestInformation(global::GrimoireCli.Generated.Models.Backend__routers__books___schemas__MetadataSearch body, Action<RequestConfiguration<global::GrimoireCli.Generated.Api.Books.Item.MetadataSearch.MetadataSearchRequestBuilder.MetadataSearchRequestBuilderPostQueryParameters>>? requestConfiguration = default)
+        public RequestInformation ToPostRequestInformation(global::GrimoireCli.Generated.Models.Backend__routers__books___schemas__MetadataSearch body, Action<RequestConfiguration<DefaultQueryParameters>>? requestConfiguration = default)
         {
 #nullable restore
 #else
-        public RequestInformation ToPostRequestInformation(global::GrimoireCli.Generated.Models.Backend__routers__books___schemas__MetadataSearch body, Action<RequestConfiguration<global::GrimoireCli.Generated.Api.Books.Item.MetadataSearch.MetadataSearchRequestBuilder.MetadataSearchRequestBuilderPostQueryParameters>> requestConfiguration = default)
+        public RequestInformation ToPostRequestInformation(global::GrimoireCli.Generated.Models.Backend__routers__books___schemas__MetadataSearch body, Action<RequestConfiguration<DefaultQueryParameters>> requestConfiguration = default)
         {
 #endif
             if(ReferenceEquals(body, null)) throw new ArgumentNullException(nameof(body));
@@ -90,31 +90,11 @@ namespace GrimoireCli.Generated.Api.Books.Item.MetadataSearch
             return new global::GrimoireCli.Generated.Api.Books.Item.MetadataSearch.MetadataSearchRequestBuilder(rawUrl, RequestAdapter);
         }
         /// <summary>
-        /// Returns ranked candidate matches for this book from one add-on. An empty query defaults to the book&apos;s title. GM or admin role required.
-        /// </summary>
-        [global::System.CodeDom.Compiler.GeneratedCode("Kiota", "1.0.0")]
-        public partial class MetadataSearchRequestBuilderPostQueryParameters 
-        {
-#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
-#nullable enable
-            #pragma warning disable CS1591
-            [QueryParameter("token")]
-            public string? Token { get; set; }
-            #pragma warning restore CS1591
-#nullable restore
-#else
-            #pragma warning disable CS1591
-            [QueryParameter("token")]
-            public string Token { get; set; }
-            #pragma warning restore CS1591
-#endif
-        }
-        /// <summary>
         /// Configuration for the request such as headers, query parameters, and middleware options.
         /// </summary>
         [Obsolete("This class is deprecated. Please use the generic RequestConfiguration class generated by the generator.")]
         [global::System.CodeDom.Compiler.GeneratedCode("Kiota", "1.0.0")]
-        public partial class MetadataSearchRequestBuilderPostRequestConfiguration : RequestConfiguration<global::GrimoireCli.Generated.Api.Books.Item.MetadataSearch.MetadataSearchRequestBuilder.MetadataSearchRequestBuilderPostQueryParameters>
+        public partial class MetadataSearchRequestBuilderPostRequestConfiguration : RequestConfiguration<DefaultQueryParameters>
         {
         }
     }

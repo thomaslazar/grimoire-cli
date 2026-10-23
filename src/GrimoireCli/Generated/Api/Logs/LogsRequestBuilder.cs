@@ -22,7 +22,7 @@ namespace GrimoireCli.Generated.Api.Logs
         /// </summary>
         /// <param name="pathParameters">Path parameters for the request</param>
         /// <param name="requestAdapter">The request adapter to use to execute the requests.</param>
-        public LogsRequestBuilder(Dictionary<string, object> pathParameters, IRequestAdapter requestAdapter) : base(requestAdapter, "{+baseurl}/api/logs{?after_seq*,level*,limit*,offset*,token*}", pathParameters)
+        public LogsRequestBuilder(Dictionary<string, object> pathParameters, IRequestAdapter requestAdapter) : base(requestAdapter, "{+baseurl}/api/logs{?after_seq*,level*,limit*,offset*,user*}", pathParameters)
         {
         }
         /// <summary>
@@ -30,11 +30,11 @@ namespace GrimoireCli.Generated.Api.Logs
         /// </summary>
         /// <param name="rawUrl">The raw URL to use for the request builder.</param>
         /// <param name="requestAdapter">The request adapter to use to execute the requests.</param>
-        public LogsRequestBuilder(string rawUrl, IRequestAdapter requestAdapter) : base(requestAdapter, "{+baseurl}/api/logs{?after_seq*,level*,limit*,offset*,token*}", rawUrl)
+        public LogsRequestBuilder(string rawUrl, IRequestAdapter requestAdapter) : base(requestAdapter, "{+baseurl}/api/logs{?after_seq*,level*,limit*,offset*,user*}", rawUrl)
         {
         }
         /// <summary>
-        /// Returns recent application log entries from the in-memory ring buffer (up to 20 000 entries). The `level` filter follows standard log hierarchy: `debug` returns all levels, `info` returns info/warning/error/critical, etc. Console output is controlled by the `LOG_LEVEL` environment variable, but this endpoint always has access to DEBUG-level logs regardless of that setting. For live polling, pass `after_seq` set to the `max_seq` value from the previous response - only entries with a higher sequence number are returned, making polling exact regardless of how fast entries arrive. **Admin only.**
+        /// Returns recent application log entries from the in-memory ring buffer (up to 20 000 entries). The `level` filter follows standard log hierarchy: `debug` returns all levels, `info` returns info/warning/error/critical, etc. Console output is controlled by the `LOG_LEVEL` environment variable, but this endpoint always has access to DEBUG-level logs regardless of that setting. For live polling, pass `after_seq` set to the `max_seq` value from the previous response - only entries with a higher sequence number are returned, making polling exact regardless of how fast entries arrive. Each entry names the `user` whose request emitted it (null for server-side lines); pass `user` to keep only one user&apos;s lines, and `users` in the response lists every username in the buffer. **Admin only.**
         /// </summary>
         /// <returns>A <see cref="global::GrimoireCli.Generated.Models.LogsResponse"/></returns>
         /// <param name="cancellationToken">Cancellation token to use when cancelling requests</param>
@@ -57,7 +57,7 @@ namespace GrimoireCli.Generated.Api.Logs
             return await RequestAdapter.SendAsync<global::GrimoireCli.Generated.Models.LogsResponse>(requestInfo, global::GrimoireCli.Generated.Models.LogsResponse.CreateFromDiscriminatorValue, errorMapping, cancellationToken).ConfigureAwait(false);
         }
         /// <summary>
-        /// Returns recent application log entries from the in-memory ring buffer (up to 20 000 entries). The `level` filter follows standard log hierarchy: `debug` returns all levels, `info` returns info/warning/error/critical, etc. Console output is controlled by the `LOG_LEVEL` environment variable, but this endpoint always has access to DEBUG-level logs regardless of that setting. For live polling, pass `after_seq` set to the `max_seq` value from the previous response - only entries with a higher sequence number are returned, making polling exact regardless of how fast entries arrive. **Admin only.**
+        /// Returns recent application log entries from the in-memory ring buffer (up to 20 000 entries). The `level` filter follows standard log hierarchy: `debug` returns all levels, `info` returns info/warning/error/critical, etc. Console output is controlled by the `LOG_LEVEL` environment variable, but this endpoint always has access to DEBUG-level logs regardless of that setting. For live polling, pass `after_seq` set to the `max_seq` value from the previous response - only entries with a higher sequence number are returned, making polling exact regardless of how fast entries arrive. Each entry names the `user` whose request emitted it (null for server-side lines); pass `user` to keep only one user&apos;s lines, and `users` in the response lists every username in the buffer. **Admin only.**
         /// </summary>
         /// <returns>A <see cref="RequestInformation"/></returns>
         /// <param name="requestConfiguration">Configuration for the request such as headers, query parameters, and middleware options.</param>
@@ -85,7 +85,7 @@ namespace GrimoireCli.Generated.Api.Logs
             return new global::GrimoireCli.Generated.Api.Logs.LogsRequestBuilder(rawUrl, RequestAdapter);
         }
         /// <summary>
-        /// Returns recent application log entries from the in-memory ring buffer (up to 20 000 entries). The `level` filter follows standard log hierarchy: `debug` returns all levels, `info` returns info/warning/error/critical, etc. Console output is controlled by the `LOG_LEVEL` environment variable, but this endpoint always has access to DEBUG-level logs regardless of that setting. For live polling, pass `after_seq` set to the `max_seq` value from the previous response - only entries with a higher sequence number are returned, making polling exact regardless of how fast entries arrive. **Admin only.**
+        /// Returns recent application log entries from the in-memory ring buffer (up to 20 000 entries). The `level` filter follows standard log hierarchy: `debug` returns all levels, `info` returns info/warning/error/critical, etc. Console output is controlled by the `LOG_LEVEL` environment variable, but this endpoint always has access to DEBUG-level logs regardless of that setting. For live polling, pass `after_seq` set to the `max_seq` value from the previous response - only entries with a higher sequence number are returned, making polling exact regardless of how fast entries arrive. Each entry names the `user` whose request emitted it (null for server-side lines); pass `user` to keep only one user&apos;s lines, and `users` in the response lists every username in the buffer. **Admin only.**
         /// </summary>
         [global::System.CodeDom.Compiler.GeneratedCode("Kiota", "1.0.0")]
         public partial class LogsRequestBuilderGetQueryParameters 
@@ -113,18 +113,15 @@ namespace GrimoireCli.Generated.Api.Logs
             /// <summary>Entries to skip from the newest end (historical pagination, ignored when after_seq is set)</summary>
             [QueryParameter("offset")]
             public int? Offset { get; set; }
+            /// <summary>Return only lines from requests made by this username</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
-            #pragma warning disable CS1591
-            [QueryParameter("token")]
-            public string? Token { get; set; }
-            #pragma warning restore CS1591
+            [QueryParameter("user")]
+            public string? User { get; set; }
 #nullable restore
 #else
-            #pragma warning disable CS1591
-            [QueryParameter("token")]
-            public string Token { get; set; }
-            #pragma warning restore CS1591
+            [QueryParameter("user")]
+            public string User { get; set; }
 #endif
         }
         /// <summary>

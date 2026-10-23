@@ -52,8 +52,7 @@ public static class CampaignAvailabilityCommands
             "",
             "--is-cancelled needs the owner or an admin and sets only the target's row,",
             "so it cannot reliably uncancel a date toggle-cancel cancelled.",
-            "--user-id answers 422 for any real user id: the server types user_id as",
-            "an integer, and user ids are strings."]);
+            "--user-id for another member needs the owner or an admin; 403 otherwise."]);
         command.AddExamples("grimoire-cli campaigns availability set --id <campaign-id> --date 2026-10-21 --status tentative");
         command.AddResponseExample<Generated.Models.AvailabilitySetOut>();
         command.SetAction(async (parseResult, cancellationToken) =>

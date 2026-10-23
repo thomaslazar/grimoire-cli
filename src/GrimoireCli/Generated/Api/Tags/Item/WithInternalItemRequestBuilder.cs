@@ -40,7 +40,7 @@ namespace GrimoireCli.Generated.Api.Tags.Item
         /// </summary>
         /// <param name="pathParameters">Path parameters for the request</param>
         /// <param name="requestAdapter">The request adapter to use to execute the requests.</param>
-        public WithInternalItemRequestBuilder(Dictionary<string, object> pathParameters, IRequestAdapter requestAdapter) : base(requestAdapter, "{+baseurl}/api/tags/{internal}{?token*}", pathParameters)
+        public WithInternalItemRequestBuilder(Dictionary<string, object> pathParameters, IRequestAdapter requestAdapter) : base(requestAdapter, "{+baseurl}/api/tags/{internal}", pathParameters)
         {
         }
         /// <summary>
@@ -48,7 +48,7 @@ namespace GrimoireCli.Generated.Api.Tags.Item
         /// </summary>
         /// <param name="rawUrl">The raw URL to use for the request builder.</param>
         /// <param name="requestAdapter">The request adapter to use to execute the requests.</param>
-        public WithInternalItemRequestBuilder(string rawUrl, IRequestAdapter requestAdapter) : base(requestAdapter, "{+baseurl}/api/tags/{internal}{?token*}", rawUrl)
+        public WithInternalItemRequestBuilder(string rawUrl, IRequestAdapter requestAdapter) : base(requestAdapter, "{+baseurl}/api/tags/{internal}", rawUrl)
         {
         }
         /// <summary>
@@ -59,11 +59,11 @@ namespace GrimoireCli.Generated.Api.Tags.Item
         /// <exception cref="global::GrimoireCli.Generated.Models.HTTPValidationError">When receiving a 422 status code</exception>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
-        public async Task DeleteAsync(Action<RequestConfiguration<global::GrimoireCli.Generated.Api.Tags.Item.WithInternalItemRequestBuilder.WithInternalItemRequestBuilderDeleteQueryParameters>>? requestConfiguration = default, CancellationToken cancellationToken = default)
+        public async Task DeleteAsync(Action<RequestConfiguration<DefaultQueryParameters>>? requestConfiguration = default, CancellationToken cancellationToken = default)
         {
 #nullable restore
 #else
-        public async Task DeleteAsync(Action<RequestConfiguration<global::GrimoireCli.Generated.Api.Tags.Item.WithInternalItemRequestBuilder.WithInternalItemRequestBuilderDeleteQueryParameters>> requestConfiguration = default, CancellationToken cancellationToken = default)
+        public async Task DeleteAsync(Action<RequestConfiguration<DefaultQueryParameters>> requestConfiguration = default, CancellationToken cancellationToken = default)
         {
 #endif
             var requestInfo = ToDeleteRequestInformation(requestConfiguration);
@@ -83,11 +83,11 @@ namespace GrimoireCli.Generated.Api.Tags.Item
         /// <exception cref="global::GrimoireCli.Generated.Models.HTTPValidationError">When receiving a 422 status code</exception>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
-        public async Task<global::GrimoireCli.Generated.Models.TagRenamedResponse?> PatchAsync(global::GrimoireCli.Generated.Models.TagDisplayUpdate body, Action<RequestConfiguration<global::GrimoireCli.Generated.Api.Tags.Item.WithInternalItemRequestBuilder.WithInternalItemRequestBuilderPatchQueryParameters>>? requestConfiguration = default, CancellationToken cancellationToken = default)
+        public async Task<global::GrimoireCli.Generated.Models.TagRenamedResponse?> PatchAsync(global::GrimoireCli.Generated.Models.TagDisplayUpdate body, Action<RequestConfiguration<DefaultQueryParameters>>? requestConfiguration = default, CancellationToken cancellationToken = default)
         {
 #nullable restore
 #else
-        public async Task<global::GrimoireCli.Generated.Models.TagRenamedResponse> PatchAsync(global::GrimoireCli.Generated.Models.TagDisplayUpdate body, Action<RequestConfiguration<global::GrimoireCli.Generated.Api.Tags.Item.WithInternalItemRequestBuilder.WithInternalItemRequestBuilderPatchQueryParameters>> requestConfiguration = default, CancellationToken cancellationToken = default)
+        public async Task<global::GrimoireCli.Generated.Models.TagRenamedResponse> PatchAsync(global::GrimoireCli.Generated.Models.TagDisplayUpdate body, Action<RequestConfiguration<DefaultQueryParameters>> requestConfiguration = default, CancellationToken cancellationToken = default)
         {
 #endif
             if(ReferenceEquals(body, null)) throw new ArgumentNullException(nameof(body));
@@ -105,11 +105,11 @@ namespace GrimoireCli.Generated.Api.Tags.Item
         /// <param name="requestConfiguration">Configuration for the request such as headers, query parameters, and middleware options.</param>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
-        public RequestInformation ToDeleteRequestInformation(Action<RequestConfiguration<global::GrimoireCli.Generated.Api.Tags.Item.WithInternalItemRequestBuilder.WithInternalItemRequestBuilderDeleteQueryParameters>>? requestConfiguration = default)
+        public RequestInformation ToDeleteRequestInformation(Action<RequestConfiguration<DefaultQueryParameters>>? requestConfiguration = default)
         {
 #nullable restore
 #else
-        public RequestInformation ToDeleteRequestInformation(Action<RequestConfiguration<global::GrimoireCli.Generated.Api.Tags.Item.WithInternalItemRequestBuilder.WithInternalItemRequestBuilderDeleteQueryParameters>> requestConfiguration = default)
+        public RequestInformation ToDeleteRequestInformation(Action<RequestConfiguration<DefaultQueryParameters>> requestConfiguration = default)
         {
 #endif
             var requestInfo = new RequestInformation(Method.DELETE, UrlTemplate, PathParameters);
@@ -125,11 +125,11 @@ namespace GrimoireCli.Generated.Api.Tags.Item
         /// <param name="requestConfiguration">Configuration for the request such as headers, query parameters, and middleware options.</param>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
-        public RequestInformation ToPatchRequestInformation(global::GrimoireCli.Generated.Models.TagDisplayUpdate body, Action<RequestConfiguration<global::GrimoireCli.Generated.Api.Tags.Item.WithInternalItemRequestBuilder.WithInternalItemRequestBuilderPatchQueryParameters>>? requestConfiguration = default)
+        public RequestInformation ToPatchRequestInformation(global::GrimoireCli.Generated.Models.TagDisplayUpdate body, Action<RequestConfiguration<DefaultQueryParameters>>? requestConfiguration = default)
         {
 #nullable restore
 #else
-        public RequestInformation ToPatchRequestInformation(global::GrimoireCli.Generated.Models.TagDisplayUpdate body, Action<RequestConfiguration<global::GrimoireCli.Generated.Api.Tags.Item.WithInternalItemRequestBuilder.WithInternalItemRequestBuilderPatchQueryParameters>> requestConfiguration = default)
+        public RequestInformation ToPatchRequestInformation(global::GrimoireCli.Generated.Models.TagDisplayUpdate body, Action<RequestConfiguration<DefaultQueryParameters>> requestConfiguration = default)
         {
 #endif
             if(ReferenceEquals(body, null)) throw new ArgumentNullException(nameof(body));
@@ -149,59 +149,19 @@ namespace GrimoireCli.Generated.Api.Tags.Item
             return new global::GrimoireCli.Generated.Api.Tags.Item.WithInternalItemRequestBuilder(rawUrl, RequestAdapter);
         }
         /// <summary>
-        /// Delete a tag: unlink it from every resource and strip it from any foldertags. Folder-derived tags (no shared-tag row) are still handled — their folderassociations are removed (a rescan may reapply them from ``tags.json``).
+        /// Configuration for the request such as headers, query parameters, and middleware options.
         /// </summary>
+        [Obsolete("This class is deprecated. Please use the generic RequestConfiguration class generated by the generator.")]
         [global::System.CodeDom.Compiler.GeneratedCode("Kiota", "1.0.0")]
-        public partial class WithInternalItemRequestBuilderDeleteQueryParameters 
+        public partial class WithInternalItemRequestBuilderDeleteRequestConfiguration : RequestConfiguration<DefaultQueryParameters>
         {
-#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
-#nullable enable
-            #pragma warning disable CS1591
-            [QueryParameter("token")]
-            public string? Token { get; set; }
-            #pragma warning restore CS1591
-#nullable restore
-#else
-            #pragma warning disable CS1591
-            [QueryParameter("token")]
-            public string Token { get; set; }
-            #pragma warning restore CS1591
-#endif
         }
         /// <summary>
         /// Configuration for the request such as headers, query parameters, and middleware options.
         /// </summary>
         [Obsolete("This class is deprecated. Please use the generic RequestConfiguration class generated by the generator.")]
         [global::System.CodeDom.Compiler.GeneratedCode("Kiota", "1.0.0")]
-        public partial class WithInternalItemRequestBuilderDeleteRequestConfiguration : RequestConfiguration<global::GrimoireCli.Generated.Api.Tags.Item.WithInternalItemRequestBuilder.WithInternalItemRequestBuilderDeleteQueryParameters>
-        {
-        }
-        /// <summary>
-        /// Rename a tag. Its ``internal`` match key follows the new display when thenormalized form changes (so a typo fix like ``freinds`` → ``friends`` alsofixes search-by-internal); if that key already exists, the tags are merged.
-        /// </summary>
-        [global::System.CodeDom.Compiler.GeneratedCode("Kiota", "1.0.0")]
-        public partial class WithInternalItemRequestBuilderPatchQueryParameters 
-        {
-#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
-#nullable enable
-            #pragma warning disable CS1591
-            [QueryParameter("token")]
-            public string? Token { get; set; }
-            #pragma warning restore CS1591
-#nullable restore
-#else
-            #pragma warning disable CS1591
-            [QueryParameter("token")]
-            public string Token { get; set; }
-            #pragma warning restore CS1591
-#endif
-        }
-        /// <summary>
-        /// Configuration for the request such as headers, query parameters, and middleware options.
-        /// </summary>
-        [Obsolete("This class is deprecated. Please use the generic RequestConfiguration class generated by the generator.")]
-        [global::System.CodeDom.Compiler.GeneratedCode("Kiota", "1.0.0")]
-        public partial class WithInternalItemRequestBuilderPatchRequestConfiguration : RequestConfiguration<global::GrimoireCli.Generated.Api.Tags.Item.WithInternalItemRequestBuilder.WithInternalItemRequestBuilderPatchQueryParameters>
+        public partial class WithInternalItemRequestBuilderPatchRequestConfiguration : RequestConfiguration<DefaultQueryParameters>
         {
         }
     }

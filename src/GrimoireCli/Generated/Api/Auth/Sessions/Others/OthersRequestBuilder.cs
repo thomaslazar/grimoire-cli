@@ -22,7 +22,7 @@ namespace GrimoireCli.Generated.Api.Auth.Sessions.Others
         /// </summary>
         /// <param name="pathParameters">Path parameters for the request</param>
         /// <param name="requestAdapter">The request adapter to use to execute the requests.</param>
-        public OthersRequestBuilder(Dictionary<string, object> pathParameters, IRequestAdapter requestAdapter) : base(requestAdapter, "{+baseurl}/api/auth/sessions/others{?token*}", pathParameters)
+        public OthersRequestBuilder(Dictionary<string, object> pathParameters, IRequestAdapter requestAdapter) : base(requestAdapter, "{+baseurl}/api/auth/sessions/others", pathParameters)
         {
         }
         /// <summary>
@@ -30,7 +30,7 @@ namespace GrimoireCli.Generated.Api.Auth.Sessions.Others
         /// </summary>
         /// <param name="rawUrl">The raw URL to use for the request builder.</param>
         /// <param name="requestAdapter">The request adapter to use to execute the requests.</param>
-        public OthersRequestBuilder(string rawUrl, IRequestAdapter requestAdapter) : base(requestAdapter, "{+baseurl}/api/auth/sessions/others{?token*}", rawUrl)
+        public OthersRequestBuilder(string rawUrl, IRequestAdapter requestAdapter) : base(requestAdapter, "{+baseurl}/api/auth/sessions/others", rawUrl)
         {
         }
         /// <summary>
@@ -42,11 +42,11 @@ namespace GrimoireCli.Generated.Api.Auth.Sessions.Others
         /// <exception cref="global::GrimoireCli.Generated.Models.HTTPValidationError">When receiving a 422 status code</exception>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
-        public async Task<global::GrimoireCli.Generated.Models.RevokeOtherSessionsResponse?> DeleteAsync(Action<RequestConfiguration<global::GrimoireCli.Generated.Api.Auth.Sessions.Others.OthersRequestBuilder.OthersRequestBuilderDeleteQueryParameters>>? requestConfiguration = default, CancellationToken cancellationToken = default)
+        public async Task<global::GrimoireCli.Generated.Models.RevokeOtherSessionsResponse?> DeleteAsync(Action<RequestConfiguration<DefaultQueryParameters>>? requestConfiguration = default, CancellationToken cancellationToken = default)
         {
 #nullable restore
 #else
-        public async Task<global::GrimoireCli.Generated.Models.RevokeOtherSessionsResponse> DeleteAsync(Action<RequestConfiguration<global::GrimoireCli.Generated.Api.Auth.Sessions.Others.OthersRequestBuilder.OthersRequestBuilderDeleteQueryParameters>> requestConfiguration = default, CancellationToken cancellationToken = default)
+        public async Task<global::GrimoireCli.Generated.Models.RevokeOtherSessionsResponse> DeleteAsync(Action<RequestConfiguration<DefaultQueryParameters>> requestConfiguration = default, CancellationToken cancellationToken = default)
         {
 #endif
             var requestInfo = ToDeleteRequestInformation(requestConfiguration);
@@ -63,11 +63,11 @@ namespace GrimoireCli.Generated.Api.Auth.Sessions.Others
         /// <param name="requestConfiguration">Configuration for the request such as headers, query parameters, and middleware options.</param>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
-        public RequestInformation ToDeleteRequestInformation(Action<RequestConfiguration<global::GrimoireCli.Generated.Api.Auth.Sessions.Others.OthersRequestBuilder.OthersRequestBuilderDeleteQueryParameters>>? requestConfiguration = default)
+        public RequestInformation ToDeleteRequestInformation(Action<RequestConfiguration<DefaultQueryParameters>>? requestConfiguration = default)
         {
 #nullable restore
 #else
-        public RequestInformation ToDeleteRequestInformation(Action<RequestConfiguration<global::GrimoireCli.Generated.Api.Auth.Sessions.Others.OthersRequestBuilder.OthersRequestBuilderDeleteQueryParameters>> requestConfiguration = default)
+        public RequestInformation ToDeleteRequestInformation(Action<RequestConfiguration<DefaultQueryParameters>> requestConfiguration = default)
         {
 #endif
             var requestInfo = new RequestInformation(Method.DELETE, UrlTemplate, PathParameters);
@@ -85,31 +85,11 @@ namespace GrimoireCli.Generated.Api.Auth.Sessions.Others
             return new global::GrimoireCli.Generated.Api.Auth.Sessions.Others.OthersRequestBuilder(rawUrl, RequestAdapter);
         }
         /// <summary>
-        /// Revokes all of the caller&apos;s sessions except the current one. Returns `{ok, revoked, kept_current}`.
-        /// </summary>
-        [global::System.CodeDom.Compiler.GeneratedCode("Kiota", "1.0.0")]
-        public partial class OthersRequestBuilderDeleteQueryParameters 
-        {
-#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
-#nullable enable
-            #pragma warning disable CS1591
-            [QueryParameter("token")]
-            public string? Token { get; set; }
-            #pragma warning restore CS1591
-#nullable restore
-#else
-            #pragma warning disable CS1591
-            [QueryParameter("token")]
-            public string Token { get; set; }
-            #pragma warning restore CS1591
-#endif
-        }
-        /// <summary>
         /// Configuration for the request such as headers, query parameters, and middleware options.
         /// </summary>
         [Obsolete("This class is deprecated. Please use the generic RequestConfiguration class generated by the generator.")]
         [global::System.CodeDom.Compiler.GeneratedCode("Kiota", "1.0.0")]
-        public partial class OthersRequestBuilderDeleteRequestConfiguration : RequestConfiguration<global::GrimoireCli.Generated.Api.Auth.Sessions.Others.OthersRequestBuilder.OthersRequestBuilderDeleteQueryParameters>
+        public partial class OthersRequestBuilderDeleteRequestConfiguration : RequestConfiguration<DefaultQueryParameters>
         {
         }
     }

@@ -22,7 +22,7 @@ namespace GrimoireCli.Generated.Api.Maps.Item.Otfbm.Image
         /// </summary>
         /// <param name="pathParameters">Path parameters for the request</param>
         /// <param name="requestAdapter">The request adapter to use to execute the requests.</param>
-        public ImageRequestBuilder(Dictionary<string, object> pathParameters, IRequestAdapter requestAdapter) : base(requestAdapter, "{+baseurl}/api/maps/{map_id}/otfbm/image{?cell*,token*}", pathParameters)
+        public ImageRequestBuilder(Dictionary<string, object> pathParameters, IRequestAdapter requestAdapter) : base(requestAdapter, "{+baseurl}/api/maps/{map_id}/otfbm/image{?cell*}", pathParameters)
         {
         }
         /// <summary>
@@ -30,7 +30,7 @@ namespace GrimoireCli.Generated.Api.Maps.Item.Otfbm.Image
         /// </summary>
         /// <param name="rawUrl">The raw URL to use for the request builder.</param>
         /// <param name="requestAdapter">The request adapter to use to execute the requests.</param>
-        public ImageRequestBuilder(string rawUrl, IRequestAdapter requestAdapter) : base(requestAdapter, "{+baseurl}/api/maps/{map_id}/otfbm/image{?cell*,token*}", rawUrl)
+        public ImageRequestBuilder(string rawUrl, IRequestAdapter requestAdapter) : base(requestAdapter, "{+baseurl}/api/maps/{map_id}/otfbm/image{?cell*}", rawUrl)
         {
         }
         /// <summary>
@@ -94,19 +94,6 @@ namespace GrimoireCli.Generated.Api.Maps.Item.Otfbm.Image
             [QueryParameter("cell")]
             public int? Cell { get; set; }
             #pragma warning restore CS1591
-#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
-#nullable enable
-            #pragma warning disable CS1591
-            [QueryParameter("token")]
-            public string? Token { get; set; }
-            #pragma warning restore CS1591
-#nullable restore
-#else
-            #pragma warning disable CS1591
-            [QueryParameter("token")]
-            public string Token { get; set; }
-            #pragma warning restore CS1591
-#endif
         }
         /// <summary>
         /// Configuration for the request such as headers, query parameters, and middleware options.

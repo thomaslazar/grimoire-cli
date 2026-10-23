@@ -22,7 +22,7 @@ namespace GrimoireCli.Generated.Api.Campaigns.Item.Wiki.Item.Hide
         /// </summary>
         /// <param name="pathParameters">Path parameters for the request</param>
         /// <param name="requestAdapter">The request adapter to use to execute the requests.</param>
-        public HideRequestBuilder(Dictionary<string, object> pathParameters, IRequestAdapter requestAdapter) : base(requestAdapter, "{+baseurl}/api/campaigns/{campaign_id}/wiki/{page_id}/hide{?token*}", pathParameters)
+        public HideRequestBuilder(Dictionary<string, object> pathParameters, IRequestAdapter requestAdapter) : base(requestAdapter, "{+baseurl}/api/campaigns/{campaign_id}/wiki/{page_id}/hide", pathParameters)
         {
         }
         /// <summary>
@@ -30,7 +30,7 @@ namespace GrimoireCli.Generated.Api.Campaigns.Item.Wiki.Item.Hide
         /// </summary>
         /// <param name="rawUrl">The raw URL to use for the request builder.</param>
         /// <param name="requestAdapter">The request adapter to use to execute the requests.</param>
-        public HideRequestBuilder(string rawUrl, IRequestAdapter requestAdapter) : base(requestAdapter, "{+baseurl}/api/campaigns/{campaign_id}/wiki/{page_id}/hide{?token*}", rawUrl)
+        public HideRequestBuilder(string rawUrl, IRequestAdapter requestAdapter) : base(requestAdapter, "{+baseurl}/api/campaigns/{campaign_id}/wiki/{page_id}/hide", rawUrl)
         {
         }
         /// <summary>
@@ -42,11 +42,11 @@ namespace GrimoireCli.Generated.Api.Campaigns.Item.Wiki.Item.Hide
         /// <exception cref="global::GrimoireCli.Generated.Models.HTTPValidationError">When receiving a 422 status code</exception>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
-        public async Task<global::GrimoireCli.Generated.Models.WikiPageHiddenOut?> DeleteAsync(Action<RequestConfiguration<global::GrimoireCli.Generated.Api.Campaigns.Item.Wiki.Item.Hide.HideRequestBuilder.HideRequestBuilderDeleteQueryParameters>>? requestConfiguration = default, CancellationToken cancellationToken = default)
+        public async Task<global::GrimoireCli.Generated.Models.WikiPageHiddenOut?> DeleteAsync(Action<RequestConfiguration<DefaultQueryParameters>>? requestConfiguration = default, CancellationToken cancellationToken = default)
         {
 #nullable restore
 #else
-        public async Task<global::GrimoireCli.Generated.Models.WikiPageHiddenOut> DeleteAsync(Action<RequestConfiguration<global::GrimoireCli.Generated.Api.Campaigns.Item.Wiki.Item.Hide.HideRequestBuilder.HideRequestBuilderDeleteQueryParameters>> requestConfiguration = default, CancellationToken cancellationToken = default)
+        public async Task<global::GrimoireCli.Generated.Models.WikiPageHiddenOut> DeleteAsync(Action<RequestConfiguration<DefaultQueryParameters>> requestConfiguration = default, CancellationToken cancellationToken = default)
         {
 #endif
             var requestInfo = ToDeleteRequestInformation(requestConfiguration);
@@ -65,11 +65,11 @@ namespace GrimoireCli.Generated.Api.Campaigns.Item.Wiki.Item.Hide
         /// <exception cref="global::GrimoireCli.Generated.Models.HTTPValidationError">When receiving a 422 status code</exception>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
-        public async Task<global::GrimoireCli.Generated.Models.WikiPageHiddenOut?> PostAsync(Action<RequestConfiguration<global::GrimoireCli.Generated.Api.Campaigns.Item.Wiki.Item.Hide.HideRequestBuilder.HideRequestBuilderPostQueryParameters>>? requestConfiguration = default, CancellationToken cancellationToken = default)
+        public async Task<global::GrimoireCli.Generated.Models.WikiPageHiddenOut?> PostAsync(Action<RequestConfiguration<DefaultQueryParameters>>? requestConfiguration = default, CancellationToken cancellationToken = default)
         {
 #nullable restore
 #else
-        public async Task<global::GrimoireCli.Generated.Models.WikiPageHiddenOut> PostAsync(Action<RequestConfiguration<global::GrimoireCli.Generated.Api.Campaigns.Item.Wiki.Item.Hide.HideRequestBuilder.HideRequestBuilderPostQueryParameters>> requestConfiguration = default, CancellationToken cancellationToken = default)
+        public async Task<global::GrimoireCli.Generated.Models.WikiPageHiddenOut> PostAsync(Action<RequestConfiguration<DefaultQueryParameters>> requestConfiguration = default, CancellationToken cancellationToken = default)
         {
 #endif
             var requestInfo = ToPostRequestInformation(requestConfiguration);
@@ -86,11 +86,11 @@ namespace GrimoireCli.Generated.Api.Campaigns.Item.Wiki.Item.Hide
         /// <param name="requestConfiguration">Configuration for the request such as headers, query parameters, and middleware options.</param>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
-        public RequestInformation ToDeleteRequestInformation(Action<RequestConfiguration<global::GrimoireCli.Generated.Api.Campaigns.Item.Wiki.Item.Hide.HideRequestBuilder.HideRequestBuilderDeleteQueryParameters>>? requestConfiguration = default)
+        public RequestInformation ToDeleteRequestInformation(Action<RequestConfiguration<DefaultQueryParameters>>? requestConfiguration = default)
         {
 #nullable restore
 #else
-        public RequestInformation ToDeleteRequestInformation(Action<RequestConfiguration<global::GrimoireCli.Generated.Api.Campaigns.Item.Wiki.Item.Hide.HideRequestBuilder.HideRequestBuilderDeleteQueryParameters>> requestConfiguration = default)
+        public RequestInformation ToDeleteRequestInformation(Action<RequestConfiguration<DefaultQueryParameters>> requestConfiguration = default)
         {
 #endif
             var requestInfo = new RequestInformation(Method.DELETE, UrlTemplate, PathParameters);
@@ -105,11 +105,11 @@ namespace GrimoireCli.Generated.Api.Campaigns.Item.Wiki.Item.Hide
         /// <param name="requestConfiguration">Configuration for the request such as headers, query parameters, and middleware options.</param>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
-        public RequestInformation ToPostRequestInformation(Action<RequestConfiguration<global::GrimoireCli.Generated.Api.Campaigns.Item.Wiki.Item.Hide.HideRequestBuilder.HideRequestBuilderPostQueryParameters>>? requestConfiguration = default)
+        public RequestInformation ToPostRequestInformation(Action<RequestConfiguration<DefaultQueryParameters>>? requestConfiguration = default)
         {
 #nullable restore
 #else
-        public RequestInformation ToPostRequestInformation(Action<RequestConfiguration<global::GrimoireCli.Generated.Api.Campaigns.Item.Wiki.Item.Hide.HideRequestBuilder.HideRequestBuilderPostQueryParameters>> requestConfiguration = default)
+        public RequestInformation ToPostRequestInformation(Action<RequestConfiguration<DefaultQueryParameters>> requestConfiguration = default)
         {
 #endif
             var requestInfo = new RequestInformation(Method.POST, UrlTemplate, PathParameters);
@@ -127,59 +127,19 @@ namespace GrimoireCli.Generated.Api.Campaigns.Item.Wiki.Item.Hide
             return new global::GrimoireCli.Generated.Api.Campaigns.Item.Wiki.Item.Hide.HideRequestBuilder(rawUrl, RequestAdapter);
         }
         /// <summary>
-        /// Restore a page this user had hidden.Only clears the user&apos;s own row. A page hidden because an ancestor is hiddenhas no row of its own, so un-hiding it individually is a no-op — the ancestoris what has to come back.Unlike `hide_page`, this is *not* refused in a personal campaign. Rows canpredate the campaign becoming personal or the guard existing at all, andrefusing here would strand them: the page would stay hidden with nothing inthe UI or API able to bring it back. Clearing state is always safe.
+        /// Configuration for the request such as headers, query parameters, and middleware options.
         /// </summary>
+        [Obsolete("This class is deprecated. Please use the generic RequestConfiguration class generated by the generator.")]
         [global::System.CodeDom.Compiler.GeneratedCode("Kiota", "1.0.0")]
-        public partial class HideRequestBuilderDeleteQueryParameters 
+        public partial class HideRequestBuilderDeleteRequestConfiguration : RequestConfiguration<DefaultQueryParameters>
         {
-#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
-#nullable enable
-            #pragma warning disable CS1591
-            [QueryParameter("token")]
-            public string? Token { get; set; }
-            #pragma warning restore CS1591
-#nullable restore
-#else
-            #pragma warning disable CS1591
-            [QueryParameter("token")]
-            public string Token { get; set; }
-            #pragma warning restore CS1591
-#endif
         }
         /// <summary>
         /// Configuration for the request such as headers, query parameters, and middleware options.
         /// </summary>
         [Obsolete("This class is deprecated. Please use the generic RequestConfiguration class generated by the generator.")]
         [global::System.CodeDom.Compiler.GeneratedCode("Kiota", "1.0.0")]
-        public partial class HideRequestBuilderDeleteRequestConfiguration : RequestConfiguration<global::GrimoireCli.Generated.Api.Campaigns.Item.Wiki.Item.Hide.HideRequestBuilder.HideRequestBuilderDeleteQueryParameters>
-        {
-        }
-        /// <summary>
-        /// Hide a page from this user&apos;s own view.Per-user decluttering, so it is available on any page the user can see —including one they cannot edit or delete, which is the whole point: a playerfacing fifty GM pages can put the ones they don&apos;t need away without touchinganybody else&apos;s wiki. Hiding a parent hides its subtree (resolved on read, see`hidden_page_ids`), so only the row for the page the user clicked is stored.Deliberately not gated on `assert_not_archived`: hiding writes nothing to thecampaign&apos;s content, and an archived campaign is still one you might want totidy.Refused in a personal campaign, where the feature has no premise: the onlynotes to hide are your own, and deleting already covers those. The UI offersno control there, so this is closing the API behind it rather than a rule auser could trip over.
-        /// </summary>
-        [global::System.CodeDom.Compiler.GeneratedCode("Kiota", "1.0.0")]
-        public partial class HideRequestBuilderPostQueryParameters 
-        {
-#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
-#nullable enable
-            #pragma warning disable CS1591
-            [QueryParameter("token")]
-            public string? Token { get; set; }
-            #pragma warning restore CS1591
-#nullable restore
-#else
-            #pragma warning disable CS1591
-            [QueryParameter("token")]
-            public string Token { get; set; }
-            #pragma warning restore CS1591
-#endif
-        }
-        /// <summary>
-        /// Configuration for the request such as headers, query parameters, and middleware options.
-        /// </summary>
-        [Obsolete("This class is deprecated. Please use the generic RequestConfiguration class generated by the generator.")]
-        [global::System.CodeDom.Compiler.GeneratedCode("Kiota", "1.0.0")]
-        public partial class HideRequestBuilderPostRequestConfiguration : RequestConfiguration<global::GrimoireCli.Generated.Api.Campaigns.Item.Wiki.Item.Hide.HideRequestBuilder.HideRequestBuilderPostQueryParameters>
+        public partial class HideRequestBuilderPostRequestConfiguration : RequestConfiguration<DefaultQueryParameters>
         {
         }
     }

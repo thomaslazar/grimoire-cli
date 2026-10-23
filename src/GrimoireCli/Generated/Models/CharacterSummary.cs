@@ -15,6 +15,8 @@ namespace GrimoireCli.Generated.Models
     {
         /// <summary>Stores additional data not described in the OpenAPI description found when deserializing. Can be used for serialization as well.</summary>
         public IDictionary<string, object> AdditionalData { get; set; }
+        /// <summary>The campaign_has_gm property</summary>
+        public bool? CampaignHasGm { get; set; }
         /// <summary>The campaign_id property</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
@@ -39,6 +41,10 @@ namespace GrimoireCli.Generated.Models
 #else
         public global::GrimoireCli.Generated.Models.CharacterSummary.CharacterSummary_created_at CreatedAt { get; set; }
 #endif
+        /// <summary>The editable property</summary>
+        public bool? Editable { get; set; }
+        /// <summary>The gm_can_edit property</summary>
+        public bool? GmCanEdit { get; set; }
         /// <summary>The id property</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
@@ -57,6 +63,22 @@ namespace GrimoireCli.Generated.Models
 #endif
         /// <summary>The owned property</summary>
         public bool? Owned { get; set; }
+        /// <summary>The owner_name property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public string? OwnerName { get; set; }
+#nullable restore
+#else
+        public string OwnerName { get; set; }
+#endif
+        /// <summary>The portrait_crop property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public global::GrimoireCli.Generated.Models.PortraitCrop? PortraitCrop { get; set; }
+#nullable restore
+#else
+        public global::GrimoireCli.Generated.Models.PortraitCrop PortraitCrop { get; set; }
+#endif
         /// <summary>The portrait_path property</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
@@ -115,12 +137,23 @@ namespace GrimoireCli.Generated.Models
 #else
         public global::GrimoireCli.Generated.Models.CharacterSummary.CharacterSummary_updated_at UpdatedAt { get; set; }
 #endif
+        /// <summary>The user_id property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public string? UserId { get; set; }
+#nullable restore
+#else
+        public string UserId { get; set; }
+#endif
         /// <summary>
         /// Instantiates a new <see cref="global::GrimoireCli.Generated.Models.CharacterSummary"/> and sets the default values.
         /// </summary>
         public CharacterSummary()
         {
             AdditionalData = new Dictionary<string, object>();
+            CampaignHasGm = false;
+            Editable = true;
+            GmCanEdit = false;
             Owned = true;
             SchemaMissing = false;
             Status = "active";
@@ -143,12 +176,17 @@ namespace GrimoireCli.Generated.Models
         {
             return new Dictionary<string, Action<IParseNode>>
             {
+                { "campaign_has_gm", n => { CampaignHasGm = n.GetBoolValue(); } },
                 { "campaign_id", n => { CampaignId = n.GetObjectValue<global::GrimoireCli.Generated.Models.CharacterSummary.CharacterSummary_campaign_id>(global::GrimoireCli.Generated.Models.CharacterSummary.CharacterSummary_campaign_id.CreateFromDiscriminatorValue); } },
                 { "campaign_name", n => { CampaignName = n.GetObjectValue<global::GrimoireCli.Generated.Models.CharacterSummary.CharacterSummary_campaign_name>(global::GrimoireCli.Generated.Models.CharacterSummary.CharacterSummary_campaign_name.CreateFromDiscriminatorValue); } },
                 { "created_at", n => { CreatedAt = n.GetObjectValue<global::GrimoireCli.Generated.Models.CharacterSummary.CharacterSummary_created_at>(global::GrimoireCli.Generated.Models.CharacterSummary.CharacterSummary_created_at.CreateFromDiscriminatorValue); } },
+                { "editable", n => { Editable = n.GetBoolValue(); } },
+                { "gm_can_edit", n => { GmCanEdit = n.GetBoolValue(); } },
                 { "id", n => { Id = n.GetStringValue(); } },
                 { "name", n => { Name = n.GetStringValue(); } },
                 { "owned", n => { Owned = n.GetBoolValue(); } },
+                { "owner_name", n => { OwnerName = n.GetStringValue(); } },
+                { "portrait_crop", n => { PortraitCrop = n.GetObjectValue<global::GrimoireCli.Generated.Models.PortraitCrop>(global::GrimoireCli.Generated.Models.PortraitCrop.CreateFromDiscriminatorValue); } },
                 { "portrait_path", n => { PortraitPath = n.GetObjectValue<global::GrimoireCli.Generated.Models.CharacterSummary.CharacterSummary_portrait_path>(global::GrimoireCli.Generated.Models.CharacterSummary.CharacterSummary_portrait_path.CreateFromDiscriminatorValue); } },
                 { "portrait_version", n => { PortraitVersion = n.GetObjectValue<global::GrimoireCli.Generated.Models.CharacterSummary.CharacterSummary_portrait_version>(global::GrimoireCli.Generated.Models.CharacterSummary.CharacterSummary_portrait_version.CreateFromDiscriminatorValue); } },
                 { "schema_missing", n => { SchemaMissing = n.GetBoolValue(); } },
@@ -157,6 +195,7 @@ namespace GrimoireCli.Generated.Models
                 { "status", n => { Status = n.GetStringValue(); } },
                 { "system", n => { System = n.GetStringValue(); } },
                 { "updated_at", n => { UpdatedAt = n.GetObjectValue<global::GrimoireCli.Generated.Models.CharacterSummary.CharacterSummary_updated_at>(global::GrimoireCli.Generated.Models.CharacterSummary.CharacterSummary_updated_at.CreateFromDiscriminatorValue); } },
+                { "user_id", n => { UserId = n.GetStringValue(); } },
             };
         }
         /// <summary>
@@ -166,12 +205,17 @@ namespace GrimoireCli.Generated.Models
         public virtual void Serialize(ISerializationWriter writer)
         {
             if(ReferenceEquals(writer, null)) throw new ArgumentNullException(nameof(writer));
+            writer.WriteBoolValue("campaign_has_gm", CampaignHasGm);
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.CharacterSummary.CharacterSummary_campaign_id>("campaign_id", CampaignId);
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.CharacterSummary.CharacterSummary_campaign_name>("campaign_name", CampaignName);
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.CharacterSummary.CharacterSummary_created_at>("created_at", CreatedAt);
+            writer.WriteBoolValue("editable", Editable);
+            writer.WriteBoolValue("gm_can_edit", GmCanEdit);
             writer.WriteStringValue("id", Id);
             writer.WriteStringValue("name", Name);
             writer.WriteBoolValue("owned", Owned);
+            writer.WriteStringValue("owner_name", OwnerName);
+            writer.WriteObjectValue<global::GrimoireCli.Generated.Models.PortraitCrop>("portrait_crop", PortraitCrop);
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.CharacterSummary.CharacterSummary_portrait_path>("portrait_path", PortraitPath);
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.CharacterSummary.CharacterSummary_portrait_version>("portrait_version", PortraitVersion);
             writer.WriteBoolValue("schema_missing", SchemaMissing);
@@ -180,6 +224,7 @@ namespace GrimoireCli.Generated.Models
             writer.WriteStringValue("status", Status);
             writer.WriteStringValue("system", System);
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.CharacterSummary.CharacterSummary_updated_at>("updated_at", UpdatedAt);
+            writer.WriteStringValue("user_id", UserId);
             writer.WriteAdditionalData(AdditionalData);
         }
         /// <summary>

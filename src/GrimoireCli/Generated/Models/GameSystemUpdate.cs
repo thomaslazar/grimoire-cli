@@ -33,10 +33,10 @@ namespace GrimoireCli.Generated.Models
         /// <summary>The character_builder_urls property</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
-        public List<global::GrimoireCli.Generated.Models.Backend__routers__systems___schemas__LinkEntry>? CharacterBuilderUrls { get; set; }
+        public List<global::GrimoireCli.Generated.Models.LinkEntry>? CharacterBuilderUrls { get; set; }
 #nullable restore
 #else
-        public List<global::GrimoireCli.Generated.Models.Backend__routers__systems___schemas__LinkEntry> CharacterBuilderUrls { get; set; }
+        public List<global::GrimoireCli.Generated.Models.LinkEntry> CharacterBuilderUrls { get; set; }
 #endif
         /// <summary>The codex_id property</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
@@ -153,10 +153,10 @@ namespace GrimoireCli.Generated.Models
         /// <summary>The urls property</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
-        public List<global::GrimoireCli.Generated.Models.Backend__routers__systems___schemas__LinkEntry>? Urls { get; set; }
+        public List<global::GrimoireCli.Generated.Models.LinkEntry>? Urls { get; set; }
 #nullable restore
 #else
-        public List<global::GrimoireCli.Generated.Models.Backend__routers__systems___schemas__LinkEntry> Urls { get; set; }
+        public List<global::GrimoireCli.Generated.Models.LinkEntry> Urls { get; set; }
 #endif
         /// <summary>The year property</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
@@ -193,7 +193,7 @@ namespace GrimoireCli.Generated.Models
             {
                 { "access_level", n => { AccessLevel = n.GetObjectValue<global::GrimoireCli.Generated.Models.GameSystemUpdate.GameSystemUpdate_access_level>(global::GrimoireCli.Generated.Models.GameSystemUpdate.GameSystemUpdate_access_level.CreateFromDiscriminatorValue); } },
                 { "character_builder_url", n => { CharacterBuilderUrl = n.GetObjectValue<global::GrimoireCli.Generated.Models.GameSystemUpdate.GameSystemUpdate_character_builder_url>(global::GrimoireCli.Generated.Models.GameSystemUpdate.GameSystemUpdate_character_builder_url.CreateFromDiscriminatorValue); } },
-                { "character_builder_urls", n => { CharacterBuilderUrls = n.GetCollectionOfObjectValues<global::GrimoireCli.Generated.Models.Backend__routers__systems___schemas__LinkEntry>(global::GrimoireCli.Generated.Models.Backend__routers__systems___schemas__LinkEntry.CreateFromDiscriminatorValue)?.AsList(); } },
+                { "character_builder_urls", n => { CharacterBuilderUrls = n.GetCollectionOfObjectValues<global::GrimoireCli.Generated.Models.LinkEntry>(global::GrimoireCli.Generated.Models.LinkEntry.CreateFromDiscriminatorValue)?.AsList(); } },
                 { "codex_id", n => { CodexId = n.GetObjectValue<global::GrimoireCli.Generated.Models.GameSystemUpdate.GameSystemUpdate_codex_id>(global::GrimoireCli.Generated.Models.GameSystemUpdate.GameSystemUpdate_codex_id.CreateFromDiscriminatorValue); } },
                 { "cover_book_id", n => { CoverBookId = n.GetObjectValue<global::GrimoireCli.Generated.Models.GameSystemUpdate.GameSystemUpdate_cover_book_id>(global::GrimoireCli.Generated.Models.GameSystemUpdate.GameSystemUpdate_cover_book_id.CreateFromDiscriminatorValue); } },
                 { "description", n => { Description = n.GetObjectValue<global::GrimoireCli.Generated.Models.GameSystemUpdate.GameSystemUpdate_description>(global::GrimoireCli.Generated.Models.GameSystemUpdate.GameSystemUpdate_description.CreateFromDiscriminatorValue); } },
@@ -208,7 +208,7 @@ namespace GrimoireCli.Generated.Models
                 { "publishers", n => { Publishers = n.GetCollectionOfObjectValues<global::GrimoireCli.Generated.Models.PublisherEntry>(global::GrimoireCli.Generated.Models.PublisherEntry.CreateFromDiscriminatorValue)?.AsList(); } },
                 { "system_family", n => { SystemFamily = n.GetObjectValue<global::GrimoireCli.Generated.Models.GameSystemUpdate.GameSystemUpdate_system_family>(global::GrimoireCli.Generated.Models.GameSystemUpdate.GameSystemUpdate_system_family.CreateFromDiscriminatorValue); } },
                 { "tags", n => { Tags = n.GetCollectionOfPrimitiveValues<string>()?.AsList(); } },
-                { "urls", n => { Urls = n.GetCollectionOfObjectValues<global::GrimoireCli.Generated.Models.Backend__routers__systems___schemas__LinkEntry>(global::GrimoireCli.Generated.Models.Backend__routers__systems___schemas__LinkEntry.CreateFromDiscriminatorValue)?.AsList(); } },
+                { "urls", n => { Urls = n.GetCollectionOfObjectValues<global::GrimoireCli.Generated.Models.LinkEntry>(global::GrimoireCli.Generated.Models.LinkEntry.CreateFromDiscriminatorValue)?.AsList(); } },
                 { "year", n => { Year = n.GetObjectValue<global::GrimoireCli.Generated.Models.GameSystemUpdate.GameSystemUpdate_year>(global::GrimoireCli.Generated.Models.GameSystemUpdate.GameSystemUpdate_year.CreateFromDiscriminatorValue); } },
             };
         }
@@ -221,7 +221,7 @@ namespace GrimoireCli.Generated.Models
             if(ReferenceEquals(writer, null)) throw new ArgumentNullException(nameof(writer));
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.GameSystemUpdate.GameSystemUpdate_access_level>("access_level", AccessLevel);
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.GameSystemUpdate.GameSystemUpdate_character_builder_url>("character_builder_url", CharacterBuilderUrl);
-            writer.WriteCollectionOfObjectValues<global::GrimoireCli.Generated.Models.Backend__routers__systems___schemas__LinkEntry>("character_builder_urls", CharacterBuilderUrls);
+            writer.WriteCollectionOfObjectValues<global::GrimoireCli.Generated.Models.LinkEntry>("character_builder_urls", CharacterBuilderUrls);
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.GameSystemUpdate.GameSystemUpdate_codex_id>("codex_id", CodexId);
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.GameSystemUpdate.GameSystemUpdate_cover_book_id>("cover_book_id", CoverBookId);
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.GameSystemUpdate.GameSystemUpdate_description>("description", Description);
@@ -236,7 +236,7 @@ namespace GrimoireCli.Generated.Models
             writer.WriteCollectionOfObjectValues<global::GrimoireCli.Generated.Models.PublisherEntry>("publishers", Publishers);
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.GameSystemUpdate.GameSystemUpdate_system_family>("system_family", SystemFamily);
             writer.WriteCollectionOfPrimitiveValues<string>("tags", Tags);
-            writer.WriteCollectionOfObjectValues<global::GrimoireCli.Generated.Models.Backend__routers__systems___schemas__LinkEntry>("urls", Urls);
+            writer.WriteCollectionOfObjectValues<global::GrimoireCli.Generated.Models.LinkEntry>("urls", Urls);
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.GameSystemUpdate.GameSystemUpdate_year>("year", Year);
             writer.WriteAdditionalData(AdditionalData);
         }

@@ -22,7 +22,7 @@ namespace GrimoireCli.Generated.Api.Campaigns.Item.Availability.Item.Cancel
         /// </summary>
         /// <param name="pathParameters">Path parameters for the request</param>
         /// <param name="requestAdapter">The request adapter to use to execute the requests.</param>
-        public CancelRequestBuilder(Dictionary<string, object> pathParameters, IRequestAdapter requestAdapter) : base(requestAdapter, "{+baseurl}/api/campaigns/{campaign_id}/availability/{session_date}/cancel{?token*}", pathParameters)
+        public CancelRequestBuilder(Dictionary<string, object> pathParameters, IRequestAdapter requestAdapter) : base(requestAdapter, "{+baseurl}/api/campaigns/{campaign_id}/availability/{session_date}/cancel", pathParameters)
         {
         }
         /// <summary>
@@ -30,7 +30,7 @@ namespace GrimoireCli.Generated.Api.Campaigns.Item.Availability.Item.Cancel
         /// </summary>
         /// <param name="rawUrl">The raw URL to use for the request builder.</param>
         /// <param name="requestAdapter">The request adapter to use to execute the requests.</param>
-        public CancelRequestBuilder(string rawUrl, IRequestAdapter requestAdapter) : base(requestAdapter, "{+baseurl}/api/campaigns/{campaign_id}/availability/{session_date}/cancel{?token*}", rawUrl)
+        public CancelRequestBuilder(string rawUrl, IRequestAdapter requestAdapter) : base(requestAdapter, "{+baseurl}/api/campaigns/{campaign_id}/availability/{session_date}/cancel", rawUrl)
         {
         }
         /// <summary>
@@ -42,11 +42,11 @@ namespace GrimoireCli.Generated.Api.Campaigns.Item.Availability.Item.Cancel
         /// <exception cref="global::GrimoireCli.Generated.Models.HTTPValidationError">When receiving a 422 status code</exception>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
-        public async Task<global::GrimoireCli.Generated.Models.SessionDateCancelOut?> PutAsync(Action<RequestConfiguration<global::GrimoireCli.Generated.Api.Campaigns.Item.Availability.Item.Cancel.CancelRequestBuilder.CancelRequestBuilderPutQueryParameters>>? requestConfiguration = default, CancellationToken cancellationToken = default)
+        public async Task<global::GrimoireCli.Generated.Models.SessionDateCancelOut?> PutAsync(Action<RequestConfiguration<DefaultQueryParameters>>? requestConfiguration = default, CancellationToken cancellationToken = default)
         {
 #nullable restore
 #else
-        public async Task<global::GrimoireCli.Generated.Models.SessionDateCancelOut> PutAsync(Action<RequestConfiguration<global::GrimoireCli.Generated.Api.Campaigns.Item.Availability.Item.Cancel.CancelRequestBuilder.CancelRequestBuilderPutQueryParameters>> requestConfiguration = default, CancellationToken cancellationToken = default)
+        public async Task<global::GrimoireCli.Generated.Models.SessionDateCancelOut> PutAsync(Action<RequestConfiguration<DefaultQueryParameters>> requestConfiguration = default, CancellationToken cancellationToken = default)
         {
 #endif
             var requestInfo = ToPutRequestInformation(requestConfiguration);
@@ -63,11 +63,11 @@ namespace GrimoireCli.Generated.Api.Campaigns.Item.Availability.Item.Cancel
         /// <param name="requestConfiguration">Configuration for the request such as headers, query parameters, and middleware options.</param>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
-        public RequestInformation ToPutRequestInformation(Action<RequestConfiguration<global::GrimoireCli.Generated.Api.Campaigns.Item.Availability.Item.Cancel.CancelRequestBuilder.CancelRequestBuilderPutQueryParameters>>? requestConfiguration = default)
+        public RequestInformation ToPutRequestInformation(Action<RequestConfiguration<DefaultQueryParameters>>? requestConfiguration = default)
         {
 #nullable restore
 #else
-        public RequestInformation ToPutRequestInformation(Action<RequestConfiguration<global::GrimoireCli.Generated.Api.Campaigns.Item.Availability.Item.Cancel.CancelRequestBuilder.CancelRequestBuilderPutQueryParameters>> requestConfiguration = default)
+        public RequestInformation ToPutRequestInformation(Action<RequestConfiguration<DefaultQueryParameters>> requestConfiguration = default)
         {
 #endif
             var requestInfo = new RequestInformation(Method.PUT, UrlTemplate, PathParameters);
@@ -85,31 +85,11 @@ namespace GrimoireCli.Generated.Api.Campaigns.Item.Availability.Item.Cancel
             return new global::GrimoireCli.Generated.Api.Campaigns.Item.Availability.Item.Cancel.CancelRequestBuilder(rawUrl, RequestAdapter);
         }
         /// <summary>
-        /// GM: cancel or uncancel a session date
-        /// </summary>
-        [global::System.CodeDom.Compiler.GeneratedCode("Kiota", "1.0.0")]
-        public partial class CancelRequestBuilderPutQueryParameters 
-        {
-#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
-#nullable enable
-            #pragma warning disable CS1591
-            [QueryParameter("token")]
-            public string? Token { get; set; }
-            #pragma warning restore CS1591
-#nullable restore
-#else
-            #pragma warning disable CS1591
-            [QueryParameter("token")]
-            public string Token { get; set; }
-            #pragma warning restore CS1591
-#endif
-        }
-        /// <summary>
         /// Configuration for the request such as headers, query parameters, and middleware options.
         /// </summary>
         [Obsolete("This class is deprecated. Please use the generic RequestConfiguration class generated by the generator.")]
         [global::System.CodeDom.Compiler.GeneratedCode("Kiota", "1.0.0")]
-        public partial class CancelRequestBuilderPutRequestConfiguration : RequestConfiguration<global::GrimoireCli.Generated.Api.Campaigns.Item.Availability.Item.Cancel.CancelRequestBuilder.CancelRequestBuilderPutQueryParameters>
+        public partial class CancelRequestBuilderPutRequestConfiguration : RequestConfiguration<DefaultQueryParameters>
         {
         }
     }

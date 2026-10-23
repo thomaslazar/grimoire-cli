@@ -41,10 +41,10 @@ namespace GrimoireCli.Generated.Models
         /// <summary>The file_url property</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
-        public string? FileUrl { get; set; }
+        public global::GrimoireCli.Generated.Models.ShareLinkOut.ShareLinkOut_file_url? FileUrl { get; set; }
 #nullable restore
 #else
-        public string FileUrl { get; set; }
+        public global::GrimoireCli.Generated.Models.ShareLinkOut.ShareLinkOut_file_url FileUrl { get; set; }
 #endif
         /// <summary>The has_password property</summary>
         public bool? HasPassword { get; set; }
@@ -115,10 +115,10 @@ namespace GrimoireCli.Generated.Models
         /// <summary>The url property</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
-        public string? Url { get; set; }
+        public global::GrimoireCli.Generated.Models.ShareLinkOut.ShareLinkOut_url? Url { get; set; }
 #nullable restore
 #else
-        public string Url { get; set; }
+        public global::GrimoireCli.Generated.Models.ShareLinkOut.ShareLinkOut_url Url { get; set; }
 #endif
         /// <summary>The use_count property</summary>
         public int? UseCount { get; set; }
@@ -182,7 +182,7 @@ namespace GrimoireCli.Generated.Models
             {
                 { "created_at", n => { CreatedAt = n.GetObjectValue<global::GrimoireCli.Generated.Models.ShareLinkOut.ShareLinkOut_created_at>(global::GrimoireCli.Generated.Models.ShareLinkOut.ShareLinkOut_created_at.CreateFromDiscriminatorValue); } },
                 { "expires_at", n => { ExpiresAt = n.GetObjectValue<global::GrimoireCli.Generated.Models.ShareLinkOut.ShareLinkOut_expires_at>(global::GrimoireCli.Generated.Models.ShareLinkOut.ShareLinkOut_expires_at.CreateFromDiscriminatorValue); } },
-                { "file_url", n => { FileUrl = n.GetStringValue(); } },
+                { "file_url", n => { FileUrl = n.GetObjectValue<global::GrimoireCli.Generated.Models.ShareLinkOut.ShareLinkOut_file_url>(global::GrimoireCli.Generated.Models.ShareLinkOut.ShareLinkOut_file_url.CreateFromDiscriminatorValue); } },
                 { "filename", n => { Filename = n.GetStringValue(); } },
                 { "has_password", n => { HasPassword = n.GetBoolValue(); } },
                 { "id", n => { Id = n.GetStringValue(); } },
@@ -193,7 +193,7 @@ namespace GrimoireCli.Generated.Models
                 { "resource_type", n => { ResourceType = n.GetStringValue(); } },
                 { "revoked_at", n => { RevokedAt = n.GetObjectValue<global::GrimoireCli.Generated.Models.ShareLinkOut.ShareLinkOut_revoked_at>(global::GrimoireCli.Generated.Models.ShareLinkOut.ShareLinkOut_revoked_at.CreateFromDiscriminatorValue); } },
                 { "state", n => { State = n.GetStringValue(); } },
-                { "url", n => { Url = n.GetStringValue(); } },
+                { "url", n => { Url = n.GetObjectValue<global::GrimoireCli.Generated.Models.ShareLinkOut.ShareLinkOut_url>(global::GrimoireCli.Generated.Models.ShareLinkOut.ShareLinkOut_url.CreateFromDiscriminatorValue); } },
                 { "use_count", n => { UseCount = n.GetIntValue(); } },
                 { "user_id", n => { UserId = n.GetObjectValue<global::GrimoireCli.Generated.Models.ShareLinkOut.ShareLinkOut_user_id>(global::GrimoireCli.Generated.Models.ShareLinkOut.ShareLinkOut_user_id.CreateFromDiscriminatorValue); } },
                 { "username", n => { Username = n.GetObjectValue<global::GrimoireCli.Generated.Models.ShareLinkOut.ShareLinkOut_username>(global::GrimoireCli.Generated.Models.ShareLinkOut.ShareLinkOut_username.CreateFromDiscriminatorValue); } },
@@ -211,7 +211,7 @@ namespace GrimoireCli.Generated.Models
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.ShareLinkOut.ShareLinkOut_created_at>("created_at", CreatedAt);
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.ShareLinkOut.ShareLinkOut_expires_at>("expires_at", ExpiresAt);
             writer.WriteStringValue("filename", Filename);
-            writer.WriteStringValue("file_url", FileUrl);
+            writer.WriteObjectValue<global::GrimoireCli.Generated.Models.ShareLinkOut.ShareLinkOut_file_url>("file_url", FileUrl);
             writer.WriteBoolValue("has_password", HasPassword);
             writer.WriteStringValue("id", Id);
             writer.WriteStringValue("label", Label);
@@ -221,7 +221,7 @@ namespace GrimoireCli.Generated.Models
             writer.WriteStringValue("resource_type", ResourceType);
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.ShareLinkOut.ShareLinkOut_revoked_at>("revoked_at", RevokedAt);
             writer.WriteStringValue("state", State);
-            writer.WriteStringValue("url", Url);
+            writer.WriteObjectValue<global::GrimoireCli.Generated.Models.ShareLinkOut.ShareLinkOut_url>("url", Url);
             writer.WriteIntValue("use_count", UseCount);
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.ShareLinkOut.ShareLinkOut_user_id>("user_id", UserId);
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.ShareLinkOut.ShareLinkOut_username>("username", Username);
@@ -366,6 +366,74 @@ namespace GrimoireCli.Generated.Models
             }
         }
         /// <summary>
+        /// Composed type wrapper for classes <see cref="global::GrimoireCli.Generated.Models.ShareLinkOut_file_urlMember1"/>, <see cref="string"/>
+        /// </summary>
+        [global::System.CodeDom.Compiler.GeneratedCode("Kiota", "1.0.0")]
+        public partial class ShareLinkOut_file_url : IComposedTypeWrapper, IParsable
+        {
+            /// <summary>Composed type representation for type <see cref="global::GrimoireCli.Generated.Models.ShareLinkOut_file_urlMember1"/></summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+            public global::GrimoireCli.Generated.Models.ShareLinkOut_file_urlMember1? ShareLinkOutFileUrlMember1 { get; set; }
+#nullable restore
+#else
+            public global::GrimoireCli.Generated.Models.ShareLinkOut_file_urlMember1 ShareLinkOutFileUrlMember1 { get; set; }
+#endif
+            /// <summary>Composed type representation for type <see cref="string"/></summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+            public string? String { get; set; }
+#nullable restore
+#else
+            public string String { get; set; }
+#endif
+            /// <summary>
+            /// Creates a new instance of the appropriate class based on discriminator value
+            /// </summary>
+            /// <returns>A <see cref="global::GrimoireCli.Generated.Models.ShareLinkOut.ShareLinkOut_file_url"/></returns>
+            /// <param name="parseNode">The parse node to use to read the discriminator value and create the object</param>
+            public static global::GrimoireCli.Generated.Models.ShareLinkOut.ShareLinkOut_file_url CreateFromDiscriminatorValue(IParseNode parseNode)
+            {
+                if(ReferenceEquals(parseNode, null)) throw new ArgumentNullException(nameof(parseNode));
+                var result = new global::GrimoireCli.Generated.Models.ShareLinkOut.ShareLinkOut_file_url();
+                if(parseNode.GetStringValue() is string stringValue)
+                {
+                    result.String = stringValue;
+                }
+                else {
+                    result.ShareLinkOutFileUrlMember1 = new global::GrimoireCli.Generated.Models.ShareLinkOut_file_urlMember1();
+                }
+                return result;
+            }
+            /// <summary>
+            /// The deserialization information for the current model
+            /// </summary>
+            /// <returns>A IDictionary&lt;string, Action&lt;IParseNode&gt;&gt;</returns>
+            public virtual IDictionary<string, Action<IParseNode>> GetFieldDeserializers()
+            {
+                if(ShareLinkOutFileUrlMember1 != null)
+                {
+                    return ParseNodeHelper.MergeDeserializersForIntersectionWrapper(ShareLinkOutFileUrlMember1);
+                }
+                return new Dictionary<string, Action<IParseNode>>();
+            }
+            /// <summary>
+            /// Serializes information the current object
+            /// </summary>
+            /// <param name="writer">Serialization writer to use to serialize this model</param>
+            public virtual void Serialize(ISerializationWriter writer)
+            {
+                if(ReferenceEquals(writer, null)) throw new ArgumentNullException(nameof(writer));
+                if(String != null)
+                {
+                    writer.WriteStringValue(null, String);
+                }
+                else {
+                    writer.WriteObjectValue<global::GrimoireCli.Generated.Models.ShareLinkOut_file_urlMember1>(null, ShareLinkOutFileUrlMember1);
+                }
+            }
+        }
+        /// <summary>
         /// Composed type wrapper for classes <see cref="global::GrimoireCli.Generated.Models.ShareLinkOut_last_used_atMember1"/>, <see cref="string"/>
         /// </summary>
         [global::System.CodeDom.Compiler.GeneratedCode("Kiota", "1.0.0")]
@@ -498,6 +566,74 @@ namespace GrimoireCli.Generated.Models
                 }
                 else {
                     writer.WriteObjectValue<global::GrimoireCli.Generated.Models.ShareLinkOut_revoked_atMember1>(null, ShareLinkOutRevokedAtMember1);
+                }
+            }
+        }
+        /// <summary>
+        /// Composed type wrapper for classes <see cref="global::GrimoireCli.Generated.Models.ShareLinkOut_urlMember1"/>, <see cref="string"/>
+        /// </summary>
+        [global::System.CodeDom.Compiler.GeneratedCode("Kiota", "1.0.0")]
+        public partial class ShareLinkOut_url : IComposedTypeWrapper, IParsable
+        {
+            /// <summary>Composed type representation for type <see cref="global::GrimoireCli.Generated.Models.ShareLinkOut_urlMember1"/></summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+            public global::GrimoireCli.Generated.Models.ShareLinkOut_urlMember1? ShareLinkOutUrlMember1 { get; set; }
+#nullable restore
+#else
+            public global::GrimoireCli.Generated.Models.ShareLinkOut_urlMember1 ShareLinkOutUrlMember1 { get; set; }
+#endif
+            /// <summary>Composed type representation for type <see cref="string"/></summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+            public string? String { get; set; }
+#nullable restore
+#else
+            public string String { get; set; }
+#endif
+            /// <summary>
+            /// Creates a new instance of the appropriate class based on discriminator value
+            /// </summary>
+            /// <returns>A <see cref="global::GrimoireCli.Generated.Models.ShareLinkOut.ShareLinkOut_url"/></returns>
+            /// <param name="parseNode">The parse node to use to read the discriminator value and create the object</param>
+            public static global::GrimoireCli.Generated.Models.ShareLinkOut.ShareLinkOut_url CreateFromDiscriminatorValue(IParseNode parseNode)
+            {
+                if(ReferenceEquals(parseNode, null)) throw new ArgumentNullException(nameof(parseNode));
+                var result = new global::GrimoireCli.Generated.Models.ShareLinkOut.ShareLinkOut_url();
+                if(parseNode.GetStringValue() is string stringValue)
+                {
+                    result.String = stringValue;
+                }
+                else {
+                    result.ShareLinkOutUrlMember1 = new global::GrimoireCli.Generated.Models.ShareLinkOut_urlMember1();
+                }
+                return result;
+            }
+            /// <summary>
+            /// The deserialization information for the current model
+            /// </summary>
+            /// <returns>A IDictionary&lt;string, Action&lt;IParseNode&gt;&gt;</returns>
+            public virtual IDictionary<string, Action<IParseNode>> GetFieldDeserializers()
+            {
+                if(ShareLinkOutUrlMember1 != null)
+                {
+                    return ParseNodeHelper.MergeDeserializersForIntersectionWrapper(ShareLinkOutUrlMember1);
+                }
+                return new Dictionary<string, Action<IParseNode>>();
+            }
+            /// <summary>
+            /// Serializes information the current object
+            /// </summary>
+            /// <param name="writer">Serialization writer to use to serialize this model</param>
+            public virtual void Serialize(ISerializationWriter writer)
+            {
+                if(ReferenceEquals(writer, null)) throw new ArgumentNullException(nameof(writer));
+                if(String != null)
+                {
+                    writer.WriteStringValue(null, String);
+                }
+                else {
+                    writer.WriteObjectValue<global::GrimoireCli.Generated.Models.ShareLinkOut_urlMember1>(null, ShareLinkOutUrlMember1);
                 }
             }
         }

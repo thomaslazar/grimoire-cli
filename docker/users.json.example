@@ -1,5 +1,5 @@
 [
-  { "username": "admin", "password": "admin", "role": "admin" },
-  { "username": "gm", "password": "gm", "role": "gm" },
-  { "username": "player", "password": "player", "role": "player" }
+  {"username": "admin", "password": "$bcrypt-sha256$v=2,t=2b,r=12$bDhKiOJp9C0qcj5JKBmAl.$IoeVz1swljIUA9ZEVdGkB6IAy6MXZHO", "role": "admin"},
+  {"username": "gm", "password": "$bcrypt-sha256$v=2,t=2b,r=12$moxbT0ZMsw1h6qcsIt2vU.$MMue2E3l5C6cT9LaSjzWGkFJTYXqKWm", "role": "gm"},
+  {"username": "player", "password": "$bcrypt-sha256$v=2,t=2b,r=12$cZF9gm2GmXWioOGsu0qwFu$3VpZu.BxfAuqaNYob.vRnMBAnZjc07i", "role": "player"}
 ]

@@ -22,7 +22,7 @@ namespace GrimoireCli.Generated.Api.Campaigns.Item.Resources.Item
         /// </summary>
         /// <param name="pathParameters">Path parameters for the request</param>
         /// <param name="requestAdapter">The request adapter to use to execute the requests.</param>
-        public WithResource_ItemRequestBuilder(Dictionary<string, object> pathParameters, IRequestAdapter requestAdapter) : base(requestAdapter, "{+baseurl}/api/campaigns/{campaign_id}/resources/{resource_id}{?token*}", pathParameters)
+        public WithResource_ItemRequestBuilder(Dictionary<string, object> pathParameters, IRequestAdapter requestAdapter) : base(requestAdapter, "{+baseurl}/api/campaigns/{campaign_id}/resources/{resource_id}", pathParameters)
         {
         }
         /// <summary>
@@ -30,7 +30,7 @@ namespace GrimoireCli.Generated.Api.Campaigns.Item.Resources.Item
         /// </summary>
         /// <param name="rawUrl">The raw URL to use for the request builder.</param>
         /// <param name="requestAdapter">The request adapter to use to execute the requests.</param>
-        public WithResource_ItemRequestBuilder(string rawUrl, IRequestAdapter requestAdapter) : base(requestAdapter, "{+baseurl}/api/campaigns/{campaign_id}/resources/{resource_id}{?token*}", rawUrl)
+        public WithResource_ItemRequestBuilder(string rawUrl, IRequestAdapter requestAdapter) : base(requestAdapter, "{+baseurl}/api/campaigns/{campaign_id}/resources/{resource_id}", rawUrl)
         {
         }
         /// <summary>
@@ -41,11 +41,11 @@ namespace GrimoireCli.Generated.Api.Campaigns.Item.Resources.Item
         /// <exception cref="global::GrimoireCli.Generated.Models.HTTPValidationError">When receiving a 422 status code</exception>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
-        public async Task DeleteAsync(Action<RequestConfiguration<global::GrimoireCli.Generated.Api.Campaigns.Item.Resources.Item.WithResource_ItemRequestBuilder.WithResource_ItemRequestBuilderDeleteQueryParameters>>? requestConfiguration = default, CancellationToken cancellationToken = default)
+        public async Task DeleteAsync(Action<RequestConfiguration<DefaultQueryParameters>>? requestConfiguration = default, CancellationToken cancellationToken = default)
         {
 #nullable restore
 #else
-        public async Task DeleteAsync(Action<RequestConfiguration<global::GrimoireCli.Generated.Api.Campaigns.Item.Resources.Item.WithResource_ItemRequestBuilder.WithResource_ItemRequestBuilderDeleteQueryParameters>> requestConfiguration = default, CancellationToken cancellationToken = default)
+        public async Task DeleteAsync(Action<RequestConfiguration<DefaultQueryParameters>> requestConfiguration = default, CancellationToken cancellationToken = default)
         {
 #endif
             var requestInfo = ToDeleteRequestInformation(requestConfiguration);
@@ -65,11 +65,11 @@ namespace GrimoireCli.Generated.Api.Campaigns.Item.Resources.Item
         /// <exception cref="global::GrimoireCli.Generated.Models.HTTPValidationError">When receiving a 422 status code</exception>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
-        public async Task<global::GrimoireCli.Generated.Models.LinkedResourceOut?> PatchAsync(global::GrimoireCli.Generated.Models.ResourceUpdate body, Action<RequestConfiguration<global::GrimoireCli.Generated.Api.Campaigns.Item.Resources.Item.WithResource_ItemRequestBuilder.WithResource_ItemRequestBuilderPatchQueryParameters>>? requestConfiguration = default, CancellationToken cancellationToken = default)
+        public async Task<global::GrimoireCli.Generated.Models.LinkedResourceOut?> PatchAsync(global::GrimoireCli.Generated.Models.ResourceUpdate body, Action<RequestConfiguration<DefaultQueryParameters>>? requestConfiguration = default, CancellationToken cancellationToken = default)
         {
 #nullable restore
 #else
-        public async Task<global::GrimoireCli.Generated.Models.LinkedResourceOut> PatchAsync(global::GrimoireCli.Generated.Models.ResourceUpdate body, Action<RequestConfiguration<global::GrimoireCli.Generated.Api.Campaigns.Item.Resources.Item.WithResource_ItemRequestBuilder.WithResource_ItemRequestBuilderPatchQueryParameters>> requestConfiguration = default, CancellationToken cancellationToken = default)
+        public async Task<global::GrimoireCli.Generated.Models.LinkedResourceOut> PatchAsync(global::GrimoireCli.Generated.Models.ResourceUpdate body, Action<RequestConfiguration<DefaultQueryParameters>> requestConfiguration = default, CancellationToken cancellationToken = default)
         {
 #endif
             if(ReferenceEquals(body, null)) throw new ArgumentNullException(nameof(body));
@@ -87,11 +87,11 @@ namespace GrimoireCli.Generated.Api.Campaigns.Item.Resources.Item
         /// <param name="requestConfiguration">Configuration for the request such as headers, query parameters, and middleware options.</param>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
-        public RequestInformation ToDeleteRequestInformation(Action<RequestConfiguration<global::GrimoireCli.Generated.Api.Campaigns.Item.Resources.Item.WithResource_ItemRequestBuilder.WithResource_ItemRequestBuilderDeleteQueryParameters>>? requestConfiguration = default)
+        public RequestInformation ToDeleteRequestInformation(Action<RequestConfiguration<DefaultQueryParameters>>? requestConfiguration = default)
         {
 #nullable restore
 #else
-        public RequestInformation ToDeleteRequestInformation(Action<RequestConfiguration<global::GrimoireCli.Generated.Api.Campaigns.Item.Resources.Item.WithResource_ItemRequestBuilder.WithResource_ItemRequestBuilderDeleteQueryParameters>> requestConfiguration = default)
+        public RequestInformation ToDeleteRequestInformation(Action<RequestConfiguration<DefaultQueryParameters>> requestConfiguration = default)
         {
 #endif
             var requestInfo = new RequestInformation(Method.DELETE, UrlTemplate, PathParameters);
@@ -107,11 +107,11 @@ namespace GrimoireCli.Generated.Api.Campaigns.Item.Resources.Item
         /// <param name="requestConfiguration">Configuration for the request such as headers, query parameters, and middleware options.</param>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
-        public RequestInformation ToPatchRequestInformation(global::GrimoireCli.Generated.Models.ResourceUpdate body, Action<RequestConfiguration<global::GrimoireCli.Generated.Api.Campaigns.Item.Resources.Item.WithResource_ItemRequestBuilder.WithResource_ItemRequestBuilderPatchQueryParameters>>? requestConfiguration = default)
+        public RequestInformation ToPatchRequestInformation(global::GrimoireCli.Generated.Models.ResourceUpdate body, Action<RequestConfiguration<DefaultQueryParameters>>? requestConfiguration = default)
         {
 #nullable restore
 #else
-        public RequestInformation ToPatchRequestInformation(global::GrimoireCli.Generated.Models.ResourceUpdate body, Action<RequestConfiguration<global::GrimoireCli.Generated.Api.Campaigns.Item.Resources.Item.WithResource_ItemRequestBuilder.WithResource_ItemRequestBuilderPatchQueryParameters>> requestConfiguration = default)
+        public RequestInformation ToPatchRequestInformation(global::GrimoireCli.Generated.Models.ResourceUpdate body, Action<RequestConfiguration<DefaultQueryParameters>> requestConfiguration = default)
         {
 #endif
             if(ReferenceEquals(body, null)) throw new ArgumentNullException(nameof(body));
@@ -131,59 +131,19 @@ namespace GrimoireCli.Generated.Api.Campaigns.Item.Resources.Item
             return new global::GrimoireCli.Generated.Api.Campaigns.Item.Resources.Item.WithResource_ItemRequestBuilder(rawUrl, RequestAdapter);
         }
         /// <summary>
-        /// Unlink a resource
+        /// Configuration for the request such as headers, query parameters, and middleware options.
         /// </summary>
+        [Obsolete("This class is deprecated. Please use the generic RequestConfiguration class generated by the generator.")]
         [global::System.CodeDom.Compiler.GeneratedCode("Kiota", "1.0.0")]
-        public partial class WithResource_ItemRequestBuilderDeleteQueryParameters 
+        public partial class WithResource_ItemRequestBuilderDeleteRequestConfiguration : RequestConfiguration<DefaultQueryParameters>
         {
-#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
-#nullable enable
-            #pragma warning disable CS1591
-            [QueryParameter("token")]
-            public string? Token { get; set; }
-            #pragma warning restore CS1591
-#nullable restore
-#else
-            #pragma warning disable CS1591
-            [QueryParameter("token")]
-            public string Token { get; set; }
-            #pragma warning restore CS1591
-#endif
         }
         /// <summary>
         /// Configuration for the request such as headers, query parameters, and middleware options.
         /// </summary>
         [Obsolete("This class is deprecated. Please use the generic RequestConfiguration class generated by the generator.")]
         [global::System.CodeDom.Compiler.GeneratedCode("Kiota", "1.0.0")]
-        public partial class WithResource_ItemRequestBuilderDeleteRequestConfiguration : RequestConfiguration<global::GrimoireCli.Generated.Api.Campaigns.Item.Resources.Item.WithResource_ItemRequestBuilder.WithResource_ItemRequestBuilderDeleteQueryParameters>
-        {
-        }
-        /// <summary>
-        /// Update resource visibility/category
-        /// </summary>
-        [global::System.CodeDom.Compiler.GeneratedCode("Kiota", "1.0.0")]
-        public partial class WithResource_ItemRequestBuilderPatchQueryParameters 
-        {
-#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
-#nullable enable
-            #pragma warning disable CS1591
-            [QueryParameter("token")]
-            public string? Token { get; set; }
-            #pragma warning restore CS1591
-#nullable restore
-#else
-            #pragma warning disable CS1591
-            [QueryParameter("token")]
-            public string Token { get; set; }
-            #pragma warning restore CS1591
-#endif
-        }
-        /// <summary>
-        /// Configuration for the request such as headers, query parameters, and middleware options.
-        /// </summary>
-        [Obsolete("This class is deprecated. Please use the generic RequestConfiguration class generated by the generator.")]
-        [global::System.CodeDom.Compiler.GeneratedCode("Kiota", "1.0.0")]
-        public partial class WithResource_ItemRequestBuilderPatchRequestConfiguration : RequestConfiguration<global::GrimoireCli.Generated.Api.Campaigns.Item.Resources.Item.WithResource_ItemRequestBuilder.WithResource_ItemRequestBuilderPatchQueryParameters>
+        public partial class WithResource_ItemRequestBuilderPatchRequestConfiguration : RequestConfiguration<DefaultQueryParameters>
         {
         }
     }

@@ -28,7 +28,7 @@ namespace GrimoireCli.Generated.Api.AudioFolders
         /// </summary>
         /// <param name="pathParameters">Path parameters for the request</param>
         /// <param name="requestAdapter">The request adapter to use to execute the requests.</param>
-        public AudioFoldersRequestBuilder(Dictionary<string, object> pathParameters, IRequestAdapter requestAdapter) : base(requestAdapter, "{+baseurl}/api/audio-folders{?token*}", pathParameters)
+        public AudioFoldersRequestBuilder(Dictionary<string, object> pathParameters, IRequestAdapter requestAdapter) : base(requestAdapter, "{+baseurl}/api/audio-folders", pathParameters)
         {
         }
         /// <summary>
@@ -36,7 +36,7 @@ namespace GrimoireCli.Generated.Api.AudioFolders
         /// </summary>
         /// <param name="rawUrl">The raw URL to use for the request builder.</param>
         /// <param name="requestAdapter">The request adapter to use to execute the requests.</param>
-        public AudioFoldersRequestBuilder(string rawUrl, IRequestAdapter requestAdapter) : base(requestAdapter, "{+baseurl}/api/audio-folders{?token*}", rawUrl)
+        public AudioFoldersRequestBuilder(string rawUrl, IRequestAdapter requestAdapter) : base(requestAdapter, "{+baseurl}/api/audio-folders", rawUrl)
         {
         }
         /// <summary>
@@ -48,11 +48,11 @@ namespace GrimoireCli.Generated.Api.AudioFolders
         /// <exception cref="global::GrimoireCli.Generated.Models.HTTPValidationError">When receiving a 422 status code</exception>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
-        public async Task<global::GrimoireCli.Generated.Models.AudioFoldersResponse?> GetAsync(Action<RequestConfiguration<global::GrimoireCli.Generated.Api.AudioFolders.AudioFoldersRequestBuilder.AudioFoldersRequestBuilderGetQueryParameters>>? requestConfiguration = default, CancellationToken cancellationToken = default)
+        public async Task<global::GrimoireCli.Generated.Models.AudioFoldersResponse?> GetAsync(Action<RequestConfiguration<DefaultQueryParameters>>? requestConfiguration = default, CancellationToken cancellationToken = default)
         {
 #nullable restore
 #else
-        public async Task<global::GrimoireCli.Generated.Models.AudioFoldersResponse> GetAsync(Action<RequestConfiguration<global::GrimoireCli.Generated.Api.AudioFolders.AudioFoldersRequestBuilder.AudioFoldersRequestBuilderGetQueryParameters>> requestConfiguration = default, CancellationToken cancellationToken = default)
+        public async Task<global::GrimoireCli.Generated.Models.AudioFoldersResponse> GetAsync(Action<RequestConfiguration<DefaultQueryParameters>> requestConfiguration = default, CancellationToken cancellationToken = default)
         {
 #endif
             var requestInfo = ToGetRequestInformation(requestConfiguration);
@@ -72,11 +72,11 @@ namespace GrimoireCli.Generated.Api.AudioFolders
         /// <exception cref="global::GrimoireCli.Generated.Models.HTTPValidationError">When receiving a 422 status code</exception>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
-        public async Task<global::GrimoireCli.Generated.Models.Backend__routers__audio___schemas__FolderTagsOut?> PatchAsync(global::GrimoireCli.Generated.Models.FolderTagsUpdate body, Action<RequestConfiguration<global::GrimoireCli.Generated.Api.AudioFolders.AudioFoldersRequestBuilder.AudioFoldersRequestBuilderPatchQueryParameters>>? requestConfiguration = default, CancellationToken cancellationToken = default)
+        public async Task<global::GrimoireCli.Generated.Models.Backend__routers__audio___schemas__FolderTagsOut?> PatchAsync(global::GrimoireCli.Generated.Models.FolderTagsUpdate body, Action<RequestConfiguration<DefaultQueryParameters>>? requestConfiguration = default, CancellationToken cancellationToken = default)
         {
 #nullable restore
 #else
-        public async Task<global::GrimoireCli.Generated.Models.Backend__routers__audio___schemas__FolderTagsOut> PatchAsync(global::GrimoireCli.Generated.Models.FolderTagsUpdate body, Action<RequestConfiguration<global::GrimoireCli.Generated.Api.AudioFolders.AudioFoldersRequestBuilder.AudioFoldersRequestBuilderPatchQueryParameters>> requestConfiguration = default, CancellationToken cancellationToken = default)
+        public async Task<global::GrimoireCli.Generated.Models.Backend__routers__audio___schemas__FolderTagsOut> PatchAsync(global::GrimoireCli.Generated.Models.FolderTagsUpdate body, Action<RequestConfiguration<DefaultQueryParameters>> requestConfiguration = default, CancellationToken cancellationToken = default)
         {
 #endif
             if(ReferenceEquals(body, null)) throw new ArgumentNullException(nameof(body));
@@ -94,11 +94,11 @@ namespace GrimoireCli.Generated.Api.AudioFolders
         /// <param name="requestConfiguration">Configuration for the request such as headers, query parameters, and middleware options.</param>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
-        public RequestInformation ToGetRequestInformation(Action<RequestConfiguration<global::GrimoireCli.Generated.Api.AudioFolders.AudioFoldersRequestBuilder.AudioFoldersRequestBuilderGetQueryParameters>>? requestConfiguration = default)
+        public RequestInformation ToGetRequestInformation(Action<RequestConfiguration<DefaultQueryParameters>>? requestConfiguration = default)
         {
 #nullable restore
 #else
-        public RequestInformation ToGetRequestInformation(Action<RequestConfiguration<global::GrimoireCli.Generated.Api.AudioFolders.AudioFoldersRequestBuilder.AudioFoldersRequestBuilderGetQueryParameters>> requestConfiguration = default)
+        public RequestInformation ToGetRequestInformation(Action<RequestConfiguration<DefaultQueryParameters>> requestConfiguration = default)
         {
 #endif
             var requestInfo = new RequestInformation(Method.GET, UrlTemplate, PathParameters);
@@ -114,11 +114,11 @@ namespace GrimoireCli.Generated.Api.AudioFolders
         /// <param name="requestConfiguration">Configuration for the request such as headers, query parameters, and middleware options.</param>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
-        public RequestInformation ToPatchRequestInformation(global::GrimoireCli.Generated.Models.FolderTagsUpdate body, Action<RequestConfiguration<global::GrimoireCli.Generated.Api.AudioFolders.AudioFoldersRequestBuilder.AudioFoldersRequestBuilderPatchQueryParameters>>? requestConfiguration = default)
+        public RequestInformation ToPatchRequestInformation(global::GrimoireCli.Generated.Models.FolderTagsUpdate body, Action<RequestConfiguration<DefaultQueryParameters>>? requestConfiguration = default)
         {
 #nullable restore
 #else
-        public RequestInformation ToPatchRequestInformation(global::GrimoireCli.Generated.Models.FolderTagsUpdate body, Action<RequestConfiguration<global::GrimoireCli.Generated.Api.AudioFolders.AudioFoldersRequestBuilder.AudioFoldersRequestBuilderPatchQueryParameters>> requestConfiguration = default)
+        public RequestInformation ToPatchRequestInformation(global::GrimoireCli.Generated.Models.FolderTagsUpdate body, Action<RequestConfiguration<DefaultQueryParameters>> requestConfiguration = default)
         {
 #endif
             if(ReferenceEquals(body, null)) throw new ArgumentNullException(nameof(body));
@@ -138,59 +138,19 @@ namespace GrimoireCli.Generated.Api.AudioFolders
             return new global::GrimoireCli.Generated.Api.AudioFolders.AudioFoldersRequestBuilder(rawUrl, RequestAdapter);
         }
         /// <summary>
-        /// Returns all known audio folder paths and their associated tags.
+        /// Configuration for the request such as headers, query parameters, and middleware options.
         /// </summary>
+        [Obsolete("This class is deprecated. Please use the generic RequestConfiguration class generated by the generator.")]
         [global::System.CodeDom.Compiler.GeneratedCode("Kiota", "1.0.0")]
-        public partial class AudioFoldersRequestBuilderGetQueryParameters 
+        public partial class AudioFoldersRequestBuilderGetRequestConfiguration : RequestConfiguration<DefaultQueryParameters>
         {
-#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
-#nullable enable
-            #pragma warning disable CS1591
-            [QueryParameter("token")]
-            public string? Token { get; set; }
-            #pragma warning restore CS1591
-#nullable restore
-#else
-            #pragma warning disable CS1591
-            [QueryParameter("token")]
-            public string Token { get; set; }
-            #pragma warning restore CS1591
-#endif
         }
         /// <summary>
         /// Configuration for the request such as headers, query parameters, and middleware options.
         /// </summary>
         [Obsolete("This class is deprecated. Please use the generic RequestConfiguration class generated by the generator.")]
         [global::System.CodeDom.Compiler.GeneratedCode("Kiota", "1.0.0")]
-        public partial class AudioFoldersRequestBuilderGetRequestConfiguration : RequestConfiguration<global::GrimoireCli.Generated.Api.AudioFolders.AudioFoldersRequestBuilder.AudioFoldersRequestBuilderGetQueryParameters>
-        {
-        }
-        /// <summary>
-        /// Creates or replaces the tag list for a folder path. GM or admin role required.
-        /// </summary>
-        [global::System.CodeDom.Compiler.GeneratedCode("Kiota", "1.0.0")]
-        public partial class AudioFoldersRequestBuilderPatchQueryParameters 
-        {
-#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
-#nullable enable
-            #pragma warning disable CS1591
-            [QueryParameter("token")]
-            public string? Token { get; set; }
-            #pragma warning restore CS1591
-#nullable restore
-#else
-            #pragma warning disable CS1591
-            [QueryParameter("token")]
-            public string Token { get; set; }
-            #pragma warning restore CS1591
-#endif
-        }
-        /// <summary>
-        /// Configuration for the request such as headers, query parameters, and middleware options.
-        /// </summary>
-        [Obsolete("This class is deprecated. Please use the generic RequestConfiguration class generated by the generator.")]
-        [global::System.CodeDom.Compiler.GeneratedCode("Kiota", "1.0.0")]
-        public partial class AudioFoldersRequestBuilderPatchRequestConfiguration : RequestConfiguration<global::GrimoireCli.Generated.Api.AudioFolders.AudioFoldersRequestBuilder.AudioFoldersRequestBuilderPatchQueryParameters>
+        public partial class AudioFoldersRequestBuilderPatchRequestConfiguration : RequestConfiguration<DefaultQueryParameters>
         {
         }
     }

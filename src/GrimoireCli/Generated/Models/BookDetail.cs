@@ -260,10 +260,10 @@ namespace GrimoireCli.Generated.Models
         /// <summary>The urls property</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
-        public List<global::GrimoireCli.Generated.Models.Backend__routers__books___schemas__LinkEntry>? Urls { get; set; }
+        public List<global::GrimoireCli.Generated.Models.LinkRef>? Urls { get; set; }
 #nullable restore
 #else
-        public List<global::GrimoireCli.Generated.Models.Backend__routers__books___schemas__LinkEntry> Urls { get; set; }
+        public List<global::GrimoireCli.Generated.Models.LinkRef> Urls { get; set; }
 #endif
         /// <summary>The variant_kind property</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
@@ -405,7 +405,7 @@ namespace GrimoireCli.Generated.Models
                 { "relative_path", n => { RelativePath = n.GetObjectValue<global::GrimoireCli.Generated.Models.BookDetail.BookDetail_relative_path>(global::GrimoireCli.Generated.Models.BookDetail.BookDetail_relative_path.CreateFromDiscriminatorValue); } },
                 { "tags", n => { Tags = n.GetCollectionOfPrimitiveValues<string>()?.AsList(); } },
                 { "title", n => { Title = n.GetStringValue(); } },
-                { "urls", n => { Urls = n.GetCollectionOfObjectValues<global::GrimoireCli.Generated.Models.Backend__routers__books___schemas__LinkEntry>(global::GrimoireCli.Generated.Models.Backend__routers__books___schemas__LinkEntry.CreateFromDiscriminatorValue)?.AsList(); } },
+                { "urls", n => { Urls = n.GetCollectionOfObjectValues<global::GrimoireCli.Generated.Models.LinkRef>(global::GrimoireCli.Generated.Models.LinkRef.CreateFromDiscriminatorValue)?.AsList(); } },
                 { "variant_kind", n => { VariantKind = n.GetStringValue(); } },
                 { "variant_label", n => { VariantLabel = n.GetStringValue(); } },
                 { "variant_main_filename", n => { VariantMainFilename = n.GetStringValue(); } },
@@ -459,7 +459,7 @@ namespace GrimoireCli.Generated.Models
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.BookDetail.BookDetail_relative_path>("relative_path", RelativePath);
             writer.WriteCollectionOfPrimitiveValues<string>("tags", Tags);
             writer.WriteStringValue("title", Title);
-            writer.WriteCollectionOfObjectValues<global::GrimoireCli.Generated.Models.Backend__routers__books___schemas__LinkEntry>("urls", Urls);
+            writer.WriteCollectionOfObjectValues<global::GrimoireCli.Generated.Models.LinkRef>("urls", Urls);
             writer.WriteStringValue("variant_kind", VariantKind);
             writer.WriteStringValue("variant_label", VariantLabel);
             writer.WriteStringValue("variant_main_filename", VariantMainFilename);

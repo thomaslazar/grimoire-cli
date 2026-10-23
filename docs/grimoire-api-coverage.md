@@ -2,7 +2,7 @@
 
 Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any) that implements it.
 
-- **Reference:** spec fetched live from the pinned stack's `/api/openapi.json` (v1.9.0, 306 paths, 399 operations) and the upstream router source read from the same container. Tested range: `1.9.0` only (`GrimoireApiClient.cs`).
+- **Reference:** spec fetched live from the pinned stack's `/api/openapi.json` (v1.9.1, 316 paths, 415 operations) and the upstream router source read from the same container. Tested range: `1.9.0`-`1.9.1` (`GrimoireApiClient.cs`).
 - **Perm** column uses Grimoire's roles (`admin` / `gm or admin` / `not guest`); blank = any authenticated user. `?` = a dependency this script could not resolve.
 - **Key** column is the API key permission a route needs (`—`: no key can call it), derived from `backend/api_keys.py` in the same container.
 - ✅ = covered by a CLI command · — = not implemented · 🔒 = internal-only (no user-facing verb); 🔒 rows never count as covered.
@@ -13,22 +13,22 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | Tag | Covered / Total |
 |-----|-----------------|
 | (untagged) | 0 / 1 |
-| addons | 8 / 8 |
+| addons | 8 / 10 |
 | api-keys | 0 / 6 |
 | audio | 15 / 16 |
 | audio-sets | 0 / 5 |
 | auth | 2 / 15 |
 | backups | 6 / 6 |
 | bookmarks | 0 / 4 |
-| books | 16 / 20 |
+| books | 16 / 21 |
 | campaigns | 80 / 93 |
-| characters | 0 / 20 |
+| characters | 0 / 23 |
 | codex | 0 / 8 |
 | content | 0 / 6 |
 | downloads | 1 / 1 |
-| duplicates | 13 / 14 |
+| duplicates | 13 / 18 |
 | favorites | 0 / 3 |
-| files | 9 / 10 |
+| files | 9 / 16 |
 | library | 4 / 7 |
 | logs | 1 / 1 |
 | lookups | 15 / 15 |
@@ -48,7 +48,7 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | token-frames | 0 / 2 |
 | tokens | 11 / 11 |
 | users | 0 / 16 |
-| **Total** | **238 / 399** |
+| **Total** | **238 / 415** |
 
 2 operation(s) are internal-only (🔒) and excluded from covered counts.
 
@@ -64,7 +64,9 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 |--------|------|-------------|------|-----|-----|
 | GET | `/api/addons` | List add-ons | admin | addons: read | `addons list` ✅ |
 | POST | `/api/addons/refresh` | Refresh the add-on index | admin | addons: write | `addons refresh` ✅ |
-| PATCH | `/api/addons/settings` | Update add-on settings | admin | addons: write | `addons settings` ✅ |
+| PATCH | `/api/addons/settings` | Update add-on settings | admin | — | `addons settings` ✅ |
+| PUT | `/api/addons/sources/credential` | Set a private source's access token | admin | — | — |
+| DELETE | `/api/addons/sources/credential` | Remove a private source's access token | admin | — | — |
 | POST | `/api/addons/update-all` | Update all add-ons | admin | addons: write | `addons upgrade-all` ✅ |
 | GET | `/api/addons/verify-index` | Verify an add-on index URL |  | addons: read | `addons verify-index` ✅ |
 | PATCH | `/api/addons/{addon_id}` | Enable, disable, or approve an add-on | admin | addons: write | `addons update` ✅ |
@@ -172,6 +174,7 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | GET | `/api/books/{book_id}/page/{page_num}/shapes` | Suggest cut-outs on a page |  | books: read | — |
 | GET | `/api/books/{book_id}/page/{page_num}/size` | Get a page's size |  | books: read | — |
 | GET | `/api/books/{book_id}/page/{page_num}/text` | Get page text |  | books: read | `books page-text` ✅ |
+| GET | `/api/books/{book_id}/page/{page_num}/tile` | Render one zoom tile of a page as WebP |  | books: read | — |
 | GET | `/api/books/{book_id}/page/{page_num}/words` | Get page word bounding boxes |  | books: read | `books page-words` ✅ |
 | POST | `/api/books/{book_id}/reindex` | Re-run OCR on a book (optional DPI override) | gm or admin | books: write | `books reindex` ✅ |
 | POST | `/api/books/{book_id}/rescan` | Re-read a book from disk and rebuild its search index | gm or admin | books: write | `books rescan` ✅ |
@@ -215,11 +218,11 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | GET | `/api/campaigns/{campaign_id}/eligible-members` | List users that can be invited |  | campaigns: read | `campaigns members eligible` ✅ |
 | POST | `/api/campaigns/{campaign_id}/files` | Upload a campaign file (GM); links it as a resource |  | campaigns: write | `campaigns files upload` ✅ |
 | GET | `/api/campaigns/{campaign_id}/files/{file_id}` | Download a campaign file (honours resource visibility) |  | campaigns: read | `campaigns files get` ✅ |
-| POST | `/api/campaigns/{campaign_id}/guests` | Create a guest invite code for a GM campaign |  | campaigns: write | `campaigns guests create` ✅ |
-| GET | `/api/campaigns/{campaign_id}/guests` | List a campaign's guests and their invite codes |  | campaigns: read | `campaigns guests list` ✅ |
+| POST | `/api/campaigns/{campaign_id}/guests` | Create a guest invite code for a GM campaign |  | — | `campaigns guests create` ✅ |
+| GET | `/api/campaigns/{campaign_id}/guests` | List a campaign's guests and their invite codes |  | — | `campaigns guests list` ✅ |
 | DELETE | `/api/campaigns/{campaign_id}/guests/{member_id}` | Remove a guest (deletes the guest account) |  | campaigns: write | `campaigns guests remove` ✅ |
-| POST | `/api/campaigns/{campaign_id}/guests/{member_id}/regenerate` | Regenerate a guest's invite code |  | campaigns: write | `campaigns guests regenerate` ✅ |
-| GET | `/api/campaigns/{campaign_id}/guests/{member_id}/share-template` | Get share text and links for a guest invite code |  | campaigns: read | `campaigns guests share` ✅ |
+| POST | `/api/campaigns/{campaign_id}/guests/{member_id}/regenerate` | Regenerate a guest's invite code |  | — | `campaigns guests regenerate` ✅ |
+| GET | `/api/campaigns/{campaign_id}/guests/{member_id}/share-template` | Get share text and links for a guest invite code |  | — | `campaigns guests share` ✅ |
 | POST | `/api/campaigns/{campaign_id}/images` | Upload an image (GM); links it as an image resource for note embedding |  | campaigns: write | `campaigns files upload-image` ✅ |
 | POST | `/api/campaigns/{campaign_id}/invite` | Invite a player to a GM campaign |  | campaigns: write | `campaigns members invite` ✅ |
 | POST | `/api/campaigns/{campaign_id}/members/{member_id}/art` | Upload a member's character art |  | campaigns: write | `campaigns members art upload` ✅ |
@@ -297,6 +300,9 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | PUT | `/api/characters/{character_id}` | Update a character |  | characters: write | — |
 | DELETE | `/api/characters/{character_id}` | Delete a character |  | characters: write | — |
 | GET | `/api/characters/{character_id}/export` | Export a character as a self-contained file |  | characters: read | — |
+| POST | `/api/characters/{character_id}/images/{field}` | Set the picture an image field holds |  | characters: write | — |
+| GET | `/api/characters/{character_id}/images/{field}` | An image field's picture |  | characters: read | — |
+| DELETE | `/api/characters/{character_id}/images/{field}` | Remove an image field's picture |  | characters: write | — |
 | POST | `/api/characters/{character_id}/portrait` | Set a character's portrait |  | characters: write | — |
 | GET | `/api/characters/{character_id}/portrait` | A character's portrait image |  | characters: read | — |
 | DELETE | `/api/characters/{character_id}/portrait` | Remove a character's portrait |  | characters: write | — |
@@ -344,11 +350,15 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | GET | `/api/duplicates/groups` | Candidate duplicate groups from the last scan | admin | duplicates: read | `duplicates groups` ✅ |
 | DELETE | `/api/duplicates/items/{resource_type}/{item_id}` | Delete one duplicate record, and optionally its file | admin | duplicates: write | `duplicates delete` ✅ |
 | POST | `/api/duplicates/link` | File items under a parent as its variants | admin | duplicates: write | `duplicates link` ✅ |
+| POST | `/api/duplicates/merge` | Merge copies into one, moving everything that points at them | admin | duplicates: write | — |
+| POST | `/api/duplicates/merge-batch` | Run several merges behind one confirmation | admin | duplicates: write | — |
 | POST | `/api/duplicates/merge-metadata` | Copy metadata fields from one copy onto another | admin | duplicates: write | `duplicates merge-metadata` ✅ |
 | POST | `/api/duplicates/promote` | Make a different copy the main version of an existing family | admin | duplicates: write | `duplicates promote` ✅ |
 | POST | `/api/duplicates/scan` | Start a duplicate-detection scan | admin | duplicates: write | `duplicates scan` ✅ |
 | GET | `/api/duplicates/scan-status` | Progress of the duplicate-detection scan | admin | duplicates: read | `duplicates scan-status` ✅ |
 | POST | `/api/duplicates/unlink` | Promote variants back to standalone entries | admin | duplicates: write | `duplicates unlink` ✅ |
+| GET | `/api/naming/variant-rules` | List the library's variant filename rules | admin | duplicates: read | — |
+| PUT | `/api/naming/variant-rules` | Replace the library's variant filename rules | admin | duplicates: write | — |
 
 ## favorites
 
@@ -372,6 +382,12 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | POST | `/api/files/move` | Move files or folders, preserving their metadata | admin | files: write | `files move` ✅ |
 | POST | `/api/files/rename` | Rename a file or folder on disk | admin | files: write | `files rename` ✅ |
 | POST | `/api/files/upload` | Upload a single file into a library folder | admin | files: write | `files upload` ✅ |
+| POST | `/api/naming/apply-titles` | Set books' titles from their filenames | admin | files: write | — |
+| GET | `/api/naming/folders` | List folder naming patterns | admin | files: read | — |
+| PUT | `/api/naming/folders` | Set a folder's naming pattern | admin | files: write | — |
+| DELETE | `/api/naming/folders` | Remove a folder's naming pattern | admin | files: write | — |
+| POST | `/api/naming/preview` | Preview a naming pattern against the books it governs | admin | files: read | — |
+| POST | `/api/naming/rename` | Rename books' files onto the folder's naming pattern | admin | files: write | — |
 
 ## library
 
@@ -508,8 +524,8 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 |--------|------|-------------|------|-----|-----|
 | GET | `/api/settings` | Get app settings | admin | settings: read | — |
 | PATCH | `/api/settings` | Update app settings | admin | settings: write | — |
-| POST | `/api/settings/oidc-button-icon` | Upload the OIDC login-button icon | admin | settings: write | — |
-| DELETE | `/api/settings/oidc-button-icon` | Remove the OIDC login-button icon | admin | settings: write | — |
+| POST | `/api/settings/oidc-button-icon` | Upload the OIDC login-button icon | admin | — | — |
+| DELETE | `/api/settings/oidc-button-icon` | Remove the OIDC login-button icon | admin | — | — |
 | GET | `/api/settings/ui` | UI settings (any authenticated user) |  | settings: read | — |
 
 ## share
@@ -527,9 +543,9 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 |--------|------|-------------|------|-----|-----|
 | GET | `/api/share-links` | List my share links | not guest | share-links: read | — |
 | POST | `/api/share-links` | Create a share link | not guest | share-links: write | — |
-| GET | `/api/share-links/all` | List every share link | admin | share-links: read | — |
+| GET | `/api/share-links/all` | List every share link | admin | — | — |
 | GET | `/api/share-links/permission` | Whether I may create share links | not guest | share-links: read | — |
-| GET | `/api/share-links/users/{user_id}` | List a user's share links | admin | share-links: read | — |
+| GET | `/api/share-links/users/{user_id}` | List a user's share links | admin | — | — |
 | PATCH | `/api/share-links/{link_id}` | Change a share link | not guest | share-links: write | — |
 | DELETE | `/api/share-links/{link_id}` | Delete a share link | not guest | share-links: write | — |
 | POST | `/api/share-links/{link_id}/revoke` | Revoke a share link | not guest | share-links: write | — |

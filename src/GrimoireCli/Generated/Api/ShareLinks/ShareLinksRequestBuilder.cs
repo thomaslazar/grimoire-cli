@@ -53,7 +53,7 @@ namespace GrimoireCli.Generated.Api.ShareLinks
         /// </summary>
         /// <param name="pathParameters">Path parameters for the request</param>
         /// <param name="requestAdapter">The request adapter to use to execute the requests.</param>
-        public ShareLinksRequestBuilder(Dictionary<string, object> pathParameters, IRequestAdapter requestAdapter) : base(requestAdapter, "{+baseurl}/api/share-links{?resource_id*,resource_type*,token*,variant*}", pathParameters)
+        public ShareLinksRequestBuilder(Dictionary<string, object> pathParameters, IRequestAdapter requestAdapter) : base(requestAdapter, "{+baseurl}/api/share-links{?resource_id*,resource_type*,variant*}", pathParameters)
         {
         }
         /// <summary>
@@ -61,7 +61,7 @@ namespace GrimoireCli.Generated.Api.ShareLinks
         /// </summary>
         /// <param name="rawUrl">The raw URL to use for the request builder.</param>
         /// <param name="requestAdapter">The request adapter to use to execute the requests.</param>
-        public ShareLinksRequestBuilder(string rawUrl, IRequestAdapter requestAdapter) : base(requestAdapter, "{+baseurl}/api/share-links{?resource_id*,resource_type*,token*,variant*}", rawUrl)
+        public ShareLinksRequestBuilder(string rawUrl, IRequestAdapter requestAdapter) : base(requestAdapter, "{+baseurl}/api/share-links{?resource_id*,resource_type*,variant*}", rawUrl)
         {
         }
         /// <summary>
@@ -98,11 +98,11 @@ namespace GrimoireCli.Generated.Api.ShareLinks
         /// <exception cref="global::GrimoireCli.Generated.Models.HTTPValidationError">When receiving a 422 status code</exception>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
-        public async Task<global::GrimoireCli.Generated.Models.ShareLinkOut?> PostAsync(global::GrimoireCli.Generated.Models.ShareLinkCreate body, Action<RequestConfiguration<global::GrimoireCli.Generated.Api.ShareLinks.ShareLinksRequestBuilder.ShareLinksRequestBuilderPostQueryParameters>>? requestConfiguration = default, CancellationToken cancellationToken = default)
+        public async Task<global::GrimoireCli.Generated.Models.ShareLinkOut?> PostAsync(global::GrimoireCli.Generated.Models.ShareLinkCreate body, Action<RequestConfiguration<DefaultQueryParameters>>? requestConfiguration = default, CancellationToken cancellationToken = default)
         {
 #nullable restore
 #else
-        public async Task<global::GrimoireCli.Generated.Models.ShareLinkOut> PostAsync(global::GrimoireCli.Generated.Models.ShareLinkCreate body, Action<RequestConfiguration<global::GrimoireCli.Generated.Api.ShareLinks.ShareLinksRequestBuilder.ShareLinksRequestBuilderPostQueryParameters>> requestConfiguration = default, CancellationToken cancellationToken = default)
+        public async Task<global::GrimoireCli.Generated.Models.ShareLinkOut> PostAsync(global::GrimoireCli.Generated.Models.ShareLinkCreate body, Action<RequestConfiguration<DefaultQueryParameters>> requestConfiguration = default, CancellationToken cancellationToken = default)
         {
 #endif
             if(ReferenceEquals(body, null)) throw new ArgumentNullException(nameof(body));
@@ -140,11 +140,11 @@ namespace GrimoireCli.Generated.Api.ShareLinks
         /// <param name="requestConfiguration">Configuration for the request such as headers, query parameters, and middleware options.</param>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
-        public RequestInformation ToPostRequestInformation(global::GrimoireCli.Generated.Models.ShareLinkCreate body, Action<RequestConfiguration<global::GrimoireCli.Generated.Api.ShareLinks.ShareLinksRequestBuilder.ShareLinksRequestBuilderPostQueryParameters>>? requestConfiguration = default)
+        public RequestInformation ToPostRequestInformation(global::GrimoireCli.Generated.Models.ShareLinkCreate body, Action<RequestConfiguration<DefaultQueryParameters>>? requestConfiguration = default)
         {
 #nullable restore
 #else
-        public RequestInformation ToPostRequestInformation(global::GrimoireCli.Generated.Models.ShareLinkCreate body, Action<RequestConfiguration<global::GrimoireCli.Generated.Api.ShareLinks.ShareLinksRequestBuilder.ShareLinksRequestBuilderPostQueryParameters>> requestConfiguration = default)
+        public RequestInformation ToPostRequestInformation(global::GrimoireCli.Generated.Models.ShareLinkCreate body, Action<RequestConfiguration<DefaultQueryParameters>> requestConfiguration = default)
         {
 #endif
             if(ReferenceEquals(body, null)) throw new ArgumentNullException(nameof(body));
@@ -198,19 +198,6 @@ namespace GrimoireCli.Generated.Api.ShareLinks
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
             #pragma warning disable CS1591
-            [QueryParameter("token")]
-            public string? Token { get; set; }
-            #pragma warning restore CS1591
-#nullable restore
-#else
-            #pragma warning disable CS1591
-            [QueryParameter("token")]
-            public string Token { get; set; }
-            #pragma warning restore CS1591
-#endif
-#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
-#nullable enable
-            #pragma warning disable CS1591
             [QueryParameter("variant")]
             public string? Variant { get; set; }
             #pragma warning restore CS1591
@@ -231,31 +218,11 @@ namespace GrimoireCli.Generated.Api.ShareLinks
         {
         }
         /// <summary>
-        /// Creates a public link to one book, map, token, audio track or model you can read. Optional `label`, `expires_in_days` (null for never) and `password`. `variant: &quot;otfbm&quot;` (maps only, with an optional `cell` of 20-100) makes the link serve the map resized as an OTFBM background instead of the original. 403 when share links are off or you may not create them.
-        /// </summary>
-        [global::System.CodeDom.Compiler.GeneratedCode("Kiota", "1.0.0")]
-        public partial class ShareLinksRequestBuilderPostQueryParameters 
-        {
-#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
-#nullable enable
-            #pragma warning disable CS1591
-            [QueryParameter("token")]
-            public string? Token { get; set; }
-            #pragma warning restore CS1591
-#nullable restore
-#else
-            #pragma warning disable CS1591
-            [QueryParameter("token")]
-            public string Token { get; set; }
-            #pragma warning restore CS1591
-#endif
-        }
-        /// <summary>
         /// Configuration for the request such as headers, query parameters, and middleware options.
         /// </summary>
         [Obsolete("This class is deprecated. Please use the generic RequestConfiguration class generated by the generator.")]
         [global::System.CodeDom.Compiler.GeneratedCode("Kiota", "1.0.0")]
-        public partial class ShareLinksRequestBuilderPostRequestConfiguration : RequestConfiguration<global::GrimoireCli.Generated.Api.ShareLinks.ShareLinksRequestBuilder.ShareLinksRequestBuilderPostQueryParameters>
+        public partial class ShareLinksRequestBuilderPostRequestConfiguration : RequestConfiguration<DefaultQueryParameters>
         {
         }
     }

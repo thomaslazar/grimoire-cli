@@ -23,6 +23,10 @@ namespace GrimoireCli.Generated.Models
 #else
         public string Id { get; set; }
 #endif
+        /// <summary>The is_one_page property</summary>
+        public bool? IsOnePage { get; set; }
+        /// <summary>The is_system_agnostic property</summary>
+        public bool? IsSystemAgnostic { get; set; }
         /// <summary>The name property</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
@@ -45,6 +49,8 @@ namespace GrimoireCli.Generated.Models
         public BookSystemRef()
         {
             AdditionalData = new Dictionary<string, object>();
+            IsOnePage = false;
+            IsSystemAgnostic = false;
         }
         /// <summary>
         /// Creates a new instance of the appropriate class based on discriminator value
@@ -65,6 +71,8 @@ namespace GrimoireCli.Generated.Models
             return new Dictionary<string, Action<IParseNode>>
             {
                 { "id", n => { Id = n.GetStringValue(); } },
+                { "is_one_page", n => { IsOnePage = n.GetBoolValue(); } },
+                { "is_system_agnostic", n => { IsSystemAgnostic = n.GetBoolValue(); } },
                 { "name", n => { Name = n.GetStringValue(); } },
                 { "slug", n => { Slug = n.GetStringValue(); } },
             };
@@ -77,6 +85,8 @@ namespace GrimoireCli.Generated.Models
         {
             if(ReferenceEquals(writer, null)) throw new ArgumentNullException(nameof(writer));
             writer.WriteStringValue("id", Id);
+            writer.WriteBoolValue("is_one_page", IsOnePage);
+            writer.WriteBoolValue("is_system_agnostic", IsSystemAgnostic);
             writer.WriteStringValue("name", Name);
             writer.WriteStringValue("slug", Slug);
             writer.WriteAdditionalData(AdditionalData);

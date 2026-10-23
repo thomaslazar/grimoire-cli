@@ -41,7 +41,7 @@ namespace GrimoireCli.Generated.Api.Books
         /// </summary>
         /// <param name="pathParameters">Path parameters for the request</param>
         /// <param name="requestAdapter">The request adapter to use to execute the requests.</param>
-        public BooksRequestBuilder(Dictionary<string, object> pathParameters, IRequestAdapter requestAdapter) : base(requestAdapter, "{+baseurl}/api/books{?added_since*,category*,limit*,offset*,order*,sort*,system_id*,token*}", pathParameters)
+        public BooksRequestBuilder(Dictionary<string, object> pathParameters, IRequestAdapter requestAdapter) : base(requestAdapter, "{+baseurl}/api/books{?added_since*,category*,limit*,offset*,order*,sort*,system_id*}", pathParameters)
         {
         }
         /// <summary>
@@ -49,7 +49,7 @@ namespace GrimoireCli.Generated.Api.Books
         /// </summary>
         /// <param name="rawUrl">The raw URL to use for the request builder.</param>
         /// <param name="requestAdapter">The request adapter to use to execute the requests.</param>
-        public BooksRequestBuilder(string rawUrl, IRequestAdapter requestAdapter) : base(requestAdapter, "{+baseurl}/api/books{?added_since*,category*,limit*,offset*,order*,sort*,system_id*,token*}", rawUrl)
+        public BooksRequestBuilder(string rawUrl, IRequestAdapter requestAdapter) : base(requestAdapter, "{+baseurl}/api/books{?added_since*,category*,limit*,offset*,order*,sort*,system_id*}", rawUrl)
         {
         }
         /// <summary>
@@ -185,19 +185,6 @@ namespace GrimoireCli.Generated.Api.Books
             #pragma warning disable CS1591
             [QueryParameter("system_id")]
             public string SystemId { get; set; }
-            #pragma warning restore CS1591
-#endif
-#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
-#nullable enable
-            #pragma warning disable CS1591
-            [QueryParameter("token")]
-            public string? Token { get; set; }
-            #pragma warning restore CS1591
-#nullable restore
-#else
-            #pragma warning disable CS1591
-            [QueryParameter("token")]
-            public string Token { get; set; }
             #pragma warning restore CS1591
 #endif
         }

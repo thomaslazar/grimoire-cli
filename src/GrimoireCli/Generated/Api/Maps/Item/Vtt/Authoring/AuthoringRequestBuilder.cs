@@ -22,7 +22,7 @@ namespace GrimoireCli.Generated.Api.Maps.Item.Vtt.Authoring
         /// </summary>
         /// <param name="pathParameters">Path parameters for the request</param>
         /// <param name="requestAdapter">The request adapter to use to execute the requests.</param>
-        public AuthoringRequestBuilder(Dictionary<string, object> pathParameters, IRequestAdapter requestAdapter) : base(requestAdapter, "{+baseurl}/api/maps/{map_id}/vtt/authoring{?token*}", pathParameters)
+        public AuthoringRequestBuilder(Dictionary<string, object> pathParameters, IRequestAdapter requestAdapter) : base(requestAdapter, "{+baseurl}/api/maps/{map_id}/vtt/authoring", pathParameters)
         {
         }
         /// <summary>
@@ -30,7 +30,7 @@ namespace GrimoireCli.Generated.Api.Maps.Item.Vtt.Authoring
         /// </summary>
         /// <param name="rawUrl">The raw URL to use for the request builder.</param>
         /// <param name="requestAdapter">The request adapter to use to execute the requests.</param>
-        public AuthoringRequestBuilder(string rawUrl, IRequestAdapter requestAdapter) : base(requestAdapter, "{+baseurl}/api/maps/{map_id}/vtt/authoring{?token*}", rawUrl)
+        public AuthoringRequestBuilder(string rawUrl, IRequestAdapter requestAdapter) : base(requestAdapter, "{+baseurl}/api/maps/{map_id}/vtt/authoring", rawUrl)
         {
         }
         /// <summary>
@@ -42,11 +42,11 @@ namespace GrimoireCli.Generated.Api.Maps.Item.Vtt.Authoring
         /// <exception cref="global::GrimoireCli.Generated.Models.HTTPValidationError">When receiving a 422 status code</exception>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
-        public async Task<global::GrimoireCli.Generated.Models.VttAuthoringResponse?> GetAsync(Action<RequestConfiguration<global::GrimoireCli.Generated.Api.Maps.Item.Vtt.Authoring.AuthoringRequestBuilder.AuthoringRequestBuilderGetQueryParameters>>? requestConfiguration = default, CancellationToken cancellationToken = default)
+        public async Task<global::GrimoireCli.Generated.Models.VttAuthoringResponse?> GetAsync(Action<RequestConfiguration<DefaultQueryParameters>>? requestConfiguration = default, CancellationToken cancellationToken = default)
         {
 #nullable restore
 #else
-        public async Task<global::GrimoireCli.Generated.Models.VttAuthoringResponse> GetAsync(Action<RequestConfiguration<global::GrimoireCli.Generated.Api.Maps.Item.Vtt.Authoring.AuthoringRequestBuilder.AuthoringRequestBuilderGetQueryParameters>> requestConfiguration = default, CancellationToken cancellationToken = default)
+        public async Task<global::GrimoireCli.Generated.Models.VttAuthoringResponse> GetAsync(Action<RequestConfiguration<DefaultQueryParameters>> requestConfiguration = default, CancellationToken cancellationToken = default)
         {
 #endif
             var requestInfo = ToGetRequestInformation(requestConfiguration);
@@ -66,11 +66,11 @@ namespace GrimoireCli.Generated.Api.Maps.Item.Vtt.Authoring
         /// <exception cref="global::GrimoireCli.Generated.Models.HTTPValidationError">When receiving a 422 status code</exception>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
-        public async Task<global::GrimoireCli.Generated.Models.VttAuthoringSaveResponse?> PutAsync(global::GrimoireCli.Generated.Models.VttAuthoringUpdate body, Action<RequestConfiguration<global::GrimoireCli.Generated.Api.Maps.Item.Vtt.Authoring.AuthoringRequestBuilder.AuthoringRequestBuilderPutQueryParameters>>? requestConfiguration = default, CancellationToken cancellationToken = default)
+        public async Task<global::GrimoireCli.Generated.Models.VttAuthoringSaveResponse?> PutAsync(global::GrimoireCli.Generated.Models.VttAuthoringUpdate body, Action<RequestConfiguration<DefaultQueryParameters>>? requestConfiguration = default, CancellationToken cancellationToken = default)
         {
 #nullable restore
 #else
-        public async Task<global::GrimoireCli.Generated.Models.VttAuthoringSaveResponse> PutAsync(global::GrimoireCli.Generated.Models.VttAuthoringUpdate body, Action<RequestConfiguration<global::GrimoireCli.Generated.Api.Maps.Item.Vtt.Authoring.AuthoringRequestBuilder.AuthoringRequestBuilderPutQueryParameters>> requestConfiguration = default, CancellationToken cancellationToken = default)
+        public async Task<global::GrimoireCli.Generated.Models.VttAuthoringSaveResponse> PutAsync(global::GrimoireCli.Generated.Models.VttAuthoringUpdate body, Action<RequestConfiguration<DefaultQueryParameters>> requestConfiguration = default, CancellationToken cancellationToken = default)
         {
 #endif
             if(ReferenceEquals(body, null)) throw new ArgumentNullException(nameof(body));
@@ -88,11 +88,11 @@ namespace GrimoireCli.Generated.Api.Maps.Item.Vtt.Authoring
         /// <param name="requestConfiguration">Configuration for the request such as headers, query parameters, and middleware options.</param>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
-        public RequestInformation ToGetRequestInformation(Action<RequestConfiguration<global::GrimoireCli.Generated.Api.Maps.Item.Vtt.Authoring.AuthoringRequestBuilder.AuthoringRequestBuilderGetQueryParameters>>? requestConfiguration = default)
+        public RequestInformation ToGetRequestInformation(Action<RequestConfiguration<DefaultQueryParameters>>? requestConfiguration = default)
         {
 #nullable restore
 #else
-        public RequestInformation ToGetRequestInformation(Action<RequestConfiguration<global::GrimoireCli.Generated.Api.Maps.Item.Vtt.Authoring.AuthoringRequestBuilder.AuthoringRequestBuilderGetQueryParameters>> requestConfiguration = default)
+        public RequestInformation ToGetRequestInformation(Action<RequestConfiguration<DefaultQueryParameters>> requestConfiguration = default)
         {
 #endif
             var requestInfo = new RequestInformation(Method.GET, UrlTemplate, PathParameters);
@@ -108,11 +108,11 @@ namespace GrimoireCli.Generated.Api.Maps.Item.Vtt.Authoring
         /// <param name="requestConfiguration">Configuration for the request such as headers, query parameters, and middleware options.</param>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
-        public RequestInformation ToPutRequestInformation(global::GrimoireCli.Generated.Models.VttAuthoringUpdate body, Action<RequestConfiguration<global::GrimoireCli.Generated.Api.Maps.Item.Vtt.Authoring.AuthoringRequestBuilder.AuthoringRequestBuilderPutQueryParameters>>? requestConfiguration = default)
+        public RequestInformation ToPutRequestInformation(global::GrimoireCli.Generated.Models.VttAuthoringUpdate body, Action<RequestConfiguration<DefaultQueryParameters>>? requestConfiguration = default)
         {
 #nullable restore
 #else
-        public RequestInformation ToPutRequestInformation(global::GrimoireCli.Generated.Models.VttAuthoringUpdate body, Action<RequestConfiguration<global::GrimoireCli.Generated.Api.Maps.Item.Vtt.Authoring.AuthoringRequestBuilder.AuthoringRequestBuilderPutQueryParameters>> requestConfiguration = default)
+        public RequestInformation ToPutRequestInformation(global::GrimoireCli.Generated.Models.VttAuthoringUpdate body, Action<RequestConfiguration<DefaultQueryParameters>> requestConfiguration = default)
         {
 #endif
             if(ReferenceEquals(body, null)) throw new ArgumentNullException(nameof(body));
@@ -132,59 +132,19 @@ namespace GrimoireCli.Generated.Api.Maps.Item.Vtt.Authoring
             return new global::GrimoireCli.Generated.Api.Maps.Item.Vtt.Authoring.AuthoringRequestBuilder(rawUrl, RequestAdapter);
         }
         /// <summary>
-        /// Returns the walls, portals, lights and environment authored for a map in the in-app editor, along with the resolved grid to draw them on. `data` is null when nothing has been authored.
+        /// Configuration for the request such as headers, query parameters, and middleware options.
         /// </summary>
+        [Obsolete("This class is deprecated. Please use the generic RequestConfiguration class generated by the generator.")]
         [global::System.CodeDom.Compiler.GeneratedCode("Kiota", "1.0.0")]
-        public partial class AuthoringRequestBuilderGetQueryParameters 
+        public partial class AuthoringRequestBuilderGetRequestConfiguration : RequestConfiguration<DefaultQueryParameters>
         {
-#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
-#nullable enable
-            #pragma warning disable CS1591
-            [QueryParameter("token")]
-            public string? Token { get; set; }
-            #pragma warning restore CS1591
-#nullable restore
-#else
-            #pragma warning disable CS1591
-            [QueryParameter("token")]
-            public string Token { get; set; }
-            #pragma warning restore CS1591
-#endif
         }
         /// <summary>
         /// Configuration for the request such as headers, query parameters, and middleware options.
         /// </summary>
         [Obsolete("This class is deprecated. Please use the generic RequestConfiguration class generated by the generator.")]
         [global::System.CodeDom.Compiler.GeneratedCode("Kiota", "1.0.0")]
-        public partial class AuthoringRequestBuilderGetRequestConfiguration : RequestConfiguration<global::GrimoireCli.Generated.Api.Maps.Item.Vtt.Authoring.AuthoringRequestBuilder.AuthoringRequestBuilderGetQueryParameters>
-        {
-        }
-        /// <summary>
-        /// Replaces a map&apos;s authored walls/portals/lights in one atomic write. Body: {data: {...}} — send `{&quot;data&quot;: null}` to clear everything. Coordinates are in grid units. Nothing is written to the library: the `.uvtt` is built on demand by the export endpoint. GM or admin role required.
-        /// </summary>
-        [global::System.CodeDom.Compiler.GeneratedCode("Kiota", "1.0.0")]
-        public partial class AuthoringRequestBuilderPutQueryParameters 
-        {
-#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
-#nullable enable
-            #pragma warning disable CS1591
-            [QueryParameter("token")]
-            public string? Token { get; set; }
-            #pragma warning restore CS1591
-#nullable restore
-#else
-            #pragma warning disable CS1591
-            [QueryParameter("token")]
-            public string Token { get; set; }
-            #pragma warning restore CS1591
-#endif
-        }
-        /// <summary>
-        /// Configuration for the request such as headers, query parameters, and middleware options.
-        /// </summary>
-        [Obsolete("This class is deprecated. Please use the generic RequestConfiguration class generated by the generator.")]
-        [global::System.CodeDom.Compiler.GeneratedCode("Kiota", "1.0.0")]
-        public partial class AuthoringRequestBuilderPutRequestConfiguration : RequestConfiguration<global::GrimoireCli.Generated.Api.Maps.Item.Vtt.Authoring.AuthoringRequestBuilder.AuthoringRequestBuilderPutQueryParameters>
+        public partial class AuthoringRequestBuilderPutRequestConfiguration : RequestConfiguration<DefaultQueryParameters>
         {
         }
     }

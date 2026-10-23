@@ -8,6 +8,8 @@ using GrimoireCli.Generated.Api.Duplicates.Dismissals;
 using GrimoireCli.Generated.Api.Duplicates.Groups;
 using GrimoireCli.Generated.Api.Duplicates.Items;
 using GrimoireCli.Generated.Api.Duplicates.Link;
+using GrimoireCli.Generated.Api.Duplicates.Merge;
+using GrimoireCli.Generated.Api.Duplicates.MergeBatch;
 using GrimoireCli.Generated.Api.Duplicates.MergeMetadata;
 using GrimoireCli.Generated.Api.Duplicates.Promote;
 using GrimoireCli.Generated.Api.Duplicates.Scan;
@@ -66,6 +68,16 @@ namespace GrimoireCli.Generated.Api.Duplicates
         public global::GrimoireCli.Generated.Api.Duplicates.Link.LinkRequestBuilder Link
         {
             get => new global::GrimoireCli.Generated.Api.Duplicates.Link.LinkRequestBuilder(PathParameters, RequestAdapter);
+        }
+        /// <summary>The merge property</summary>
+        public global::GrimoireCli.Generated.Api.Duplicates.Merge.MergeRequestBuilder Merge
+        {
+            get => new global::GrimoireCli.Generated.Api.Duplicates.Merge.MergeRequestBuilder(PathParameters, RequestAdapter);
+        }
+        /// <summary>The mergeBatch property</summary>
+        public global::GrimoireCli.Generated.Api.Duplicates.MergeBatch.MergeBatchRequestBuilder MergeBatch
+        {
+            get => new global::GrimoireCli.Generated.Api.Duplicates.MergeBatch.MergeBatchRequestBuilder(PathParameters, RequestAdapter);
         }
         /// <summary>The mergeMetadata property</summary>
         public global::GrimoireCli.Generated.Api.Duplicates.MergeMetadata.MergeMetadataRequestBuilder MergeMetadata

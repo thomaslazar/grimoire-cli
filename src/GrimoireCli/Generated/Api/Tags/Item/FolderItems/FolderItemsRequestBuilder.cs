@@ -22,7 +22,7 @@ namespace GrimoireCli.Generated.Api.Tags.Item.FolderItems
         /// </summary>
         /// <param name="pathParameters">Path parameters for the request</param>
         /// <param name="requestAdapter">The request adapter to use to execute the requests.</param>
-        public FolderItemsRequestBuilder(Dictionary<string, object> pathParameters, IRequestAdapter requestAdapter) : base(requestAdapter, "{+baseurl}/api/tags/{internal}/folder-items?folder={folder}&resource_type={resource_type}{&limit*,offset*,token*}", pathParameters)
+        public FolderItemsRequestBuilder(Dictionary<string, object> pathParameters, IRequestAdapter requestAdapter) : base(requestAdapter, "{+baseurl}/api/tags/{internal}/folder-items?folder={folder}&resource_type={resource_type}{&limit*,offset*}", pathParameters)
         {
         }
         /// <summary>
@@ -30,7 +30,7 @@ namespace GrimoireCli.Generated.Api.Tags.Item.FolderItems
         /// </summary>
         /// <param name="rawUrl">The raw URL to use for the request builder.</param>
         /// <param name="requestAdapter">The request adapter to use to execute the requests.</param>
-        public FolderItemsRequestBuilder(string rawUrl, IRequestAdapter requestAdapter) : base(requestAdapter, "{+baseurl}/api/tags/{internal}/folder-items?folder={folder}&resource_type={resource_type}{&limit*,offset*,token*}", rawUrl)
+        public FolderItemsRequestBuilder(string rawUrl, IRequestAdapter requestAdapter) : base(requestAdapter, "{+baseurl}/api/tags/{internal}/folder-items?folder={folder}&resource_type={resource_type}{&limit*,offset*}", rawUrl)
         {
         }
         /// <summary>
@@ -117,19 +117,6 @@ namespace GrimoireCli.Generated.Api.Tags.Item.FolderItems
 #else
             [QueryParameter("resource_type")]
             public string ResourceType { get; set; }
-#endif
-#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
-#nullable enable
-            #pragma warning disable CS1591
-            [QueryParameter("token")]
-            public string? Token { get; set; }
-            #pragma warning restore CS1591
-#nullable restore
-#else
-            #pragma warning disable CS1591
-            [QueryParameter("token")]
-            public string Token { get; set; }
-            #pragma warning restore CS1591
 #endif
         }
         /// <summary>

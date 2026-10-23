@@ -45,6 +45,40 @@ namespace GrimoireCli.Generated.Models
         public bool? HideModels { get; set; }
         /// <summary>The hide_tokens property</summary>
         public bool? HideTokens { get; set; }
+        /// <summary>The library_watch_enabled property</summary>
+        public bool? LibraryWatchEnabled { get; set; }
+        /// <summary>The library_watch_env_locked property</summary>
+        public bool? LibraryWatchEnvLocked { get; set; }
+        /// <summary>The library_watch_mode property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public string? LibraryWatchMode { get; set; }
+#nullable restore
+#else
+        public string LibraryWatchMode { get; set; }
+#endif
+        /// <summary>The library_watch_mode_env_locked property</summary>
+        public bool? LibraryWatchModeEnvLocked { get; set; }
+        /// <summary>The library_watch_poll_interval property</summary>
+        public int? LibraryWatchPollInterval { get; set; }
+        /// <summary>The library_watch_state property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public global::GrimoireCli.Generated.Models.LibraryWatchState? LibraryWatchState { get; set; }
+#nullable restore
+#else
+        public global::GrimoireCli.Generated.Models.LibraryWatchState LibraryWatchState { get; set; }
+#endif
+        /// <summary>The oidc_admin_group property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public string? OidcAdminGroup { get; set; }
+#nullable restore
+#else
+        public string OidcAdminGroup { get; set; }
+#endif
+        /// <summary>The oidc_admin_group_env_locked property</summary>
+        public bool? OidcAdminGroupEnvLocked { get; set; }
         /// <summary>The oidc_authorization_endpoint property</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
@@ -153,6 +187,16 @@ namespace GrimoireCli.Generated.Models
 #endif
         /// <summary>The oidc_end_session_endpoint_env_locked property</summary>
         public bool? OidcEndSessionEndpointEnvLocked { get; set; }
+        /// <summary>The oidc_gm_group property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public string? OidcGmGroup { get; set; }
+#nullable restore
+#else
+        public string OidcGmGroup { get; set; }
+#endif
+        /// <summary>The oidc_gm_group_env_locked property</summary>
+        public bool? OidcGmGroupEnvLocked { get; set; }
         /// <summary>The oidc_groups_claim property</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
@@ -203,6 +247,16 @@ namespace GrimoireCli.Generated.Models
 #endif
         /// <summary>The oidc_permissions_claim_env_locked property</summary>
         public bool? OidcPermissionsClaimEnvLocked { get; set; }
+        /// <summary>The oidc_player_group property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public string? OidcPlayerGroup { get; set; }
+#nullable restore
+#else
+        public string OidcPlayerGroup { get; set; }
+#endif
+        /// <summary>The oidc_player_group_env_locked property</summary>
+        public bool? OidcPlayerGroupEnvLocked { get; set; }
         /// <summary>The oidc_redirect_uri property</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
@@ -340,6 +394,14 @@ namespace GrimoireCli.Generated.Models
                 { "hide_maps", n => { HideMaps = n.GetBoolValue(); } },
                 { "hide_models", n => { HideModels = n.GetBoolValue(); } },
                 { "hide_tokens", n => { HideTokens = n.GetBoolValue(); } },
+                { "library_watch_enabled", n => { LibraryWatchEnabled = n.GetBoolValue(); } },
+                { "library_watch_env_locked", n => { LibraryWatchEnvLocked = n.GetBoolValue(); } },
+                { "library_watch_mode", n => { LibraryWatchMode = n.GetStringValue(); } },
+                { "library_watch_mode_env_locked", n => { LibraryWatchModeEnvLocked = n.GetBoolValue(); } },
+                { "library_watch_poll_interval", n => { LibraryWatchPollInterval = n.GetIntValue(); } },
+                { "library_watch_state", n => { LibraryWatchState = n.GetObjectValue<global::GrimoireCli.Generated.Models.LibraryWatchState>(global::GrimoireCli.Generated.Models.LibraryWatchState.CreateFromDiscriminatorValue); } },
+                { "oidc_admin_group", n => { OidcAdminGroup = n.GetStringValue(); } },
+                { "oidc_admin_group_env_locked", n => { OidcAdminGroupEnvLocked = n.GetBoolValue(); } },
                 { "oidc_authorization_endpoint", n => { OidcAuthorizationEndpoint = n.GetStringValue(); } },
                 { "oidc_authorization_endpoint_env_locked", n => { OidcAuthorizationEndpointEnvLocked = n.GetBoolValue(); } },
                 { "oidc_auto_launch", n => { OidcAutoLaunch = n.GetBoolValue(); } },
@@ -367,6 +429,8 @@ namespace GrimoireCli.Generated.Models
                 { "oidc_enabled_env_locked", n => { OidcEnabledEnvLocked = n.GetBoolValue(); } },
                 { "oidc_end_session_endpoint", n => { OidcEndSessionEndpoint = n.GetStringValue(); } },
                 { "oidc_end_session_endpoint_env_locked", n => { OidcEndSessionEndpointEnvLocked = n.GetBoolValue(); } },
+                { "oidc_gm_group", n => { OidcGmGroup = n.GetStringValue(); } },
+                { "oidc_gm_group_env_locked", n => { OidcGmGroupEnvLocked = n.GetBoolValue(); } },
                 { "oidc_groups_claim", n => { OidcGroupsClaim = n.GetStringValue(); } },
                 { "oidc_groups_claim_env_locked", n => { OidcGroupsClaimEnvLocked = n.GetBoolValue(); } },
                 { "oidc_issuer_url", n => { OidcIssuerUrl = n.GetStringValue(); } },
@@ -377,6 +441,8 @@ namespace GrimoireCli.Generated.Models
                 { "oidc_match_by_env_locked", n => { OidcMatchByEnvLocked = n.GetBoolValue(); } },
                 { "oidc_permissions_claim", n => { OidcPermissionsClaim = n.GetStringValue(); } },
                 { "oidc_permissions_claim_env_locked", n => { OidcPermissionsClaimEnvLocked = n.GetBoolValue(); } },
+                { "oidc_player_group", n => { OidcPlayerGroup = n.GetStringValue(); } },
+                { "oidc_player_group_env_locked", n => { OidcPlayerGroupEnvLocked = n.GetBoolValue(); } },
                 { "oidc_redirect_uri", n => { OidcRedirectUri = n.GetStringValue(); } },
                 { "oidc_signing_alg", n => { OidcSigningAlg = n.GetStringValue(); } },
                 { "oidc_signing_alg_env_locked", n => { OidcSigningAlgEnvLocked = n.GetBoolValue(); } },
@@ -427,6 +493,14 @@ namespace GrimoireCli.Generated.Models
             writer.WriteBoolValue("hide_maps", HideMaps);
             writer.WriteBoolValue("hide_models", HideModels);
             writer.WriteBoolValue("hide_tokens", HideTokens);
+            writer.WriteBoolValue("library_watch_enabled", LibraryWatchEnabled);
+            writer.WriteBoolValue("library_watch_env_locked", LibraryWatchEnvLocked);
+            writer.WriteStringValue("library_watch_mode", LibraryWatchMode);
+            writer.WriteBoolValue("library_watch_mode_env_locked", LibraryWatchModeEnvLocked);
+            writer.WriteIntValue("library_watch_poll_interval", LibraryWatchPollInterval);
+            writer.WriteObjectValue<global::GrimoireCli.Generated.Models.LibraryWatchState>("library_watch_state", LibraryWatchState);
+            writer.WriteStringValue("oidc_admin_group", OidcAdminGroup);
+            writer.WriteBoolValue("oidc_admin_group_env_locked", OidcAdminGroupEnvLocked);
             writer.WriteStringValue("oidc_authorization_endpoint", OidcAuthorizationEndpoint);
             writer.WriteBoolValue("oidc_authorization_endpoint_env_locked", OidcAuthorizationEndpointEnvLocked);
             writer.WriteBoolValue("oidc_auto_launch", OidcAutoLaunch);
@@ -454,6 +528,8 @@ namespace GrimoireCli.Generated.Models
             writer.WriteBoolValue("oidc_enabled_env_locked", OidcEnabledEnvLocked);
             writer.WriteStringValue("oidc_end_session_endpoint", OidcEndSessionEndpoint);
             writer.WriteBoolValue("oidc_end_session_endpoint_env_locked", OidcEndSessionEndpointEnvLocked);
+            writer.WriteStringValue("oidc_gm_group", OidcGmGroup);
+            writer.WriteBoolValue("oidc_gm_group_env_locked", OidcGmGroupEnvLocked);
             writer.WriteStringValue("oidc_groups_claim", OidcGroupsClaim);
             writer.WriteBoolValue("oidc_groups_claim_env_locked", OidcGroupsClaimEnvLocked);
             writer.WriteStringValue("oidc_issuer_url", OidcIssuerUrl);
@@ -464,6 +540,8 @@ namespace GrimoireCli.Generated.Models
             writer.WriteBoolValue("oidc_match_by_env_locked", OidcMatchByEnvLocked);
             writer.WriteStringValue("oidc_permissions_claim", OidcPermissionsClaim);
             writer.WriteBoolValue("oidc_permissions_claim_env_locked", OidcPermissionsClaimEnvLocked);
+            writer.WriteStringValue("oidc_player_group", OidcPlayerGroup);
+            writer.WriteBoolValue("oidc_player_group_env_locked", OidcPlayerGroupEnvLocked);
             writer.WriteStringValue("oidc_redirect_uri", OidcRedirectUri);
             writer.WriteStringValue("oidc_signing_alg", OidcSigningAlg);
             writer.WriteBoolValue("oidc_signing_alg_env_locked", OidcSigningAlgEnvLocked);

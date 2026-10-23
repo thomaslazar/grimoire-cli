@@ -22,7 +22,7 @@ namespace GrimoireCli.Generated.Api.Campaigns.Item.Wiki.Reorder
         /// </summary>
         /// <param name="pathParameters">Path parameters for the request</param>
         /// <param name="requestAdapter">The request adapter to use to execute the requests.</param>
-        public ReorderRequestBuilder(Dictionary<string, object> pathParameters, IRequestAdapter requestAdapter) : base(requestAdapter, "{+baseurl}/api/campaigns/{campaign_id}/wiki/reorder{?token*}", pathParameters)
+        public ReorderRequestBuilder(Dictionary<string, object> pathParameters, IRequestAdapter requestAdapter) : base(requestAdapter, "{+baseurl}/api/campaigns/{campaign_id}/wiki/reorder", pathParameters)
         {
         }
         /// <summary>
@@ -30,7 +30,7 @@ namespace GrimoireCli.Generated.Api.Campaigns.Item.Wiki.Reorder
         /// </summary>
         /// <param name="rawUrl">The raw URL to use for the request builder.</param>
         /// <param name="requestAdapter">The request adapter to use to execute the requests.</param>
-        public ReorderRequestBuilder(string rawUrl, IRequestAdapter requestAdapter) : base(requestAdapter, "{+baseurl}/api/campaigns/{campaign_id}/wiki/reorder{?token*}", rawUrl)
+        public ReorderRequestBuilder(string rawUrl, IRequestAdapter requestAdapter) : base(requestAdapter, "{+baseurl}/api/campaigns/{campaign_id}/wiki/reorder", rawUrl)
         {
         }
         /// <summary>
@@ -43,11 +43,11 @@ namespace GrimoireCli.Generated.Api.Campaigns.Item.Wiki.Reorder
         /// <exception cref="global::GrimoireCli.Generated.Models.HTTPValidationError">When receiving a 422 status code</exception>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
-        public async Task<global::GrimoireCli.Generated.Models.Backend__routers__campaigns___response_schemas__OkResponse?> PutAsync(global::GrimoireCli.Generated.Models.WikiReorder body, Action<RequestConfiguration<global::GrimoireCli.Generated.Api.Campaigns.Item.Wiki.Reorder.ReorderRequestBuilder.ReorderRequestBuilderPutQueryParameters>>? requestConfiguration = default, CancellationToken cancellationToken = default)
+        public async Task<global::GrimoireCli.Generated.Models.Backend__routers__campaigns___response_schemas__OkResponse?> PutAsync(global::GrimoireCli.Generated.Models.WikiReorder body, Action<RequestConfiguration<DefaultQueryParameters>>? requestConfiguration = default, CancellationToken cancellationToken = default)
         {
 #nullable restore
 #else
-        public async Task<global::GrimoireCli.Generated.Models.Backend__routers__campaigns___response_schemas__OkResponse> PutAsync(global::GrimoireCli.Generated.Models.WikiReorder body, Action<RequestConfiguration<global::GrimoireCli.Generated.Api.Campaigns.Item.Wiki.Reorder.ReorderRequestBuilder.ReorderRequestBuilderPutQueryParameters>> requestConfiguration = default, CancellationToken cancellationToken = default)
+        public async Task<global::GrimoireCli.Generated.Models.Backend__routers__campaigns___response_schemas__OkResponse> PutAsync(global::GrimoireCli.Generated.Models.WikiReorder body, Action<RequestConfiguration<DefaultQueryParameters>> requestConfiguration = default, CancellationToken cancellationToken = default)
         {
 #endif
             if(ReferenceEquals(body, null)) throw new ArgumentNullException(nameof(body));
@@ -66,11 +66,11 @@ namespace GrimoireCli.Generated.Api.Campaigns.Item.Wiki.Reorder
         /// <param name="requestConfiguration">Configuration for the request such as headers, query parameters, and middleware options.</param>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
-        public RequestInformation ToPutRequestInformation(global::GrimoireCli.Generated.Models.WikiReorder body, Action<RequestConfiguration<global::GrimoireCli.Generated.Api.Campaigns.Item.Wiki.Reorder.ReorderRequestBuilder.ReorderRequestBuilderPutQueryParameters>>? requestConfiguration = default)
+        public RequestInformation ToPutRequestInformation(global::GrimoireCli.Generated.Models.WikiReorder body, Action<RequestConfiguration<DefaultQueryParameters>>? requestConfiguration = default)
         {
 #nullable restore
 #else
-        public RequestInformation ToPutRequestInformation(global::GrimoireCli.Generated.Models.WikiReorder body, Action<RequestConfiguration<global::GrimoireCli.Generated.Api.Campaigns.Item.Wiki.Reorder.ReorderRequestBuilder.ReorderRequestBuilderPutQueryParameters>> requestConfiguration = default)
+        public RequestInformation ToPutRequestInformation(global::GrimoireCli.Generated.Models.WikiReorder body, Action<RequestConfiguration<DefaultQueryParameters>> requestConfiguration = default)
         {
 #endif
             if(ReferenceEquals(body, null)) throw new ArgumentNullException(nameof(body));
@@ -90,31 +90,11 @@ namespace GrimoireCli.Generated.Api.Campaigns.Item.Wiki.Reorder
             return new global::GrimoireCli.Generated.Api.Campaigns.Item.Wiki.Reorder.ReorderRequestBuilder(rawUrl, RequestAdapter);
         }
         /// <summary>
-        /// Apply a new manual order, expressed relative to what this user can see.``sort_order`` is global but a user only ever sees a subset of the campaign&apos;spages, so their submitted list cannot be written as absolute positions —doing that would renumber pages they can&apos;t see and shuffle the wiki foreveryone else. Instead we treat the submission as an ordering *of the slotsthe movable pages already occupy*: collect those pages&apos; current sort_ordervalues, then redeal them in the requested order. Every other page — invisibleto this user, or visible but not writable by them — keeps the exactsort_order it had, so its position relative to the untouched pages ispreserved.A user needs write access to move a page (issue #232): a page they may readbut not edit is skipped and holds its slot.
-        /// </summary>
-        [global::System.CodeDom.Compiler.GeneratedCode("Kiota", "1.0.0")]
-        public partial class ReorderRequestBuilderPutQueryParameters 
-        {
-#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
-#nullable enable
-            #pragma warning disable CS1591
-            [QueryParameter("token")]
-            public string? Token { get; set; }
-            #pragma warning restore CS1591
-#nullable restore
-#else
-            #pragma warning disable CS1591
-            [QueryParameter("token")]
-            public string Token { get; set; }
-            #pragma warning restore CS1591
-#endif
-        }
-        /// <summary>
         /// Configuration for the request such as headers, query parameters, and middleware options.
         /// </summary>
         [Obsolete("This class is deprecated. Please use the generic RequestConfiguration class generated by the generator.")]
         [global::System.CodeDom.Compiler.GeneratedCode("Kiota", "1.0.0")]
-        public partial class ReorderRequestBuilderPutRequestConfiguration : RequestConfiguration<global::GrimoireCli.Generated.Api.Campaigns.Item.Wiki.Reorder.ReorderRequestBuilder.ReorderRequestBuilderPutQueryParameters>
+        public partial class ReorderRequestBuilderPutRequestConfiguration : RequestConfiguration<DefaultQueryParameters>
         {
         }
     }

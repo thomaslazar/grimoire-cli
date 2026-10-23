@@ -22,7 +22,7 @@ namespace GrimoireCli.Generated.Api.Systems.Item.Books
         /// </summary>
         /// <param name="pathParameters">Path parameters for the request</param>
         /// <param name="requestAdapter">The request adapter to use to execute the requests.</param>
-        public BooksRequestBuilder(Dictionary<string, object> pathParameters, IRequestAdapter requestAdapter) : base(requestAdapter, "{+baseurl}/api/systems/{system_id}/books{?added_since*,category*,explicit*,favorites*,folder*,genre*,limit*,offset*,order*,product_code*,q*,sort*,tags*,token*}", pathParameters)
+        public BooksRequestBuilder(Dictionary<string, object> pathParameters, IRequestAdapter requestAdapter) : base(requestAdapter, "{+baseurl}/api/systems/{system_id}/books{?added_since*,category*,explicit*,favorites*,folder*,genre*,limit*,offset*,order*,product_code*,q*,sort*,tags*}", pathParameters)
         {
         }
         /// <summary>
@@ -30,7 +30,7 @@ namespace GrimoireCli.Generated.Api.Systems.Item.Books
         /// </summary>
         /// <param name="rawUrl">The raw URL to use for the request builder.</param>
         /// <param name="requestAdapter">The request adapter to use to execute the requests.</param>
-        public BooksRequestBuilder(string rawUrl, IRequestAdapter requestAdapter) : base(requestAdapter, "{+baseurl}/api/systems/{system_id}/books{?added_since*,category*,explicit*,favorites*,folder*,genre*,limit*,offset*,order*,product_code*,q*,sort*,tags*,token*}", rawUrl)
+        public BooksRequestBuilder(string rawUrl, IRequestAdapter requestAdapter) : base(requestAdapter, "{+baseurl}/api/systems/{system_id}/books{?added_since*,category*,explicit*,favorites*,folder*,genre*,limit*,offset*,order*,product_code*,q*,sort*,tags*}", rawUrl)
         {
         }
         /// <summary>
@@ -204,19 +204,6 @@ namespace GrimoireCli.Generated.Api.Systems.Item.Books
 #else
             [QueryParameter("tags")]
             public string Tags { get; set; }
-#endif
-#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
-#nullable enable
-            #pragma warning disable CS1591
-            [QueryParameter("token")]
-            public string? Token { get; set; }
-            #pragma warning restore CS1591
-#nullable restore
-#else
-            #pragma warning disable CS1591
-            [QueryParameter("token")]
-            public string Token { get; set; }
-            #pragma warning restore CS1591
 #endif
         }
         /// <summary>

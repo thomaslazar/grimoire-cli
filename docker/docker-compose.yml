@@ -35,7 +35,7 @@ services:
     #
     # The tag is immutable, so the spec cannot drift under the committed client
     # between regenerations — which is what the prerelease channel could not offer.
-    image: hunterreadca/grimoire:1.9.0
+    image: hunterreadca/grimoire:1.9.1
     ports:
       - "9481:9481"
     environment:
@@ -51,6 +51,9 @@ services:
       # OPDS must stay off — with it on, GET /api/openapi.json returns 500
       # (hunter-read/grimoire#276), and that spec is what the CLI is built from.
       - OPDS_ENABLED=false
+      # Since 1.9.1 the spec needs a session by default; the generators and
+      # the smoke test fetch it anonymously.
+      - API_DOCS=public
       # The smoke test logs in several times; the default is 10/minute.
       - RATE_LIMIT_ENABLED=false
       # Guest invite codes are off by default; the smoke test creates guests.
@@ -77,14 +80,18 @@ services:
   # Serves docker/addon-index/ (fixture manifest + generated index.json) so
   # the smoke test can install a real add-on without depending on the
   # published community index or a third-party host. Fetched by the grimoire
-  # container as http://addon-index/index.json — a compose service name the
-  # devcontainer itself cannot resolve and does not need to.
+  # container as http://addon-index.localhost/index.json — a network alias the
+  # devcontainer itself cannot resolve and does not need to. The `.localhost`
+  # suffix is what lets plain http through: since 1.9.1 Grimoire refuses an
+  # http:// index URL unless its host reads as local (addons/urls.py).
   addon-index:
     image: nginx:alpine
     volumes:
       - ${GRIMOIRE_ADDON_INDEX:-./addon-index}:/usr/share/nginx/html:ro
     networks:
-      - grimoire-cli-dev
+      grimoire-cli-dev:
+        aliases:
+          - addon-index.localhost
 
 # Named explicitly because the default would be derived from this file's parent
 # directory: every project whose compose file lives in docker/ would share one

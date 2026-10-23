@@ -98,7 +98,7 @@ public static class BooksCommand
             idOption
         };
         command.AddHelpSection("Notes", HelpSectionPosition.Top,
-            "403 if the book is explicit and the account disallows explicit content.");
+            "404 if the book is explicit and the account disallows explicit content.");
         command.AddExamples("grimoire-cli books get --id <book-id>");
         command.AddResponseExample<Generated.Models.BookDetail>();
         command.SetAction(async (parseResult, cancellationToken) =>
@@ -130,6 +130,9 @@ public static class BooksCommand
             "and \"\" is a 422.",
             "",
             "tags replace the set. To add without removing, use batch-tag.",
+            "",
+            "access_level, and a category change that shows the book to more",
+            "people, need admin: 403 otherwise. URLs must be http(s): 422 otherwise.",
             "",
             "Responds {\"status\": \"ok\"} and echoes nothing — read back with:",
             "grimoire-cli books get --id <id>",
@@ -182,7 +185,11 @@ public static class BooksCommand
             "updated lists the ids that resolved, not the fields that changed.",
             "",
             "\"\" not null clears a field, and year/month/day/codex_id cannot be",
-            "cleared — see books update.");
+            "cleared — see books update.",
+            "",
+            "Non-admin: access_level anywhere 403s the whole batch; a category change",
+            "that widens visibility fails only its item. A non-http(s) URL 422s the",
+            "whole batch.");
         command.AddExamples(
             "grimoire-cli books batch-update --input items.json",
             "jq -c '{items: .}' edits.json | grimoire-cli books batch-update --stdin");
@@ -300,8 +307,8 @@ public static class BooksCommand
         command.AddRoleRequired("gm or admin");
         command.AddHelpSection("Notes", HelpSectionPosition.Top,
             "Re-reads the file and rebuilds the index, refreshing page count and",
-            "thumbnail if the file changed. PDFs only: 400 on an epub or djvu, 404",
-            "if the file is gone from disk.",
+            "thumbnail if the file changed. 400 on a format the server cannot",
+            "index, 404 if the file is gone from disk.",
             "",
             "No-ops (silently skipped) under a library scan already running, and",
             "blocks a library rescan started right after it; the response is",
@@ -424,7 +431,7 @@ public static class BooksCommand
             "page 1 only. Anything else is 404 — which makes this the one page",
             "read that works on a comic, where page-text and page-words do not.",
             "",
-            "--width defaults to 1200 and is capped at 3000. maps page defaults",
+            "--width defaults to 1200 and takes 16-3000. maps page defaults",
             "to 1600, so the two are not interchangeable.",
             "",
             "A file missing from disk is 404, and the book's is_missing is set",

@@ -40,7 +40,7 @@ namespace GrimoireCli.Generated.Api.Files.Folder
         /// </summary>
         /// <param name="pathParameters">Path parameters for the request</param>
         /// <param name="requestAdapter">The request adapter to use to execute the requests.</param>
-        public FolderRequestBuilder(Dictionary<string, object> pathParameters, IRequestAdapter requestAdapter) : base(requestAdapter, "{+baseurl}/api/files/folder{?token*}", pathParameters)
+        public FolderRequestBuilder(Dictionary<string, object> pathParameters, IRequestAdapter requestAdapter) : base(requestAdapter, "{+baseurl}/api/files/folder", pathParameters)
         {
         }
         /// <summary>
@@ -48,7 +48,7 @@ namespace GrimoireCli.Generated.Api.Files.Folder
         /// </summary>
         /// <param name="rawUrl">The raw URL to use for the request builder.</param>
         /// <param name="requestAdapter">The request adapter to use to execute the requests.</param>
-        public FolderRequestBuilder(string rawUrl, IRequestAdapter requestAdapter) : base(requestAdapter, "{+baseurl}/api/files/folder{?token*}", rawUrl)
+        public FolderRequestBuilder(string rawUrl, IRequestAdapter requestAdapter) : base(requestAdapter, "{+baseurl}/api/files/folder", rawUrl)
         {
         }
         /// <summary>
@@ -61,11 +61,11 @@ namespace GrimoireCli.Generated.Api.Files.Folder
         /// <exception cref="global::GrimoireCli.Generated.Models.HTTPValidationError">When receiving a 422 status code</exception>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
-        public async Task<global::GrimoireCli.Generated.Models.DeleteResponse?> DeleteAsDeleteResponseAsync(global::GrimoireCli.Generated.Models.DeleteFolderRequest body, Action<RequestConfiguration<global::GrimoireCli.Generated.Api.Files.Folder.FolderRequestBuilder.FolderRequestBuilderDeleteQueryParameters>>? requestConfiguration = default, CancellationToken cancellationToken = default)
+        public async Task<global::GrimoireCli.Generated.Models.DeleteResponse?> DeleteAsDeleteResponseAsync(global::GrimoireCli.Generated.Models.DeleteFolderRequest body, Action<RequestConfiguration<DefaultQueryParameters>>? requestConfiguration = default, CancellationToken cancellationToken = default)
         {
 #nullable restore
 #else
-        public async Task<global::GrimoireCli.Generated.Models.DeleteResponse> DeleteAsDeleteResponseAsync(global::GrimoireCli.Generated.Models.DeleteFolderRequest body, Action<RequestConfiguration<global::GrimoireCli.Generated.Api.Files.Folder.FolderRequestBuilder.FolderRequestBuilderDeleteQueryParameters>> requestConfiguration = default, CancellationToken cancellationToken = default)
+        public async Task<global::GrimoireCli.Generated.Models.DeleteResponse> DeleteAsDeleteResponseAsync(global::GrimoireCli.Generated.Models.DeleteFolderRequest body, Action<RequestConfiguration<DefaultQueryParameters>> requestConfiguration = default, CancellationToken cancellationToken = default)
         {
 #endif
             if(ReferenceEquals(body, null)) throw new ArgumentNullException(nameof(body));
@@ -87,11 +87,11 @@ namespace GrimoireCli.Generated.Api.Files.Folder
         [Obsolete("This method is obsolete. Use DeleteAsDeleteResponseAsync instead.")]
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
-        public async Task<global::GrimoireCli.Generated.Models.Response?> DeleteAsync(global::GrimoireCli.Generated.Models.DeleteFolderRequest body, Action<RequestConfiguration<global::GrimoireCli.Generated.Api.Files.Folder.FolderRequestBuilder.FolderRequestBuilderDeleteQueryParameters>>? requestConfiguration = default, CancellationToken cancellationToken = default)
+        public async Task<global::GrimoireCli.Generated.Models.Response?> DeleteAsync(global::GrimoireCli.Generated.Models.DeleteFolderRequest body, Action<RequestConfiguration<DefaultQueryParameters>>? requestConfiguration = default, CancellationToken cancellationToken = default)
         {
 #nullable restore
 #else
-        public async Task<global::GrimoireCli.Generated.Models.Response> DeleteAsync(global::GrimoireCli.Generated.Models.DeleteFolderRequest body, Action<RequestConfiguration<global::GrimoireCli.Generated.Api.Files.Folder.FolderRequestBuilder.FolderRequestBuilderDeleteQueryParameters>> requestConfiguration = default, CancellationToken cancellationToken = default)
+        public async Task<global::GrimoireCli.Generated.Models.Response> DeleteAsync(global::GrimoireCli.Generated.Models.DeleteFolderRequest body, Action<RequestConfiguration<DefaultQueryParameters>> requestConfiguration = default, CancellationToken cancellationToken = default)
         {
 #endif
             if(ReferenceEquals(body, null)) throw new ArgumentNullException(nameof(body));
@@ -112,11 +112,11 @@ namespace GrimoireCli.Generated.Api.Files.Folder
         /// <exception cref="global::GrimoireCli.Generated.Models.HTTPValidationError">When receiving a 422 status code</exception>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
-        public async Task<global::GrimoireCli.Generated.Models.FolderResponse?> PostAsync(global::GrimoireCli.Generated.Models.CreateFolderRequest body, Action<RequestConfiguration<global::GrimoireCli.Generated.Api.Files.Folder.FolderRequestBuilder.FolderRequestBuilderPostQueryParameters>>? requestConfiguration = default, CancellationToken cancellationToken = default)
+        public async Task<global::GrimoireCli.Generated.Models.FolderResponse?> PostAsync(global::GrimoireCli.Generated.Models.CreateFolderRequest body, Action<RequestConfiguration<DefaultQueryParameters>>? requestConfiguration = default, CancellationToken cancellationToken = default)
         {
 #nullable restore
 #else
-        public async Task<global::GrimoireCli.Generated.Models.FolderResponse> PostAsync(global::GrimoireCli.Generated.Models.CreateFolderRequest body, Action<RequestConfiguration<global::GrimoireCli.Generated.Api.Files.Folder.FolderRequestBuilder.FolderRequestBuilderPostQueryParameters>> requestConfiguration = default, CancellationToken cancellationToken = default)
+        public async Task<global::GrimoireCli.Generated.Models.FolderResponse> PostAsync(global::GrimoireCli.Generated.Models.CreateFolderRequest body, Action<RequestConfiguration<DefaultQueryParameters>> requestConfiguration = default, CancellationToken cancellationToken = default)
         {
 #endif
             if(ReferenceEquals(body, null)) throw new ArgumentNullException(nameof(body));
@@ -135,11 +135,11 @@ namespace GrimoireCli.Generated.Api.Files.Folder
         /// <param name="requestConfiguration">Configuration for the request such as headers, query parameters, and middleware options.</param>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
-        public RequestInformation ToDeleteRequestInformation(global::GrimoireCli.Generated.Models.DeleteFolderRequest body, Action<RequestConfiguration<global::GrimoireCli.Generated.Api.Files.Folder.FolderRequestBuilder.FolderRequestBuilderDeleteQueryParameters>>? requestConfiguration = default)
+        public RequestInformation ToDeleteRequestInformation(global::GrimoireCli.Generated.Models.DeleteFolderRequest body, Action<RequestConfiguration<DefaultQueryParameters>>? requestConfiguration = default)
         {
 #nullable restore
 #else
-        public RequestInformation ToDeleteRequestInformation(global::GrimoireCli.Generated.Models.DeleteFolderRequest body, Action<RequestConfiguration<global::GrimoireCli.Generated.Api.Files.Folder.FolderRequestBuilder.FolderRequestBuilderDeleteQueryParameters>> requestConfiguration = default)
+        public RequestInformation ToDeleteRequestInformation(global::GrimoireCli.Generated.Models.DeleteFolderRequest body, Action<RequestConfiguration<DefaultQueryParameters>> requestConfiguration = default)
         {
 #endif
             if(ReferenceEquals(body, null)) throw new ArgumentNullException(nameof(body));
@@ -157,11 +157,11 @@ namespace GrimoireCli.Generated.Api.Files.Folder
         /// <param name="requestConfiguration">Configuration for the request such as headers, query parameters, and middleware options.</param>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
-        public RequestInformation ToPostRequestInformation(global::GrimoireCli.Generated.Models.CreateFolderRequest body, Action<RequestConfiguration<global::GrimoireCli.Generated.Api.Files.Folder.FolderRequestBuilder.FolderRequestBuilderPostQueryParameters>>? requestConfiguration = default)
+        public RequestInformation ToPostRequestInformation(global::GrimoireCli.Generated.Models.CreateFolderRequest body, Action<RequestConfiguration<DefaultQueryParameters>>? requestConfiguration = default)
         {
 #nullable restore
 #else
-        public RequestInformation ToPostRequestInformation(global::GrimoireCli.Generated.Models.CreateFolderRequest body, Action<RequestConfiguration<global::GrimoireCli.Generated.Api.Files.Folder.FolderRequestBuilder.FolderRequestBuilderPostQueryParameters>> requestConfiguration = default)
+        public RequestInformation ToPostRequestInformation(global::GrimoireCli.Generated.Models.CreateFolderRequest body, Action<RequestConfiguration<DefaultQueryParameters>> requestConfiguration = default)
         {
 #endif
             if(ReferenceEquals(body, null)) throw new ArgumentNullException(nameof(body));
@@ -181,59 +181,19 @@ namespace GrimoireCli.Generated.Api.Files.Folder
             return new global::GrimoireCli.Generated.Api.Files.Folder.FolderRequestBuilder(rawUrl, RequestAdapter);
         }
         /// <summary>
-        /// Deletes a folder holding nothing but markers and empty descendants. One still holding content is refused with 428 until `confirm_name` matches the folder&apos;s own name.
+        /// Configuration for the request such as headers, query parameters, and middleware options.
         /// </summary>
+        [Obsolete("This class is deprecated. Please use the generic RequestConfiguration class generated by the generator.")]
         [global::System.CodeDom.Compiler.GeneratedCode("Kiota", "1.0.0")]
-        public partial class FolderRequestBuilderDeleteQueryParameters 
+        public partial class FolderRequestBuilderDeleteRequestConfiguration : RequestConfiguration<DefaultQueryParameters>
         {
-#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
-#nullable enable
-            #pragma warning disable CS1591
-            [QueryParameter("token")]
-            public string? Token { get; set; }
-            #pragma warning restore CS1591
-#nullable restore
-#else
-            #pragma warning disable CS1591
-            [QueryParameter("token")]
-            public string Token { get; set; }
-            #pragma warning restore CS1591
-#endif
         }
         /// <summary>
         /// Configuration for the request such as headers, query parameters, and middleware options.
         /// </summary>
         [Obsolete("This class is deprecated. Please use the generic RequestConfiguration class generated by the generator.")]
         [global::System.CodeDom.Compiler.GeneratedCode("Kiota", "1.0.0")]
-        public partial class FolderRequestBuilderDeleteRequestConfiguration : RequestConfiguration<global::GrimoireCli.Generated.Api.Files.Folder.FolderRequestBuilder.FolderRequestBuilderDeleteQueryParameters>
-        {
-        }
-        /// <summary>
-        /// Create a folder, writing container/NSFW marker files when asked.
-        /// </summary>
-        [global::System.CodeDom.Compiler.GeneratedCode("Kiota", "1.0.0")]
-        public partial class FolderRequestBuilderPostQueryParameters 
-        {
-#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
-#nullable enable
-            #pragma warning disable CS1591
-            [QueryParameter("token")]
-            public string? Token { get; set; }
-            #pragma warning restore CS1591
-#nullable restore
-#else
-            #pragma warning disable CS1591
-            [QueryParameter("token")]
-            public string Token { get; set; }
-            #pragma warning restore CS1591
-#endif
-        }
-        /// <summary>
-        /// Configuration for the request such as headers, query parameters, and middleware options.
-        /// </summary>
-        [Obsolete("This class is deprecated. Please use the generic RequestConfiguration class generated by the generator.")]
-        [global::System.CodeDom.Compiler.GeneratedCode("Kiota", "1.0.0")]
-        public partial class FolderRequestBuilderPostRequestConfiguration : RequestConfiguration<global::GrimoireCli.Generated.Api.Files.Folder.FolderRequestBuilder.FolderRequestBuilderPostQueryParameters>
+        public partial class FolderRequestBuilderPostRequestConfiguration : RequestConfiguration<DefaultQueryParameters>
         {
         }
     }

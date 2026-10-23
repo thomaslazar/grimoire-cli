@@ -9,6 +9,7 @@ public static class CampaignGuestsCommands
 {
     private const string Owned = "Campaign owner only; group campaigns only (400); 409 while archived.";
     private const string Code = "The code is the guest's login; anyone holding it is that guest.";
+    private const string SessionOnly = "Refused with an API-key login: needs a password login.";
 
     public static Command Create()
     {
@@ -31,7 +32,7 @@ public static class CampaignGuestsCommands
     {
         var idOption = CampaignIdOption();
         var command = new Command("list", "List the campaign's guests and their codes") { idOption };
-        command.AddHelpSection("Notes", HelpSectionPosition.Top, [Owned, Code]);
+        command.AddHelpSection("Notes", HelpSectionPosition.Top, [Owned, Code, SessionOnly]);
         command.AddExamples("grimoire-cli campaigns guests list --id <campaign-id>");
         command.AddResponseExampleArray<Generated.Models.Backend__routers__campaigns___response_schemas__GuestOut>();
         command.SetAction(async (parseResult, cancellationToken) =>
@@ -49,7 +50,8 @@ public static class CampaignGuestsCommands
         var nicknameOption = new Option<string?>("--nickname") { Description = "Name shown for the guest (default Guest)" };
         var command = new Command("create", "Create a guest and their invite code") { idOption, nicknameOption };
         command.AddHelpSection("Notes", HelpSectionPosition.Top,
-            [Owned, "403 when the server has guest access off. The guest is a member at once.", Code]);
+            [Owned, "403 when the server has guest access off. The guest is a member at once.", Code,
+            SessionOnly]);
         command.AddExamples("grimoire-cli campaigns guests create --id <campaign-id> --nickname \"Sam\"");
         command.AddResponseExample<Generated.Models.Backend__routers__campaigns___response_schemas__GuestOut>();
         command.SetAction(async (parseResult, cancellationToken) =>
@@ -69,7 +71,7 @@ public static class CampaignGuestsCommands
         var command = new Command("regenerate", "Replace a guest's invite code") { idOption, memberIdOption };
         command.AddHelpSection("Notes", HelpSectionPosition.Top,
             [Owned, "403 when the server has guest access off. The old code stops working",
-            "and the guest's sessions end.", Code]);
+            "and the guest's sessions end.", Code, SessionOnly]);
         command.AddExamples("grimoire-cli campaigns guests regenerate --id <campaign-id> --member-id <member-id>");
         command.AddResponseExample<Generated.Models.Backend__routers__campaigns___response_schemas__GuestOut>();
         command.SetAction(async (parseResult, cancellationToken) =>
@@ -107,7 +109,7 @@ public static class CampaignGuestsCommands
         var memberIdOption = MemberIdOption();
         var command = new Command("share", "Invite text and link carrying a guest's code") { idOption, memberIdOption };
         command.AddHelpSection("Notes", HelpSectionPosition.Top,
-            [Owned, Code, "The link is built from the server's BASE_URL."]);
+            [Owned, Code, "The link is built from the server's BASE_URL.", SessionOnly]);
         command.AddExamples("grimoire-cli campaigns guests share --id <campaign-id> --member-id <member-id>");
         command.AddResponseExample<Generated.Models.GuestShareTemplateOut>();
         command.SetAction(async (parseResult, cancellationToken) =>

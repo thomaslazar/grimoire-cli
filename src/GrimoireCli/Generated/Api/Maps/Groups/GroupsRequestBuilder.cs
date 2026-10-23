@@ -22,7 +22,7 @@ namespace GrimoireCli.Generated.Api.Maps.Groups
         /// </summary>
         /// <param name="pathParameters">Path parameters for the request</param>
         /// <param name="requestAdapter">The request adapter to use to execute the requests.</param>
-        public GroupsRequestBuilder(Dictionary<string, object> pathParameters, IRequestAdapter requestAdapter) : base(requestAdapter, "{+baseurl}/api/maps/groups{?added_since*,favorites*,folder*,map_type*,order*,q*,sort*,tags*,token*}", pathParameters)
+        public GroupsRequestBuilder(Dictionary<string, object> pathParameters, IRequestAdapter requestAdapter) : base(requestAdapter, "{+baseurl}/api/maps/groups{?added_since*,favorites*,folder*,map_type*,order*,q*,sort*,tags*}", pathParameters)
         {
         }
         /// <summary>
@@ -30,7 +30,7 @@ namespace GrimoireCli.Generated.Api.Maps.Groups
         /// </summary>
         /// <param name="rawUrl">The raw URL to use for the request builder.</param>
         /// <param name="requestAdapter">The request adapter to use to execute the requests.</param>
-        public GroupsRequestBuilder(string rawUrl, IRequestAdapter requestAdapter) : base(requestAdapter, "{+baseurl}/api/maps/groups{?added_since*,favorites*,folder*,map_type*,order*,q*,sort*,tags*,token*}", rawUrl)
+        public GroupsRequestBuilder(string rawUrl, IRequestAdapter requestAdapter) : base(requestAdapter, "{+baseurl}/api/maps/groups{?added_since*,favorites*,folder*,map_type*,order*,q*,sort*,tags*}", rawUrl)
         {
         }
         /// <summary>
@@ -173,19 +173,6 @@ namespace GrimoireCli.Generated.Api.Maps.Groups
 #else
             [QueryParameter("tags")]
             public string Tags { get; set; }
-#endif
-#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
-#nullable enable
-            #pragma warning disable CS1591
-            [QueryParameter("token")]
-            public string? Token { get; set; }
-            #pragma warning restore CS1591
-#nullable restore
-#else
-            #pragma warning disable CS1591
-            [QueryParameter("token")]
-            public string Token { get; set; }
-            #pragma warning restore CS1591
 #endif
         }
         /// <summary>

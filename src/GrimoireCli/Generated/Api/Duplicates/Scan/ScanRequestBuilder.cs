@@ -22,7 +22,7 @@ namespace GrimoireCli.Generated.Api.Duplicates.Scan
         /// </summary>
         /// <param name="pathParameters">Path parameters for the request</param>
         /// <param name="requestAdapter">The request adapter to use to execute the requests.</param>
-        public ScanRequestBuilder(Dictionary<string, object> pathParameters, IRequestAdapter requestAdapter) : base(requestAdapter, "{+baseurl}/api/duplicates/scan{?token*}", pathParameters)
+        public ScanRequestBuilder(Dictionary<string, object> pathParameters, IRequestAdapter requestAdapter) : base(requestAdapter, "{+baseurl}/api/duplicates/scan", pathParameters)
         {
         }
         /// <summary>
@@ -30,7 +30,7 @@ namespace GrimoireCli.Generated.Api.Duplicates.Scan
         /// </summary>
         /// <param name="rawUrl">The raw URL to use for the request builder.</param>
         /// <param name="requestAdapter">The request adapter to use to execute the requests.</param>
-        public ScanRequestBuilder(string rawUrl, IRequestAdapter requestAdapter) : base(requestAdapter, "{+baseurl}/api/duplicates/scan{?token*}", rawUrl)
+        public ScanRequestBuilder(string rawUrl, IRequestAdapter requestAdapter) : base(requestAdapter, "{+baseurl}/api/duplicates/scan", rawUrl)
         {
         }
         /// <summary>
@@ -43,11 +43,11 @@ namespace GrimoireCli.Generated.Api.Duplicates.Scan
         /// <exception cref="global::GrimoireCli.Generated.Models.HTTPValidationError">When receiving a 422 status code</exception>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
-        public async Task<global::GrimoireCli.Generated.Models.ScanTriggerResult?> PostAsync(global::GrimoireCli.Generated.Models.ScanRequest body, Action<RequestConfiguration<global::GrimoireCli.Generated.Api.Duplicates.Scan.ScanRequestBuilder.ScanRequestBuilderPostQueryParameters>>? requestConfiguration = default, CancellationToken cancellationToken = default)
+        public async Task<global::GrimoireCli.Generated.Models.ScanTriggerResult?> PostAsync(global::GrimoireCli.Generated.Models.ScanRequest body, Action<RequestConfiguration<DefaultQueryParameters>>? requestConfiguration = default, CancellationToken cancellationToken = default)
         {
 #nullable restore
 #else
-        public async Task<global::GrimoireCli.Generated.Models.ScanTriggerResult> PostAsync(global::GrimoireCli.Generated.Models.ScanRequest body, Action<RequestConfiguration<global::GrimoireCli.Generated.Api.Duplicates.Scan.ScanRequestBuilder.ScanRequestBuilderPostQueryParameters>> requestConfiguration = default, CancellationToken cancellationToken = default)
+        public async Task<global::GrimoireCli.Generated.Models.ScanTriggerResult> PostAsync(global::GrimoireCli.Generated.Models.ScanRequest body, Action<RequestConfiguration<DefaultQueryParameters>> requestConfiguration = default, CancellationToken cancellationToken = default)
         {
 #endif
             if(ReferenceEquals(body, null)) throw new ArgumentNullException(nameof(body));
@@ -66,11 +66,11 @@ namespace GrimoireCli.Generated.Api.Duplicates.Scan
         /// <param name="requestConfiguration">Configuration for the request such as headers, query parameters, and middleware options.</param>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
-        public RequestInformation ToPostRequestInformation(global::GrimoireCli.Generated.Models.ScanRequest body, Action<RequestConfiguration<global::GrimoireCli.Generated.Api.Duplicates.Scan.ScanRequestBuilder.ScanRequestBuilderPostQueryParameters>>? requestConfiguration = default)
+        public RequestInformation ToPostRequestInformation(global::GrimoireCli.Generated.Models.ScanRequest body, Action<RequestConfiguration<DefaultQueryParameters>>? requestConfiguration = default)
         {
 #nullable restore
 #else
-        public RequestInformation ToPostRequestInformation(global::GrimoireCli.Generated.Models.ScanRequest body, Action<RequestConfiguration<global::GrimoireCli.Generated.Api.Duplicates.Scan.ScanRequestBuilder.ScanRequestBuilderPostQueryParameters>> requestConfiguration = default)
+        public RequestInformation ToPostRequestInformation(global::GrimoireCli.Generated.Models.ScanRequest body, Action<RequestConfiguration<DefaultQueryParameters>> requestConfiguration = default)
         {
 #endif
             if(ReferenceEquals(body, null)) throw new ArgumentNullException(nameof(body));
@@ -90,31 +90,11 @@ namespace GrimoireCli.Generated.Api.Duplicates.Scan
             return new global::GrimoireCli.Generated.Api.Duplicates.Scan.ScanRequestBuilder(rawUrl, RequestAdapter);
         }
         /// <summary>
-        /// Kick off a detection pass in the background.Refuses while a library scan is running: detection reads a snapshot of thelibrary, and comparing rows the scanner is actively rewriting produces groupsthat are wrong by the time they are displayed.
-        /// </summary>
-        [global::System.CodeDom.Compiler.GeneratedCode("Kiota", "1.0.0")]
-        public partial class ScanRequestBuilderPostQueryParameters 
-        {
-#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
-#nullable enable
-            #pragma warning disable CS1591
-            [QueryParameter("token")]
-            public string? Token { get; set; }
-            #pragma warning restore CS1591
-#nullable restore
-#else
-            #pragma warning disable CS1591
-            [QueryParameter("token")]
-            public string Token { get; set; }
-            #pragma warning restore CS1591
-#endif
-        }
-        /// <summary>
         /// Configuration for the request such as headers, query parameters, and middleware options.
         /// </summary>
         [Obsolete("This class is deprecated. Please use the generic RequestConfiguration class generated by the generator.")]
         [global::System.CodeDom.Compiler.GeneratedCode("Kiota", "1.0.0")]
-        public partial class ScanRequestBuilderPostRequestConfiguration : RequestConfiguration<global::GrimoireCli.Generated.Api.Duplicates.Scan.ScanRequestBuilder.ScanRequestBuilderPostQueryParameters>
+        public partial class ScanRequestBuilderPostRequestConfiguration : RequestConfiguration<DefaultQueryParameters>
         {
         }
     }

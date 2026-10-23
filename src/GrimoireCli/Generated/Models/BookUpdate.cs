@@ -161,10 +161,10 @@ namespace GrimoireCli.Generated.Models
         /// <summary>The urls property</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
-        public List<global::GrimoireCli.Generated.Models.Backend__routers__books___schemas__LinkEntry>? Urls { get; set; }
+        public List<global::GrimoireCli.Generated.Models.LinkEntry>? Urls { get; set; }
 #nullable restore
 #else
-        public List<global::GrimoireCli.Generated.Models.Backend__routers__books___schemas__LinkEntry> Urls { get; set; }
+        public List<global::GrimoireCli.Generated.Models.LinkEntry> Urls { get; set; }
 #endif
         /// <summary>The version property</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
@@ -225,7 +225,7 @@ namespace GrimoireCli.Generated.Models
                 { "publisher_url", n => { PublisherUrl = n.GetObjectValue<global::GrimoireCli.Generated.Models.BookUpdate.BookUpdate_publisher_url>(global::GrimoireCli.Generated.Models.BookUpdate.BookUpdate_publisher_url.CreateFromDiscriminatorValue); } },
                 { "tags", n => { Tags = n.GetCollectionOfPrimitiveValues<string>()?.AsList(); } },
                 { "title", n => { Title = n.GetObjectValue<global::GrimoireCli.Generated.Models.BookUpdate.BookUpdate_title>(global::GrimoireCli.Generated.Models.BookUpdate.BookUpdate_title.CreateFromDiscriminatorValue); } },
-                { "urls", n => { Urls = n.GetCollectionOfObjectValues<global::GrimoireCli.Generated.Models.Backend__routers__books___schemas__LinkEntry>(global::GrimoireCli.Generated.Models.Backend__routers__books___schemas__LinkEntry.CreateFromDiscriminatorValue)?.AsList(); } },
+                { "urls", n => { Urls = n.GetCollectionOfObjectValues<global::GrimoireCli.Generated.Models.LinkEntry>(global::GrimoireCli.Generated.Models.LinkEntry.CreateFromDiscriminatorValue)?.AsList(); } },
                 { "version", n => { Version = n.GetObjectValue<global::GrimoireCli.Generated.Models.BookUpdate.BookUpdate_version>(global::GrimoireCli.Generated.Models.BookUpdate.BookUpdate_version.CreateFromDiscriminatorValue); } },
                 { "year", n => { Year = n.GetObjectValue<global::GrimoireCli.Generated.Models.BookUpdate.BookUpdate_year>(global::GrimoireCli.Generated.Models.BookUpdate.BookUpdate_year.CreateFromDiscriminatorValue); } },
             };
@@ -255,7 +255,7 @@ namespace GrimoireCli.Generated.Models
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.BookUpdate.BookUpdate_publisher_url>("publisher_url", PublisherUrl);
             writer.WriteCollectionOfPrimitiveValues<string>("tags", Tags);
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.BookUpdate.BookUpdate_title>("title", Title);
-            writer.WriteCollectionOfObjectValues<global::GrimoireCli.Generated.Models.Backend__routers__books___schemas__LinkEntry>("urls", Urls);
+            writer.WriteCollectionOfObjectValues<global::GrimoireCli.Generated.Models.LinkEntry>("urls", Urls);
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.BookUpdate.BookUpdate_version>("version", Version);
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.BookUpdate.BookUpdate_year>("year", Year);
             writer.WriteAdditionalData(AdditionalData);

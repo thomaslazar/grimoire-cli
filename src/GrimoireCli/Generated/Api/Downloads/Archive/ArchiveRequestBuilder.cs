@@ -22,7 +22,7 @@ namespace GrimoireCli.Generated.Api.Downloads.Archive
         /// </summary>
         /// <param name="pathParameters">Path parameters for the request</param>
         /// <param name="requestAdapter">The request adapter to use to execute the requests.</param>
-        public ArchiveRequestBuilder(Dictionary<string, object> pathParameters, IRequestAdapter requestAdapter) : base(requestAdapter, "{+baseurl}/api/downloads/archive?type={type}{&category*,fmt*,folder*,id*,resource_type*,tag*,token*}", pathParameters)
+        public ArchiveRequestBuilder(Dictionary<string, object> pathParameters, IRequestAdapter requestAdapter) : base(requestAdapter, "{+baseurl}/api/downloads/archive?type={type}{&category*,fmt*,folder*,id*,resource_type*,tag*}", pathParameters)
         {
         }
         /// <summary>
@@ -30,7 +30,7 @@ namespace GrimoireCli.Generated.Api.Downloads.Archive
         /// </summary>
         /// <param name="rawUrl">The raw URL to use for the request builder.</param>
         /// <param name="requestAdapter">The request adapter to use to execute the requests.</param>
-        public ArchiveRequestBuilder(string rawUrl, IRequestAdapter requestAdapter) : base(requestAdapter, "{+baseurl}/api/downloads/archive?type={type}{&category*,fmt*,folder*,id*,resource_type*,tag*,token*}", rawUrl)
+        public ArchiveRequestBuilder(string rawUrl, IRequestAdapter requestAdapter) : base(requestAdapter, "{+baseurl}/api/downloads/archive?type={type}{&category*,fmt*,folder*,id*,resource_type*,tag*}", rawUrl)
         {
         }
         /// <summary>
@@ -149,19 +149,6 @@ namespace GrimoireCli.Generated.Api.Downloads.Archive
 #else
             [QueryParameter("tag")]
             public string Tag { get; set; }
-#endif
-#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
-#nullable enable
-            #pragma warning disable CS1591
-            [QueryParameter("token")]
-            public string? Token { get; set; }
-            #pragma warning restore CS1591
-#nullable restore
-#else
-            #pragma warning disable CS1591
-            [QueryParameter("token")]
-            public string Token { get; set; }
-            #pragma warning restore CS1591
 #endif
             /// <summary>Scope: system | system_category | book_folder | map_folder | token_folder | audio_folder | model_folder | library_folder | tag | tag_type | tag_folder</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER

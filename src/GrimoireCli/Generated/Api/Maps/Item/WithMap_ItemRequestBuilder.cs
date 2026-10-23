@@ -64,7 +64,7 @@ namespace GrimoireCli.Generated.Api.Maps.Item
         /// </summary>
         /// <param name="pathParameters">Path parameters for the request</param>
         /// <param name="requestAdapter">The request adapter to use to execute the requests.</param>
-        public WithMap_ItemRequestBuilder(Dictionary<string, object> pathParameters, IRequestAdapter requestAdapter) : base(requestAdapter, "{+baseurl}/api/maps/{map_id}{?token*}", pathParameters)
+        public WithMap_ItemRequestBuilder(Dictionary<string, object> pathParameters, IRequestAdapter requestAdapter) : base(requestAdapter, "{+baseurl}/api/maps/{map_id}", pathParameters)
         {
         }
         /// <summary>
@@ -72,7 +72,7 @@ namespace GrimoireCli.Generated.Api.Maps.Item
         /// </summary>
         /// <param name="rawUrl">The raw URL to use for the request builder.</param>
         /// <param name="requestAdapter">The request adapter to use to execute the requests.</param>
-        public WithMap_ItemRequestBuilder(string rawUrl, IRequestAdapter requestAdapter) : base(requestAdapter, "{+baseurl}/api/maps/{map_id}{?token*}", rawUrl)
+        public WithMap_ItemRequestBuilder(string rawUrl, IRequestAdapter requestAdapter) : base(requestAdapter, "{+baseurl}/api/maps/{map_id}", rawUrl)
         {
         }
         /// <summary>
@@ -84,11 +84,11 @@ namespace GrimoireCli.Generated.Api.Maps.Item
         /// <exception cref="global::GrimoireCli.Generated.Models.HTTPValidationError">When receiving a 422 status code</exception>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
-        public async Task<global::GrimoireCli.Generated.Models.MapDetailResponse?> GetAsync(Action<RequestConfiguration<global::GrimoireCli.Generated.Api.Maps.Item.WithMap_ItemRequestBuilder.WithMap_ItemRequestBuilderGetQueryParameters>>? requestConfiguration = default, CancellationToken cancellationToken = default)
+        public async Task<global::GrimoireCli.Generated.Models.MapDetailResponse?> GetAsync(Action<RequestConfiguration<DefaultQueryParameters>>? requestConfiguration = default, CancellationToken cancellationToken = default)
         {
 #nullable restore
 #else
-        public async Task<global::GrimoireCli.Generated.Models.MapDetailResponse> GetAsync(Action<RequestConfiguration<global::GrimoireCli.Generated.Api.Maps.Item.WithMap_ItemRequestBuilder.WithMap_ItemRequestBuilderGetQueryParameters>> requestConfiguration = default, CancellationToken cancellationToken = default)
+        public async Task<global::GrimoireCli.Generated.Models.MapDetailResponse> GetAsync(Action<RequestConfiguration<DefaultQueryParameters>> requestConfiguration = default, CancellationToken cancellationToken = default)
         {
 #endif
             var requestInfo = ToGetRequestInformation(requestConfiguration);
@@ -108,11 +108,11 @@ namespace GrimoireCli.Generated.Api.Maps.Item
         /// <exception cref="global::GrimoireCli.Generated.Models.HTTPValidationError">When receiving a 422 status code</exception>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
-        public async Task<global::GrimoireCli.Generated.Models.Backend__routers__maps___schemas__StatusResponse?> PatchAsync(global::GrimoireCli.Generated.Models.MapUpdate body, Action<RequestConfiguration<global::GrimoireCli.Generated.Api.Maps.Item.WithMap_ItemRequestBuilder.WithMap_ItemRequestBuilderPatchQueryParameters>>? requestConfiguration = default, CancellationToken cancellationToken = default)
+        public async Task<global::GrimoireCli.Generated.Models.Backend__routers__maps___schemas__StatusResponse?> PatchAsync(global::GrimoireCli.Generated.Models.MapUpdate body, Action<RequestConfiguration<DefaultQueryParameters>>? requestConfiguration = default, CancellationToken cancellationToken = default)
         {
 #nullable restore
 #else
-        public async Task<global::GrimoireCli.Generated.Models.Backend__routers__maps___schemas__StatusResponse> PatchAsync(global::GrimoireCli.Generated.Models.MapUpdate body, Action<RequestConfiguration<global::GrimoireCli.Generated.Api.Maps.Item.WithMap_ItemRequestBuilder.WithMap_ItemRequestBuilderPatchQueryParameters>> requestConfiguration = default, CancellationToken cancellationToken = default)
+        public async Task<global::GrimoireCli.Generated.Models.Backend__routers__maps___schemas__StatusResponse> PatchAsync(global::GrimoireCli.Generated.Models.MapUpdate body, Action<RequestConfiguration<DefaultQueryParameters>> requestConfiguration = default, CancellationToken cancellationToken = default)
         {
 #endif
             if(ReferenceEquals(body, null)) throw new ArgumentNullException(nameof(body));
@@ -130,11 +130,11 @@ namespace GrimoireCli.Generated.Api.Maps.Item
         /// <param name="requestConfiguration">Configuration for the request such as headers, query parameters, and middleware options.</param>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
-        public RequestInformation ToGetRequestInformation(Action<RequestConfiguration<global::GrimoireCli.Generated.Api.Maps.Item.WithMap_ItemRequestBuilder.WithMap_ItemRequestBuilderGetQueryParameters>>? requestConfiguration = default)
+        public RequestInformation ToGetRequestInformation(Action<RequestConfiguration<DefaultQueryParameters>>? requestConfiguration = default)
         {
 #nullable restore
 #else
-        public RequestInformation ToGetRequestInformation(Action<RequestConfiguration<global::GrimoireCli.Generated.Api.Maps.Item.WithMap_ItemRequestBuilder.WithMap_ItemRequestBuilderGetQueryParameters>> requestConfiguration = default)
+        public RequestInformation ToGetRequestInformation(Action<RequestConfiguration<DefaultQueryParameters>> requestConfiguration = default)
         {
 #endif
             var requestInfo = new RequestInformation(Method.GET, UrlTemplate, PathParameters);
@@ -150,11 +150,11 @@ namespace GrimoireCli.Generated.Api.Maps.Item
         /// <param name="requestConfiguration">Configuration for the request such as headers, query parameters, and middleware options.</param>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
-        public RequestInformation ToPatchRequestInformation(global::GrimoireCli.Generated.Models.MapUpdate body, Action<RequestConfiguration<global::GrimoireCli.Generated.Api.Maps.Item.WithMap_ItemRequestBuilder.WithMap_ItemRequestBuilderPatchQueryParameters>>? requestConfiguration = default)
+        public RequestInformation ToPatchRequestInformation(global::GrimoireCli.Generated.Models.MapUpdate body, Action<RequestConfiguration<DefaultQueryParameters>>? requestConfiguration = default)
         {
 #nullable restore
 #else
-        public RequestInformation ToPatchRequestInformation(global::GrimoireCli.Generated.Models.MapUpdate body, Action<RequestConfiguration<global::GrimoireCli.Generated.Api.Maps.Item.WithMap_ItemRequestBuilder.WithMap_ItemRequestBuilderPatchQueryParameters>> requestConfiguration = default)
+        public RequestInformation ToPatchRequestInformation(global::GrimoireCli.Generated.Models.MapUpdate body, Action<RequestConfiguration<DefaultQueryParameters>> requestConfiguration = default)
         {
 #endif
             if(ReferenceEquals(body, null)) throw new ArgumentNullException(nameof(body));
@@ -174,59 +174,19 @@ namespace GrimoireCli.Generated.Api.Maps.Item
             return new global::GrimoireCli.Generated.Api.Maps.Item.WithMap_ItemRequestBuilder(rawUrl, RequestAdapter);
         }
         /// <summary>
-        /// Returns full map metadata including pixel dimensions, DPI, detected grid size, and folder tags.
+        /// Configuration for the request such as headers, query parameters, and middleware options.
         /// </summary>
+        [Obsolete("This class is deprecated. Please use the generic RequestConfiguration class generated by the generator.")]
         [global::System.CodeDom.Compiler.GeneratedCode("Kiota", "1.0.0")]
-        public partial class WithMap_ItemRequestBuilderGetQueryParameters 
+        public partial class WithMap_ItemRequestBuilderGetRequestConfiguration : RequestConfiguration<DefaultQueryParameters>
         {
-#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
-#nullable enable
-            #pragma warning disable CS1591
-            [QueryParameter("token")]
-            public string? Token { get; set; }
-            #pragma warning restore CS1591
-#nullable restore
-#else
-            #pragma warning disable CS1591
-            [QueryParameter("token")]
-            public string Token { get; set; }
-            #pragma warning restore CS1591
-#endif
         }
         /// <summary>
         /// Configuration for the request such as headers, query parameters, and middleware options.
         /// </summary>
         [Obsolete("This class is deprecated. Please use the generic RequestConfiguration class generated by the generator.")]
         [global::System.CodeDom.Compiler.GeneratedCode("Kiota", "1.0.0")]
-        public partial class WithMap_ItemRequestBuilderGetRequestConfiguration : RequestConfiguration<global::GrimoireCli.Generated.Api.Maps.Item.WithMap_ItemRequestBuilder.WithMap_ItemRequestBuilderGetQueryParameters>
-        {
-        }
-        /// <summary>
-        /// Updates editable fields on a map (description, tags, map_type, grid_size). GM or admin role required.
-        /// </summary>
-        [global::System.CodeDom.Compiler.GeneratedCode("Kiota", "1.0.0")]
-        public partial class WithMap_ItemRequestBuilderPatchQueryParameters 
-        {
-#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
-#nullable enable
-            #pragma warning disable CS1591
-            [QueryParameter("token")]
-            public string? Token { get; set; }
-            #pragma warning restore CS1591
-#nullable restore
-#else
-            #pragma warning disable CS1591
-            [QueryParameter("token")]
-            public string Token { get; set; }
-            #pragma warning restore CS1591
-#endif
-        }
-        /// <summary>
-        /// Configuration for the request such as headers, query parameters, and middleware options.
-        /// </summary>
-        [Obsolete("This class is deprecated. Please use the generic RequestConfiguration class generated by the generator.")]
-        [global::System.CodeDom.Compiler.GeneratedCode("Kiota", "1.0.0")]
-        public partial class WithMap_ItemRequestBuilderPatchRequestConfiguration : RequestConfiguration<global::GrimoireCli.Generated.Api.Maps.Item.WithMap_ItemRequestBuilder.WithMap_ItemRequestBuilderPatchQueryParameters>
+        public partial class WithMap_ItemRequestBuilderPatchRequestConfiguration : RequestConfiguration<DefaultQueryParameters>
         {
         }
     }

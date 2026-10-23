@@ -143,7 +143,7 @@ namespace GrimoireCli.Generated.Models
             }
         }
         /// <summary>
-        /// Composed type wrapper for classes <see cref="global::GrimoireCli.Generated.Models.AvailabilityUpdate_user_idMember1"/>, <see cref="int"/>
+        /// Composed type wrapper for classes <see cref="global::GrimoireCli.Generated.Models.AvailabilityUpdate_user_idMember1"/>, <see cref="string"/>
         /// </summary>
         [global::System.CodeDom.Compiler.GeneratedCode("Kiota", "1.0.0")]
         public partial class AvailabilityUpdate_user_id : IComposedTypeWrapper, IParsable
@@ -156,8 +156,14 @@ namespace GrimoireCli.Generated.Models
 #else
             public global::GrimoireCli.Generated.Models.AvailabilityUpdate_user_idMember1 AvailabilityUpdateUserIdMember1 { get; set; }
 #endif
-            /// <summary>Composed type representation for type <see cref="int"/></summary>
-            public int? Integer { get; set; }
+            /// <summary>Composed type representation for type <see cref="string"/></summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+            public string? String { get; set; }
+#nullable restore
+#else
+            public string String { get; set; }
+#endif
             /// <summary>
             /// Creates a new instance of the appropriate class based on discriminator value
             /// </summary>
@@ -167,9 +173,9 @@ namespace GrimoireCli.Generated.Models
             {
                 if(ReferenceEquals(parseNode, null)) throw new ArgumentNullException(nameof(parseNode));
                 var result = new global::GrimoireCli.Generated.Models.AvailabilityUpdate.AvailabilityUpdate_user_id();
-                if(parseNode.GetIntValue() is int integerValue)
+                if(parseNode.GetStringValue() is string stringValue)
                 {
-                    result.Integer = integerValue;
+                    result.String = stringValue;
                 }
                 else {
                     result.AvailabilityUpdateUserIdMember1 = new global::GrimoireCli.Generated.Models.AvailabilityUpdate_user_idMember1();
@@ -195,9 +201,9 @@ namespace GrimoireCli.Generated.Models
             public virtual void Serialize(ISerializationWriter writer)
             {
                 if(ReferenceEquals(writer, null)) throw new ArgumentNullException(nameof(writer));
-                if(Integer != null)
+                if(String != null)
                 {
-                    writer.WriteIntValue(null, Integer);
+                    writer.WriteStringValue(null, String);
                 }
                 else {
                     writer.WriteObjectValue<global::GrimoireCli.Generated.Models.AvailabilityUpdate_user_idMember1>(null, AvailabilityUpdateUserIdMember1);

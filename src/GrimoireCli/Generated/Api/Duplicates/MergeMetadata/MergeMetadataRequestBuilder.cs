@@ -22,7 +22,7 @@ namespace GrimoireCli.Generated.Api.Duplicates.MergeMetadata
         /// </summary>
         /// <param name="pathParameters">Path parameters for the request</param>
         /// <param name="requestAdapter">The request adapter to use to execute the requests.</param>
-        public MergeMetadataRequestBuilder(Dictionary<string, object> pathParameters, IRequestAdapter requestAdapter) : base(requestAdapter, "{+baseurl}/api/duplicates/merge-metadata{?token*}", pathParameters)
+        public MergeMetadataRequestBuilder(Dictionary<string, object> pathParameters, IRequestAdapter requestAdapter) : base(requestAdapter, "{+baseurl}/api/duplicates/merge-metadata", pathParameters)
         {
         }
         /// <summary>
@@ -30,7 +30,7 @@ namespace GrimoireCli.Generated.Api.Duplicates.MergeMetadata
         /// </summary>
         /// <param name="rawUrl">The raw URL to use for the request builder.</param>
         /// <param name="requestAdapter">The request adapter to use to execute the requests.</param>
-        public MergeMetadataRequestBuilder(string rawUrl, IRequestAdapter requestAdapter) : base(requestAdapter, "{+baseurl}/api/duplicates/merge-metadata{?token*}", rawUrl)
+        public MergeMetadataRequestBuilder(string rawUrl, IRequestAdapter requestAdapter) : base(requestAdapter, "{+baseurl}/api/duplicates/merge-metadata", rawUrl)
         {
         }
         /// <summary>
@@ -43,11 +43,11 @@ namespace GrimoireCli.Generated.Api.Duplicates.MergeMetadata
         /// <exception cref="global::GrimoireCli.Generated.Models.HTTPValidationError">When receiving a 422 status code</exception>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
-        public async Task<global::GrimoireCli.Generated.Models.MergeMetadataResult?> PostAsync(global::GrimoireCli.Generated.Models.MergeMetadataRequest body, Action<RequestConfiguration<global::GrimoireCli.Generated.Api.Duplicates.MergeMetadata.MergeMetadataRequestBuilder.MergeMetadataRequestBuilderPostQueryParameters>>? requestConfiguration = default, CancellationToken cancellationToken = default)
+        public async Task<global::GrimoireCli.Generated.Models.MergeMetadataResult?> PostAsync(global::GrimoireCli.Generated.Models.MergeMetadataRequest body, Action<RequestConfiguration<DefaultQueryParameters>>? requestConfiguration = default, CancellationToken cancellationToken = default)
         {
 #nullable restore
 #else
-        public async Task<global::GrimoireCli.Generated.Models.MergeMetadataResult> PostAsync(global::GrimoireCli.Generated.Models.MergeMetadataRequest body, Action<RequestConfiguration<global::GrimoireCli.Generated.Api.Duplicates.MergeMetadata.MergeMetadataRequestBuilder.MergeMetadataRequestBuilderPostQueryParameters>> requestConfiguration = default, CancellationToken cancellationToken = default)
+        public async Task<global::GrimoireCli.Generated.Models.MergeMetadataResult> PostAsync(global::GrimoireCli.Generated.Models.MergeMetadataRequest body, Action<RequestConfiguration<DefaultQueryParameters>> requestConfiguration = default, CancellationToken cancellationToken = default)
         {
 #endif
             if(ReferenceEquals(body, null)) throw new ArgumentNullException(nameof(body));
@@ -66,11 +66,11 @@ namespace GrimoireCli.Generated.Api.Duplicates.MergeMetadata
         /// <param name="requestConfiguration">Configuration for the request such as headers, query parameters, and middleware options.</param>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
-        public RequestInformation ToPostRequestInformation(global::GrimoireCli.Generated.Models.MergeMetadataRequest body, Action<RequestConfiguration<global::GrimoireCli.Generated.Api.Duplicates.MergeMetadata.MergeMetadataRequestBuilder.MergeMetadataRequestBuilderPostQueryParameters>>? requestConfiguration = default)
+        public RequestInformation ToPostRequestInformation(global::GrimoireCli.Generated.Models.MergeMetadataRequest body, Action<RequestConfiguration<DefaultQueryParameters>>? requestConfiguration = default)
         {
 #nullable restore
 #else
-        public RequestInformation ToPostRequestInformation(global::GrimoireCli.Generated.Models.MergeMetadataRequest body, Action<RequestConfiguration<global::GrimoireCli.Generated.Api.Duplicates.MergeMetadata.MergeMetadataRequestBuilder.MergeMetadataRequestBuilderPostQueryParameters>> requestConfiguration = default)
+        public RequestInformation ToPostRequestInformation(global::GrimoireCli.Generated.Models.MergeMetadataRequest body, Action<RequestConfiguration<DefaultQueryParameters>> requestConfiguration = default)
         {
 #endif
             if(ReferenceEquals(body, null)) throw new ArgumentNullException(nameof(body));
@@ -90,31 +90,11 @@ namespace GrimoireCli.Generated.Api.Duplicates.MergeMetadata
             return new global::GrimoireCli.Generated.Api.Duplicates.MergeMetadata.MergeMetadataRequestBuilder(rawUrl, RequestAdapter);
         }
         /// <summary>
-        /// Copy chosen metadata fields from one record onto another.Keeping the file with the worse metadata should not be a punishment (issue#304), so the good record&apos;s title, authors, and tags can move across beforethe other copy is deleted.
-        /// </summary>
-        [global::System.CodeDom.Compiler.GeneratedCode("Kiota", "1.0.0")]
-        public partial class MergeMetadataRequestBuilderPostQueryParameters 
-        {
-#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
-#nullable enable
-            #pragma warning disable CS1591
-            [QueryParameter("token")]
-            public string? Token { get; set; }
-            #pragma warning restore CS1591
-#nullable restore
-#else
-            #pragma warning disable CS1591
-            [QueryParameter("token")]
-            public string Token { get; set; }
-            #pragma warning restore CS1591
-#endif
-        }
-        /// <summary>
         /// Configuration for the request such as headers, query parameters, and middleware options.
         /// </summary>
         [Obsolete("This class is deprecated. Please use the generic RequestConfiguration class generated by the generator.")]
         [global::System.CodeDom.Compiler.GeneratedCode("Kiota", "1.0.0")]
-        public partial class MergeMetadataRequestBuilderPostRequestConfiguration : RequestConfiguration<global::GrimoireCli.Generated.Api.Duplicates.MergeMetadata.MergeMetadataRequestBuilder.MergeMetadataRequestBuilderPostQueryParameters>
+        public partial class MergeMetadataRequestBuilderPostRequestConfiguration : RequestConfiguration<DefaultQueryParameters>
         {
         }
     }

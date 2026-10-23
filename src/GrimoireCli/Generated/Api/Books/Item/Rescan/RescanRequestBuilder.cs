@@ -22,7 +22,7 @@ namespace GrimoireCli.Generated.Api.Books.Item.Rescan
         /// </summary>
         /// <param name="pathParameters">Path parameters for the request</param>
         /// <param name="requestAdapter">The request adapter to use to execute the requests.</param>
-        public RescanRequestBuilder(Dictionary<string, object> pathParameters, IRequestAdapter requestAdapter) : base(requestAdapter, "{+baseurl}/api/books/{book_id}/rescan{?token*}", pathParameters)
+        public RescanRequestBuilder(Dictionary<string, object> pathParameters, IRequestAdapter requestAdapter) : base(requestAdapter, "{+baseurl}/api/books/{book_id}/rescan", pathParameters)
         {
         }
         /// <summary>
@@ -30,11 +30,11 @@ namespace GrimoireCli.Generated.Api.Books.Item.Rescan
         /// </summary>
         /// <param name="rawUrl">The raw URL to use for the request builder.</param>
         /// <param name="requestAdapter">The request adapter to use to execute the requests.</param>
-        public RescanRequestBuilder(string rawUrl, IRequestAdapter requestAdapter) : base(requestAdapter, "{+baseurl}/api/books/{book_id}/rescan{?token*}", rawUrl)
+        public RescanRequestBuilder(string rawUrl, IRequestAdapter requestAdapter) : base(requestAdapter, "{+baseurl}/api/books/{book_id}/rescan", rawUrl)
         {
         }
         /// <summary>
-        /// Re-read a single book from disk and rebuild its search index.The general per-book re-index: unlike the OCR-only ``/reindex`` path, thisworks for any indexable book a user has edited externally — PDF, EPUB, DjVu,or a text document. A text-layer PDF is re-extracted and its FTS rowsrebuilt; an image-only PDF is re-queued for OCR. The page count and coverthumbnail are refreshed if the file changed.The work runs in the background; poll ``GET /api/scan-status`` for progress.No-ops (leaving the request for the running scan) if a library scan isalready in progress.
+        /// Re-read a single book from disk and rebuild its search index.The general per-book re-index: unlike the OCR-only ``/reindex`` path, thisworks for any indexable book a user has edited externally — PDF, EPUB, DjVu,or a text document. A text-layer PDF is re-extracted and its FTS rowsrebuilt; an image-only PDF is re-queued for OCR. The page count and coverthumbnail are refreshed if the file changed.The work runs in the background on the per-book re-index queue shared withreplace uploads (issue #657); poll ``GET /api/scan-status`` for progress.No-ops (leaving the request for the running scan) if a library scan isalready in progress.
         /// </summary>
         /// <returns>A <see cref="global::GrimoireCli.Generated.Models.Backend__routers__books___schemas__StatusResponse"/></returns>
         /// <param name="cancellationToken">Cancellation token to use when cancelling requests</param>
@@ -42,11 +42,11 @@ namespace GrimoireCli.Generated.Api.Books.Item.Rescan
         /// <exception cref="global::GrimoireCli.Generated.Models.HTTPValidationError">When receiving a 422 status code</exception>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
-        public async Task<global::GrimoireCli.Generated.Models.Backend__routers__books___schemas__StatusResponse?> PostAsync(Action<RequestConfiguration<global::GrimoireCli.Generated.Api.Books.Item.Rescan.RescanRequestBuilder.RescanRequestBuilderPostQueryParameters>>? requestConfiguration = default, CancellationToken cancellationToken = default)
+        public async Task<global::GrimoireCli.Generated.Models.Backend__routers__books___schemas__StatusResponse?> PostAsync(Action<RequestConfiguration<DefaultQueryParameters>>? requestConfiguration = default, CancellationToken cancellationToken = default)
         {
 #nullable restore
 #else
-        public async Task<global::GrimoireCli.Generated.Models.Backend__routers__books___schemas__StatusResponse> PostAsync(Action<RequestConfiguration<global::GrimoireCli.Generated.Api.Books.Item.Rescan.RescanRequestBuilder.RescanRequestBuilderPostQueryParameters>> requestConfiguration = default, CancellationToken cancellationToken = default)
+        public async Task<global::GrimoireCli.Generated.Models.Backend__routers__books___schemas__StatusResponse> PostAsync(Action<RequestConfiguration<DefaultQueryParameters>> requestConfiguration = default, CancellationToken cancellationToken = default)
         {
 #endif
             var requestInfo = ToPostRequestInformation(requestConfiguration);
@@ -57,17 +57,17 @@ namespace GrimoireCli.Generated.Api.Books.Item.Rescan
             return await RequestAdapter.SendAsync<global::GrimoireCli.Generated.Models.Backend__routers__books___schemas__StatusResponse>(requestInfo, global::GrimoireCli.Generated.Models.Backend__routers__books___schemas__StatusResponse.CreateFromDiscriminatorValue, errorMapping, cancellationToken).ConfigureAwait(false);
         }
         /// <summary>
-        /// Re-read a single book from disk and rebuild its search index.The general per-book re-index: unlike the OCR-only ``/reindex`` path, thisworks for any indexable book a user has edited externally — PDF, EPUB, DjVu,or a text document. A text-layer PDF is re-extracted and its FTS rowsrebuilt; an image-only PDF is re-queued for OCR. The page count and coverthumbnail are refreshed if the file changed.The work runs in the background; poll ``GET /api/scan-status`` for progress.No-ops (leaving the request for the running scan) if a library scan isalready in progress.
+        /// Re-read a single book from disk and rebuild its search index.The general per-book re-index: unlike the OCR-only ``/reindex`` path, thisworks for any indexable book a user has edited externally — PDF, EPUB, DjVu,or a text document. A text-layer PDF is re-extracted and its FTS rowsrebuilt; an image-only PDF is re-queued for OCR. The page count and coverthumbnail are refreshed if the file changed.The work runs in the background on the per-book re-index queue shared withreplace uploads (issue #657); poll ``GET /api/scan-status`` for progress.No-ops (leaving the request for the running scan) if a library scan isalready in progress.
         /// </summary>
         /// <returns>A <see cref="RequestInformation"/></returns>
         /// <param name="requestConfiguration">Configuration for the request such as headers, query parameters, and middleware options.</param>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
-        public RequestInformation ToPostRequestInformation(Action<RequestConfiguration<global::GrimoireCli.Generated.Api.Books.Item.Rescan.RescanRequestBuilder.RescanRequestBuilderPostQueryParameters>>? requestConfiguration = default)
+        public RequestInformation ToPostRequestInformation(Action<RequestConfiguration<DefaultQueryParameters>>? requestConfiguration = default)
         {
 #nullable restore
 #else
-        public RequestInformation ToPostRequestInformation(Action<RequestConfiguration<global::GrimoireCli.Generated.Api.Books.Item.Rescan.RescanRequestBuilder.RescanRequestBuilderPostQueryParameters>> requestConfiguration = default)
+        public RequestInformation ToPostRequestInformation(Action<RequestConfiguration<DefaultQueryParameters>> requestConfiguration = default)
         {
 #endif
             var requestInfo = new RequestInformation(Method.POST, UrlTemplate, PathParameters);
@@ -85,31 +85,11 @@ namespace GrimoireCli.Generated.Api.Books.Item.Rescan
             return new global::GrimoireCli.Generated.Api.Books.Item.Rescan.RescanRequestBuilder(rawUrl, RequestAdapter);
         }
         /// <summary>
-        /// Re-read a single book from disk and rebuild its search index.The general per-book re-index: unlike the OCR-only ``/reindex`` path, thisworks for any indexable book a user has edited externally — PDF, EPUB, DjVu,or a text document. A text-layer PDF is re-extracted and its FTS rowsrebuilt; an image-only PDF is re-queued for OCR. The page count and coverthumbnail are refreshed if the file changed.The work runs in the background; poll ``GET /api/scan-status`` for progress.No-ops (leaving the request for the running scan) if a library scan isalready in progress.
-        /// </summary>
-        [global::System.CodeDom.Compiler.GeneratedCode("Kiota", "1.0.0")]
-        public partial class RescanRequestBuilderPostQueryParameters 
-        {
-#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
-#nullable enable
-            #pragma warning disable CS1591
-            [QueryParameter("token")]
-            public string? Token { get; set; }
-            #pragma warning restore CS1591
-#nullable restore
-#else
-            #pragma warning disable CS1591
-            [QueryParameter("token")]
-            public string Token { get; set; }
-            #pragma warning restore CS1591
-#endif
-        }
-        /// <summary>
         /// Configuration for the request such as headers, query parameters, and middleware options.
         /// </summary>
         [Obsolete("This class is deprecated. Please use the generic RequestConfiguration class generated by the generator.")]
         [global::System.CodeDom.Compiler.GeneratedCode("Kiota", "1.0.0")]
-        public partial class RescanRequestBuilderPostRequestConfiguration : RequestConfiguration<global::GrimoireCli.Generated.Api.Books.Item.Rescan.RescanRequestBuilder.RescanRequestBuilderPostQueryParameters>
+        public partial class RescanRequestBuilderPostRequestConfiguration : RequestConfiguration<DefaultQueryParameters>
         {
         }
     }
