@@ -3,6 +3,45 @@
 All notable changes to grimoire-cli are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## v0.7.1 — 2026-10-23
+
+Patch release that adds Grimoire 1.9.1 to the supported range, now 1.9.0 –
+1.9.1. No command, flag or output shape changed; the help catches up with
+the rules 1.9.1 tightened.
+
+### Highlights
+
+- **Grimoire 1.9.1 is tested and supported.** 1.9.0 stays supported, since
+  nothing the CLI sends was added or removed. Login no longer warns on a
+  1.9.1 server.
+- **Help states the stricter 1.9.1 rules**, so an agent learns them before
+  it hits the error:
+  - `access_level`, and a book category change that widens visibility,
+    need admin.
+  - Link fields take http(s) only.
+  - Page `--width` is 16-3000, and `grid_px` is 0 or 4-2000.
+  - An explicit book hidden from the account is a 404 on `books get`.
+- **API-key logins are refused on more commands.** 1.9.1 closes
+  `addons settings` and `campaigns guests` list, create, regenerate and
+  share to API keys. Their help now says they need a password login.
+- **`files delete --delete-files` on a system folder now removes the
+  system too**, even one that was renamed or given a description. Only a
+  campaign that uses it keeps it. The help says so.
+
+### Features
+
+- feat: target grimoire 1.9.1
+
+### Chores
+
+- chore: bump version to 0.7.1
+
+### Docs
+
+- docs: document 1.9.1 rules in help and re-cite api-notes
+- docs: record 1.9.1 support as 0.7.1 in the compatibility matrix
+- docs: record 1.9.1 support as 0.8.0 in the compatibility matrix
+
 ## v0.7.0 — 2026-10-16
 
 Minor release that covers the campaign play side: the wiki, note templates,
