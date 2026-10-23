@@ -150,6 +150,9 @@ public static class SystemsCommand
             "",
             "Prefer genres and character_builder_urls; the singles are legacy.",
             "",
+            "access_level needs admin: 403 otherwise. URLs must be http(s): 422",
+            "otherwise.",
+            "",
             "genres, license, parent_system, system_family and dice_materials draw",
             "on vocabularies: genres list, licenses list, parent-systems list,",
             "system-families list, dice-materials list. Submit the name, not the id.",
@@ -203,7 +206,10 @@ public static class SystemsCommand
             "updated lists the ids that resolved, not the fields that changed.",
             "",
             "Renaming is permanent and \"\" not null clears a field, codex_id aside —",
-            "see systems update.");
+            "see systems update.",
+            "",
+            "Non-admin: access_level fails only its item. A non-http(s) URL 422s the",
+            "whole batch.");
         command.AddExamples(
             "grimoire-cli systems batch-update --input items.json",
             "jq -c '{items: .}' edits.json | grimoire-cli systems batch-update --stdin");

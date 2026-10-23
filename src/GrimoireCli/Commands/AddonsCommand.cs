@@ -206,6 +206,8 @@ public static class AddonsCommand
             "--index-url must be https unless its host is localhost or a private",
             "address; 422 otherwise.",
             "",
+            "Refused with an API-key login: needs a password login.",
+            "",
             "--allow-scripts is the global switch. An add-on that ships a script also",
             "needs its own approval, from install --approve-script.");
         command.AddExamples("grimoire-cli addons settings --allow-scripts true");

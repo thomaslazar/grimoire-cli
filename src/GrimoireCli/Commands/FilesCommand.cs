@@ -189,7 +189,9 @@ public static class FilesCommand
             "unless the system carries a custom name, description or cover, or a",
             "campaign references it.",
             "",
-            "--delete-files also deletes the files, and cannot be undone.",
+            "--delete-files also deletes the files, and cannot be undone. On a",
+            "system folder it drops the system row too, custom name or not, unless",
+            "a campaign references it.",
             "",
             "--confirm-name applies only with --delete-files, and only when the",
             "target is a folder still holding something: without a match, 428.");

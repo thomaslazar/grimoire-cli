@@ -217,7 +217,7 @@ public static class MapsCommand
         command.AddHelpSection("Notes", HelpSectionPosition.Top,
             "An image map is streamed as stored and accepts page 1 only.",
             "",
-            "--width defaults to 1600, max 3000; above that the server rejects it.",
+            "--width defaults to 1600 and takes 16-3000; outside that is a 422.",
             "",
             "--output - writes the image to stdout; a path writes it and prints",
             "{path, bytes}.");
