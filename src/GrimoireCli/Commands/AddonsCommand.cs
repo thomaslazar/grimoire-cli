@@ -203,6 +203,8 @@ public static class AddonsCommand
             "values are in addons list.",
             "",
             "Changing --index-url does not refetch; run addons refresh after.",
+            "--index-url must be https unless its host is localhost or a private",
+            "address; 422 otherwise.",
             "",
             "--allow-scripts is the global switch. An add-on that ships a script also",
             "needs its own approval, from install --approve-script.");

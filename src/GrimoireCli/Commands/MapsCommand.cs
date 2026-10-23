@@ -267,7 +267,7 @@ public static class MapsCommand
             "grid_width, grid_height and grid_px take 0 to clear the override and",
             "resume detection. batch-update cannot: it drops a 0 silently.",
             "",
-            "grid_width and grid_height are 0-1000, grid_px 0-2000; outside that is",
+            "grid_width and grid_height are 0-1000, grid_px 0 or 4-2000; outside that is",
             "a 422.",
             "",
             "Responds {\"status\": \"ok\", \"grid_warning\": …} and echoes no field",
@@ -319,7 +319,7 @@ public static class MapsCommand
             "",
             "Nothing else is per-item: a schema-invalid item 422s the whole batch",
             "and nothing is written. grid_width and grid_height are 0-1000, grid_px",
-            "0-2000, and no tag may contain / or \\.",
+            "0 or 4-2000, and no tag may contain / or \\.",
             "",
             "A grid field sent as 0 is dropped here, so this cannot clear an",
             "override — maps update can.");

@@ -36,6 +36,8 @@ namespace GrimoireCli.Generated.Models
 #else
         public global::GrimoireCli.Generated.Models.AuthMeResponse.AuthMeResponse_email Email { get; set; }
 #endif
+        /// <summary>The explicit_locked property</summary>
+        public bool? ExplicitLocked { get; set; }
         /// <summary>The id property</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
@@ -70,6 +72,7 @@ namespace GrimoireCli.Generated.Models
         public AuthMeResponse()
         {
             AdditionalData = new Dictionary<string, object>();
+            ExplicitLocked = false;
             ShareLinksAllowed = false;
         }
         /// <summary>
@@ -95,6 +98,7 @@ namespace GrimoireCli.Generated.Models
                 { "campaign_access", n => { CampaignAccess = n.GetBoolValue(); } },
                 { "display_name", n => { DisplayName = n.GetObjectValue<global::GrimoireCli.Generated.Models.AuthMeResponse.AuthMeResponse_display_name>(global::GrimoireCli.Generated.Models.AuthMeResponse.AuthMeResponse_display_name.CreateFromDiscriminatorValue); } },
                 { "email", n => { Email = n.GetObjectValue<global::GrimoireCli.Generated.Models.AuthMeResponse.AuthMeResponse_email>(global::GrimoireCli.Generated.Models.AuthMeResponse.AuthMeResponse_email.CreateFromDiscriminatorValue); } },
+                { "explicit_locked", n => { ExplicitLocked = n.GetBoolValue(); } },
                 { "id", n => { Id = n.GetStringValue(); } },
                 { "oidc_linked", n => { OidcLinked = n.GetBoolValue(); } },
                 { "role", n => { Role = n.GetObjectValue<global::GrimoireCli.Generated.Models.AuthMeResponse.AuthMeResponse_role>(global::GrimoireCli.Generated.Models.AuthMeResponse.AuthMeResponse_role.CreateFromDiscriminatorValue); } },
@@ -114,6 +118,7 @@ namespace GrimoireCli.Generated.Models
             writer.WriteBoolValue("campaign_access", CampaignAccess);
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.AuthMeResponse.AuthMeResponse_display_name>("display_name", DisplayName);
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.AuthMeResponse.AuthMeResponse_email>("email", Email);
+            writer.WriteBoolValue("explicit_locked", ExplicitLocked);
             writer.WriteStringValue("id", Id);
             writer.WriteBoolValue("oidc_linked", OidcLinked);
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.AuthMeResponse.AuthMeResponse_role>("role", Role);

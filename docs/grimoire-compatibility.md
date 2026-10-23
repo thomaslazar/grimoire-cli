@@ -11,7 +11,8 @@
 | 0.4.0 | 1.7.2 – 1.7.3 | superseded by 0.5.0 |
 | 0.5.0 | 1.8.0 | superseded by 0.6.0 |
 | 0.6.0 | 1.8.0 | superseded by 0.7.0 |
-| 0.7.0 | 1.9.0 | current, on `main` |
+| 0.7.0 | 1.9.0 | superseded by 0.7.1 |
+| 0.7.1 | 1.9.0 – 1.9.1 | current, on `main` |
 
 **The floor rises only when something forces it**, not on every server release.
 Each row above records a pairing that was necessary at the time — 1.5.6 → 1.6.0
@@ -29,7 +30,7 @@ an older Grimoire does not know is dropped by Pydantic rather than rejected, so
 the command answers 200 and does nothing — the one failure the version warning
 exists to catch.
 
-`main` targets Grimoire 1.9.0. Reaching 1.6.0 was more than a version bump: it
+`main` targets Grimoire 1.9.1. Reaching 1.6.0 was more than a version bump: it
 shortened the access token from 30 days to 30 minutes and made the library
 writable, which is why the CLI renews its own session
 ([authentication.md](authentication.md)) and why the `files` endpoints exist at
@@ -74,7 +75,7 @@ plain `BaseModel`s with Pydantic's default `extra='ignore'`, so that flag's fiel
 is dropped and the folder is created with no marker and a 200. A silent no-op is
 what the floor warning is for; without the new flag this release would not have
 needed one.
-`docker/docker-compose.yml` pins the `1.9.0` release tag, so the spec cannot
+`docker/docker-compose.yml` pins the `1.9.1` release tag, so the spec cannot
 drift under the committed client between regenerations.
 
 **1.7.1 raised `MaxTestedVersion` and left the floor alone** — the first bump
@@ -186,10 +187,32 @@ The `characters`, `content` and `rulesets` routes, the media `/groups` routes an
 the system shelf routes (`/books`, `/book-groups`, `/book-facets`) are new and not
 implemented.
 
+**1.9.1 raised `MaxTestedVersion` and left the floor alone.** Nothing the CLI
+sends was added or removed. What moved around it:
+
+- **Token-in-URL auth is gone**, and a session cookie counts only for GET and
+  HEAD (`auth.py:351-353`, `385-391`). The CLI always sends `Authorization:
+  Bearer`, so nothing changes for it; the spec's `?token` parameter vanished
+  from every route.
+- **GM and admin tokens are re-checked on every request** (`auth.py:409-454`).
+  A role change, deleted account or revoked session is an immediate 401
+  without `X-Token-Expired`, so the CLI does not try to refresh.
+- **`/api/openapi.json` needs a session** unless `API_DOCS=public`, which the
+  local stack sets so the generators can fetch it.
+- **Plain-http add-on index URLs are refused** unless the host is local or
+  private (`addons/urls.py:26-38`). The fixture index is served as
+  `addon-index.localhost` for that reason.
+- **Seeded passwords must be long and uncommon** (`seed_users.py:62-72`), so
+  `docker/users.json.example` ships bcrypt-sha256 hashes, which skip the check.
+- **Visibility is enforced more widely.** An explicit book a user may not see is
+  a 404 on `books get`; a system or book outside a GM's reach is a 404 on its
+  writes; `tags` counts and `library stats` are scoped to the caller.
+- **`campaigns availability set --user-id` works**, for the owner or an admin.
+
 ## Runtime check
 
 `src/GrimoireCli/Api/GrimoireApiClient.cs` defines `MinSupportedVersion` and
-`MaxTestedVersion`, currently both `"1.9.0"`. A check runs before the first
+`MaxTestedVersion`, currently `"1.9.0"` and `"1.9.1"`. A check runs before the first
 request of any command, calling `GET /api/about` and comparing the reported
 version against that range. It is throttled to once every 24 hours — a
 config with a recent `lastVersionCheck` skips the probe entirely — and

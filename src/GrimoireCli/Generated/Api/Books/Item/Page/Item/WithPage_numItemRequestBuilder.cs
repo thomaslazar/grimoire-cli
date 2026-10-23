@@ -3,6 +3,7 @@
 using GrimoireCli.Generated.Api.Books.Item.Page.Item.Shapes;
 using GrimoireCli.Generated.Api.Books.Item.Page.Item.Size;
 using GrimoireCli.Generated.Api.Books.Item.Page.Item.Text;
+using GrimoireCli.Generated.Api.Books.Item.Page.Item.Tile;
 using GrimoireCli.Generated.Api.Books.Item.Page.Item.Words;
 using GrimoireCli.Generated.Models;
 using Microsoft.Kiota.Abstractions.Extensions;
@@ -36,6 +37,11 @@ namespace GrimoireCli.Generated.Api.Books.Item.Page.Item
         {
             get => new global::GrimoireCli.Generated.Api.Books.Item.Page.Item.Text.TextRequestBuilder(PathParameters, RequestAdapter);
         }
+        /// <summary>The tile property</summary>
+        public global::GrimoireCli.Generated.Api.Books.Item.Page.Item.Tile.TileRequestBuilder Tile
+        {
+            get => new global::GrimoireCli.Generated.Api.Books.Item.Page.Item.Tile.TileRequestBuilder(PathParameters, RequestAdapter);
+        }
         /// <summary>The words property</summary>
         public global::GrimoireCli.Generated.Api.Books.Item.Page.Item.Words.WordsRequestBuilder Words
         {
@@ -46,7 +52,7 @@ namespace GrimoireCli.Generated.Api.Books.Item.Page.Item
         /// </summary>
         /// <param name="pathParameters">Path parameters for the request</param>
         /// <param name="requestAdapter">The request adapter to use to execute the requests.</param>
-        public WithPage_numItemRequestBuilder(Dictionary<string, object> pathParameters, IRequestAdapter requestAdapter) : base(requestAdapter, "{+baseurl}/api/books/{book_id}/page/{page_num}{?token*,width*}", pathParameters)
+        public WithPage_numItemRequestBuilder(Dictionary<string, object> pathParameters, IRequestAdapter requestAdapter) : base(requestAdapter, "{+baseurl}/api/books/{book_id}/page/{page_num}{?width*}", pathParameters)
         {
         }
         /// <summary>
@@ -54,7 +60,7 @@ namespace GrimoireCli.Generated.Api.Books.Item.Page.Item
         /// </summary>
         /// <param name="rawUrl">The raw URL to use for the request builder.</param>
         /// <param name="requestAdapter">The request adapter to use to execute the requests.</param>
-        public WithPage_numItemRequestBuilder(string rawUrl, IRequestAdapter requestAdapter) : base(requestAdapter, "{+baseurl}/api/books/{book_id}/page/{page_num}{?token*,width*}", rawUrl)
+        public WithPage_numItemRequestBuilder(string rawUrl, IRequestAdapter requestAdapter) : base(requestAdapter, "{+baseurl}/api/books/{book_id}/page/{page_num}{?width*}", rawUrl)
         {
         }
         /// <summary>
@@ -114,19 +120,6 @@ namespace GrimoireCli.Generated.Api.Books.Item.Page.Item
         [global::System.CodeDom.Compiler.GeneratedCode("Kiota", "1.0.0")]
         public partial class WithPage_numItemRequestBuilderGetQueryParameters 
         {
-#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
-#nullable enable
-            #pragma warning disable CS1591
-            [QueryParameter("token")]
-            public string? Token { get; set; }
-            #pragma warning restore CS1591
-#nullable restore
-#else
-            #pragma warning disable CS1591
-            [QueryParameter("token")]
-            public string Token { get; set; }
-            #pragma warning restore CS1591
-#endif
             #pragma warning disable CS1591
             [QueryParameter("width")]
             public int? Width { get; set; }

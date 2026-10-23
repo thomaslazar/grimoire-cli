@@ -39,12 +39,15 @@ namespace GrimoireCli.Generated.Models
 #else
         public global::GrimoireCli.Generated.Models.PreferencesResponse.PreferencesResponse_email Email { get; set; }
 #endif
+        /// <summary>The explicit_locked property</summary>
+        public bool? ExplicitLocked { get; set; }
         /// <summary>
         /// Instantiates a new <see cref="global::GrimoireCli.Generated.Models.PreferencesResponse"/> and sets the default values.
         /// </summary>
         public PreferencesResponse()
         {
             AdditionalData = new Dictionary<string, object>();
+            ExplicitLocked = false;
         }
         /// <summary>
         /// Creates a new instance of the appropriate class based on discriminator value
@@ -67,6 +70,7 @@ namespace GrimoireCli.Generated.Models
                 { "allow_explicit", n => { AllowExplicit = n.GetObjectValue<global::GrimoireCli.Generated.Models.PreferencesResponse.PreferencesResponse_allow_explicit>(global::GrimoireCli.Generated.Models.PreferencesResponse.PreferencesResponse_allow_explicit.CreateFromDiscriminatorValue); } },
                 { "display_name", n => { DisplayName = n.GetObjectValue<global::GrimoireCli.Generated.Models.PreferencesResponse.PreferencesResponse_display_name>(global::GrimoireCli.Generated.Models.PreferencesResponse.PreferencesResponse_display_name.CreateFromDiscriminatorValue); } },
                 { "email", n => { Email = n.GetObjectValue<global::GrimoireCli.Generated.Models.PreferencesResponse.PreferencesResponse_email>(global::GrimoireCli.Generated.Models.PreferencesResponse.PreferencesResponse_email.CreateFromDiscriminatorValue); } },
+                { "explicit_locked", n => { ExplicitLocked = n.GetBoolValue(); } },
             };
         }
         /// <summary>
@@ -79,6 +83,7 @@ namespace GrimoireCli.Generated.Models
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.PreferencesResponse.PreferencesResponse_allow_explicit>("allow_explicit", AllowExplicit);
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.PreferencesResponse.PreferencesResponse_display_name>("display_name", DisplayName);
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.PreferencesResponse.PreferencesResponse_email>("email", Email);
+            writer.WriteBoolValue("explicit_locked", ExplicitLocked);
             writer.WriteAdditionalData(AdditionalData);
         }
         /// <summary>

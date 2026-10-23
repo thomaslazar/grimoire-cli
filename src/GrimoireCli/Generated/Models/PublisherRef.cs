@@ -8,7 +8,7 @@ using System;
 namespace GrimoireCli.Generated.Models
 {
     /// <summary>
-    /// A publisher on a game system: a name with an optional link.Mirrors ``systems._schemas.PublisherEntry`` (the request-side model) for useby the response models that surface the ``publishers`` column.
+    /// A publisher on a game system: a name with an optional link.Mirrors ``systems._schemas.PublisherEntry`` (the request-side model) for useby the response models that surface the ``publishers`` column. A link thatis not http(s) comes back blank (see ``_link_urls``).
     /// </summary>
     [global::System.CodeDom.Compiler.GeneratedCode("Kiota", "1.0.0")]
     public partial class PublisherRef : IAdditionalDataHolder, IParsable

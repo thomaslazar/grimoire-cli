@@ -53,9 +53,10 @@ public static class BackupsCommand
             "409 if a backup is already running. Writes to the data directory, not the",
             "library, so a read-only library mount does not block it.",
             "",
-            "Holds the database plus campaign uploads and system/audio covers. The",
-            "library tree is not in it — back that up separately. Thumbnails and the",
-            "page cache are excluded too, and regenerate on demand.");
+            "Holds the database plus campaign uploads, character images and",
+            "system/audio covers. The library tree is not in it — back that up",
+            "separately. Thumbnails and the page cache are excluded too, and",
+            "regenerate on demand.");
         command.AddExamples("grimoire-cli backups create");
         command.AddResponseExample<Generated.Models.BackupItem>();
         command.SetAction(async (parseResult, cancellationToken) =>

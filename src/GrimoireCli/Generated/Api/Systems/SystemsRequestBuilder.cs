@@ -41,7 +41,7 @@ namespace GrimoireCli.Generated.Api.Systems
         /// </summary>
         /// <param name="pathParameters">Path parameters for the request</param>
         /// <param name="requestAdapter">The request adapter to use to execute the requests.</param>
-        public SystemsRequestBuilder(Dictionary<string, object> pathParameters, IRequestAdapter requestAdapter) : base(requestAdapter, "{+baseurl}/api/systems{?edition*,explicit*,family*,genre*,include_children*,license*,order*,parent_id*,parent_system*,sort*,token*}", pathParameters)
+        public SystemsRequestBuilder(Dictionary<string, object> pathParameters, IRequestAdapter requestAdapter) : base(requestAdapter, "{+baseurl}/api/systems{?edition*,explicit*,family*,genre*,include_children*,license*,order*,parent_id*,parent_system*,sort*}", pathParameters)
         {
         }
         /// <summary>
@@ -49,7 +49,7 @@ namespace GrimoireCli.Generated.Api.Systems
         /// </summary>
         /// <param name="rawUrl">The raw URL to use for the request builder.</param>
         /// <param name="requestAdapter">The request adapter to use to execute the requests.</param>
-        public SystemsRequestBuilder(string rawUrl, IRequestAdapter requestAdapter) : base(requestAdapter, "{+baseurl}/api/systems{?edition*,explicit*,family*,genre*,include_children*,license*,order*,parent_id*,parent_system*,sort*,token*}", rawUrl)
+        public SystemsRequestBuilder(string rawUrl, IRequestAdapter requestAdapter) : base(requestAdapter, "{+baseurl}/api/systems{?edition*,explicit*,family*,genre*,include_children*,license*,order*,parent_id*,parent_system*,sort*}", rawUrl)
         {
         }
         /// <summary>
@@ -220,19 +220,6 @@ namespace GrimoireCli.Generated.Api.Systems
             #pragma warning disable CS1591
             [QueryParameter("sort")]
             public string Sort { get; set; }
-            #pragma warning restore CS1591
-#endif
-#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
-#nullable enable
-            #pragma warning disable CS1591
-            [QueryParameter("token")]
-            public string? Token { get; set; }
-            #pragma warning restore CS1591
-#nullable restore
-#else
-            #pragma warning disable CS1591
-            [QueryParameter("token")]
-            public string Token { get; set; }
             #pragma warning restore CS1591
 #endif
         }

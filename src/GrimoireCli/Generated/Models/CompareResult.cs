@@ -30,6 +30,14 @@ namespace GrimoireCli.Generated.Models
 #else
         public List<global::GrimoireCli.Generated.Models.CompareItem> Items { get; set; }
 #endif
+        /// <summary>The mergeable_fields property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public List<string>? MergeableFields { get; set; }
+#nullable restore
+#else
+        public List<string> MergeableFields { get; set; }
+#endif
         /// <summary>The page_count_min property</summary>
         public int? PageCountMin { get; set; }
         /// <summary>The resource_type property</summary>
@@ -70,6 +78,7 @@ namespace GrimoireCli.Generated.Models
             {
                 { "differences", n => { Differences = n.GetCollectionOfObjectValues<global::GrimoireCli.Generated.Models.CompareDifference>(global::GrimoireCli.Generated.Models.CompareDifference.CreateFromDiscriminatorValue)?.AsList(); } },
                 { "items", n => { Items = n.GetCollectionOfObjectValues<global::GrimoireCli.Generated.Models.CompareItem>(global::GrimoireCli.Generated.Models.CompareItem.CreateFromDiscriminatorValue)?.AsList(); } },
+                { "mergeable_fields", n => { MergeableFields = n.GetCollectionOfPrimitiveValues<string>()?.AsList(); } },
                 { "page_count_min", n => { PageCountMin = n.GetIntValue(); } },
                 { "resource_type", n => { ResourceType = n.GetEnumValue<global::GrimoireCli.Generated.Models.CompareResult_resource_type>(); } },
                 { "suggested_parent_id", n => { SuggestedParentId = n.GetObjectValue<global::GrimoireCli.Generated.Models.CompareResult.CompareResult_suggested_parent_id>(global::GrimoireCli.Generated.Models.CompareResult.CompareResult_suggested_parent_id.CreateFromDiscriminatorValue); } },
@@ -84,6 +93,7 @@ namespace GrimoireCli.Generated.Models
             if(ReferenceEquals(writer, null)) throw new ArgumentNullException(nameof(writer));
             writer.WriteCollectionOfObjectValues<global::GrimoireCli.Generated.Models.CompareDifference>("differences", Differences);
             writer.WriteCollectionOfObjectValues<global::GrimoireCli.Generated.Models.CompareItem>("items", Items);
+            writer.WriteCollectionOfPrimitiveValues<string>("mergeable_fields", MergeableFields);
             writer.WriteIntValue("page_count_min", PageCountMin);
             writer.WriteEnumValue<global::GrimoireCli.Generated.Models.CompareResult_resource_type>("resource_type", ResourceType);
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.CompareResult.CompareResult_suggested_parent_id>("suggested_parent_id", SuggestedParentId);

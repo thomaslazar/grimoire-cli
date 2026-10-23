@@ -79,8 +79,9 @@ public static class FilesCommand
             "memory, so in practice keep it under about 2 GiB.",
             "",
             "replace overwrites an indexed book's file in place and keeps its id",
-            "(record_id). 409 when the target is not an indexed book or while a",
-            "scan or OCR run is going; 404 when --relative-dir does not exist.");
+            "(record_id). 409 when the target is not an indexed book, while a scan",
+            "or OCR run is going, or while that book is being re-indexed; 404 when",
+            "--relative-dir does not exist.");
         command.AddExamples(
             "grimoire-cli files upload --destination \"books/Call of Cthulhu/7e EN/core\" --file \"Keeper Rulebook.pdf\"");
         command.AddResponseExample<Generated.Models.UploadResponse>();

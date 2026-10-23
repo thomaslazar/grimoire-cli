@@ -22,7 +22,7 @@ namespace GrimoireCli.Generated.Api.Audio.Item.Cover.FromSource
         /// </summary>
         /// <param name="pathParameters">Path parameters for the request</param>
         /// <param name="requestAdapter">The request adapter to use to execute the requests.</param>
-        public FromSourceRequestBuilder(Dictionary<string, object> pathParameters, IRequestAdapter requestAdapter) : base(requestAdapter, "{+baseurl}/api/audio/{audio_id}/cover/from-source{?token*}", pathParameters)
+        public FromSourceRequestBuilder(Dictionary<string, object> pathParameters, IRequestAdapter requestAdapter) : base(requestAdapter, "{+baseurl}/api/audio/{audio_id}/cover/from-source", pathParameters)
         {
         }
         /// <summary>
@@ -30,7 +30,7 @@ namespace GrimoireCli.Generated.Api.Audio.Item.Cover.FromSource
         /// </summary>
         /// <param name="rawUrl">The raw URL to use for the request builder.</param>
         /// <param name="requestAdapter">The request adapter to use to execute the requests.</param>
-        public FromSourceRequestBuilder(string rawUrl, IRequestAdapter requestAdapter) : base(requestAdapter, "{+baseurl}/api/audio/{audio_id}/cover/from-source{?token*}", rawUrl)
+        public FromSourceRequestBuilder(string rawUrl, IRequestAdapter requestAdapter) : base(requestAdapter, "{+baseurl}/api/audio/{audio_id}/cover/from-source", rawUrl)
         {
         }
         /// <summary>
@@ -43,11 +43,11 @@ namespace GrimoireCli.Generated.Api.Audio.Item.Cover.FromSource
         /// <exception cref="global::GrimoireCli.Generated.Models.HTTPValidationError">When receiving a 422 status code</exception>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
-        public async Task<global::GrimoireCli.Generated.Models.AudioCoverResponse?> PostAsync(global::GrimoireCli.Generated.Models.AudioCoverSourceIn body, Action<RequestConfiguration<global::GrimoireCli.Generated.Api.Audio.Item.Cover.FromSource.FromSourceRequestBuilder.FromSourceRequestBuilderPostQueryParameters>>? requestConfiguration = default, CancellationToken cancellationToken = default)
+        public async Task<global::GrimoireCli.Generated.Models.AudioCoverResponse?> PostAsync(global::GrimoireCli.Generated.Models.AudioCoverSourceIn body, Action<RequestConfiguration<DefaultQueryParameters>>? requestConfiguration = default, CancellationToken cancellationToken = default)
         {
 #nullable restore
 #else
-        public async Task<global::GrimoireCli.Generated.Models.AudioCoverResponse> PostAsync(global::GrimoireCli.Generated.Models.AudioCoverSourceIn body, Action<RequestConfiguration<global::GrimoireCli.Generated.Api.Audio.Item.Cover.FromSource.FromSourceRequestBuilder.FromSourceRequestBuilderPostQueryParameters>> requestConfiguration = default, CancellationToken cancellationToken = default)
+        public async Task<global::GrimoireCli.Generated.Models.AudioCoverResponse> PostAsync(global::GrimoireCli.Generated.Models.AudioCoverSourceIn body, Action<RequestConfiguration<DefaultQueryParameters>> requestConfiguration = default, CancellationToken cancellationToken = default)
         {
 #endif
             if(ReferenceEquals(body, null)) throw new ArgumentNullException(nameof(body));
@@ -66,11 +66,11 @@ namespace GrimoireCli.Generated.Api.Audio.Item.Cover.FromSource
         /// <param name="requestConfiguration">Configuration for the request such as headers, query parameters, and middleware options.</param>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
-        public RequestInformation ToPostRequestInformation(global::GrimoireCli.Generated.Models.AudioCoverSourceIn body, Action<RequestConfiguration<global::GrimoireCli.Generated.Api.Audio.Item.Cover.FromSource.FromSourceRequestBuilder.FromSourceRequestBuilderPostQueryParameters>>? requestConfiguration = default)
+        public RequestInformation ToPostRequestInformation(global::GrimoireCli.Generated.Models.AudioCoverSourceIn body, Action<RequestConfiguration<DefaultQueryParameters>>? requestConfiguration = default)
         {
 #nullable restore
 #else
-        public RequestInformation ToPostRequestInformation(global::GrimoireCli.Generated.Models.AudioCoverSourceIn body, Action<RequestConfiguration<global::GrimoireCli.Generated.Api.Audio.Item.Cover.FromSource.FromSourceRequestBuilder.FromSourceRequestBuilderPostQueryParameters>> requestConfiguration = default)
+        public RequestInformation ToPostRequestInformation(global::GrimoireCli.Generated.Models.AudioCoverSourceIn body, Action<RequestConfiguration<DefaultQueryParameters>> requestConfiguration = default)
         {
 #endif
             if(ReferenceEquals(body, null)) throw new ArgumentNullException(nameof(body));
@@ -90,31 +90,11 @@ namespace GrimoireCli.Generated.Api.Audio.Item.Cover.FromSource
             return new global::GrimoireCli.Generated.Api.Audio.Item.Cover.FromSource.FromSourceRequestBuilder(rawUrl, RequestAdapter);
         }
         /// <summary>
-        /// Copies an image Grimoire already holds — a library map or token, book cover, or another track&apos;s artwork — into this track&apos;s cover. Body: {source_type, source_id}. GM or admin role required.
-        /// </summary>
-        [global::System.CodeDom.Compiler.GeneratedCode("Kiota", "1.0.0")]
-        public partial class FromSourceRequestBuilderPostQueryParameters 
-        {
-#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
-#nullable enable
-            #pragma warning disable CS1591
-            [QueryParameter("token")]
-            public string? Token { get; set; }
-            #pragma warning restore CS1591
-#nullable restore
-#else
-            #pragma warning disable CS1591
-            [QueryParameter("token")]
-            public string Token { get; set; }
-            #pragma warning restore CS1591
-#endif
-        }
-        /// <summary>
         /// Configuration for the request such as headers, query parameters, and middleware options.
         /// </summary>
         [Obsolete("This class is deprecated. Please use the generic RequestConfiguration class generated by the generator.")]
         [global::System.CodeDom.Compiler.GeneratedCode("Kiota", "1.0.0")]
-        public partial class FromSourceRequestBuilderPostRequestConfiguration : RequestConfiguration<global::GrimoireCli.Generated.Api.Audio.Item.Cover.FromSource.FromSourceRequestBuilder.FromSourceRequestBuilderPostQueryParameters>
+        public partial class FromSourceRequestBuilderPostRequestConfiguration : RequestConfiguration<DefaultQueryParameters>
         {
         }
     }

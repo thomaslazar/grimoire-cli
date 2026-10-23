@@ -17,7 +17,7 @@ target: game-system
 description: Local fixture for the grimoire-cli smoke test.
 attribution: Fixture data, not a real source.
 source:
-  url: http://addon-index/catalogue.json
+  url: http://addon-index.localhost/catalogue.json
   format: json
   cache_ttl: 0
 records:

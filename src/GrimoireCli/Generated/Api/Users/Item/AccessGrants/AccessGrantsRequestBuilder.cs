@@ -35,7 +35,7 @@ namespace GrimoireCli.Generated.Api.Users.Item.AccessGrants
         /// </summary>
         /// <param name="pathParameters">Path parameters for the request</param>
         /// <param name="requestAdapter">The request adapter to use to execute the requests.</param>
-        public AccessGrantsRequestBuilder(Dictionary<string, object> pathParameters, IRequestAdapter requestAdapter) : base(requestAdapter, "{+baseurl}/api/users/{user_id}/access-grants{?token*}", pathParameters)
+        public AccessGrantsRequestBuilder(Dictionary<string, object> pathParameters, IRequestAdapter requestAdapter) : base(requestAdapter, "{+baseurl}/api/users/{user_id}/access-grants", pathParameters)
         {
         }
         /// <summary>
@@ -43,7 +43,7 @@ namespace GrimoireCli.Generated.Api.Users.Item.AccessGrants
         /// </summary>
         /// <param name="rawUrl">The raw URL to use for the request builder.</param>
         /// <param name="requestAdapter">The request adapter to use to execute the requests.</param>
-        public AccessGrantsRequestBuilder(string rawUrl, IRequestAdapter requestAdapter) : base(requestAdapter, "{+baseurl}/api/users/{user_id}/access-grants{?token*}", rawUrl)
+        public AccessGrantsRequestBuilder(string rawUrl, IRequestAdapter requestAdapter) : base(requestAdapter, "{+baseurl}/api/users/{user_id}/access-grants", rawUrl)
         {
         }
         /// <summary>
@@ -55,11 +55,11 @@ namespace GrimoireCli.Generated.Api.Users.Item.AccessGrants
         /// <exception cref="global::GrimoireCli.Generated.Models.HTTPValidationError">When receiving a 422 status code</exception>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
-        public async Task<List<global::GrimoireCli.Generated.Models.AccessGrantOut>?> GetAsync(Action<RequestConfiguration<global::GrimoireCli.Generated.Api.Users.Item.AccessGrants.AccessGrantsRequestBuilder.AccessGrantsRequestBuilderGetQueryParameters>>? requestConfiguration = default, CancellationToken cancellationToken = default)
+        public async Task<List<global::GrimoireCli.Generated.Models.AccessGrantOut>?> GetAsync(Action<RequestConfiguration<DefaultQueryParameters>>? requestConfiguration = default, CancellationToken cancellationToken = default)
         {
 #nullable restore
 #else
-        public async Task<List<global::GrimoireCli.Generated.Models.AccessGrantOut>> GetAsync(Action<RequestConfiguration<global::GrimoireCli.Generated.Api.Users.Item.AccessGrants.AccessGrantsRequestBuilder.AccessGrantsRequestBuilderGetQueryParameters>> requestConfiguration = default, CancellationToken cancellationToken = default)
+        public async Task<List<global::GrimoireCli.Generated.Models.AccessGrantOut>> GetAsync(Action<RequestConfiguration<DefaultQueryParameters>> requestConfiguration = default, CancellationToken cancellationToken = default)
         {
 #endif
             var requestInfo = ToGetRequestInformation(requestConfiguration);
@@ -80,11 +80,11 @@ namespace GrimoireCli.Generated.Api.Users.Item.AccessGrants
         /// <exception cref="global::GrimoireCli.Generated.Models.HTTPValidationError">When receiving a 422 status code</exception>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
-        public async Task<global::GrimoireCli.Generated.Models.AccessGrantOut?> PostAsync(global::GrimoireCli.Generated.Models.AccessGrantCreate body, Action<RequestConfiguration<global::GrimoireCli.Generated.Api.Users.Item.AccessGrants.AccessGrantsRequestBuilder.AccessGrantsRequestBuilderPostQueryParameters>>? requestConfiguration = default, CancellationToken cancellationToken = default)
+        public async Task<global::GrimoireCli.Generated.Models.AccessGrantOut?> PostAsync(global::GrimoireCli.Generated.Models.AccessGrantCreate body, Action<RequestConfiguration<DefaultQueryParameters>>? requestConfiguration = default, CancellationToken cancellationToken = default)
         {
 #nullable restore
 #else
-        public async Task<global::GrimoireCli.Generated.Models.AccessGrantOut> PostAsync(global::GrimoireCli.Generated.Models.AccessGrantCreate body, Action<RequestConfiguration<global::GrimoireCli.Generated.Api.Users.Item.AccessGrants.AccessGrantsRequestBuilder.AccessGrantsRequestBuilderPostQueryParameters>> requestConfiguration = default, CancellationToken cancellationToken = default)
+        public async Task<global::GrimoireCli.Generated.Models.AccessGrantOut> PostAsync(global::GrimoireCli.Generated.Models.AccessGrantCreate body, Action<RequestConfiguration<DefaultQueryParameters>> requestConfiguration = default, CancellationToken cancellationToken = default)
         {
 #endif
             if(ReferenceEquals(body, null)) throw new ArgumentNullException(nameof(body));
@@ -102,11 +102,11 @@ namespace GrimoireCli.Generated.Api.Users.Item.AccessGrants
         /// <param name="requestConfiguration">Configuration for the request such as headers, query parameters, and middleware options.</param>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
-        public RequestInformation ToGetRequestInformation(Action<RequestConfiguration<global::GrimoireCli.Generated.Api.Users.Item.AccessGrants.AccessGrantsRequestBuilder.AccessGrantsRequestBuilderGetQueryParameters>>? requestConfiguration = default)
+        public RequestInformation ToGetRequestInformation(Action<RequestConfiguration<DefaultQueryParameters>>? requestConfiguration = default)
         {
 #nullable restore
 #else
-        public RequestInformation ToGetRequestInformation(Action<RequestConfiguration<global::GrimoireCli.Generated.Api.Users.Item.AccessGrants.AccessGrantsRequestBuilder.AccessGrantsRequestBuilderGetQueryParameters>> requestConfiguration = default)
+        public RequestInformation ToGetRequestInformation(Action<RequestConfiguration<DefaultQueryParameters>> requestConfiguration = default)
         {
 #endif
             var requestInfo = new RequestInformation(Method.GET, UrlTemplate, PathParameters);
@@ -122,11 +122,11 @@ namespace GrimoireCli.Generated.Api.Users.Item.AccessGrants
         /// <param name="requestConfiguration">Configuration for the request such as headers, query parameters, and middleware options.</param>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
-        public RequestInformation ToPostRequestInformation(global::GrimoireCli.Generated.Models.AccessGrantCreate body, Action<RequestConfiguration<global::GrimoireCli.Generated.Api.Users.Item.AccessGrants.AccessGrantsRequestBuilder.AccessGrantsRequestBuilderPostQueryParameters>>? requestConfiguration = default)
+        public RequestInformation ToPostRequestInformation(global::GrimoireCli.Generated.Models.AccessGrantCreate body, Action<RequestConfiguration<DefaultQueryParameters>>? requestConfiguration = default)
         {
 #nullable restore
 #else
-        public RequestInformation ToPostRequestInformation(global::GrimoireCli.Generated.Models.AccessGrantCreate body, Action<RequestConfiguration<global::GrimoireCli.Generated.Api.Users.Item.AccessGrants.AccessGrantsRequestBuilder.AccessGrantsRequestBuilderPostQueryParameters>> requestConfiguration = default)
+        public RequestInformation ToPostRequestInformation(global::GrimoireCli.Generated.Models.AccessGrantCreate body, Action<RequestConfiguration<DefaultQueryParameters>> requestConfiguration = default)
         {
 #endif
             if(ReferenceEquals(body, null)) throw new ArgumentNullException(nameof(body));
@@ -146,59 +146,19 @@ namespace GrimoireCli.Generated.Api.Users.Item.AccessGrants
             return new global::GrimoireCli.Generated.Api.Users.Item.AccessGrants.AccessGrantsRequestBuilder(rawUrl, RequestAdapter);
         }
         /// <summary>
-        /// Admin only. Lists the restricted systems/books this user has been granted.
+        /// Configuration for the request such as headers, query parameters, and middleware options.
         /// </summary>
+        [Obsolete("This class is deprecated. Please use the generic RequestConfiguration class generated by the generator.")]
         [global::System.CodeDom.Compiler.GeneratedCode("Kiota", "1.0.0")]
-        public partial class AccessGrantsRequestBuilderGetQueryParameters 
+        public partial class AccessGrantsRequestBuilderGetRequestConfiguration : RequestConfiguration<DefaultQueryParameters>
         {
-#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
-#nullable enable
-            #pragma warning disable CS1591
-            [QueryParameter("token")]
-            public string? Token { get; set; }
-            #pragma warning restore CS1591
-#nullable restore
-#else
-            #pragma warning disable CS1591
-            [QueryParameter("token")]
-            public string Token { get; set; }
-            #pragma warning restore CS1591
-#endif
         }
         /// <summary>
         /// Configuration for the request such as headers, query parameters, and middleware options.
         /// </summary>
         [Obsolete("This class is deprecated. Please use the generic RequestConfiguration class generated by the generator.")]
         [global::System.CodeDom.Compiler.GeneratedCode("Kiota", "1.0.0")]
-        public partial class AccessGrantsRequestBuilderGetRequestConfiguration : RequestConfiguration<global::GrimoireCli.Generated.Api.Users.Item.AccessGrants.AccessGrantsRequestBuilder.AccessGrantsRequestBuilderGetQueryParameters>
-        {
-        }
-        /// <summary>
-        /// Admin only, and only for GMs. Re-granting an existing scope updates its level rather than erroring.
-        /// </summary>
-        [global::System.CodeDom.Compiler.GeneratedCode("Kiota", "1.0.0")]
-        public partial class AccessGrantsRequestBuilderPostQueryParameters 
-        {
-#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
-#nullable enable
-            #pragma warning disable CS1591
-            [QueryParameter("token")]
-            public string? Token { get; set; }
-            #pragma warning restore CS1591
-#nullable restore
-#else
-            #pragma warning disable CS1591
-            [QueryParameter("token")]
-            public string Token { get; set; }
-            #pragma warning restore CS1591
-#endif
-        }
-        /// <summary>
-        /// Configuration for the request such as headers, query parameters, and middleware options.
-        /// </summary>
-        [Obsolete("This class is deprecated. Please use the generic RequestConfiguration class generated by the generator.")]
-        [global::System.CodeDom.Compiler.GeneratedCode("Kiota", "1.0.0")]
-        public partial class AccessGrantsRequestBuilderPostRequestConfiguration : RequestConfiguration<global::GrimoireCli.Generated.Api.Users.Item.AccessGrants.AccessGrantsRequestBuilder.AccessGrantsRequestBuilderPostQueryParameters>
+        public partial class AccessGrantsRequestBuilderPostRequestConfiguration : RequestConfiguration<DefaultQueryParameters>
         {
         }
     }

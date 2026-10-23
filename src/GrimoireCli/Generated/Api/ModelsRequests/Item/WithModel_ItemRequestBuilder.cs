@@ -34,7 +34,7 @@ namespace GrimoireCli.Generated.Api.ModelsRequests.Item
         /// </summary>
         /// <param name="pathParameters">Path parameters for the request</param>
         /// <param name="requestAdapter">The request adapter to use to execute the requests.</param>
-        public WithModel_ItemRequestBuilder(Dictionary<string, object> pathParameters, IRequestAdapter requestAdapter) : base(requestAdapter, "{+baseurl}/api/models/{model_id}{?token*}", pathParameters)
+        public WithModel_ItemRequestBuilder(Dictionary<string, object> pathParameters, IRequestAdapter requestAdapter) : base(requestAdapter, "{+baseurl}/api/models/{model_id}", pathParameters)
         {
         }
         /// <summary>
@@ -42,7 +42,7 @@ namespace GrimoireCli.Generated.Api.ModelsRequests.Item
         /// </summary>
         /// <param name="rawUrl">The raw URL to use for the request builder.</param>
         /// <param name="requestAdapter">The request adapter to use to execute the requests.</param>
-        public WithModel_ItemRequestBuilder(string rawUrl, IRequestAdapter requestAdapter) : base(requestAdapter, "{+baseurl}/api/models/{model_id}{?token*}", rawUrl)
+        public WithModel_ItemRequestBuilder(string rawUrl, IRequestAdapter requestAdapter) : base(requestAdapter, "{+baseurl}/api/models/{model_id}", rawUrl)
         {
         }
         /// <summary>
@@ -54,11 +54,11 @@ namespace GrimoireCli.Generated.Api.ModelsRequests.Item
         /// <exception cref="global::GrimoireCli.Generated.Models.HTTPValidationError">When receiving a 422 status code</exception>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
-        public async Task<global::GrimoireCli.Generated.Models.Model3DDetailResponse?> GetAsync(Action<RequestConfiguration<global::GrimoireCli.Generated.Api.ModelsRequests.Item.WithModel_ItemRequestBuilder.WithModel_ItemRequestBuilderGetQueryParameters>>? requestConfiguration = default, CancellationToken cancellationToken = default)
+        public async Task<global::GrimoireCli.Generated.Models.Model3DDetailResponse?> GetAsync(Action<RequestConfiguration<DefaultQueryParameters>>? requestConfiguration = default, CancellationToken cancellationToken = default)
         {
 #nullable restore
 #else
-        public async Task<global::GrimoireCli.Generated.Models.Model3DDetailResponse> GetAsync(Action<RequestConfiguration<global::GrimoireCli.Generated.Api.ModelsRequests.Item.WithModel_ItemRequestBuilder.WithModel_ItemRequestBuilderGetQueryParameters>> requestConfiguration = default, CancellationToken cancellationToken = default)
+        public async Task<global::GrimoireCli.Generated.Models.Model3DDetailResponse> GetAsync(Action<RequestConfiguration<DefaultQueryParameters>> requestConfiguration = default, CancellationToken cancellationToken = default)
         {
 #endif
             var requestInfo = ToGetRequestInformation(requestConfiguration);
@@ -78,11 +78,11 @@ namespace GrimoireCli.Generated.Api.ModelsRequests.Item
         /// <exception cref="global::GrimoireCli.Generated.Models.HTTPValidationError">When receiving a 422 status code</exception>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
-        public async Task<global::GrimoireCli.Generated.Models.Backend__routers__models___schemas__StatusResponse?> PatchAsync(global::GrimoireCli.Generated.Models.Model3DUpdate body, Action<RequestConfiguration<global::GrimoireCli.Generated.Api.ModelsRequests.Item.WithModel_ItemRequestBuilder.WithModel_ItemRequestBuilderPatchQueryParameters>>? requestConfiguration = default, CancellationToken cancellationToken = default)
+        public async Task<global::GrimoireCli.Generated.Models.Backend__routers__models___schemas__StatusResponse?> PatchAsync(global::GrimoireCli.Generated.Models.Model3DUpdate body, Action<RequestConfiguration<DefaultQueryParameters>>? requestConfiguration = default, CancellationToken cancellationToken = default)
         {
 #nullable restore
 #else
-        public async Task<global::GrimoireCli.Generated.Models.Backend__routers__models___schemas__StatusResponse> PatchAsync(global::GrimoireCli.Generated.Models.Model3DUpdate body, Action<RequestConfiguration<global::GrimoireCli.Generated.Api.ModelsRequests.Item.WithModel_ItemRequestBuilder.WithModel_ItemRequestBuilderPatchQueryParameters>> requestConfiguration = default, CancellationToken cancellationToken = default)
+        public async Task<global::GrimoireCli.Generated.Models.Backend__routers__models___schemas__StatusResponse> PatchAsync(global::GrimoireCli.Generated.Models.Model3DUpdate body, Action<RequestConfiguration<DefaultQueryParameters>> requestConfiguration = default, CancellationToken cancellationToken = default)
         {
 #endif
             if(ReferenceEquals(body, null)) throw new ArgumentNullException(nameof(body));
@@ -100,11 +100,11 @@ namespace GrimoireCli.Generated.Api.ModelsRequests.Item
         /// <param name="requestConfiguration">Configuration for the request such as headers, query parameters, and middleware options.</param>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
-        public RequestInformation ToGetRequestInformation(Action<RequestConfiguration<global::GrimoireCli.Generated.Api.ModelsRequests.Item.WithModel_ItemRequestBuilder.WithModel_ItemRequestBuilderGetQueryParameters>>? requestConfiguration = default)
+        public RequestInformation ToGetRequestInformation(Action<RequestConfiguration<DefaultQueryParameters>>? requestConfiguration = default)
         {
 #nullable restore
 #else
-        public RequestInformation ToGetRequestInformation(Action<RequestConfiguration<global::GrimoireCli.Generated.Api.ModelsRequests.Item.WithModel_ItemRequestBuilder.WithModel_ItemRequestBuilderGetQueryParameters>> requestConfiguration = default)
+        public RequestInformation ToGetRequestInformation(Action<RequestConfiguration<DefaultQueryParameters>> requestConfiguration = default)
         {
 #endif
             var requestInfo = new RequestInformation(Method.GET, UrlTemplate, PathParameters);
@@ -120,11 +120,11 @@ namespace GrimoireCli.Generated.Api.ModelsRequests.Item
         /// <param name="requestConfiguration">Configuration for the request such as headers, query parameters, and middleware options.</param>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
-        public RequestInformation ToPatchRequestInformation(global::GrimoireCli.Generated.Models.Model3DUpdate body, Action<RequestConfiguration<global::GrimoireCli.Generated.Api.ModelsRequests.Item.WithModel_ItemRequestBuilder.WithModel_ItemRequestBuilderPatchQueryParameters>>? requestConfiguration = default)
+        public RequestInformation ToPatchRequestInformation(global::GrimoireCli.Generated.Models.Model3DUpdate body, Action<RequestConfiguration<DefaultQueryParameters>>? requestConfiguration = default)
         {
 #nullable restore
 #else
-        public RequestInformation ToPatchRequestInformation(global::GrimoireCli.Generated.Models.Model3DUpdate body, Action<RequestConfiguration<global::GrimoireCli.Generated.Api.ModelsRequests.Item.WithModel_ItemRequestBuilder.WithModel_ItemRequestBuilderPatchQueryParameters>> requestConfiguration = default)
+        public RequestInformation ToPatchRequestInformation(global::GrimoireCli.Generated.Models.Model3DUpdate body, Action<RequestConfiguration<DefaultQueryParameters>> requestConfiguration = default)
         {
 #endif
             if(ReferenceEquals(body, null)) throw new ArgumentNullException(nameof(body));
@@ -144,59 +144,19 @@ namespace GrimoireCli.Generated.Api.ModelsRequests.Item
             return new global::GrimoireCli.Generated.Api.ModelsRequests.Item.WithModel_ItemRequestBuilder(rawUrl, RequestAdapter);
         }
         /// <summary>
-        /// Returns full model metadata including folder tags, mesh size, the presupported/unsupported flag, and whether the browser viewer can render this file.
+        /// Configuration for the request such as headers, query parameters, and middleware options.
         /// </summary>
+        [Obsolete("This class is deprecated. Please use the generic RequestConfiguration class generated by the generator.")]
         [global::System.CodeDom.Compiler.GeneratedCode("Kiota", "1.0.0")]
-        public partial class WithModel_ItemRequestBuilderGetQueryParameters 
+        public partial class WithModel_ItemRequestBuilderGetRequestConfiguration : RequestConfiguration<DefaultQueryParameters>
         {
-#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
-#nullable enable
-            #pragma warning disable CS1591
-            [QueryParameter("token")]
-            public string? Token { get; set; }
-            #pragma warning restore CS1591
-#nullable restore
-#else
-            #pragma warning disable CS1591
-            [QueryParameter("token")]
-            public string Token { get; set; }
-            #pragma warning restore CS1591
-#endif
         }
         /// <summary>
         /// Configuration for the request such as headers, query parameters, and middleware options.
         /// </summary>
         [Obsolete("This class is deprecated. Please use the generic RequestConfiguration class generated by the generator.")]
         [global::System.CodeDom.Compiler.GeneratedCode("Kiota", "1.0.0")]
-        public partial class WithModel_ItemRequestBuilderGetRequestConfiguration : RequestConfiguration<global::GrimoireCli.Generated.Api.ModelsRequests.Item.WithModel_ItemRequestBuilder.WithModel_ItemRequestBuilderGetQueryParameters>
-        {
-        }
-        /// <summary>
-        /// Updates editable fields on a model (description, tags, is_explicit, is_supported). GM or admin role required.
-        /// </summary>
-        [global::System.CodeDom.Compiler.GeneratedCode("Kiota", "1.0.0")]
-        public partial class WithModel_ItemRequestBuilderPatchQueryParameters 
-        {
-#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
-#nullable enable
-            #pragma warning disable CS1591
-            [QueryParameter("token")]
-            public string? Token { get; set; }
-            #pragma warning restore CS1591
-#nullable restore
-#else
-            #pragma warning disable CS1591
-            [QueryParameter("token")]
-            public string Token { get; set; }
-            #pragma warning restore CS1591
-#endif
-        }
-        /// <summary>
-        /// Configuration for the request such as headers, query parameters, and middleware options.
-        /// </summary>
-        [Obsolete("This class is deprecated. Please use the generic RequestConfiguration class generated by the generator.")]
-        [global::System.CodeDom.Compiler.GeneratedCode("Kiota", "1.0.0")]
-        public partial class WithModel_ItemRequestBuilderPatchRequestConfiguration : RequestConfiguration<global::GrimoireCli.Generated.Api.ModelsRequests.Item.WithModel_ItemRequestBuilder.WithModel_ItemRequestBuilderPatchQueryParameters>
+        public partial class WithModel_ItemRequestBuilderPatchRequestConfiguration : RequestConfiguration<DefaultQueryParameters>
         {
         }
     }

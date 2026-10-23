@@ -16,6 +16,10 @@ namespace GrimoireCli.Generated.Models
         public IDictionary<string, object> AdditionalData { get; set; }
         /// <summary>The initialized property</summary>
         public bool? Initialized { get; set; }
+        /// <summary>The password_min_length property</summary>
+        public int? PasswordMinLength { get; set; }
+        /// <summary>The share_link_password_min_length property</summary>
+        public int? ShareLinkPasswordMinLength { get; set; }
         /// <summary>
         /// Instantiates a new <see cref="global::GrimoireCli.Generated.Models.AuthStatusResponse"/> and sets the default values.
         /// </summary>
@@ -42,6 +46,8 @@ namespace GrimoireCli.Generated.Models
             return new Dictionary<string, Action<IParseNode>>
             {
                 { "initialized", n => { Initialized = n.GetBoolValue(); } },
+                { "password_min_length", n => { PasswordMinLength = n.GetIntValue(); } },
+                { "share_link_password_min_length", n => { ShareLinkPasswordMinLength = n.GetIntValue(); } },
             };
         }
         /// <summary>
@@ -52,6 +58,8 @@ namespace GrimoireCli.Generated.Models
         {
             if(ReferenceEquals(writer, null)) throw new ArgumentNullException(nameof(writer));
             writer.WriteBoolValue("initialized", Initialized);
+            writer.WriteIntValue("password_min_length", PasswordMinLength);
+            writer.WriteIntValue("share_link_password_min_length", ShareLinkPasswordMinLength);
             writer.WriteAdditionalData(AdditionalData);
         }
     }

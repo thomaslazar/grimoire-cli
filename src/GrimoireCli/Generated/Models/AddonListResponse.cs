@@ -72,6 +72,14 @@ namespace GrimoireCli.Generated.Models
 #else
         public global::GrimoireCli.Generated.Models.AddonListResponse_source_contents SourceContents { get; set; }
 #endif
+        /// <summary>The source_credentials property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public global::GrimoireCli.Generated.Models.AddonListResponse_source_credentials? SourceCredentials { get; set; }
+#nullable restore
+#else
+        public global::GrimoireCli.Generated.Models.AddonListResponse_source_credentials SourceCredentials { get; set; }
+#endif
         /// <summary>The trusted_index_urls property</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
@@ -113,6 +121,7 @@ namespace GrimoireCli.Generated.Models
                 { "index_urls", n => { IndexUrls = n.GetCollectionOfPrimitiveValues<string>()?.AsList(); } },
                 { "installed", n => { Installed = n.GetCollectionOfObjectValues<global::GrimoireCli.Generated.Models.InstalledAddon>(global::GrimoireCli.Generated.Models.InstalledAddon.CreateFromDiscriminatorValue)?.AsList(); } },
                 { "source_contents", n => { SourceContents = n.GetObjectValue<global::GrimoireCli.Generated.Models.AddonListResponse_source_contents>(global::GrimoireCli.Generated.Models.AddonListResponse_source_contents.CreateFromDiscriminatorValue); } },
+                { "source_credentials", n => { SourceCredentials = n.GetObjectValue<global::GrimoireCli.Generated.Models.AddonListResponse_source_credentials>(global::GrimoireCli.Generated.Models.AddonListResponse_source_credentials.CreateFromDiscriminatorValue); } },
                 { "trusted_index_urls", n => { TrustedIndexUrls = n.GetCollectionOfPrimitiveValues<string>()?.AsList(); } },
             };
         }
@@ -131,6 +140,7 @@ namespace GrimoireCli.Generated.Models
             writer.WriteCollectionOfPrimitiveValues<string>("index_urls", IndexUrls);
             writer.WriteCollectionOfObjectValues<global::GrimoireCli.Generated.Models.InstalledAddon>("installed", Installed);
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.AddonListResponse_source_contents>("source_contents", SourceContents);
+            writer.WriteObjectValue<global::GrimoireCli.Generated.Models.AddonListResponse_source_credentials>("source_credentials", SourceCredentials);
             writer.WriteCollectionOfPrimitiveValues<string>("trusted_index_urls", TrustedIndexUrls);
             writer.WriteAdditionalData(AdditionalData);
         }

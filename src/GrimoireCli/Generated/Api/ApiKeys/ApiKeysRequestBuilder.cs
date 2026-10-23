@@ -41,7 +41,7 @@ namespace GrimoireCli.Generated.Api.ApiKeys
         /// </summary>
         /// <param name="pathParameters">Path parameters for the request</param>
         /// <param name="requestAdapter">The request adapter to use to execute the requests.</param>
-        public ApiKeysRequestBuilder(Dictionary<string, object> pathParameters, IRequestAdapter requestAdapter) : base(requestAdapter, "{+baseurl}/api/api-keys{?all*,token*}", pathParameters)
+        public ApiKeysRequestBuilder(Dictionary<string, object> pathParameters, IRequestAdapter requestAdapter) : base(requestAdapter, "{+baseurl}/api/api-keys{?all*}", pathParameters)
         {
         }
         /// <summary>
@@ -49,7 +49,7 @@ namespace GrimoireCli.Generated.Api.ApiKeys
         /// </summary>
         /// <param name="rawUrl">The raw URL to use for the request builder.</param>
         /// <param name="requestAdapter">The request adapter to use to execute the requests.</param>
-        public ApiKeysRequestBuilder(string rawUrl, IRequestAdapter requestAdapter) : base(requestAdapter, "{+baseurl}/api/api-keys{?all*,token*}", rawUrl)
+        public ApiKeysRequestBuilder(string rawUrl, IRequestAdapter requestAdapter) : base(requestAdapter, "{+baseurl}/api/api-keys{?all*}", rawUrl)
         {
         }
         /// <summary>
@@ -86,11 +86,11 @@ namespace GrimoireCli.Generated.Api.ApiKeys
         /// <exception cref="global::GrimoireCli.Generated.Models.HTTPValidationError">When receiving a 422 status code</exception>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
-        public async Task<global::GrimoireCli.Generated.Models.ApiKeyWithSecret?> PostAsync(global::GrimoireCli.Generated.Models.ApiKeyCreate body, Action<RequestConfiguration<global::GrimoireCli.Generated.Api.ApiKeys.ApiKeysRequestBuilder.ApiKeysRequestBuilderPostQueryParameters>>? requestConfiguration = default, CancellationToken cancellationToken = default)
+        public async Task<global::GrimoireCli.Generated.Models.ApiKeyWithSecret?> PostAsync(global::GrimoireCli.Generated.Models.ApiKeyCreate body, Action<RequestConfiguration<DefaultQueryParameters>>? requestConfiguration = default, CancellationToken cancellationToken = default)
         {
 #nullable restore
 #else
-        public async Task<global::GrimoireCli.Generated.Models.ApiKeyWithSecret> PostAsync(global::GrimoireCli.Generated.Models.ApiKeyCreate body, Action<RequestConfiguration<global::GrimoireCli.Generated.Api.ApiKeys.ApiKeysRequestBuilder.ApiKeysRequestBuilderPostQueryParameters>> requestConfiguration = default, CancellationToken cancellationToken = default)
+        public async Task<global::GrimoireCli.Generated.Models.ApiKeyWithSecret> PostAsync(global::GrimoireCli.Generated.Models.ApiKeyCreate body, Action<RequestConfiguration<DefaultQueryParameters>> requestConfiguration = default, CancellationToken cancellationToken = default)
         {
 #endif
             if(ReferenceEquals(body, null)) throw new ArgumentNullException(nameof(body));
@@ -128,11 +128,11 @@ namespace GrimoireCli.Generated.Api.ApiKeys
         /// <param name="requestConfiguration">Configuration for the request such as headers, query parameters, and middleware options.</param>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
-        public RequestInformation ToPostRequestInformation(global::GrimoireCli.Generated.Models.ApiKeyCreate body, Action<RequestConfiguration<global::GrimoireCli.Generated.Api.ApiKeys.ApiKeysRequestBuilder.ApiKeysRequestBuilderPostQueryParameters>>? requestConfiguration = default)
+        public RequestInformation ToPostRequestInformation(global::GrimoireCli.Generated.Models.ApiKeyCreate body, Action<RequestConfiguration<DefaultQueryParameters>>? requestConfiguration = default)
         {
 #nullable restore
 #else
-        public RequestInformation ToPostRequestInformation(global::GrimoireCli.Generated.Models.ApiKeyCreate body, Action<RequestConfiguration<global::GrimoireCli.Generated.Api.ApiKeys.ApiKeysRequestBuilder.ApiKeysRequestBuilderPostQueryParameters>> requestConfiguration = default)
+        public RequestInformation ToPostRequestInformation(global::GrimoireCli.Generated.Models.ApiKeyCreate body, Action<RequestConfiguration<DefaultQueryParameters>> requestConfiguration = default)
         {
 #endif
             if(ReferenceEquals(body, null)) throw new ArgumentNullException(nameof(body));
@@ -160,19 +160,6 @@ namespace GrimoireCli.Generated.Api.ApiKeys
             /// <summary>Admins only: every user&apos;s keys, not just your own</summary>
             [QueryParameter("all")]
             public bool? All { get; set; }
-#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
-#nullable enable
-            #pragma warning disable CS1591
-            [QueryParameter("token")]
-            public string? Token { get; set; }
-            #pragma warning restore CS1591
-#nullable restore
-#else
-            #pragma warning disable CS1591
-            [QueryParameter("token")]
-            public string Token { get; set; }
-            #pragma warning restore CS1591
-#endif
         }
         /// <summary>
         /// Configuration for the request such as headers, query parameters, and middleware options.
@@ -183,31 +170,11 @@ namespace GrimoireCli.Generated.Api.ApiKeys
         {
         }
         /// <summary>
-        /// Returns the full key once, in `key`. Only its hash is stored.
-        /// </summary>
-        [global::System.CodeDom.Compiler.GeneratedCode("Kiota", "1.0.0")]
-        public partial class ApiKeysRequestBuilderPostQueryParameters 
-        {
-#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
-#nullable enable
-            #pragma warning disable CS1591
-            [QueryParameter("token")]
-            public string? Token { get; set; }
-            #pragma warning restore CS1591
-#nullable restore
-#else
-            #pragma warning disable CS1591
-            [QueryParameter("token")]
-            public string Token { get; set; }
-            #pragma warning restore CS1591
-#endif
-        }
-        /// <summary>
         /// Configuration for the request such as headers, query parameters, and middleware options.
         /// </summary>
         [Obsolete("This class is deprecated. Please use the generic RequestConfiguration class generated by the generator.")]
         [global::System.CodeDom.Compiler.GeneratedCode("Kiota", "1.0.0")]
-        public partial class ApiKeysRequestBuilderPostRequestConfiguration : RequestConfiguration<global::GrimoireCli.Generated.Api.ApiKeys.ApiKeysRequestBuilder.ApiKeysRequestBuilderPostQueryParameters>
+        public partial class ApiKeysRequestBuilderPostRequestConfiguration : RequestConfiguration<DefaultQueryParameters>
         {
         }
     }

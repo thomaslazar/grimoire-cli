@@ -98,7 +98,7 @@ public static class BooksCommand
             idOption
         };
         command.AddHelpSection("Notes", HelpSectionPosition.Top,
-            "403 if the book is explicit and the account disallows explicit content.");
+            "404 if the book is explicit and the account disallows explicit content.");
         command.AddExamples("grimoire-cli books get --id <book-id>");
         command.AddResponseExample<Generated.Models.BookDetail>();
         command.SetAction(async (parseResult, cancellationToken) =>
@@ -300,8 +300,8 @@ public static class BooksCommand
         command.AddRoleRequired("gm or admin");
         command.AddHelpSection("Notes", HelpSectionPosition.Top,
             "Re-reads the file and rebuilds the index, refreshing page count and",
-            "thumbnail if the file changed. PDFs only: 400 on an epub or djvu, 404",
-            "if the file is gone from disk.",
+            "thumbnail if the file changed. 400 on a format the server cannot",
+            "index, 404 if the file is gone from disk.",
             "",
             "No-ops (silently skipped) under a library scan already running, and",
             "blocks a library rescan started right after it; the response is",

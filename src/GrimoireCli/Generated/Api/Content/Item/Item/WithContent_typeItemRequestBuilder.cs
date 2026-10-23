@@ -35,7 +35,7 @@ namespace GrimoireCli.Generated.Api.Content.Item.Item
         /// </summary>
         /// <param name="pathParameters">Path parameters for the request</param>
         /// <param name="requestAdapter">The request adapter to use to execute the requests.</param>
-        public WithContent_typeItemRequestBuilder(Dictionary<string, object> pathParameters, IRequestAdapter requestAdapter) : base(requestAdapter, "{+baseurl}/api/content/{schema_id}/{content_type}{?include_rulesets*,page*,page_size*,search*,sort*,token*}", pathParameters)
+        public WithContent_typeItemRequestBuilder(Dictionary<string, object> pathParameters, IRequestAdapter requestAdapter) : base(requestAdapter, "{+baseurl}/api/content/{schema_id}/{content_type}{?include_rulesets*,page*,page_size*,search*,sort*}", pathParameters)
         {
         }
         /// <summary>
@@ -43,7 +43,7 @@ namespace GrimoireCli.Generated.Api.Content.Item.Item
         /// </summary>
         /// <param name="rawUrl">The raw URL to use for the request builder.</param>
         /// <param name="requestAdapter">The request adapter to use to execute the requests.</param>
-        public WithContent_typeItemRequestBuilder(string rawUrl, IRequestAdapter requestAdapter) : base(requestAdapter, "{+baseurl}/api/content/{schema_id}/{content_type}{?include_rulesets*,page*,page_size*,search*,sort*,token*}", rawUrl)
+        public WithContent_typeItemRequestBuilder(string rawUrl, IRequestAdapter requestAdapter) : base(requestAdapter, "{+baseurl}/api/content/{schema_id}/{content_type}{?include_rulesets*,page*,page_size*,search*,sort*}", rawUrl)
         {
         }
         /// <summary>
@@ -139,19 +139,6 @@ namespace GrimoireCli.Generated.Api.Content.Item.Item
             #pragma warning disable CS1591
             [QueryParameter("sort")]
             public string Sort { get; set; }
-            #pragma warning restore CS1591
-#endif
-#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
-#nullable enable
-            #pragma warning disable CS1591
-            [QueryParameter("token")]
-            public string? Token { get; set; }
-            #pragma warning restore CS1591
-#nullable restore
-#else
-            #pragma warning disable CS1591
-            [QueryParameter("token")]
-            public string Token { get; set; }
             #pragma warning restore CS1591
 #endif
         }

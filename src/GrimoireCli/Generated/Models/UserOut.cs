@@ -47,6 +47,8 @@ namespace GrimoireCli.Generated.Models
 #else
         public global::GrimoireCli.Generated.Models.UserOut.UserOut_email Email { get; set; }
 #endif
+        /// <summary>The explicit_locked property</summary>
+        public bool? ExplicitLocked { get; set; }
         /// <summary>The id property</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
@@ -54,6 +56,22 @@ namespace GrimoireCli.Generated.Models
 #nullable restore
 #else
         public string Id { get; set; }
+#endif
+        /// <summary>The last_active_at property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public global::GrimoireCli.Generated.Models.UserOut.UserOut_last_active_at? LastActiveAt { get; set; }
+#nullable restore
+#else
+        public global::GrimoireCli.Generated.Models.UserOut.UserOut_last_active_at LastActiveAt { get; set; }
+#endif
+        /// <summary>The last_login_at property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public global::GrimoireCli.Generated.Models.UserOut.UserOut_last_login_at? LastLoginAt { get; set; }
+#nullable restore
+#else
+        public global::GrimoireCli.Generated.Models.UserOut.UserOut_last_login_at LastLoginAt { get; set; }
 #endif
         /// <summary>The oidc_linked property</summary>
         public bool? OidcLinked { get; set; }
@@ -97,6 +115,7 @@ namespace GrimoireCli.Generated.Models
         public UserOut()
         {
             AdditionalData = new Dictionary<string, object>();
+            ExplicitLocked = false;
             ShareLinks = "role";
             ShareLinksAllowed = false;
             ShareLinksSource = "role";
@@ -126,7 +145,10 @@ namespace GrimoireCli.Generated.Models
                 { "created_at", n => { CreatedAt = n.GetObjectValue<global::GrimoireCli.Generated.Models.UserOut.UserOut_created_at>(global::GrimoireCli.Generated.Models.UserOut.UserOut_created_at.CreateFromDiscriminatorValue); } },
                 { "display_name", n => { DisplayName = n.GetObjectValue<global::GrimoireCli.Generated.Models.UserOut.UserOut_display_name>(global::GrimoireCli.Generated.Models.UserOut.UserOut_display_name.CreateFromDiscriminatorValue); } },
                 { "email", n => { Email = n.GetObjectValue<global::GrimoireCli.Generated.Models.UserOut.UserOut_email>(global::GrimoireCli.Generated.Models.UserOut.UserOut_email.CreateFromDiscriminatorValue); } },
+                { "explicit_locked", n => { ExplicitLocked = n.GetBoolValue(); } },
                 { "id", n => { Id = n.GetStringValue(); } },
+                { "last_active_at", n => { LastActiveAt = n.GetObjectValue<global::GrimoireCli.Generated.Models.UserOut.UserOut_last_active_at>(global::GrimoireCli.Generated.Models.UserOut.UserOut_last_active_at.CreateFromDiscriminatorValue); } },
+                { "last_login_at", n => { LastLoginAt = n.GetObjectValue<global::GrimoireCli.Generated.Models.UserOut.UserOut_last_login_at>(global::GrimoireCli.Generated.Models.UserOut.UserOut_last_login_at.CreateFromDiscriminatorValue); } },
                 { "oidc_linked", n => { OidcLinked = n.GetBoolValue(); } },
                 { "role", n => { Role = n.GetObjectValue<global::GrimoireCli.Generated.Models.UserOut.UserOut_role>(global::GrimoireCli.Generated.Models.UserOut.UserOut_role.CreateFromDiscriminatorValue); } },
                 { "share_links", n => { ShareLinks = n.GetStringValue(); } },
@@ -149,7 +171,10 @@ namespace GrimoireCli.Generated.Models
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.UserOut.UserOut_created_at>("created_at", CreatedAt);
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.UserOut.UserOut_display_name>("display_name", DisplayName);
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.UserOut.UserOut_email>("email", Email);
+            writer.WriteBoolValue("explicit_locked", ExplicitLocked);
             writer.WriteStringValue("id", Id);
+            writer.WriteObjectValue<global::GrimoireCli.Generated.Models.UserOut.UserOut_last_active_at>("last_active_at", LastActiveAt);
+            writer.WriteObjectValue<global::GrimoireCli.Generated.Models.UserOut.UserOut_last_login_at>("last_login_at", LastLoginAt);
             writer.WriteBoolValue("oidc_linked", OidcLinked);
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.UserOut.UserOut_role>("role", Role);
             writer.WriteStringValue("share_links", ShareLinks);
@@ -359,6 +384,142 @@ namespace GrimoireCli.Generated.Models
                 }
                 else {
                     writer.WriteObjectValue<global::GrimoireCli.Generated.Models.UserOut_emailMember1>(null, UserOutEmailMember1);
+                }
+            }
+        }
+        /// <summary>
+        /// Composed type wrapper for classes <see cref="global::GrimoireCli.Generated.Models.UserOut_last_active_atMember1"/>, <see cref="string"/>
+        /// </summary>
+        [global::System.CodeDom.Compiler.GeneratedCode("Kiota", "1.0.0")]
+        public partial class UserOut_last_active_at : IComposedTypeWrapper, IParsable
+        {
+            /// <summary>Composed type representation for type <see cref="string"/></summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+            public string? String { get; set; }
+#nullable restore
+#else
+            public string String { get; set; }
+#endif
+            /// <summary>Composed type representation for type <see cref="global::GrimoireCli.Generated.Models.UserOut_last_active_atMember1"/></summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+            public global::GrimoireCli.Generated.Models.UserOut_last_active_atMember1? UserOutLastActiveAtMember1 { get; set; }
+#nullable restore
+#else
+            public global::GrimoireCli.Generated.Models.UserOut_last_active_atMember1 UserOutLastActiveAtMember1 { get; set; }
+#endif
+            /// <summary>
+            /// Creates a new instance of the appropriate class based on discriminator value
+            /// </summary>
+            /// <returns>A <see cref="global::GrimoireCli.Generated.Models.UserOut.UserOut_last_active_at"/></returns>
+            /// <param name="parseNode">The parse node to use to read the discriminator value and create the object</param>
+            public static global::GrimoireCli.Generated.Models.UserOut.UserOut_last_active_at CreateFromDiscriminatorValue(IParseNode parseNode)
+            {
+                if(ReferenceEquals(parseNode, null)) throw new ArgumentNullException(nameof(parseNode));
+                var result = new global::GrimoireCli.Generated.Models.UserOut.UserOut_last_active_at();
+                if(parseNode.GetStringValue() is string stringValue)
+                {
+                    result.String = stringValue;
+                }
+                else {
+                    result.UserOutLastActiveAtMember1 = new global::GrimoireCli.Generated.Models.UserOut_last_active_atMember1();
+                }
+                return result;
+            }
+            /// <summary>
+            /// The deserialization information for the current model
+            /// </summary>
+            /// <returns>A IDictionary&lt;string, Action&lt;IParseNode&gt;&gt;</returns>
+            public virtual IDictionary<string, Action<IParseNode>> GetFieldDeserializers()
+            {
+                if(UserOutLastActiveAtMember1 != null)
+                {
+                    return ParseNodeHelper.MergeDeserializersForIntersectionWrapper(UserOutLastActiveAtMember1);
+                }
+                return new Dictionary<string, Action<IParseNode>>();
+            }
+            /// <summary>
+            /// Serializes information the current object
+            /// </summary>
+            /// <param name="writer">Serialization writer to use to serialize this model</param>
+            public virtual void Serialize(ISerializationWriter writer)
+            {
+                if(ReferenceEquals(writer, null)) throw new ArgumentNullException(nameof(writer));
+                if(String != null)
+                {
+                    writer.WriteStringValue(null, String);
+                }
+                else {
+                    writer.WriteObjectValue<global::GrimoireCli.Generated.Models.UserOut_last_active_atMember1>(null, UserOutLastActiveAtMember1);
+                }
+            }
+        }
+        /// <summary>
+        /// Composed type wrapper for classes <see cref="global::GrimoireCli.Generated.Models.UserOut_last_login_atMember1"/>, <see cref="string"/>
+        /// </summary>
+        [global::System.CodeDom.Compiler.GeneratedCode("Kiota", "1.0.0")]
+        public partial class UserOut_last_login_at : IComposedTypeWrapper, IParsable
+        {
+            /// <summary>Composed type representation for type <see cref="string"/></summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+            public string? String { get; set; }
+#nullable restore
+#else
+            public string String { get; set; }
+#endif
+            /// <summary>Composed type representation for type <see cref="global::GrimoireCli.Generated.Models.UserOut_last_login_atMember1"/></summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+            public global::GrimoireCli.Generated.Models.UserOut_last_login_atMember1? UserOutLastLoginAtMember1 { get; set; }
+#nullable restore
+#else
+            public global::GrimoireCli.Generated.Models.UserOut_last_login_atMember1 UserOutLastLoginAtMember1 { get; set; }
+#endif
+            /// <summary>
+            /// Creates a new instance of the appropriate class based on discriminator value
+            /// </summary>
+            /// <returns>A <see cref="global::GrimoireCli.Generated.Models.UserOut.UserOut_last_login_at"/></returns>
+            /// <param name="parseNode">The parse node to use to read the discriminator value and create the object</param>
+            public static global::GrimoireCli.Generated.Models.UserOut.UserOut_last_login_at CreateFromDiscriminatorValue(IParseNode parseNode)
+            {
+                if(ReferenceEquals(parseNode, null)) throw new ArgumentNullException(nameof(parseNode));
+                var result = new global::GrimoireCli.Generated.Models.UserOut.UserOut_last_login_at();
+                if(parseNode.GetStringValue() is string stringValue)
+                {
+                    result.String = stringValue;
+                }
+                else {
+                    result.UserOutLastLoginAtMember1 = new global::GrimoireCli.Generated.Models.UserOut_last_login_atMember1();
+                }
+                return result;
+            }
+            /// <summary>
+            /// The deserialization information for the current model
+            /// </summary>
+            /// <returns>A IDictionary&lt;string, Action&lt;IParseNode&gt;&gt;</returns>
+            public virtual IDictionary<string, Action<IParseNode>> GetFieldDeserializers()
+            {
+                if(UserOutLastLoginAtMember1 != null)
+                {
+                    return ParseNodeHelper.MergeDeserializersForIntersectionWrapper(UserOutLastLoginAtMember1);
+                }
+                return new Dictionary<string, Action<IParseNode>>();
+            }
+            /// <summary>
+            /// Serializes information the current object
+            /// </summary>
+            /// <param name="writer">Serialization writer to use to serialize this model</param>
+            public virtual void Serialize(ISerializationWriter writer)
+            {
+                if(ReferenceEquals(writer, null)) throw new ArgumentNullException(nameof(writer));
+                if(String != null)
+                {
+                    writer.WriteStringValue(null, String);
+                }
+                else {
+                    writer.WriteObjectValue<global::GrimoireCli.Generated.Models.UserOut_last_login_atMember1>(null, UserOutLastLoginAtMember1);
                 }
             }
         }

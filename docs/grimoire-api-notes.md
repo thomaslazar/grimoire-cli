@@ -2,7 +2,7 @@
 
 Behaviour verified against Grimoire **v1.5.6** — the release the live instance
 runs — by reading `temp/grimoire/` at that tag and by calling the API. The local
-stack runs the `1.9.0` release, so a note measured there says so. Don't
+stack runs the `1.9.1` release, so a note measured there says so. Don't
 re-derive these, and don't trust the published docs over them. Re-verify after a
 server upgrade — see [grimoire-compatibility.md](grimoire-compatibility.md) for
 the bump procedure.
@@ -183,11 +183,13 @@ Read from `backend/routers/tags/` at tag `v1.8.0`.
   default 100, plus `offset`; it returns `{total, items}` (`items.py:197-224`).
   It lists everything beneath the folder, subfolders included, tagged or not.
   A folder that does not carry the tag is a 404 (`:213-214`).
-- **These counts are per caller; `GET /api/tags`'s are not.** `/items` and
-  `/folder-items` drop explicit items for an account that hides them and books
-  or systems the caller cannot access (`items.py:45-56`); `live_link_counts`
-  takes no user (`services/tag_service/_queries.py:117-143`). A tag's
-  `tags list` count can therefore exceed its `/items` `total`.
+- **These counts are per caller; `GET /api/tags`'s are only partly so.**
+  `/items` and `/folder-items` drop explicit items for an account that hides
+  them and books or systems the caller cannot access (`items.py:45-56`).
+  `GET /api/tags` counts only books and systems the caller can see
+  (`routers/tags/core.py:91-101`, `services/tag_service/_queries.py:37-45`,
+  v1.9.1) but still counts explicit items, so a `tags list` count can exceed
+  its `/items` `total` for an account that hides them.
 
 ### Tag writes
 
@@ -258,7 +260,7 @@ Verified against v1.5.6, backing `systems update`, `systems batch-update`,
   `scope` (e.g. `books/<system>/supplements`). `missing` reapplies OPF sidecars
   while treating any populated field as user-protected. Poll `GET /api/scan-status`.
 - **A `scope` that resolves to no real directory still answers `scan_started`.**
-  `resolve_scope` (`indexer/metadata.py:393-425`, v1.9.0) validates only that the path
+  `resolve_scope` (`indexer/metadata.py:397-429`, v1.9.1) validates only that the path
   begins with a known collection (`books`/`maps`/`tokens`/`audio`/`models`) and does not
   escape the library root — it never checks the target exists. A scope typo'd
   or naming a non-existent subtree walks nothing and completes instantly with
@@ -319,7 +321,7 @@ flags on `systems get`.
   file toward `total_books` — any wait loop polling
   `scanned_books >= total_books` hangs forever with a loose file present.
 - **Some folder names map only as the whole name**, as of 1.8.0.
-  `CATEGORY_EXACT_NAMES` (`backend/indexer/constants.py:158`, v1.9.0) maps `Player(s)`
+  `CATEGORY_EXACT_NAMES` (`backend/indexer/constants.py:158`, v1.9.1) maps `Player(s)`
   and `GM(s)` / `Game Master(s)` to `core`, `Sheet(s)` to `character-sheet` and
   `Source(s)` to `supplement` — and, as of 1.9.0, `Journal(s)`, `Issue(s)` and
   `Back Issue(s)` to `magazine` — checked before `CATEGORY_MAP`
@@ -455,13 +457,16 @@ Verified against v1.5.6, backing the seven `addons` commands.
   nothing ships bundled with the server. Verified live: `addons list` reports
   `available: []` and a system's `metadata-sources` reports no source until
   `addons refresh` has run at least once.
-- **`fetch_json` carries no host allow-list** (`backend/addons/fetch.py:92-134`)
-  — it is plain httpx, restricted only by the `http(s)://` scheme check in
-  `refresh_index` (`backend/addons/install.py:63-64`), not by destination.
-  A URL on the docker-compose network works exactly like the published index,
-  which is what lets `docker/smoke-test.sh` point `addons settings
-  --index-url` at the internal `addon-index` service instead of the real
-  `raw.githubusercontent.com` catalogue.
+- **An index URL must be `https://` unless its host reads as local.**
+  `index_url_problem` allows plain `http://` only for `localhost`,
+  `*.localhost`, or an IP literal that is loopback, private or link-local
+  (`backend/addons/urls.py:16-37`, v1.9.1); a private hostname such as a
+  compose service name is not local. `addons settings` refuses a bad URL with a
+  422 (`routers/addons/_schemas.py:36-49`), and `refresh_index` checks every
+  configured URL before fetching any, so one bad entry fails the whole refresh
+  (`backend/addons/install.py:86-91`). That is why `docker/smoke-test.sh`
+  points `--index-url` at `http://addon-index.localhost/index.json`, a network
+  alias of the internal `addon-index` service.
 - **The index setting is a comma-joined list**, as of 1.7.0. `AddonSettingsUpdate`
   takes `index_urls` as well as `index_url`, and the plural wins when both are
   sent; either way the value is stored in one setting and split back out on read.
@@ -553,9 +558,9 @@ and `books thumbnail`.
   not by a downstream campaign lookup.** `SystemCoverSourceIn.known_source`
   builds its allowed set as every `services.image_source.SOURCE_TYPES` entry
   except `campaign_file` and raises on anything else
-  (`routers/systems/_schemas.py:356-364`, v1.9.0), so sending `campaign_file` here is
+  (`routers/systems/_schemas.py:350-358`, v1.9.1), so sending `campaign_file` here is
   a 422 validation error, never a 400 — the wider `SOURCE_TYPES` tuple in
-  `services/image_source.py:32` includes it only for the callers (the banner)
+  `services/image_source.py:33` includes it only for the callers (the banner)
   that do have a campaign in context. Verified live: `campaign_file` answered
   422 with `"source_type must be one of map, token, book, audio"`.
 - The bytes are copied in exactly as an upload does, so folder cover art still
@@ -601,7 +606,7 @@ source citations name the shipped backend inside the container. Backs
 
 - **A book folder is a second tagging layer, addressed by path rather than by
   id.** Its path takes the form `{system_id}/{category}/{subfolder…}`; the model
-  has three columns, `id`, `path`, `tags` (`backend/models/library.py:263-270`, v1.9.0).
+  has three columns, `id`, `path`, `tags` (`backend/models/library.py:275-282`, v1.9.1).
   Tagging one folder covers every book at or below that path, resolved on read by
   `_book_folder_ancestor_paths` (`backend/services/tag_service.py:117`). A book
   directly in the category directory (no subfolder) belongs to no folder.
@@ -712,12 +717,20 @@ Verified against v1.5.6 by reading `backend/routers/maintenance/`, backing
 
 - Grimoire seeds users from `{DATA_PATH}/users.json` at startup
   (`backend/seed_users.py`): a JSON array of `{username, password, role}` with
-  roles `admin|gm|player`, plaintext or bcrypt. It then renames the file to
-  `users.json.imported`.
-- That rename is unguarded and the startup call has no `except` around it
-  (`backend/main.py`), so the file must sit **inside** a mounted directory —
-  bind-mounting it as a single file makes the rename fail and the container will
-  not start.
+  roles `admin|gm|player`, plaintext or a `$bcrypt-sha256$` hash. It then
+  writes `users.json.imported`, every password replaced by its hash, and
+  deletes `users.json` (`seed_users.py:117-120`, v1.9.1).
+- **A plaintext password must pass the new-password rules**: at least
+  `PASSWORD_MIN_LENGTH` characters (default 12, env-overridable) and not a
+  common password (`passwords.py:26`, `:48`, `:69-75`, v1.9.1). A hash skips
+  the check (`seed_users.py:123-127`). A failing entry is skipped; if no admin
+  entry passes, the whole seed is skipped and `users.json` stays in place
+  (`seed_users.py:62-74`). `docker/users.json.example` therefore ships hashes;
+  the logins are still `admin/admin`, `gm/gm`, `player/player`.
+- That delete is unguarded and the startup call has no `except` around it
+  (`backend/main.py:281-285`, v1.9.1), so the file must sit **inside** a
+  mounted directory — bind-mounting it as a single file makes the delete fail
+  and the container will not start.
 - `POST /api/auth/setup` also exists and creates the first admin, failing once any
   user exists. The local stack uses the `users.json` path instead, so no bootstrap
   branch is needed in scripts.
@@ -783,8 +796,9 @@ byte-identical to `v1.6.0`.
   held off for its duration, and answers **409** when a backup is already in
   flight (`RuntimeError` → `HTTPException(409)`). An `OSError` becomes a 500.
 - **The archive does not contain the library.** It holds the database plus
-  `campaign_uploads`, `system_covers`, `audio_covers` and, as of 1.9.0,
-  `branding` (`services/backup/_archive.py:30-35`), and its own manifest names the excludes:
+  `campaign_uploads`, `system_covers`, `audio_covers`, `branding` (as of 1.9.0)
+  and, as of 1.9.1, `character_portraits` and `character_images`
+  (`services/backup/_archive.py:32-39`, v1.9.1), and its own manifest names the excludes:
   `library (mounted read-only; back it up separately)`, `thumbnails` and
   `page_cache`, the last two regenerating on demand. So a backup taken before a
   destructive file operation protects the catalogue, not the files.
@@ -857,16 +871,18 @@ tag `v1.7.0`; the upload conflict policy re-read at `v1.8.0`.
   `rename|skip|replace` in the handler and answers **400** (`core.py:440`,
   `:470-474`).
 - **`upload` with `on_conflict=replace` overwrites an indexed book in place**
-  (`_replace_book`, `core.py:491-556`; `replace_upload`,
-  `services/library_fs/uploads.py:126-175`). The target must be a file already
+  (`_replace_book`, `core.py:491-584`; `replace_upload`,
+  `services/library_fs/uploads.py:126-180`, v1.9.1). The target must be a file already
   indexed as a book at that exact path; anything else — a missing file, a map
   or token — is a **409** `conflict`, so a typo cannot add a second copy. The
   book keeps its id and everything keyed by it (metadata, tags, bookmarks,
   favorites, campaign links); hash, size, pages, cover and search text are
   rebuilt, the text indexing in the background on `GET /api/scan-status`. It is
-  also a **409** while a scan, re-index or OCR run is in progress
-  (`core.py:518-522`). A `relative_dir` that does not exist is a **404**
-  `not_found` rather than being created (`uploads.py:190-193`). The response
+  also a **409** while a library scan or OCR run is in progress, and a **409**
+  `"This book is being re-indexed"` while that same book is; a re-index of
+  other books does not block it (`core.py:524-541`, v1.9.1). A `relative_dir`
+  that does not exist is a **404** `not_found` rather than being created
+  (`uploads.py:195-198`, v1.9.1). The response
   adds `record_id` and `replaced: true`, which are `null` and `false` on the
   other policies (`routers/files/_schemas.py:176-185`).
 - **`upload` is one file per request by design**, so a large import that fails
@@ -1024,11 +1040,11 @@ measured against the running 1.7.0 stack; the list parameters re-read at
 - `GET /api/maps/{id}/vtt/data` is JSON, not a download: it is registered with
   `response_model=VttDataResponse` and returns the grid resolution and
   wall/portal/light counts with the embedded image omitted
-  (`routers/maps/__init__.py:206-217`, v1.9.0). Its sibling `vtt/image` serves the
+  (`routers/maps/__init__.py:206-217`, v1.9.1). Its sibling `vtt/image` serves the
   picture. Both 400 unless the map is a `.uvtt`/`.dd2vtt`.
 - `GET /api/maps/{id}/export.uvtt` is a download whose payload is JSON: the
   handler returns a `Response` carrying the image as base64 WebP plus the grid
-  and any authored geometry (`routers/maps/core.py:360-462`, v1.9.0). A raster map is
+  and any authored geometry (`routers/maps/core.py:365-467`, v1.9.1). A raster map is
   the normal case — verified live, a plain PNG fixture map exported 200
   `application/octet-stream` with top-level keys `format`, `resolution`,
   `image`, `environment`, `lights`, `line_of_sight`, `objects_line_of_sight`,
@@ -1067,7 +1083,7 @@ and measured against the running 1.7.1 stack; `core.py` line refs re-read at
   the whole batch with nothing written.
 - **Supported/unsupported is inferred from the whole relative path — folder or
   filename.** `_detect_support` matches both regexes against the path with the
-  filename included (`indexer/media.py:441-453`, v1.9.0), so `goblin_unsupported.stl`
+  filename included (`indexer/media.py:441-453`, v1.9.1), so `goblin_unsupported.stl`
   is detected in an untagged folder; the convention it targets is folder-level,
   `Goblins/Presupported/goblin_a.stl`. Unsupported is tried first, since
   "unsupported" contains "supported".
@@ -1094,7 +1110,7 @@ hold unchanged on both; only the differences are recorded here.
   by marking it explicit, because there is nothing to mark.
 - **`audio` carries six scan-derived fields no endpoint can write.**
   `duration`, `title`, `artist`, `album`, `track_number` and `disc_number` are
-  read from the file at index time (`indexer/metadata.py:37-88`, v1.9.0) and
+  read from the file at index time (`indexer/metadata.py:39-90`, v1.9.1) and
   appear on the row (`audio/core.py:48-54`); `AudioUpdate` declares only
   `description` and `tags` (`audio/_schemas.py:11-13`). Measured on 1.7.1: a
   tagless WAV indexes with a real `duration` and empty strings for the other
@@ -1129,7 +1145,7 @@ hold unchanged on both; only the differences are recorded here.
   ceiling, then decodes: an unsupported type is 400, an oversized file 413, an
   empty one 400 (`covers.py:91-109`).
 - `AudioCoverSourceIn` excludes `campaign_file` from its allowed set exactly as
-  `SystemCoverSourceIn` does (`routers/audio/_schemas.py:121-140`, v1.9.0), so the two
+  `SystemCoverSourceIn` does (`routers/audio/_schemas.py:121-140`, v1.9.1), so the two
   `from-source` verbs behave identically, 422 included.
 
 ## Search
@@ -1189,7 +1205,7 @@ measured against the running 1.6.2 stack.
   returned `entries: []` with `max_seq: 107`, so a poll filtered to a level that
   matches nothing still advances the cursor.
 - **A poll truncates from the oldest end.** With `after_seq` set the handler
-  returns `new[-limit:]` (`config.py:649`, v1.9.0) — the *newest* `limit` of what is
+  returns `new[-limit:]` (`config.py:788`, v1.9.1) — the *newest* `limit` of what is
   new, not the oldest. Measured: 96 entries arrived and a poll with `limit=3`
   returned seq `[1471, 1472, 1473]`, skipping 93 that advancing the cursor then
   loses for good. A caller catching up on a backlog must raise `limit`.
@@ -1229,7 +1245,7 @@ the running 1.6.2 stack.
 - **`/unlink` with neither `ids` nor `parent_id` is a silent no-op**, answering
   `200 {"unlinked": []}`. `parent_id` wins when both are given.
 - **`variant_label` is trimmed to 120 characters silently**
-  (`services/variants.py:256`, v1.9.0), on both `/link` and `/promote`.
+  (`services/variants.py:261`, v1.9.1), on both `/link` and `/promote`.
 - **A main version can describe itself**, as of 1.9.0 (upstream #556). Its own
   `variant_kind`/`variant_label` name it in the picker; both empty means "Main
   version". `/link` sets them from `parent_kind`/`parent_label` only when at
@@ -1340,9 +1356,10 @@ Read from `backend/routers/campaigns/` at tag `v1.7.2`, and verified against the
   `assert_can_manage` (`uploads.py:551`), so it is owner only.
 - `create` checks roles itself (`core.py:160-163`): guests are refused, and
   `is_gm_campaign: true` needs gm or admin.
-- **`GET /campaigns/{id}` hides guest codes from everyone but the owner**, as
-  of 1.8.0: `members[].guest_code` is nulled for any other caller
-  (`core.py:233-239`), since a guest's code is their login.
+- **`GET /campaigns/{id}` hides guest codes from everyone but the owner's
+  session**, as of 1.8.0: `members[].guest_code` is nulled for any other
+  caller, and for the owner calling with an API key (`_helpers.py:637-649`,
+  v1.9.1), since a guest's code is their login.
 - **An invalid `visibility` is silently `gm` on add and bulk**
   (`resources.py:164,214`), but a 400 on update (`resources.py:252`). The CLI's
   `--visibility` choice set catches it on add; bulk JSON does not.
@@ -1448,9 +1465,10 @@ Read from `backend/routers/campaigns/schedule.py`, `calendar.py` and
   to the rest; a caller with no row for the date is first recorded as
   available (`schedule.py:309-333`). It admits the owner or any admin, unlike the
   campaign's other writes.
-- **`availability` `user_id` cannot work.** `AvailabilityUpdate.user_id` is
-  `Optional[int]` (`_schemas.py:177`) while user ids are UUID strings, so any
-  real user id is a 422 `int_parsing` and a GM cannot set another member's row.
+- **`availability` `user_id` sets another member's row.**
+  `AvailabilityUpdate.user_id` is `Optional[str]` (`_schemas.py:181`, v1.9.1);
+  the owner or any admin may name another user, anyone else is a 403
+  (`schedule.py:247-253`, v1.9.1).
 - **Calendar subscription is session only.** The three
   `/calendar/subscription` routes carry `x-api-key-access: none`; minting
   also needs `BASE_URL` (400 otherwise).

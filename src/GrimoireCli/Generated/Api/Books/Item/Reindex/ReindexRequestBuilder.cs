@@ -22,7 +22,7 @@ namespace GrimoireCli.Generated.Api.Books.Item.Reindex
         /// </summary>
         /// <param name="pathParameters">Path parameters for the request</param>
         /// <param name="requestAdapter">The request adapter to use to execute the requests.</param>
-        public ReindexRequestBuilder(Dictionary<string, object> pathParameters, IRequestAdapter requestAdapter) : base(requestAdapter, "{+baseurl}/api/books/{book_id}/reindex{?ocr_dpi*,token*}", pathParameters)
+        public ReindexRequestBuilder(Dictionary<string, object> pathParameters, IRequestAdapter requestAdapter) : base(requestAdapter, "{+baseurl}/api/books/{book_id}/reindex{?ocr_dpi*}", pathParameters)
         {
         }
         /// <summary>
@@ -30,7 +30,7 @@ namespace GrimoireCli.Generated.Api.Books.Item.Reindex
         /// </summary>
         /// <param name="rawUrl">The raw URL to use for the request builder.</param>
         /// <param name="requestAdapter">The request adapter to use to execute the requests.</param>
-        public ReindexRequestBuilder(string rawUrl, IRequestAdapter requestAdapter) : base(requestAdapter, "{+baseurl}/api/books/{book_id}/reindex{?ocr_dpi*,token*}", rawUrl)
+        public ReindexRequestBuilder(string rawUrl, IRequestAdapter requestAdapter) : base(requestAdapter, "{+baseurl}/api/books/{book_id}/reindex{?ocr_dpi*}", rawUrl)
         {
         }
         /// <summary>
@@ -93,19 +93,6 @@ namespace GrimoireCli.Generated.Api.Books.Item.Reindex
             /// <summary>Optional OCR resolution override (DPI, 72–600) for this book. Omit to use the global OCR_DPI default.</summary>
             [QueryParameter("ocr_dpi")]
             public int? OcrDpi { get; set; }
-#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
-#nullable enable
-            #pragma warning disable CS1591
-            [QueryParameter("token")]
-            public string? Token { get; set; }
-            #pragma warning restore CS1591
-#nullable restore
-#else
-            #pragma warning disable CS1591
-            [QueryParameter("token")]
-            public string Token { get; set; }
-            #pragma warning restore CS1591
-#endif
         }
         /// <summary>
         /// Configuration for the request such as headers, query parameters, and middleware options.
