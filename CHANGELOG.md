@@ -3,6 +3,32 @@
 All notable changes to grimoire-cli are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## v0.7.2 — 2026-10-26
+
+Patch release that adds Grimoire 1.9.2 to the supported range, now 1.9.0 –
+1.9.2, with one additive flag for the cleanup guard 1.9.2 introduced.
+
+### Highlights
+
+- **Grimoire 1.9.2 is tested and supported.** 1.9.0 and 1.9.1 stay
+  supported. Login no longer warns on a 1.9.2 server.
+- **`library cleanup-missing --force`.** 1.9.2 refuses a cleanup with a 409
+  when the library root is missing or empty while the database still holds
+  rows, because an unmounted share would otherwise read as the whole
+  catalogue deleted. `--force` passes that guard when the empty library is
+  real. A missing subfolder is still not caught, and the help says so.
+- **Books can read metadata from their own file.** `books metadata-sources`
+  now always lists `file-metadata`, which offers what the PDF, EPUB or
+  ComicInfo.xml carries, offline and with no add-on. The help explains it.
+
+### Features
+
+- feat: target grimoire 1.9.2
+
+### Chores
+
+- chore: bump version to 0.7.2
+
 ## v0.7.1 — 2026-10-23
 
 Patch release that adds Grimoire 1.9.1 to the supported range, now 1.9.0 –
