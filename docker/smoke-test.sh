@@ -1639,6 +1639,13 @@ echo "$CLEANUP_JSON" | jq -e '[.removed[]] | add == 0' >/dev/null \
   || fail "a second cleanup should find nothing left to remove: $CLEANUP_JSON"
 ok "a second library cleanup-missing removes nothing"
 
+# running cleanup-missing --force on a mounted library expecting the same no-op
+CLEANUP_JSON=$("$CLI" library cleanup-missing --force 2>"$WORK/cli.err") \
+  || { cat "$WORK/cli.err" >&2; fail "library cleanup-missing --force exited non-zero"; }
+echo "$CLEANUP_JSON" | jq -e '[.removed[]] | add == 0' >/dev/null \
+  || fail "cleanup --force on a mounted library should remove nothing: $CLEANUP_JSON"
+ok "library cleanup-missing --force is accepted"
+
 # ---- sidecars ---------------------------------------------------------------
 # Enabling a format is what switches on export, the refresh-on-edit hook and the
 # export-on-scan hook together. It cannot be switched off again from the CLI, so
@@ -1751,12 +1758,12 @@ echo "$SOURCES_JSON" | jq -e '.sources[] | select(.id == "fixture-source" and .s
   || fail "fixture-source should offer itself with supports_paste true: $SOURCES_JSON"
 ok "systems metadata-sources lists the installed fixture add-on"
 
-# The fixture targets game-system, so an empty list here is target filtering
-# working rather than the endpoint returning nothing.
+# The fixture targets game-system, so its absence here is target filtering at
+# work; the built-in file-metadata source (1.9.2) proves the list is not empty.
 # listing metadata sources for a book expecting the game-system add-on excluded
 BOOKSOURCES_JSON=$("$CLI" books metadata-sources --id "$SR4_BOOK" 2>"$WORK/cli.err") \
   || { cat "$WORK/cli.err" >&2; fail "books metadata-sources exited non-zero"; }
-[ "$(echo "$BOOKSOURCES_JSON" | jq '.sources | length')" -eq 0 ] \
+echo "$BOOKSOURCES_JSON" | jq -e '[.sources[].id] | (index("fixture-source") == null) and (index("file-metadata") != null)' >/dev/null \
   || fail "a game-system add-on must not appear as a book source: $BOOKSOURCES_JSON"
 ok "books metadata-sources excludes a game-system add-on"
 

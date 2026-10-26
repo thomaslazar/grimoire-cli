@@ -67,7 +67,8 @@ public class LibraryCommandTests
     {
         var output = RenderHelp(["library", "cleanup-missing"], full: false);
         Assert.Contains("bookmarks", output);
-        Assert.Contains("absent rather than hung", output);
+        Assert.Contains("unmounted share", output);
+        Assert.Contains("missing subfolder is not", output);
     }
 
     [Fact]

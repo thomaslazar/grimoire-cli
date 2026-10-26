@@ -2,7 +2,7 @@
 
 Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any) that implements it.
 
-- **Reference:** spec fetched live from the pinned stack's `/api/openapi.json` (v1.9.1, 316 paths, 415 operations) and the upstream router source read from the same container. Tested range: `1.9.0`-`1.9.1` (`GrimoireApiClient.cs`).
+- **Reference:** spec fetched live from the pinned stack's `/api/openapi.json` (v1.9.2, 319 paths, 418 operations) and the upstream router source read from the same container. Tested range: `1.9.0`-`1.9.2` (`GrimoireApiClient.cs`).
 - **Perm** column uses Grimoire's roles (`admin` / `gm or admin` / `not guest`); blank = any authenticated user. `?` = a dependency this script could not resolve.
 - **Key** column is the API key permission a route needs (`—`: no key can call it), derived from `backend/api_keys.py` in the same container.
 - ✅ = covered by a CLI command · — = not implemented · 🔒 = internal-only (no user-facing verb); 🔒 rows never count as covered.
@@ -23,13 +23,13 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | books | 16 / 21 |
 | campaigns | 80 / 93 |
 | characters | 0 / 23 |
-| codex | 0 / 8 |
+| codex | 0 / 10 |
 | content | 0 / 6 |
 | downloads | 1 / 1 |
 | duplicates | 13 / 18 |
 | favorites | 0 / 3 |
 | files | 9 / 16 |
-| library | 4 / 7 |
+| library | 4 / 8 |
 | logs | 1 / 1 |
 | lookups | 15 / 15 |
 | maintenance | 3 / 4 |
@@ -48,7 +48,7 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | token-frames | 0 / 2 |
 | tokens | 11 / 11 |
 | users | 0 / 16 |
-| **Total** | **238 / 415** |
+| **Total** | **238 / 418** |
 
 2 operation(s) are internal-only (🔒) and excluded from covered counts.
 
@@ -311,11 +311,13 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 
 | Method | Path | Description | Perm | Key | CLI |
 |--------|------|-------------|------|-----|-----|
+| GET | `/api/codex/books/{book_id}/compare` | Compare a book with Grimoire Codex DB | gm or admin | codex: read | — |
 | DELETE | `/api/codex/books/{book_id}/link` | Unlink a book from Grimoire Codex DB | gm or admin | codex: write | — |
 | POST | `/api/codex/books/{book_id}/submit` | Send a book to Grimoire Codex DB | gm or admin | codex: write | — |
 | GET | `/api/codex/settings` | Get Grimoire Codex DB settings | admin | codex: read | — |
 | PUT | `/api/codex/settings` | Update Grimoire Codex DB settings | admin | codex: write | — |
 | GET | `/api/codex/status` | Grimoire Codex DB status | not guest | codex: read | — |
+| GET | `/api/codex/systems/{system_id}/compare` | Compare a game system with Grimoire Codex DB | gm or admin | codex: read | — |
 | DELETE | `/api/codex/systems/{system_id}/link` | Unlink a game system from Grimoire Codex DB | gm or admin | codex: write | — |
 | POST | `/api/codex/systems/{system_id}/submit` | Send a game system to Grimoire Codex DB | gm or admin | codex: write | — |
 | POST | `/api/codex/test` | Test the Grimoire Codex DB connection | admin | codex: write | — |
@@ -398,6 +400,7 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | GET | `/api/changelog` | Release changelog |  | library: read | — |
 | GET | `/api/latest-release` | Latest published release |  | library: read | — |
 | POST | `/api/maintenance/cleanup-missing` | Remove DB entries for missing files | admin | library: write | `library cleanup-missing` ✅ |
+| GET | `/api/maintenance/cleanup-missing/preview` | Preview which DB entries a cleanup would remove | admin | library: read | — |
 | POST | `/api/rescan` | Rescan and reindex library | admin | library: write | `library rescan` ✅ |
 | GET | `/api/scan-status` | Scan status | admin | library: read | `library scan-status` ✅ |
 

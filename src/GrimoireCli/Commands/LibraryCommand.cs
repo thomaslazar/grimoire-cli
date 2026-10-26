@@ -99,7 +99,11 @@ public static class LibraryCommand
 
     private static Command CreateCleanupMissingCommand()
     {
-        var command = new Command("cleanup-missing", "Remove DB entries for files no longer on disk");
+        var forceOption = new Option<bool>("--force") { Description = "Run even when the library root looks unmounted" };
+        var command = new Command("cleanup-missing", "Remove DB entries for files no longer on disk")
+        {
+            forceOption
+        };
         command.AddRoleRequired("admin");
         command.AddHelpSection("Notes", HelpSectionPosition.Top,
             "Deletes DB rows for files no longer on disk, each book's search index",
@@ -108,10 +112,11 @@ public static class LibraryCommand
             "",
             "Normally a no-op. Run it after restructuring the library on disk.",
             "",
-            "A library directory that is absent rather than hung reads as wholly",
-            "deleted, and a rescan does not restore hand-entered metadata or",
-            "bookmarks. A hung mount is safe — the server treats a timed-out path",
-            "as present.",
+            "A library root that is missing or empty while the DB holds rows — an",
+            "unmounted share — is a 409 unless --force. A missing subfolder is not",
+            "caught: its rows read as deleted, and a rescan does not restore",
+            "hand-entered metadata or bookmarks. A hung mount is safe — the server",
+            "treats a timed-out path as present.",
             "",
             "409 while a scan is running; commits per row, so a failure part-way",
             "leaves earlier removals applied.");
@@ -121,7 +126,7 @@ public static class LibraryCommand
         {
             var (client, _) = CommandHelper.BuildClient();
             var service = new LibraryService(client);
-            var result = await service.CleanupMissingAsync();
+            var result = await service.CleanupMissingAsync(parseResult.GetValue(forceOption));
             ConsoleOutput.WriteRawJson(result);
             return 0;
         });

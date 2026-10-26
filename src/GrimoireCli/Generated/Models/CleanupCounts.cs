@@ -21,6 +21,8 @@ namespace GrimoireCli.Generated.Models
         public int? Books { get; set; }
         /// <summary>The maps property</summary>
         public int? Maps { get; set; }
+        /// <summary>The models property</summary>
+        public int? Models { get; set; }
         /// <summary>The systems property</summary>
         public int? Systems { get; set; }
         /// <summary>The tokens property</summary>
@@ -53,6 +55,7 @@ namespace GrimoireCli.Generated.Models
                 { "audio", n => { Audio = n.GetIntValue(); } },
                 { "books", n => { Books = n.GetIntValue(); } },
                 { "maps", n => { Maps = n.GetIntValue(); } },
+                { "models", n => { Models = n.GetIntValue(); } },
                 { "systems", n => { Systems = n.GetIntValue(); } },
                 { "tokens", n => { Tokens = n.GetIntValue(); } },
             };
@@ -67,6 +70,7 @@ namespace GrimoireCli.Generated.Models
             writer.WriteIntValue("audio", Audio);
             writer.WriteIntValue("books", Books);
             writer.WriteIntValue("maps", Maps);
+            writer.WriteIntValue("models", Models);
             writer.WriteIntValue("systems", Systems);
             writer.WriteIntValue("tokens", Tokens);
             writer.WriteAdditionalData(AdditionalData);

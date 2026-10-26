@@ -173,6 +173,8 @@ namespace GrimoireCli.Generated.Models
         public int? OidcClientSecretLength { get; set; }
         /// <summary>The oidc_client_secret_set property</summary>
         public bool? OidcClientSecretSet { get; set; }
+        /// <summary>The oidc_configured property</summary>
+        public bool? OidcConfigured { get; set; }
         /// <summary>The oidc_enabled property</summary>
         public bool? OidcEnabled { get; set; }
         /// <summary>The oidc_enabled_env_locked property</summary>
@@ -425,6 +427,7 @@ namespace GrimoireCli.Generated.Models
                 { "oidc_client_secret_env_locked", n => { OidcClientSecretEnvLocked = n.GetBoolValue(); } },
                 { "oidc_client_secret_length", n => { OidcClientSecretLength = n.GetIntValue(); } },
                 { "oidc_client_secret_set", n => { OidcClientSecretSet = n.GetBoolValue(); } },
+                { "oidc_configured", n => { OidcConfigured = n.GetBoolValue(); } },
                 { "oidc_enabled", n => { OidcEnabled = n.GetBoolValue(); } },
                 { "oidc_enabled_env_locked", n => { OidcEnabledEnvLocked = n.GetBoolValue(); } },
                 { "oidc_end_session_endpoint", n => { OidcEndSessionEndpoint = n.GetStringValue(); } },
@@ -524,6 +527,7 @@ namespace GrimoireCli.Generated.Models
             writer.WriteBoolValue("oidc_client_secret_env_locked", OidcClientSecretEnvLocked);
             writer.WriteIntValue("oidc_client_secret_length", OidcClientSecretLength);
             writer.WriteBoolValue("oidc_client_secret_set", OidcClientSecretSet);
+            writer.WriteBoolValue("oidc_configured", OidcConfigured);
             writer.WriteBoolValue("oidc_enabled", OidcEnabled);
             writer.WriteBoolValue("oidc_enabled_env_locked", OidcEnabledEnvLocked);
             writer.WriteStringValue("oidc_end_session_endpoint", OidcEndSessionEndpoint);
