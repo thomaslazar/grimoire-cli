@@ -12,7 +12,8 @@
 | 0.5.0 | 1.8.0 | superseded by 0.6.0 |
 | 0.6.0 | 1.8.0 | superseded by 0.7.0 |
 | 0.7.0 | 1.9.0 | superseded by 0.7.1 |
-| 0.7.1 | 1.9.0 – 1.9.1 | current, on `main` |
+| 0.7.1 | 1.9.0 – 1.9.1 | superseded by 0.7.2 |
+| 0.7.2 | 1.9.0 – 1.9.2 | current, on `main` |
 
 **The floor rises only when something forces it**, not on every server release.
 Each row above records a pairing that was necessary at the time — 1.5.6 → 1.6.0
@@ -30,7 +31,7 @@ an older Grimoire does not know is dropped by Pydantic rather than rejected, so
 the command answers 200 and does nothing — the one failure the version warning
 exists to catch.
 
-`main` targets Grimoire 1.9.1. Reaching 1.6.0 was more than a version bump: it
+`main` targets Grimoire 1.9.2. Reaching 1.6.0 was more than a version bump: it
 shortened the access token from 30 days to 30 minutes and made the library
 writable, which is why the CLI renews its own session
 ([authentication.md](authentication.md)) and why the `files` endpoints exist at
@@ -75,7 +76,7 @@ plain `BaseModel`s with Pydantic's default `extra='ignore'`, so that flag's fiel
 is dropped and the folder is created with no marker and a 200. A silent no-op is
 what the floor warning is for; without the new flag this release would not have
 needed one.
-`docker/docker-compose.yml` pins the `1.9.1` release tag, so the spec cannot
+`docker/docker-compose.yml` pins the `1.9.2` release tag, so the spec cannot
 drift under the committed client between regenerations.
 
 **1.7.1 raised `MaxTestedVersion` and left the floor alone** — the first bump
@@ -209,10 +210,20 @@ sends was added or removed. What moved around it:
   writes; `tags` counts and `library stats` are scoped to the caller.
 - **`campaigns availability set --user-id` works**, for the owner or an admin.
 
+**1.9.2 raised `MaxTestedVersion` and left the floor alone.**
+
+- **`library cleanup-missing` refuses an unmounted library.** A library root
+  that is missing or empty while the database holds rows is a 409, unless
+  `--force` (`routers/maintenance/core.py`, `_helpers.py:72-83`). On 1.9.1 the
+  server ignores `force`, but it also never refuses, so the flag forces no
+  floor. The response gains a `models` count.
+- **`GET /api/maintenance/cleanup-missing/preview`** is a new dry run, and the
+  Codex compare routes are new; neither is implemented here.
+
 ## Runtime check
 
 `src/GrimoireCli/Api/GrimoireApiClient.cs` defines `MinSupportedVersion` and
-`MaxTestedVersion`, currently `"1.9.0"` and `"1.9.1"`. A check runs before the first
+`MaxTestedVersion`, currently `"1.9.0"` and `"1.9.2"`. A check runs before the first
 request of any command, calling `GET /api/about` and comparing the reported
 version against that range. It is throttled to once every 24 hours — a
 config with a recent `lastVersionCheck` skips the probe entirely — and

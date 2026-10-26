@@ -22,6 +22,14 @@ namespace GrimoireCli.Generated.Models
 #else
         public global::GrimoireCli.Generated.Models.OpdsStatusResponse.OpdsStatusResponse_feed_url FeedUrl { get; set; }
 #endif
+        /// <summary>The feed_urls property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public List<global::GrimoireCli.Generated.Models.OpdsFeedUrl>? FeedUrls { get; set; }
+#nullable restore
+#else
+        public List<global::GrimoireCli.Generated.Models.OpdsFeedUrl> FeedUrls { get; set; }
+#endif
         /// <summary>The has_token property</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
@@ -58,6 +66,7 @@ namespace GrimoireCli.Generated.Models
             return new Dictionary<string, Action<IParseNode>>
             {
                 { "feed_url", n => { FeedUrl = n.GetObjectValue<global::GrimoireCli.Generated.Models.OpdsStatusResponse.OpdsStatusResponse_feed_url>(global::GrimoireCli.Generated.Models.OpdsStatusResponse.OpdsStatusResponse_feed_url.CreateFromDiscriminatorValue); } },
+                { "feed_urls", n => { FeedUrls = n.GetCollectionOfObjectValues<global::GrimoireCli.Generated.Models.OpdsFeedUrl>(global::GrimoireCli.Generated.Models.OpdsFeedUrl.CreateFromDiscriminatorValue)?.AsList(); } },
                 { "has_token", n => { HasToken = n.GetObjectValue<global::GrimoireCli.Generated.Models.OpdsStatusResponse.OpdsStatusResponse_has_token>(global::GrimoireCli.Generated.Models.OpdsStatusResponse.OpdsStatusResponse_has_token.CreateFromDiscriminatorValue); } },
                 { "opds_enabled", n => { OpdsEnabled = n.GetBoolValue(); } },
             };
@@ -70,6 +79,7 @@ namespace GrimoireCli.Generated.Models
         {
             if(ReferenceEquals(writer, null)) throw new ArgumentNullException(nameof(writer));
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.OpdsStatusResponse.OpdsStatusResponse_feed_url>("feed_url", FeedUrl);
+            writer.WriteCollectionOfObjectValues<global::GrimoireCli.Generated.Models.OpdsFeedUrl>("feed_urls", FeedUrls);
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.OpdsStatusResponse.OpdsStatusResponse_has_token>("has_token", HasToken);
             writer.WriteBoolValue("opds_enabled", OpdsEnabled);
             writer.WriteAdditionalData(AdditionalData);

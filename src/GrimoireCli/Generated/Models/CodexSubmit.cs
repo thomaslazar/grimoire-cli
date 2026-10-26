@@ -14,6 +14,24 @@ namespace GrimoireCli.Generated.Models
     {
         /// <summary>Stores additional data not described in the OpenAPI description found when deserializing. Can be used for serialization as well.</summary>
         public IDictionary<string, object> AdditionalData { get; set; }
+        /// <summary>The attribution property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public global::GrimoireCli.Generated.Models.CodexAttribution? Attribution { get; set; }
+#nullable restore
+#else
+        public global::GrimoireCli.Generated.Models.CodexAttribution Attribution { get; set; }
+#endif
+        /// <summary>The base_revision property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public global::GrimoireCli.Generated.Models.CodexSubmit.CodexSubmit_base_revision? BaseRevision { get; set; }
+#nullable restore
+#else
+        public global::GrimoireCli.Generated.Models.CodexSubmit.CodexSubmit_base_revision BaseRevision { get; set; }
+#endif
+        /// <summary>The cover property</summary>
+        public bool? Cover { get; set; }
         /// <summary>The fields property</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
@@ -30,12 +48,29 @@ namespace GrimoireCli.Generated.Models
 #else
         public string Note { get; set; }
 #endif
+        /// <summary>The sources property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public List<string>? Sources { get; set; }
+#nullable restore
+#else
+        public List<string> Sources { get; set; }
+#endif
+        /// <summary>The system property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public global::GrimoireCli.Generated.Models.CodexSystemChoice? System { get; set; }
+#nullable restore
+#else
+        public global::GrimoireCli.Generated.Models.CodexSystemChoice System { get; set; }
+#endif
         /// <summary>
         /// Instantiates a new <see cref="global::GrimoireCli.Generated.Models.CodexSubmit"/> and sets the default values.
         /// </summary>
         public CodexSubmit()
         {
             AdditionalData = new Dictionary<string, object>();
+            Cover = false;
         }
         /// <summary>
         /// Creates a new instance of the appropriate class based on discriminator value
@@ -55,8 +90,13 @@ namespace GrimoireCli.Generated.Models
         {
             return new Dictionary<string, Action<IParseNode>>
             {
+                { "attribution", n => { Attribution = n.GetObjectValue<global::GrimoireCli.Generated.Models.CodexAttribution>(global::GrimoireCli.Generated.Models.CodexAttribution.CreateFromDiscriminatorValue); } },
+                { "base_revision", n => { BaseRevision = n.GetObjectValue<global::GrimoireCli.Generated.Models.CodexSubmit.CodexSubmit_base_revision>(global::GrimoireCli.Generated.Models.CodexSubmit.CodexSubmit_base_revision.CreateFromDiscriminatorValue); } },
+                { "cover", n => { Cover = n.GetBoolValue(); } },
                 { "fields", n => { Fields = n.GetCollectionOfPrimitiveValues<string>()?.AsList(); } },
                 { "note", n => { Note = n.GetStringValue(); } },
+                { "sources", n => { Sources = n.GetCollectionOfPrimitiveValues<string>()?.AsList(); } },
+                { "system", n => { System = n.GetObjectValue<global::GrimoireCli.Generated.Models.CodexSystemChoice>(global::GrimoireCli.Generated.Models.CodexSystemChoice.CreateFromDiscriminatorValue); } },
             };
         }
         /// <summary>
@@ -66,9 +106,76 @@ namespace GrimoireCli.Generated.Models
         public virtual void Serialize(ISerializationWriter writer)
         {
             if(ReferenceEquals(writer, null)) throw new ArgumentNullException(nameof(writer));
+            writer.WriteObjectValue<global::GrimoireCli.Generated.Models.CodexAttribution>("attribution", Attribution);
+            writer.WriteObjectValue<global::GrimoireCli.Generated.Models.CodexSubmit.CodexSubmit_base_revision>("base_revision", BaseRevision);
+            writer.WriteBoolValue("cover", Cover);
             writer.WriteCollectionOfPrimitiveValues<string>("fields", Fields);
             writer.WriteStringValue("note", Note);
+            writer.WriteCollectionOfPrimitiveValues<string>("sources", Sources);
+            writer.WriteObjectValue<global::GrimoireCli.Generated.Models.CodexSystemChoice>("system", System);
             writer.WriteAdditionalData(AdditionalData);
+        }
+        /// <summary>
+        /// Composed type wrapper for classes <see cref="global::GrimoireCli.Generated.Models.CodexSubmit_base_revisionMember1"/>, <see cref="int"/>
+        /// </summary>
+        [global::System.CodeDom.Compiler.GeneratedCode("Kiota", "1.0.0")]
+        public partial class CodexSubmit_base_revision : IComposedTypeWrapper, IParsable
+        {
+            /// <summary>Composed type representation for type <see cref="global::GrimoireCli.Generated.Models.CodexSubmit_base_revisionMember1"/></summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+            public global::GrimoireCli.Generated.Models.CodexSubmit_base_revisionMember1? CodexSubmitBaseRevisionMember1 { get; set; }
+#nullable restore
+#else
+            public global::GrimoireCli.Generated.Models.CodexSubmit_base_revisionMember1 CodexSubmitBaseRevisionMember1 { get; set; }
+#endif
+            /// <summary>Composed type representation for type <see cref="int"/></summary>
+            public int? Integer { get; set; }
+            /// <summary>
+            /// Creates a new instance of the appropriate class based on discriminator value
+            /// </summary>
+            /// <returns>A <see cref="global::GrimoireCli.Generated.Models.CodexSubmit.CodexSubmit_base_revision"/></returns>
+            /// <param name="parseNode">The parse node to use to read the discriminator value and create the object</param>
+            public static global::GrimoireCli.Generated.Models.CodexSubmit.CodexSubmit_base_revision CreateFromDiscriminatorValue(IParseNode parseNode)
+            {
+                if(ReferenceEquals(parseNode, null)) throw new ArgumentNullException(nameof(parseNode));
+                var result = new global::GrimoireCli.Generated.Models.CodexSubmit.CodexSubmit_base_revision();
+                if(parseNode.GetIntValue() is int integerValue)
+                {
+                    result.Integer = integerValue;
+                }
+                else {
+                    result.CodexSubmitBaseRevisionMember1 = new global::GrimoireCli.Generated.Models.CodexSubmit_base_revisionMember1();
+                }
+                return result;
+            }
+            /// <summary>
+            /// The deserialization information for the current model
+            /// </summary>
+            /// <returns>A IDictionary&lt;string, Action&lt;IParseNode&gt;&gt;</returns>
+            public virtual IDictionary<string, Action<IParseNode>> GetFieldDeserializers()
+            {
+                if(CodexSubmitBaseRevisionMember1 != null)
+                {
+                    return ParseNodeHelper.MergeDeserializersForIntersectionWrapper(CodexSubmitBaseRevisionMember1);
+                }
+                return new Dictionary<string, Action<IParseNode>>();
+            }
+            /// <summary>
+            /// Serializes information the current object
+            /// </summary>
+            /// <param name="writer">Serialization writer to use to serialize this model</param>
+            public virtual void Serialize(ISerializationWriter writer)
+            {
+                if(ReferenceEquals(writer, null)) throw new ArgumentNullException(nameof(writer));
+                if(Integer != null)
+                {
+                    writer.WriteIntValue(null, Integer);
+                }
+                else {
+                    writer.WriteObjectValue<global::GrimoireCli.Generated.Models.CodexSubmit_base_revisionMember1>(null, CodexSubmitBaseRevisionMember1);
+                }
+            }
         }
     }
 }

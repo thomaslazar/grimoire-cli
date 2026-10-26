@@ -248,7 +248,7 @@ grimoire-cli config set server https://grimoire.example.com
 | `library rescan [--scope <path>] [--metadata-mode new\|missing\|replace]` | Scan the library for new and changed files; exit 3 if already running (admin) |
 | `library scan-status` | Show the running scan's progress (admin) |
 | `library cancel-scan` | Stop the running scan (admin) |
-| `library cleanup-missing` | Remove DB entries for files no longer on disk (admin; deletes each book's bookmarks too) |
+| `library cleanup-missing` | Remove DB entries for files no longer on disk (admin; deletes each book's bookmarks too; `--force` past the unmounted-library 409) |
 | `library stats` | Counts and sizes across the whole library |
 | `downloads archive --type <type> [scope flags] [--fmt <fmt>] --output <path\|->` | Download a slice of the library as one archive |
 | `addons list` | List installed and available add-ons (admin) |
@@ -518,7 +518,7 @@ Verified API behaviour worth reading before designing a command: [docs/grimoire-
 
 ## Compatibility
 
-Requires Grimoire **v1.9.0 – v1.9.1**. The CLI warns on login if the server reports a version outside that range. See [docs/grimoire-compatibility.md](docs/grimoire-compatibility.md) for the version matrix and the bump procedure.
+Requires Grimoire **v1.9.0 – v1.9.2**. The CLI warns on login if the server reports a version outside that range. See [docs/grimoire-compatibility.md](docs/grimoire-compatibility.md) for the version matrix and the bump procedure.
 
 ## License
 

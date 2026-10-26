@@ -1,4 +1,5 @@
 using GrimoireCli.Api;
+using Microsoft.Kiota.Abstractions;
 
 namespace GrimoireCli.Services;
 
@@ -57,11 +58,17 @@ public class LibraryService
     /// 409 while a scan runs; the server's message names that state, so no hint
     /// replaces it.
     /// </summary>
-    public async Task<string> CleanupMissingAsync()
-    {
-        var info = _client.Api.Api.Maintenance.CleanupMissing.ToPostRequestInformation();
-        return await _client.SendAsync(info, permissionHint: "the admin role");
-    }
+    public async Task<string> CleanupMissingAsync(bool force)
+        => await _client.SendAsync(CleanupMissingRequest(force), permissionHint: "the admin role");
+
+    internal RequestInformation CleanupMissingRequest(bool force)
+        => _client.Api.Api.Maintenance.CleanupMissing.ToPostRequestInformation(c =>
+        {
+            if (force)
+            {
+                c.QueryParameters.Force = true;
+            }
+        });
 
     /// <summary>
     /// GET /api/stats. Guarded by optional_get_current_user with an

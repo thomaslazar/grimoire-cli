@@ -48,7 +48,7 @@ public class VersionCheckCadenceTests
         var warning = GrimoireApiClient.VersionWarning("1.10.0", previous: null);
         Assert.NotNull(warning);
         Assert.Contains("1.10.0", warning);
-        Assert.Contains("1.9.1", warning);
+        Assert.Contains("1.9.2", warning);
         Assert.Contains(GrimoireApiClient.ClientVersion, warning);
         Assert.Contains("newer grimoire-cli", warning);
     }

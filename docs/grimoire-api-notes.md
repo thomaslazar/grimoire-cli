@@ -521,12 +521,18 @@ fixture add-on (`docker/addon-index/fixture-source.yml`) and via
   confirms target filtering, not that the endpoint is simply empty.
 - **Grimoire Codex DB is a built-in source**, as of 1.9.0: id `grimoire-codex`,
   listed first, and only while the server has `GRIMOIRE_CODEX_DB_API_TOKEN`
-  set (`routers/_metadata_lookup.py:74-77`, v1.9.1, `codex/settings.py:49-52`). A book
+  set (`routers/_metadata_lookup.py:84-87`, v1.9.2, `codex/settings.py:49-52`). A book
   search goes to its `/match` with every signal the book carries (ISBN, hash,
   authors, page count…), not the query alone; a system search is by name
   (`codex/lookup.py:42-65`). An add-on id that is not a scraper is a 400
   (`addons/service.py:52-58`). Not exercised live: the local stack sets no
   token.
+- **File metadata is a built-in book source**, as of 1.9.2: id `file-metadata`,
+  listed last for books only (`routers/_metadata_lookup.py:29`, `:107-116`,
+  v1.9.2). It reads what the file carries — PDF info, EPUB OPF, a comic's
+  `ComicInfo.xml` — via `metadata/embedded.py`. Search yields one candidate,
+  identity `file`, or none when the file carries nothing; an unreadable file
+  or a system is a 400, never a 502 (`:119-135`, v1.9.2).
 - **400, not 502, for both bad-input cases actually seen.** `metadata-fetch
   --identity <unknown>` against a real source returned `Bad request. {"detail":
   "that result is no longer available from the source"}`; `metadata-search
@@ -679,23 +685,30 @@ Verified against v1.5.6 by reading `backend/routers/maintenance/`, backing
 `library cleanup-missing`.
 
 - **An absent path deletes; a hung one does not.** `_path_exists`
-  (`_helpers.py:16-33`, v1.9.1) runs `os.path.exists` on a daemon thread with a
+  (`_helpers.py:19-36`, v1.9.2) runs `os.path.exists` on a daemon thread with a
   5-second join and **returns True if the thread is still alive**, so a stalled
   mount is treated as present and skipped. A directory that is simply gone
   returns False promptly and every row beneath it is removed. The asymmetry is
   deliberate and is the difference between a storage hiccup and data loss.
-- **It commits per row** (`_helpers.py:260`, and per pruned system at `:110`, v1.9.1), so
+- **An unmounted library root is refused**, as of 1.9.2. `library_root_unavailable`
+  (`_helpers.py:72-83`, v1.9.2) is true when `LIBRARY_PATH` is missing, not a
+  directory, or empty while the database still holds library rows; the cleanup
+  then answers 409 unless `force=true`. Only the root is checked, so a missing
+  subfolder still reads as deleted. `GET /cleanup-missing/preview` reports the
+  same flag with per-collection `missing` and `total` counts, deleting nothing
+  (`_helpers.py:101-112`, v1.9.2).
+- **It commits per row** (`_helpers.py:126`, and per pruned system at `:206`, v1.9.2), so
   a failure part-way through leaves earlier removals applied; the handler's
   `except` rolls back only the uncommitted remainder. The docstring at
-  `:243-244` gives the reason: releasing the write lock between rows so a
+  `:118-119` gives the reason: releasing the write lock between rows so a
   concurrent scanner session is not blocked.
-- **A book takes its references with it** (`_helpers.py:257-260`, v1.9.1):
+- **A book takes its references with it** (`_helpers.py:124-126`, v1.9.2):
   `purge_references` drops its `book_search` rows, bookmarks, favorites, tag
   links and campaign resource links, then the book goes
   (`services/library_fs/references.py:57-91`, v1.9.1). Bookmarks are user data and a rescan
   does not restore them, nor any hand-entered metadata.
 - **Container folders are protected from the orphan sweep.**
-  `_prune_orphaned_systems` (`_helpers.py:36`, v1.9.1) keeps a system alive if it has
+  `_prune_orphaned_systems` (`_helpers.py:132`, v1.9.2) keeps a system alive if it has
   books, a campaign references it, **or it has a surviving child** — the last
   rule phrased over `parent_id` rather than `container_kind`, so container kinds
   added later are covered without changing the function. Without it a container

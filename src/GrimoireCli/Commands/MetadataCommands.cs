@@ -31,14 +31,27 @@ public static class MetadataCommands
             idOption
         };
         command.AddRoleRequired("gm or admin");
-        command.AddHelpSection("Notes", HelpSectionPosition.Top,
+        string[] notes =
+        [
             "Grimoire Codex DB (id grimoire-codex) first, while the server sets",
             "GRIMOIRE_CODEX_DB_API_TOKEN; then add-ons that are installed, enabled and",
             "runnable (addons list) and target this resource type — a book source",
             "never appears here for a system.",
             "",
             "supports_paste false means metadata-fetch --paste is a 400 for that",
-            "source; search for an identity instead.");
+            "source; search for an identity instead."
+        ];
+        if (resource == "books")
+        {
+            notes =
+            [
+                .. notes,
+                "",
+                "file-metadata is always last: what the PDF, EPUB or ComicInfo.xml",
+                "carries itself, offline. An unreadable file is a 400, not a 502."
+            ];
+        }
+        command.AddHelpSection("Notes", HelpSectionPosition.Top, notes);
         command.AddExamples($"grimoire-cli {resource} metadata-sources --id <id>");
         command.AddResponseExample<Generated.Models.MetadataSourcesResponse>();
         command.SetAction(async (parseResult, cancellationToken) =>

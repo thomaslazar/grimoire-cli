@@ -43,6 +43,16 @@ public class LibraryServiceTests
         Assert.Equal("books/D&D 5e", body.Scope?.String);
     }
 
+    [Theory]
+    [InlineData(false, "http://example.test/api/maintenance/cleanup-missing")]
+    [InlineData(true, "http://example.test/api/maintenance/cleanup-missing?force=true")]
+    public void CleanupMissingSendsForceOnlyWhenSet(bool force, string expected)
+    {
+        var info = new LibraryService(Client()).CleanupMissingRequest(force);
+        info.PathParameters["baseurl"] = "http://example.test";
+        Assert.Equal(expected, info.URI.AbsoluteUri);
+    }
+
     [Fact]
     public void StatsResolvesToTheStatsPath()
     {

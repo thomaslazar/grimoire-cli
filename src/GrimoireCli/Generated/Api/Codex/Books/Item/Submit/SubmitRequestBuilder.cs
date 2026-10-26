@@ -34,7 +34,7 @@ namespace GrimoireCli.Generated.Api.Codex.Books.Item.Submit
         {
         }
         /// <summary>
-        /// Creates the book in Grimoire Codex DB, or sends the chosen fields as a correction to the linked record. Grimoire Codex DB decides whether it applies at once or waits for review.
+        /// Creates the book in Grimoire Codex DB, or sends the chosen fields as a correction to the linked record, optionally with its cover, source links and a credit for scraped fields. A new book whose game system is not linked names an existing Grimoire Codex DB system or sends its system first. Grimoire Codex DB decides whether it applies at once or waits for review.
         /// </summary>
         /// <returns>A <see cref="global::GrimoireCli.Generated.Models.CodexSubmitResponse"/></returns>
         /// <param name="body">The request body</param>
@@ -59,7 +59,7 @@ namespace GrimoireCli.Generated.Api.Codex.Books.Item.Submit
             return await RequestAdapter.SendAsync<global::GrimoireCli.Generated.Models.CodexSubmitResponse>(requestInfo, global::GrimoireCli.Generated.Models.CodexSubmitResponse.CreateFromDiscriminatorValue, errorMapping, cancellationToken).ConfigureAwait(false);
         }
         /// <summary>
-        /// Creates the book in Grimoire Codex DB, or sends the chosen fields as a correction to the linked record. Grimoire Codex DB decides whether it applies at once or waits for review.
+        /// Creates the book in Grimoire Codex DB, or sends the chosen fields as a correction to the linked record, optionally with its cover, source links and a credit for scraped fields. A new book whose game system is not linked names an existing Grimoire Codex DB system or sends its system first. Grimoire Codex DB decides whether it applies at once or waits for review.
         /// </summary>
         /// <returns>A <see cref="RequestInformation"/></returns>
         /// <param name="body">The request body</param>

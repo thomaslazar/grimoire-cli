@@ -40,6 +40,14 @@ namespace GrimoireCli.Generated.Models
 #else
         public string Status { get; set; }
 #endif
+        /// <summary>The system property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public global::GrimoireCli.Generated.Models.CodexSubmitResult? System { get; set; }
+#nullable restore
+#else
+        public global::GrimoireCli.Generated.Models.CodexSubmitResult System { get; set; }
+#endif
         /// <summary>
         /// Instantiates a new <see cref="global::GrimoireCli.Generated.Models.CodexSubmitResponse"/> and sets the default values.
         /// </summary>
@@ -69,6 +77,7 @@ namespace GrimoireCli.Generated.Models
                 { "edit_url", n => { EditUrl = n.GetStringValue(); } },
                 { "linked", n => { Linked = n.GetBoolValue(); } },
                 { "status", n => { Status = n.GetStringValue(); } },
+                { "system", n => { System = n.GetObjectValue<global::GrimoireCli.Generated.Models.CodexSubmitResult>(global::GrimoireCli.Generated.Models.CodexSubmitResult.CreateFromDiscriminatorValue); } },
             };
         }
         /// <summary>
@@ -82,6 +91,7 @@ namespace GrimoireCli.Generated.Models
             writer.WriteStringValue("edit_url", EditUrl);
             writer.WriteBoolValue("linked", Linked);
             writer.WriteStringValue("status", Status);
+            writer.WriteObjectValue<global::GrimoireCli.Generated.Models.CodexSubmitResult>("system", System);
             writer.WriteAdditionalData(AdditionalData);
         }
         /// <summary>
