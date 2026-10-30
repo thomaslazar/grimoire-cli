@@ -63,7 +63,7 @@ namespace GrimoireCli.Generated.Api.Addons.Item
             return await RequestAdapter.SendAsync<global::GrimoireCli.Generated.Models.Backend__routers__addons___schemas__StatusResponse>(requestInfo, global::GrimoireCli.Generated.Models.Backend__routers__addons___schemas__StatusResponse.CreateFromDiscriminatorValue, errorMapping, cancellationToken).ConfigureAwait(false);
         }
         /// <summary>
-        /// Toggles an add-on&apos;s enabled state or its script approval. Admin only.
+        /// Toggles an add-on&apos;s enabled state or its script approval. Approving records the SHA-256 of the script on disk; a script that no longer matches it must be approved again before it runs. Admin only.
         /// </summary>
         /// <returns>A <see cref="global::GrimoireCli.Generated.Models.InstalledAddon"/></returns>
         /// <param name="body">The request body</param>
@@ -107,7 +107,7 @@ namespace GrimoireCli.Generated.Api.Addons.Item
             return requestInfo;
         }
         /// <summary>
-        /// Toggles an add-on&apos;s enabled state or its script approval. Admin only.
+        /// Toggles an add-on&apos;s enabled state or its script approval. Approving records the SHA-256 of the script on disk; a script that no longer matches it must be approved again before it runs. Admin only.
         /// </summary>
         /// <returns>A <see cref="RequestInformation"/></returns>
         /// <param name="body">The request body</param>

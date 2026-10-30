@@ -23,6 +23,8 @@ namespace GrimoireCli.Generated.Models
 #endif
         /// <summary>Stores additional data not described in the OpenAPI description found when deserializing. Can be used for serialization as well.</summary>
         public IDictionary<string, object> AdditionalData { get; set; }
+        /// <summary>The can_reocr property</summary>
+        public bool? CanReocr { get; set; }
         /// <summary>The category property</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
@@ -146,6 +148,7 @@ namespace GrimoireCli.Generated.Models
             return new Dictionary<string, Action<IParseNode>>
             {
                 { "added_at", n => { AddedAt = n.GetObjectValue<global::GrimoireCli.Generated.Models.BookListItem.BookListItem_added_at>(global::GrimoireCli.Generated.Models.BookListItem.BookListItem_added_at.CreateFromDiscriminatorValue); } },
+                { "can_reocr", n => { CanReocr = n.GetBoolValue(); } },
                 { "category", n => { Category = n.GetObjectValue<global::GrimoireCli.Generated.Models.BookListItem.BookListItem_category>(global::GrimoireCli.Generated.Models.BookListItem.BookListItem_category.CreateFromDiscriminatorValue); } },
                 { "file_size", n => { FileSize = n.GetObjectValue<global::GrimoireCli.Generated.Models.BookListItem.BookListItem_file_size>(global::GrimoireCli.Generated.Models.BookListItem.BookListItem_file_size.CreateFromDiscriminatorValue); } },
                 { "filename", n => { Filename = n.GetStringValue(); } },
@@ -171,6 +174,7 @@ namespace GrimoireCli.Generated.Models
         {
             if(ReferenceEquals(writer, null)) throw new ArgumentNullException(nameof(writer));
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.BookListItem.BookListItem_added_at>("added_at", AddedAt);
+            writer.WriteBoolValue("can_reocr", CanReocr);
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.BookListItem.BookListItem_category>("category", Category);
             writer.WriteStringValue("filename", Filename);
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.BookListItem.BookListItem_file_size>("file_size", FileSize);

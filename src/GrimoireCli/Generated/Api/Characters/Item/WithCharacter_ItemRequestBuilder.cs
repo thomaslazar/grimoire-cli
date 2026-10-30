@@ -3,6 +3,7 @@
 using GrimoireCli.Generated.Api.Characters.Item.Export;
 using GrimoireCli.Generated.Api.Characters.Item.Images;
 using GrimoireCli.Generated.Api.Characters.Item.Portrait;
+using GrimoireCli.Generated.Api.Characters.Item.Transfer;
 using GrimoireCli.Generated.Models;
 using Microsoft.Kiota.Abstractions.Extensions;
 using Microsoft.Kiota.Abstractions.Serialization;
@@ -34,6 +35,11 @@ namespace GrimoireCli.Generated.Api.Characters.Item
         public global::GrimoireCli.Generated.Api.Characters.Item.Portrait.PortraitRequestBuilder Portrait
         {
             get => new global::GrimoireCli.Generated.Api.Characters.Item.Portrait.PortraitRequestBuilder(PathParameters, RequestAdapter);
+        }
+        /// <summary>The transfer property</summary>
+        public global::GrimoireCli.Generated.Api.Characters.Item.Transfer.TransferRequestBuilder Transfer
+        {
+            get => new global::GrimoireCli.Generated.Api.Characters.Item.Transfer.TransferRequestBuilder(PathParameters, RequestAdapter);
         }
         /// <summary>
         /// Instantiates a new <see cref="global::GrimoireCli.Generated.Api.Characters.Item.WithCharacter_ItemRequestBuilder"/> and sets the default values.

@@ -8,7 +8,7 @@ using System;
 namespace GrimoireCli.Generated.Models
 {
     /// <summary>
-    /// A pasted or uploaded sheet.Three ways to give the sheet itself, in order of preference:* ``document`` — already-parsed JSON, which is what the catalogue installer  and older clients send.* ``text`` — the sheet as typed, parsed as JSON and then as YAML. A sheet is  a document people hand-write, and YAML is far kinder to write by hand than  JSON: no quoting every key, no trailing-comma errors, and comments.``layout`` and ``styles`` carry a custom sheet&apos;s HTML and CSS as their ownfields. A layout inlined into JSON has to be escaped, which turns a readabletemplate into one unbroken line of ``\&quot;`` and ``\n`` — the community repokeeps them in sibling files for exactly that reason, and pasting one shouldnot be worse than installing one. Given here, they override whatever thedocument holds.
+    /// A pasted or uploaded sheet.Three ways to give the sheet itself, in order of preference:* ``document`` — already-parsed JSON, which is what the catalogue installer  and older clients send.* ``text`` — the sheet as typed, parsed as JSON and then as YAML. A sheet is  a document people hand-write, and YAML is far kinder to write by hand than  JSON: no quoting every key, no trailing-comma errors, and comments.``layout`` and ``styles`` carry a custom sheet&apos;s HTML and CSS as their ownfields. A layout inlined into JSON has to be escaped, which turns a readabletemplate into one unbroken line of ``\&quot;`` and ``\n`` — the community repokeeps them in sibling files for exactly that reason, and pasting one shouldnot be worse than installing one. Given here, they override whatever thedocument holds. ``mobile_layout`` and ``mobile_styles`` do the same for asheet&apos;s optional phone layout (``mobile_layout_html`` / ``mobile_styles``).
     /// </summary>
     [global::System.CodeDom.Compiler.GeneratedCode("Kiota", "1.0.0")]
     public partial class SchemaImport : IAdditionalDataHolder, IParsable
@@ -30,6 +30,22 @@ namespace GrimoireCli.Generated.Models
 #nullable restore
 #else
         public string Layout { get; set; }
+#endif
+        /// <summary>The mobile_layout property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public string? MobileLayout { get; set; }
+#nullable restore
+#else
+        public string MobileLayout { get; set; }
+#endif
+        /// <summary>The mobile_styles property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public string? MobileStyles { get; set; }
+#nullable restore
+#else
+        public string MobileStyles { get; set; }
 #endif
         /// <summary>The source_id property</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
@@ -98,6 +114,8 @@ namespace GrimoireCli.Generated.Models
             {
                 { "document", n => { Document = n.GetObjectValue<global::GrimoireCli.Generated.Models.SchemaImport_document>(global::GrimoireCli.Generated.Models.SchemaImport_document.CreateFromDiscriminatorValue); } },
                 { "layout", n => { Layout = n.GetStringValue(); } },
+                { "mobile_layout", n => { MobileLayout = n.GetStringValue(); } },
+                { "mobile_styles", n => { MobileStyles = n.GetStringValue(); } },
                 { "source_id", n => { SourceId = n.GetObjectValue<global::GrimoireCli.Generated.Models.SchemaImport.SchemaImport_source_id>(global::GrimoireCli.Generated.Models.SchemaImport.SchemaImport_source_id.CreateFromDiscriminatorValue); } },
                 { "source_url", n => { SourceUrl = n.GetObjectValue<global::GrimoireCli.Generated.Models.SchemaImport.SchemaImport_source_url>(global::GrimoireCli.Generated.Models.SchemaImport.SchemaImport_source_url.CreateFromDiscriminatorValue); } },
                 { "source_version", n => { SourceVersion = n.GetObjectValue<global::GrimoireCli.Generated.Models.SchemaImport.SchemaImport_source_version>(global::GrimoireCli.Generated.Models.SchemaImport.SchemaImport_source_version.CreateFromDiscriminatorValue); } },
@@ -114,6 +132,8 @@ namespace GrimoireCli.Generated.Models
             if(ReferenceEquals(writer, null)) throw new ArgumentNullException(nameof(writer));
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.SchemaImport_document>("document", Document);
             writer.WriteStringValue("layout", Layout);
+            writer.WriteStringValue("mobile_layout", MobileLayout);
+            writer.WriteStringValue("mobile_styles", MobileStyles);
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.SchemaImport.SchemaImport_source_id>("source_id", SourceId);
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.SchemaImport.SchemaImport_source_url>("source_url", SourceUrl);
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.SchemaImport.SchemaImport_source_version>("source_version", SourceVersion);

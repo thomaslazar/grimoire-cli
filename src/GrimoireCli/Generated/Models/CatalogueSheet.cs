@@ -41,6 +41,8 @@ namespace GrimoireCli.Generated.Models
 #endif
         /// <summary>The custom_layout property</summary>
         public bool? CustomLayout { get; set; }
+        /// <summary>The custom_mobile_layout property</summary>
+        public bool? CustomMobileLayout { get; set; }
         /// <summary>The description property</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
@@ -85,6 +87,14 @@ namespace GrimoireCli.Generated.Models
 #endif
         /// <summary>The installed property</summary>
         public bool? Installed { get; set; }
+        /// <summary>The installed_version property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public string? InstalledVersion { get; set; }
+#nullable restore
+#else
+        public string InstalledVersion { get; set; }
+#endif
         /// <summary>The layout_path property</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
@@ -116,6 +126,38 @@ namespace GrimoireCli.Generated.Models
 #nullable restore
 #else
         public string LicenseUrl { get; set; }
+#endif
+        /// <summary>The mobile_layout_path property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public string? MobileLayoutPath { get; set; }
+#nullable restore
+#else
+        public string MobileLayoutPath { get; set; }
+#endif
+        /// <summary>The mobile_layout_sha256 property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public string? MobileLayoutSha256 { get; set; }
+#nullable restore
+#else
+        public string MobileLayoutSha256 { get; set; }
+#endif
+        /// <summary>The mobile_styles_path property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public string? MobileStylesPath { get; set; }
+#nullable restore
+#else
+        public string MobileStylesPath { get; set; }
+#endif
+        /// <summary>The mobile_styles_sha256 property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public string? MobileStylesSha256 { get; set; }
+#nullable restore
+#else
+        public string MobileStylesSha256 { get; set; }
 #endif
         /// <summary>The name property</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
@@ -173,6 +215,8 @@ namespace GrimoireCli.Generated.Models
 #else
         public string System { get; set; }
 #endif
+        /// <summary>The update_available property</summary>
+        public bool? UpdateAvailable { get; set; }
         /// <summary>The version property</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
@@ -188,8 +232,10 @@ namespace GrimoireCli.Generated.Models
         {
             AdditionalData = new Dictionary<string, object>();
             CustomLayout = false;
+            CustomMobileLayout = false;
             FieldCount = 0;
             Installed = false;
+            UpdateAvailable = false;
         }
         /// <summary>
         /// Creates a new instance of the appropriate class based on discriminator value
@@ -213,6 +259,7 @@ namespace GrimoireCli.Generated.Models
                 { "author", n => { Author = n.GetStringValue(); } },
                 { "author_url", n => { AuthorUrl = n.GetStringValue(); } },
                 { "custom_layout", n => { CustomLayout = n.GetBoolValue(); } },
+                { "custom_mobile_layout", n => { CustomMobileLayout = n.GetBoolValue(); } },
                 { "description", n => { Description = n.GetStringValue(); } },
                 { "field_count", n => { FieldCount = n.GetIntValue(); } },
                 { "grimoire_min_version", n => { GrimoireMinVersion = n.GetStringValue(); } },
@@ -220,10 +267,15 @@ namespace GrimoireCli.Generated.Models
                 { "id", n => { Id = n.GetStringValue(); } },
                 { "index_url", n => { IndexUrl = n.GetStringValue(); } },
                 { "installed", n => { Installed = n.GetBoolValue(); } },
+                { "installed_version", n => { InstalledVersion = n.GetStringValue(); } },
                 { "layout_path", n => { LayoutPath = n.GetStringValue(); } },
                 { "layout_sha256", n => { LayoutSha256 = n.GetStringValue(); } },
                 { "license", n => { License = n.GetStringValue(); } },
                 { "license_url", n => { LicenseUrl = n.GetStringValue(); } },
+                { "mobile_layout_path", n => { MobileLayoutPath = n.GetStringValue(); } },
+                { "mobile_layout_sha256", n => { MobileLayoutSha256 = n.GetStringValue(); } },
+                { "mobile_styles_path", n => { MobileStylesPath = n.GetStringValue(); } },
+                { "mobile_styles_sha256", n => { MobileStylesSha256 = n.GetStringValue(); } },
                 { "name", n => { Name = n.GetStringValue(); } },
                 { "path", n => { Path = n.GetStringValue(); } },
                 { "raw_id", n => { RawId = n.GetStringValue(); } },
@@ -231,6 +283,7 @@ namespace GrimoireCli.Generated.Models
                 { "styles_path", n => { StylesPath = n.GetStringValue(); } },
                 { "styles_sha256", n => { StylesSha256 = n.GetStringValue(); } },
                 { "system", n => { System = n.GetStringValue(); } },
+                { "update_available", n => { UpdateAvailable = n.GetBoolValue(); } },
                 { "version", n => { Version = n.GetStringValue(); } },
             };
         }
@@ -245,6 +298,7 @@ namespace GrimoireCli.Generated.Models
             writer.WriteStringValue("author", Author);
             writer.WriteStringValue("author_url", AuthorUrl);
             writer.WriteBoolValue("custom_layout", CustomLayout);
+            writer.WriteBoolValue("custom_mobile_layout", CustomMobileLayout);
             writer.WriteStringValue("description", Description);
             writer.WriteIntValue("field_count", FieldCount);
             writer.WriteStringValue("grimoire_min_version", GrimoireMinVersion);
@@ -252,10 +306,15 @@ namespace GrimoireCli.Generated.Models
             writer.WriteStringValue("id", Id);
             writer.WriteStringValue("index_url", IndexUrl);
             writer.WriteBoolValue("installed", Installed);
+            writer.WriteStringValue("installed_version", InstalledVersion);
             writer.WriteStringValue("layout_path", LayoutPath);
             writer.WriteStringValue("layout_sha256", LayoutSha256);
             writer.WriteStringValue("license", License);
             writer.WriteStringValue("license_url", LicenseUrl);
+            writer.WriteStringValue("mobile_layout_path", MobileLayoutPath);
+            writer.WriteStringValue("mobile_layout_sha256", MobileLayoutSha256);
+            writer.WriteStringValue("mobile_styles_path", MobileStylesPath);
+            writer.WriteStringValue("mobile_styles_sha256", MobileStylesSha256);
             writer.WriteStringValue("name", Name);
             writer.WriteStringValue("path", Path);
             writer.WriteStringValue("raw_id", RawId);
@@ -263,6 +322,7 @@ namespace GrimoireCli.Generated.Models
             writer.WriteStringValue("styles_path", StylesPath);
             writer.WriteStringValue("styles_sha256", StylesSha256);
             writer.WriteStringValue("system", System);
+            writer.WriteBoolValue("update_available", UpdateAvailable);
             writer.WriteStringValue("version", Version);
             writer.WriteAdditionalData(AdditionalData);
         }

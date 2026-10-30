@@ -86,8 +86,8 @@ public static class AddonsCommand
             "",
             "Also upgrades: re-running on an installed add-on replaces it.",
             "",
-            "Approval is per install: an add-on installed or upgraded without",
-            "--approve-script is unapproved, whatever it was before.");
+            "Without --approve-script, approval carries over only while the script",
+            "bytes and declared env names are unchanged.");
         command.AddExamples("grimoire-cli addons install --id <addon-id> --approve-script");
         command.AddResponseExample<Generated.Models.InstalledAddon>();
         command.SetAction(async (parseResult, cancellationToken) =>
@@ -116,7 +116,10 @@ public static class AddonsCommand
             "Changes state, never version — upgrade with install or upgrade-all.",
             "",
             "404 if no such add-on is installed, or if --script-approved true names",
-            "an add-on that ships no script.");
+            "an add-on that ships no script.",
+            "",
+            "Approval pins the script's current SHA-256; a script changed on disk is",
+            "blocked until re-approved.");
         command.AddExamples("grimoire-cli addons update --id <addon-id> --enabled false");
         command.AddResponseExample<Generated.Models.InstalledAddon>();
         command.SetAction(async (parseResult, cancellationToken) =>
@@ -169,8 +172,9 @@ public static class AddonsCommand
             "Skip-and-continue: an add-on that cannot be upgraded lands in failed and",
             "the rest still upgrade. Exit 3 is HTTP 200 with a non-empty failed list.",
             "",
-            "Script approval is not carried over, so a script-backed add-on is",
-            "unapproved until re-approved with install --approve-script.");
+            "Script approval carries over only while the script bytes and declared",
+            "env names are unchanged; otherwise re-approve with install",
+            "--approve-script.");
         command.AddExamples("grimoire-cli addons upgrade-all");
         command.AddResponseExample<Generated.Models.UpdateAllResponse>();
         command.SetAction(async (parseResult, cancellationToken) =>

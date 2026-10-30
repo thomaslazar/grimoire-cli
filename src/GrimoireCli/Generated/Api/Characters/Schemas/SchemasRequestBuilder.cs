@@ -3,6 +3,7 @@
 using GrimoireCli.Generated.Api.Characters.Schemas.Browse;
 using GrimoireCli.Generated.Api.Characters.Schemas.Install;
 using GrimoireCli.Generated.Api.Characters.Schemas.Item;
+using GrimoireCli.Generated.Api.Characters.Schemas.Updates;
 using GrimoireCli.Generated.Models;
 using Microsoft.Kiota.Abstractions.Extensions;
 using Microsoft.Kiota.Abstractions.Serialization;
@@ -29,6 +30,11 @@ namespace GrimoireCli.Generated.Api.Characters.Schemas
         public global::GrimoireCli.Generated.Api.Characters.Schemas.Install.InstallRequestBuilder Install
         {
             get => new global::GrimoireCli.Generated.Api.Characters.Schemas.Install.InstallRequestBuilder(PathParameters, RequestAdapter);
+        }
+        /// <summary>The updates property</summary>
+        public global::GrimoireCli.Generated.Api.Characters.Schemas.Updates.UpdatesRequestBuilder Updates
+        {
+            get => new global::GrimoireCli.Generated.Api.Characters.Schemas.Updates.UpdatesRequestBuilder(PathParameters, RequestAdapter);
         }
         /// <summary>Gets an item from the GrimoireCli.Generated.api.characters.schemas.item collection</summary>
         /// <param name="position">Unique identifier of the item</param>
@@ -85,7 +91,7 @@ namespace GrimoireCli.Generated.Api.Characters.Schemas
         /// Install a pasted schema, replacing this user&apos;s copy if it exists.Validation happens here rather than at render: a schema that names anunknown field type or hides a script in its layout is rejected with amessage saying so, which is far better than a sheet that draws nothinglater.The sheet arrives either already parsed (``document``) or as text, which isread as JSON and then as YAML. A custom sheet&apos;s HTML and CSS may come astheir own fields rather than escaped into the document, matching how thecommunity repo keeps them in sibling files.
         /// </summary>
         /// <returns>A <see cref="global::GrimoireCli.Generated.Models.SchemaDetail"/></returns>
-        /// <param name="body">A pasted or uploaded sheet.Three ways to give the sheet itself, in order of preference:* ``document`` — already-parsed JSON, which is what the catalogue installer  and older clients send.* ``text`` — the sheet as typed, parsed as JSON and then as YAML. A sheet is  a document people hand-write, and YAML is far kinder to write by hand than  JSON: no quoting every key, no trailing-comma errors, and comments.``layout`` and ``styles`` carry a custom sheet&apos;s HTML and CSS as their ownfields. A layout inlined into JSON has to be escaped, which turns a readabletemplate into one unbroken line of ``\&quot;`` and ``\n`` — the community repokeeps them in sibling files for exactly that reason, and pasting one shouldnot be worse than installing one. Given here, they override whatever thedocument holds.</param>
+        /// <param name="body">A pasted or uploaded sheet.Three ways to give the sheet itself, in order of preference:* ``document`` — already-parsed JSON, which is what the catalogue installer  and older clients send.* ``text`` — the sheet as typed, parsed as JSON and then as YAML. A sheet is  a document people hand-write, and YAML is far kinder to write by hand than  JSON: no quoting every key, no trailing-comma errors, and comments.``layout`` and ``styles`` carry a custom sheet&apos;s HTML and CSS as their ownfields. A layout inlined into JSON has to be escaped, which turns a readabletemplate into one unbroken line of ``\&quot;`` and ``\n`` — the community repokeeps them in sibling files for exactly that reason, and pasting one shouldnot be worse than installing one. Given here, they override whatever thedocument holds. ``mobile_layout`` and ``mobile_styles`` do the same for asheet&apos;s optional phone layout (``mobile_layout_html`` / ``mobile_styles``).</param>
         /// <param name="cancellationToken">Cancellation token to use when cancelling requests</param>
         /// <param name="requestConfiguration">Configuration for the request such as headers, query parameters, and middleware options.</param>
         /// <exception cref="global::GrimoireCli.Generated.Models.HTTPValidationError">When receiving a 422 status code</exception>
@@ -129,7 +135,7 @@ namespace GrimoireCli.Generated.Api.Characters.Schemas
         /// Install a pasted schema, replacing this user&apos;s copy if it exists.Validation happens here rather than at render: a schema that names anunknown field type or hides a script in its layout is rejected with amessage saying so, which is far better than a sheet that draws nothinglater.The sheet arrives either already parsed (``document``) or as text, which isread as JSON and then as YAML. A custom sheet&apos;s HTML and CSS may come astheir own fields rather than escaped into the document, matching how thecommunity repo keeps them in sibling files.
         /// </summary>
         /// <returns>A <see cref="RequestInformation"/></returns>
-        /// <param name="body">A pasted or uploaded sheet.Three ways to give the sheet itself, in order of preference:* ``document`` — already-parsed JSON, which is what the catalogue installer  and older clients send.* ``text`` — the sheet as typed, parsed as JSON and then as YAML. A sheet is  a document people hand-write, and YAML is far kinder to write by hand than  JSON: no quoting every key, no trailing-comma errors, and comments.``layout`` and ``styles`` carry a custom sheet&apos;s HTML and CSS as their ownfields. A layout inlined into JSON has to be escaped, which turns a readabletemplate into one unbroken line of ``\&quot;`` and ``\n`` — the community repokeeps them in sibling files for exactly that reason, and pasting one shouldnot be worse than installing one. Given here, they override whatever thedocument holds.</param>
+        /// <param name="body">A pasted or uploaded sheet.Three ways to give the sheet itself, in order of preference:* ``document`` — already-parsed JSON, which is what the catalogue installer  and older clients send.* ``text`` — the sheet as typed, parsed as JSON and then as YAML. A sheet is  a document people hand-write, and YAML is far kinder to write by hand than  JSON: no quoting every key, no trailing-comma errors, and comments.``layout`` and ``styles`` carry a custom sheet&apos;s HTML and CSS as their ownfields. A layout inlined into JSON has to be escaped, which turns a readabletemplate into one unbroken line of ``\&quot;`` and ``\n`` — the community repokeeps them in sibling files for exactly that reason, and pasting one shouldnot be worse than installing one. Given here, they override whatever thedocument holds. ``mobile_layout`` and ``mobile_styles`` do the same for asheet&apos;s optional phone layout (``mobile_layout_html`` / ``mobile_styles``).</param>
         /// <param name="requestConfiguration">Configuration for the request such as headers, query parameters, and middleware options.</param>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable

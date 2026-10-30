@@ -8,7 +8,7 @@ using System;
 namespace GrimoireCli.Generated.Models
 {
     /// <summary>
-    /// Detected grid dimensions for a map (see `_helpers._map_image_info`).`cell_px` is only present on the DPI/computed branches — the filename branchomits it, and PDF maps have it stripped — so it is Optional.Floats rather than ints: a manual override may carry a fractional cell countfor a map that bleeds part of a cell past its grid (issue #125). Inferredgrids still come back whole.
+    /// Detected grid dimensions for a map (see `services.media.maps.map_image_info`).`cell_px` is only present on the DPI/computed branches — the filename branchomits it, and PDF maps have it stripped — so it is Optional.Floats rather than ints: a manual override may carry a fractional cell countfor a map that bleeds part of a cell past its grid (issue #125). Inferredgrids still come back whole.
     /// </summary>
     [global::System.CodeDom.Compiler.GeneratedCode("Kiota", "1.0.0")]
     public partial class MapGrid : IAdditionalDataHolder, IParsable

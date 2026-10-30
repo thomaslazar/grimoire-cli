@@ -2,7 +2,7 @@
 
 Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any) that implements it.
 
-- **Reference:** spec fetched live from the pinned stack's `/api/openapi.json` (v1.9.2, 319 paths, 418 operations) and the upstream router source read from the same container. Tested range: `1.9.0`-`1.9.2` (`GrimoireApiClient.cs`).
+- **Reference:** spec fetched live from the pinned stack's `/api/openapi.json` (v1.10.0, 322 paths, 421 operations) and the upstream router source read from the same container. Tested range: `1.9.0`-`1.10.0` (`GrimoireApiClient.cs`).
 - **Perm** column uses Grimoire's roles (`admin` / `gm or admin` / `not guest`); blank = any authenticated user. `?` = a dependency this script could not resolve.
 - **Key** column is the API key permission a route needs (`—`: no key can call it), derived from `backend/api_keys.py` in the same container.
 - ✅ = covered by a CLI command · — = not implemented · 🔒 = internal-only (no user-facing verb); 🔒 rows never count as covered.
@@ -22,8 +22,8 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | bookmarks | 0 / 4 |
 | books | 16 / 21 |
 | campaigns | 80 / 93 |
-| characters | 0 / 23 |
-| codex | 0 / 10 |
+| characters | 0 / 25 |
+| codex | 0 / 11 |
 | content | 0 / 6 |
 | downloads | 1 / 1 |
 | duplicates | 13 / 18 |
@@ -48,7 +48,7 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | token-frames | 0 / 2 |
 | tokens | 11 / 11 |
 | users | 0 / 16 |
-| **Total** | **238 / 418** |
+| **Total** | **238 / 421** |
 
 2 operation(s) are internal-only (🔒) and excluded from covered counts.
 
@@ -294,6 +294,7 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | POST | `/api/characters/schemas` | Install a pasted character schema |  | characters: write | — |
 | GET | `/api/characters/schemas/browse` | Browse the community sheet catalogue |  | characters: read | — |
 | POST | `/api/characters/schemas/install/{sheet_id}` | Install a sheet from the catalogue |  | characters: write | — |
+| GET | `/api/characters/schemas/updates` | Installed sheets the catalogue has a newer version of |  | characters: read | — |
 | GET | `/api/characters/schemas/{schema_id}` | Get a schema and its document |  | characters: read | — |
 | DELETE | `/api/characters/schemas/{schema_id}` | Uninstall a schema |  | characters: write | — |
 | GET | `/api/characters/{character_id}` | Get a character with computed values |  | characters: read | — |
@@ -306,6 +307,7 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | POST | `/api/characters/{character_id}/portrait` | Set a character's portrait |  | characters: write | — |
 | GET | `/api/characters/{character_id}/portrait` | A character's portrait image |  | characters: read | — |
 | DELETE | `/api/characters/{character_id}/portrait` | Remove a character's portrait |  | characters: write | — |
+| POST | `/api/characters/{character_id}/transfer` | Give a character to a player in a campaign you run |  | characters: write | — |
 
 ## codex
 
@@ -314,6 +316,7 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | GET | `/api/codex/books/{book_id}/compare` | Compare a book with Grimoire Codex DB | gm or admin | codex: read | — |
 | DELETE | `/api/codex/books/{book_id}/link` | Unlink a book from Grimoire Codex DB | gm or admin | codex: write | — |
 | POST | `/api/codex/books/{book_id}/submit` | Send a book to Grimoire Codex DB | gm or admin | codex: write | — |
+| POST | `/api/codex/collection/sync` | Sync the Grimoire Codex DB collection | admin | codex: write | — |
 | GET | `/api/codex/settings` | Get Grimoire Codex DB settings | admin | codex: read | — |
 | PUT | `/api/codex/settings` | Update Grimoire Codex DB settings | admin | codex: write | — |
 | GET | `/api/codex/status` | Grimoire Codex DB status | not guest | codex: read | — |

@@ -45,10 +45,10 @@ public class VersionCheckCadenceTests
     [Fact]
     public void ANewerServerNamesBothVersionsAndTheClient()
     {
-        var warning = GrimoireApiClient.VersionWarning("1.10.0", previous: null);
+        var warning = GrimoireApiClient.VersionWarning("1.11.0", previous: null);
         Assert.NotNull(warning);
+        Assert.Contains("1.11.0", warning);
         Assert.Contains("1.10.0", warning);
-        Assert.Contains("1.9.2", warning);
         Assert.Contains(GrimoireApiClient.ClientVersion, warning);
         Assert.Contains("newer grimoire-cli", warning);
     }
@@ -76,11 +76,11 @@ public class VersionCheckCadenceTests
     [Fact]
     public void AChangedVersionSaysItMoved()
     {
-        var warning = GrimoireApiClient.VersionWarning("1.10.0", previous: "1.6.0");
+        var warning = GrimoireApiClient.VersionWarning("1.11.0", previous: "1.6.0");
         Assert.NotNull(warning);
         Assert.Contains("moved", warning);
         Assert.Contains("1.6.0", warning);
-        Assert.Contains("1.10.0", warning);
+        Assert.Contains("1.11.0", warning);
     }
 
     // An unchanged in-range version stays silent even across checks.

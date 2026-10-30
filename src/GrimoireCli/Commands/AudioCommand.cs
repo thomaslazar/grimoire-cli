@@ -28,7 +28,7 @@ public static class AudioCommand
 
     private static Command CreateListCommand()
     {
-        var limitOption = OptionHelpers.Range("--limit", "Results per page (the server sets no maximum)", 1);
+        var limitOption = OptionHelpers.Range("--limit", "Results per page; max 100000", 1, 100000);
         limitOption.DefaultValueFactory = _ => 100;
         var offsetOption = OptionHelpers.Range("--offset", "Items to skip", 0);
         var browse = new MediaBrowseOptions();

@@ -38,8 +38,8 @@ public class AddonsCommandTests
     {
         var output = RenderHelp(["addons", "install"], full: false);
         Assert.Contains("verified against the index's digest", output);
-        Assert.Contains("Approval is per install", output);
-        Assert.Contains("unapproved, whatever it was before", output);
+        Assert.Contains("approval carries over only while", output);
+        Assert.Contains("bytes and declared env names are unchanged", output);
     }
 
     [Fact]
@@ -88,7 +88,7 @@ public class AddonsCommandTests
         var output = RenderHelp(["addons", "upgrade-all"], full: true);
         Assert.Contains("Exit 3", output);
         Assert.Contains("\"failed\":", output);
-        Assert.Contains("not carried over", output);
+        Assert.Contains("carries over only while", output);
     }
 
     [Fact]

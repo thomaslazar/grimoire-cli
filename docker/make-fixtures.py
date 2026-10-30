@@ -27,6 +27,10 @@ def make_pdf(path: str, pages: int) -> None:
     for i in range(pages):
         page = doc.new_page()
         page.insert_text((72, 72), f"grimoire-cli fixture — page {i + 1}")
+        # Grimoire counts a page as text only past OCR_MIN_PAGE_CHARS (100 by
+        # default); a header alone reads as a scan and is offered for re-OCR.
+        page.insert_text((72, 96), "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do")
+        page.insert_text((72, 110), "eiusmod tempor incididunt ut labore et dolore magna aliqua.")
     doc.save(path)
     doc.close()
 
