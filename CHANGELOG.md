@@ -3,6 +3,34 @@
 All notable changes to grimoire-cli are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## v0.7.3 — 2026-10-30
+
+Patch release that adds Grimoire 1.10.0 to the supported range, now 1.9.0 –
+1.10.0. No command or request changed; the help catches up with what the
+server now does.
+
+### Highlights
+
+- **Grimoire 1.10.0 is tested and supported.** 1.9.x stays supported. Login
+  no longer warns on a 1.10.0 server.
+- **Media `--limit` is capped at 100000.** 1.10.0 rejects anything larger
+  with a 422, so `maps`, `models`, `tokens` and `audio list` now refuse it
+  before the request rather than after.
+- **Help that had gone stale is corrected.** `library scan-status` lists the
+  new `reconciling` and `pruning` phases; `books reindex` explains the
+  `can_reocr` gate that replaced "image-only PDF"; the add-on commands say
+  script approval now carries over while the script is unchanged; and
+  `maps page` no longer claims image maps stream as stored — they are
+  re-encoded as WebP and shrunk to `--width`.
+
+### Features
+
+- feat: target grimoire 1.10.0
+
+### Chores
+
+- chore: bump version to 0.7.3
+
 ## v0.7.2 — 2026-10-26
 
 Patch release that adds Grimoire 1.9.2 to the supported range, now 1.9.0 –
