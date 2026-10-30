@@ -2,7 +2,7 @@
 
 Behaviour verified against Grimoire **v1.5.6** — the release the live instance
 runs — by reading `temp/grimoire/` at that tag and by calling the API. The local
-stack runs the `1.9.1` release, so a note measured there says so. Don't
+stack runs the `1.10.0` release, so a note measured there says so. Don't
 re-derive these, and don't trust the published docs over them. Re-verify after a
 server upgrade — see [grimoire-compatibility.md](grimoire-compatibility.md) for
 the bump procedure.
@@ -25,7 +25,8 @@ rest of this file describes.
 - **`/api/auth/setup` returns the same body shape.** The key is `token`, not
   `access_token`.
 - **The access token lives 30 minutes.** Observed `exp - iat` is 1800s, per
-  `ACCESS_TOKEN_EXPIRE_MINUTES` (`backend/sessions.py`, env-overridable). Claims
+  `ACCESS_TOKEN_EXPIRE_MINUTES` (`backend/config/env.py:706`, v1.10.0,
+  env-overridable). Claims
   are `sub`, `username`, `role`, `iat`, `jti`, `exp`, `sid`. v1.5.6 issued a
   single JWT valid 30 days and no refresh token at all.
 - **The refresh token is opaque text, not a JWT**, so its expiry cannot be read
@@ -65,7 +66,8 @@ rest of this file describes.
   CI does not cover this; the smoke test covers only the retired-session
   failure path.
 - Auth endpoints are rate-limited: `AUTH_RATE_LIMIT` defaults to `10/minute`,
-  and `RATE_LIMIT_ENABLED=false` disables it (`backend/security.py`). The local
+  and `RATE_LIMIT_ENABLED=false` disables it (`backend/config/env.py:745`,
+  `:756`, v1.10.0, applied in `backend/security.py`). The local
   stack sets the latter. `/api/auth/refresh` is among them, because the cookie
   is a bearer credential.
 
@@ -129,12 +131,12 @@ Applies to both `PATCH /api/systems/{id}` and `PATCH /api/books/{id}`
   value regardless, so the two diverge permanently and renaming the folder on
   disk creates a *second* system row instead of updating the first.
   **v1.5.5 guards the rename** (`_apply_rename`,
-  `backend/routers/systems/core.py:461-481`, v1.9.1, issue #261/#262): a name clash now
+  `backend/routers/systems/core.py:465-485`, v1.10.0, issue #261/#262): a name clash now
   raises a 409, and a successful rename sets `GameSystem.name_is_custom`
   (`backend/models/library.py:91`, v1.9.1). This supersedes the old "scanner never
   writes `name`" mechanism — the scanner now only skips refreshing `name` from
   the folder when `name_is_custom` is set (`if not system.name_is_custom and
-  system.name != name`, `backend/indexer/systems.py:305`, v1.9.1), so an unrenamed
+  system.name != name`, `backend/indexer/systems.py:300`, v1.10.0), so an unrenamed
   (default-named) system's display name still tracks a folder rename. The
   slug-divergence behaviour above is unaffected either way; the full rename
   write-up has not been re-verified end-to-end against v1.5.5 beyond this.
@@ -145,22 +147,22 @@ Applies to both `PATCH /api/systems/{id}` and `PATCH /api/books/{id}`
   matches, so a freshly scanned system is excluded from every metadata filter.
   `genre=` tests the `genres` list, not the legacy `genre` string.
 - **`category` on `GET /api/systems/{id}` is case-SENSITIVE**, unlike every other
-  filter. `core.py:238` (v1.9.1) compares with `==` (`b.category == category`) while
+  filter. `core.py:240` (v1.10.0) compares with `==` (`b.category == category`) while
   `genre` goes through `_has_value`, which lowercases both sides. So
   `category=Core` returns no books and `category=core` returns them. Verified
   against a running instance.
 - **`GET /api/systems/{id}?include_books=false` returns `books: []`**, as of
   1.8.0, and computes `book_count` / `total_page_count` in SQL without the
   `explicit`, `category` and `genre` filters, so those three have no effect on
-  it (`core.py:196-220`, v1.9.1); with books included the counts follow the
-  filtered list (`:250-251`). The default is `true`. Either way the response
+  it (`core.py:198-222`, v1.10.0); with books included the counts follow the
+  filtered list (`:252-253`). The default is `true`. Either way the response
   carries `scope_path`, the system's own folder (`books/{System}`) for a
-  scoped rescan, null for a system with no books (`core.py:265-280`, v1.9.1).
+  scoped rescan, null for a system with no books (`core.py:267-282`, v1.10.0).
 - **`GET /api/books` sorts by `title` or `added_at`**, as of 1.8.0
-  (`routers/books/core.py:60-82`, v1.9.1). `order` defaults to ascending for `title`
+  (`routers/books/core.py:59-83`, v1.10.0). `order` defaults to ascending for `title`
   and to newest first for `added_at`; a null `added_at` sorts last in either
   direction. `added_since` keeps books added at or after it, a naive value
-  read as UTC, and a null `added_at` never matches (`:102-108`).
+  read as UTC, and a null `added_at` never matches (`:103-109`).
 
 ### Tag reads
 
@@ -209,7 +211,7 @@ Read from `backend/routers/tags/` at tag `v1.8.0`; re-read at `v1.9.1`.
   why merging a folder-derived tag succeeded when verified live against 1.7.1.
   But `library cleanup-missing` reaches `prune_orphan_tags`
   (`services/tag_service/_admin.py:182`, v1.9.1), which deletes any `Tag` row with no
-  `ResourceTag` link (`routers/maintenance/_helpers.py:231`, v1.9.1) — a folder tag has
+  `ResourceTag` link (`services/library_cleanup.py:347`, v1.10.0) — a folder tag has
   none by construction, its count being derived at read time — so after a
   cleanup run a tag carried only by folders has no catalog row and `merge`
   404s on it, while `rename` still works because it materialises a row first.
@@ -229,17 +231,17 @@ Verified against v1.5.6, backing `systems update`, `systems batch-update`,
 `systems batch-tag` and `me`.
 
 - **`PATCH /api/systems/{id}` answers `{"status":"ok"}`** and echoes nothing
-  back (`routers/systems/core.py:443`, v1.9.1); a follow-up `GET` is the only way to
+  back (`routers/systems/core.py:447`, v1.10.0); a follow-up `GET` is the only way to
   see the result.
 - **The payload that reaches the row has already had nulls and unknown keys
   removed** (`payload = data.model_dump(exclude_none=True)`,
-  `routers/systems/core.py:427`, v1.9.1): a JSON `null` is dropped rather than
+  `routers/systems/core.py:430`, v1.10.0): a JSON `null` is dropped rather than
   clearing the field, so `""` is the only way to clear a string.
 - **A rename sets `name_is_custom` permanently**
-  (`routers/systems/core.py:481`, v1.9.1), after which the scanner stops re-deriving
-  the name from the folder (`indexer/systems.py:305`, v1.9.1). Renaming to the system's
+  (`routers/systems/core.py:485`, v1.10.0), after which the scanner stops re-deriving
+  the name from the folder (`indexer/systems.py:300`, v1.10.0). Renaming to the system's
   own current value returns before the flag is touched
-  (`routers/systems/core.py:472-473`, v1.9.1), so it stays folder-derived.
+  (`routers/systems/core.py:476-477`, v1.10.0), so it stays folder-derived.
 - **Bulk update is skip-and-continue.** An unresolved id or a validation
   rejection (e.g. a name clash) is reported in `errors` and does not fail the
   rest of the batch. The transaction commits once, only if at least one item
@@ -250,7 +252,7 @@ Verified against v1.5.6, backing `systems update`, `systems batch-update`,
   (`services/bulk_service.py:174-180`, v1.9.1).
 - **`GET /api/auth/me` sets a session cookie as a side effect** when called
   with a bearer token and no existing cookie, reusing that token rather than
-  minting a new one (`routers/auth/core.py:337-340`, v1.9.1) — a bare read has a
+  minting a new one (`routers/auth/core.py:334-337`, v1.10.0) — a bare read has a
   write side effect on the client's cookie jar.
 
 ## Content and rescan
@@ -262,18 +264,18 @@ Verified against v1.5.6, backing `systems update`, `systems batch-update`,
   `scope` (e.g. `books/<system>/supplements`). `missing` reapplies OPF sidecars
   while treating any populated field as user-protected. Poll `GET /api/scan-status`.
 - **A `scope` that resolves to no real directory still answers `scan_started`.**
-  `resolve_scope` (`indexer/metadata.py:397-429`, v1.9.1) validates only that the path
+  `resolve_scope` (`indexer/metadata.py:410-442`, v1.10.0) validates only that the path
   begins with a known collection (`books`/`maps`/`tokens`/`audio`/`models`) and does not
   escape the library root — it never checks the target exists. A scope typo'd
   or naming a non-existent subtree walks nothing and completes instantly with
   no error, so `scan_started` alone confirms the request was well-formed, not
   that anything was scanned.
 - **`books rescan` and `library rescan` share one `running` flag.**
-  `rescan_single_book` (`backend/routers/library/_helpers.py:576-595`, v1.9.1,
+  `rescan_single_book` (`backend/services/library_scan/runner.py:440-459`, v1.10.0,
   backing `POST /api/books/{id}/rescan`) queues the book on the per-book
   re-index queue, whose drain sets the status flag
-  (`backend/routers/library/_reindex_queue.py:133-165`, v1.9.1), and
-  `run_rescan_sync` (`backend/routers/library/_helpers.py:598-618`, v1.9.1,
+  (`backend/services/library_scan/reindex_queue.py:133-165`, v1.10.0), and
+  `run_rescan_sync` (`backend/services/library_scan/runner.py:462-482`, v1.10.0,
   backing `POST /api/rescan`) guards on and sets the same flag. If a `books rescan` is still
   running in the background, a `library rescan` fired right after it sees the
   flag set and answers `already_running` (CLI exit 3) instead of
@@ -285,10 +287,11 @@ Verified against v1.5.6, backing `systems update`, `systems batch-update`,
   back without waiting for `GET /api/scan-status`'s `running` to clear
   reproduces both directions.
 - **A stale `running` flag blocks nothing.** Every guard reads
-  `scan_in_progress` (`_helpers.py:271-274`, v1.9.1), which discounts a status whose
-  `heartbeat` is more than 300s old (`is_stale`, `:247-268`, `STALE_AFTER_SECONDS`
-  at `:32`) — the remains of a scan whose process died. A running scan refreshes
-  the heartbeat every 30s. So `POST /api/rescan` starts over a stale status
+  `scan_in_progress` (`services/library_scan/runner.py:83-86`, v1.10.0), which
+  discounts a status whose `heartbeat` is more than 300s old (`is_stale`,
+  `services/jobs.py:264-285`, `STALE_AFTER_SECONDS` at `:42`, v1.10.0) — the
+  remains of a scan whose process died. A running scan refreshes the heartbeat
+  every 30s (`HEARTBEAT_INTERVAL_SECONDS`, `:46`). So `POST /api/rescan` starts over a stale status
   (`library/core.py:72`, v1.9.1), as do `cleanup-missing`, sidecar export and the
   duplicate scan, rather than answering `already_running` or 409.
   `POST /api/cancel-scan` clears a stale status outright and answers
@@ -320,20 +323,20 @@ flags on `systems get`.
   system becomes a map category; at subfolder depth the name is inert.
 - **A loose file directly under `books/` is never indexed, but is still counted.**
   `_scan_books` skips anything that isn't a directory
-  (`if not system_dir.is_dir() or …: continue`, `backend/indexer/books.py:89-90`,
-  v1.9.1), so a
+  (`if not system_dir.is_dir() or …: continue`, `backend/indexer/books.py:91-92`,
+  v1.10.0), so a
   stray `foo.pdf` next to the system folders produces no system and no book.
   `_count_eligible_files` doesn't apply the same skip, so it still counts the
   file toward `total_books` — any wait loop polling
   `scanned_books >= total_books` hangs forever with a loose file present.
 - **Some folder names map only as the whole name**, as of 1.8.0.
-  `CATEGORY_EXACT_NAMES` (`backend/indexer/constants.py:158`, v1.9.1) maps `Player(s)`
+  `CATEGORY_EXACT_NAMES` (`backend/indexer/constants.py:157`, v1.10.0) maps `Player(s)`
   and `GM(s)` / `Game Master(s)` to `core`, `Sheet(s)` to `character-sheet` and
   `Source(s)` to `supplement` — and, as of 1.9.0, `Journal(s)`, `Issue(s)` and
   `Back Issue(s)` to `magazine` — checked before `CATEGORY_MAP`
-  (`categories.py:193`). As one word of a longer name they do nothing:
+  (`categories.py:190`, v1.10.0). As one word of a longer name they do nothing:
   `Player Handouts` is still `handout`. `unofficial` joined `homebrew`'s
-  keywords (`constants.py:147`).
+  keywords (`constants.py:146`, v1.10.0).
 - **A name that is not UTF-8 is skipped, not indexed**, as of 1.9.0
   (`backend/filenames.py`, `indexer/_context.py:32-44`, v1.9.1). The scan logs a warning
   and walks on; a skipped folder takes its whole subtree with it, and the
@@ -344,7 +347,7 @@ flags on `systems get`.
 - **The first import leaves `added_at` null**, as of 1.8.0
   (`backend/indexer/added_dates.py`). Every item is dated when a scan inserts
   it, except during the first import: until a full, unscoped scan has finished
-  over a non-empty library (`scan.py:305-306`, v1.9.1) and no row carries a date
+  over a non-empty library (`scan.py:311-312`, v1.10.0) and no row carries a date
   (`added_dates.py:42`), inserts stay undated, so a fresh install does not
   badge its whole library as new. A freshly seeded local stack is therefore
   entirely undated — `--added-since` matches nothing and `added_at` sorts are
@@ -352,7 +355,7 @@ flags on `systems get`.
 
 ### One-page collections
 
-Verified against v1.5.5 (`backend/indexer/constants.py:185-195`, v1.9.1,
+Verified against v1.5.5 (`backend/indexer/constants.py:184-194`, v1.10.0,
 `backend/indexer/categories.py::detect_container_kind`).
 
 The reserved slugs are `one-page-rpgs`, `single-page-rpgs`, `one-shot-rpgs` and
@@ -377,10 +380,10 @@ category labels. Any claim about this behaviour must name a version.
   `core`, `supplement`, `adventure`, `character-sheet`, `map`, `handout`,
   `homebrew`, `starter-set` and, as of 1.9.0, `magazine` (`magazine`, `zine`,
   `fanzine`, `periodical`; checked last, so `Zine Maps` stays `map`,
-  `constants.py:149-151`). A top-level folder that matches none of them
-  becomes its own category: `guess_category` (`categories.py:228-262`) falls
+  `constants.py:148-150`, v1.10.0). A top-level folder that matches none of them
+  becomes its own category: `guess_category` (`categories.py:225-259`) falls
   back to the slugified folder name (`Extras/` → `extras`). System-agnostic
-  folders go through `agnostic_category` (`categories.py:265`) instead,
+  folders go through `agnostic_category` (`categories.py:262`, v1.10.0) instead,
   which slugs the immediate subfolder and yields `uncategorized` for books with
   no subfolder at all. One-page folders no longer take this path in v1.5.5 —
   they're a container (see above), so each loose file gets ordinary category
@@ -390,9 +393,9 @@ category labels. Any claim about this behaviour must name a version.
   `Vampire The Masquerade 5 EN` with `is_explicit: true`.
 - **`is_explicit` only ever latches on, never off, via rescan.** The
   existing-system branch is `if folder.is_nsfw and not system.is_explicit:
-  system.is_explicit = True` (`backend/indexer/systems.py:289-290`, v1.9.1) — removing
+  system.is_explicit = True` (`backend/indexer/systems.py:284-285`, v1.10.0) — removing
   `(nsfw)` from a folder name and rescanning does not clear the flag on that
-  system row; only the creation branch (`is_explicit=folder.is_nsfw`, line 266)
+  system row; only the creation branch (`is_explicit=folder.is_nsfw`, line 261)
   sets it from the folder state. Clearing a stale flag needs a database reset, not a
   rescan. Verified against source, not yet against a live instance.
 - **Leading `!`, `$`, `%` are stripped from system folder names**
@@ -419,15 +422,15 @@ file in `temp/grimoire`.
 - **Only `parent` sets its children's `parent_system`.** A `family` container
   fills in each child's `system_family`, a `publisher` fills in `publishers`,
   and `generic` propagates nothing.
-- A child's display name is `"<container> <folder>"` (`indexer/books.py:186`), so
+- A child's display name is `"<container> <folder>"` (`indexer/books.py:188`, v1.10.0), so
   `Shadowrun` + `6 DE` is `Shadowrun 6 DE`.
-- `edition` is the child folder name **verbatim** (`indexer/books.py:264`): a
+- `edition` is the child folder name **verbatim** (`indexer/books.py:266`, v1.10.0): a
   folder called `6 DE` yields edition `6 DE`, not `6`.
 - `parent_system` is still a free-text column, auto-set to the container's name
-  on child creation (`indexer/systems.py:271`). Both it and the real `parent_id`
+  on child creation (`indexer/systems.py:266`, v1.10.0). Both it and the real `parent_id`
   foreign key are returned.
 - Sort prefixes are stripped before the container name is used
-  (`indexer/systems.py:66`), so `!!Dungeons & Dragons` yields `Dungeons & Dragons`.
+  (`indexer/systems.py:65`, v1.10.0), so `!!Dungeons & Dragons` yields `Dungeons & Dragons`.
 - **Containers nest as of v1.5.6.** `_scan_container` recurses into a child
   that is itself a container (`indexer/books.py:301-315`), and category depth
   follows it: `system_depth=2 + depth` (`indexer/books.py:328`), where `depth`
@@ -435,13 +438,13 @@ file in `temp/grimoire`.
   only one container level worked — any claim that nesting is unavailable
   describes v1.5.5 and earlier.
 - **`GET /api/systems` hides container children before applying any filter**
-  (`routers/systems/core.py:90-104`). A filter on metadata only children carry
+  (`routers/systems/core.py:92-106`, v1.10.0). A filter on metadata only children carry
   returns `[]` with exit 0 unless `include_children=true` is also sent.
 - `GET /api/systems/{id}` returns the summary shape plus `books` **and**
-  `children` (`routers/systems/core.py:248-262`).
+  `children` (`routers/systems/core.py:250-264`, v1.10.0).
 - `Book.category` is assigned in three places: the new-book insert
-  (`indexer/_book_records.py:255`), a re-home, guarded by
-  `if existing.game_system_id != system.id` (`indexer/_book_records.py:149`),
+  (`indexer/_book_records.py:246`, v1.10.0), a re-home, guarded by
+  `if existing.game_system_id != system.id` (`indexer/_book_records.py:148`),
   and a detected file move, which takes the category of the new path
   (`indexer/moves.py:283`). An ordinary rescan does **not** re-derive it, so a
   `PATCH category` holds — but converting a folder into a container re-homes
@@ -460,9 +463,10 @@ per-book metadata.
 Verified against v1.5.6, backing the seven `addons` commands.
 
 - **A fresh instance has never fetched the add-on index.** `available()`
-  (`backend/addons/install.py:216`, v1.9.1) reads the index straight off
-  `get_cached_index` (`backend/addons/registry.py:116`, v1.9.1), which stays empty
-  until `refresh_index` first saves one (`backend/addons/install.py:78-145`, v1.9.1) —
+  (`backend/addons/install.py:219`, through `_index_entries` at `:198-199`,
+  v1.10.0) reads the index straight off `get_cached_index`
+  (`backend/addons/registry.py:117`, v1.10.0), which stays empty until
+  `refresh_index` first saves one (`backend/addons/install.py:81-148`, v1.10.0) —
   nothing ships bundled with the server. Verified live: `addons list` reports
   `available: []` and a system's `metadata-sources` reports no source until
   `addons refresh` has run at least once.
@@ -471,9 +475,9 @@ Verified against v1.5.6, backing the seven `addons` commands.
   `*.localhost`, or an IP literal that is loopback, private or link-local
   (`backend/addons/urls.py:16-37`, v1.9.1); a private hostname such as a
   compose service name is not local. `addons settings` refuses a bad URL with a
-  422 (`routers/addons/_schemas.py:36-49`), and `refresh_index` checks every
+  422 (`routers/addons/_schemas.py:37-51`, v1.10.0), and `refresh_index` checks every
   configured URL before fetching any, so one bad entry fails the whole refresh
-  (`backend/addons/install.py:86-91`, v1.9.1). That is why `docker/smoke-test.sh`
+  (`backend/addons/install.py:89-94`, v1.10.0). That is why `docker/smoke-test.sh`
   points `--index-url` at `http://addon-index.localhost/index.json`, a network
   alias of the internal `addon-index` service.
 - **The index setting is a comma-joined list**, as of 1.7.0. `AddonSettingsUpdate`
@@ -521,18 +525,18 @@ fixture add-on (`docker/addon-index/fixture-source.yml`) and via
   confirms target filtering, not that the endpoint is simply empty.
 - **Grimoire Codex DB is a built-in source**, as of 1.9.0: id `grimoire-codex`,
   listed first, and only while the server has `GRIMOIRE_CODEX_DB_API_TOKEN`
-  set (`routers/_metadata_lookup.py:84-87`, v1.9.2, `codex/settings.py:49-52`). A book
+  set (`routers/_metadata_lookup.py:85-88`, v1.10.0, `codex/settings.py:54-57`). A book
   search goes to its `/match` with every signal the book carries (ISBN, hash,
   authors, page count…), not the query alone; a system search is by name
-  (`codex/lookup.py:42-65`). An add-on id that is not a scraper is a 400
+  (`codex/lookup.py:43-70`, v1.10.0). An add-on id that is not a scraper is a 400
   (`addons/service.py:52-58`). Not exercised live: the local stack sets no
   token.
 - **File metadata is a built-in book source**, as of 1.9.2: id `file-metadata`,
-  listed last for books only (`routers/_metadata_lookup.py:29`, `:107-116`,
-  v1.9.2). It reads what the file carries — PDF info, EPUB OPF, a comic's
+  listed last for books only (`routers/_metadata_lookup.py:30`, `:108-117`,
+  v1.10.0). It reads what the file carries — PDF info, EPUB OPF, a comic's
   `ComicInfo.xml` — via `metadata/embedded.py`. Search yields one candidate,
   identity `file`, or none when the file carries nothing; an unreadable file
-  or a system is a 400, never a 502 (`:119-135`, v1.9.2).
+  or a system is a 400, never a 502 (`:120-136`, v1.10.0).
 - **400, not 502, for both bad-input cases actually seen.** `metadata-fetch
   --identity <unknown>` against a real source returned `Bad request. {"detail":
   "that result is no longer available from the source"}`; `metadata-search
@@ -573,7 +577,7 @@ and `books thumbnail`.
   not by a downstream campaign lookup.** `SystemCoverSourceIn.known_source`
   builds its allowed set as every `services.image_source.SOURCE_TYPES` entry
   except `campaign_file` and raises on anything else
-  (`routers/systems/_schemas.py:350-358`, v1.9.1), so sending `campaign_file` here is
+  (`routers/systems/_schemas.py:352-360`, v1.10.0), so sending `campaign_file` here is
   a 422 validation error, never a 400 — the wider `SOURCE_TYPES` tuple in
   `services/image_source.py:33` includes it only for the callers (the banner)
   that do have a campaign in context. Verified live: `campaign_file` answered
@@ -601,7 +605,7 @@ the 1.8.0 stack; re-read at `v1.9.1`. Backs `systems books list`, `folder-counts
 - **`genre` is exact and case-insensitive, `product_code` a prefix**; both take
   `__grim:none__` / `__grim:any__` (`:162-182`).
 - **Bare `q` text matches title, filename or product code**
-  (`routers/search/_books.py:137-150`); field prefixes are the book search
+  (`services/book_search.py:136-149`, v1.10.0); field prefixes are the book search
   fields (`services/search_query.py:86-102`), `text:` ignored.
 - **`/book-groups` rows are directories, counted directly** (`:282-324`):
   `{category, path, dir, count, first}`. Live on `Das Schwarze Auge 5 DE`:
@@ -621,7 +625,7 @@ source citations name the shipped backend inside the container. Backs
 
 - **A book folder is a second tagging layer, addressed by path rather than by
   id.** Its path takes the form `{system_id}/{category}/{subfolder…}`; the model
-  has three columns, `id`, `path`, `tags` (`backend/models/library.py:275-282`, v1.9.1).
+  has three columns, `id`, `path`, `tags` (`backend/models/library.py:281-288`, v1.10.0).
   Tagging one folder covers every book at or below that path, resolved on read by
   `_book_folder_ancestor_paths` (`backend/services/tag_service/_paths.py:81`, v1.9.1). A book
   directly in the category directory (no subfolder) belongs to no folder.
@@ -630,14 +634,14 @@ source citations name the shipped backend inside the container. Backs
   (`routers/systems/__init__.py:114`), so it carries no role tag. `PATCH` takes `{"path", "tags"}` and echoes the same shape;
   `DELETE` takes the path as a **query** parameter, not a body, and returns
   `{"status": "deleted"}`. Both writes depend on `require_gm_or_admin`
-  (`backend/routers/systems/core.py:385`, `:402`, v1.9.1).
+  (`backend/routers/systems/core.py:387`, `:404`, v1.10.0).
 - **A `BookFolder` row exists only once a path has been tagged.**
   `upsert_folder_tags` (`tag_service/_folders.py:62`, v1.9.1) is the only site that inserts one;
   the scanner and indexer never do. Measured: `core/errata` existed on disk with
   a book in it and `GET` returned `{"folders": []}` until a `PATCH` created the
   row. So `list` reports what has been tagged, never what is on disk.
 - **The path must belong to the system in the URL.** `_require_owned_folder_path`
-  (`core.py:352`, v1.9.1) 404s an unknown system and 400s a path that is not prefixed
+  (`core.py:354`, v1.10.0) 404s an unknown system and 400s a path that is not prefixed
   with the system's id or has fewer than three segments. Measured: writing
   `wrong/core/x` returned `400 {"detail": "path must be
   '{system_id}/{category}/{subfolder...}' for this system"}`. v1.5.6 ignored the
@@ -682,33 +686,37 @@ source citations name the shipped backend inside the container. Backs
 ## Cleanup of missing files
 
 Verified against v1.5.6 by reading `backend/routers/maintenance/`, backing
-`library cleanup-missing`.
+`library cleanup-missing`. As of 1.10.0 the work lives in
+`backend/services/library_cleanup.py`; cites below are to that file at v1.10.0.
 
 - **An absent path deletes; a hung one does not.** `_path_exists`
-  (`_helpers.py:19-36`, v1.9.2) runs `os.path.exists` on a daemon thread with a
+  (`library_cleanup.py:24-41`) runs `os.path.exists` on a daemon thread with a
   5-second join and **returns True if the thread is still alive**, so a stalled
   mount is treated as present and skipped. A directory that is simply gone
   returns False promptly and every row beneath it is removed. The asymmetry is
   deliberate and is the difference between a storage hiccup and data loss.
 - **An unmounted library root is refused**, as of 1.9.2. `library_root_unavailable`
-  (`_helpers.py:72-83`, v1.9.2) is true when `LIBRARY_PATH` is missing, not a
+  (`:77-88`) is true when `LIBRARY_PATH` is missing, not a
   directory, or empty while the database still holds library rows; the cleanup
-  then answers 409 unless `force=true`. Only the root is checked, so a missing
+  then answers 409 unless `force=true` (`routers/maintenance/core.py:42-45`).
+  Only the root is checked, so a missing
   subfolder still reads as deleted. `GET /cleanup-missing/preview` reports the
   same flag with per-collection `missing` and `total` counts, deleting nothing
-  (`_helpers.py:101-112`, v1.9.2).
-- **It commits per row** (`_helpers.py:126`, and per pruned system at `:206`, v1.9.2), so
-  a failure part-way through leaves earlier removals applied; the handler's
-  `except` rolls back only the uncommitted remainder. The docstring at
-  `:118-119` gives the reason: releasing the write lock between rows so a
-  concurrent scanner session is not blocked.
-- **A book takes its references with it** (`_helpers.py:124-126`, v1.9.2):
-  `purge_references` drops its `book_search` rows, bookmarks, favorites, tag
-  links and campaign resource links, then the book goes
-  (`services/library_fs/references.py:57-91`, v1.9.1). Bookmarks are user data and a rescan
+  (`preview_cleanup`, `:106-117`).
+- **It commits every 200 rows**, as of 1.10.0 (`_REMOVE_BATCH = 200`, `:21`;
+  `_remove_missing`, `:120-149`), and per pruned system (`:226`), so a failure
+  part-way through leaves earlier batches applied; the handler's `except` rolls
+  back only the uncommitted remainder (`routers/maintenance/core.py:53-55`). The
+  docstring at `:123-127` gives the reason: releasing the write lock between
+  batches so a concurrent scanner session is not blocked, without paying a
+  full `book_search` scan per book (upstream #748).
+- **A book takes its references with it** (`flush`, `:132-136`):
+  `purge_many_references` drops the batch's `book_search` rows, bookmarks,
+  favorites, tag links and campaign resource links, then the books go
+  (`services/library_fs/references.py:90-133`, v1.10.0). Bookmarks are user data and a rescan
   does not restore them, nor any hand-entered metadata.
 - **Container folders are protected from the orphan sweep.**
-  `_prune_orphaned_systems` (`_helpers.py:132`, v1.9.2) keeps a system alive if it has
+  `_prune_orphaned_systems` (`:152`) keeps a system alive if it has
   books, a campaign references it, **or it has a surviving child** — the last
   rule phrased over `parent_id` rather than `container_kind`, so container kinds
   added later are covered without changing the function. Without it a container
@@ -718,7 +726,7 @@ Verified against v1.5.6 by reading `backend/routers/maintenance/`, backing
   walked deepest-first so a container emptied earlier in the same pass is still
   collected.
 - **A running scan is a 409**, not a queue: `"A library scan is already running;
-  retry after it completes."` (`core.py:20-25`, v1.9.1). A stale scan status does not
+  retry after it completes."` (`routers/maintenance/core.py:17-25`, v1.10.0). A stale scan status does not
   count — see "Content and rescan". `library scan-status` reports the state it
   refers to.
 - **Live, against the seeded fixture stack:** two consecutive calls each
@@ -730,8 +738,8 @@ Verified against v1.5.6 by reading `backend/routers/maintenance/`, backing
 
 - `GET /api/stats` carries two size fields that are not the same number:
   `total_size_mb` is books only, while `library_size_mb` adds maps, tokens,
-  audio and models (`routers/library/_schemas.py:83-85`, `core.py:173-177`,
-  v1.9.1). Both scope the book portion to what the caller may see, so a
+  audio and models (`routers/library/_schemas.py:88-90`, `core.py:173-177`,
+  v1.10.0). Both scope the book portion to what the caller may see, so a
   restricted book's bytes stay out of either total.
 - **Guests are refused**, as of 1.8.0: the route depends on `require_not_guest`
   (`routers/library/core.py:135`, v1.9.1), since the counts describe the whole library.
@@ -745,13 +753,13 @@ Verified against v1.5.6 by reading `backend/routers/maintenance/`, backing
   deletes `users.json` (`seed_users.py:117-120`, v1.9.1).
 - **A plaintext password must pass the new-password rules**: at least
   `PASSWORD_MIN_LENGTH` characters (default 12, env-overridable) and not a
-  common password (`passwords.py:26`, `:48`, `:69-75`, v1.9.1). A hash skips
+  common password (`config/env.py:713`, `:732`, `passwords.py:53-59`, v1.10.0). A hash skips
   the check (`seed_users.py:123-127`). A failing entry is skipped; if no admin
   entry passes, the whole seed is skipped and `users.json` stays in place
   (`seed_users.py:62-74`). `docker/users.json.example` therefore ships hashes;
   the logins are still `admin/admin`, `gm/gm`, `player/player`.
 - That delete is unguarded and the startup call has no `except` around it
-  (`backend/main.py:281-285`, v1.9.1), so the file must sit **inside** a
+  (`backend/main.py:283-287`, v1.10.0), so the file must sit **inside** a
   mounted directory — bind-mounting it as a single file makes the delete fail
   and the container will not start.
 - `POST /api/auth/setup` also exists and creates the first admin, failing once any
@@ -773,9 +781,9 @@ Read from `backend/routers/lookups/` at tag `v1.7.1`; route roles re-read at
   `PATCH /api/books/{id}` or either `bulk` endpoint. An unmatched string is
   stored as written, and merely stops matching `?genre=` and the server's own
   usage counts. The five lists are conventions to agree with, not enforced sets.
-- **`parent-systems` ships empty.** `models/lookup_defaults.py` seeds genres,
-  system families, licenses and dice materials, but `DEFAULT_PARENT_SYSTEMS` is
-  `()`. A container child's `parent_system` is folder-derived, so values in use
+- **`parent-systems` ships empty.** `migrations/_frozen/lookup_defaults.py`
+  (moved from `models/` in 1.10.0) seeds genres, system families, licenses and
+  dice materials, but `DEFAULT_PARENT_SYSTEMS` is `()` (`:80`, v1.10.0). A container child's `parent_system` is folder-derived, so values in use
   and values in the vocabulary diverge freely.
 - **All five reads are `require_not_guest`**, as of 1.8.0
   (`routers/lookups/__init__.py:51`, `:73`, `:95`, `:117`, `:139`): any
@@ -871,7 +879,7 @@ tag `v1.7.0`; the upload conflict policy re-read at `v1.8.0`.
   or a campaign reference. It is counted in `records`.
 - **A hard delete of a system folder drops the row too**, as of 1.9.1, custom
   name, description or cover notwithstanding — only a campaign reference keeps
-  it (`deletes.py:316`, `:417`, v1.9.1). A container's child system counts as a
+  it (`deletes.py:371`, `:472`, `:481`, v1.10.0). A container's child system counts as a
   system folder (`folders.py:130-158`, v1.9.1).
 - **A path segment over 255 bytes is a 400**, as of 1.9.1
   (`library_fs/paths.py:27`, v1.9.1).
@@ -893,10 +901,10 @@ tag `v1.7.0`; the upload conflict policy re-read at `v1.8.0`.
   defaults to `rename` (an upload is an explicit "add this"), `move` to `skip` (a
   bulk reorganisation should step over a collision and report it). `move` never
   overwrites — `_dest_for` has no overwrite branch
-  (`services/library_fs/moves.py:400-419`, v1.9.1).
+  (`services/library_fs/moves.py:408-427`, v1.10.0).
 - **Both validate `on_conflict`, differently.** `move`'s schema carries
   `pattern="^(skip|rename)$"` and 422s on anything else
-  (`routers/files/_schemas.py:80`); `upload` checks against
+  (`routers/files/_schemas.py:93`, v1.10.0); `upload` checks against
   `rename|skip|replace` in the handler and answers **400** (`core.py:440`,
   `:470-474`).
 - **`upload` with `on_conflict=replace` overwrites an indexed book in place**
@@ -913,7 +921,7 @@ tag `v1.7.0`; the upload conflict policy re-read at `v1.8.0`.
   that does not exist is a **404** `not_found` rather than being created
   (`uploads.py:195-198`, v1.9.1). The response
   adds `record_id` and `replaced: true`, which are `null` and `false` on the
-  other policies (`routers/files/_schemas.py:176-185`).
+  other policies (`routers/files/_schemas.py:187-198`, v1.10.0).
 - **`upload` is one file per request by design**, so a large import that fails
   partway can report and retry precisely. 8 GiB cap → **413**. The file lands
   under a temporary name and is renamed into place only once fully written.
@@ -976,14 +984,17 @@ Read from `backend/routers/maps/core.py` and `_schemas.py` at tag `v1.7.0`, and
 measured against the running 1.7.0 stack; the list parameters re-read at
 `v1.8.0`.
 
-- **`limit` defaults to 100000 with no ceiling.** `Query(100000)` and no `le=`
-  (`maps/core.py:66`, v1.9.1), so an unflagged `GET /api/maps` returns the whole
-  library. `tokens`, `models` and `audio` declare the same. `books` is the
-  outlier at `Query(100, le=500)`. The CLI supplies its own default of 100 here,
+- **`limit` defaults to 100000, which is also its ceiling**, as of 1.10.0:
+  `Query(MAX_MEDIA_LIMIT, le=MAX_MEDIA_LIMIT)` (`maps/core.py:67`,
+  `routers/_browse.py:26`, v1.10.0), so an unflagged `GET /api/maps` returns the
+  whole library and anything above is a 422. `offset` is capped at
+  1 000 000 000 (`MAX_OFFSET`, `_browse.py:22`, `maps/core.py:68`). `tokens`,
+  `models` and `audio` declare the same. `books` is the outlier at
+  `Query(100, le=500)`. The CLI supplies its own default of 100 here,
   which is the one place `maps list` holds an opinion the server does not.
 - **The four media lists share one filter set and page in SQL**, as of 1.8.0.
   `maps`, `tokens`, `audio` and `models` all take `media_browse_params`
-  (`routers/_browse.py:27-72`) and page through `MediaBrowser.page`
+  (`routers/_browse.py:37-82`, v1.10.0) and page through `MediaBrowser.page`
   (`services/browse/media.py:221-226`), `folder` or not: `q`, `tags` (JSON
   groups), `favorites`, `added_since`, `folder`, `sort` and `order` (`asc` |
   `desc`, default `asc`). An unknown `sort` is a 422. `maps` adds `map_type`.
@@ -997,7 +1008,7 @@ measured against the running 1.7.0 stack; the list parameters re-read at
   unlike `tags items`' `folders[].count`, which covers the subtree. `path` is
   collection-relative, `""` for the root, and only folders with a match appear.
   Groups come back in path order: `sort` and `order` are validated
-  (`routers/_browse.py:63`) but change nothing. Backs `<collection> folder-counts`.
+  (`routers/_browse.py:72-73`, v1.10.0) but change nothing. Backs `<collection> folder-counts`.
 - **`sort` defaults to `path`: folder, then `sort_name`** — the natural-sort
   key, not the raw filename (`media.py:192-195`, `:207-208`, v1.9.1). `name` is `sort_name` first,
   then folder. `size`, `added_at`, `title` and `duration` tie-break on
@@ -1058,11 +1069,16 @@ measured against the running 1.7.0 stack; the list parameters re-read at
   bulk verb book folders have no counterpart for. `tag_service.upsert_folder_tags`
   inserts a row for any path string without checking the tree, so a typo'd path
   creates a row that nothing can ever remove.
-- **`GET /api/maps/{id}/page/{n}` streams an image map as stored; `--width` is
-  a no-op on it.** Verified live against a raster fixture map: page 1 with and
-  without `--width` produced byte-identical output. Width only affects
-  rendering a PDF page; page 2 on an image map 400s with `"Image maps have
-  only one page"`.
+- **`GET /api/maps/{id}/page/{n}` re-encodes a raster map as WebP, never
+  upscaled.** `render_map_preview` shrinks it to `width` and keeps a narrower
+  image at its own size (`services/media/maps.py:257-263`, v1.10.0), so on a
+  small map `--width` changes nothing — verified live against a raster fixture
+  map, page 1 with and without `--width` byte-identical. SVG streams as stored
+  (`routers/maps/core.py:280-291`). Page 2 on an image map 400s with
+  `"Image maps have only one page"`.
+- **Map page and `vtt/image` answer 304 to a matching `If-None-Match`**, as of
+  1.10.0: both send an `ETag` built from the file's content token, checked
+  before anything renders (`routers/maps/core.py:262-265`, `:331-333`, v1.10.0).
 
 ### Universal VTT routes
 
@@ -1073,7 +1089,7 @@ measured against the running 1.7.0 stack; the list parameters re-read at
   picture. Both 400 unless the map is a `.uvtt`/`.dd2vtt`.
 - `GET /api/maps/{id}/export.uvtt` is a download whose payload is JSON: the
   handler returns a `Response` carrying the image as base64 WebP plus the grid
-  and any authored geometry (`routers/maps/core.py:365-467`, v1.9.1). A raster map is
+  and any authored geometry (`routers/maps/core.py:345-447`, v1.10.0). A raster map is
   the normal case — verified live, a plain PNG fixture map exported 200
   `application/octet-stream` with top-level keys `format`, `resolution`,
   `image`, `environment`, `lights`, `line_of_sight`, `objects_line_of_sight`,
@@ -1094,7 +1110,7 @@ and measured against the running 1.7.1 stack; re-read at `v1.9.1`.
   normally in either direction, including back over the other value — nothing
   about the field itself is one-way. What cannot happen is returning to
   unknown once set: a model can leave null but never come back to it. Maps
-  rescues a sent `0` deliberately (`maps/core.py:643-646`); nothing here
+  rescues a sent `0` deliberately (`maps/core.py:623-626`, v1.10.0); nothing here
   rescues a `null`. Measured: `null` after `true` read back as still
   presupported; `false` after `true`, and `true` after `false`, both read back
   changed.
@@ -1103,7 +1119,7 @@ and measured against the running 1.7.1 stack; re-read at `v1.9.1`.
   both false when unknown; the write path takes the single `is_supported`. The
   field a caller reads is never the field it writes.
 - **`GET /api/models` takes the shared media filters**, as on maps
-  (`core.py:35-46`), with `limit` at `Query(100000)` and no `le=`.
+  (`core.py:35-46`), with `limit` capped like maps' (`core.py:36`, v1.10.0).
 - **Explicit rows are filtered server-side per account** (`core.py:44-46`), and
   variants never reach the list (`services/browse/media.py:150`).
 - **`bulk_update_models` passes no `validate` hook** (`core.py:222-234`), as on
@@ -1111,7 +1127,7 @@ and measured against the running 1.7.1 stack; re-read at `v1.9.1`.
   the whole batch with nothing written.
 - **Supported/unsupported is inferred from the whole relative path — folder or
   filename.** `_detect_support` matches both regexes against the path with the
-  filename included (`indexer/media.py:441-453`), so `goblin_unsupported.stl`
+  filename included (`indexer/media.py:430-442`, v1.10.0), so `goblin_unsupported.stl`
   is detected in an untagged folder; the convention it targets is folder-level,
   `Goblins/Presupported/goblin_a.stl`. Unsupported is tried first, since
   "unsupported" contains "supported".
@@ -1130,25 +1146,25 @@ about the missing `validate` hook, the dropped `null`, and folder-tag handling
 hold unchanged on both; only the differences are recorded here.
 
 - **`audio` has no `is_explicit` at all** — not on the row
-  (`audio/core.py:43-65`), not on `AudioUpdate` (`audio/_schemas.py:11-13`),
+  (`audio/core.py:31-53`, v1.10.0), not on `AudioUpdate` (`audio/_schemas.py:11-13`),
   and `list_audio` builds its browser with `hide_explicit=False`
-  (`audio/core.py:77`). `tokens` does filter per account (`tokens/core.py:43-45`), as
+  (`audio/core.py:65`). `tokens` does filter per account (`tokens/core.py:43-45`), as
   `books` and `models` do. A caller cannot hide an audio track from a player
   by marking it explicit, because there is nothing to mark.
 - **`audio` carries six scan-derived fields no endpoint can write.**
   `duration`, `title`, `artist`, `album`, `track_number` and `disc_number` are
   read from the file at index time (`indexer/metadata.py:39-90`) and
-  appear on the row (`audio/core.py:50-56`); `AudioUpdate` declares only
+  appear on the row (`audio/core.py:38-44`); `AudioUpdate` declares only
   `description` and `tags` (`audio/_schemas.py:11-13`). Measured on 1.7.1: a
   tagless WAV indexes with a real `duration` and empty strings for the other
   three. As of 1.9.0 the two numbers are null for no tag, and for a row from
   before 1.9.0 until the next scan reads them once; that read also fills a
-  blank title, artist or album, never replacing one (`indexer/media.py:286-311`).
+  blank title, artist or album, never replacing one (`indexer/media.py:276-301`, v1.10.0).
   They drive `sort=track` (`services/browse/media.py:196-206`).
 - **`GET /api/audio/{id}/artwork` resolves three sources, then 404s**
-  (`audio/core.py:197-224`): a cover set deliberately through the UI, then
+  (`audio/core.py:185-212`, v1.10.0): a cover set deliberately through the UI, then
   folder art, then art embedded in the file. `has_artwork` on the row says
-  whether any exists. `has_cover` (`audio/core.py:60`) is true only for the
+  whether any exists. `has_cover` (`audio/core.py:48`) is true only for the
   first of the three.
 
 ### Audio covers
@@ -1181,13 +1197,18 @@ Read from `backend/routers/search/core.py`, `backend/routers/search/_books.py`,
 `backend/routers/search/_helpers.py` and the query parser at tag `v1.6.2`; the
 limit behaviour was verified against the running 1.6.1 stack. 1.8.0 moved the
 parser to `backend/services/search_query.py`, shared with the media lists'
-`q`.
+`q`; 1.10.0 moved `_books.py` to `backend/services/book_search.py`.
 
 `GET /api/search` is not full-text-only. As of 1.6.2 it returns six
 independently-populated arrays — `results` (page text), `book_matches`, `maps`,
 `tokens`, `audio`, `models` — and `total` counts every row across all of them,
 so a book matching by title *and* by page text is counted twice.
 
+- **A book row names its system only when the caller can see it**, as of
+  1.10.0. In `results` and `book_matches` alike, `game_system` and
+  `game_system_id` are `""` for a system hidden from the caller
+  (`routers/search/core.py:130-136`, `services/book_search.py:225-231`, v1.10.0);
+  1.9.2 named it regardless.
 - **`limit` bounds `results` alone.** `book_matches` is capped at
   `TITLE_MATCH_LIMIT = 50` and each media set at a literal `.limit(50)`,
   neither reachable from the query string. There is no offset, so those five
@@ -1232,7 +1253,7 @@ measured against the running 1.6.2 stack.
   returned `entries: []` with `max_seq: 107`, so a poll filtered to a level that
   matches nothing still advances the cursor.
 - **A poll truncates from the oldest end.** With `after_seq` set the handler
-  returns `new[-limit:]` (`config.py:788`, v1.9.1) — the *newest* `limit` of what is
+  returns `new[-limit:]` (`config/logs.py:168`, v1.10.0) — the *newest* `limit` of what is
   new, not the oldest. Measured: 96 entries arrived and a poll with `limit=3`
   returned seq `[1471, 1472, 1473]`, skipping 93 that advancing the cursor then
   loses for good. A caller catching up on a backlog must raise `limit`.
@@ -1286,13 +1307,16 @@ the running 1.6.2 stack.
   negative value slices to an empty page and answers 200.
 - **`/scan` has two conflict paths.** A *library* scan in flight is a 409; a
   *duplicate* scan in flight is `200 {"status": "already_running"}` with nothing
-  started. `/cancel-scan` answers `not_running`, `stop_requested` or
-  `cleared_stale`, all 200.
+  started — as of 1.10.0 that includes one holding the job's lock on another
+  worker, which a Valkey-less status cannot see (`detection.py:46-50`, v1.10.0).
+  `/cancel-scan` answers `not_running`, `stop_requested` or `cleared_stale`, all
+  200; without Valkey, a status that reads idle while the lock is held is asked
+  to stop and answers `stop_requested` (`:75-80`).
 - **A duplicate scan whose heartbeat went stale blocks nothing** (upstream #304,
   new in 1.6.2). `ScanStatus.heartbeat` is what distinguishes a slow scan from an
   abandoned one: `/scan` calls `force_clear` and starts anyway
-  (`detection.py:44-47`, v1.9.1), and `/cancel-scan` clears the record outright and reports
-  `cleared_stale` (`detection.py:73-76`, v1.9.1). Before that a killed worker left `running`
+  (`detection.py:48-52`, v1.10.0), and `/cancel-scan` clears the record outright and reports
+  `cleared_stale` (`detection.py:82-85`, v1.10.0). Before that a killed worker left `running`
   true for good and refused every later scan.
 - **`resource_type` is a body or query field on twelve of the thirteen routes** —
   only the item delete carries it in the path. So one command group covers books,
@@ -1306,45 +1330,51 @@ the running 1.6.2 stack.
 ## Book reading
 
 Read from `backend/routers/books/pages.py` and `backend/indexer/formats.py` at
-tag `v1.7.1`, and verified against the 1.7.1 stack; re-read at `v1.9.1`. Backs `books file`,
+tag `v1.7.1`, and verified against the 1.7.1 stack; re-read at `v1.10.0`. Backs `books file`,
 `books page`, `books toc`, `books page-text` and `books page-words`.
 
 - `GET /api/books/{id}/page/{n}/text` reads the `book_search` FTS row for that
   page and only extracts live when there is none
-  (`routers/books/pages.py:159-195`). Its format gate is `can_index`, not an
+  (`routers/books/pages.py:167-204`). Its format gate is `can_index`, not an
   `application/` MIME prefix, so `text/plain` and `text/markdown` books are
-  readable too (`:167-171`).
+  readable too (`:175-179`).
 - `GET /api/books/{id}/page/{n}/words` answers **200 with an empty overlay**
   (`{"width": 0, "height": 0, "words": []}`) for any book outside the `fitz`
-  format family (`routers/books/pages.py:206-209`). Only PDF, EPUB and DjVu are
+  format family (`routers/books/pages.py:215-218`). Only PDF, EPUB and DjVu are
   `fitz`; `.txt`/`.md`/`.rtf` and the comic archives all get the empty overlay
-  (`indexer/formats.py:63-82`). Its `page-text` sibling only 404s for the
+  (`indexer/formats.py:64-83`, v1.10.0). Its `page-text` sibling only 404s for the
   comic family — the text family is `can_index`, so `page-text` succeeds there
   while `page-words` still returns the empty overlay. An empty result
   therefore does not distinguish "not a renderable document" from "no words on
   this page"; `width` does.
 - A page outside the book is **400 with the real page count** in the message,
-  not 404 (`routers/books/pages.py:189-190`; `render/ops.py:36-37` via
-  `routers/books/_render_cache.py:39-40`).
+  not 404 (`routers/books/pages.py:198-199`; `render/ops.py:40-41` via
+  `routers/_render_errors.py:21-22`).
 - `GET /api/books/{id}/toc` covers EPUB as well as PDF: the handler gates on
   `is_fitz_mime`, and PyMuPDF exposes an EPUB's nav document through the same
-  API as a PDF outline (`routers/books/pages.py:52-61`). Its 404 is bare, so an
+  API as a PDF outline (`routers/books/pages.py:59-68`). Its 404 is bare, so an
   unknown id and an unopenable format are indistinguishable from the response.
 - `GET /api/books/{id}/file` and `GET /api/books/{id}/page/{n}` both **write on
   a missing file**: they set the book's `is_missing` to true and commit before
-  raising 404 (`routers/books/core.py:470-474`; `pages.py:120, 130, 151`
-  through `_mark_missing`, `:31-36`, the file route's one site and the page
+  raising 404 (`routers/books/core.py:480-484`; `pages.py:128, 138, 159`
+  through `_mark_missing`, `:33-38`, the file route's one site and the page
   route's three). A read that
   mutates is worth knowing about when a scripted sweep hits a library whose
   files have moved.
 - `GET /api/books/{id}/page/{n}` defaults `width` to **1200**, where the maps
-  equivalent defaults to 1600; both cap at 3000 (`pages.py:96`). Measured live:
+  equivalent defaults to 1600; both cap at 3000 (`pages.py:104`). Measured live:
   the same fixture page rendered at 8444 bytes with no `--width` and 1476 bytes
   with `--width 400` — a genuine re-render, not a passthrough. It renders PDF,
   EPUB and DjVu, serves a comic archive's page as the stored image member
-  without rendering (`pages.py:126-136`), and serves a single-page image book
-  as stored on page 1 only (`pages.py:114-124`). That makes it the one page
+  without rendering (`pages.py:134-144`), and serves a single-page image book
+  as stored on page 1 only (`pages.py:122-132`). That makes it the one page
   read that works on a comic.
+- **A render can be refused with 503**, as of 1.10.0. A page not yet in the
+  render cache counts against `RENDER_QUEUE_LIMIT` (default 16 per app process,
+  env-overridable, `config/env.py:418-432`); past it the request answers 503
+  with `Retry-After: 1` at once (`routers/books/_render_cache.py:45-61`,
+  v1.10.0). Cache hits and the 304 path are never refused. Map pages do not go
+  through this cache, so they have no such 503.
 
 ## Archive downloads
 
@@ -1377,18 +1407,18 @@ Read from `backend/routers/campaigns/` at tag `v1.7.2`, and verified against the
 `campaigns files`.
 
 - **Writes are gated on ownership, not role.** Every write calls
-  `assert_can_manage` (`_helpers.py:468-487`, v1.9.1): 403 unless the caller owns the
+  `assert_can_manage` (`_helpers.py:182-201`, v1.10.0): 403 unless the caller owns the
   campaign — no admin override — and the owner's campaign access is enabled and
   the campaign is not archived. None of it is a route dependency, so no
   campaign command carries a role tag. The upload route's description says "GM
-  or admin role required" (`__init__.py:538`, v1.9.1); the handler calls
+  or admin role required" (`__init__.py:539`, v1.10.0); the handler calls
   `assert_can_manage` (`uploads.py:615`, v1.9.1), so it is owner only.
-- `create` checks roles itself (`core.py:163-166`, v1.9.1): guests are refused, and
+- `create` checks roles itself (`core.py:154-157`, v1.10.0): guests are refused, and
   `is_gm_campaign: true` needs gm or admin.
 - **`GET /campaigns/{id}` hides guest codes from everyone but the owner's
   session**, as of 1.8.0: `members[].guest_code` is nulled for any other
-  caller, and for the owner calling with an API key (`_helpers.py:637-649`,
-  v1.9.1), since a guest's code is their login.
+  caller, and for the owner calling with an API key (`_helpers.py:301-313`,
+  v1.10.0), since a guest's code is their login.
 - **An invalid `visibility` is silently `gm` on add and bulk**
   (`resources.py:164,214`), but a 400 on update (`resources.py:252`). The CLI's
   `--visibility` choice set catches it on add; bulk JSON does not.
@@ -1415,9 +1445,9 @@ Read from `backend/routers/campaigns/` at tag `v1.7.2`, and verified against the
   skipping the file cleanup that `DELETE /resources/{id}` does for a `file`
   link (`resources.py:300-302`), so the upload stays on disk.
 - **Delete leaves files on disk.** `delete_campaign` removes rows only
-  (`core.py:367-392`, v1.9.1): the banner (`<id>.webp`, `<id>_sm.webp`) and uploaded
+  (`core.py:358-384`, v1.10.0): the banner (`<id>.webp`, `<id>_sm.webp`) and uploaded
   files stay under `campaign_uploads/`. Verified against the 1.8.0 stack.
-- **Deleting a parent campaign is a 500.** `parent_campaign_id` has no `ondelete` (`models/campaigns.py:32`, v1.9.1), so deleting a campaign another names as its parent fails on the foreign key and leaves both rows. Verified against the 1.8.0 stack.
+- **Deleting a parent campaign is a 500.** `parent_campaign_id` has no `ondelete` (`models/campaigns.py:33`, v1.10.0), so deleting a campaign another names as its parent fails on the foreign key and leaves both rows. Verified against the 1.8.0 stack.
 
 ## Campaign wiki
 
@@ -1449,10 +1479,10 @@ at tag `v1.8.0`; starred items verified against the 1.8.0 stack. Backs
   (`rewrite_inbound_titles`).
 - **Delete moves children up to the deleted page's parent**, and an unknown page
   id is a silent 204 (`wiki.py:467-516`, v1.9.1).
-- **`||text||` belongs to the campaign owner** (`_helpers.py:301-334`, v1.9.1). `get`
+- **`||text||` belongs to the campaign owner** (`_helpers.py:14-63`, v1.10.0). `get`
   strips it for anyone else, leaving no marker; a non-owner's `||…||` is stored
   as literal text; a non-owner's save re-weaves stored secrets by position
-  (`merge_gm_secrets`, `:369`).
+  (`merge_gm_secrets`, `:83`).
 - **Search is a plain case-insensitive substring** over title and body; hidden
   pages are excluded, and non-owners do not match on secret text
   (`wiki.py:579-618`, v1.9.1). The query runs through SQL `ilike('%q%')`
@@ -1469,7 +1499,7 @@ Read from `backend/main.py`, `wiki_migration.py`, `session_creator.py` and
 restarting it. Why `campaigns` has no session-note commands.
 
 - **Every startup rolls session notes into wiki pages** and deletes them
-  (`main.py:294`, `wiki_migration.py:33-137`, v1.9.1). GM internal notes become a `gm`
+  (`main.py:296`, `wiki_migration.py:26-130`, v1.10.0). GM internal notes become a `gm`
   page "<title> - GM Notes", GM external notes a `group` page "<title>", and
   each player's note a `group` page "<title> - <name>'s Notes" authored by that
   player. All of them get `page_type: session` and `session_date`, filed under
@@ -1489,15 +1519,15 @@ Read from `backend/routers/campaigns/schedule.py`, `calendar.py` and
 `_schemas.py` at tag `v1.8.0`; verified against the 1.8.0 stack.
 
 - **Cancelling a date is a toggle.** `PUT availability/{date}/cancel` flips
-  `is_cancelled` on every row for that date (`schedule.py:296-338`, v1.9.1); a second
+  `is_cancelled` on every row for that date (`schedule.py:291-333`, v1.10.0); a second
   call undoes the first. It flips the caller's own row and copies that value
   to the rest; a caller with no row for the date is first recorded as
-  available (`schedule.py:311-335`, v1.9.1). It admits the owner or any admin, unlike the
+  available (`schedule.py:306-330`, v1.10.0). It admits the owner or any admin, unlike the
   campaign's other writes.
 - **`availability` `user_id` sets another member's row.**
   `AvailabilityUpdate.user_id` is `Optional[str]` (`_schemas.py:181`, v1.9.1);
   the owner or any admin may name another user, anyone else is a 403
-  (`schedule.py:247-253`, v1.9.1).
+  (`schedule.py:242-248`, v1.10.0).
 - **Calendar subscription is session only.** The three
   `/calendar/subscription` routes carry `x-api-key-access: none`; minting
   also needs `BASE_URL` (400 otherwise).

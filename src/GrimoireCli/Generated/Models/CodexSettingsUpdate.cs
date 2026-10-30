@@ -22,6 +22,14 @@ namespace GrimoireCli.Generated.Models
 #else
         public global::GrimoireCli.Generated.Models.CodexSettingsUpdate.CodexSettingsUpdate_send_hashes SendHashes { get; set; }
 #endif
+        /// <summary>The sync_collection property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public global::GrimoireCli.Generated.Models.CodexSettingsUpdate.CodexSettingsUpdate_sync_collection? SyncCollection { get; set; }
+#nullable restore
+#else
+        public global::GrimoireCli.Generated.Models.CodexSettingsUpdate.CodexSettingsUpdate_sync_collection SyncCollection { get; set; }
+#endif
         /// <summary>The url property</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
@@ -56,6 +64,7 @@ namespace GrimoireCli.Generated.Models
             return new Dictionary<string, Action<IParseNode>>
             {
                 { "send_hashes", n => { SendHashes = n.GetObjectValue<global::GrimoireCli.Generated.Models.CodexSettingsUpdate.CodexSettingsUpdate_send_hashes>(global::GrimoireCli.Generated.Models.CodexSettingsUpdate.CodexSettingsUpdate_send_hashes.CreateFromDiscriminatorValue); } },
+                { "sync_collection", n => { SyncCollection = n.GetObjectValue<global::GrimoireCli.Generated.Models.CodexSettingsUpdate.CodexSettingsUpdate_sync_collection>(global::GrimoireCli.Generated.Models.CodexSettingsUpdate.CodexSettingsUpdate_sync_collection.CreateFromDiscriminatorValue); } },
                 { "url", n => { Url = n.GetObjectValue<global::GrimoireCli.Generated.Models.CodexSettingsUpdate.CodexSettingsUpdate_url>(global::GrimoireCli.Generated.Models.CodexSettingsUpdate.CodexSettingsUpdate_url.CreateFromDiscriminatorValue); } },
             };
         }
@@ -67,6 +76,7 @@ namespace GrimoireCli.Generated.Models
         {
             if(ReferenceEquals(writer, null)) throw new ArgumentNullException(nameof(writer));
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.CodexSettingsUpdate.CodexSettingsUpdate_send_hashes>("send_hashes", SendHashes);
+            writer.WriteObjectValue<global::GrimoireCli.Generated.Models.CodexSettingsUpdate.CodexSettingsUpdate_sync_collection>("sync_collection", SyncCollection);
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.CodexSettingsUpdate.CodexSettingsUpdate_url>("url", Url);
             writer.WriteAdditionalData(AdditionalData);
         }
@@ -129,6 +139,68 @@ namespace GrimoireCli.Generated.Models
                 }
                 else {
                     writer.WriteObjectValue<global::GrimoireCli.Generated.Models.CodexSettingsUpdate_send_hashesMember1>(null, CodexSettingsUpdateSendHashesMember1);
+                }
+            }
+        }
+        /// <summary>
+        /// Composed type wrapper for classes <see cref="bool"/>, <see cref="global::GrimoireCli.Generated.Models.CodexSettingsUpdate_sync_collectionMember1"/>
+        /// </summary>
+        [global::System.CodeDom.Compiler.GeneratedCode("Kiota", "1.0.0")]
+        public partial class CodexSettingsUpdate_sync_collection : IComposedTypeWrapper, IParsable
+        {
+            /// <summary>Composed type representation for type <see cref="bool"/></summary>
+            public bool? Boolean { get; set; }
+            /// <summary>Composed type representation for type <see cref="global::GrimoireCli.Generated.Models.CodexSettingsUpdate_sync_collectionMember1"/></summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+            public global::GrimoireCli.Generated.Models.CodexSettingsUpdate_sync_collectionMember1? CodexSettingsUpdateSyncCollectionMember1 { get; set; }
+#nullable restore
+#else
+            public global::GrimoireCli.Generated.Models.CodexSettingsUpdate_sync_collectionMember1 CodexSettingsUpdateSyncCollectionMember1 { get; set; }
+#endif
+            /// <summary>
+            /// Creates a new instance of the appropriate class based on discriminator value
+            /// </summary>
+            /// <returns>A <see cref="global::GrimoireCli.Generated.Models.CodexSettingsUpdate.CodexSettingsUpdate_sync_collection"/></returns>
+            /// <param name="parseNode">The parse node to use to read the discriminator value and create the object</param>
+            public static global::GrimoireCli.Generated.Models.CodexSettingsUpdate.CodexSettingsUpdate_sync_collection CreateFromDiscriminatorValue(IParseNode parseNode)
+            {
+                if(ReferenceEquals(parseNode, null)) throw new ArgumentNullException(nameof(parseNode));
+                var result = new global::GrimoireCli.Generated.Models.CodexSettingsUpdate.CodexSettingsUpdate_sync_collection();
+                if(parseNode.GetBoolValue() is bool booleanValue)
+                {
+                    result.Boolean = booleanValue;
+                }
+                else {
+                    result.CodexSettingsUpdateSyncCollectionMember1 = new global::GrimoireCli.Generated.Models.CodexSettingsUpdate_sync_collectionMember1();
+                }
+                return result;
+            }
+            /// <summary>
+            /// The deserialization information for the current model
+            /// </summary>
+            /// <returns>A IDictionary&lt;string, Action&lt;IParseNode&gt;&gt;</returns>
+            public virtual IDictionary<string, Action<IParseNode>> GetFieldDeserializers()
+            {
+                if(CodexSettingsUpdateSyncCollectionMember1 != null)
+                {
+                    return ParseNodeHelper.MergeDeserializersForIntersectionWrapper(CodexSettingsUpdateSyncCollectionMember1);
+                }
+                return new Dictionary<string, Action<IParseNode>>();
+            }
+            /// <summary>
+            /// Serializes information the current object
+            /// </summary>
+            /// <param name="writer">Serialization writer to use to serialize this model</param>
+            public virtual void Serialize(ISerializationWriter writer)
+            {
+                if(ReferenceEquals(writer, null)) throw new ArgumentNullException(nameof(writer));
+                if(Boolean != null)
+                {
+                    writer.WriteBoolValue(null, Boolean);
+                }
+                else {
+                    writer.WriteObjectValue<global::GrimoireCli.Generated.Models.CodexSettingsUpdate_sync_collectionMember1>(null, CodexSettingsUpdateSyncCollectionMember1);
                 }
             }
         }

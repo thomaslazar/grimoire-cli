@@ -60,8 +60,9 @@ public static class LibraryCommand
         var command = new Command("scan-status", "Show the running scan's progress");
         command.AddRoleRequired("admin");
         command.AddHelpSection("Notes", HelpSectionPosition.Top,
-            "phase is scanning, indexing or ocr; the counters belong to the scan in",
-            "flight.",
+            "phase is scanning, reconciling, pruning, indexing, thumbnails or ocr,",
+            "and may be null while running; the counters belong to the scan in",
+            "flight. step_done/step_total count the current phase.",
             "",
             "A loose file directly under books/ counts toward total_books but is",
             "never scanned, so scanned_books >= total_books never becomes true. Poll",
@@ -118,8 +119,8 @@ public static class LibraryCommand
             "hand-entered metadata or bookmarks. A hung mount is safe — the server",
             "treats a timed-out path as present.",
             "",
-            "409 while a scan is running; commits per row, so a failure part-way",
-            "leaves earlier removals applied.");
+            "409 while a scan is running; commits every 200 rows, so a failure",
+            "part-way leaves earlier batches applied.");
         command.AddExamples("grimoire-cli library cleanup-missing");
         command.AddResponseExample<Generated.Models.CleanupResponse>();
         command.SetAction(async (parseResult, cancellationToken) =>

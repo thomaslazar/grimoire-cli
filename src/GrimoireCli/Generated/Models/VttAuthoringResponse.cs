@@ -31,7 +31,7 @@ namespace GrimoireCli.Generated.Models
 #else
         public string Filename { get; set; }
 #endif
-        /// <summary>Detected grid dimensions for a map (see `_helpers._map_image_info`).`cell_px` is only present on the DPI/computed branches — the filename branchomits it, and PDF maps have it stripped — so it is Optional.Floats rather than ints: a manual override may carry a fractional cell countfor a map that bleeds part of a cell past its grid (issue #125). Inferredgrids still come back whole.</summary>
+        /// <summary>Detected grid dimensions for a map (see `services.media.maps.map_image_info`).`cell_px` is only present on the DPI/computed branches — the filename branchomits it, and PDF maps have it stripped — so it is Optional.Floats rather than ints: a manual override may carry a fractional cell countfor a map that bleeds part of a cell past its grid (issue #125). Inferredgrids still come back whole.</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
         public global::GrimoireCli.Generated.Models.MapGrid? Grid { get; set; }

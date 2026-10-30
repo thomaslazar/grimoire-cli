@@ -24,6 +24,8 @@ namespace GrimoireCli.Generated.Models
 #endif
         /// <summary>The send_hashes property</summary>
         public bool? SendHashes { get; set; }
+        /// <summary>The sync_collection property</summary>
+        public bool? SyncCollection { get; set; }
         /// <summary>The url property</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
@@ -59,6 +61,7 @@ namespace GrimoireCli.Generated.Models
             {
                 { "locked", n => { Locked = n.GetCollectionOfPrimitiveValues<string>()?.AsList(); } },
                 { "send_hashes", n => { SendHashes = n.GetBoolValue(); } },
+                { "sync_collection", n => { SyncCollection = n.GetBoolValue(); } },
                 { "url", n => { Url = n.GetStringValue(); } },
             };
         }
@@ -71,6 +74,7 @@ namespace GrimoireCli.Generated.Models
             if(ReferenceEquals(writer, null)) throw new ArgumentNullException(nameof(writer));
             writer.WriteCollectionOfPrimitiveValues<string>("locked", Locked);
             writer.WriteBoolValue("send_hashes", SendHashes);
+            writer.WriteBoolValue("sync_collection", SyncCollection);
             writer.WriteStringValue("url", Url);
             writer.WriteAdditionalData(AdditionalData);
         }

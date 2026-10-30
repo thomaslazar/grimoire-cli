@@ -275,8 +275,8 @@ public static class BooksCommand
         };
         command.AddRoleRequired("gm or admin");
         command.AddHelpSection("Notes", HelpSectionPosition.Top,
-            "OCR only: 400 unless the book is an image-only PDF. A book with a real",
-            "text layer has nothing to re-OCR.",
+            "OCR only: 400 unless the book's can_reocr is true (a PDF that is",
+            "mostly image, by text coverage).",
             "",
             "Clears the book's search index and re-queues it from page 1. The OCR",
             "runs in the background — watch it with:",

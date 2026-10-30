@@ -8,7 +8,7 @@ using System;
 namespace GrimoireCli.Generated.Models
 {
     /// <summary>
-    /// `GET /maps/{id}` — map metadata, folder context, and image info.Everything from `_map_image_info` is nullable by construction: the dict isseeded with `None`s and only filled in when the file could be measured(archives, unreadable files, and PDFs all leave some or all of it None).
+    /// `GET /maps/{id}` — map metadata, folder context, and image info.Everything from `map_image_info` is nullable by construction: the dict isseeded with `None`s and only filled in when the file could be measured(archives, unreadable files, and PDFs all leave some or all of it None).
     /// </summary>
     [global::System.CodeDom.Compiler.GeneratedCode("Kiota", "1.0.0")]
     public partial class MapDetailResponse : IAdditionalDataHolder, IParsable

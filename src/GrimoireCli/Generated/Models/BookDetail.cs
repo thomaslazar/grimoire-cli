@@ -39,6 +39,8 @@ namespace GrimoireCli.Generated.Models
 #else
         public List<string> Authors { get; set; }
 #endif
+        /// <summary>The can_reocr property</summary>
+        public bool? CanReocr { get; set; }
         /// <summary>The category property</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
@@ -374,6 +376,7 @@ namespace GrimoireCli.Generated.Models
                 { "added_at", n => { AddedAt = n.GetObjectValue<global::GrimoireCli.Generated.Models.BookDetail.BookDetail_added_at>(global::GrimoireCli.Generated.Models.BookDetail.BookDetail_added_at.CreateFromDiscriminatorValue); } },
                 { "artists", n => { Artists = n.GetCollectionOfPrimitiveValues<string>()?.AsList(); } },
                 { "authors", n => { Authors = n.GetCollectionOfPrimitiveValues<string>()?.AsList(); } },
+                { "can_reocr", n => { CanReocr = n.GetBoolValue(); } },
                 { "category", n => { Category = n.GetObjectValue<global::GrimoireCli.Generated.Models.BookDetail.BookDetail_category>(global::GrimoireCli.Generated.Models.BookDetail.BookDetail_category.CreateFromDiscriminatorValue); } },
                 { "codex_id", n => { CodexId = n.GetObjectValue<global::GrimoireCli.Generated.Models.BookDetail.BookDetail_codex_id>(global::GrimoireCli.Generated.Models.BookDetail.BookDetail_codex_id.CreateFromDiscriminatorValue); } },
                 { "content_token", n => { ContentToken = n.GetObjectValue<global::GrimoireCli.Generated.Models.BookDetail.BookDetail_content_token>(global::GrimoireCli.Generated.Models.BookDetail.BookDetail_content_token.CreateFromDiscriminatorValue); } },
@@ -428,6 +431,7 @@ namespace GrimoireCli.Generated.Models
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.BookDetail.BookDetail_added_at>("added_at", AddedAt);
             writer.WriteCollectionOfPrimitiveValues<string>("artists", Artists);
             writer.WriteCollectionOfPrimitiveValues<string>("authors", Authors);
+            writer.WriteBoolValue("can_reocr", CanReocr);
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.BookDetail.BookDetail_category>("category", Category);
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.BookDetail.BookDetail_codex_id>("codex_id", CodexId);
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.BookDetail.BookDetail_content_token>("content_token", ContentToken);

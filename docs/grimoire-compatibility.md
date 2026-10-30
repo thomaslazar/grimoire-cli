@@ -13,7 +13,8 @@
 | 0.6.0 | 1.8.0 | superseded by 0.7.0 |
 | 0.7.0 | 1.9.0 | superseded by 0.7.1 |
 | 0.7.1 | 1.9.0 – 1.9.1 | superseded by 0.7.2 |
-| 0.7.2 | 1.9.0 – 1.9.2 | current, on `main` |
+| 0.7.2 | 1.9.0 – 1.9.2 | superseded by 0.7.3 |
+| 0.7.3 | 1.9.0 – 1.10.0 | current, on `main` |
 
 **The floor rises only when something forces it**, not on every server release.
 Each row above records a pairing that was necessary at the time — 1.5.6 → 1.6.0
@@ -31,7 +32,7 @@ an older Grimoire does not know is dropped by Pydantic rather than rejected, so
 the command answers 200 and does nothing — the one failure the version warning
 exists to catch.
 
-`main` targets Grimoire 1.9.2. Reaching 1.6.0 was more than a version bump: it
+`main` targets Grimoire 1.10.0. Reaching 1.6.0 was more than a version bump: it
 shortened the access token from 30 days to 30 minutes and made the library
 writable, which is why the CLI renews its own session
 ([authentication.md](authentication.md)) and why the `files` endpoints exist at
@@ -76,7 +77,7 @@ plain `BaseModel`s with Pydantic's default `extra='ignore'`, so that flag's fiel
 is dropped and the folder is created with no marker and a 200. A silent no-op is
 what the floor warning is for; without the new flag this release would not have
 needed one.
-`docker/docker-compose.yml` pins the `1.9.2` release tag, so the spec cannot
+`docker/docker-compose.yml` pins the `1.10.0` release tag, so the spec cannot
 drift under the committed client between regenerations.
 
 **1.7.1 raised `MaxTestedVersion` and left the floor alone** — the first bump
@@ -220,10 +221,25 @@ sends was added or removed. What moved around it:
 - **`GET /api/maintenance/cleanup-missing/preview`** is a new dry run, and the
   Codex compare routes are new; neither is implemented here.
 
+**1.10.0 raised `MaxTestedVersion` and left the floor alone.** No request a
+command sends changed; the help text did.
+
+- **Media `--limit` is capped at 100000** (`routers/_browse.py`); the CLI now
+  enforces it. 1.9.x had no ceiling but the same default, so nothing is lost.
+- **`library scan-status`** gains the `reconciling` and `pruning` phases and
+  `step_done` / `step_total`. **`library cleanup-missing`** commits every 200
+  rows rather than per row (`services/library_cleanup.py`).
+- **`books reindex`** gates on `can_reocr`, now on every book, rather than on
+  image-only PDFs.
+- **Add-on script approval carries over** an install or upgrade while the
+  script and its env names are unchanged (`addons/install.py`).
+- **Codex collection sync, character transfer and schema updates** are new;
+  none is implemented here.
+
 ## Runtime check
 
 `src/GrimoireCli/Api/GrimoireApiClient.cs` defines `MinSupportedVersion` and
-`MaxTestedVersion`, currently `"1.9.0"` and `"1.9.2"`. A check runs before the first
+`MaxTestedVersion`, currently `"1.9.0"` and `"1.10.0"`. A check runs before the first
 request of any command, calling `GET /api/about` and comparing the reported
 version against that range. It is throttled to once every 24 hours — a
 config with a recent `lastVersionCheck` skips the probe entirely — and

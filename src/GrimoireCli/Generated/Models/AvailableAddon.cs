@@ -99,6 +99,14 @@ namespace GrimoireCli.Generated.Models
 #endif
         /// <summary>The requires_script property</summary>
         public bool? RequiresScript { get; set; }
+        /// <summary>The script_env property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public List<string>? ScriptEnv { get; set; }
+#nullable restore
+#else
+        public List<string> ScriptEnv { get; set; }
+#endif
         /// <summary>The script_sha256 property</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
@@ -170,6 +178,7 @@ namespace GrimoireCli.Generated.Models
                 { "kind", n => { Kind = n.GetStringValue(); } },
                 { "name", n => { Name = n.GetStringValue(); } },
                 { "requires_script", n => { RequiresScript = n.GetBoolValue(); } },
+                { "script_env", n => { ScriptEnv = n.GetCollectionOfPrimitiveValues<string>()?.AsList(); } },
                 { "script_sha256", n => { ScriptSha256 = n.GetStringValue(); } },
                 { "source_url", n => { SourceUrl = n.GetObjectValue<global::GrimoireCli.Generated.Models.AvailableAddon.AvailableAddon_source_url>(global::GrimoireCli.Generated.Models.AvailableAddon.AvailableAddon_source_url.CreateFromDiscriminatorValue); } },
                 { "target", n => { Target = n.GetStringValue(); } },
@@ -196,6 +205,7 @@ namespace GrimoireCli.Generated.Models
             writer.WriteStringValue("kind", Kind);
             writer.WriteStringValue("name", Name);
             writer.WriteBoolValue("requires_script", RequiresScript);
+            writer.WriteCollectionOfPrimitiveValues<string>("script_env", ScriptEnv);
             writer.WriteStringValue("script_sha256", ScriptSha256);
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.AvailableAddon.AvailableAddon_source_url>("source_url", SourceUrl);
             writer.WriteStringValue("target", Target);

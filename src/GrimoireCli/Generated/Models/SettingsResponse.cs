@@ -8,7 +8,7 @@ using System;
 namespace GrimoireCli.Generated.Models
 {
     /// <summary>
-    /// The full admin settings payload, as built by `_helpers._to_typed`.Every field is derived from the string-valued `app_settings` table through`_DEFAULTS`, so each one is always present and already coerced to its finaltype — none can come back null. The `*_env_locked` booleans say whether thematching field is pinned by an environment variable and so read-only in theadmin UI.
+    /// The full admin settings payload, as built by `services.app_settings.to_typed`.Every field is derived from the string-valued `app_settings` table through`_DEFAULTS`, so each one is always present and already coerced to its finaltype — none can come back null. The `*_env_locked` booleans say whether thematching field is pinned by an environment variable and so read-only in theadmin UI.
     /// </summary>
     [global::System.CodeDom.Compiler.GeneratedCode("Kiota", "1.0.0")]
     public partial class SettingsResponse : IAdditionalDataHolder, IParsable

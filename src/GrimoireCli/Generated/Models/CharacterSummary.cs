@@ -113,6 +113,14 @@ namespace GrimoireCli.Generated.Models
 #else
         public string SchemaRef { get; set; }
 #endif
+        /// <summary>The schema_version property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public string? SchemaVersion { get; set; }
+#nullable restore
+#else
+        public string SchemaVersion { get; set; }
+#endif
         /// <summary>The status property</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
@@ -192,6 +200,7 @@ namespace GrimoireCli.Generated.Models
                 { "schema_missing", n => { SchemaMissing = n.GetBoolValue(); } },
                 { "schema_name", n => { SchemaName = n.GetStringValue(); } },
                 { "schema_ref", n => { SchemaRef = n.GetStringValue(); } },
+                { "schema_version", n => { SchemaVersion = n.GetStringValue(); } },
                 { "status", n => { Status = n.GetStringValue(); } },
                 { "system", n => { System = n.GetStringValue(); } },
                 { "updated_at", n => { UpdatedAt = n.GetObjectValue<global::GrimoireCli.Generated.Models.CharacterSummary.CharacterSummary_updated_at>(global::GrimoireCli.Generated.Models.CharacterSummary.CharacterSummary_updated_at.CreateFromDiscriminatorValue); } },
@@ -221,6 +230,7 @@ namespace GrimoireCli.Generated.Models
             writer.WriteBoolValue("schema_missing", SchemaMissing);
             writer.WriteStringValue("schema_name", SchemaName);
             writer.WriteStringValue("schema_ref", SchemaRef);
+            writer.WriteStringValue("schema_version", SchemaVersion);
             writer.WriteStringValue("status", Status);
             writer.WriteStringValue("system", System);
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.CharacterSummary.CharacterSummary_updated_at>("updated_at", UpdatedAt);

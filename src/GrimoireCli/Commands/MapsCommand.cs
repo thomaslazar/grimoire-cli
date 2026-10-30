@@ -30,7 +30,7 @@ public static class MapsCommand
     private static Command CreateListCommand()
     {
         var mapTypeOption = new Option<string?>("--map-type") { Description = "Filter by map type" };
-        var limitOption = OptionHelpers.Range("--limit", "Results per page (the server sets no maximum)", 1);
+        var limitOption = OptionHelpers.Range("--limit", "Results per page; max 100000", 1, 100000);
         limitOption.DefaultValueFactory = _ => 100;
         var offsetOption = OptionHelpers.Range("--offset", "Items to skip", 0);
         var browse = new MediaBrowseOptions();
@@ -215,7 +215,8 @@ public static class MapsCommand
             idOption, pageOption, widthOption, outputOption
         };
         command.AddHelpSection("Notes", HelpSectionPosition.Top,
-            "An image map is streamed as stored and accepts page 1 only.",
+            "An image map accepts page 1 only and is re-encoded as WebP, shrunk to",
+            "--width but never enlarged; an SVG is streamed as stored.",
             "",
             "--width defaults to 1600 and takes 16-3000; outside that is a 422.",
             "",
