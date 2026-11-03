@@ -151,10 +151,10 @@ public class BooksCommandTests
     }
 
     [Fact]
-    public void ThumbnailDocumentsTheDashAndTheScanOrigin()
+    public void ThumbnailDocumentsTheDashAndTheCoverOrigin()
     {
         var output = RenderHelp(["books", "thumbnail"], full: false);
-        Assert.Contains("generated from the file during a scan", output);
+        Assert.Contains("The custom cover if one is set, else the thumbnail", output);
         Assert.Contains("has_thumbnail", output);
         Assert.Contains("--output -", output);
     }

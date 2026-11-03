@@ -14,13 +14,14 @@
 | 0.7.0 | 1.9.0 | superseded by 0.7.1 |
 | 0.7.1 | 1.9.0 – 1.9.1 | superseded by 0.7.2 |
 | 0.7.2 | 1.9.0 – 1.9.2 | superseded by 0.7.3 |
-| 0.7.3 | 1.9.0 – 1.10.0 | current, on `main` |
+| 0.7.3 | 1.9.0 – 1.10.0 | superseded by 0.7.4 |
+| 0.7.4 | 1.10.1 | current, on `main` |
 
 **The floor rises only when something forces it**, not on every server release.
 Each row above records a pairing that was necessary at the time — 1.5.6 → 1.6.0
 because the 1.6.x line changed the token lifetime and made the library writable,
 1.7.0, 1.7.2, 1.8.0 and then 1.9.0 because each added a flag older servers silently
-drop (below).
+drop, and 1.10.1 because `books cover` needs routes older servers lack (below).
 Absent a reason like that, a bump raises `MaxTestedVersion` and leaves the floor
 where it is. Whoever stays on an older Grimoire stays on the grimoire-cli release
 its row names. Those releases get no further fixes: upstream has no LTS line, so
@@ -32,7 +33,7 @@ an older Grimoire does not know is dropped by Pydantic rather than rejected, so
 the command answers 200 and does nothing — the one failure the version warning
 exists to catch.
 
-`main` targets Grimoire 1.10.0. Reaching 1.6.0 was more than a version bump: it
+`main` targets Grimoire 1.10.1. Reaching 1.6.0 was more than a version bump: it
 shortened the access token from 30 days to 30 minutes and made the library
 writable, which is why the CLI renews its own session
 ([authentication.md](authentication.md)) and why the `files` endpoints exist at
@@ -77,7 +78,7 @@ plain `BaseModel`s with Pydantic's default `extra='ignore'`, so that flag's fiel
 is dropped and the folder is created with no marker and a 200. A silent no-op is
 what the floor warning is for; without the new flag this release would not have
 needed one.
-`docker/docker-compose.yml` pins the `1.10.0` release tag, so the spec cannot
+`docker/docker-compose.yml` pins the `1.10.1` release tag, so the spec cannot
 drift under the committed client between regenerations.
 
 **1.7.1 raised `MaxTestedVersion` and left the floor alone** — the first bump
@@ -236,10 +237,22 @@ command sends changed; the help text did.
 - **Codex collection sync, character transfer and schema updates** are new;
   none is implemented here.
 
+**1.10.1 raised the floor to itself.**
+
+- **`books cover upload | from-source | delete`** wrap the new
+  `/api/books/{id}/cover` routes; an older server answers them 404. Reading
+  the cover stays `books thumbnail`, which now serves a custom cover first
+  (`services/books/covers.py:97-99`).
+- **Read responses gain fields:** books carry `has_custom_cover`,
+  `cover_version`, `access_level` and `effective_access_level`; systems carry
+  `access_level`. `has_thumbnail` is also true for a custom cover.
+- **Backups include book covers**, and `library cleanup-missing` prunes
+  orphaned ones.
+
 ## Runtime check
 
 `src/GrimoireCli/Api/GrimoireApiClient.cs` defines `MinSupportedVersion` and
-`MaxTestedVersion`, currently `"1.9.0"` and `"1.10.0"`. A check runs before the first
+`MaxTestedVersion`, currently `"1.10.1"` and `"1.10.1"`. A check runs before the first
 request of any command, calling `GET /api/about` and comparing the reported
 version against that range. It is throttled to once every 24 hours — a
 config with a recent `lastVersionCheck` skips the probe entirely — and

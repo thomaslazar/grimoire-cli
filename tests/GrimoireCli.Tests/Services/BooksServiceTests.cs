@@ -63,4 +63,24 @@ public class BooksServiceTests
     {
         Assert.DoesNotContain("width=", Uri(Client().Api.Api.Books["b1"].Page[7].ToGetRequestInformation()));
     }
+
+    [Fact]
+    public void EachCoverRouteResolvesToItsOwnPath()
+    {
+        var api = Client().Api.Api.Books["b1"];
+        Assert.Contains("/api/books/b1/cover", Uri(api.Cover.ToDeleteRequestInformation()));
+        Assert.Contains("/api/books/b1/cover", Uri(api.Cover.ToPostRequestInformation(
+            GrimoireCli.Services.BooksService.BuildCoverUploadBody(new byte[] { 1 }, "cover.png"))));
+        Assert.Contains("/api/books/b1/cover/from-source", Uri(api.Cover.FromSource.ToPostRequestInformation(
+            new Generated.Models.BookCoverSourceIn { SourceType = "map", SourceId = "m1" })));
+    }
+
+    // The server reads the part by name; a rename would upload nothing and the
+    // failure would look like a validation error rather than a client bug.
+    [Fact]
+    public void TheUploadPartIsNamedFile()
+    {
+        var body = GrimoireCli.Services.BooksService.BuildCoverUploadBody(new byte[] { 1, 2, 3 }, "cover.png");
+        Assert.Equal(new byte[] { 1, 2, 3 }, body.GetPartValue<byte[]>("file", "cover.png"));
+    }
 }

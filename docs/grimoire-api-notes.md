@@ -566,9 +566,21 @@ and `books thumbnail`.
   `PIL.Image.verify()`, so a disguised file is a 400 even when the declared
   type is right. It replaces any existing upload and answers
   `{"cover_image": "<system-id><ext>"}`. `DELETE` answers `{"status": "ok"}`.
-- **Books have no cover endpoint of their own.** `GET /api/books/{id}/thumbnail`
-  is scan-derived from the book file, not an uploaded image, and there is no
-  corresponding upload or delete for it.
+- **Books gained a custom cover in 1.10.1**, with no `GET` of its own:
+  `POST`/`DELETE /api/books/{id}/cover` and `POST .../cover/from-source` (gm or
+  admin), and `GET /api/books/{id}/thumbnail` serves the custom cover first,
+  else the scan-generated thumbnail (`book_cover_path`,
+  `services/books/covers.py:97-99`; `routers/books/core.py:543`, v1.10.1). The
+  routes mirror the system ones — same types, 10 MB cap, 413 before 400 — but
+  re-encode to WebP at most 900px wide (`COVER_MAX_WIDTH`, `covers.py:40`), and
+  answer `{cover_image, has_custom_cover, cover_version, has_thumbnail}` for
+  all three, including the delete (`routers/books/covers.py:27-35`). The delete
+  succeeds with no custom cover set. A rescan never replaces the cover. Each
+  write rewrites a `.cover.jpg` sidecar the book already has, after the commit
+  and never failing the request (`covers.py:37-47`, `:95`).
+- **`has_thumbnail` on book reads is true for a custom cover too**
+  (`bool(has_thumbnail or cover_image)`, `routers/books/core.py:132,230`,
+  v1.10.1), so it stays the test for whether `books thumbnail` will 404.
 
 ### Cover from-source
 
@@ -725,6 +737,9 @@ Verified against v1.5.6 by reading `backend/routers/maintenance/`, backing
   books: upstream issue #309, fixed by the release this CLI targets. Systems are
   walked deepest-first so a container emptied earlier in the same pass is still
   collected.
+- **Orphaned book covers go too**, as of 1.10.1: custom covers whose book is
+  gone are pruned last (`prune_orphan_covers`, `library_cleanup.py:389-391`,
+  v1.10.1). The response has no count for them.
 - **A running scan is a 409**, not a queue: `"A library scan is already running;
   retry after it completes."` (`routers/maintenance/core.py:17-25`, v1.10.0). A stale scan status does not
   count — see "Content and rescan". `library scan-status` reports the state it
@@ -827,9 +842,9 @@ byte-identical to `v1.6.0`.
   held off for its duration, and answers **409** when a backup is already in
   flight (`RuntimeError` → `HTTPException(409)`). An `OSError` becomes a 500.
 - **The archive does not contain the library.** It holds the database plus
-  `campaign_uploads`, `system_covers`, `audio_covers`, `branding` (as of 1.9.0)
-  and, as of 1.9.1, `character_portraits` and `character_images`
-  (`services/backup/_archive.py:32-39`, v1.9.1), and its own manifest names the excludes:
+  `campaign_uploads`, `system_covers`, `audio_covers`, `branding` (as of 1.9.0),
+  as of 1.9.1 `character_portraits` and `character_images`, and as of 1.10.1
+  `book_covers` (`services/backup/_archive.py:33-41`, v1.10.1), and its own manifest names the excludes:
   `library (mounted read-only; back it up separately)`, `thumbnails` and
   `page_cache`, the last two regenerating on demand. So a backup taken before a
   destructive file operation protects the catalogue, not the files.

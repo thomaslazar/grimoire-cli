@@ -223,7 +223,10 @@ grimoire-cli config set server https://grimoire.example.com
 | `books batch-tag {--input <file> \| --stdin}` | Add tags to many books, additively; exit 3 if partial (gm or admin) |
 | `books reindex --id <id> [--ocr-dpi <n>]` | Re-run OCR on one book (gm or admin) |
 | `books rescan --id <id>` | Re-read one book from disk and rebuild its index (gm or admin) |
-| `books thumbnail --id <id> --output <path\|->` | Download a book's scan-generated cover thumbnail |
+| `books thumbnail --id <id> --output <path\|->` | Download a book's cover: the custom one if set, else the scan-generated thumbnail |
+| `books cover upload --id <id> --file <path>` | Upload a book's custom cover (gm or admin) |
+| `books cover delete --id <id>` | Remove a book's custom cover (gm or admin) |
+| `books cover from-source --id <id> --source-type <type> --source-id <id>` | Set a book cover from a library image (gm or admin) |
 | `books file --id <id> --output <path\|->` | Download the book file as stored |
 | `books page --id <id> --page <n> [--width <px>] --output <path\|->` | Render or extract one page as an image |
 | `books toc --id <id>` | The book's table of contents (PDF, EPUB or DjVu) |
@@ -518,7 +521,7 @@ Verified API behaviour worth reading before designing a command: [docs/grimoire-
 
 ## Compatibility
 
-Requires Grimoire **v1.9.0 – v1.10.0**. The CLI warns on login if the server reports a version outside that range. See [docs/grimoire-compatibility.md](docs/grimoire-compatibility.md) for the version matrix and the bump procedure.
+Requires Grimoire **v1.10.1**. The CLI warns on login if the server reports a version outside that range. See [docs/grimoire-compatibility.md](docs/grimoire-compatibility.md) for the version matrix and the bump procedure.
 
 ## License
 

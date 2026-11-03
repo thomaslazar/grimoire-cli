@@ -1,5 +1,6 @@
 using System.Text;
 using GrimoireCli.Api;
+using GrimoireCli.Commands;
 
 namespace GrimoireCli.Services;
 
@@ -109,6 +110,72 @@ public class BooksService
     {
         var info = _client.Api.Api.Books[id].Thumbnail.ToGetRequestInformation();
         return await _client.SendStreamAsync(info);
+    }
+
+    /// <summary>
+    /// POST /api/books/{id}/cover. Multipart; the server checks the content
+    /// type, then the size (routers/books/covers.py:50-63).
+    /// </summary>
+    public async Task<string> UploadCoverAsync(string id, string filePath)
+    {
+        byte[] bytes;
+        try
+        {
+            bytes = await File.ReadAllBytesAsync(filePath);
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or ArgumentException or NotSupportedException)
+        {
+            throw new BodyInputException($"Could not read {filePath}: {ex.Message}");
+        }
+        var info = _client.Api.Api.Books[id].Cover.ToPostRequestInformation(BuildCoverUploadBody(bytes, filePath));
+        return await _client.SendAsync(info, permissionHint: "the gm or admin role");
+    }
+
+    /// <summary>
+    /// Internal so a test can pin the part name the server reads the file from.
+    /// </summary>
+    internal static Microsoft.Kiota.Abstractions.MultipartBody BuildCoverUploadBody(byte[] bytes, string filePath)
+    {
+        var body = new Microsoft.Kiota.Abstractions.MultipartBody();
+        body.AddOrReplacePart("file", MimeForExtension(filePath), bytes, Path.GetFileName(filePath));
+        return body;
+    }
+
+    /// <summary>
+    /// The content type the server checks `file.content_type` against. Unknown
+    /// extensions send octet-stream and let the server refuse — which types are
+    /// acceptable is its policy, not ours. Internal so a test can pin the map.
+    /// </summary>
+    internal static string MimeForExtension(string path) => Path.GetExtension(path).ToLowerInvariant() switch
+    {
+        ".png" => "image/png",
+        ".jpg" or ".jpeg" => "image/jpeg",
+        ".webp" => "image/webp",
+        ".gif" => "image/gif",
+        _ => "application/octet-stream",
+    };
+
+    /// <summary>DELETE /api/books/{id}/cover. The generated thumbnail is served again
+    /// (routers/books/covers.py:85-96).</summary>
+    public async Task<string> DeleteCoverAsync(string id)
+    {
+        var info = _client.Api.Api.Books[id].Cover.ToDeleteRequestInformation();
+        return await _client.SendAsync(info, permissionHint: "the gm or admin role");
+    }
+
+    /// <summary>
+    /// POST /api/books/{id}/cover/from-source. Same validator as the systems
+    /// and audio verbs, campaign_file excluded (routers/books/_schemas.py:308-327).
+    /// </summary>
+    // No notFoundHint: this route has two independent 404 sources — the book
+    // lookup, and load_source_image's per-source messages — and a hint would
+    // replace the server's discriminating body with one that cannot tell them
+    // apart.
+    public async Task<string> CoverFromSourceAsync(string id, string sourceType, string sourceId)
+    {
+        var body = new Generated.Models.BookCoverSourceIn { SourceType = sourceType, SourceId = sourceId };
+        var info = _client.Api.Api.Books[id].Cover.FromSource.ToPostRequestInformation(body);
+        return await _client.SendAsync(info, permissionHint: "the gm or admin role");
     }
 
     /// <summary>
