@@ -14,8 +14,8 @@
 | 0.7.0 | 1.9.0 | superseded by 0.7.1 |
 | 0.7.1 | 1.9.0 – 1.9.1 | superseded by 0.7.2 |
 | 0.7.2 | 1.9.0 – 1.9.2 | superseded by 0.7.3 |
-| 0.7.3 | 1.9.0 – 1.10.0 | superseded by 0.8.0 |
-| 0.8.0 | 1.10.1 | current, on `main` |
+| 0.7.3 | 1.9.0 – 1.10.0 | superseded by 0.7.4 |
+| 0.7.4 | 1.10.1 | current, on `main` |
 
 **The floor rises only when something forces it**, not on every server release.
 Each row above records a pairing that was necessary at the time — 1.5.6 → 1.6.0
