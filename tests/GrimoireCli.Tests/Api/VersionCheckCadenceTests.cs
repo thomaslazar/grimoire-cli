@@ -34,7 +34,7 @@ public class VersionCheckCadenceTests
 
     [Fact]
     public void AnInRangeVersionWarnsAboutNothing()
-        => Assert.Null(GrimoireApiClient.VersionWarning("1.9.0", previous: "1.9.0"));
+        => Assert.Null(GrimoireApiClient.VersionWarning("1.10.1", previous: "1.10.1"));
 
     [Fact]
     public void AnUnknownVersionWarnsAboutNothing()
@@ -48,7 +48,7 @@ public class VersionCheckCadenceTests
         var warning = GrimoireApiClient.VersionWarning("1.11.0", previous: null);
         Assert.NotNull(warning);
         Assert.Contains("1.11.0", warning);
-        Assert.Contains("1.10.0", warning);
+        Assert.Contains("1.10.1", warning);
         Assert.Contains(GrimoireApiClient.ClientVersion, warning);
         Assert.Contains("newer grimoire-cli", warning);
     }
@@ -86,7 +86,7 @@ public class VersionCheckCadenceTests
     // An unchanged in-range version stays silent even across checks.
     [Fact]
     public void AnUnchangedInRangeVersionStaysSilent()
-        => Assert.Null(GrimoireApiClient.VersionWarning("1.9.0", previous: "1.9.0"));
+        => Assert.Null(GrimoireApiClient.VersionWarning("1.10.1", previous: "1.10.1"));
 
     // The bug this fixes: "nightly" parsed as 0.0.0 and so read as older than the
     // minimum supported version, which is a claim the string does not support.

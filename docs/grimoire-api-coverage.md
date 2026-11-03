@@ -2,7 +2,7 @@
 
 Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any) that implements it.
 
-- **Reference:** spec fetched live from the pinned stack's `/api/openapi.json` (v1.10.0, 322 paths, 421 operations) and the upstream router source read from the same container. Tested range: `1.9.0`-`1.10.0` (`GrimoireApiClient.cs`).
+- **Reference:** spec fetched live from the pinned stack's `/api/openapi.json` (v1.10.1, 324 paths, 424 operations) and the upstream router source read from the same container. Tested range: `1.10.1` only (`GrimoireApiClient.cs`).
 - **Perm** column uses Grimoire's roles (`admin` / `gm or admin` / `not guest`); blank = any authenticated user. `?` = a dependency this script could not resolve.
 - **Key** column is the API key permission a route needs (`—`: no key can call it), derived from `backend/api_keys.py` in the same container.
 - ✅ = covered by a CLI command · — = not implemented · 🔒 = internal-only (no user-facing verb); 🔒 rows never count as covered.
@@ -20,7 +20,7 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | auth | 2 / 15 |
 | backups | 6 / 6 |
 | bookmarks | 0 / 4 |
-| books | 16 / 21 |
+| books | 19 / 24 |
 | campaigns | 80 / 93 |
 | characters | 0 / 25 |
 | codex | 0 / 11 |
@@ -48,7 +48,7 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | token-frames | 0 / 2 |
 | tokens | 11 / 11 |
 | users | 0 / 16 |
-| **Total** | **238 / 421** |
+| **Total** | **241 / 424** |
 
 2 operation(s) are internal-only (🔒) and excluded from covered counts.
 
@@ -164,6 +164,9 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | POST | `/api/books/bulk/tags` | Bulk add tags to books | gm or admin | books: write | `books batch-tag` ✅ |
 | GET | `/api/books/{book_id}` | Get a book |  | books: read | `books get` ✅ |
 | PATCH | `/api/books/{book_id}` | Update book metadata | gm or admin | books: write | `books update` ✅ |
+| POST | `/api/books/{book_id}/cover` | Upload a book cover | gm or admin | books: write | `books cover upload` ✅ |
+| DELETE | `/api/books/{book_id}/cover` | Remove a book's custom cover | gm or admin | books: write | `books cover delete` ✅ |
+| POST | `/api/books/{book_id}/cover/from-source` | Set a book cover from an existing image | gm or admin | books: write | `books cover from-source` ✅ |
 | POST | `/api/books/{book_id}/export` | Export pages or cut-outs |  | books: read | — |
 | POST | `/api/books/{book_id}/export/save` | Save an export into the library | admin | books: write | — |
 | GET | `/api/books/{book_id}/file` | Download book file |  | books: read | `books file` ✅ |

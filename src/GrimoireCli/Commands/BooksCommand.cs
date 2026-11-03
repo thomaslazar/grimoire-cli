@@ -24,6 +24,7 @@ public static class BooksCommand
         command.Subcommands.Add(CreateReindexCommand());
         command.Subcommands.Add(CreateRescanCommand());
         command.Subcommands.Add(CreateThumbnailCommand());
+        command.Subcommands.Add(BookCoverCommands.Create());
         command.Subcommands.Add(CreateFileCommand());
         command.Subcommands.Add(CreatePageCommand());
         command.Subcommands.Add(CreateTocCommand());
@@ -339,8 +340,8 @@ public static class BooksCommand
             idOption, outputOption
         };
         command.AddHelpSection("Notes", HelpSectionPosition.Top,
-            "The cover thumbnail generated from the file during a scan, not an",
-            "uploaded image. 404 when has_thumbnail is false in books list.",
+            "The custom cover if one is set, else the thumbnail generated from the",
+            "file during a scan. 404 when has_thumbnail is false in books list.",
             "",
             "--output - writes the image to stdout; a path writes the file and",
             "prints {path, bytes}.");

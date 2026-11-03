@@ -982,6 +982,36 @@ else
   ok "books thumbnail skipped — the server generated no thumbnail for this fixture"
 fi
 
+# books cover. The fixture book carries no custom cover, so the delete at the
+# end restores the exact prior state and a re-run converges. Checked rather
+# than assumed: with a real cover set, this would clobber it.
+[ "$(echo "$GET_JSON" | jq -r .has_custom_cover)" = "false" ] \
+  || fail "the fixture book should start with no custom cover: $(echo "$GET_JSON" | jq -c '{has_custom_cover, cover_image}')"
+# uploading a png cover expecting it stored as webp and books thumbnail serving it
+BCOVER_JSON=$("$CLI" books cover upload --id "$SR4_BOOK" --file docker/fixture-cover.png 2>"$WORK/cli.err") \
+  || { cat "$WORK/cli.err" >&2; fail "books cover upload exited non-zero"; }
+echo "$BCOVER_JSON" | jq -e '.has_custom_cover and .has_thumbnail and (.cover_image | endswith(".webp"))' >/dev/null \
+  || fail "upload should report a custom .webp cover: $BCOVER_JSON"
+"$CLI" books thumbnail --id "$SR4_BOOK" --output "$WORK/bcover.webp" >/dev/null 2>"$WORK/cli.err" \
+  || { cat "$WORK/cli.err" >&2; fail "books thumbnail should serve the custom cover"; }
+ok "books cover upload stores the cover and books thumbnail serves it"
+
+# setting the cover from the book's own image, expecting a new custom cover
+"$CLI" books cover from-source --id "$SR4_BOOK" --source-type book --source-id "$SR4_BOOK" 2>"$WORK/cli.err" \
+  | jq -e '.has_custom_cover' >/dev/null \
+  || { cat "$WORK/cli.err" >&2; fail "books cover from-source should set a custom cover"; }
+# a campaign_file source is refused by the schema
+"$CLI" books cover from-source --id "$SR4_BOOK" --source-type campaign_file --source-id "$SR4_BOOK" \
+  >/dev/null 2>&1 \
+  && fail "books cover from-source should refuse a campaign_file source"
+ok "books cover from-source copies a library image and refuses campaign_file"
+
+# deleting the cover expecting has_custom_cover false again
+"$CLI" books cover delete --id "$SR4_BOOK" 2>"$WORK/cli.err" \
+  | jq -e '.has_custom_cover == false and .cover_version == null' >/dev/null \
+  || { cat "$WORK/cli.err" >&2; fail "books cover delete should clear the custom cover"; }
+ok "books cover delete removes the custom cover"
+
 # The first book write. Shadowrun 4 DE is seeded raw for exactly this, same as
 # the systems section above. description is used for the same reason: nothing
 # above filters on it, so re-running the suite converges instead of drifting.
