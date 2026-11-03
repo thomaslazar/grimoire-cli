@@ -3,6 +3,42 @@
 All notable changes to grimoire-cli are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## v0.7.4 — 2026-11-03
+
+Patch release that moves to Grimoire 1.10.1 and wraps its new book cover
+routes. The supported range is now 1.10.1 only: the new commands do not
+exist on older servers.
+
+### Highlights
+
+- **Grimoire 1.10.1 is required.** Login warns on anything older. Whoever
+  stays on 1.9.0 – 1.10.0 stays on 0.7.3.
+- **`books cover upload | from-source | delete`.** Books gain a custom cover,
+  alongside `systems cover` and `audio cover`. It is shown in place of the
+  generated thumbnail and survives a rescan.
+- **`books thumbnail` serves the custom cover first**, and falls back to the
+  scan-generated thumbnail. `has_thumbnail` is true for either, so it is still
+  the test for whether the download will 404.
+- **Book and system reads carry `access_level`**, and books also
+  `effective_access_level`, `has_custom_cover` and `cover_version`. Backups now
+  include book covers.
+
+### Features
+
+- feat: target grimoire 1.10.1 and add books cover
+
+### Tests
+
+- test: wait for the scoped rescan's own counters in the smoke test
+
+### Chores
+
+- chore: bump version to 0.7.4
+
+### Docs
+
+- docs: target 0.7.4 in the compatibility matrix
+
 ## v0.7.3 — 2026-10-30
 
 Patch release that adds Grimoire 1.10.0 to the supported range, now 1.9.0 –
