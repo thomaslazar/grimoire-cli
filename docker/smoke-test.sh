@@ -1614,14 +1614,18 @@ jq -e '.status == "scan_started"' "$WORK/librescan.out" >/dev/null \
   || fail "library rescan should answer scan_started: $(cat "$WORK/librescan.out")"
 ok "library rescan starts a scoped scan"
 
-# Wait for the scoped scan to settle before reading its counters, or a
-# still-in-flight snapshot would read as a smaller, unstable number.
-# polling scan-status until the scoped rescan finishes
+# Wait for the scoped scan to settle before reading its counters. rescan only
+# queues the scan as a background task (routers/library/core.py:73-78), so a
+# fast first poll can still see the previous full scan's running=false and its
+# 18-book counters. The scoped scan resets them when it starts
+# (services/library_scan/runner.py:482), so waiting for total_books to reach
+# Shadowrun 4 DE's own 3 cannot be satisfied by that earlier scan.
+# polling scan-status until the scoped rescan has run and finished
 for i in $(seq 1 30); do
   STATUS_JSON=$("$CLI" library scan-status 2>"$WORK/cli.err") \
     || { cat "$WORK/cli.err" >&2; fail "library scan-status exited non-zero"; }
-  [ "$(echo "$STATUS_JSON" | jq -r .running)" = "false" ] && break
-  [ "$i" -eq 30 ] && fail "the scoped rescan never finished"
+  [ "$(echo "$STATUS_JSON" | jq -r '.running == false and .total_books == 3')" = "true" ] && break
+  [ "$i" -eq 30 ] && fail "the scoped rescan never settled: $STATUS_JSON"
   sleep 1
 done
 echo "$STATUS_JSON" | jq -e '.running | type == "boolean"' >/dev/null \
