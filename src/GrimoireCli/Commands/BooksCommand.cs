@@ -135,6 +135,8 @@ public static class BooksCommand
             "access_level, and a category change that shows the book to more",
             "people, need admin: 403 otherwise. URLs must be http(s): 422 otherwise.",
             "",
+            "category names one folder: /, \\, .. or a leading dot is a 422.",
+            "",
             "Responds {\"status\": \"ok\"} and echoes nothing — read back with:",
             "grimoire-cli books get --id <id>",
             "",
@@ -189,8 +191,8 @@ public static class BooksCommand
             "cleared — see books update.",
             "",
             "Non-admin: access_level anywhere 403s the whole batch; a category change",
-            "that widens visibility fails only its item. A non-http(s) URL 422s the",
-            "whole batch.");
+            "that widens visibility fails only its item. A non-http(s) URL or an",
+            "invalid category (see books update) 422s the whole batch.");
         command.AddExamples(
             "grimoire-cli books batch-update --input items.json",
             "jq -c '{items: .}' edits.json | grimoire-cli books batch-update --stdin");
@@ -415,7 +417,8 @@ public static class BooksCommand
     private static Command CreatePageCommand()
     {
         var idOption = new Option<string>("--id") { Description = "Book ID", Required = true };
-        var pageOption = new Option<int>("--page") { Description = "1-based page number", Required = true };
+        var pageOption = OptionHelpers.Range("--page", "1-based page number; max 1000000", 1, 1_000_000);
+        pageOption.Required = true;
         var widthOption = new Option<int?>("--width") { Description = "Target pixel width" };
         var outputOption = new Option<string>("--output")
         {
@@ -450,7 +453,7 @@ public static class BooksCommand
             var service = new BooksService(client);
             await using var stream = await service.PageAsync(
                 parseResult.GetValue(idOption)!,
-                parseResult.GetValue(pageOption),
+                parseResult.GetValue(pageOption)!.Value,
                 parseResult.GetValue(widthOption));
             try
             {
@@ -494,7 +497,8 @@ public static class BooksCommand
     private static Command CreatePageTextCommand()
     {
         var idOption = new Option<string>("--id") { Description = "Book ID", Required = true };
-        var pageOption = new Option<int>("--page") { Description = "1-based page number", Required = true };
+        var pageOption = OptionHelpers.Range("--page", "1-based page number; max 1000000", 1, 1_000_000);
+        pageOption.Required = true;
         var command = new Command("page-text", "The text of one page")
         {
             idOption, pageOption
@@ -519,7 +523,7 @@ public static class BooksCommand
             var service = new BooksService(client);
             var result = await service.PageTextAsync(
                 parseResult.GetValue(idOption)!,
-                parseResult.GetValue(pageOption));
+                parseResult.GetValue(pageOption)!.Value);
             ConsoleOutput.WriteRawJson(result);
             return 0;
         });
@@ -529,7 +533,8 @@ public static class BooksCommand
     private static Command CreatePageWordsCommand()
     {
         var idOption = new Option<string>("--id") { Description = "Book ID", Required = true };
-        var pageOption = new Option<int>("--page") { Description = "1-based page number", Required = true };
+        var pageOption = OptionHelpers.Range("--page", "1-based page number; max 1000000", 1, 1_000_000);
+        pageOption.Required = true;
         var command = new Command("page-words", "Word bounding boxes for one page")
         {
             idOption, pageOption
@@ -550,7 +555,7 @@ public static class BooksCommand
             var service = new BooksService(client);
             var result = await service.PageWordsAsync(
                 parseResult.GetValue(idOption)!,
-                parseResult.GetValue(pageOption));
+                parseResult.GetValue(pageOption)!.Value);
             ConsoleOutput.WriteRawJson(result);
             return 0;
         });

@@ -32,6 +32,7 @@ public static class BookCoverCommands
             "",
             "The server checks the content type first, then the size, so an",
             "oversized image (over 10 MB) answers 413 and an unsupported one 400.",
+            "An image over 40 megapixels is also a 400.",
             "",
             "Rewrites the book's .cover.jpg sidecar if it already has one.");
         command.AddExamples("grimoire-cli books cover upload --id <book-id> --file cover.png");

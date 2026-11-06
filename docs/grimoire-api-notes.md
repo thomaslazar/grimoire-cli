@@ -581,6 +581,11 @@ and `books thumbnail`.
 - **`has_thumbnail` on book reads is true for a custom cover too**
   (`bool(has_thumbnail or cover_image)`, `routers/books/core.py:132,230`,
   v1.10.1), so it stays the test for whether `books thumbnail` will 404.
+- **A book in a system hidden from the reader hides the system's folders too.**
+  `books get` cuts the system and container folders out of `relative_path`,
+  for the book and each variant, and `books list` sends `game_system_id: ""`
+  for it (`services/systems.py:60-89`, `routers/books/core.py:122-141,216`,
+  v1.10.2).
 
 ### Cover from-source
 
@@ -1228,11 +1233,12 @@ so a book matching by title *and* by page text is counted twice.
   `TITLE_MATCH_LIMIT = 50` and each media set at a literal `.limit(50)`,
   neither reachable from the query string. There is no offset, so those five
   are a hard ceiling rather than a page.
-- **`limit` has no lower bound, and `-1` means unlimited.** The route declares
-  `Query(50, le=200)`, which 422s above 200, but the value reaches SQLite as a
-  bare `LIMIT :limit`. Verified against a 126-page index: `limit=-1` returned
-  all 126 rows with a 200, and `limit=0` returned none. The CLI guards this
-  with `OptionHelpers.Range(1, 200)`.
+- **`limit` is 1 to 200** (`Query(50, ge=1, le=200)`, `routers/search/core.py:33`,
+  v1.10.2). Before 1.10.2 it had no lower bound and reached SQLite as a bare
+  `LIMIT :limit`, so `-1` meant unlimited; the CLI guards both with
+  `OptionHelpers.Range(1, 200)`.
+- **Control characters in `q` are read as spaces** (`services/search_query.py:245-256`,
+  v1.10.2); a NUL used to end the FTS5 query early.
 - **An unrecognised `field:` prefix is not an error.** It falls through to
   free text and is searched literally, because a colon is ordinary
   punctuation in a title. `q=titel:dsa` answers 200 with every array empty

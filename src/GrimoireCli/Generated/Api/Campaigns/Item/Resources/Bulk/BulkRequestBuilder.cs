@@ -34,7 +34,7 @@ namespace GrimoireCli.Generated.Api.Campaigns.Item.Resources.Bulk
         {
         }
         /// <summary>
-        /// Link many resources at once. Duplicates and unknown types are skippedsilently so one bad entry doesn&apos;t fail the whole batch. Returns the rowsthat were actually created.
+        /// Link many resources at once. Duplicates, unknown types and items thecaller cannot link are skipped silently so one bad entry doesn&apos;t fail thewhole batch. Returns the rows that were actually created.
         /// </summary>
         /// <returns>A List&lt;global::GrimoireCli.Generated.Models.LinkedResourceOut&gt;</returns>
         /// <param name="body">The request body</param>
@@ -60,7 +60,7 @@ namespace GrimoireCli.Generated.Api.Campaigns.Item.Resources.Bulk
             return collectionResult?.AsList();
         }
         /// <summary>
-        /// Link many resources at once. Duplicates and unknown types are skippedsilently so one bad entry doesn&apos;t fail the whole batch. Returns the rowsthat were actually created.
+        /// Link many resources at once. Duplicates, unknown types and items thecaller cannot link are skipped silently so one bad entry doesn&apos;t fail thewhole batch. Returns the rows that were actually created.
         /// </summary>
         /// <returns>A <see cref="RequestInformation"/></returns>
         /// <param name="body">The request body</param>

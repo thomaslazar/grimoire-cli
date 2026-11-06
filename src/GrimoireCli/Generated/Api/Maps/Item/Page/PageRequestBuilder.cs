@@ -16,7 +16,7 @@ namespace GrimoireCli.Generated.Api.Maps.Item.Page
     public partial class PageRequestBuilder : BaseRequestBuilder
     {
         /// <summary>Gets an item from the GrimoireCli.Generated.api.maps.item.page.item collection</summary>
-        /// <param name="position">Unique identifier of the item</param>
+        /// <param name="position">Page number, from 1.</param>
         /// <returns>A <see cref="global::GrimoireCli.Generated.Api.Maps.Item.Page.Item.WithPage_numItemRequestBuilder"/></returns>
         public global::GrimoireCli.Generated.Api.Maps.Item.Page.Item.WithPage_numItemRequestBuilder this[int position]
         {
@@ -28,7 +28,7 @@ namespace GrimoireCli.Generated.Api.Maps.Item.Page
             }
         }
         /// <summary>Gets an item from the GrimoireCli.Generated.api.maps.item.page.item collection</summary>
-        /// <param name="position">Unique identifier of the item</param>
+        /// <param name="position">Page number, from 1.</param>
         /// <returns>A <see cref="global::GrimoireCli.Generated.Api.Maps.Item.Page.Item.WithPage_numItemRequestBuilder"/></returns>
         [Obsolete("This indexer is deprecated and will be removed in the next major version. Use the one with the typed parameter instead.")]
         public global::GrimoireCli.Generated.Api.Maps.Item.Page.Item.WithPage_numItemRequestBuilder this[string position]

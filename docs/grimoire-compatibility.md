@@ -15,7 +15,8 @@
 | 0.7.1 | 1.9.0 – 1.9.1 | superseded by 0.7.2 |
 | 0.7.2 | 1.9.0 – 1.9.2 | superseded by 0.7.3 |
 | 0.7.3 | 1.9.0 – 1.10.0 | superseded by 0.7.4 |
-| 0.7.4 | 1.10.1 | current, on `main` |
+| 0.7.4 | 1.10.1 | superseded by 0.7.5 |
+| 0.7.5 | 1.10.1 – 1.10.2 | current, on `main` |
 
 **The floor rises only when something forces it**, not on every server release.
 Each row above records a pairing that was necessary at the time — 1.5.6 → 1.6.0
@@ -33,7 +34,7 @@ an older Grimoire does not know is dropped by Pydantic rather than rejected, so
 the command answers 200 and does nothing — the one failure the version warning
 exists to catch.
 
-`main` targets Grimoire 1.10.1. Reaching 1.6.0 was more than a version bump: it
+`main` targets Grimoire 1.10.1 – 1.10.2. Reaching 1.6.0 was more than a version bump: it
 shortened the access token from 30 days to 30 minutes and made the library
 writable, which is why the CLI renews its own session
 ([authentication.md](authentication.md)) and why the `files` endpoints exist at
@@ -248,6 +249,24 @@ command sends changed; the help text did.
   `access_level`. `has_thumbnail` is also true for a custom cover.
 - **Backups include book covers**, and `library cleanup-missing` prunes
   orphaned ones.
+
+**1.10.2 raised `MaxTestedVersion` and left the floor alone.** No route was
+added or removed; the help text and two bounds changed.
+
+- **Every page route takes a page from 1 to 1000000** (`routers/_page_num.py`);
+  the CLI now enforces it on `books page | page-text | page-words` and
+  `maps page`. 1.10.1 had no bound, so nothing valid is lost.
+- **`addons update --script-approved true`** on an add-on with no script is a
+  400, not a 404, and a refused call saves neither flag
+  (`routers/addons/core.py:283-302`).
+- **`books cover upload`** refuses an image over 40 megapixels with a 400
+  (`services/books/covers.py:43,126`).
+- **`books update` / `batch-update`** 422 a category that is not one folder
+  name (`routers/books/_schemas.py:100-109`).
+- **Campaign resources respect book access.** `campaigns resources add` 404s a
+  book the caller cannot read; `bulk` and `campaigns create` skip it, and
+  `create` now forces a restricted book to `gm` as `bulk` does
+  (`routers/campaigns/_helpers.py:251-289`). Lists leave such books out.
 
 ## Runtime check
 

@@ -48,7 +48,8 @@ public static class CampaignResourcesCommands
             "Ordered by visibility (public, private, gm), then sort_order, then name.",
             "id is the link id that update, remove and reorder take.",
             "",
-            "Owner or accepted member; members see only what visibility allows.");
+            "Owner or accepted member; members see only what visibility allows.",
+            "A linked book the caller cannot read is left out.");
         command.AddExamples("grimoire-cli campaigns resources list --id <campaign-id>");
         command.AddResponseExampleArray<Generated.Models.LinkedResourceOut>();
         command.SetAction(async (parseResult, cancellationToken) =>
@@ -74,7 +75,8 @@ public static class CampaignResourcesCommands
         };
         command.AddHelpSection("Notes", HelpSectionPosition.Top,
             [.. OwnerOnly, "",
-            "The item id is not checked: an unknown id links a row named by the id.",
+            "404 for a book the caller cannot read or that does not exist. Other ids",
+            "are not checked: an unknown id links a row named by the id.",
             "A model link's name is always its id.",
             "",
             "A restricted book is forced to gm whatever --visibility says. private",
@@ -107,12 +109,13 @@ public static class CampaignResourcesCommands
         JsonBodyInput.RequireExactlyOneSource(command, inputOption, stdinOption);
         command.AddHelpSection("Notes", HelpSectionPosition.Top,
             [.. OwnerOnly, "",
-            "Duplicates and unknown resource_type values are skipped silently; the",
+            "Duplicates, unknown resource_type values, books the caller cannot read",
+            "and files of another campaign are skipped silently; the",
             "response lists only the links created. Exit 3 when fewer come back than",
             "were sent; stdout still carries them.",
             "",
             "A visibility outside gm|public|private becomes gm; a restricted book is",
-            "forced to gm regardless. Item ids are not checked. An invalid category_id",
+            "forced to gm regardless. Other ids are not checked. An invalid category_id",
             "fails the whole call with 400."]);
         command.AddExamples("echo '{\"resources\":[{\"resource_type\":\"book\",\"resource_id\":\"<id>\"}]}' | grimoire-cli campaigns resources bulk --id <campaign-id> --stdin");
         command.AddRequestShape<Generated.Models.ResourceBulkAdd>();

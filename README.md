@@ -228,10 +228,10 @@ grimoire-cli config set server https://grimoire.example.com
 | `books cover delete --id <id>` | Remove a book's custom cover (gm or admin) |
 | `books cover from-source --id <id> --source-type <type> --source-id <id>` | Set a book cover from a library image (gm or admin) |
 | `books file --id <id> --output <path\|->` | Download the book file as stored |
-| `books page --id <id> --page <n> [--width <px>] --output <path\|->` | Render or extract one page as an image |
+| `books page --id <id> --page <1-1000000> [--width <px>] --output <path\|->` | Render or extract one page as an image |
 | `books toc --id <id>` | The book's table of contents (PDF, EPUB or DjVu) |
-| `books page-text --id <id> --page <n>` | The text of one page |
-| `books page-words --id <id> --page <n>` | Word bounding boxes for one page |
+| `books page-text --id <id> --page <1-1000000>` | The text of one page |
+| `books page-words --id <id> --page <1-1000000>` | Word bounding boxes for one page |
 | `systems cover get --id <id> --output <path\|->` | Download a system's cover image |
 | `systems cover upload --id <id> --file <path>` | Upload a system's cover image (gm or admin) |
 | `systems cover delete --id <id>` | Delete a system's uploaded cover image (gm or admin) |
@@ -285,7 +285,7 @@ grimoire-cli config set server https://grimoire.example.com
 | `maps get --id <id>` | Get one map, with its detected grid and any manual override |
 | `maps thumbnail --id <id> --output <path\|->` | Download a map's scan-generated thumbnail |
 | `maps file --id <id> --output <path\|->` | Download the map file as stored |
-| `maps page --id <id> --page <n> [--width <px>] --output <path\|->` | Render one page of a PDF map as WebP |
+| `maps page --id <id> --page <1-1000000> [--width <px>] --output <path\|->` | Render one page of a PDF map as WebP |
 | `maps vtt image --id <id> --output <path\|->` | Download the battlemap inside a Universal VTT file |
 | `maps vtt data --id <id>` | Grid and feature counts from a Universal VTT file |
 | `maps vtt export --id <id> --output <path\|->` | Export a raster map as a Universal VTT file |
@@ -521,7 +521,7 @@ Verified API behaviour worth reading before designing a command: [docs/grimoire-
 
 ## Compatibility
 
-Requires Grimoire **v1.10.1**. The CLI warns on login if the server reports a version outside that range. See [docs/grimoire-compatibility.md](docs/grimoire-compatibility.md) for the version matrix and the bump procedure.
+Requires Grimoire **v1.10.1 – v1.10.2**. The CLI warns on login if the server reports a version outside that range. See [docs/grimoire-compatibility.md](docs/grimoire-compatibility.md) for the version matrix and the bump procedure.
 
 ## License
 

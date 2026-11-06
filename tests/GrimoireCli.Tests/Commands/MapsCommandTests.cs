@@ -340,4 +340,14 @@ public class MapsCommandTests
     [Fact]
     public void ListNamesFolderCountsAsASourceForFolder()
         => Assert.Contains("path from maps folder-counts", Help(["maps", "list"]));
+
+    [Theory]
+    [InlineData("0")]
+    [InlineData("1000001")]
+    public void PageRejectsAPageOutsideTheServerBound(string page)
+        => Assert.NotEmpty(MapsCommand.Create().Parse(["page", "--id", "x", "--page", page, "--output", "-"]).Errors);
+
+    [Fact]
+    public void PageAcceptsTheServerMaximum()
+        => Assert.Empty(MapsCommand.Create().Parse(["page", "--id", "x", "--page", "1000000", "--output", "-"]).Errors);
 }
