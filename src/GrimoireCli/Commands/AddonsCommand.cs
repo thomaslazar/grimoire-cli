@@ -115,8 +115,8 @@ public static class AddonsCommand
         command.AddHelpSection("Notes", HelpSectionPosition.Top,
             "Changes state, never version — upgrade with install or upgrade-all.",
             "",
-            "404 if no such add-on is installed, or if --script-approved true names",
-            "an add-on that ships no script.",
+            "404 if no such add-on is installed; 400 if --script-approved true names",
+            "an add-on that ships no script. A refused call saves neither flag.",
             "",
             "Approval pins the script's current SHA-256; a script changed on disk is",
             "blocked until re-approved.");

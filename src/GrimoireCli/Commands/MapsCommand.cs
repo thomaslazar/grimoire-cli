@@ -203,7 +203,8 @@ public static class MapsCommand
     private static Command CreatePageCommand()
     {
         var idOption = new Option<string>("--id") { Description = "Map ID", Required = true };
-        var pageOption = new Option<int>("--page") { Description = "1-based page number", Required = true };
+        var pageOption = OptionHelpers.Range("--page", "1-based page number; max 1000000", 1, 1_000_000);
+        pageOption.Required = true;
         var widthOption = new Option<int?>("--width") { Description = "Target pixel width" };
         var outputOption = new Option<string>("--output")
         {
@@ -232,7 +233,7 @@ public static class MapsCommand
             var service = new MapsService(client);
             await using var stream = await service.PageAsync(
                 parseResult.GetValue(idOption)!,
-                parseResult.GetValue(pageOption),
+                parseResult.GetValue(pageOption)!.Value,
                 parseResult.GetValue(widthOption));
             try
             {

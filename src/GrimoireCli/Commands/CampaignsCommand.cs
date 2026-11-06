@@ -100,8 +100,8 @@ public static class CampaignsCommand
             "",
             "is_gm_campaign true needs the gm or admin role; guests cannot create.",
             "",
-            "resources links items at creation, but unlike bulk a restricted book",
-            "keeps the visibility asked for and category_id is not accepted.");
+            "resources links items at creation, skipping and clamping as resources",
+            "bulk does, but category_id is not accepted.");
         command.AddExamples(
             "grimoire-cli campaigns create --input campaign.json",
             "echo '{\"name\":\"Curse of Strahd\"}' | grimoire-cli campaigns create --stdin");

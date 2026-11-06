@@ -287,4 +287,27 @@ public class BooksCommandTests
         Assert.Contains("is_missing",
             HelpRenderer.Render(BooksCommand.Create(), ["books", leaf], full: false));
     }
+
+    // Every page route takes 1 to 1000000 (routers/_page_num.py, v1.10.2).
+    [Theory]
+    [InlineData("page", "0")]
+    [InlineData("page", "1000001")]
+    [InlineData("page-text", "0")]
+    [InlineData("page-text", "1000001")]
+    [InlineData("page-words", "0")]
+    [InlineData("page-words", "1000001")]
+    public void PageCommandsRejectAPageOutsideTheServerBound(string sub, string page)
+        => Assert.NotEmpty(BooksCommand.Create().Parse(PageArgs(sub, page)).Errors);
+
+    [Theory]
+    [InlineData("page")]
+    [InlineData("page-text")]
+    [InlineData("page-words")]
+    public void PageCommandsAcceptTheServerMaximum(string sub)
+        => Assert.Empty(BooksCommand.Create().Parse(PageArgs(sub, "1000000")).Errors);
+
+    private static string[] PageArgs(string sub, string page)
+        => sub == "page"
+            ? [sub, "--id", "x", "--page", page, "--output", "-"]
+            : [sub, "--id", "x", "--page", page];
 }
