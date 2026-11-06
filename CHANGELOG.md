@@ -3,6 +3,37 @@
 All notable changes to grimoire-cli are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## v0.7.5 — 2026-11-06
+
+Patch release that adds Grimoire 1.10.2 to the tested range. No command was
+added or removed; the floor stays at 1.10.1, so the supported range is now
+1.10.1 – 1.10.2.
+
+### Highlights
+
+- **Grimoire 1.10.2 is tested.** Login no longer warns against it, and 1.10.1
+  servers stay supported: nothing here depends on the newer server.
+- **`--page` is bounded to 1 – 1000000** on `books page | page-text |
+  page-words` and `maps page`, matching the bound 1.10.2 puts on every page
+  route. An out-of-range page is refused before the request rather than as a
+  server 422.
+- **Campaign resources follow book access.** `campaigns resources add` answers
+  404 for a book the caller cannot read; `bulk` and `campaigns create` skip it,
+  and `create` now forces a restricted book to `gm` like `bulk` does. The help
+  said otherwise before.
+- **Help matches 1.10.2's refusals:** `addons update` approving a script-less
+  add-on is a 400 and saves nothing; `books cover upload` refuses images over
+  40 megapixels; `books update` and `batch-update` 422 a category that is not
+  one folder name.
+
+### Features
+
+- feat: target grimoire 1.10.2
+
+### Chores
+
+- chore: bump version to 0.7.5
+
 ## v0.7.4 — 2026-11-03
 
 Patch release that moves to Grimoire 1.10.1 and wraps its new book cover
