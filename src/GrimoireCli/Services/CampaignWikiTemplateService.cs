@@ -45,18 +45,7 @@ public class CampaignWikiTemplateService
     /// local basename: the server picks its parser by extension.
     /// </summary>
     public async Task<string> ImportAsync(string campaignId, string filePath)
-    {
-        byte[] bytes;
-        try
-        {
-            bytes = await File.ReadAllBytesAsync(filePath);
-        }
-        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or ArgumentException or NotSupportedException)
-        {
-            throw new BodyInputException($"Could not read {filePath}: {ex.Message}");
-        }
-        return await _client.SendAsync(ImportRequest(campaignId, bytes, Path.GetFileName(filePath)), notFoundHint: CampaignNotFound);
-    }
+        => await _client.SendUploadAsync(ImportRequest(campaignId, FileUpload.Open(filePath), filePath), notFoundHint: CampaignNotFound);
 
     /// <summary>GET /api/campaigns/{id}/wiki/templates/{template}/export. A zip, as bytes.</summary>
     public async Task<Stream> ExportAsync(string campaignId, string templateId)
@@ -103,12 +92,8 @@ public class CampaignWikiTemplateService
     internal RequestInformation ExportRequest(string campaignId, string templateId)
         => _client.Api.Api.Campaigns[campaignId].Wiki.Templates[templateId].Export.ToGetRequestInformation();
 
-    internal RequestInformation ImportRequest(string campaignId, byte[] bytes, string fileName)
-    {
-        var body = new MultipartBody();
-        body.AddOrReplacePart("file", "application/octet-stream", bytes, fileName);
-        return _client.Api.Api.Campaigns[campaignId].Wiki.Templates.Upload.ToPostRequestInformation(body);
-    }
+    internal RequestInformation ImportRequest(string campaignId, Stream file, string filePath)
+        => FileUpload.Request(b => _client.Api.Api.Campaigns[campaignId].Wiki.Templates.Upload.ToPostRequestInformation(b), FileUpload.Body(file, filePath, "application/octet-stream"));
 
     internal RequestInformation CatalogueRequest(string campaignId, bool refresh)
         => _client.Api.Api.Campaigns[campaignId].Wiki.Templates.Browse.ToGetRequestInformation(c =>

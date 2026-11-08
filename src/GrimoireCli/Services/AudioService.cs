@@ -152,29 +152,10 @@ public class AudioService
 
     /// <summary>POST /api/audio/{id}/cover. Multipart; the server checks the content type, then the size.</summary>
     public async Task<string> UploadCoverAsync(string id, string filePath)
-    {
-        byte[] bytes;
-        try
-        {
-            bytes = await File.ReadAllBytesAsync(filePath);
-        }
-        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or ArgumentException or NotSupportedException)
-        {
-            throw new BodyInputException($"Could not read {filePath}: {ex.Message}");
-        }
-        var info = _client.Api.Api.Audio[id].Cover.ToPostRequestInformation(BuildCoverUploadBody(bytes, filePath));
-        return await _client.SendAsync(info, permissionHint: GmHint);
-    }
+        => await _client.SendUploadAsync(UploadCoverRequest(id, FileUpload.Open(filePath), filePath), permissionHint: GmHint);
 
-    /// <summary>
-    /// Internal so a test can pin the part name the server reads the file from.
-    /// </summary>
-    internal static Microsoft.Kiota.Abstractions.MultipartBody BuildCoverUploadBody(byte[] bytes, string filePath)
-    {
-        var body = new Microsoft.Kiota.Abstractions.MultipartBody();
-        body.AddOrReplacePart("file", MimeForExtension(filePath), bytes, Path.GetFileName(filePath));
-        return body;
-    }
+    internal Microsoft.Kiota.Abstractions.RequestInformation UploadCoverRequest(string id, Stream file, string filePath)
+        => FileUpload.Request(b => _client.Api.Api.Audio[id].Cover.ToPostRequestInformation(b), FileUpload.Body(file, filePath, MimeForExtension(filePath)));
 
     /// <summary>
     /// The content type the server checks `file.content_type` against. Unknown

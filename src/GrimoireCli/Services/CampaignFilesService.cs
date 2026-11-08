@@ -23,53 +23,31 @@ public class CampaignFilesService
     /// are named as FastAPI binds them.
     /// </summary>
     public async Task<string> UploadAsync(string campaignId, string filePath, string? categoryId, string? newCategoryName)
-    {
-        byte[] bytes;
-        try
-        {
-            bytes = await File.ReadAllBytesAsync(filePath);
-        }
-        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or ArgumentException or NotSupportedException)
-        {
-            throw new BodyInputException($"Could not read {filePath}: {ex.Message}");
-        }
-        var body = new Microsoft.Kiota.Abstractions.MultipartBody();
-        body.AddOrReplacePart("file", MimeForExtension(filePath), bytes, Path.GetFileName(filePath));
-        if (categoryId is not null)
-            body.AddOrReplacePart("category_id", "text/plain", categoryId);
-        if (newCategoryName is not null)
-            body.AddOrReplacePart("new_category_name", "text/plain", newCategoryName);
-        return await _client.SendAsync(
-            _client.Api.Api.Campaigns[campaignId].Files.ToPostRequestInformation(body),
+        => await _client.SendUploadAsync(
+            FileUpload.Request(
+                b => _client.Api.Api.Campaigns[campaignId].Files.ToPostRequestInformation(b),
+                Body(FileUpload.Open(filePath), filePath, categoryId, newCategoryName)),
             notFoundHint: "No campaign with that ID. List them with: grimoire-cli campaigns list");
-    }
 
     /// <summary>POST /api/campaigns/{id}/images. As <see cref="UploadAsync"/>, image types only.</summary>
     public async Task<string> UploadImageAsync(string campaignId, string filePath, string? categoryId, string? newCategoryName)
-    {
-        byte[] bytes;
-        try
-        {
-            bytes = await File.ReadAllBytesAsync(filePath);
-        }
-        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or ArgumentException or NotSupportedException)
-        {
-            throw new BodyInputException($"Could not read {filePath}: {ex.Message}");
-        }
-        return await _client.SendAsync(
-            UploadImageRequest(campaignId, bytes, filePath, categoryId, newCategoryName),
+        => await _client.SendUploadAsync(
+            UploadImageRequest(campaignId, FileUpload.Open(filePath), filePath, categoryId, newCategoryName),
             notFoundHint: "No campaign with that ID. List them with: grimoire-cli campaigns list");
-    }
 
-    internal Microsoft.Kiota.Abstractions.RequestInformation UploadImageRequest(string campaignId, byte[] bytes, string filePath, string? categoryId, string? newCategoryName)
+    internal Microsoft.Kiota.Abstractions.RequestInformation UploadImageRequest(string campaignId, Stream file, string filePath, string? categoryId, string? newCategoryName)
+        => FileUpload.Request(
+            b => _client.Api.Api.Campaigns[campaignId].Images.ToPostRequestInformation(b),
+            Body(file, filePath, categoryId, newCategoryName));
+
+    private static StreamedMultipartBody Body(Stream file, string filePath, string? categoryId, string? newCategoryName)
     {
-        var body = new Microsoft.Kiota.Abstractions.MultipartBody();
-        body.AddOrReplacePart("file", MimeForExtension(filePath), bytes, Path.GetFileName(filePath));
+        var fields = new List<(string, string)>();
         if (categoryId is not null)
-            body.AddOrReplacePart("category_id", "text/plain", categoryId);
+            fields.Add(("category_id", categoryId));
         if (newCategoryName is not null)
-            body.AddOrReplacePart("new_category_name", "text/plain", newCategoryName);
-        return _client.Api.Api.Campaigns[campaignId].Images.ToPostRequestInformation(body);
+            fields.Add(("new_category_name", newCategoryName));
+        return new StreamedMultipartBody(fields, Path.GetFileName(filePath), MimeForExtension(filePath), file);
     }
 
     /// <summary>

@@ -23,27 +23,12 @@ public class CampaignMemberSheetService
     internal static string SheetMimeForExtension(string path)
         => Path.GetExtension(path).Equals(".pdf", StringComparison.OrdinalIgnoreCase) ? "application/pdf" : SystemsService.MimeForExtension(path);
 
-    internal RequestInformation UploadRequest(string id, string memberId, byte[] bytes, string filePath)
-    {
-        var body = new MultipartBody();
-        body.AddOrReplacePart("file", SheetMimeForExtension(filePath), bytes, Path.GetFileName(filePath));
-        return _client.Api.Api.Campaigns[id].Members[memberId].Sheet.ToPostRequestInformation(body);
-    }
+    internal RequestInformation UploadRequest(string id, string memberId, Stream file, string filePath)
+        => FileUpload.Request(b => _client.Api.Api.Campaigns[id].Members[memberId].Sheet.ToPostRequestInformation(b), FileUpload.Body(file, filePath, SheetMimeForExtension(filePath)));
 
     /// <summary>POST /api/campaigns/{id}/members/{member_id}/sheet. One multipart part named "file".</summary>
     public async Task<string> UploadAsync(string id, string memberId, string filePath)
-    {
-        byte[] bytes;
-        try
-        {
-            bytes = await File.ReadAllBytesAsync(filePath);
-        }
-        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or ArgumentException or NotSupportedException)
-        {
-            throw new BodyInputException($"Could not read {filePath}: {ex.Message}");
-        }
-        return await _client.SendAsync(UploadRequest(id, memberId, bytes, filePath));
-    }
+        => await _client.SendUploadAsync(UploadRequest(id, memberId, FileUpload.Open(filePath), filePath));
 
     internal RequestInformation DeleteRequest(string id, string memberId)
         => _client.Api.Api.Campaigns[id].Members[memberId].Sheet.ToDeleteRequestInformation();

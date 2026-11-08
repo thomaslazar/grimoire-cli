@@ -298,6 +298,7 @@ public class GrimoireApiClient
     internal static string TransportErrorMessage(Exception ex, string? server) => ex switch
     {
         TaskCanceledException => $"The request to {server} timed out.",
+        HttpIOException => $"The response from {server} broke off. {ex.Message}",
         _ => $"Cannot reach the Grimoire server at {server}. {ex.Message}"
     };
 
@@ -309,19 +310,24 @@ public class GrimoireApiClient
     /// Program's handler runs, which is why that handler cannot do this job.
     /// </summary>
     private async Task<HttpResponseMessage> SendOrExitAsync(
-        HttpRequestMessage request, CancellationToken cancellationToken)
+        HttpRequestMessage request, HttpCompletionOption completion, CancellationToken cancellationToken)
     {
         try
         {
-            return await _http.SendAsync(request, cancellationToken);
+            return await _http.SendAsync(request, completion, cancellationToken);
         }
         catch (Exception ex) when (ex is HttpRequestException or TaskCanceledException)
         {
-            _logger.Error(TransportErrorMessage(ex, _config.Server));
-            _logger.Debug(ex.ToString());
-            Environment.Exit(2);
+            ExitOnTransportError(ex);
             throw;
         }
+    }
+
+    private void ExitOnTransportError(Exception ex)
+    {
+        _logger.Error(TransportErrorMessage(ex, _config.Server));
+        _logger.Debug(ex.ToString());
+        Environment.Exit(2);
     }
 
     /// <summary>
@@ -330,16 +336,18 @@ public class GrimoireApiClient
     /// request from the same <see cref="RequestInformation"/> — an
     /// HttpRequestMessage cannot be resent — and rewinds the body stream first so
     /// the second attempt carries the same content as the first. Every body the
-    /// CLI sends is a seekable MemoryStream — the SetStreamContent call sites in
-    /// Services wrap one over an in-memory byte array, and the generated builders
-    /// use SetContentFromParsable. A body that reports otherwise is not replayed.
+    /// CLI sends is seekable — the SetStreamContent call sites in Services wrap a
+    /// MemoryStream over an in-memory byte array or pass a StreamedMultipartBody,
+    /// and the generated builders use SetContentFromParsable. A body that reports
+    /// otherwise is not replayed.
     /// </summary>
     private async Task<HttpResponseMessage> SendWithRefreshAsync(
-        RequestInformation info, CancellationToken cancellationToken)
+        RequestInformation info, CancellationToken cancellationToken,
+        HttpCompletionOption completion = HttpCompletionOption.ResponseContentRead)
     {
         var request = await _adapter.ConvertToNativeRequestAsync<HttpRequestMessage>(info, cancellationToken)
             ?? throw new InvalidOperationException($"Failed to build request for {info.URI.AbsolutePath}");
-        var response = await SendOrExitAsync(request, cancellationToken);
+        var response = await SendOrExitAsync(request, completion, cancellationToken);
         if (!ShouldRefreshOn401(response, CanRefresh)) return response;
         if (info.Content is { CanSeek: false })
         {
@@ -354,21 +362,88 @@ public class GrimoireApiClient
             info.Content.Position = 0;
         var retry = await _adapter.ConvertToNativeRequestAsync<HttpRequestMessage>(info, cancellationToken)
             ?? throw new InvalidOperationException($"Failed to rebuild request for {info.URI.AbsolutePath}");
-        return await SendOrExitAsync(retry, cancellationToken);
+        return await SendOrExitAsync(retry, completion, cancellationToken);
+    }
+
+    /// <summary>
+    /// A file upload. No timeout: the server bounds the body, and how long it
+    /// takes to send is the link's business. Closes the streamed body after.
+    /// </summary>
+    public async Task<string> SendUploadAsync(RequestInformation info, string? permissionHint = null, string? notFoundHint = null)
+    {
+        await using var body = info.Content;
+        return await SendAsync(info, permissionHint, notFoundHint, Timeout.InfiniteTimeSpan);
     }
 
     /// <summary>
     /// A response whose body is bytes rather than JSON. Identical to SendAsync
     /// through preflight, permission hints and error handling; only the read
-    /// differs. The caller owns the returned stream.
+    /// differs. The body streams as the caller reads it, so a library-sized
+    /// file never has to fit in memory, and like an upload it has no timeout.
+    /// A connection lost mid-body exits the same way as one lost before the
+    /// response. The caller owns the returned stream.
     /// </summary>
-    public async Task<Stream> SendStreamAsync(RequestInformation info, string? permissionHint = null, string? notFoundHint = null, TimeSpan? timeout = null)
+    public async Task<Stream> SendStreamAsync(RequestInformation info, string? permissionHint = null, string? notFoundHint = null)
     {
-        using var cts = new CancellationTokenSource(timeout ?? DefaultRequestTimeout);
-        await PreflightAsync(cts.Token);
-        var response = await SendWithRefreshAsync(info, cts.Token);
+        await PreflightAsync(CancellationToken.None);
+        var response = await SendWithRefreshAsync(info, CancellationToken.None, HttpCompletionOption.ResponseHeadersRead);
         await EnsureSuccessAsync(response, permissionHint, notFoundHint);
-        return await response.Content.ReadAsStreamAsync(cts.Token);
+        return new ExitOnBreakStream(await response.Content.ReadAsStreamAsync(), this);
+    }
+
+    /// <summary>
+    /// A response body whose read failures exit like <see cref="SendOrExitAsync"/>.
+    /// Only reads are caught: a failure writing the output is the caller's.
+    /// </summary>
+    private sealed class ExitOnBreakStream(Stream inner, GrimoireApiClient client) : Stream
+    {
+        public override bool CanRead => true;
+        public override bool CanSeek => false;
+        public override bool CanWrite => false;
+        public override long Length => throw new NotSupportedException();
+        public override long Position { get => throw new NotSupportedException(); set => throw new NotSupportedException(); }
+
+        public override int Read(byte[] buffer, int offset, int count) => Read(buffer.AsSpan(offset, count));
+
+        public override int Read(Span<byte> buffer)
+        {
+            try
+            {
+                return inner.Read(buffer);
+            }
+            catch (Exception ex) when (ex is HttpIOException or HttpRequestException)
+            {
+                client.ExitOnTransportError(ex);
+                throw;
+            }
+        }
+
+        public override async ValueTask<int> ReadAsync(Memory<byte> buffer, CancellationToken cancellationToken = default)
+        {
+            try
+            {
+                return await inner.ReadAsync(buffer, cancellationToken);
+            }
+            catch (Exception ex) when (ex is HttpIOException or HttpRequestException)
+            {
+                client.ExitOnTransportError(ex);
+                throw;
+            }
+        }
+
+        public override Task<int> ReadAsync(byte[] buffer, int offset, int count, CancellationToken cancellationToken)
+            => ReadAsync(buffer.AsMemory(offset, count), cancellationToken).AsTask();
+
+        public override void Flush() { }
+        public override long Seek(long offset, SeekOrigin origin) => throw new NotSupportedException();
+        public override void SetLength(long value) => throw new NotSupportedException();
+        public override void Write(byte[] buffer, int offset, int count) => throw new NotSupportedException();
+
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing) inner.Dispose();
+            base.Dispose(disposing);
+        }
     }
 
     internal static string TruncateForLogging(string body, int maxChars = 500)
@@ -395,7 +470,7 @@ public class GrimoireApiClient
         var request = await _adapter.ConvertToNativeRequestAsync<HttpRequestMessage>(info, cancellationToken)
             ?? throw new InvalidOperationException("Failed to build refresh request");
         request.Headers.Add("Cookie", $"{RefreshCookieName}={_config.RefreshToken}");
-        var response = await SendOrExitAsync(request, cancellationToken);
+        var response = await SendOrExitAsync(request, HttpCompletionOption.ResponseContentRead, cancellationToken);
         if (!response.IsSuccessStatusCode)
         {
             _logger.Debug($"refresh rejected: {(int)response.StatusCode} "

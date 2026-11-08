@@ -21,7 +21,7 @@ public class CampaignMemberTokenServiceTests
     public void GetHitsItsRoute() => Assert.Equal(("GET", Base), Of(Service().GetRequest("c-1", "m-1")));
 
     [Fact]
-    public void UploadHitsItsRoute() => Assert.Equal(("POST", Base), Of(Service().UploadRequest("c-1", "m-1", [1], "a.png")));
+    public void UploadHitsItsRoute() => Assert.Equal(("POST", Base), Of(Service().UploadRequest("c-1", "m-1", new MemoryStream([1]), "a.png")));
 
     [Fact]
     public void DeleteHitsItsRoute() => Assert.Equal(("DELETE", Base), Of(Service().DeleteRequest("c-1", "m-1")));
@@ -29,7 +29,7 @@ public class CampaignMemberTokenServiceTests
     [Fact]
     public void UploadSendsAnImagePartNamedFile()
     {
-        using var reader = new StreamReader(Service().UploadRequest("c-1", "m-1", [1], "a.png").Content);
+        using var reader = new StreamReader(Service().UploadRequest("c-1", "m-1", new MemoryStream([1]), "a.png").Content);
         var body = reader.ReadToEnd();
         Assert.Contains("name=\"file\"", body);
         Assert.Contains("Content-Type: image/png", body);

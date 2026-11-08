@@ -38,6 +38,19 @@ public class TransportErrorTests
         Assert.DoesNotContain("Cannot reach", message);
     }
 
+    // A download streams, so the connection can drop after the response began;
+    // the server was reached, and the message must not claim otherwise.
+    [Fact]
+    public void ABodyThatBreaksOffSaysSoRatherThanClaimingTheServerIsUnreachable()
+    {
+        var message = GrimoireApiClient.TransportErrorMessage(
+            new HttpIOException(HttpRequestError.ResponseEnded, "The response ended prematurely."), Server);
+
+        Assert.Contains(Server, message);
+        Assert.Contains("broke off", message);
+        Assert.DoesNotContain("Cannot reach", message);
+    }
+
     // The message is what a human or an agent reads on stderr; a trailing frame
     // or an empty tail would mean the exception text leaked in raw.
     [Fact]

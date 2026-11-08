@@ -69,8 +69,7 @@ public class BooksServiceTests
     {
         var api = Client().Api.Api.Books["b1"];
         Assert.Contains("/api/books/b1/cover", Uri(api.Cover.ToDeleteRequestInformation()));
-        Assert.Contains("/api/books/b1/cover", Uri(api.Cover.ToPostRequestInformation(
-            GrimoireCli.Services.BooksService.BuildCoverUploadBody(new byte[] { 1 }, "cover.png"))));
+        Assert.Contains("/api/books/b1/cover", Uri(new GrimoireCli.Services.BooksService(Client()).UploadCoverRequest("b1", new MemoryStream([1]), "cover.png")));
         Assert.Contains("/api/books/b1/cover/from-source", Uri(api.Cover.FromSource.ToPostRequestInformation(
             new Generated.Models.BookCoverSourceIn { SourceType = "map", SourceId = "m1" })));
     }
@@ -80,7 +79,11 @@ public class BooksServiceTests
     [Fact]
     public void TheUploadPartIsNamedFile()
     {
-        var body = GrimoireCli.Services.BooksService.BuildCoverUploadBody(new byte[] { 1, 2, 3 }, "cover.png");
-        Assert.Equal(new byte[] { 1, 2, 3 }, body.GetPartValue<byte[]>("file", "cover.png"));
+        var info = new GrimoireCli.Services.BooksService(Client()).UploadCoverRequest("b1", new MemoryStream("abc"u8.ToArray()), "cover.png");
+        using var reader = new StreamReader(info.Content);
+        var body = reader.ReadToEnd();
+        Assert.Contains("name=\"file\"; filename=\"cover.png\"", body);
+        Assert.Contains("Content-Type: image/png", body);
+        Assert.Contains("\r\n\r\nabc\r\n", body);
     }
 }

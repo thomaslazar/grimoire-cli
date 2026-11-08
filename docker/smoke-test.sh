@@ -239,6 +239,15 @@ jq -e '.name == "smoke-upload.txt" and .size == 5' "$WORK/fupload.out" >/dev/nul
   || fail "upload should report the name and size: $(cat "$WORK/fupload.out")"
 ok "files upload landed one file"
 
+# The file part is streamed from disk: a body spanning many reads, under a
+# non-ASCII name, has to arrive whole.
+head -c 3145728 /dev/zero >"$WORK/smoke-große.txt"
+"$CLI" files upload --destination "books/$SMOKE_DIR" --file "$WORK/smoke-große.txt" >"$WORK/fupload-big.out" 2>"$WORK/fupload-big.err" \
+  || { cat "$WORK/fupload-big.err" >&2; fail "streamed files upload exited non-zero"; }
+jq -e '.name == "smoke-große.txt" and .size == 3145728' "$WORK/fupload-big.out" >/dev/null \
+  || fail "a streamed upload should arrive whole: $(cat "$WORK/fupload-big.out")"
+ok "files upload streams a 3 MiB file under a non-ASCII name"
+
 # browsing the folder expecting the uploaded file listed with no record_id
 "$CLI" files browse --path "books/$SMOKE_DIR" >"$WORK/fbrowse.out" 2>"$WORK/fbrowse.err" \
   || { cat "$WORK/fbrowse.err" >&2; fail "files browse exited non-zero"; }

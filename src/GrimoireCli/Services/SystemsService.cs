@@ -1,6 +1,7 @@
 using System.Text;
 using GrimoireCli.Api;
 using GrimoireCli.Commands;
+using Microsoft.Kiota.Abstractions;
 
 namespace GrimoireCli.Services;
 
@@ -98,29 +99,12 @@ public class SystemsService
         return await _client.SendStreamAsync(info);
     }
 
-    /// <summary>
-    /// POST /api/systems/{id}/cover. The CLI's only multipart body: a
-    /// <see cref="Microsoft.Kiota.Abstractions.MultipartBody"/> with one part named
-    /// "file" — the name FastAPI binds — built with the generated builder's own
-    /// <c>ToPostRequestInformation</c>. An empty <c>MultipartBody</c> throws ("No
-    /// parts to serialize"), so the part must be added before that call.
-    /// </summary>
+    /// <summary>POST /api/systems/{id}/cover. One multipart part named "file".</summary>
     public async Task<string> UploadCoverAsync(string id, string filePath)
-    {
-        byte[] bytes;
-        try
-        {
-            bytes = await File.ReadAllBytesAsync(filePath);
-        }
-        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or ArgumentException or NotSupportedException)
-        {
-            throw new BodyInputException($"Could not read {filePath}: {ex.Message}");
-        }
-        var body = new Microsoft.Kiota.Abstractions.MultipartBody();
-        body.AddOrReplacePart("file", MimeForExtension(filePath), bytes, Path.GetFileName(filePath));
-        var info = _client.Api.Api.Systems[id].Cover.ToPostRequestInformation(body);
-        return await _client.SendAsync(info, permissionHint: "the gm or admin role");
-    }
+        => await _client.SendUploadAsync(UploadCoverRequest(id, FileUpload.Open(filePath), filePath), permissionHint: "the gm or admin role");
+
+    internal Microsoft.Kiota.Abstractions.RequestInformation UploadCoverRequest(string id, Stream file, string filePath)
+        => FileUpload.Request(b => _client.Api.Api.Systems[id].Cover.ToPostRequestInformation(b), FileUpload.Body(file, filePath, MimeForExtension(filePath)));
 
     /// <summary>
     /// The content type the server checks `file.content_type` against. Unknown
