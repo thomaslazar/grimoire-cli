@@ -3,6 +3,38 @@
 All notable changes to grimoire-cli are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## v0.7.6 — 2026-11-08
+
+Patch release that makes large files work. Every command that sends or
+receives a file now streams it and has no timeout. The supported server range
+is unchanged at 1.10.1 – 1.10.2.
+
+### Highlights
+
+- **Large uploads finish.** `files upload` used to hold the whole file in
+  memory and give up after 100 s, so a ~300 MB file never landed (#135). It now
+  streams from disk with no timeout, up to the server's 8 GiB limit.
+- **Every file upload behaves the same.** Cover uploads, campaign files,
+  images, banners, member tokens, sheets and art, and wiki and template imports
+  all go through the same streamed, no-timeout path.
+- **Downloads stream too.** `books file`, `backups download`, exports and every
+  other `--output` command write the body as it arrives instead of buffering it,
+  and no longer cut off a slow but healthy transfer at 100 s.
+- **A broken download says so.** A connection lost partway through exits 2 with
+  "The response from … broke off" rather than a .NET stack trace.
+
+### Fixes
+
+- fix: stream file uploads and downloads with no timeout
+
+### Chores
+
+- chore: bump version to 0.7.6
+
+### Docs
+
+- docs: add 0.7.6 to the compatibility matrix
+
 ## v0.7.5 — 2026-11-06
 
 Patch release that adds Grimoire 1.10.2 to the tested range. No command was
