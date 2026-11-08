@@ -236,25 +236,25 @@ than repeating the branch per command.
 
 `GrimoireApiClient.SendStreamAsync` is `SendAsync` with `ReadAsStreamAsync` in
 place of `ReadAsStringAsync` — same preflight version check, permission hints
-and error handling. **It still buffers the whole response body in memory**:
-the two-arg `_http.SendAsync(request, cts.Token)` defaults to
-`HttpCompletionOption.ResponseContentRead`, so nothing streams until the
-server has finished sending. That's fine for thumbnails and the 10 MB cover
-cap this convention was built for. Book files and page images are expected to
-reuse this same path (see `docs/roadmap.md`) — for those, buffering a large
-PDF in memory is not fine, and the fix is three changes together, not one:
+and error handling. The response is read with `ResponseHeadersRead`, so the
+body streams to the output as it arrives instead of being buffered in memory,
+and, like an upload, it has no timeout: a book file or a backup takes as long
+as the link needs. A connection lost partway through the body exits 2 with the
+same kind of stderr line as one lost before the response.
 
-- `HttpCompletionOption.ResponseHeadersRead` on the `_http.SendAsync` call, so
-  the body streams instead of buffering.
-- The `CancellationTokenSource` moved out of its `using` and disposed only
-  when the caller is done with the stream. `SendStreamAsync` returns the
-  stream to the caller while `using var cts` is still in scope today; under
-  `ResponseHeadersRead` that would dispose the CTS while the caller is still
-  reading a live body.
-- A timeout that covers the whole download, not the fixed 100 s
-  `DefaultRequestTimeout` — which, left as is, would stay armed across an
-  entire book-file download and cancel a slow-but-healthy transfer partway
-  through.
+## File uploads
+
+Every command that sends a local file goes through `Services/FileUpload.cs` and
+`GrimoireApiClient.SendUploadAsync`, so they all behave alike:
+
+- **Streamed.** `StreamedMultipartBody` reads the file from disk as it is sent,
+  instead of Kiota's `MultipartBody`, which serializes the whole body into a
+  `MemoryStream` and so caps it at 2 GiB. Its part headers match what
+  `MultipartBody` writes, and it is seekable, so the token-refresh retry can
+  rewind it.
+- **No timeout.** The server bounds each body (8 GiB for `files upload`); how
+  long it takes to send depends on the link, so the fixed 100 s
+  `DefaultRequestTimeout` would fail a slow but healthy upload partway through.
 
 ## Role tagging
 

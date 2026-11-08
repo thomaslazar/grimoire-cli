@@ -46,7 +46,7 @@ public class CampaignWikiTemplateServiceTests
             "create" => s.CreateRequest("c-1", "{\"name\":\"N\"}"),
             "update" => s.UpdateRequest("c-1", "t-1", "{\"name\":\"N\"}"),
             "delete" => s.DeleteRequest("c-1", "t-1"),
-            "import" => s.ImportRequest("c-1", [1], "npc.zip"),
+            "import" => s.ImportRequest("c-1", new MemoryStream([1]), "npc.zip"),
             "export" => s.ExportRequest("c-1", "t-1"),
             "use" => s.UseRequest("c-1", "t-1"),
             "catalogue" => s.CatalogueRequest("c-1", false),
@@ -71,7 +71,7 @@ public class CampaignWikiTemplateServiceTests
     [Fact]
     public void ImportSendsOneFilePartNamedAfterTheLocalFile()
     {
-        var info = Service().ImportRequest("c-1", "hello"u8.ToArray(), "npc.zip");
+        var info = Service().ImportRequest("c-1", new MemoryStream("hello"u8.ToArray()), "npc.zip");
         using var reader = new StreamReader(info.Content);
         var body = reader.ReadToEnd();
         Assert.Contains("name=\"file\"", body);

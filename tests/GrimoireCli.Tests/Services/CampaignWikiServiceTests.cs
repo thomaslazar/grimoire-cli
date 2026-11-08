@@ -56,7 +56,7 @@ public class CampaignWikiServiceTests
             "hide" => s.HideRequest("c-1", "p-1"),
             "unhide" => s.UnhideRequest("c-1", "p-1"),
             "export" => s.ExportRequest("c-1", null),
-            "import" => s.ImportRequest("c-1", [1], "vault.zip"),
+            "import" => s.ImportRequest("c-1", new MemoryStream([1]), "vault.zip"),
             _ => throw new ArgumentException($"Unknown verb '{verb}'.", nameof(verb)),
         };
     }
@@ -104,7 +104,7 @@ public class CampaignWikiServiceTests
     [Fact]
     public void ImportSendsOneFilePartNamedAfterTheLocalFile()
     {
-        var info = Service().ImportRequest("c-1", "hello"u8.ToArray(), "vault.zip");
+        var info = Service().ImportRequest("c-1", new MemoryStream("hello"u8.ToArray()), "vault.zip");
         using var reader = new StreamReader(info.Content);
         var body = reader.ReadToEnd();
         Assert.Contains("name=\"file\"", body);

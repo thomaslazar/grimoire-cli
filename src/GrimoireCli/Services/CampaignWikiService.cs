@@ -69,18 +69,7 @@ public class CampaignWikiService
     /// basename: the server picks its parser by extension.
     /// </summary>
     public async Task<string> ImportAsync(string campaignId, string filePath)
-    {
-        byte[] bytes;
-        try
-        {
-            bytes = await File.ReadAllBytesAsync(filePath);
-        }
-        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or ArgumentException or NotSupportedException)
-        {
-            throw new BodyInputException($"Could not read {filePath}: {ex.Message}");
-        }
-        return await _client.SendAsync(ImportRequest(campaignId, bytes, Path.GetFileName(filePath)), notFoundHint: CampaignNotFound);
-    }
+        => await _client.SendUploadAsync(ImportRequest(campaignId, FileUpload.Open(filePath), filePath), notFoundHint: CampaignNotFound);
 
     internal RequestInformation ListRequest(string campaignId, bool mine, bool includeHidden)
         => _client.Api.Api.Campaigns[campaignId].Wiki.ToGetRequestInformation(c =>
@@ -133,10 +122,6 @@ public class CampaignWikiService
             if (format is not null) c.QueryParameters.Format = format;
         });
 
-    internal RequestInformation ImportRequest(string campaignId, byte[] bytes, string fileName)
-    {
-        var body = new MultipartBody();
-        body.AddOrReplacePart("file", "application/octet-stream", bytes, fileName);
-        return _client.Api.Api.Campaigns[campaignId].Wiki.Import.ToPostRequestInformation(body);
-    }
+    internal RequestInformation ImportRequest(string campaignId, Stream file, string filePath)
+        => FileUpload.Request(b => _client.Api.Api.Campaigns[campaignId].Wiki.Import.ToPostRequestInformation(b), FileUpload.Body(file, filePath, "application/octet-stream"));
 }

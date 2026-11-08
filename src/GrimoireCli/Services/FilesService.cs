@@ -1,5 +1,6 @@
 using GrimoireCli.Api;
 using GrimoireCli.Commands;
+using Microsoft.Kiota.Abstractions;
 
 namespace GrimoireCli.Services;
 
@@ -37,25 +38,22 @@ public class FilesService
     /// alongside the file part, which FastAPI binds by name.
     /// </summary>
     public async Task<string> UploadAsync(string destination, string filePath, string? relativeDir, string? onConflict)
+        => await _client.SendUploadAsync(
+            UploadRequest(destination, FileUpload.Open(filePath), filePath, relativeDir, onConflict),
+            permissionHint: AdminHint, notFoundHint: NotFoundHint);
+
+    internal RequestInformation UploadRequest(string destination, Stream file, string filePath, string? relativeDir, string? onConflict)
+        => FileUpload.Request(
+            b => _client.Api.Api.Files.Upload.ToPostRequestInformation(b),
+            new StreamedMultipartBody(UploadFields(destination, relativeDir, onConflict), Path.GetFileName(filePath), "application/octet-stream", file));
+
+    internal static IEnumerable<(string Name, string Value)> UploadFields(string destination, string? relativeDir, string? onConflict)
     {
-        byte[] bytes;
-        try
-        {
-            bytes = await File.ReadAllBytesAsync(filePath);
-        }
-        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or ArgumentException or NotSupportedException)
-        {
-            throw new BodyInputException($"Could not read {filePath}: {ex.Message}");
-        }
-        var body = new Microsoft.Kiota.Abstractions.MultipartBody();
-        body.AddOrReplacePart("destination", "text/plain", destination);
+        yield return ("destination", destination);
         if (relativeDir is not null)
-            body.AddOrReplacePart("relative_dir", "text/plain", relativeDir);
+            yield return ("relative_dir", relativeDir);
         if (onConflict is not null)
-            body.AddOrReplacePart("on_conflict", "text/plain", onConflict);
-        body.AddOrReplacePart("file", "application/octet-stream", bytes, Path.GetFileName(filePath));
-        var info = _client.Api.Api.Files.Upload.ToPostRequestInformation(body);
-        return await _client.SendAsync(info, permissionHint: AdminHint, notFoundHint: NotFoundHint);
+            yield return ("on_conflict", onConflict);
     }
 
     /// <summary>POST /api/files/move. One request carrying every source.</summary>

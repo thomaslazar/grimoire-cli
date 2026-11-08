@@ -75,8 +75,8 @@ public static class FilesCommand
         };
         command.AddRoleRequired("admin");
         command.AddHelpSection("Notes", HelpSectionPosition.Top,
-            "The server refuses above 8 GiB with 413; this CLI reads the file into",
-            "memory, so in practice keep it under about 2 GiB.",
+            "The server refuses above 8 GiB with 413. The file is streamed and the",
+            "request has no timeout, so a large upload runs until it finishes.",
             "",
             "replace overwrites an indexed book's file in place and keeps its id",
             "(record_id). 409 when the target is not an indexed book, while a scan",

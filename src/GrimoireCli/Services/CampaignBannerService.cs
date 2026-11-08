@@ -23,27 +23,12 @@ public class CampaignBannerService
     public async Task<Stream> GetAsync(string id, bool full)
         => await _client.SendStreamAsync(GetRequest(id, full));
 
-    internal RequestInformation UploadRequest(string id, byte[] bytes, string filePath)
-    {
-        var body = new MultipartBody();
-        body.AddOrReplacePart("file", SystemsService.MimeForExtension(filePath), bytes, Path.GetFileName(filePath));
-        return _client.Api.Api.Campaigns[id].Banner.ToPostRequestInformation(body);
-    }
+    internal RequestInformation UploadRequest(string id, Stream file, string filePath)
+        => FileUpload.Request(b => _client.Api.Api.Campaigns[id].Banner.ToPostRequestInformation(b), FileUpload.Body(file, filePath, SystemsService.MimeForExtension(filePath)));
 
     /// <summary>POST /api/campaigns/{id}/banner. One multipart part named "file".</summary>
     public async Task<string> UploadAsync(string id, string filePath)
-    {
-        byte[] bytes;
-        try
-        {
-            bytes = await File.ReadAllBytesAsync(filePath);
-        }
-        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or ArgumentException or NotSupportedException)
-        {
-            throw new BodyInputException($"Could not read {filePath}: {ex.Message}");
-        }
-        return await _client.SendAsync(UploadRequest(id, bytes, filePath), notFoundHint: NotFound);
-    }
+        => await _client.SendUploadAsync(UploadRequest(id, FileUpload.Open(filePath), filePath), notFoundHint: NotFound);
 
     internal RequestInformation DeleteRequest(string id) => _client.Api.Api.Campaigns[id].Banner.ToDeleteRequestInformation();
 

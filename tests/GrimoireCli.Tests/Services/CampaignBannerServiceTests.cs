@@ -35,11 +35,11 @@ public class CampaignBannerServiceTests
         {
             "get" => s.GetRequest("c-1", false),
             "get-full" => s.GetRequest("c-1", true),
-            "upload" => s.UploadRequest("c-1", [1], "b.png"),
+            "upload" => s.UploadRequest("c-1", new MemoryStream([1]), "b.png"),
             "delete" => s.DeleteRequest("c-1"),
             "from-source" => s.FromSourceRequest("c-1", "map", "m-1"),
             "focus" => s.FocusRequest("c-1", 30),
-            "image" => new CampaignFilesService(Client()).UploadImageRequest("c-1", [1], "i.png", null, null),
+            "image" => new CampaignFilesService(Client()).UploadImageRequest("c-1", new MemoryStream([1]), "i.png", null, null),
             _ => throw new ArgumentException(verb),
         };
     }

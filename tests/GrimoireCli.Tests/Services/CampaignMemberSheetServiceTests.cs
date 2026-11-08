@@ -21,7 +21,7 @@ public class CampaignMemberSheetServiceTests
     public void GetHitsItsRoute() => Assert.Equal(("GET", Base + "/members/m-1/sheet"), Of(Service().GetRequest("c-1", "m-1")));
 
     [Fact]
-    public void UploadHitsItsRoute() => Assert.Equal(("POST", Base + "/members/m-1/sheet"), Of(Service().UploadRequest("c-1", "m-1", [1], "a.pdf")));
+    public void UploadHitsItsRoute() => Assert.Equal(("POST", Base + "/members/m-1/sheet"), Of(Service().UploadRequest("c-1", "m-1", new MemoryStream([1]), "a.pdf")));
 
     [Fact]
     public void DeleteHitsItsRoute() => Assert.Equal(("DELETE", Base + "/members/m-1/sheet"), Of(Service().DeleteRequest("c-1", "m-1")));

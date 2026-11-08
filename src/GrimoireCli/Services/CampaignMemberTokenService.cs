@@ -19,27 +19,12 @@ public class CampaignMemberTokenService
     public async Task<Stream> GetAsync(string id, string memberId)
         => await _client.SendStreamAsync(GetRequest(id, memberId));
 
-    internal RequestInformation UploadRequest(string id, string memberId, byte[] bytes, string filePath)
-    {
-        var body = new MultipartBody();
-        body.AddOrReplacePart("file", SystemsService.MimeForExtension(filePath), bytes, Path.GetFileName(filePath));
-        return _client.Api.Api.Campaigns[id].Members[memberId].Token.ToPostRequestInformation(body);
-    }
+    internal RequestInformation UploadRequest(string id, string memberId, Stream file, string filePath)
+        => FileUpload.Request(b => _client.Api.Api.Campaigns[id].Members[memberId].Token.ToPostRequestInformation(b), FileUpload.Body(file, filePath, SystemsService.MimeForExtension(filePath)));
 
     /// <summary>POST /api/campaigns/{id}/members/{member_id}/token. One multipart part named "file".</summary>
     public async Task<string> UploadAsync(string id, string memberId, string filePath)
-    {
-        byte[] bytes;
-        try
-        {
-            bytes = await File.ReadAllBytesAsync(filePath);
-        }
-        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or ArgumentException or NotSupportedException)
-        {
-            throw new BodyInputException($"Could not read {filePath}: {ex.Message}");
-        }
-        return await _client.SendAsync(UploadRequest(id, memberId, bytes, filePath));
-    }
+        => await _client.SendUploadAsync(UploadRequest(id, memberId, FileUpload.Open(filePath), filePath));
 
     internal RequestInformation DeleteRequest(string id, string memberId)
         => _client.Api.Api.Campaigns[id].Members[memberId].Token.ToDeleteRequestInformation();
