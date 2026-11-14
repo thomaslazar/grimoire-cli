@@ -75,7 +75,8 @@ public static class CampaignMemberSheetCommands
         };
         command.AddHelpSection("Notes", HelpSectionPosition.Top,
             "The member themselves or the campaign owner; 409 while the campaign is",
-            "archived. The owner has no slot of their own.",
+            "archived, 403 while the GM's campaign access is disabled. The owner has",
+            "no slot of their own.",
             "",
             "A PDF, or a PNG, JPEG, WebP or GIF, max 15 MB; replaces the current",
             "sheet and clears any sheet link. A link set with members update clears",
@@ -112,7 +113,8 @@ public static class CampaignMemberSheetCommands
         };
         command.AddHelpSection("Notes", HelpSectionPosition.Top,
             "The member themselves or the campaign owner; 409 while the campaign is",
-            "archived. The owner has no slot of their own.",
+            "archived, 403 while the GM's campaign access is disabled. The owner has",
+            "no slot of their own.",
             "A no-op when the slot is empty.");
         command.AddExamples("grimoire-cli campaigns members sheet delete --id <campaign-id> --member-id <member-id>");
         command.SetAction(async (parseResult, cancellationToken) =>
@@ -138,7 +140,8 @@ public static class CampaignMemberSheetCommands
         };
         command.AddHelpSection("Notes", HelpSectionPosition.Top,
             "The member themselves or the campaign owner; 409 while the campaign is",
-            "archived. The owner has no slot of their own.",
+            "archived, 403 while the GM's campaign access is disabled. The owner has",
+            "no slot of their own.",
             "",
             "Only what sheet sources lists for you can be copied (404 otherwise); PDF",
             "only, max 15 MB. Clears any sheet link.");

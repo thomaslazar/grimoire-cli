@@ -3,6 +3,7 @@
 using GrimoireCli.Generated.Api.About;
 using GrimoireCli.Generated.Api.Addons;
 using GrimoireCli.Generated.Api.ApiKeys;
+using GrimoireCli.Generated.Api.Armies;
 using GrimoireCli.Generated.Api.Audio;
 using GrimoireCli.Generated.Api.AudioFolders;
 using GrimoireCli.Generated.Api.AudioSets;
@@ -24,6 +25,7 @@ using GrimoireCli.Generated.Api.Files;
 using GrimoireCli.Generated.Api.Genres;
 using GrimoireCli.Generated.Api.Health;
 using GrimoireCli.Generated.Api.LatestRelease;
+using GrimoireCli.Generated.Api.Leagues;
 using GrimoireCli.Generated.Api.Licenses;
 using GrimoireCli.Generated.Api.Logs;
 using GrimoireCli.Generated.Api.Maintenance;
@@ -33,6 +35,7 @@ using GrimoireCli.Generated.Api.ModelFolders;
 using GrimoireCli.Generated.Api.ModelsRequests;
 using GrimoireCli.Generated.Api.Naming;
 using GrimoireCli.Generated.Api.ParentSystems;
+using GrimoireCli.Generated.Api.Pins;
 using GrimoireCli.Generated.Api.Rescan;
 using GrimoireCli.Generated.Api.Rulesets;
 using GrimoireCli.Generated.Api.SavedFilters;
@@ -78,6 +81,11 @@ namespace GrimoireCli.Generated.Api
         public global::GrimoireCli.Generated.Api.ApiKeys.ApiKeysRequestBuilder ApiKeys
         {
             get => new global::GrimoireCli.Generated.Api.ApiKeys.ApiKeysRequestBuilder(PathParameters, RequestAdapter);
+        }
+        /// <summary>The armies property</summary>
+        public global::GrimoireCli.Generated.Api.Armies.ArmiesRequestBuilder Armies
+        {
+            get => new global::GrimoireCli.Generated.Api.Armies.ArmiesRequestBuilder(PathParameters, RequestAdapter);
         }
         /// <summary>The audio property</summary>
         public global::GrimoireCli.Generated.Api.Audio.AudioRequestBuilder Audio
@@ -184,6 +192,11 @@ namespace GrimoireCli.Generated.Api
         {
             get => new global::GrimoireCli.Generated.Api.LatestRelease.LatestReleaseRequestBuilder(PathParameters, RequestAdapter);
         }
+        /// <summary>The leagues property</summary>
+        public global::GrimoireCli.Generated.Api.Leagues.LeaguesRequestBuilder Leagues
+        {
+            get => new global::GrimoireCli.Generated.Api.Leagues.LeaguesRequestBuilder(PathParameters, RequestAdapter);
+        }
         /// <summary>The licenses property</summary>
         public global::GrimoireCli.Generated.Api.Licenses.LicensesRequestBuilder Licenses
         {
@@ -228,6 +241,11 @@ namespace GrimoireCli.Generated.Api
         public global::GrimoireCli.Generated.Api.ParentSystems.ParentSystemsRequestBuilder ParentSystems
         {
             get => new global::GrimoireCli.Generated.Api.ParentSystems.ParentSystemsRequestBuilder(PathParameters, RequestAdapter);
+        }
+        /// <summary>The pins property</summary>
+        public global::GrimoireCli.Generated.Api.Pins.PinsRequestBuilder Pins
+        {
+            get => new global::GrimoireCli.Generated.Api.Pins.PinsRequestBuilder(PathParameters, RequestAdapter);
         }
         /// <summary>The rescan property</summary>
         public global::GrimoireCli.Generated.Api.Rescan.RescanRequestBuilder Rescan

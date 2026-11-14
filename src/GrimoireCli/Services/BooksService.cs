@@ -46,7 +46,7 @@ public class BooksService
     public async Task<string> UpdateAsync(string id, string rawBody)
     {
         var info = _client.Api.Api.Books[id].ToPatchRequestInformation(
-            new Generated.Models.BookUpdate());
+            new Generated.Models.Backend__routers__books___schemas__BookUpdate());
         info.SetStreamContent(new MemoryStream(Encoding.UTF8.GetBytes(rawBody)), "application/json");
         return await _client.SendAsync(
             info,

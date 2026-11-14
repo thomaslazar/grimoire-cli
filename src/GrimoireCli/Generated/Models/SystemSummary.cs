@@ -101,6 +101,14 @@ namespace GrimoireCli.Generated.Models
 #else
         public string Edition { get; set; }
 #endif
+        /// <summary>The game_type property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public string? GameType { get; set; }
+#nullable restore
+#else
+        public string GameType { get; set; }
+#endif
         /// <summary>The genre property</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
@@ -234,6 +242,7 @@ namespace GrimoireCli.Generated.Models
         {
             AdditionalData = new Dictionary<string, object>();
             CategoryDepth = 2;
+            GameType = "ttrpg";
         }
         /// <summary>
         /// Creates a new instance of the appropriate class based on discriminator value
@@ -266,6 +275,7 @@ namespace GrimoireCli.Generated.Models
                 { "description", n => { Description = n.GetObjectValue<global::GrimoireCli.Generated.Models.SystemSummary.SystemSummary_description>(global::GrimoireCli.Generated.Models.SystemSummary.SystemSummary_description.CreateFromDiscriminatorValue); } },
                 { "dice_materials", n => { DiceMaterials = n.GetCollectionOfPrimitiveValues<string>()?.AsList(); } },
                 { "edition", n => { Edition = n.GetStringValue(); } },
+                { "game_type", n => { GameType = n.GetStringValue(); } },
                 { "genre", n => { Genre = n.GetObjectValue<global::GrimoireCli.Generated.Models.SystemSummary.SystemSummary_genre>(global::GrimoireCli.Generated.Models.SystemSummary.SystemSummary_genre.CreateFromDiscriminatorValue); } },
                 { "genres", n => { Genres = n.GetCollectionOfPrimitiveValues<string>()?.AsList(); } },
                 { "has_cover", n => { HasCover = n.GetBoolValue(); } },
@@ -309,6 +319,7 @@ namespace GrimoireCli.Generated.Models
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.SystemSummary.SystemSummary_description>("description", Description);
             writer.WriteCollectionOfPrimitiveValues<string>("dice_materials", DiceMaterials);
             writer.WriteStringValue("edition", Edition);
+            writer.WriteStringValue("game_type", GameType);
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.SystemSummary.SystemSummary_genre>("genre", Genre);
             writer.WriteCollectionOfPrimitiveValues<string>("genres", Genres);
             writer.WriteBoolValue("has_cover", HasCover);

@@ -43,9 +43,10 @@ public static class FilesFolderCommands
         };
         command.AddRoleRequired("admin");
         command.AddHelpSection("Notes", HelpSectionPosition.Top,
-            "--container-kind only applies where a game system belongs: inside books/,",
-            "at a depth reached through containers alone. one-page and agnostic may",
-            "exist only once in the library.",
+            "--container-kind only applies where a game system belongs: inside books/",
+            "or armory/, at a depth reached through containers alone, and never on a",
+            "container's shared-library/ folder. one-page and agnostic may exist only",
+            "once in the library, and only in books/.",
             "",
             "--frames-container only applies under tokens/, at any depth below it.",
             "",
@@ -87,11 +88,12 @@ public static class FilesFolderCommands
             "Omitted fields are left alone.",
             "",
             "Setting --container-kind needs a folder where a game system belongs",
-            "(inside books/, at a depth reached through containers alone); setting",
-            "--frames-container needs one under tokens/. Either outside its own tree is",
-            "400. Clearing is always allowed, so a marker written by hand in the wrong",
-            "place stays removable. files browse reports accepts_container_kind and",
-            "accepts_frames_marker per row.");
+            "(inside books/ or armory/, at a depth reached through containers alone,",
+            "not a container's shared-library/; one-page and agnostic in books/ only);",
+            "setting --frames-container needs one under tokens/. Either outside its own",
+            "tree is 400. Clearing is always allowed, so a marker written by hand in",
+            "the wrong place stays removable. files browse reports",
+            "accepts_container_kind and accepts_frames_marker per row.");
         command.AddExamples(
             "grimoire-cli files folder markers --path \"books/Kult\" --nsfw true",
             "grimoire-cli files folder markers --path \"books/Publishers\" --container-kind publisher");
@@ -121,9 +123,10 @@ public static class FilesFolderCommands
         command.AddRoleRequired("admin");
         command.AddHelpSection("Notes", HelpSectionPosition.Top,
             "Creates Core, Supplements, Adventures, Character Sheets, Maps, Handouts,",
-            "Homebrew, Starter Sets and Magazines. Re-running is safe.",
+            "Homebrew, Starter Sets and Magazines; under armory/, Core, Factions,",
+            "Rules Updates, Missions, Campaigns and Supplements. Re-running is safe.",
             "",
-            "--path must be a system folder: books/ itself and container folders",
+            "--path must be a system folder: books/, armory/ and container folders",
             "hold systems, not categories, and are refused with 400. files browse",
             "reports category_host per row.");
         command.AddExamples("grimoire-cli files folder scaffold --path \"books/Dungeons & Dragons/5e EN\"");

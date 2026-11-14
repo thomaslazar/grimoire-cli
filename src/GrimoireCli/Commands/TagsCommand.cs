@@ -61,7 +61,10 @@ public static class TagsCommand
             "in the order system, book, map, token, audio, model; page with",
             "--offset against total. folders lists each folder carrying the tag",
             "with its count, not its contents — pass a folder's key to",
-            "tags folder-items. --resource-type narrows counts and folders too.");
+            "tags folder-items. --resource-type narrows counts and folders too.",
+            "",
+            "Non-admin: 404 when nothing carrying the tag is visible, including",
+            "when --resource-type names a type the tag is not on.");
         command.AddExamples(
             "grimoire-cli tags items --tag dungeon",
             "grimoire-cli tags items --tag dungeon --resource-type map --offset 100");

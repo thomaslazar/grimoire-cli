@@ -4,7 +4,6 @@ using GrimoireCli.Generated.Api.Themes.Browse;
 using GrimoireCli.Generated.Api.Themes.Install;
 using GrimoireCli.Generated.Api.Themes.Item;
 using GrimoireCli.Generated.Api.Themes.Selection;
-using GrimoireCli.Generated.Api.Themes.Source;
 using GrimoireCli.Generated.Models;
 using Microsoft.Kiota.Abstractions.Extensions;
 using Microsoft.Kiota.Abstractions.Serialization;
@@ -36,11 +35,6 @@ namespace GrimoireCli.Generated.Api.Themes
         public global::GrimoireCli.Generated.Api.Themes.Selection.SelectionRequestBuilder Selection
         {
             get => new global::GrimoireCli.Generated.Api.Themes.Selection.SelectionRequestBuilder(PathParameters, RequestAdapter);
-        }
-        /// <summary>The source property</summary>
-        public global::GrimoireCli.Generated.Api.Themes.Source.SourceRequestBuilder Source
-        {
-            get => new global::GrimoireCli.Generated.Api.Themes.Source.SourceRequestBuilder(PathParameters, RequestAdapter);
         }
         /// <summary>Gets an item from the GrimoireCli.Generated.api.themes.item collection</summary>
         /// <param name="position">Unique identifier of the item</param>

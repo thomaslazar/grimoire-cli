@@ -2,6 +2,7 @@
 #pragma warning disable CS0618
 using GrimoireCli.Generated.Api.Audio.Bulk;
 using GrimoireCli.Generated.Api.Audio.Groups;
+using GrimoireCli.Generated.Api.Audio.IndexNamespace;
 using GrimoireCli.Generated.Api.Audio.Item;
 using GrimoireCli.Generated.Models;
 using Microsoft.Kiota.Abstractions.Extensions;
@@ -29,6 +30,11 @@ namespace GrimoireCli.Generated.Api.Audio
         public global::GrimoireCli.Generated.Api.Audio.Groups.GroupsRequestBuilder Groups
         {
             get => new global::GrimoireCli.Generated.Api.Audio.Groups.GroupsRequestBuilder(PathParameters, RequestAdapter);
+        }
+        /// <summary>The index property</summary>
+        public global::GrimoireCli.Generated.Api.Audio.IndexNamespace.IndexRequestBuilder Index
+        {
+            get => new global::GrimoireCli.Generated.Api.Audio.IndexNamespace.IndexRequestBuilder(PathParameters, RequestAdapter);
         }
         /// <summary>Gets an item from the GrimoireCli.Generated.api.audio.item collection</summary>
         /// <param name="position">Unique identifier of the item</param>

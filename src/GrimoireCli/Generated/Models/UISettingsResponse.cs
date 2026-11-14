@@ -25,10 +25,18 @@ namespace GrimoireCli.Generated.Models
         public bool? CampaignUploadsDisabled { get; set; }
         /// <summary>The guest_access_enabled property</summary>
         public bool? GuestAccessEnabled { get; set; }
+        /// <summary>The hide_armies property</summary>
+        public bool? HideArmies { get; set; }
+        /// <summary>The hide_armory property</summary>
+        public bool? HideArmory { get; set; }
         /// <summary>The hide_audio property</summary>
         public bool? HideAudio { get; set; }
         /// <summary>The hide_campaigns property</summary>
         public bool? HideCampaigns { get; set; }
+        /// <summary>The hide_leagues property</summary>
+        public bool? HideLeagues { get; set; }
+        /// <summary>The hide_library property</summary>
+        public bool? HideLibrary { get; set; }
         /// <summary>The hide_maps property</summary>
         public bool? HideMaps { get; set; }
         /// <summary>The hide_models property</summary>
@@ -65,6 +73,8 @@ namespace GrimoireCli.Generated.Models
         public UISettingsResponse()
         {
             AdditionalData = new Dictionary<string, object>();
+            HideArmory = false;
+            HideLibrary = false;
         }
         /// <summary>
         /// Creates a new instance of the appropriate class based on discriminator value
@@ -89,8 +99,12 @@ namespace GrimoireCli.Generated.Models
                 { "campaign_upload_max_total_mb", n => { CampaignUploadMaxTotalMb = n.GetIntValue(); } },
                 { "campaign_uploads_disabled", n => { CampaignUploadsDisabled = n.GetBoolValue(); } },
                 { "guest_access_enabled", n => { GuestAccessEnabled = n.GetBoolValue(); } },
+                { "hide_armies", n => { HideArmies = n.GetBoolValue(); } },
+                { "hide_armory", n => { HideArmory = n.GetBoolValue(); } },
                 { "hide_audio", n => { HideAudio = n.GetBoolValue(); } },
                 { "hide_campaigns", n => { HideCampaigns = n.GetBoolValue(); } },
+                { "hide_leagues", n => { HideLeagues = n.GetBoolValue(); } },
+                { "hide_library", n => { HideLibrary = n.GetBoolValue(); } },
                 { "hide_maps", n => { HideMaps = n.GetBoolValue(); } },
                 { "hide_models", n => { HideModels = n.GetBoolValue(); } },
                 { "hide_tokens", n => { HideTokens = n.GetBoolValue(); } },
@@ -120,8 +134,12 @@ namespace GrimoireCli.Generated.Models
             writer.WriteIntValue("campaign_upload_max_total_mb", CampaignUploadMaxTotalMb);
             writer.WriteBoolValue("campaign_uploads_disabled", CampaignUploadsDisabled);
             writer.WriteBoolValue("guest_access_enabled", GuestAccessEnabled);
+            writer.WriteBoolValue("hide_armies", HideArmies);
+            writer.WriteBoolValue("hide_armory", HideArmory);
             writer.WriteBoolValue("hide_audio", HideAudio);
             writer.WriteBoolValue("hide_campaigns", HideCampaigns);
+            writer.WriteBoolValue("hide_leagues", HideLeagues);
+            writer.WriteBoolValue("hide_library", HideLibrary);
             writer.WriteBoolValue("hide_maps", HideMaps);
             writer.WriteBoolValue("hide_models", HideModels);
             writer.WriteBoolValue("hide_tokens", HideTokens);

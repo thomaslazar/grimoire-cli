@@ -8,7 +8,7 @@ public static class SearchCommand
 {
     public static Command Create()
     {
-        var queryOption = new Option<string>("--query") { Description = "Search text (2+ characters)", Required = true };
+        var queryOption = new Option<string>("--query") { Description = "Search text (2-500 characters)", Required = true };
         var limitOption = OptionHelpers.Range("--limit", "Page-text results; default 50, max 200", 1, 200);
         var bookIdOption = new Option<string?>("--book-id") { Description = "Restrict to one book" };
         var systemIdOption = new Option<string?>("--system-id") { Description = "Restrict to one game system" };
@@ -36,7 +36,11 @@ public static class SearchCommand
             "snippet carries literal <mark> HTML.",
             "",
             "--book-id and --system-id drop the map, token, audio and model",
-            "results; --book-id also empties book_matches.");
+            "results; --book-id also empties book_matches. --system-id includes",
+            "books linked onto the system; system: matches only a book's own.",
+            "",
+            "Only the first 64 terms reach page text; the rest are dropped. A query",
+            "the server still cannot run is a 400.");
         command.AddHelpSection("Query syntax", HelpSectionPosition.Top,
             "Fields, aliases in parens. Books and media: title (name), filename",
             "(file), tag (tags). Books and audio: artist (artists). Audio only:",

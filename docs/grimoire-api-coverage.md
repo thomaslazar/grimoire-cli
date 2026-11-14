@@ -2,7 +2,7 @@
 
 Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any) that implements it.
 
-- **Reference:** spec fetched live from the pinned stack's `/api/openapi.json` (v1.10.2, 324 paths, 424 operations) and the upstream router source read from the same container. Tested range: `1.10.1`-`1.10.2` (`GrimoireApiClient.cs`).
+- **Reference:** spec fetched live from the pinned stack's `/api/openapi.json` (v1.11.0, 374 paths, 491 operations) and the upstream router source read from the same container. Tested range: `1.10.1`-`1.11.0` (`GrimoireApiClient.cs`).
 - **Perm** column uses Grimoire's roles (`admin` / `gm or admin` / `not guest`); blank = any authenticated user. `?` = a dependency this script could not resolve.
 - **Key** column is the API key permission a route needs (`—`: no key can call it), derived from `backend/api_keys.py` in the same container.
 - ✅ = covered by a CLI command · — = not implemented · 🔒 = internal-only (no user-facing verb); 🔒 rows never count as covered.
@@ -15,40 +15,43 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | (untagged) | 0 / 1 |
 | addons | 8 / 10 |
 | api-keys | 0 / 6 |
-| audio | 15 / 16 |
+| armies | 0 / 14 |
+| audio | 15 / 17 |
 | audio-sets | 0 / 5 |
 | auth | 2 / 15 |
 | backups | 6 / 6 |
 | bookmarks | 0 / 4 |
-| books | 19 / 24 |
-| campaigns | 80 / 93 |
+| books | 19 / 27 |
+| campaigns | 80 / 109 |
 | characters | 0 / 25 |
 | codex | 0 / 11 |
 | content | 0 / 6 |
 | downloads | 1 / 1 |
 | duplicates | 13 / 18 |
 | favorites | 0 / 3 |
-| files | 9 / 16 |
+| files | 9 / 17 |
+| leagues | 0 / 23 |
 | library | 4 / 8 |
 | logs | 1 / 1 |
 | lookups | 15 / 15 |
 | maintenance | 3 / 4 |
-| maps | 15 / 23 |
-| models | 11 / 11 |
+| maps | 15 / 24 |
+| models | 11 / 12 |
+| pins | 0 / 3 |
 | rulesets | 0 / 17 |
 | saved-filters | 0 / 4 |
 | search | 2 / 2 |
-| settings | 0 / 5 |
+| settings | 0 / 8 |
 | share | 0 / 4 |
 | share-links | 0 / 8 |
 | stats | 1 / 1 |
-| systems | 18 / 18 |
+| systems | 18 / 19 |
 | tags | 7 / 7 |
-| themes | 0 / 7 |
+| themes | 0 / 6 |
 | token-frames | 0 / 2 |
-| tokens | 11 / 11 |
+| tokens | 11 / 12 |
 | users | 0 / 16 |
-| **Total** | **241 / 424** |
+| **Total** | **241 / 491** |
 
 2 operation(s) are internal-only (🔒) and excluded from covered counts.
 
@@ -84,6 +87,25 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | DELETE | `/api/api-keys/{key_id}` | Revoke (delete) an API key |  | — | — |
 | POST | `/api/api-keys/{key_id}/regenerate` | Issue a new secret for a key |  | — | — |
 
+## armies
+
+| Method | Path | Description | Perm | Key | CLI |
+|--------|------|-------------|------|-----|-----|
+| GET | `/api/armies` | List your armies |  | armies: read | — |
+| POST | `/api/armies` | Build an army by hand |  | armies: write | — |
+| GET | `/api/armies/games` | The wargames an army can be set to |  | armies: read | — |
+| GET | `/api/armies/games/{system_id}/factions` | A wargame's factions, for the army form |  | armies: read | — |
+| POST | `/api/armies/import` | Import a BattleScribe roster |  | armies: write | — |
+| PUT | `/api/armies/publication-links` | Link a cited publication to a library book (GM/admin) | gm or admin | armies: write | — |
+| DELETE | `/api/armies/publication-links` | Remove a publication link (GM/admin) | gm or admin | armies: write | — |
+| GET | `/api/armies/publication-links/books` | Find wargame books to link a publication to (GM/admin) | gm or admin | armies: read | — |
+| GET | `/api/armies/{army_id}` | Get an army |  | armies: read | — |
+| PATCH | `/api/armies/{army_id}` | Update an army |  | armies: write | — |
+| DELETE | `/api/armies/{army_id}` | Delete an army |  | armies: write | — |
+| GET | `/api/armies/{army_id}/export` | Export an army as its roster file or as text |  | armies: read | — |
+| GET | `/api/armies/{army_id}/publications` | The publications an army cites, and their library links |  | armies: read | — |
+| PUT | `/api/armies/{army_id}/units/{unit_id}/progress` | Set a unit's experience, honours and notes |  | armies: write | — |
+
 ## audio
 
 | Method | Path | Description | Perm | Key | CLI |
@@ -95,6 +117,7 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | POST | `/api/audio/bulk` | Bulk update audio tracks | gm or admin | audio: write | `audio batch-update` ✅ |
 | POST | `/api/audio/bulk/tags` | Bulk add tags to audio tracks | gm or admin | audio: write | `audio batch-tag` ✅ |
 | GET | `/api/audio/groups` | Folders holding matching audio tracks | not guest | audio: read | `audio folder-counts` ✅ |
+| GET | `/api/audio/index` | Where each letter starts in the flat list | not guest | audio: read | — |
 | GET | `/api/audio/{audio_id}` | Get an audio track |  | audio: read | `audio get` ✅ |
 | PATCH | `/api/audio/{audio_id}` | Update audio metadata | gm or admin | audio: write | `audio update` ✅ |
 | GET | `/api/audio/{audio_id}/artwork` | Audio artwork |  | audio: read | `audio artwork` ✅ |
@@ -142,7 +165,7 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | GET | `/api/backups` | List backups, newest first | admin | backups: read | `backups list` ✅ |
 | POST | `/api/backups` | Create a backup now | admin | backups: write | `backups create` ✅ |
 | GET | `/api/backups/settings` | Read backup schedule and retention settings | admin | backups: read | `backups settings get` ✅ |
-| PUT | `/api/backups/settings` | Configure backup schedule and retention | admin | backups: write | `backups settings set` ✅ |
+| PUT | `/api/backups/settings` | Configure backup schedule and retention | admin | — | `backups settings set` ✅ |
 | DELETE | `/api/backups/{backup_id}` | Delete a backup archive | admin | backups: write | `backups delete` ✅ |
 | GET | `/api/backups/{backup_id}/download` | Download a backup archive | admin | backups: read | `backups download` ✅ |
 
@@ -181,6 +204,9 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | GET | `/api/books/{book_id}/page/{page_num}/words` | Get page word bounding boxes |  | books: read | `books page-words` ✅ |
 | POST | `/api/books/{book_id}/reindex` | Re-run OCR on a book (optional DPI override) | gm or admin | books: write | `books reindex` ✅ |
 | POST | `/api/books/{book_id}/rescan` | Re-read a book from disk and rebuild its search index | gm or admin | books: write | `books rescan` ✅ |
+| GET | `/api/books/{book_id}/systems` | List the other systems a book appears in | not guest | books: read | — |
+| POST | `/api/books/{book_id}/systems` | Show a book on another system's shelf | gm or admin | books: write | — |
+| DELETE | `/api/books/{book_id}/systems/{system_id}` | Take a book off another system's shelf | gm or admin | books: write | — |
 | GET | `/api/books/{book_id}/thumbnail` | Book cover thumbnail |  | books: read | `books thumbnail` ✅ |
 | GET | `/api/books/{book_id}/toc` | PDF table of contents |  | books: read | `books toc` ✅ |
 
@@ -221,6 +247,19 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | GET | `/api/campaigns/{campaign_id}/eligible-members` | List users that can be invited |  | campaigns: read | `campaigns members eligible` ✅ |
 | POST | `/api/campaigns/{campaign_id}/files` | Upload a campaign file (GM); links it as a resource |  | campaigns: write | `campaigns files upload` ✅ |
 | GET | `/api/campaigns/{campaign_id}/files/{file_id}` | Download a campaign file (honours resource visibility) |  | campaigns: read | `campaigns files get` ✅ |
+| GET | `/api/campaigns/{campaign_id}/gm-screen` | Get the GM screen's panels |  | campaigns: read | — |
+| POST | `/api/campaigns/{campaign_id}/gm-screen/copy` | Copy another campaign's GM screen |  | campaigns: write | — |
+| GET | `/api/campaigns/{campaign_id}/gm-screen/export` | Export the GM screen as a board document |  | campaigns: read | — |
+| POST | `/api/campaigns/{campaign_id}/gm-screen/import` | Put a board document on the GM screen |  | campaigns: write | — |
+| PUT | `/api/campaigns/{campaign_id}/gm-screen/layout` | Move and resize GM screen panels |  | campaigns: write | — |
+| POST | `/api/campaigns/{campaign_id}/gm-screen/panels` | Add a panel to the GM screen |  | campaigns: write | — |
+| PATCH | `/api/campaigns/{campaign_id}/gm-screen/panels/{panel_id}` | Update a GM screen panel |  | campaigns: write | — |
+| DELETE | `/api/campaigns/{campaign_id}/gm-screen/panels/{panel_id}` | Remove a GM screen panel |  | campaigns: write | — |
+| GET | `/api/campaigns/{campaign_id}/gm-screen/party` | The party's characters and values for the GM screen |  | campaigns: read | — |
+| GET | `/api/campaigns/{campaign_id}/gm-screen/presets` | Browse community GM screen presets |  | campaigns: read | — |
+| POST | `/api/campaigns/{campaign_id}/gm-screen/presets/apply` | Apply a community GM screen preset |  | campaigns: write | — |
+| POST | `/api/campaigns/{campaign_id}/gm-screen/reset` | End a scene or session, or rest: clear marked panels |  | campaigns: write | — |
+| GET | `/api/campaigns/{campaign_id}/gm-screen/sources` | Other campaigns with a GM screen to copy |  | campaigns: read | — |
 | POST | `/api/campaigns/{campaign_id}/guests` | Create a guest invite code for a GM campaign |  | — | `campaigns guests create` ✅ |
 | GET | `/api/campaigns/{campaign_id}/guests` | List a campaign's guests and their invite codes |  | — | `campaigns guests list` ✅ |
 | DELETE | `/api/campaigns/{campaign_id}/guests/{member_id}` | Remove a guest (deletes the guest account) |  | campaigns: write | `campaigns guests remove` ✅ |
@@ -281,6 +320,9 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | DELETE | `/api/campaigns/{campaign_id}/wiki/{page_id}` | Delete a wiki page |  | campaigns: write | `campaigns wiki delete` ✅ |
 | POST | `/api/campaigns/{campaign_id}/wiki/{page_id}/hide` | Hide a wiki page from your own view |  | campaigns: write | `campaigns wiki hide` ✅ |
 | DELETE | `/api/campaigns/{campaign_id}/wiki/{page_id}/hide` | Un-hide a wiki page you had hidden |  | campaigns: write | `campaigns wiki unhide` ✅ |
+| POST | `/api/campaigns/{campaign_id}/wiki/{page_id}/pins` | Add a pin to a map page |  | campaigns: write | — |
+| PATCH | `/api/campaigns/{campaign_id}/wiki/{page_id}/pins/{pin_id}` | Move or edit a pin on a map page |  | campaigns: write | — |
+| DELETE | `/api/campaigns/{campaign_id}/wiki/{page_id}/pins/{pin_id}` | Remove a pin from a map page |  | campaigns: write | — |
 
 ## characters
 
@@ -381,6 +423,7 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | Method | Path | Description | Perm | Key | CLI |
 |--------|------|-------------|------|-----|-----|
 | GET | `/api/files/browse` | List a library folder with indexing state | admin | files: read | `files browse` ✅ |
+| GET | `/api/files/campaign-map-copies` | Campaigns that use a map a delete would remove, and whether each keeps a copy | admin | files: read | — |
 | POST | `/api/files/delete` | Remove a file or folder from the index, or from disk | admin | files: write | `files delete` ✅ |
 | POST | `/api/files/folder` | Create a folder, optionally as a container or NSFW | admin | files: write | `files folder create` ✅ |
 | DELETE | `/api/files/folder` | Delete a folder, recursively when confirmed by name | admin | files: write | — |
@@ -396,6 +439,34 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | DELETE | `/api/naming/folders` | Remove a folder's naming pattern | admin | files: write | — |
 | POST | `/api/naming/preview` | Preview a naming pattern against the books it governs | admin | files: read | — |
 | POST | `/api/naming/rename` | Rename books' files onto the folder's naming pattern | admin | files: write | — |
+
+## leagues
+
+| Method | Path | Description | Perm | Key | CLI |
+|--------|------|-------------|------|-----|-----|
+| GET | `/api/leagues` | List your leagues |  | armies: read | — |
+| POST | `/api/leagues` | Create a league (GM/admin) | gm or admin | armies: write | — |
+| GET | `/api/leagues/{league_id}` | Get a league |  | armies: read | — |
+| PATCH | `/api/leagues/{league_id}` | Update a league |  | armies: write | — |
+| DELETE | `/api/leagues/{league_id}` | Delete a league |  | armies: write | — |
+| GET | `/api/leagues/{league_id}/books` | Books shared with the league |  | armies: read | — |
+| POST | `/api/leagues/{league_id}/books` | Share a book with the league (organiser) |  | armies: write | — |
+| PUT | `/api/leagues/{league_id}/books/order` | Reorder the league's books (organiser) |  | armies: write | — |
+| GET | `/api/leagues/{league_id}/books/search` | Find library books to share (organiser) |  | armies: read | — |
+| PATCH | `/api/leagues/{league_id}/books/{resource_id}` | Change who a shared book reaches (organiser) |  | armies: write | — |
+| DELETE | `/api/leagues/{league_id}/books/{resource_id}` | Stop sharing a book (organiser) |  | armies: write | — |
+| GET | `/api/leagues/{league_id}/eligible-members` | Users the organiser can add |  | armies: read | — |
+| POST | `/api/leagues/{league_id}/games` | Log a game |  | armies: write | — |
+| PUT | `/api/leagues/{league_id}/games/{game_id}` | Edit a game |  | armies: write | — |
+| DELETE | `/api/leagues/{league_id}/games/{game_id}` | Delete a game |  | armies: write | — |
+| GET | `/api/leagues/{league_id}/guests` | List the league's guests |  | — | — |
+| POST | `/api/leagues/{league_id}/guests` | Invite a guest |  | — | — |
+| DELETE | `/api/leagues/{league_id}/guests/{user_id}` | Remove a guest from the league |  | armies: write | — |
+| POST | `/api/leagues/{league_id}/guests/{user_id}/regenerate` | Give a guest a new code |  | — | — |
+| GET | `/api/leagues/{league_id}/guests/{user_id}/share` | Invite text for a guest's code |  | — | — |
+| POST | `/api/leagues/{league_id}/members` | Add a member |  | armies: write | — |
+| DELETE | `/api/leagues/{league_id}/members/{user_id}` | Remove a member, or leave |  | armies: write | — |
+| PUT | `/api/leagues/{league_id}/members/{user_id}/army` | Register the army a member plays |  | armies: write | — |
 
 ## library
 
@@ -456,6 +527,7 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | POST | `/api/maps/bulk` | Bulk update maps | gm or admin | maps: write | `maps batch-update` ✅ |
 | POST | `/api/maps/bulk/tags` | Bulk add tags to maps | gm or admin | maps: write | `maps batch-tag` ✅ |
 | GET | `/api/maps/groups` | Folders holding matching maps | not guest | maps: read | `maps folder-counts` ✅ |
+| GET | `/api/maps/index` | Where each letter starts in the flat list | not guest | maps: read | — |
 | GET | `/api/maps/{map_id}` | Get a map |  | maps: read | `maps get` ✅ |
 | PATCH | `/api/maps/{map_id}` | Update map metadata | gm or admin | maps: write | `maps update` ✅ |
 | POST | `/api/maps/{map_id}/export` | Export map pages or cut-outs |  | maps: read | — |
@@ -484,10 +556,19 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | POST | `/api/models/bulk` | Bulk update models | gm or admin | models: write | `models batch-update` ✅ |
 | POST | `/api/models/bulk/tags` | Bulk add tags to models | gm or admin | models: write | `models batch-tag` ✅ |
 | GET | `/api/models/groups` | Folders holding matching 3D models | not guest | models: read | `models folder-counts` ✅ |
+| GET | `/api/models/index` | Where each letter starts in the flat list | not guest | models: read | — |
 | GET | `/api/models/{model_id}` | Get a 3D model |  | models: read | `models get` ✅ |
 | PATCH | `/api/models/{model_id}` | Update model metadata | gm or admin | models: write | `models update` ✅ |
 | GET | `/api/models/{model_id}/file` | Download model file |  | models: read | `models file` ✅ |
 | GET | `/api/models/{model_id}/thumbnail` | Model thumbnail |  | models: read | `models thumbnail` ✅ |
+
+## pins
+
+| Method | Path | Description | Perm | Key | CLI |
+|--------|------|-------------|------|-----|-----|
+| GET | `/api/pins` | List the user's pins |  | personal: read | — |
+| POST | `/api/pins` | Pin a folder or game system |  | personal: write | — |
+| DELETE | `/api/pins/{pin_id}` | Unpin |  | personal: write | — |
 
 ## rulesets
 
@@ -533,6 +614,9 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 |--------|------|-------------|------|-----|-----|
 | GET | `/api/settings` | Get app settings | admin | settings: read | — |
 | PATCH | `/api/settings` | Update app settings | admin | settings: write | — |
+| GET | `/api/settings/folder-access` | List folder access restrictions | admin | settings: read | — |
+| PUT | `/api/settings/folder-access` | Restrict a folder | admin | settings: write | — |
+| DELETE | `/api/settings/folder-access` | Lift a folder's restriction | admin | settings: write | — |
 | POST | `/api/settings/oidc-button-icon` | Upload the OIDC login-button icon | admin | — | — |
 | DELETE | `/api/settings/oidc-button-icon` | Remove the OIDC login-button icon | admin | — | — |
 | GET | `/api/settings/ui` | UI settings (any authenticated user) |  | settings: read | — |
@@ -584,6 +668,7 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | POST | `/api/systems/{system_id}/cover` | Upload a system cover | gm or admin | systems: write | `systems cover upload` ✅ |
 | DELETE | `/api/systems/{system_id}/cover` | Remove an uploaded system cover | gm or admin | systems: write | `systems cover delete` ✅ |
 | POST | `/api/systems/{system_id}/cover/from-source` | Set a system cover from an existing image | gm or admin | systems: write | `systems cover from-source` ✅ |
+| GET | `/api/systems/{system_id}/factions` | List a wargame system's factions | not guest | systems: read | — |
 | POST | `/api/systems/{system_id}/metadata-fetch` | Fetch metadata for review | gm or admin | systems: read | `systems metadata-fetch` ✅ |
 | POST | `/api/systems/{system_id}/metadata-search` | Search a metadata source | gm or admin | systems: read | `systems metadata-search` ✅ |
 | GET | `/api/systems/{system_id}/metadata-sources` | List metadata sources | gm or admin | systems: read | `systems metadata-sources` ✅ |
@@ -609,7 +694,6 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | GET | `/api/themes/browse` | Browse the community catalogue |  | personal: read | — |
 | POST | `/api/themes/install/{theme_id}` | Install a theme from the catalogue |  | personal: write | — |
 | PUT | `/api/themes/selection` | Set the active mode and theme |  | personal: write | — |
-| PUT | `/api/themes/source` | Set the catalogue URL (admin) | admin | personal: write | — |
 | DELETE | `/api/themes/{theme_id}` | Uninstall a theme |  | personal: write | — |
 
 ## token-frames
@@ -630,6 +714,7 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | POST | `/api/tokens/bulk` | Bulk update tokens | gm or admin | tokens: write | `tokens batch-update` ✅ |
 | POST | `/api/tokens/bulk/tags` | Bulk add tags to tokens | gm or admin | tokens: write | `tokens batch-tag` ✅ |
 | GET | `/api/tokens/groups` | Folders holding matching tokens | not guest | tokens: read | `tokens folder-counts` ✅ |
+| GET | `/api/tokens/index` | Where each letter starts in the flat list | not guest | tokens: read | — |
 | GET | `/api/tokens/{token_id}` | Get a token |  | tokens: read | `tokens get` ✅ |
 | PATCH | `/api/tokens/{token_id}` | Update token metadata | gm or admin | tokens: write | `tokens update` ✅ |
 | GET | `/api/tokens/{token_id}/file` | Download token file |  | tokens: read | `tokens file` ✅ |

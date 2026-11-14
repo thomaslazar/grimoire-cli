@@ -90,9 +90,21 @@ Applies to both `PATCH /api/systems/{id}` and `PATCH /api/books/{id}`
   `setattr` what survives, so a JSON `null` is *silently ignored* — a field cannot
   be cleared to null, and a body of nothing but nulls returns 200 having changed
   nothing.
-- **Clearing** works with `""` / `[]` for string and list fields. The integer
-  fields (`year` on systems; `year`/`month`/`day` on books) **cannot be cleared at
-  all** — `null` is dropped and `""` fails Pydantic coercion with a 422.
+- **Clearing** works with `""` / `[]` for string and list fields — **except book
+  `category`**, as of 1.11.0: the validator trims it, then 422s a blank value
+  (`category can't be blank`), one over `CATEGORY_MAX_LENGTH = 100` characters,
+  and one holding `/`, `\`, `..` or a control character or starting with a dot
+  (`routers/books/_schemas.py:22`, `:107-121`, v1.11.0). In a bulk body that
+  422 fails the whole request, not its item. The integer fields (`year` on
+  systems; `year`/`month`/`day` on books) **cannot be cleared at all** — `null`
+  is dropped and `""` fails Pydantic coercion with a 422.
+- **`year` is 0–9999** on both, as of 1.11.0, else 422
+  (`routers/books/_schemas.py:46`, `routers/systems/_schemas.py:84`, v1.11.0).
+  A book's `month` is 1–12 and `day` 1–31 (`books/_schemas.py:123-135`).
+- **`genres` and `tags` must be JSON lists**, as of 1.11.0: a bare string is a
+  422 (`books/_schemas.py:91-93`, `systems/_schemas.py:131-132`,
+  `services/tag_service/_catalog.py:75-77`, v1.11.0). 1.10.2 iterated the
+  string, storing one entry per character.
 - **Unknown keys are silently discarded.** Neither `GameSystemUpdate` nor
   `BookUpdate` sets `model_config`, so Pydantic's default `extra='ignore'` applies:
   a typo'd field name returns `{"status":"ok"}` and changes nothing.
@@ -131,12 +143,16 @@ Applies to both `PATCH /api/systems/{id}` and `PATCH /api/books/{id}`
   value regardless, so the two diverge permanently and renaming the folder on
   disk creates a *second* system row instead of updating the first.
   **v1.5.5 guards the rename** (`_apply_rename`,
-  `backend/routers/systems/core.py:465-485`, v1.10.0, issue #261/#262): a name clash now
+  `backend/routers/systems/core.py:529-549`, v1.11.0, issue #261/#262): a name clash now
   raises a 409, and a successful rename sets `GameSystem.name_is_custom`
-  (`backend/models/library.py:91`, v1.9.1). This supersedes the old "scanner never
+  (`backend/models/library.py:109`, v1.11.0). **As of 1.11.0 `name` and `slug`
+  are unique per `game_type`**, not globally (`models/library.py:35-36`,
+  v1.11.0), so a role-playing system and an `armory/` wargame may share a name.
+  The rename check still compares across both types (`core.py:540-546`), so
+  renaming a system to a wargame's name 409s. This supersedes the old "scanner never
   writes `name`" mechanism — the scanner now only skips refreshing `name` from
   the folder when `name_is_custom` is set (`if not system.name_is_custom and
-  system.name != name`, `backend/indexer/systems.py:300`, v1.10.0), so an unrenamed
+  system.name != name`, `backend/indexer/systems.py:301`, v1.11.0), so an unrenamed
   (default-named) system's display name still tracks a folder rename. The
   slug-divergence behaviour above is unaffected either way; the full rename
   write-up has not been re-verified end-to-end against v1.5.5 beyond this.
@@ -147,17 +163,32 @@ Applies to both `PATCH /api/systems/{id}` and `PATCH /api/books/{id}`
   matches, so a freshly scanned system is excluded from every metadata filter.
   `genre=` tests the `genres` list, not the legacy `genre` string.
 - **`category` on `GET /api/systems/{id}` is case-SENSITIVE**, unlike every other
-  filter. `core.py:240` (v1.10.0) compares with `==` (`b.category == category`) while
+  filter. `core.py:268` (v1.11.0) compares with `==` (`b.category == category`) while
   `genre` goes through `_has_value`, which lowercases both sides. So
   `category=Core` returns no books and `category=core` returns them. Verified
   against a running instance.
+- **A system's books include books linked onto its shelf**, as of 1.11.0
+  (issue #446). `GET /api/systems/{id}` builds `books`, `book_count` and
+  `total_page_count` from `book_links.on_shelf` — own books plus linked ones
+  (`core.py:211-212`, v1.11.0) — and `GET /api/systems` adds linked counts to
+  each row (`core.py:91-94`, `:356-359` for children). A linked row carries
+  `is_linked: true` and its home system in `linked_from`. `category` and
+  `genre` test a linked book's own values. The automatic cover is picked from
+  own books only (`core.py:230-233`, `:257-260`).
+- **`GET /api/systems` lists wargames too**, as of 1.11.0: `game_type`
+  (`ttrpg` | `wargame`) narrows it, and omitted means both (`core.py:52-58`,
+  `:88-89`, v1.11.0). The CLI does not send it.
 - **`GET /api/systems/{id}?include_books=false` returns `books: []`**, as of
   1.8.0, and computes `book_count` / `total_page_count` in SQL without the
   `explicit`, `category` and `genre` filters, so those three have no effect on
-  it (`core.py:198-222`, v1.10.0); with books included the counts follow the
-  filtered list (`:252-253`). The default is `true`. Either way the response
-  carries `scope_path`, the system's own folder (`books/{System}`) for a
-  scoped rescan, null for a system with no books (`core.py:267-282`, v1.10.0).
+  it (`core.py:222-249`, v1.11.0); with books included the counts follow the
+  filtered list (`:280-281`). The default is `true`. Either way the response
+  carries `scope_path`, null for a system with no books of its own
+  (`core.py:303-318`, v1.11.0): the first `category_depth` segments of an own
+  book's folder, so `books/{System}`, `armory/{System}` for a wargame, and
+  `books/{Container}/shared-library` for a `parent`, `family`, `publisher` or
+  `generic` container, whose own books sit in that folder as of 1.11.0
+  (`_serializers.py:173-189`, `indexer/constants.py:102-113`, v1.11.0).
 - **`GET /api/books` sorts by `title` or `added_at`**, as of 1.8.0
   (`routers/books/core.py:59-83`, v1.10.0). `order` defaults to ascending for `title`
   and to newest first for `added_at`; a null `added_at` sorts last in either
@@ -182,6 +213,12 @@ Read from `backend/routers/tags/` at tag `v1.8.0`; re-read at `v1.9.1`.
   display, `key` addresses the folder. As of 1.9.1 a book folder is left out
   for an account that cannot see its system or any book in it
   (`items.py:161-173`).
+- **`/items` 404s `Tag not found` for a non-admin who can see none of its
+  carriers**, as of 1.11.0: no visible item counts and no folder rows, while the
+  tag does carry something (`items.py:76-82`, `:192-195`, v1.11.0). The check
+  runs after `resource_type` narrowing but tests carriers of every type, so
+  narrowing to a type the tag is not on also 404s instead of returning empty
+  counts. An admin gets the empty summary.
 - **`GET /api/tags/{internal}/folder-items` lists one tagged folder.**
   `resource_type` and `folder` (the `key`) are required; `limit` is 1..500,
   default 100, plus `offset`; it returns `{total, items}` (`items.py:207-234`).
@@ -231,17 +268,17 @@ Verified against v1.5.6, backing `systems update`, `systems batch-update`,
 `systems batch-tag` and `me`.
 
 - **`PATCH /api/systems/{id}` answers `{"status":"ok"}`** and echoes nothing
-  back (`routers/systems/core.py:447`, v1.10.0); a follow-up `GET` is the only way to
+  back (`routers/systems/core.py:511`, v1.11.0); a follow-up `GET` is the only way to
   see the result.
 - **The payload that reaches the row has already had nulls and unknown keys
   removed** (`payload = data.model_dump(exclude_none=True)`,
-  `routers/systems/core.py:430`, v1.10.0): a JSON `null` is dropped rather than
+  `routers/systems/core.py:494`, v1.11.0): a JSON `null` is dropped rather than
   clearing the field, so `""` is the only way to clear a string.
 - **A rename sets `name_is_custom` permanently**
-  (`routers/systems/core.py:485`, v1.10.0), after which the scanner stops re-deriving
-  the name from the folder (`indexer/systems.py:300`, v1.10.0). Renaming to the system's
+  (`routers/systems/core.py:549`, v1.11.0), after which the scanner stops re-deriving
+  the name from the folder (`indexer/systems.py:301`, v1.11.0). Renaming to the system's
   own current value returns before the flag is touched
-  (`routers/systems/core.py:476-477`, v1.10.0), so it stays folder-derived.
+  (`routers/systems/core.py:540-541`, v1.11.0), so it stays folder-derived.
 - **Bulk update is skip-and-continue.** An unresolved id or a validation
   rejection (e.g. a name clash) is reported in `errors` and does not fail the
   rest of the batch. The transaction commits once, only if at least one item
@@ -252,21 +289,21 @@ Verified against v1.5.6, backing `systems update`, `systems batch-update`,
   (`services/bulk_service.py:174-180`, v1.9.1).
 - **`GET /api/auth/me` sets a session cookie as a side effect** when called
   with a bearer token and no existing cookie, reusing that token rather than
-  minting a new one (`routers/auth/core.py:334-337`, v1.10.0) — a bare read has a
+  minting a new one (`routers/auth/core.py:364-367`, v1.11.0) — a bare read has a
   write side effect on the client's cookie jar.
 
 ## Content and rescan
 
-- **No upload API.** The library is mounted `:ro`; content arrives on the
-  filesystem, then `POST /api/rescan`. A write channel is an open design question,
-  tracked outside this repo.
+- **Content arrives by `POST /api/files/upload` or on the filesystem**, then
+  `POST /api/rescan` — see "Files" for the upload, which needs the library
+  mounted read-write.
 - **`POST /api/rescan`** takes `metadata_mode: new | missing | replace` and a
   `scope` (e.g. `books/<system>/supplements`). `missing` reapplies OPF sidecars
   while treating any populated field as user-protected. Poll `GET /api/scan-status`.
 - **A `scope` that resolves to no real directory still answers `scan_started`.**
-  `resolve_scope` (`indexer/metadata.py:410-442`, v1.10.0) validates only that the path
-  begins with a known collection (`books`/`maps`/`tokens`/`audio`/`models`) and does not
-  escape the library root — it never checks the target exists. A scope typo'd
+  `resolve_scope` (`indexer/metadata.py:426-465`, v1.11.0) validates only that the path
+  begins with a known collection (`books`/`armory`/`maps`/`tokens`/`audio`/`models`;
+  `armoury` reads as `armory`, `:443-444`) and does not escape the library root — it never checks the target exists. A scope typo'd
   or naming a non-existent subtree walks nothing and completes instantly with
   no error, so `scan_started` alone confirms the request was well-formed, not
   that anything was scanned.
@@ -320,23 +357,39 @@ flags on `systems get`.
   `docker/library/books/{system}/{category}/` is enough; no real books needed.
 - **Categories** come from the folder name under the system
   (`backend/indexer/categories.py`). A folder named `Maps` **directly** under a
-  system becomes a map category; at subfolder depth the name is inert.
-- **A loose file directly under `books/` is never indexed, but is still counted.**
-  `_scan_books` skips anything that isn't a directory
-  (`if not system_dir.is_dir() or …: continue`, `backend/indexer/books.py:91-92`,
-  v1.10.0), so a
+  system becomes a map category; at subfolder depth the name is inert. This is
+  the `books/` (ttrpg) rule. As of 1.11.0 an `armory/` (wargame) system reads
+  its folders with a separate vocabulary (`WARGAME_CATEGORY_MAP`, `army-book`
+  default, `indexer/constants.py:183-259`, v1.11.0), and a folder that is not a
+  category word is a faction (`indexer/factions.py:1-26`).
+- **`shared-library/` is reserved inside a container**, as of 1.11.0: never a
+  child system, its books sit on the container's own row with categories
+  inferred inside it (`indexer/constants.py:102-113`, `indexer/books.py:262-272`,
+  `:389-430`, v1.11.0). Only `parent`, `family`, `publisher` and `generic`
+  containers have one.
+- **A loose file directly under `books/` is never indexed, but is counted on
+  the first import.** `_scan_books` skips anything that isn't a directory
+  (`if not system_dir.is_dir() or …: continue`, `backend/indexer/books.py:103`,
+  v1.11.0), so a
   stray `foo.pdf` next to the system folders produces no system and no book.
   `_count_eligible_files` doesn't apply the same skip, so it still counts the
   file toward `total_books` — any wait loop polling
   `scanned_books >= total_books` hangs forever with a loose file present.
+  As of 1.11.0 the walk count is used only when no rows exist yet: a rescan
+  takes each total from the rows the last scan left present
+  (`count`, `indexer/scan.py:202-214`; `_count_registered`,
+  `indexer/_context.py:119-135`, v1.11.0), so the loose file drops out of it,
+  and a reported total never falls below the count scanned (`_context.py:295-297`).
+  The total is still off by whatever changed since the last scan, so `running`
+  remains the thing to poll.
 - **Some folder names map only as the whole name**, as of 1.8.0.
-  `CATEGORY_EXACT_NAMES` (`backend/indexer/constants.py:157`, v1.10.0) maps `Player(s)`
+  `CATEGORY_EXACT_NAMES` (`backend/indexer/constants.py:170`, v1.11.0) maps `Player(s)`
   and `GM(s)` / `Game Master(s)` to `core`, `Sheet(s)` to `character-sheet` and
   `Source(s)` to `supplement` — and, as of 1.9.0, `Journal(s)`, `Issue(s)` and
   `Back Issue(s)` to `magazine` — checked before `CATEGORY_MAP`
-  (`categories.py:190`, v1.10.0). As one word of a longer name they do nothing:
+  (`categories.py:229`, v1.11.0). As one word of a longer name they do nothing:
   `Player Handouts` is still `handout`. `unofficial` joined `homebrew`'s
-  keywords (`constants.py:146`, v1.10.0).
+  keywords (`constants.py:159`, v1.11.0).
 - **A name that is not UTF-8 is skipped, not indexed**, as of 1.9.0
   (`backend/filenames.py`, `indexer/_context.py:32-44`, v1.9.1). The scan logs a warning
   and walks on; a skipped folder takes its whole subtree with it, and the
@@ -355,7 +408,7 @@ flags on `systems get`.
 
 ### One-page collections
 
-Verified against v1.5.5 (`backend/indexer/constants.py:184-194`, v1.10.0,
+Verified against v1.5.5 (`backend/indexer/constants.py:272-284`, v1.11.0,
 `backend/indexer/categories.py::detect_container_kind`).
 
 The reserved slugs are `one-page-rpgs`, `single-page-rpgs`, `one-shot-rpgs` and
@@ -380,10 +433,10 @@ category labels. Any claim about this behaviour must name a version.
   `core`, `supplement`, `adventure`, `character-sheet`, `map`, `handout`,
   `homebrew`, `starter-set` and, as of 1.9.0, `magazine` (`magazine`, `zine`,
   `fanzine`, `periodical`; checked last, so `Zine Maps` stays `map`,
-  `constants.py:148-150`, v1.10.0). A top-level folder that matches none of them
-  becomes its own category: `guess_category` (`categories.py:225-259`) falls
+  `constants.py:161-163`, v1.11.0). A top-level folder that matches none of them
+  becomes its own category: `guess_category` (`categories.py:265-299`) falls
   back to the slugified folder name (`Extras/` → `extras`). System-agnostic
-  folders go through `agnostic_category` (`categories.py:262`, v1.10.0) instead,
+  folders go through `agnostic_category` (`categories.py:302`, v1.11.0) instead,
   which slugs the immediate subfolder and yields `uncategorized` for books with
   no subfolder at all. One-page folders no longer take this path in v1.5.5 —
   they're a container (see above), so each loose file gets ordinary category
@@ -393,9 +446,9 @@ category labels. Any claim about this behaviour must name a version.
   `Vampire The Masquerade 5 EN` with `is_explicit: true`.
 - **`is_explicit` only ever latches on, never off, via rescan.** The
   existing-system branch is `if folder.is_nsfw and not system.is_explicit:
-  system.is_explicit = True` (`backend/indexer/systems.py:284-285`, v1.10.0) — removing
+  system.is_explicit = True` (`backend/indexer/systems.py:285-286`, v1.11.0) — removing
   `(nsfw)` from a folder name and rescanning does not clear the flag on that
-  system row; only the creation branch (`is_explicit=folder.is_nsfw`, line 261)
+  system row; only the creation branch (`is_explicit=folder.is_nsfw`, line 268)
   sets it from the folder state. Clearing a stale flag needs a database reset, not a
   rescan. Verified against source, not yet against a live instance.
 - **Leading `!`, `$`, `%` are stripped from system folder names**
@@ -422,31 +475,31 @@ file in `temp/grimoire`.
 - **Only `parent` sets its children's `parent_system`.** A `family` container
   fills in each child's `system_family`, a `publisher` fills in `publishers`,
   and `generic` propagates nothing.
-- A child's display name is `"<container> <folder>"` (`indexer/books.py:188`, v1.10.0), so
+- A child's display name is `"<container> <folder>"` (`indexer/books.py:200`, v1.11.0), so
   `Shadowrun` + `6 DE` is `Shadowrun 6 DE`.
-- `edition` is the child folder name **verbatim** (`indexer/books.py:266`, v1.10.0): a
+- `edition` is the child folder name **verbatim** (`indexer/books.py:291`, v1.11.0): a
   folder called `6 DE` yields edition `6 DE`, not `6`.
 - `parent_system` is still a free-text column, auto-set to the container's name
-  on child creation (`indexer/systems.py:266`, v1.10.0). Both it and the real `parent_id`
+  on child creation (`indexer/systems.py:273`, v1.11.0). Both it and the real `parent_id`
   foreign key are returned.
 - Sort prefixes are stripped before the container name is used
-  (`indexer/systems.py:65`, v1.10.0), so `!!Dungeons & Dragons` yields `Dungeons & Dragons`.
+  (`indexer/systems.py:66`, v1.11.0), so `!!Dungeons & Dragons` yields `Dungeons & Dragons`.
 - **Containers nest as of v1.5.6.** `_scan_container` recurses into a child
-  that is itself a container (`indexer/books.py:301-315`), and category depth
-  follows it: `system_depth=2 + depth` (`indexer/books.py:328`), where `depth`
+  that is itself a container (`indexer/books.py:304-312`, v1.11.0), and category depth
+  follows it: `system_depth=2 + depth` (`indexer/books.py:354`), where `depth`
   counts the containers above a child. On v1.5.5 that was the constant 3, so
   only one container level worked — any claim that nesting is unavailable
   describes v1.5.5 and earlier.
 - **`GET /api/systems` hides container children before applying any filter**
-  (`routers/systems/core.py:92-106`, v1.10.0). A filter on metadata only children carry
+  (`routers/systems/core.py:111-131`, v1.11.0). A filter on metadata only children carry
   returns `[]` with exit 0 unless `include_children=true` is also sent.
 - `GET /api/systems/{id}` returns the summary shape plus `books` **and**
-  `children` (`routers/systems/core.py:250-264`, v1.10.0).
+  `children` (`routers/systems/core.py:247`, `:298`, v1.11.0).
 - `Book.category` is assigned in three places: the new-book insert
-  (`indexer/_book_records.py:246`, v1.10.0), a re-home, guarded by
-  `if existing.game_system_id != system.id` (`indexer/_book_records.py:148`),
+  (`indexer/_book_records.py:327`, v1.11.0), a re-home, guarded by
+  `if existing.game_system_id != system.id` (`indexer/_book_records.py:221-227`),
   and a detected file move, which takes the category of the new path
-  (`indexer/moves.py:283`). An ordinary rescan does **not** re-derive it, so a
+  (`indexer/moves.py:301`). An ordinary rescan does **not** re-derive it, so a
   `PATCH category` holds — but converting a folder into a container re-homes
   every book in it and does reset it, as does moving the file on disk.
 
@@ -605,31 +658,37 @@ and `books thumbnail`.
 ## System shelf
 
 Read from `backend/routers/systems/books.py` at tag `v1.8.0` and verified against
-the 1.8.0 stack; re-read at `v1.9.1`. Backs `systems books list`, `folder-counts` and `facets`.
+the 1.8.0 stack; re-read at `v1.11.0`. Backs `systems books list`, `folder-counts` and `facets`.
 
-- **Three routes share one filter set**, `book_browse_params` (`books.py:74-127`):
+- **Three routes share one filter set**, `book_browse_params` (`books.py:77-129`):
   `q`, `tags`, `favorites`, `added_since`, `explicit`, `genre`, `product_code`,
   `category`, `folder`, `sort`, `order`. `/books` adds `limit` (1–500, default
-  100) and `offset` (`:393-394`); `/book-facets` takes none.
-- **Everything starts from the visible shelf** (`ShelfBrowser.base`, `:150-156`):
+  100) and `offset` (`:430-431`); `/book-facets` takes none.
+- **Everything starts from the visible shelf** (`ShelfBrowser.base`, `:153-160`):
   the system's books with variants hidden, explicit books dropped for an account
   without explicit permission, access control applied. The system itself 404s
-  when hidden (`:386-388`).
-- **`folder` needs `category`** — a 400 otherwise (`:113`). It is the subfolder
-  below the category directory, `""` for the category's own.
-- **`tags` matches the book's own tags only** (`folder_tags=False`, `:219`),
+  when hidden (`services/systems.py:92-99`). As of 1.11.0 the shelf includes
+  books linked onto it from another system (`:157`, issue #446), so every
+  route below, facets included, counts them.
+- **`folder` needs `category`** — a 400 otherwise (`:116`). It is the subfolder
+  below the category directory, `""` for the category's own. A linked book has
+  no folder on this shelf, so `folder=""` matches it as well (`:246-251`).
+- **`tags` matches the book's own tags only** (`folder_tags=False`, `:232`),
   unlike the media lists, where a folder's tags count for everything beneath it.
 - **`genre` is exact and case-insensitive, `product_code` a prefix**; both take
-  `__grim:none__` / `__grim:any__` (`:162-182`).
+  `__grim:none__` / `__grim:any__` (`:166-198`).
 - **Bare `q` text matches title, filename or product code**
-  (`services/book_search.py:136-149`, v1.10.0); field prefixes are the book search
+  (`services/book_search.py:151-164`, v1.11.0); field prefixes are the book search
   fields (`services/search_query.py:86-102`), `text:` ignored.
-- **`/book-groups` rows are directories, counted directly** (`:282-324`):
+- **`/book-groups` rows are directories, counted directly** (`:300-355`):
   `{category, path, dir, count, first}`. Live on `Das Schwarze Auge 5 DE`:
   `core`/`""` = 2, `core`/`errata` = 1. `first` is the active sort's value for
   the folder's first book, null under `title`, so `sort`/`order` change this
-  response. Two directories can share a `(category, path)`.
-- **`/book-facets` ignores every filter** (`:339-383`): categories, genres,
+  response. Two directories can share a `(category, path)`. As of 1.11.0
+  linked books add one row per category with `path` and `dir` both `""`
+  (`:325-334`, `:349-351`), which can share `(category, "")` with the
+  category's own directory.
+- **`/book-facets` ignores every filter** (`:374-420`): categories, genres,
   upper-cased leading-letter product-code prefixes and tags, over the whole
   visible shelf.
 
@@ -687,8 +746,9 @@ source citations name the shipped backend inside the container. Backs
   catalogue (`GET /api/tags`, `backend/routers/tags/core.py:36`, v1.9.1) are the only
   places the tags surface.
 - **The subfolder depth is derived per system and handles nested containers.**
-  `system_category_depth` (`tag_service/_paths.py:16`, v1.9.1) walks the whole container chain
-  for `2 + <ancestor count>`, `system_category_depths` (`:42`) returns every
+  `system_category_depth` (`tag_service/_paths.py:17`, v1.11.0) walks the whole container chain
+  for `2 + <ancestor count>`, plus one for a container's own books, which sit
+  in its `shared-library/` as of 1.11.0 (`:26-37`); `system_category_depths` (`:50`) returns every
   system's depth in one query for the bulk resolvers, and both stop on a cycle.
   Measured on a **container child**: with `{system}/core/errata` tagged
   `errata-fixture`, `GET /api/tags/errata-fixture/items` listed the folder under
@@ -728,13 +788,21 @@ Verified against v1.5.6 by reading `backend/routers/maintenance/`, backing
   batches so a concurrent scanner session is not blocked, without paying a
   full `book_search` scan per book (upstream #748).
 - **A book takes its references with it** (`flush`, `:132-136`):
-  `purge_many_references` drops the batch's `book_search` rows, bookmarks,
-  favorites, tag links and campaign resource links, then the books go
-  (`services/library_fs/references.py:90-133`, v1.10.0). Bookmarks are user data and a rescan
-  does not restore them, nor any hand-entered metadata.
+  `purge_many_references` drops the batch's indexed page text, bookmarks,
+  favorites, tag links, campaign resource links and, as of 1.11.0, league
+  resources and their shares, then the books go
+  (`services/library_fs/references.py:100-161`, v1.11.0). The page text now
+  lives in `book_pages`, whose delete trigger clears the `book_search` FTS rows
+  (`purge_search_rows`, `references.py:74-85`). Bookmarks are user data and a rescan
+  does not restore them, nor any hand-entered metadata. A missing map's
+  campaign map pages keep pointing at it and show the missing-map placeholder:
+  the copy taken on a `files delete` (see "Files") needs the file, which is
+  already gone (`references.py:113-119`).
 - **Container folders are protected from the orphan sweep.**
   `_prune_orphaned_systems` (`:152`) keeps a system alive if it has
-  books, a campaign references it, **or it has a surviving child** — the last
+  books — as of 1.11.0 counting books linked onto its shelf, not only its own
+  (`book_links.on_shelf`, `library_cleanup.py:197-205`, v1.11.0) — a campaign
+  references it, **or it has a surviving child** — the last
   rule phrased over `parent_id` rather than `container_kind`, so container kinds
   added later are covered without changing the function. Without it a container
   (which holds no books of its own) read as an orphan and the
@@ -761,6 +829,9 @@ Verified against v1.5.6 by reading `backend/routers/maintenance/`, backing
   audio and models (`routers/library/_schemas.py:88-90`, `core.py:173-177`,
   v1.10.0). Both scope the book portion to what the caller may see, so a
   restricted book's bytes stay out of either total.
+- **`armory_books`**, as of 1.11.0, counts the wargame books and is included
+  in `books`, not added to it (`routers/library/_schemas.py:82-83`,
+  `core.py:164-168`, v1.11.0); it takes the same caller scope.
 - **Guests are refused**, as of 1.8.0: the route depends on `require_not_guest`
   (`routers/library/core.py:135`, v1.9.1), since the counts describe the whole library.
 
@@ -848,11 +919,20 @@ byte-identical to `v1.6.0`.
   flight (`RuntimeError` → `HTTPException(409)`). An `OSError` becomes a 500.
 - **The archive does not contain the library.** It holds the database plus
   `campaign_uploads`, `system_covers`, `audio_covers`, `branding` (as of 1.9.0),
-  as of 1.9.1 `character_portraits` and `character_images`, and as of 1.10.1
-  `book_covers` (`services/backup/_archive.py:33-41`, v1.10.1), and its own manifest names the excludes:
+  as of 1.9.1 `character_portraits` and `character_images`, as of 1.10.1
+  `book_covers` and as of 1.11.0 `army_rosters` (`services/backup/_archive.py:40-49`, v1.11.0), and its own manifest names the excludes:
   `library (mounted read-only; back it up separately)`, `thumbnails` and
   `page_cache`, the last two regenerating on demand. So a backup taken before a
   destructive file operation protects the catalogue, not the files.
+- **On PostgreSQL the archive holds no database**, as of 1.11.0: the snapshot
+  runs only on SQLite, the manifest's `contents.database` is `null` and its
+  excludes name the database (`_archive.py:138-170`, v1.11.0). `GET /api/backups`
+  reports it as `includes_database: false` (`routers/backups/core.py:42`).
+- **`PUT /api/backups/settings` refuses API keys**, as of 1.11.0: the route is
+  marked `api_keys.EXCLUDED` (`routers/backups/__init__.py:44-45`, v1.11.0), so
+  under `login --api-key-stdin` it is a 403 `"API keys cannot be used for this
+  endpoint"` (`api_keys.py:452`) whatever the key's permissions. The coverage
+  table's Key column shows it as `—`.
 - **`DELETE` answers 204** with no body, and is irreversible.
 - **`PUT /api/backups/settings` is a partial patch despite the method.** Every
   `BackupSettingsPatch` field is optional and omitted ones are left alone. It
@@ -914,6 +994,35 @@ tag `v1.7.0`; the upload conflict policy re-read at `v1.8.0`.
 - **A hard delete is not a trash move.** The file is deleted outright, and its
   index entry goes with its tags, favorites, bookmarks, progress and campaign
   links.
+- **Deleting a map leaves each campaign using it a copy**, as of 1.11.0, soft
+  or hard, a file or a folder holding maps (`keep_campaign_copies`,
+  `services/campaigns/map_copies.py:263-296`, v1.11.0; called from
+  `purge_many_references`, `library_fs/references.py:113-119`, and, before the
+  unlink, `_delete_file`, `deletes.py:314`). The copy becomes a campaign upload;
+  the campaign's map pages are repointed at it with their pins, `[[map:<id>]]`
+  embeds become `[[image:<file id>]]`, and the map's resource link is swapped
+  for a file resource with the same visibility, shares and category
+  (`_copy_into`, `:214-260`). A copy that campaign upload settings refuse
+  (`uploads_disabled`, `too_large`), a map that is not an image (`not_image`),
+  or a file already gone (`file_missing`) gets no copy: the map pages keep
+  pointing at the deleted map and show the missing-map placeholder (`_plan`,
+  `:135-180`). A rescan re-adds a soft-deleted map as a new record and does
+  not undo the repointing. `GET /api/files/campaign-map-copies?path=` (admin)
+  answers the same plan in advance, per campaign and outcome, deleting
+  nothing (`routers/files/core.py:429-450`, v1.11.0).
+- **Folder access rules follow the tree too**, as of 1.11.0: a move or rename
+  relinks them onto the new path (`folder_access.relink_rules`,
+  `library_fs/moves.py:654`, v1.11.0) and a directory delete purges them
+  (`deletes.py:353`).
+- **A move into a system folder no scan has registered keeps a book's system
+  and game type**, as of 1.11.0 (`_relink`, `moves.py:354-368`, v1.11.0):
+  both change only when the destination resolves to a known system, so a book
+  moved from `books/` into a new `armory/` folder stays a role-playing book on
+  its old shelf until a rescan re-homes it. `category` follows the destination
+  regardless. A wargame book's factions — moved from or to the armory — are
+  replaced by those its new folders name, created as the scanner would; with
+  no registered wargame system there they are emptied (`_relink_factions`,
+  `:372-387`).
 - **428 `confirm_required`** guards a folder that still holds content, until
   `confirm_name` matches the folder's own name. An empty folder, or one holding
   only markers and empty descendants, needs no confirmation.
@@ -927,21 +1036,29 @@ tag `v1.7.0`; the upload conflict policy re-read at `v1.8.0`.
   (`routers/files/_schemas.py:93`, v1.10.0); `upload` checks against
   `rename|skip|replace` in the handler and answers **400** (`core.py:440`,
   `:470-474`).
-- **`upload` with `on_conflict=replace` overwrites an indexed book in place**
-  (`_replace_book`, `core.py:491-584`; `replace_upload`,
-  `services/library_fs/uploads.py:126-180`, v1.9.1). The target must be a file already
-  indexed as a book at that exact path; anything else — a missing file, a map
-  or token — is a **409** `conflict`, so a typo cannot add a second copy. The
-  book keeps its id and everything keyed by it (metadata, tags, bookmarks,
-  favorites, campaign links); hash, size, pages, cover and search text are
-  rebuilt, the text indexing in the background on `GET /api/scan-status`. It is
-  also a **409** while a library scan or OCR run is in progress, and a **409**
-  `"This book is being re-indexed"` while that same book is; a re-index of
-  other books does not block it (`core.py:524-541`, v1.9.1). A `relative_dir`
-  that does not exist is a **404** `not_found` rather than being created
-  (`uploads.py:195-198`, v1.9.1). The response
-  adds `record_id` and `replaced: true`, which are `null` and `false` on the
-  other policies (`routers/files/_schemas.py:187-198`, v1.10.0).
+- **`upload` with `on_conflict=replace` overwrites an indexed file in place.**
+  As of 1.11.0 that is a book (under `books/` or `armory/`), map, token, audio
+  file or model (`_REPLACEABLE`, `services/library_fs/uploads.py:41-48`;
+  `replace_upload`, `:146-202`; `replace_file`, `routers/files/replace.py:30-96`,
+  v1.11.0); 1.10.x took books only. The target must be a file already indexed
+  at that exact path; anything else — a missing file, a path in a collection
+  that has no record there — is a **409** `conflict` whose detail names the
+  noun (`"There is no indexed map named '…' there to replace"`,
+  `uploads.py:189-191`), so a typo cannot add a second copy. The record keeps
+  its id and everything keyed by it (metadata, tags, bookmarks, favorites,
+  campaign links). A book's hash, size, pages, cover and search text are
+  rebuilt, the text indexing in the background on `GET /api/scan-status`
+  (`_refresh_book`, `replace.py:99-136`); a media file's hash, size, thumbnail,
+  a model's triangle count and a track's duration are re-read before the
+  response (`_refresh_media`, `replace.py:139-161`). Any type is a **409** while
+  a library scan or OCR run is in progress (`replace.py:59-64`); only a book is
+  also a **409** `"This book is being re-indexed"` while that same book is, and a
+  re-index of other books does not block it (`replace.py:68-77`). A
+  `relative_dir` that does not exist is a **404** `not_found` rather than being
+  created (`uploads.py:219-222`, v1.11.0). The response adds `record_id`,
+  `record_type` (`book|map|token|audio|model`, new in 1.11.0) and
+  `replaced: true`, which are `null`, `null` and `false` on the other policies
+  (`routers/files/_schemas.py:208-219`, v1.11.0).
 - **`upload` is one file per request by design**, so a large import that fails
   partway can report and retry precisely. 8 GiB cap → **413**. The file lands
   under a temporary name and is renamed into place only once fully written.
@@ -958,13 +1075,20 @@ tag `v1.7.0`; the upload conflict policy re-read at `v1.8.0`.
 - **Container kinds** are `parent`, `one-page`, `agnostic`, `family`,
   `publisher`, `generic`. **`one-page` and `agnostic` are singletons** — only one
   of each may exist, recognised only at the top level of `books/`, and `browse`
-  reports `singletons_taken` as `{kind: path}`.
+  reports `singletons_taken` as `{kind: path}`. As of 1.11.0 the armory takes
+  the other four but refuses these two with a 400 `invalid`
+  (`_assert_kind_fits_collection`, `library_fs/folders.py:213-227`, v1.11.0).
 - **A folder marker is refused where it would be inert**, as of 1.7.0
   (`library_fs/folders.py`'s `accepts_container_kind` / `accepts_frames_marker`).
   A container kind says "my children are game systems", which only the books
-  scanner reads, so it is allowed only inside `books/` at a depth reached through
+  scanner reads, so it is allowed only inside `books/` — or, as of 1.11.0,
+  `armory/` (`in_book_section`, `library_fs/paths.py:151-153`; message at
+  `folders.py:57-60`, v1.11.0) — at a depth reached through
   containers alone — one level deeper is a *system* folder, whose children are
-  categories. The frame marker is read only by the `token-frames` walk, so it is
+  categories. A `shared-library` folder directly under a `parent`, `family`,
+  `publisher` or `generic` container is refused too, as of 1.11.0: it is that
+  container's own shelf of books, never a system (`folders.py:429-431`;
+  `SHARED_LIBRARY_FOLDER`, `indexer/constants.py:102-113`, v1.11.0). The frame marker is read only by the `token-frames` walk, so it is
   allowed anywhere under `tokens/` except `tokens/` itself, at any depth and with
   no precedence chain. Anything else is a 400 `invalid`. Both guards cover
   *setting* only: clearing is always allowed, so a marker written by hand in the
@@ -974,11 +1098,15 @@ tag `v1.7.0`; the upload conflict policy re-read at `v1.8.0`.
   nothing about how the children relate, so it is reported and set separately
   from `container_kind` on `create`, `markers` and every `browse` row.
 - **`scaffold` is idempotent**, creating Core, Supplements, Adventures, Character
-  Sheets, Maps, Handouts, Homebrew, Starter Sets and Magazines (nine as of 1.9.0, `library_fs/constants.py:48`), and reporting `created` and
-  `existing`.
+  Sheets, Maps, Handouts, Homebrew, Starter Sets and Magazines (nine as of 1.9.0, `library_fs/constants.py:49`, v1.11.0), and reporting `created` and
+  `existing`. As of 1.11.0 an `armory/` system gets the wargame set instead —
+  Core, Factions, Rules Updates, Missions, Campaigns, Supplements
+  (`WARGAME_SCAFFOLD_CATEGORY_FOLDERS`, `constants.py:66-73`; chosen at
+  `folders.py:523`, v1.11.0).
 - **`scaffold` takes a system folder, not a container.** As of 1.6.2 the guard is
-  `is_category_host` rather than a depth test: under `books/`, at least one level
-  down, and not itself a container — a container's children *are* the system
+  `is_category_host` rather than a depth test: under `books/` (or, as of 1.11.0,
+  `armory/`, `folders.py:377-398`), at least one level down, and not itself a
+  container — a container's children *are* the system
   folders. Anything else is a 400 `invalid`. `browse` answers the same question
   per row and for the browsed folder, as `category_host`, so a caller need not
   re-derive it. The old depth test also mis-read a system nested under two
@@ -1038,6 +1166,10 @@ measured against the running 1.7.0 stack; the list parameters re-read at
   filename.
 - **`added_since` excludes undated rows**, and a naive value is compared as
   UTC (`media.py:158-162`, v1.9.1).
+- **`q` matches `%`, `_` and `\` literally**, as of 1.11.0: free text, `title:`,
+  `filename:`, `artist:`, `album:` and tag matches all go through `contains`
+  (`services/browse/media.py:149-168`, `tag_query.py`, v1.11.0;
+  `services/sql_like.py`). Before, `%` and `_` were wildcards.
 - **`folder` is exact and collection-relative.** It matches only items directly
   in that folder, prefixed with the collection's top-level directory as stored
   (`services/browse/paths.py:101-110`); `""` is the collection root and omitting
@@ -1227,8 +1359,21 @@ so a book matching by title *and* by page text is counted twice.
 - **A book row names its system only when the caller can see it**, as of
   1.10.0. In `results` and `book_matches` alike, `game_system` and
   `game_system_id` are `""` for a system hidden from the caller
-  (`routers/search/core.py:130-136`, `services/book_search.py:225-231`, v1.10.0);
+  (`routers/search/core.py:104-113`, `services/book_search.py:245-246`, v1.11.0);
   1.9.2 named it regardless.
+- **`system:` and `system_id` disagree on linked books**, as of 1.11.0.
+  `system_id` scopes to the shelf, linked books included
+  (`routers/search/core.py:76-85`, `services/book_search.py:191-193`, v1.11.0);
+  `system:` matches `Book.game_system_id`, the home system only
+  (`book_search.py:116`), and only among systems the caller can see
+  (`:104-115`).
+- **`q` is at most 500 characters**, else 422, and only the first 64 terms reach
+  the full-text index; the rest are dropped silently (`MAX_QUERY_LENGTH`,
+  `MAX_FTS_TERMS`, `services/search_query.py:145-146`, `:175`;
+  `routers/search/core.py:33`, v1.11.0). A query the database still cannot run
+  is a 400 `Search query is too complex` (`core.py:90-95`).
+- **`%` and `_` match literally** in metadata filters and bare text as of
+  1.11.0 (`services/sql_like.py`, v1.11.0); before, they were LIKE wildcards.
 - **`limit` bounds `results` alone.** `book_matches` is capped at
   `TITLE_MATCH_LIMIT = 50` and each media set at a literal `.limit(50)`,
   neither reachable from the query string. There is no offset, so those five
@@ -1237,8 +1382,8 @@ so a book matching by title *and* by page text is counted twice.
   v1.10.2). Before 1.10.2 it had no lower bound and reached SQLite as a bare
   `LIMIT :limit`, so `-1` meant unlimited; the CLI guards both with
   `OptionHelpers.Range(1, 200)`.
-- **Control characters in `q` are read as spaces** (`services/search_query.py:245-256`,
-  v1.10.2); a NUL used to end the FTS5 query early.
+- **Control characters in `q` are read as spaces** (`services/search_query.py:257-269`,
+  v1.11.0); a NUL used to end the FTS5 query early.
 - **An unrecognised `field:` prefix is not an error.** It falls through to
   free text and is searched literally, because a colon is ordinary
   punctuation in a title. `q=titel:dsa` answers 200 with every array empty
@@ -1295,7 +1440,7 @@ the running 1.6.2 stack.
   putting the duplicate back. The CLI requires the value rather than defaulting
   it either way.
 - **What `delete` removes does not depend on the flag.** The row goes either way,
-  and `purge_references` takes the `book_search` page rows, bookmarks, favorites,
+  and `purge_references` takes the `book_pages` page rows, bookmarks, favorites,
   tags, and campaign resource links with their shares; `_purge_derived` drops the
   thumbnail and page cache. `--delete-file` decides only whether the file leaves
   the disk, with its sidecars. `ENOENT` is tolerated, so a record whose file is
@@ -1354,9 +1499,9 @@ Read from `backend/routers/books/pages.py` and `backend/indexer/formats.py` at
 tag `v1.7.1`, and verified against the 1.7.1 stack; re-read at `v1.10.0`. Backs `books file`,
 `books page`, `books toc`, `books page-text` and `books page-words`.
 
-- `GET /api/books/{id}/page/{n}/text` reads the `book_search` FTS row for that
+- `GET /api/books/{id}/page/{n}/text` reads the `book_pages` row for that
   page and only extracts live when there is none
-  (`routers/books/pages.py:167-204`). Its format gate is `can_index`, not an
+  (`routers/books/pages.py:172-204`, v1.11.0). Its format gate is `can_index`, not an
   `application/` MIME prefix, so `text/plain` and `text/markdown` books are
   readable too (`:175-179`).
 - `GET /api/books/{id}/page/{n}/words` answers **200 with an empty overlay**
@@ -1468,7 +1613,54 @@ Read from `backend/routers/campaigns/` at tag `v1.7.2`, and verified against the
 - **Delete leaves files on disk.** `delete_campaign` removes rows only
   (`core.py:358-384`, v1.10.0): the banner (`<id>.webp`, `<id>_sm.webp`) and uploaded
   files stay under `campaign_uploads/`. Verified against the 1.8.0 stack.
-- **Deleting a parent campaign is a 500.** `parent_campaign_id` has no `ondelete` (`models/campaigns.py:33`, v1.10.0), so deleting a campaign another names as its parent fails on the foreign key and leaves both rows. Verified against the 1.8.0 stack.
+- **Deleting a parent campaign keeps its children**, as of 1.11.0:
+  `delete_campaign` calls `detach_child_campaigns` (`core.py:406`, v1.11.0), which
+  nulls `parent_campaign_id` on every child (`services/campaigns/user_data.py:279-290`).
+  Before 1.11.0 the foreign key failed and the delete was a 500.
+- **A parent must be another campaign of the owner's**, as of 1.11.0.
+  `check_parent_campaign` (`_helpers.py:255-272`, v1.11.0) answers 404 for any
+  id that is not one of the owner's campaigns, so ids cannot be probed, and 400
+  for the campaign itself. `create` checks every non-empty value
+  (`core.py:175`); `update` only a value that changes the parent
+  (`core.py:307-309`), so an existing bad link can be saved around.
+- **Names are trimmed and bounded**, as of 1.11.0: `CampaignCreate.name` and
+  `CampaignUpdate.name` are `Name` (`_schemas.py:38,51`, v1.11.0;
+  `routers/_names.py`), so a blank name or one over 255 characters is a 422.
+- **A locked campaign refuses every write under `/campaigns/{id}/`**, as of
+  1.11.0. `require_writable_campaign` is a router dependency
+  (`__init__.py:201-205`, v1.11.0; `_writable.py:55-81`): for the owner and
+  accepted members it answers 403 while the owner's campaign access is disabled
+  and 409 while the campaign is archived, on any POST, PUT, PATCH or DELETE.
+  Before 1.11.0 member-level writes — wiki update, delete and reorder,
+  availability, member art, token and sheet — checked only the archive. The
+  exceptions are marked `writable_while`: archive/unarchive and delete run while
+  archived (`core.py:352,383`); member status runs while access is disabled and
+  then allows only a pure decline (`members.py:63`, `:75-83`); member remove
+  always runs and re-checks only the owner removing someone else
+  (`members.py:130`, `:145`); wiki hide/unhide always run (`wiki.py:550,588`).
+- **Sharing with an unknown user id is a 400**, as of 1.11.0:
+  `require_known_users` (`_helpers.py:233-245`, v1.11.0) answers "Can't share
+  with a user who doesn't exist" before anything is kept. It guards resource
+  shares (`resources.py:108`, so one bad id fails all of `resources bulk`),
+  resources sent with `create` (`core.py:223`; the campaign is only flushed, so
+  it is not created either) and wiki share lists (`wiki.py:277`).
+- **A file is also readable as a map page's picture**, as of 1.11.0:
+  `can_read_campaign_file` falls back to `_shown_on_readable_map_page`
+  (`uploads.py:801-847`, v1.11.0), so a gm or unlinked file is readable by
+  anyone who can read a map page whose `map_file_id` it is. Removing a file
+  resource deletes the file (`resources.py:309-310`), and such a page then
+  resolves to `missing` (`_wiki_maps.py:145-153`).
+- **Deleting a library map moves campaigns onto a copy**, as of 1.11.0
+  (`services/campaigns/map_copies.py:214-296`, v1.11.0): each campaign using it
+  gets the file as a new upload. A `map` resource link is replaced by a `file`
+  link — new link id, same visibility, shares and category; map pages switch to
+  `map_file_id`; `[[map:<id>]]` embeds become `[[image:<file-id>]]`. The copy is
+  bound by the upload settings; a refused or failed copy leaves the page
+  resolving to `missing`.
+- **Banner images are capped at 40 megapixels**, as of 1.11.0: an upload over
+  `COVER_MAX_SOURCE_PIXELS` is 400 "Image is too large" (`uploads.py:127-139`,
+  `:278`, v1.11.0); a `campaign_file` source over it is 400 "Source image could
+  not be processed" (`uploads.py:318-322`). Library sources are not capped.
 
 ## Campaign wiki
 
@@ -1484,31 +1676,49 @@ at tag `v1.8.0`; starred items verified against the 1.8.0 stack. Backs
   author only (`:91-99`). Only the author changes `visibility` or sharing.
 - **A personal campaign stores every page as `gm`** whatever is sent, and
   refuses `hide` with a 409 (`wiki.py:262-330`, `:519-554`, v1.9.1).
-- **Archived campaigns refuse create, update, delete and reorder**
-  (`assert_not_archived`); hide and unhide still work.
+- **Locked campaigns refuse create, update, delete and reorder**: 409 while
+  archived, 403 while the owner's campaign access is disabled (see
+  `## Campaigns`); hide and unhide still work (`wiki.py:550,588`, v1.11.0).
+- **`page_type` takes `map`**, as of 1.11.0 (`wiki.py:64`, v1.11.0). `map_id` /
+  `map_file_id` set the picture of a map page only and are ignored on any other
+  type; choosing one clears the other (`_wiki_maps.py:89-119`). Deleting a page
+  unlinks the map pins pointing at it if it was `group`, otherwise keeps them as
+  GM-only (owner deleting their own page) or deletes them
+  (`wiki.py:527`, `_wiki_maps.py:248-285`).
+- **A title holding `|`, `[`, `]` or a line break is a 400**, as of 1.11.0
+  (`check_page_title`, `_wiki_helpers.py:28-33`; `wiki.py:309,382`, v1.11.0).
+  Update checks only a changed title, so an older page keeps saving.
 - **Saving re-parses the body.\*** An unknown *unpinned* `[[Title]]` (including
   `[[Title|label]]`) creates an empty stub page, authored by the saver, with the
   saving page's visibility (`_wiki_helpers.py:209-220`, v1.9.1). A pinned
   `[[T:id-<missing>]]` creates none. A prefix that is not reserved —
-  `[[npc:goblin]]` — is a title and gets a stub.
+  `[[npc:goblin]]` — is a title and gets a stub. As of 1.11.0 a `[[…]]` inside
+  a fenced code block neither links nor stubs (`iter_links`,
+  `text/wikilinks.py`, v1.11.0), and a stub's title has `|`, `[`, `]` and line
+  breaks collapsed to spaces (`clean_title`, `_wiki_helpers.py:256`).
 - **Embeds are never links.\*** `[[book:<id>]]`, `[[book:<id>:<page>]]`,
   `[[map:<id>]]`, `[[token:<id>]]`, `[[audio:<id>]]`, `[[model:<id>]]` take
   library ids; `[[image:<file-id>]]` and `[[file:<file-id>]]` take campaign file
   ids. The frontend renders them (`EmbedCard.tsx`, v1.9.1); its picker offers only items
   linked to the campaign (`GrimoireEmbedPicker.jsx:23-26`, v1.9.1).
 - **A rename rewrites inbound `[[Old Title]]` links** in other pages
-  (`rewrite_inbound_titles`).
+  (`rewrite_inbound_titles`). As of 1.11.0 fenced code is left untouched, and a
+  page where the rewrite would re-pair the GM's `||` markers keeps its old link
+  text (`_wiki_helpers.py:310-322`, v1.11.0).
 - **Delete moves children up to the deleted page's parent**, and an unknown page
   id is a silent 204 (`wiki.py:467-516`, v1.9.1).
 - **`||text||` belongs to the campaign owner** (`_helpers.py:14-63`, v1.10.0). `get`
   strips it for anyone else, leaving no marker; a non-owner's `||…||` is stored
   as literal text; a non-owner's save re-weaves stored secrets by position
-  (`merge_gm_secrets`, `:83`).
+  (`merge_gm_secrets`, `:83`). As of 1.11.0 a `|` after a backslash is never a
+  marker (`_helpers.py:22`, v1.11.0); markers pair inside a code fence first,
+  then in prose, and a leftover single `||` stays literal (`:35-70`). A
+  non-owner's save whose fences would re-cut the stored secrets is a 400
+  (`:207-217`).
 - **Search is a plain case-insensitive substring** over title and body; hidden
   pages are excluded, and non-owners do not match on secret text
-  (`wiki.py:579-618`, v1.9.1). The query runs through SQL `ilike('%q%')`
-  (`wiki.py:588-593`), so for the campaign owner `%` and `_` in `--query` act
-  as wildcards; non-owners are re-filtered literally in Python.
+  (`wiki.py:579-618`, v1.9.1). As of 1.11.0 `%`, `_` and `\` match literally
+  for everyone (`contains`, `wiki.py:621-626`, v1.11.0; `services/sql_like.py`).
 - **Reorder re-deals only the slots of pages the caller can edit**; unknown,
   invisible and read-only ids are dropped and keep their slots
   (`wiki.py:100-167`, v1.9.1).

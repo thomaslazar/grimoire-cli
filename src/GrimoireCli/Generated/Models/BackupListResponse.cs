@@ -31,6 +31,8 @@ namespace GrimoireCli.Generated.Models
 #else
         public string Directory { get; set; }
 #endif
+        /// <summary>The includes_database property</summary>
+        public bool? IncludesDatabase { get; set; }
         /// <summary>The total_bytes property</summary>
         public int? TotalBytes { get; set; }
         /// <summary>
@@ -60,6 +62,7 @@ namespace GrimoireCli.Generated.Models
             {
                 { "backups", n => { Backups = n.GetCollectionOfObjectValues<global::GrimoireCli.Generated.Models.BackupItem>(global::GrimoireCli.Generated.Models.BackupItem.CreateFromDiscriminatorValue)?.AsList(); } },
                 { "directory", n => { Directory = n.GetStringValue(); } },
+                { "includes_database", n => { IncludesDatabase = n.GetBoolValue(); } },
                 { "total_bytes", n => { TotalBytes = n.GetIntValue(); } },
             };
         }
@@ -72,6 +75,7 @@ namespace GrimoireCli.Generated.Models
             if(ReferenceEquals(writer, null)) throw new ArgumentNullException(nameof(writer));
             writer.WriteCollectionOfObjectValues<global::GrimoireCli.Generated.Models.BackupItem>("backups", Backups);
             writer.WriteStringValue("directory", Directory);
+            writer.WriteBoolValue("includes_database", IncludesDatabase);
             writer.WriteIntValue("total_bytes", TotalBytes);
             writer.WriteAdditionalData(AdditionalData);
         }

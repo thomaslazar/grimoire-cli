@@ -18,10 +18,10 @@ namespace GrimoireCli.Generated.Models
         /// <summary>The backlinks property</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
-        public List<global::GrimoireCli.Generated.Models.WikiPageSummaryOut>? Backlinks { get; set; }
+        public List<global::GrimoireCli.Generated.Models.WikiBacklinkOut>? Backlinks { get; set; }
 #nullable restore
 #else
-        public List<global::GrimoireCli.Generated.Models.WikiPageSummaryOut> Backlinks { get; set; }
+        public List<global::GrimoireCli.Generated.Models.WikiBacklinkOut> Backlinks { get; set; }
 #endif
         /// <summary>The body property</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
@@ -87,6 +87,14 @@ namespace GrimoireCli.Generated.Models
         public bool? IsHidden { get; set; }
         /// <summary>The is_mine property</summary>
         public bool? IsMine { get; set; }
+        /// <summary>The map property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public global::GrimoireCli.Generated.Models.WikiMapOut? Map { get; set; }
+#nullable restore
+#else
+        public global::GrimoireCli.Generated.Models.WikiMapOut Map { get; set; }
+#endif
         /// <summary>The page_type property</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
@@ -102,6 +110,14 @@ namespace GrimoireCli.Generated.Models
 #nullable restore
 #else
         public global::GrimoireCli.Generated.Models.WikiPageDetailOut.WikiPageDetailOut_parent_id ParentId { get; set; }
+#endif
+        /// <summary>The pins property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public List<global::GrimoireCli.Generated.Models.WikiMapPinOut>? Pins { get; set; }
+#nullable restore
+#else
+        public List<global::GrimoireCli.Generated.Models.WikiMapPinOut> Pins { get; set; }
 #endif
         /// <summary>The session_date property</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
@@ -184,7 +200,7 @@ namespace GrimoireCli.Generated.Models
         {
             return new Dictionary<string, Action<IParseNode>>
             {
-                { "backlinks", n => { Backlinks = n.GetCollectionOfObjectValues<global::GrimoireCli.Generated.Models.WikiPageSummaryOut>(global::GrimoireCli.Generated.Models.WikiPageSummaryOut.CreateFromDiscriminatorValue)?.AsList(); } },
+                { "backlinks", n => { Backlinks = n.GetCollectionOfObjectValues<global::GrimoireCli.Generated.Models.WikiBacklinkOut>(global::GrimoireCli.Generated.Models.WikiBacklinkOut.CreateFromDiscriminatorValue)?.AsList(); } },
                 { "body", n => { Body = n.GetObjectValue<global::GrimoireCli.Generated.Models.WikiPageDetailOut.WikiPageDetailOut_body>(global::GrimoireCli.Generated.Models.WikiPageDetailOut.WikiPageDetailOut_body.CreateFromDiscriminatorValue); } },
                 { "campaign_id", n => { CampaignId = n.GetStringValue(); } },
                 { "can_delete", n => { CanDelete = n.GetBoolValue(); } },
@@ -196,8 +212,10 @@ namespace GrimoireCli.Generated.Models
                 { "id", n => { Id = n.GetStringValue(); } },
                 { "is_hidden", n => { IsHidden = n.GetBoolValue(); } },
                 { "is_mine", n => { IsMine = n.GetBoolValue(); } },
+                { "map", n => { Map = n.GetObjectValue<global::GrimoireCli.Generated.Models.WikiMapOut>(global::GrimoireCli.Generated.Models.WikiMapOut.CreateFromDiscriminatorValue); } },
                 { "page_type", n => { PageType = n.GetObjectValue<global::GrimoireCli.Generated.Models.WikiPageDetailOut.WikiPageDetailOut_page_type>(global::GrimoireCli.Generated.Models.WikiPageDetailOut.WikiPageDetailOut_page_type.CreateFromDiscriminatorValue); } },
                 { "parent_id", n => { ParentId = n.GetObjectValue<global::GrimoireCli.Generated.Models.WikiPageDetailOut.WikiPageDetailOut_parent_id>(global::GrimoireCli.Generated.Models.WikiPageDetailOut.WikiPageDetailOut_parent_id.CreateFromDiscriminatorValue); } },
+                { "pins", n => { Pins = n.GetCollectionOfObjectValues<global::GrimoireCli.Generated.Models.WikiMapPinOut>(global::GrimoireCli.Generated.Models.WikiMapPinOut.CreateFromDiscriminatorValue)?.AsList(); } },
                 { "session_date", n => { SessionDate = n.GetObjectValue<global::GrimoireCli.Generated.Models.WikiPageDetailOut.WikiPageDetailOut_session_date>(global::GrimoireCli.Generated.Models.WikiPageDetailOut.WikiPageDetailOut_session_date.CreateFromDiscriminatorValue); } },
                 { "shared_user_ids", n => { SharedUserIds = n.GetCollectionOfPrimitiveValues<string>()?.AsList(); } },
                 { "shared_write_user_ids", n => { SharedWriteUserIds = n.GetCollectionOfPrimitiveValues<string>()?.AsList(); } },
@@ -214,7 +232,7 @@ namespace GrimoireCli.Generated.Models
         public virtual void Serialize(ISerializationWriter writer)
         {
             if(ReferenceEquals(writer, null)) throw new ArgumentNullException(nameof(writer));
-            writer.WriteCollectionOfObjectValues<global::GrimoireCli.Generated.Models.WikiPageSummaryOut>("backlinks", Backlinks);
+            writer.WriteCollectionOfObjectValues<global::GrimoireCli.Generated.Models.WikiBacklinkOut>("backlinks", Backlinks);
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.WikiPageDetailOut.WikiPageDetailOut_body>("body", Body);
             writer.WriteStringValue("campaign_id", CampaignId);
             writer.WriteBoolValue("can_delete", CanDelete);
@@ -226,8 +244,10 @@ namespace GrimoireCli.Generated.Models
             writer.WriteStringValue("id", Id);
             writer.WriteBoolValue("is_hidden", IsHidden);
             writer.WriteBoolValue("is_mine", IsMine);
+            writer.WriteObjectValue<global::GrimoireCli.Generated.Models.WikiMapOut>("map", Map);
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.WikiPageDetailOut.WikiPageDetailOut_page_type>("page_type", PageType);
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.WikiPageDetailOut.WikiPageDetailOut_parent_id>("parent_id", ParentId);
+            writer.WriteCollectionOfObjectValues<global::GrimoireCli.Generated.Models.WikiMapPinOut>("pins", Pins);
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.WikiPageDetailOut.WikiPageDetailOut_session_date>("session_date", SessionDate);
             writer.WriteCollectionOfPrimitiveValues<string>("shared_user_ids", SharedUserIds);
             writer.WriteCollectionOfPrimitiveValues<string>("shared_write_user_ids", SharedWriteUserIds);

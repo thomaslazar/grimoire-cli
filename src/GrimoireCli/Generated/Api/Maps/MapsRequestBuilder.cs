@@ -2,6 +2,7 @@
 #pragma warning disable CS0618
 using GrimoireCli.Generated.Api.Maps.Bulk;
 using GrimoireCli.Generated.Api.Maps.Groups;
+using GrimoireCli.Generated.Api.Maps.IndexNamespace;
 using GrimoireCli.Generated.Api.Maps.Item;
 using GrimoireCli.Generated.Models;
 using Microsoft.Kiota.Abstractions.Extensions;
@@ -29,6 +30,11 @@ namespace GrimoireCli.Generated.Api.Maps
         public global::GrimoireCli.Generated.Api.Maps.Groups.GroupsRequestBuilder Groups
         {
             get => new global::GrimoireCli.Generated.Api.Maps.Groups.GroupsRequestBuilder(PathParameters, RequestAdapter);
+        }
+        /// <summary>The index property</summary>
+        public global::GrimoireCli.Generated.Api.Maps.IndexNamespace.IndexRequestBuilder Index
+        {
+            get => new global::GrimoireCli.Generated.Api.Maps.IndexNamespace.IndexRequestBuilder(PathParameters, RequestAdapter);
         }
         /// <summary>Gets an item from the GrimoireCli.Generated.api.maps.item collection</summary>
         /// <param name="position">Unique identifier of the item</param>

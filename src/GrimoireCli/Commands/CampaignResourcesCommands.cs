@@ -116,7 +116,7 @@ public static class CampaignResourcesCommands
             "",
             "A visibility outside gm|public|private becomes gm; a restricted book is",
             "forced to gm regardless. Other ids are not checked. An invalid category_id",
-            "fails the whole call with 400."]);
+            "or an unknown user in shared_user_ids fails the whole call with 400."]);
         command.AddExamples("echo '{\"resources\":[{\"resource_type\":\"book\",\"resource_id\":\"<id>\"}]}' | grimoire-cli campaigns resources bulk --id <campaign-id> --stdin");
         command.AddRequestShape<Generated.Models.ResourceBulkAdd>();
         command.AddResponseExampleArray<Generated.Models.LinkedResourceOut>();
@@ -184,7 +184,8 @@ public static class CampaignResourcesCommands
         var command = new Command("remove", "Unlink an item from a campaign") { idOption, linkIdOption };
         command.AddHelpSection("Notes", HelpSectionPosition.Top,
             [.. OwnerOnly, "",
-            "The library item is untouched, but removing a file link deletes the upload.",
+            "The library item is untouched, but removing a file link deletes the upload;",
+            "a map page using it as its picture then shows the map as missing.",
             "",
             "Answers 204: stdout carries no body. An unknown link id also answers 204."]);
         command.SetAction(async (parseResult, cancellationToken) =>

@@ -15,6 +15,8 @@ namespace GrimoireCli.Generated.Models
     {
         /// <summary>Stores additional data not described in the OpenAPI description found when deserializing. Can be used for serialization as well.</summary>
         public IDictionary<string, object> AdditionalData { get; set; }
+        /// <summary>The armory_books property</summary>
+        public int? ArmoryBooks { get; set; }
         /// <summary>The audio property</summary>
         public int? Audio { get; set; }
         /// <summary>The books property</summary>
@@ -41,6 +43,7 @@ namespace GrimoireCli.Generated.Models
         public StatsResponse()
         {
             AdditionalData = new Dictionary<string, object>();
+            ArmoryBooks = 0;
         }
         /// <summary>
         /// Creates a new instance of the appropriate class based on discriminator value
@@ -60,6 +63,7 @@ namespace GrimoireCli.Generated.Models
         {
             return new Dictionary<string, Action<IParseNode>>
             {
+                { "armory_books", n => { ArmoryBooks = n.GetIntValue(); } },
                 { "audio", n => { Audio = n.GetIntValue(); } },
                 { "books", n => { Books = n.GetIntValue(); } },
                 { "game_systems", n => { GameSystems = n.GetIntValue(); } },
@@ -79,6 +83,7 @@ namespace GrimoireCli.Generated.Models
         public virtual void Serialize(ISerializationWriter writer)
         {
             if(ReferenceEquals(writer, null)) throw new ArgumentNullException(nameof(writer));
+            writer.WriteIntValue("armory_books", ArmoryBooks);
             writer.WriteIntValue("audio", Audio);
             writer.WriteIntValue("books", Books);
             writer.WriteIntValue("game_systems", GameSystems);

@@ -40,7 +40,7 @@ namespace GrimoireCli.Generated.Api.Search
         {
         }
         /// <summary>
-        /// Searches indexed book pages using SQLite FTS5, and books, maps, tokens and audio by their own metadata. Optionally scope to a single book (`book_id`) or game system (`system_id`). Supports `field:value` filters (`title:avatar`, `author:&quot;Ben Robbins&quot;`, `tag:dungeon`); a metadata filter suppresses page-text search, and `text:` forces it. Returns snippets with HTML `&lt;mark&gt;` highlights.
+        /// Searches indexed book pages (SQLite FTS5, or PostgreSQL full-text search), and books, maps, tokens and audio by their own metadata. Optionally scope to a single book (`book_id`) or game system (`system_id`). Supports `field:value` filters (`title:avatar`, `author:&quot;Ben Robbins&quot;`, `tag:dungeon`); a metadata filter suppresses page-text search, and `text:` forces it. Returns snippets with HTML `&lt;mark&gt;` highlights.
         /// </summary>
         /// <returns>A <see cref="global::GrimoireCli.Generated.Models.SearchResponse"/></returns>
         /// <param name="cancellationToken">Cancellation token to use when cancelling requests</param>
@@ -63,7 +63,7 @@ namespace GrimoireCli.Generated.Api.Search
             return await RequestAdapter.SendAsync<global::GrimoireCli.Generated.Models.SearchResponse>(requestInfo, global::GrimoireCli.Generated.Models.SearchResponse.CreateFromDiscriminatorValue, errorMapping, cancellationToken).ConfigureAwait(false);
         }
         /// <summary>
-        /// Searches indexed book pages using SQLite FTS5, and books, maps, tokens and audio by their own metadata. Optionally scope to a single book (`book_id`) or game system (`system_id`). Supports `field:value` filters (`title:avatar`, `author:&quot;Ben Robbins&quot;`, `tag:dungeon`); a metadata filter suppresses page-text search, and `text:` forces it. Returns snippets with HTML `&lt;mark&gt;` highlights.
+        /// Searches indexed book pages (SQLite FTS5, or PostgreSQL full-text search), and books, maps, tokens and audio by their own metadata. Optionally scope to a single book (`book_id`) or game system (`system_id`). Supports `field:value` filters (`title:avatar`, `author:&quot;Ben Robbins&quot;`, `tag:dungeon`); a metadata filter suppresses page-text search, and `text:` forces it. Returns snippets with HTML `&lt;mark&gt;` highlights.
         /// </summary>
         /// <returns>A <see cref="RequestInformation"/></returns>
         /// <param name="requestConfiguration">Configuration for the request such as headers, query parameters, and middleware options.</param>
@@ -91,7 +91,7 @@ namespace GrimoireCli.Generated.Api.Search
             return new global::GrimoireCli.Generated.Api.Search.SearchRequestBuilder(rawUrl, RequestAdapter);
         }
         /// <summary>
-        /// Searches indexed book pages using SQLite FTS5, and books, maps, tokens and audio by their own metadata. Optionally scope to a single book (`book_id`) or game system (`system_id`). Supports `field:value` filters (`title:avatar`, `author:&quot;Ben Robbins&quot;`, `tag:dungeon`); a metadata filter suppresses page-text search, and `text:` forces it. Returns snippets with HTML `&lt;mark&gt;` highlights.
+        /// Searches indexed book pages (SQLite FTS5, or PostgreSQL full-text search), and books, maps, tokens and audio by their own metadata. Optionally scope to a single book (`book_id`) or game system (`system_id`). Supports `field:value` filters (`title:avatar`, `author:&quot;Ben Robbins&quot;`, `tag:dungeon`); a metadata filter suppresses page-text search, and `text:` forces it. Returns snippets with HTML `&lt;mark&gt;` highlights.
         /// </summary>
         [global::System.CodeDom.Compiler.GeneratedCode("Kiota", "1.0.0")]
         public partial class SearchRequestBuilderGetQueryParameters 

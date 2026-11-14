@@ -8,6 +8,7 @@ using GrimoireCli.Generated.Api.Campaigns.Item.Categories;
 using GrimoireCli.Generated.Api.Campaigns.Item.ConvertToGroup;
 using GrimoireCli.Generated.Api.Campaigns.Item.EligibleMembers;
 using GrimoireCli.Generated.Api.Campaigns.Item.Files;
+using GrimoireCli.Generated.Api.Campaigns.Item.GmScreen;
 using GrimoireCli.Generated.Api.Campaigns.Item.Guests;
 using GrimoireCli.Generated.Api.Campaigns.Item.Images;
 using GrimoireCli.Generated.Api.Campaigns.Item.Invite;
@@ -74,6 +75,11 @@ namespace GrimoireCli.Generated.Api.Campaigns.Item
         public global::GrimoireCli.Generated.Api.Campaigns.Item.Files.FilesRequestBuilder Files
         {
             get => new global::GrimoireCli.Generated.Api.Campaigns.Item.Files.FilesRequestBuilder(PathParameters, RequestAdapter);
+        }
+        /// <summary>The gmScreen property</summary>
+        public global::GrimoireCli.Generated.Api.Campaigns.Item.GmScreen.GmScreenRequestBuilder GmScreen
+        {
+            get => new global::GrimoireCli.Generated.Api.Campaigns.Item.GmScreen.GmScreenRequestBuilder(PathParameters, RequestAdapter);
         }
         /// <summary>The guests property</summary>
         public global::GrimoireCli.Generated.Api.Campaigns.Item.Guests.GuestsRequestBuilder Guests

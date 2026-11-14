@@ -8,7 +8,7 @@ using System;
 namespace GrimoireCli.Generated.Models
 {
     /// <summary>
-    /// Guest login adds the campaign the invite code was scoped to.
+    /// Guest login adds where the guest was invited: a campaign&apos;s guest gets``campaign_id``, a league&apos;s guest ``league_id`` (None once they are in noleague, when they still reach their own armies).
     /// </summary>
     [global::System.CodeDom.Compiler.GeneratedCode("Kiota", "1.0.0")]
     public partial class GuestLoginResponse : IAdditionalDataHolder, IParsable
@@ -18,10 +18,18 @@ namespace GrimoireCli.Generated.Models
         /// <summary>The campaign_id property</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
-        public string? CampaignId { get; set; }
+        public global::GrimoireCli.Generated.Models.GuestLoginResponse.GuestLoginResponse_campaign_id? CampaignId { get; set; }
 #nullable restore
 #else
-        public string CampaignId { get; set; }
+        public global::GrimoireCli.Generated.Models.GuestLoginResponse.GuestLoginResponse_campaign_id CampaignId { get; set; }
+#endif
+        /// <summary>The league_id property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public global::GrimoireCli.Generated.Models.GuestLoginResponse.GuestLoginResponse_league_id? LeagueId { get; set; }
+#nullable restore
+#else
+        public global::GrimoireCli.Generated.Models.GuestLoginResponse.GuestLoginResponse_league_id LeagueId { get; set; }
 #endif
         /// <summary>The token property</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
@@ -64,7 +72,8 @@ namespace GrimoireCli.Generated.Models
         {
             return new Dictionary<string, Action<IParseNode>>
             {
-                { "campaign_id", n => { CampaignId = n.GetStringValue(); } },
+                { "campaign_id", n => { CampaignId = n.GetObjectValue<global::GrimoireCli.Generated.Models.GuestLoginResponse.GuestLoginResponse_campaign_id>(global::GrimoireCli.Generated.Models.GuestLoginResponse.GuestLoginResponse_campaign_id.CreateFromDiscriminatorValue); } },
+                { "league_id", n => { LeagueId = n.GetObjectValue<global::GrimoireCli.Generated.Models.GuestLoginResponse.GuestLoginResponse_league_id>(global::GrimoireCli.Generated.Models.GuestLoginResponse.GuestLoginResponse_league_id.CreateFromDiscriminatorValue); } },
                 { "token", n => { Token = n.GetStringValue(); } },
                 { "user", n => { User = n.GetObjectValue<global::GrimoireCli.Generated.Models.LoginUser>(global::GrimoireCli.Generated.Models.LoginUser.CreateFromDiscriminatorValue); } },
             };
@@ -76,10 +85,147 @@ namespace GrimoireCli.Generated.Models
         public virtual void Serialize(ISerializationWriter writer)
         {
             if(ReferenceEquals(writer, null)) throw new ArgumentNullException(nameof(writer));
-            writer.WriteStringValue("campaign_id", CampaignId);
+            writer.WriteObjectValue<global::GrimoireCli.Generated.Models.GuestLoginResponse.GuestLoginResponse_campaign_id>("campaign_id", CampaignId);
+            writer.WriteObjectValue<global::GrimoireCli.Generated.Models.GuestLoginResponse.GuestLoginResponse_league_id>("league_id", LeagueId);
             writer.WriteStringValue("token", Token);
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.LoginUser>("user", User);
             writer.WriteAdditionalData(AdditionalData);
+        }
+        /// <summary>
+        /// Composed type wrapper for classes <see cref="global::GrimoireCli.Generated.Models.GuestLoginResponse_campaign_idMember1"/>, <see cref="string"/>
+        /// </summary>
+        [global::System.CodeDom.Compiler.GeneratedCode("Kiota", "1.0.0")]
+        public partial class GuestLoginResponse_campaign_id : IComposedTypeWrapper, IParsable
+        {
+            /// <summary>Composed type representation for type <see cref="global::GrimoireCli.Generated.Models.GuestLoginResponse_campaign_idMember1"/></summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+            public global::GrimoireCli.Generated.Models.GuestLoginResponse_campaign_idMember1? GuestLoginResponseCampaignIdMember1 { get; set; }
+#nullable restore
+#else
+            public global::GrimoireCli.Generated.Models.GuestLoginResponse_campaign_idMember1 GuestLoginResponseCampaignIdMember1 { get; set; }
+#endif
+            /// <summary>Composed type representation for type <see cref="string"/></summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+            public string? String { get; set; }
+#nullable restore
+#else
+            public string String { get; set; }
+#endif
+            /// <summary>
+            /// Creates a new instance of the appropriate class based on discriminator value
+            /// </summary>
+            /// <returns>A <see cref="global::GrimoireCli.Generated.Models.GuestLoginResponse.GuestLoginResponse_campaign_id"/></returns>
+            /// <param name="parseNode">The parse node to use to read the discriminator value and create the object</param>
+            public static global::GrimoireCli.Generated.Models.GuestLoginResponse.GuestLoginResponse_campaign_id CreateFromDiscriminatorValue(IParseNode parseNode)
+            {
+                if(ReferenceEquals(parseNode, null)) throw new ArgumentNullException(nameof(parseNode));
+                var result = new global::GrimoireCli.Generated.Models.GuestLoginResponse.GuestLoginResponse_campaign_id();
+                if(parseNode.GetStringValue() is string stringValue)
+                {
+                    result.String = stringValue;
+                }
+                else {
+                    result.GuestLoginResponseCampaignIdMember1 = new global::GrimoireCli.Generated.Models.GuestLoginResponse_campaign_idMember1();
+                }
+                return result;
+            }
+            /// <summary>
+            /// The deserialization information for the current model
+            /// </summary>
+            /// <returns>A IDictionary&lt;string, Action&lt;IParseNode&gt;&gt;</returns>
+            public virtual IDictionary<string, Action<IParseNode>> GetFieldDeserializers()
+            {
+                if(GuestLoginResponseCampaignIdMember1 != null)
+                {
+                    return ParseNodeHelper.MergeDeserializersForIntersectionWrapper(GuestLoginResponseCampaignIdMember1);
+                }
+                return new Dictionary<string, Action<IParseNode>>();
+            }
+            /// <summary>
+            /// Serializes information the current object
+            /// </summary>
+            /// <param name="writer">Serialization writer to use to serialize this model</param>
+            public virtual void Serialize(ISerializationWriter writer)
+            {
+                if(ReferenceEquals(writer, null)) throw new ArgumentNullException(nameof(writer));
+                if(String != null)
+                {
+                    writer.WriteStringValue(null, String);
+                }
+                else {
+                    writer.WriteObjectValue<global::GrimoireCli.Generated.Models.GuestLoginResponse_campaign_idMember1>(null, GuestLoginResponseCampaignIdMember1);
+                }
+            }
+        }
+        /// <summary>
+        /// Composed type wrapper for classes <see cref="global::GrimoireCli.Generated.Models.GuestLoginResponse_league_idMember1"/>, <see cref="string"/>
+        /// </summary>
+        [global::System.CodeDom.Compiler.GeneratedCode("Kiota", "1.0.0")]
+        public partial class GuestLoginResponse_league_id : IComposedTypeWrapper, IParsable
+        {
+            /// <summary>Composed type representation for type <see cref="global::GrimoireCli.Generated.Models.GuestLoginResponse_league_idMember1"/></summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+            public global::GrimoireCli.Generated.Models.GuestLoginResponse_league_idMember1? GuestLoginResponseLeagueIdMember1 { get; set; }
+#nullable restore
+#else
+            public global::GrimoireCli.Generated.Models.GuestLoginResponse_league_idMember1 GuestLoginResponseLeagueIdMember1 { get; set; }
+#endif
+            /// <summary>Composed type representation for type <see cref="string"/></summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+            public string? String { get; set; }
+#nullable restore
+#else
+            public string String { get; set; }
+#endif
+            /// <summary>
+            /// Creates a new instance of the appropriate class based on discriminator value
+            /// </summary>
+            /// <returns>A <see cref="global::GrimoireCli.Generated.Models.GuestLoginResponse.GuestLoginResponse_league_id"/></returns>
+            /// <param name="parseNode">The parse node to use to read the discriminator value and create the object</param>
+            public static global::GrimoireCli.Generated.Models.GuestLoginResponse.GuestLoginResponse_league_id CreateFromDiscriminatorValue(IParseNode parseNode)
+            {
+                if(ReferenceEquals(parseNode, null)) throw new ArgumentNullException(nameof(parseNode));
+                var result = new global::GrimoireCli.Generated.Models.GuestLoginResponse.GuestLoginResponse_league_id();
+                if(parseNode.GetStringValue() is string stringValue)
+                {
+                    result.String = stringValue;
+                }
+                else {
+                    result.GuestLoginResponseLeagueIdMember1 = new global::GrimoireCli.Generated.Models.GuestLoginResponse_league_idMember1();
+                }
+                return result;
+            }
+            /// <summary>
+            /// The deserialization information for the current model
+            /// </summary>
+            /// <returns>A IDictionary&lt;string, Action&lt;IParseNode&gt;&gt;</returns>
+            public virtual IDictionary<string, Action<IParseNode>> GetFieldDeserializers()
+            {
+                if(GuestLoginResponseLeagueIdMember1 != null)
+                {
+                    return ParseNodeHelper.MergeDeserializersForIntersectionWrapper(GuestLoginResponseLeagueIdMember1);
+                }
+                return new Dictionary<string, Action<IParseNode>>();
+            }
+            /// <summary>
+            /// Serializes information the current object
+            /// </summary>
+            /// <param name="writer">Serialization writer to use to serialize this model</param>
+            public virtual void Serialize(ISerializationWriter writer)
+            {
+                if(ReferenceEquals(writer, null)) throw new ArgumentNullException(nameof(writer));
+                if(String != null)
+                {
+                    writer.WriteStringValue(null, String);
+                }
+                else {
+                    writer.WriteObjectValue<global::GrimoireCli.Generated.Models.GuestLoginResponse_league_idMember1>(null, GuestLoginResponseLeagueIdMember1);
+                }
+            }
         }
     }
 }

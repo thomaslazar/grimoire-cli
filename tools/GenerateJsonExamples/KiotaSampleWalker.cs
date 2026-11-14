@@ -97,6 +97,8 @@ public static class KiotaSampleWalker
         // the wire format rather than a date, because a real timestamp would read
         // as a value to copy.
         if (type == typeof(DateTimeOffset)) { writer.WriteStringValue("<iso8601>"); return; }
+        // `format: date` maps to Kiota's Date, a YYYY-MM-DD string on the wire.
+        if (type == typeof(Microsoft.Kiota.Abstractions.Date)) { writer.WriteStringValue("<yyyy-mm-dd>"); return; }
         if (type == typeof(int) || type == typeof(long) || type == typeof(short) ||
             type == typeof(double) || type == typeof(float) || type == typeof(decimal))
         {
