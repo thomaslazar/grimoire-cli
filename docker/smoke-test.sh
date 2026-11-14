@@ -3255,6 +3255,7 @@ ok "books links add then remove converges"
 # restricting a Shadowrun 4 DE subfolder, listing it, lifting it
 RULE_PATH="books/Shadowrun/4 DE/adventures"
 SHARED_BOOK=$("$CLI" books list 2>"$WORK/cli.err" | jq -r '.books[0].id')
+[ -n "$SHARED_BOOK" ] && [ "$SHARED_BOOK" != "null" ] || fail "no book to check against the rule folder"
 "$CLI" files browse --path "$RULE_PATH" 2>"$WORK/cli.err" \
   | jq -e --arg b "$SHARED_BOOK" 'all(.entries[]; .record_id != $b)' >/dev/null \
   || fail "the rule folder holds the shared smoke book: $SHARED_BOOK"

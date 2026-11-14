@@ -53,8 +53,10 @@ public static class FolderAccessCommands
             "A book gets the stricter of the rule and its system's or category's",
             "level; its own access_level overrides both.",
             "",
-            "Campaign shares of the covered books are demoted to GM-only, and remove",
-            "does not restore them. The rule follows the folder on files move.");
+            "Campaign shares of the covered books are demoted to GM-only and league",
+            "shares to organiser-only; remove does not restore them.",
+            "",
+            "The rule follows the folder on files move.");
         command.AddExamples("grimoire-cli files folder access set --path \"books/Shadowrun/Adventures\" --level gm");
         command.AddResponseExample<Generated.Models.FolderAccessRuleOut>();
         command.SetAction(async (parseResult, cancellationToken) =>
@@ -77,8 +79,8 @@ public static class FolderAccessCommands
         };
         command.AddRoleRequired("admin");
         command.AddHelpSection("Notes", HelpSectionPosition.Top,
-            "404 when the folder has no rule. Campaign shares the rule demoted stay",
-            "GM-only.");
+            "404 when the folder has no rule. Campaign and league shares the rule",
+            "demoted stay demoted.");
         command.AddExamples("grimoire-cli files folder access remove --path \"books/Shadowrun/Adventures\"");
         command.AddResponseExample<Generated.Models.FolderAccessStatusResponse>();
         command.SetAction(async (parseResult, cancellationToken) =>

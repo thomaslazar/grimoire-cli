@@ -721,15 +721,15 @@ Read from `backend/routers/settings/folder_access.py` and
   stored path takes the folder's on-disk spelling, so the echoed `path` may
   differ in case from the request (`routers/settings/folder_access.py:116-149`).
   Levels are `gm` and `admin`.
-- **`set` demotes campaign shares** of the books it covers to GM-only, except
-  books with an explicit open level; `remove` does not restore them
-  (`:66-80`, `:152-166`). `remove` 404s when the folder has no rule.
+- **`set` demotes campaign shares** of the books it covers to GM-only and league
+  shares to organiser-only, except books with an explicit open level; `remove`
+  does not restore them (`_demote_campaign_shares`, `:66-104`, `:152-166`). `remove` 404s when the folder has no rule.
 - **A book resolves to the stricter** of the folder's level and what its
   system or category gives it; only the book's own level overrides
   (`routers/settings/__init__.py:53-63`).
 - **Each rule is `{path, level, exists, books}`**: `books` counts books beneath
   it, `exists` is false once the folder is gone or spelled differently
-  (`:56-63`). `list` is sorted by path and wrapped in `{"rules": [...]}`.
+  (`:48-63`). `list` is sorted by path and wrapped in `{"rules": [...]}`.
 
 ## Book folders
 

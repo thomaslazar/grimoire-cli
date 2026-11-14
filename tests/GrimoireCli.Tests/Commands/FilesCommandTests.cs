@@ -142,7 +142,11 @@ public class FilesCommandTests
 
     [Fact]
     public void CampaignMapCopiesIsAdminOnly()
-        => Assert.Contains("admin", Help(["files", "campaign-map-copies"]));
+        => Assert.Matches(@"Role required:\s*\n?\s*admin", Help(["files", "campaign-map-copies"]));
+
+    [Fact]
+    public void CampaignMapCopiesNamesTheOutcomes()
+        => Assert.Contains("too_large", Help(["files", "campaign-map-copies"]));
 
     [Fact]
     public void MoveTakesRepeatableSourcesAndRequiresADestination()

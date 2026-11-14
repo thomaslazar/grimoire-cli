@@ -50,7 +50,7 @@ public static class BookLinksCommands
             "access level still come from the book. Linking twice is a no-op.",
             "",
             "400 for the book's own system, a version of a book (link its main",
-            "version) or a system across the books/ / armory/ divide.");
+            "version) or a role-playing book onto a wargame system or the reverse.");
         command.AddExamples("grimoire-cli books links add --id <book-id> --system-id <system-id>");
         command.AddResponseExampleArray<Generated.Models.LinkedSystemRef>();
         command.SetAction(async (parseResult, cancellationToken) =>

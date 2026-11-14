@@ -279,7 +279,7 @@ grimoire-cli config set server https://grimoire.example.com
 | `files move --sources <path>... --destination <path> [--on-conflict skip\|rename]` | Move files or folders, keeping their metadata (admin) |
 | `files rename --path <path> --new-name <name>` | Rename a file or folder on disk (admin) |
 | `files delete --path <path> [--confirm-name <name>] [--delete-files]` | Drop index entries; `--delete-files` also deletes the files, irreversibly (admin) |
-| `files campaign-map-copies --path <path>` | Campaigns a delete would copy maps into, and whether each fits (admin) |
+| `files campaign-map-copies --path <path>` | Campaigns a delete would copy maps into, and whether each copy fits (admin) |
 | `files folder create --parent <path> --name <name> [--container-kind <kind>] [--nsfw] [--frames-container]` | Create a folder, optionally a container, a frame folder, or NSFW (admin) |
 | `files folder markers --path <path> [--container-kind <kind>] [--nsfw true\|false] [--frames-container true\|false]` | Set a folder's container/NSFW/frame markers (admin) |
 | `files folder scaffold --path <path>` | Create the standard category folders (admin) |

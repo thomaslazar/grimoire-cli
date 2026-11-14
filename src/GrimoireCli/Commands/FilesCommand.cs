@@ -232,6 +232,9 @@ public static class FilesCommand
             pathOption
         };
         command.AddRoleRequired("admin");
+        command.AddHelpSection("Notes", HelpSectionPosition.Top,
+            "outcome is copy, or why not: too_large, uploads_disabled, not_image,",
+            "file_missing.");
         command.AddExamples("grimoire-cli files campaign-map-copies --path \"maps/Dungeons\"");
         command.AddResponseExample<Generated.Models.CampaignMapCopiesResponse>();
         command.SetAction(async (parseResult, cancellationToken) =>

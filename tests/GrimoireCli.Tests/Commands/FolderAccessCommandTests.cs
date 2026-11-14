@@ -14,7 +14,6 @@ public class FolderAccessCommandTests
     public void AccessSitsUnderFilesFolderAndIsAdminOnly(string leaf)
     {
         var help = Help(leaf);
-        Assert.Contains("Role required:", help);
         Assert.Matches(@"Role required:\s*\n?\s*admin", help);
     }
 
@@ -36,5 +35,5 @@ public class FolderAccessCommandTests
     // irreversible part a caller has to know before set.
     [Fact]
     public void SetWarnsThatRemoveDoesNotRestoreShares()
-        => Assert.Contains("does not", Help("set"));
+        => Assert.Contains("remove does not restore", Help("set").Replace("\n", " ").Replace("  ", " "));
 }
