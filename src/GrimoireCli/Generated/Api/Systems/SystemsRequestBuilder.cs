@@ -41,7 +41,7 @@ namespace GrimoireCli.Generated.Api.Systems
         /// </summary>
         /// <param name="pathParameters">Path parameters for the request</param>
         /// <param name="requestAdapter">The request adapter to use to execute the requests.</param>
-        public SystemsRequestBuilder(Dictionary<string, object> pathParameters, IRequestAdapter requestAdapter) : base(requestAdapter, "{+baseurl}/api/systems{?edition*,explicit*,family*,genre*,include_children*,license*,order*,parent_id*,parent_system*,sort*}", pathParameters)
+        public SystemsRequestBuilder(Dictionary<string, object> pathParameters, IRequestAdapter requestAdapter) : base(requestAdapter, "{+baseurl}/api/systems{?edition*,explicit*,family*,game_type*,genre*,include_children*,license*,order*,parent_id*,parent_system*,sort*}", pathParameters)
         {
         }
         /// <summary>
@@ -49,7 +49,7 @@ namespace GrimoireCli.Generated.Api.Systems
         /// </summary>
         /// <param name="rawUrl">The raw URL to use for the request builder.</param>
         /// <param name="requestAdapter">The request adapter to use to execute the requests.</param>
-        public SystemsRequestBuilder(string rawUrl, IRequestAdapter requestAdapter) : base(requestAdapter, "{+baseurl}/api/systems{?edition*,explicit*,family*,genre*,include_children*,license*,order*,parent_id*,parent_system*,sort*}", rawUrl)
+        public SystemsRequestBuilder(string rawUrl, IRequestAdapter requestAdapter) : base(requestAdapter, "{+baseurl}/api/systems{?edition*,explicit*,family*,game_type*,genre*,include_children*,license*,order*,parent_id*,parent_system*,sort*}", rawUrl)
         {
         }
         /// <summary>
@@ -139,6 +139,16 @@ namespace GrimoireCli.Generated.Api.Systems
             [QueryParameter("family")]
             public string Family { get; set; }
             #pragma warning restore CS1591
+#endif
+            /// <summary>Only role-playing systems (`ttrpg`, the library&apos;s books/) or only wargames (`wargame`, the armory). Both when omitted.</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+            [QueryParameter("game_type")]
+            public string? GameType { get; set; }
+#nullable restore
+#else
+            [QueryParameter("game_type")]
+            public string GameType { get; set; }
 #endif
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable

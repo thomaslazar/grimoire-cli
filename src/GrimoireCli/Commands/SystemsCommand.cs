@@ -13,7 +13,7 @@ public static class SystemsCommand
 
     public static Command Create()
     {
-        var command = new Command("systems", "Game systems (the folders under books/)");
+        var command = new Command("systems", "Game systems (the folders under books/ and armory/)");
         command.Subcommands.Add(CreateListCommand());
         command.Subcommands.Add(CreateGetCommand());
         command.Subcommands.Add(CreateUpdateCommand());
@@ -51,7 +51,12 @@ public static class SystemsCommand
             "",
             "Children are hidden before filters apply, so --genre/--family/--edition/",
             "--license return [] unless --include-children is passed; --parent-id",
-            "implies it.");
+            "implies it.",
+            "",
+            "Wargame (armory/) systems are listed alongside role-playing ones, and",
+            "one of each may share a name: tell them apart by game_type.",
+            "",
+            "book_count and total_page_count include books linked onto a system.");
         command.AddExamples(
             "grimoire-cli systems list",
             "grimoire-cli systems list --sort book_count --desc",
@@ -96,6 +101,9 @@ public static class SystemsCommand
         command.AddHelpSection("Notes", HelpSectionPosition.Top,
             "--genre, --category and --explicit filter the books, not the system;",
             "book_count and total_page_count are recomputed from what survives.",
+            "",
+            "books includes books linked onto the system from another (is_linked),",
+            "and the counts include them.",
             "",
             "--category takes the normalised value, not the folder name",
             "('supplement', not 'supplements'), and is case-sensitive; --genre is",
@@ -143,10 +151,11 @@ public static class SystemsCommand
         JsonBodyInput.RequireExactlyOneSource(command, inputOption, stdinOption);
         command.AddHelpSection("Notes", HelpSectionPosition.Top,
             "Renaming is permanent: setting name marks it custom, and the scanner",
-            "never re-derives it from the folder again.",
+            "never re-derives it from the folder again. A name already taken by any",
+            "system, wargames included, is a 409.",
             "",
-            "Clear a field with \"\"; an explicit null does nothing. codex_id cannot",
-            "be cleared: \"\" is a 422.",
+            "Clear a field with \"\"; an explicit null does nothing. codex_id and",
+            "year cannot be cleared: \"\" is a 422. year is 0-9999.",
             "",
             "Prefer genres and character_builder_urls; the singles are legacy.",
             "",
@@ -205,11 +214,11 @@ public static class SystemsCommand
             "Exit 3 is HTTP 200 with a non-empty errors list — a partial write.",
             "updated lists the ids that resolved, not the fields that changed.",
             "",
-            "Renaming is permanent and \"\" not null clears a field, codex_id aside —",
-            "see systems update.",
+            "Renaming is permanent and \"\" not null clears a field, codex_id and",
+            "year aside — see systems update.",
             "",
-            "Non-admin: access_level fails only its item. A non-http(s) URL 422s the",
-            "whole batch.");
+            "Non-admin: access_level fails only its item. A non-http(s) URL or a",
+            "year outside 0-9999 422s the whole batch.");
         command.AddExamples(
             "grimoire-cli systems batch-update --input items.json",
             "jq -c '{items: .}' edits.json | grimoire-cli systems batch-update --stdin");

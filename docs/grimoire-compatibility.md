@@ -35,7 +35,7 @@ an older Grimoire does not know is dropped by Pydantic rather than rejected, so
 the command answers 200 and does nothing — the one failure the version warning
 exists to catch.
 
-`main` targets Grimoire 1.10.1 – 1.10.2. Reaching 1.6.0 was more than a version bump: it
+`main` targets Grimoire 1.10.1 – 1.11.0. Reaching 1.6.0 was more than a version bump: it
 shortened the access token from 30 days to 30 minutes and made the library
 writable, which is why the CLI renews its own session
 ([authentication.md](authentication.md)) and why the `files` endpoints exist at
@@ -268,6 +268,30 @@ added or removed; the help text and two bounds changed.
   book the caller cannot read; `bulk` and `campaigns create` skip it, and
   `create` now forces a restricted book to `gm` as `bulk` does
   (`routers/campaigns/_helpers.py:251-289`). Lists leave such books out.
+
+**1.11.0 raised `MaxTestedVersion` and left the floor alone.** The bump adds no
+command or flag; the 68 new routes (armies, leagues, GM screen, wiki map pins,
+book↔system links, folder access rules, media `index`) are left for later
+work. One route went: `PUT /api/themes/source`, which the CLI never wrapped.
+Behaviour under existing commands changed, and the help text follows it:
+
+- **`books update` / `batch-update`** can no longer clear `category`: `""` is a
+  422 (`routers/books/_schemas.py:107-121`). `year` is bounded to 0–9999 on
+  books and systems.
+- **`campaigns delete`** on a parent campaign detaches its children instead of
+  failing with a 500 (`routers/campaigns/core.py:406`). Campaign writes 403
+  while the GM's campaign access is disabled, beside the 409 while archived
+  (`routers/campaigns/_writable.py`).
+- **`files upload --on-conflict replace`** overwrites maps, tokens, audio and
+  models as well as books (`services/library_fs/uploads.py:41`).
+- **Deleting a library map** copies it into every campaign that uses it and
+  rewrites their links (`services/campaigns/map_copies.py`).
+- **A second library tree, `armory/`,** holds wargame systems; book counts on
+  a system include books linked onto its shelf from elsewhere; admin folder
+  access rules can hide books from non-admins. All three surface in existing
+  list, count and search output.
+- **Search** treats `%` and `_` literally, caps `q` at 500 characters and
+  answers an over-complex query with a 400.
 
 ## Runtime check
 

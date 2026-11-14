@@ -73,8 +73,9 @@ public static class CampaignMembersCommands
         var sheetOption = new Option<string?>("--character-sheet-url") { Description = "Link to the character sheet" };
         var command = new Command("update", "Answer an invitation or set a member's character") { idOption, userIdOption, statusOption, nameOption, sheetOption };
         command.AddHelpSection("Notes", HelpSectionPosition.Top,
-            ["Yourself, or the campaign owner for anyone; refused while the campaign",
-            "is archived. Send only what changes; \"\" clears a name or link. A sheet",
+            ["Yourself, or the campaign owner for anyone; 409 while the campaign is",
+            "archived. While the GM's campaign access is disabled only declining",
+            "works (403). Send only what changes; \"\" clears a name or link. A sheet",
             "link replaces any uploaded sheet file. Accepting needs the member's",
             "campaign access (403)."]);
         command.AddExamples(
@@ -98,9 +99,10 @@ public static class CampaignMembersCommands
         var userIdOption = UserIdOption();
         var command = new Command("remove", "Remove a member, or leave") { idOption, userIdOption };
         command.AddHelpSection("Notes", HelpSectionPosition.Top,
-            ["Yourself, which works even while the campaign is archived, or the",
-            "campaign owner for anyone. Removing a guest also deletes their account",
-            "and data. An unknown user is a silent 204."]);
+            ["Yourself, which always works, or the campaign owner for anyone (409",
+            "while archived, 403 while the GM's campaign access is disabled).",
+            "Removing a guest also deletes their account and data. An unknown user",
+            "is a silent 204."]);
         command.AddExamples("grimoire-cli campaigns members remove --id <campaign-id> --user-id <user-id>");
         command.SetAction(async (parseResult, cancellationToken) =>
         {

@@ -9,6 +9,7 @@ using GrimoireCli.Generated.Api.Books.Item.MetadataSources;
 using GrimoireCli.Generated.Api.Books.Item.Page;
 using GrimoireCli.Generated.Api.Books.Item.Reindex;
 using GrimoireCli.Generated.Api.Books.Item.Rescan;
+using GrimoireCli.Generated.Api.Books.Item.Systems;
 using GrimoireCli.Generated.Api.Books.Item.Thumbnail;
 using GrimoireCli.Generated.Api.Books.Item.Toc;
 using GrimoireCli.Generated.Models;
@@ -73,6 +74,11 @@ namespace GrimoireCli.Generated.Api.Books.Item
         {
             get => new global::GrimoireCli.Generated.Api.Books.Item.Rescan.RescanRequestBuilder(PathParameters, RequestAdapter);
         }
+        /// <summary>The systems property</summary>
+        public global::GrimoireCli.Generated.Api.Books.Item.Systems.SystemsRequestBuilder Systems
+        {
+            get => new global::GrimoireCli.Generated.Api.Books.Item.Systems.SystemsRequestBuilder(PathParameters, RequestAdapter);
+        }
         /// <summary>The thumbnail property</summary>
         public global::GrimoireCli.Generated.Api.Books.Item.Thumbnail.ThumbnailRequestBuilder Thumbnail
         {
@@ -132,11 +138,11 @@ namespace GrimoireCli.Generated.Api.Books.Item
         /// <exception cref="global::GrimoireCli.Generated.Models.HTTPValidationError">When receiving a 422 status code</exception>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
-        public async Task<global::GrimoireCli.Generated.Models.Backend__routers__books___schemas__StatusResponse?> PatchAsync(global::GrimoireCli.Generated.Models.BookUpdate body, Action<RequestConfiguration<DefaultQueryParameters>>? requestConfiguration = default, CancellationToken cancellationToken = default)
+        public async Task<global::GrimoireCli.Generated.Models.Backend__routers__books___schemas__StatusResponse?> PatchAsync(global::GrimoireCli.Generated.Models.Backend__routers__books___schemas__BookUpdate body, Action<RequestConfiguration<DefaultQueryParameters>>? requestConfiguration = default, CancellationToken cancellationToken = default)
         {
 #nullable restore
 #else
-        public async Task<global::GrimoireCli.Generated.Models.Backend__routers__books___schemas__StatusResponse> PatchAsync(global::GrimoireCli.Generated.Models.BookUpdate body, Action<RequestConfiguration<DefaultQueryParameters>> requestConfiguration = default, CancellationToken cancellationToken = default)
+        public async Task<global::GrimoireCli.Generated.Models.Backend__routers__books___schemas__StatusResponse> PatchAsync(global::GrimoireCli.Generated.Models.Backend__routers__books___schemas__BookUpdate body, Action<RequestConfiguration<DefaultQueryParameters>> requestConfiguration = default, CancellationToken cancellationToken = default)
         {
 #endif
             if(ReferenceEquals(body, null)) throw new ArgumentNullException(nameof(body));
@@ -174,11 +180,11 @@ namespace GrimoireCli.Generated.Api.Books.Item
         /// <param name="requestConfiguration">Configuration for the request such as headers, query parameters, and middleware options.</param>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
-        public RequestInformation ToPatchRequestInformation(global::GrimoireCli.Generated.Models.BookUpdate body, Action<RequestConfiguration<DefaultQueryParameters>>? requestConfiguration = default)
+        public RequestInformation ToPatchRequestInformation(global::GrimoireCli.Generated.Models.Backend__routers__books___schemas__BookUpdate body, Action<RequestConfiguration<DefaultQueryParameters>>? requestConfiguration = default)
         {
 #nullable restore
 #else
-        public RequestInformation ToPatchRequestInformation(global::GrimoireCli.Generated.Models.BookUpdate body, Action<RequestConfiguration<DefaultQueryParameters>> requestConfiguration = default)
+        public RequestInformation ToPatchRequestInformation(global::GrimoireCli.Generated.Models.Backend__routers__books___schemas__BookUpdate body, Action<RequestConfiguration<DefaultQueryParameters>> requestConfiguration = default)
         {
 #endif
             if(ReferenceEquals(body, null)) throw new ArgumentNullException(nameof(body));

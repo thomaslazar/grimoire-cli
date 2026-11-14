@@ -521,7 +521,7 @@ Verified API behaviour worth reading before designing a command: [docs/grimoire-
 
 ## Compatibility
 
-Requires Grimoire **v1.10.1 – v1.10.2**. The CLI warns on login if the server reports a version outside that range. See [docs/grimoire-compatibility.md](docs/grimoire-compatibility.md) for the version matrix and the bump procedure.
+Requires Grimoire **v1.10.1 – v1.11.0**. The CLI warns on login if the server reports a version outside that range. See [docs/grimoire-compatibility.md](docs/grimoire-compatibility.md) for the version matrix and the bump procedure.
 
 ## License
 

@@ -35,10 +35,18 @@ namespace GrimoireCli.Generated.Models
         public bool? GuestAccessEnabled { get; set; }
         /// <summary>The guest_access_env_locked property</summary>
         public bool? GuestAccessEnvLocked { get; set; }
+        /// <summary>The hide_armies property</summary>
+        public bool? HideArmies { get; set; }
+        /// <summary>The hide_armory property</summary>
+        public bool? HideArmory { get; set; }
         /// <summary>The hide_audio property</summary>
         public bool? HideAudio { get; set; }
         /// <summary>The hide_campaigns property</summary>
         public bool? HideCampaigns { get; set; }
+        /// <summary>The hide_leagues property</summary>
+        public bool? HideLeagues { get; set; }
+        /// <summary>The hide_library property</summary>
+        public bool? HideLibrary { get; set; }
         /// <summary>The hide_maps property</summary>
         public bool? HideMaps { get; set; }
         /// <summary>The hide_models property</summary>
@@ -365,6 +373,8 @@ namespace GrimoireCli.Generated.Models
         public SettingsResponse()
         {
             AdditionalData = new Dictionary<string, object>();
+            HideArmory = false;
+            HideLibrary = false;
         }
         /// <summary>
         /// Creates a new instance of the appropriate class based on discriminator value
@@ -391,8 +401,12 @@ namespace GrimoireCli.Generated.Models
                 { "disable_folder_category_inference_env_locked", n => { DisableFolderCategoryInferenceEnvLocked = n.GetBoolValue(); } },
                 { "guest_access_enabled", n => { GuestAccessEnabled = n.GetBoolValue(); } },
                 { "guest_access_env_locked", n => { GuestAccessEnvLocked = n.GetBoolValue(); } },
+                { "hide_armies", n => { HideArmies = n.GetBoolValue(); } },
+                { "hide_armory", n => { HideArmory = n.GetBoolValue(); } },
                 { "hide_audio", n => { HideAudio = n.GetBoolValue(); } },
                 { "hide_campaigns", n => { HideCampaigns = n.GetBoolValue(); } },
+                { "hide_leagues", n => { HideLeagues = n.GetBoolValue(); } },
+                { "hide_library", n => { HideLibrary = n.GetBoolValue(); } },
                 { "hide_maps", n => { HideMaps = n.GetBoolValue(); } },
                 { "hide_models", n => { HideModels = n.GetBoolValue(); } },
                 { "hide_tokens", n => { HideTokens = n.GetBoolValue(); } },
@@ -491,8 +505,12 @@ namespace GrimoireCli.Generated.Models
             writer.WriteBoolValue("disable_folder_category_inference_env_locked", DisableFolderCategoryInferenceEnvLocked);
             writer.WriteBoolValue("guest_access_enabled", GuestAccessEnabled);
             writer.WriteBoolValue("guest_access_env_locked", GuestAccessEnvLocked);
+            writer.WriteBoolValue("hide_armies", HideArmies);
+            writer.WriteBoolValue("hide_armory", HideArmory);
             writer.WriteBoolValue("hide_audio", HideAudio);
             writer.WriteBoolValue("hide_campaigns", HideCampaigns);
+            writer.WriteBoolValue("hide_leagues", HideLeagues);
+            writer.WriteBoolValue("hide_library", HideLibrary);
             writer.WriteBoolValue("hide_maps", HideMaps);
             writer.WriteBoolValue("hide_models", HideModels);
             writer.WriteBoolValue("hide_tokens", HideTokens);

@@ -134,9 +134,10 @@ public static class CampaignWikiCommands
         return command;
     }
 
-    private static readonly string[] Archived =
+    private static readonly string[] Locked =
     [
-        "Refused while the campaign is archived.",
+        "409 while the campaign is archived; 403 while the GM's campaign access",
+        "is disabled.",
     ];
 
     private static Command CreateCreateCommand()
@@ -148,7 +149,7 @@ public static class CampaignWikiCommands
         JsonBodyInput.RequireExactlyOneSource(command, inputOption, stdinOption);
         WikiPageHelp.AddTo(command);
         command.AddHelpSection("Notes", HelpSectionPosition.Top,
-            [.. Archived, "",
+            [.. Locked, "",
             "Needs campaign membership. An empty title becomes Untitled; parent_id",
             "must be a page you can edit."]);
         command.AddExamples(
@@ -186,7 +187,7 @@ public static class CampaignWikiCommands
         JsonBodyInput.RequireExactlyOneSource(command, inputOption, stdinOption);
         WikiPageHelp.AddTo(command);
         command.AddHelpSection("Notes", HelpSectionPosition.Top,
-            [.. Archived, "",
+            [.. Locked, "",
             "Send only the fields to change. parent_id \"\" moves the page to the top",
             "level; \"\" clears icon and icon_color. Needs edit access (see",
             "Visibility)."]);
@@ -221,9 +222,10 @@ public static class CampaignWikiCommands
         var pageIdOption = PageIdOption();
         var command = new Command("delete", "Delete a wiki page") { idOption, pageIdOption };
         command.AddHelpSection("Notes", HelpSectionPosition.Top,
-            [.. Archived, "",
+            [.. Locked, "",
             "Author only. The page's children move up to its parent. An unknown",
-            "page id succeeds silently."]);
+            "page id succeeds silently. Map pins pointing at it are unlinked, made",
+            "GM-only or deleted."]);
         command.AddExamples("grimoire-cli campaigns wiki delete --id <campaign-id> --page-id <page-id>");
         command.SetAction(async (parseResult, cancellationToken) =>
         {
@@ -246,7 +248,7 @@ public static class CampaignWikiCommands
         };
         var command = new Command("reorder", "Set the manual order of wiki pages") { idOption, orderedIdsOption };
         command.AddHelpSection("Notes", HelpSectionPosition.Top,
-            [.. Archived, "",
+            [.. Locked, "",
             "Re-deals the slots of the listed pages you can edit; unknown pages and",
             "pages you cannot edit are skipped and keep their slots."]);
         command.AddExamples("grimoire-cli campaigns wiki reorder --id <campaign-id> --ordered-ids <page-id> <page-id>");

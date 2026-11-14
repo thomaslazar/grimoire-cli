@@ -5,6 +5,7 @@ using GrimoireCli.Generated.Api.Systems.Item.BookFolders;
 using GrimoireCli.Generated.Api.Systems.Item.BookGroups;
 using GrimoireCli.Generated.Api.Systems.Item.Books;
 using GrimoireCli.Generated.Api.Systems.Item.Cover;
+using GrimoireCli.Generated.Api.Systems.Item.Factions;
 using GrimoireCli.Generated.Api.Systems.Item.MetadataFetch;
 using GrimoireCli.Generated.Api.Systems.Item.MetadataSearch;
 using GrimoireCli.Generated.Api.Systems.Item.MetadataSources;
@@ -49,6 +50,11 @@ namespace GrimoireCli.Generated.Api.Systems.Item
         public global::GrimoireCli.Generated.Api.Systems.Item.Cover.CoverRequestBuilder Cover
         {
             get => new global::GrimoireCli.Generated.Api.Systems.Item.Cover.CoverRequestBuilder(PathParameters, RequestAdapter);
+        }
+        /// <summary>The factions property</summary>
+        public global::GrimoireCli.Generated.Api.Systems.Item.Factions.FactionsRequestBuilder Factions
+        {
+            get => new global::GrimoireCli.Generated.Api.Systems.Item.Factions.FactionsRequestBuilder(PathParameters, RequestAdapter);
         }
         /// <summary>The metadataFetch property</summary>
         public global::GrimoireCli.Generated.Api.Systems.Item.MetadataFetch.MetadataFetchRequestBuilder MetadataFetch

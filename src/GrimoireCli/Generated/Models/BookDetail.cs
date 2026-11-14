@@ -105,6 +105,14 @@ namespace GrimoireCli.Generated.Models
 #else
         public string EffectiveAccessLevel { get; set; }
 #endif
+        /// <summary>The factions property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public List<global::GrimoireCli.Generated.Models.BookFactionRef>? Factions { get; set; }
+#nullable restore
+#else
+        public List<global::GrimoireCli.Generated.Models.BookFactionRef> Factions { get; set; }
+#endif
         /// <summary>The filename property</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
@@ -128,6 +136,14 @@ namespace GrimoireCli.Generated.Models
 #nullable restore
 #else
         public global::GrimoireCli.Generated.Models.BookSystemRef GameSystem { get; set; }
+#endif
+        /// <summary>The game_type property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public string? GameType { get; set; }
+#nullable restore
+#else
+        public string GameType { get; set; }
 #endif
         /// <summary>The genres property</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
@@ -198,6 +214,14 @@ namespace GrimoireCli.Generated.Models
 #nullable restore
 #else
         public string License { get; set; }
+#endif
+        /// <summary>The linked_systems property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public List<global::GrimoireCli.Generated.Models.LinkedSystemRef>? LinkedSystems { get; set; }
+#nullable restore
+#else
+        public List<global::GrimoireCli.Generated.Models.LinkedSystemRef> LinkedSystems { get; set; }
 #endif
         /// <summary>The mime_type property</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
@@ -379,6 +403,7 @@ namespace GrimoireCli.Generated.Models
         public BookDetail()
         {
             AdditionalData = new Dictionary<string, object>();
+            GameType = "ttrpg";
             HasCustomCover = false;
             OcrPagesSkipped = 0;
         }
@@ -412,9 +437,11 @@ namespace GrimoireCli.Generated.Models
                 { "day", n => { Day = n.GetObjectValue<global::GrimoireCli.Generated.Models.BookDetail.BookDetail_day>(global::GrimoireCli.Generated.Models.BookDetail.BookDetail_day.CreateFromDiscriminatorValue); } },
                 { "description", n => { Description = n.GetObjectValue<global::GrimoireCli.Generated.Models.BookDetail.BookDetail_description>(global::GrimoireCli.Generated.Models.BookDetail.BookDetail_description.CreateFromDiscriminatorValue); } },
                 { "effective_access_level", n => { EffectiveAccessLevel = n.GetStringValue(); } },
+                { "factions", n => { Factions = n.GetCollectionOfObjectValues<global::GrimoireCli.Generated.Models.BookFactionRef>(global::GrimoireCli.Generated.Models.BookFactionRef.CreateFromDiscriminatorValue)?.AsList(); } },
                 { "file_size", n => { FileSize = n.GetObjectValue<global::GrimoireCli.Generated.Models.BookDetail.BookDetail_file_size>(global::GrimoireCli.Generated.Models.BookDetail.BookDetail_file_size.CreateFromDiscriminatorValue); } },
                 { "filename", n => { Filename = n.GetStringValue(); } },
                 { "game_system", n => { GameSystem = n.GetObjectValue<global::GrimoireCli.Generated.Models.BookSystemRef>(global::GrimoireCli.Generated.Models.BookSystemRef.CreateFromDiscriminatorValue); } },
+                { "game_type", n => { GameType = n.GetStringValue(); } },
                 { "genres", n => { Genres = n.GetCollectionOfPrimitiveValues<string>()?.AsList(); } },
                 { "has_custom_cover", n => { HasCustomCover = n.GetBoolValue(); } },
                 { "has_thumbnail", n => { HasThumbnail = n.GetObjectValue<global::GrimoireCli.Generated.Models.BookDetail.BookDetail_has_thumbnail>(global::GrimoireCli.Generated.Models.BookDetail.BookDetail_has_thumbnail.CreateFromDiscriminatorValue); } },
@@ -426,6 +453,7 @@ namespace GrimoireCli.Generated.Models
                 { "isbn", n => { Isbn = n.GetStringValue(); } },
                 { "language", n => { Language = n.GetStringValue(); } },
                 { "license", n => { License = n.GetStringValue(); } },
+                { "linked_systems", n => { LinkedSystems = n.GetCollectionOfObjectValues<global::GrimoireCli.Generated.Models.LinkedSystemRef>(global::GrimoireCli.Generated.Models.LinkedSystemRef.CreateFromDiscriminatorValue)?.AsList(); } },
                 { "mime_type", n => { MimeType = n.GetObjectValue<global::GrimoireCli.Generated.Models.BookDetail.BookDetail_mime_type>(global::GrimoireCli.Generated.Models.BookDetail.BookDetail_mime_type.CreateFromDiscriminatorValue); } },
                 { "month", n => { Month = n.GetObjectValue<global::GrimoireCli.Generated.Models.BookDetail.BookDetail_month>(global::GrimoireCli.Generated.Models.BookDetail.BookDetail_month.CreateFromDiscriminatorValue); } },
                 { "ocr_dpi", n => { OcrDpi = n.GetObjectValue<global::GrimoireCli.Generated.Models.BookDetail.BookDetail_ocr_dpi>(global::GrimoireCli.Generated.Models.BookDetail.BookDetail_ocr_dpi.CreateFromDiscriminatorValue); } },
@@ -471,9 +499,11 @@ namespace GrimoireCli.Generated.Models
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.BookDetail.BookDetail_day>("day", Day);
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.BookDetail.BookDetail_description>("description", Description);
             writer.WriteStringValue("effective_access_level", EffectiveAccessLevel);
+            writer.WriteCollectionOfObjectValues<global::GrimoireCli.Generated.Models.BookFactionRef>("factions", Factions);
             writer.WriteStringValue("filename", Filename);
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.BookDetail.BookDetail_file_size>("file_size", FileSize);
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.BookSystemRef>("game_system", GameSystem);
+            writer.WriteStringValue("game_type", GameType);
             writer.WriteCollectionOfPrimitiveValues<string>("genres", Genres);
             writer.WriteBoolValue("has_custom_cover", HasCustomCover);
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.BookDetail.BookDetail_has_thumbnail>("has_thumbnail", HasThumbnail);
@@ -485,6 +515,7 @@ namespace GrimoireCli.Generated.Models
             writer.WriteBoolValue("is_missing", IsMissing);
             writer.WriteStringValue("language", Language);
             writer.WriteStringValue("license", License);
+            writer.WriteCollectionOfObjectValues<global::GrimoireCli.Generated.Models.LinkedSystemRef>("linked_systems", LinkedSystems);
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.BookDetail.BookDetail_mime_type>("mime_type", MimeType);
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.BookDetail.BookDetail_month>("month", Month);
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.BookDetail.BookDetail_ocr_dpi>("ocr_dpi", OcrDpi);

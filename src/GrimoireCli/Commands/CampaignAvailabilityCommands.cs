@@ -47,8 +47,9 @@ public static class CampaignAvailabilityCommands
         var userIdOption = new Option<string?>("--user-id") { Description = "Set another member's row instead of your own" };
         var command = new Command("set", "Set availability for one session date") { idOption, dateOption, statusOption, cancelledOption, userIdOption };
         command.AddHelpSection("Notes", HelpSectionPosition.Top,
-            ["Any campaign member, for their own row; refused while the campaign is",
-            "archived. Any valid date is accepted, scheduled or not.",
+            ["Any campaign member, for their own row; 409 while the campaign is",
+            "archived, 403 while the GM's campaign access is disabled. Any valid date",
+            "is accepted, scheduled or not.",
             "",
             "--is-cancelled needs the owner or an admin and sets only the target's row,",
             "so it cannot reliably uncancel a date toggle-cancel cancelled.",
@@ -72,7 +73,8 @@ public static class CampaignAvailabilityCommands
         var dateOption = DateOption("Session date, YYYY-MM-DD");
         var command = new Command("toggle-cancel", "Flip whether a session date is cancelled") { idOption, dateOption };
         command.AddHelpSection("Notes", HelpSectionPosition.Top,
-            ["Campaign owner or an admin; refused while the campaign is archived.",
+            ["Campaign owner or an admin; 409 while the campaign is archived, 403",
+            "while the GM's campaign access is disabled.",
             "",
             "Sets every member's row to the opposite of your own row's state, so a",
             "second call undoes it; is_cancelled in the response is the new state. With",

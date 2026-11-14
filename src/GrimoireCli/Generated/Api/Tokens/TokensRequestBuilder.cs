@@ -2,6 +2,7 @@
 #pragma warning disable CS0618
 using GrimoireCli.Generated.Api.Tokens.Bulk;
 using GrimoireCli.Generated.Api.Tokens.Groups;
+using GrimoireCli.Generated.Api.Tokens.IndexNamespace;
 using GrimoireCli.Generated.Api.Tokens.Item;
 using GrimoireCli.Generated.Models;
 using Microsoft.Kiota.Abstractions.Extensions;
@@ -29,6 +30,11 @@ namespace GrimoireCli.Generated.Api.Tokens
         public global::GrimoireCli.Generated.Api.Tokens.Groups.GroupsRequestBuilder Groups
         {
             get => new global::GrimoireCli.Generated.Api.Tokens.Groups.GroupsRequestBuilder(PathParameters, RequestAdapter);
+        }
+        /// <summary>The index property</summary>
+        public global::GrimoireCli.Generated.Api.Tokens.IndexNamespace.IndexRequestBuilder Index
+        {
+            get => new global::GrimoireCli.Generated.Api.Tokens.IndexNamespace.IndexRequestBuilder(PathParameters, RequestAdapter);
         }
         /// <summary>Gets an item from the GrimoireCli.Generated.api.tokens.item collection</summary>
         /// <param name="position">Unique identifier of the item</param>

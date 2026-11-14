@@ -33,8 +33,8 @@ public static class LibraryCommand
             "The only command that finds a file copied into the library by hand;",
             "books rescan re-reads a book the server already knows.",
             "",
-            "--scope is a path from the library root beginning books/, maps/,",
-            "tokens/, audio/ or models/ — the directory part of a book's",
+            "--scope is a path from the library root beginning books/, armory/,",
+            "maps/, tokens/, audio/ or models/ — the directory part of a book's",
             "relative_path in systems get, not the file path itself.",
             "A scope matching nothing still reports scan_started.",
             "",
@@ -64,9 +64,10 @@ public static class LibraryCommand
             "and may be null while running; the counters belong to the scan in",
             "flight. step_done/step_total count the current phase.",
             "",
-            "A loose file directly under books/ counts toward total_books but is",
-            "never scanned, so scanned_books >= total_books never becomes true. Poll",
-            "running instead.");
+            "total_books is a walk count on the first import, where a loose file",
+            "directly under books/ counts but is never scanned, so scanned_books >=",
+            "total_books never becomes true; on a rescan it is the last scan's row",
+            "count. Poll running instead.");
         command.AddResponseExample<Generated.Models.ScanStatusResponse>();
         command.SetAction(async (parseResult, cancellationToken) =>
         {
@@ -109,7 +110,8 @@ public static class LibraryCommand
         command.AddHelpSection("Notes", HelpSectionPosition.Top,
             "Deletes DB rows for files no longer on disk, each book's search index",
             "and bookmarks with it, then prunes systems whose books are all gone —",
-            "unless a campaign or a surviving child keeps one. Never touches files.",
+            "unless a campaign, a surviving child or a book linked onto its shelf",
+            "keeps one. Never touches files.",
             "",
             "Normally a no-op. Run it after restructuring the library on disk.",
             "",
@@ -140,7 +142,8 @@ public static class LibraryCommand
         command.AddHelpSection("Notes", HelpSectionPosition.Top,
             "total_size_mb is books only; library_size_mb adds maps, tokens,",
             "audio and models. Both scope the book portion to what the caller",
-            "may see, so a restricted book's bytes stay out of the totals.");
+            "may see, so a restricted book's bytes stay out of the totals.",
+            "books includes armory_books.");
         command.AddExamples("grimoire-cli library stats");
         command.AddResponseExample<Generated.Models.StatsResponse>();
         command.SetAction(async (parseResult, cancellationToken) =>

@@ -42,7 +42,8 @@ public static class CampaignFilesCommands
         };
         command.AddHelpSection("Notes", HelpSectionPosition.Top,
             "Any campaign member. Anyone but the owner reads only files whose link is",
-            "public, or private and shared with them; gm or unlinked files are 403.",
+            "public, or private and shared with them, or that are the picture of a",
+            "map page they can read; anything else is 403.",
             "",
             "--output - writes the bytes to stdout; a path writes the file and prints",
             "{path, bytes}.");

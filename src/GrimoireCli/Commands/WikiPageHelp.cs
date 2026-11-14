@@ -6,7 +6,7 @@ namespace GrimoireCli.Commands;
 /// The page-body and visibility rules campaigns wiki create and update share:
 /// the link and embed grammar, GM secrets, the stubs a save creates, and who can
 /// see and edit each visibility level (routers/campaigns/wiki.py,
-/// wikilinks.py, _wiki_helpers.py at v1.8.0).
+/// wikilinks.py, _wiki_helpers.py at v1.11.0).
 /// </summary>
 internal static class WikiPageHelp
 {
@@ -21,7 +21,10 @@ internal static class WikiPageHelp
             "Saving creates an empty stub for each unpinned [[Title]] whose slug",
             "matches no page, with this page's visibility; a pinned link to a missing",
             "page creates none. Renaming a page rewrites links to its old title.",
-            "page_type is note or session (else note on create, ignored on update);",
+            "[[…]] inside a fenced code block is literal: no link, no stub.",
+            "A title holding |, [, ] or a line break is a 400.",
+            "page_type is note, session or map (else note on create, ignored on",
+            "update); map_id/map_file_id apply only to a map page.",
             "session_date is YYYY-MM-DD, \"\" clears it on update.",
             "",
             "Embeds are not links: [[book:<id>]], [[book:<id>:<page>]], [[map:<id>]],",
@@ -36,7 +39,8 @@ internal static class WikiPageHelp
             "gm — the author alone (the GM's private pages, or a player's self-only",
             "note); group — every member, and every member can edit; members — the",
             "author plus shared_user_ids (read) and shared_write_user_ids (read and",
-            "write). Only the author changes visibility or sharing.",
+            "write); an unknown user id is a 400. Only the author changes visibility",
+            "or sharing.",
             "Omitted on create, it is gm. A personal campaign stores every page as gm.");
     }
 }

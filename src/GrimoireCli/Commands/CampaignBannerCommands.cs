@@ -80,7 +80,8 @@ public static class CampaignBannerCommands
         command.AddHelpSection("Notes", HelpSectionPosition.Top,
             Owner,
             "",
-            "PNG, JPEG, WebP or GIF, max 5 MB; replaces any banner.");
+            "PNG, JPEG, WebP or GIF, max 5 MB and 40 megapixels (400); replaces any",
+            "banner.");
         command.AddExamples("grimoire-cli campaigns banner upload --id <campaign-id> --file banner.png");
         command.AddResponseExample<Generated.Models.BannerUploadOut>();
         command.SetAction(async (parseResult, cancellationToken) =>
@@ -141,7 +142,8 @@ public static class CampaignBannerCommands
             "",
             "campaign_file takes a file id from this campaign (resource_id of a file",
             "resource). You must be able to read the source yourself. The bytes are",
-            "copied as a WebP at most 1000 px wide, so the banner outlives the source.");
+            "copied as a WebP at most 1000 px wide, so the banner outlives the source.",
+            "A campaign_file over 40 megapixels is a 400.");
         command.AddExamples(
             "grimoire-cli campaigns banner from-source --id <campaign-id> --source-type map --source-id <map-id>");
         command.AddResponseExample<Generated.Models.BannerUploadOut>();

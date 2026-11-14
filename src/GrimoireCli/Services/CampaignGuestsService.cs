@@ -17,7 +17,7 @@ public class CampaignGuestsService
     // Nickname is set only when given, so an absent flag sends no key.
     internal RequestInformation CreateRequest(string id, string? nickname)
     {
-        var body = new Generated.Models.GuestCreate();
+        var body = new Generated.Models.Backend__routers__campaigns___schemas__GuestCreate();
         if (nickname is not null)
         {
             body.Nickname = nickname;

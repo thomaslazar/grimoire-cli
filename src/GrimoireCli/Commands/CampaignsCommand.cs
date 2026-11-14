@@ -101,7 +101,10 @@ public static class CampaignsCommand
             "is_gm_campaign true needs the gm or admin role; guests cannot create.",
             "",
             "resources links items at creation, skipping and clamping as resources",
-            "bulk does, but category_id is not accepted.");
+            "bulk does, but category_id is not accepted; an unknown user in",
+            "shared_user_ids is a 400 and nothing is created.",
+            "",
+            "parent_campaign_id must be another campaign of yours (404 otherwise).");
         command.AddExamples(
             "grimoire-cli campaigns create --input campaign.json",
             "echo '{\"name\":\"Curse of Strahd\"}' | grimoire-cli campaigns create --stdin");
@@ -135,7 +138,9 @@ public static class CampaignsCommand
         var command = new Command("update", "Update a campaign's details") { idOption, inputOption, stdinOption };
         JsonBodyInput.RequireExactlyOneSource(command, inputOption, stdinOption);
         command.AddHelpSection("Notes", HelpSectionPosition.Top,
-            [.. OwnerOnly, "", "system_name, system_id and parent_campaign_id \"\" clear them."]);
+            [.. OwnerOnly, "", "system_name, system_id and parent_campaign_id \"\" clear them.",
+            "parent_campaign_id must be another of the owner's campaigns: itself is",
+            "400, any other id 404."]);
         command.AddExamples("echo '{\"description\":\"Session zero\"}' | grimoire-cli campaigns update --id <id> --stdin");
         command.AddRequestShape<Generated.Models.CampaignUpdate>();
         command.AddResponseExample<Generated.Models.CampaignOut>();
@@ -206,10 +211,8 @@ public static class CampaignsCommand
             "Campaign owner only; works on an archived campaign.",
             "",
             "Deletes its wiki, templates, resources, categories, files, members,",
-            "schedule, session notes and rulesets with it. There is no undo.",
-            "",
-            "Fails with a 500 while another campaign names it as parent_campaign_id;",
-            "clear that with campaigns update first.");
+            "schedule, session notes and rulesets with it. There is no undo. Child",
+            "campaigns survive with parent_campaign_id cleared.");
         command.AddExamples("grimoire-cli campaigns delete --id <campaign-id>");
         command.SetAction(async (parseResult, cancellationToken) =>
         {

@@ -78,6 +78,22 @@ namespace GrimoireCli.Generated.Models
 #else
         public global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_guest_access_enabled GuestAccessEnabled { get; set; }
 #endif
+        /// <summary>The hide_armies property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_hide_armies? HideArmies { get; set; }
+#nullable restore
+#else
+        public global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_hide_armies HideArmies { get; set; }
+#endif
+        /// <summary>The hide_armory property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_hide_armory? HideArmory { get; set; }
+#nullable restore
+#else
+        public global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_hide_armory HideArmory { get; set; }
+#endif
         /// <summary>The hide_audio property</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
@@ -93,6 +109,22 @@ namespace GrimoireCli.Generated.Models
 #nullable restore
 #else
         public global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_hide_campaigns HideCampaigns { get; set; }
+#endif
+        /// <summary>The hide_leagues property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_hide_leagues? HideLeagues { get; set; }
+#nullable restore
+#else
+        public global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_hide_leagues HideLeagues { get; set; }
+#endif
+        /// <summary>The hide_library property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_hide_library? HideLibrary { get; set; }
+#nullable restore
+#else
+        public global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_hide_library HideLibrary { get; set; }
 #endif
         /// <summary>The hide_maps property</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
@@ -503,8 +535,12 @@ namespace GrimoireCli.Generated.Models
                 { "custom_login_message_enabled", n => { CustomLoginMessageEnabled = n.GetObjectValue<global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_custom_login_message_enabled>(global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_custom_login_message_enabled.CreateFromDiscriminatorValue); } },
                 { "disable_folder_category_inference", n => { DisableFolderCategoryInference = n.GetObjectValue<global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_disable_folder_category_inference>(global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_disable_folder_category_inference.CreateFromDiscriminatorValue); } },
                 { "guest_access_enabled", n => { GuestAccessEnabled = n.GetObjectValue<global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_guest_access_enabled>(global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_guest_access_enabled.CreateFromDiscriminatorValue); } },
+                { "hide_armies", n => { HideArmies = n.GetObjectValue<global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_hide_armies>(global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_hide_armies.CreateFromDiscriminatorValue); } },
+                { "hide_armory", n => { HideArmory = n.GetObjectValue<global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_hide_armory>(global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_hide_armory.CreateFromDiscriminatorValue); } },
                 { "hide_audio", n => { HideAudio = n.GetObjectValue<global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_hide_audio>(global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_hide_audio.CreateFromDiscriminatorValue); } },
                 { "hide_campaigns", n => { HideCampaigns = n.GetObjectValue<global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_hide_campaigns>(global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_hide_campaigns.CreateFromDiscriminatorValue); } },
+                { "hide_leagues", n => { HideLeagues = n.GetObjectValue<global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_hide_leagues>(global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_hide_leagues.CreateFromDiscriminatorValue); } },
+                { "hide_library", n => { HideLibrary = n.GetObjectValue<global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_hide_library>(global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_hide_library.CreateFromDiscriminatorValue); } },
                 { "hide_maps", n => { HideMaps = n.GetObjectValue<global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_hide_maps>(global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_hide_maps.CreateFromDiscriminatorValue); } },
                 { "hide_models", n => { HideModels = n.GetObjectValue<global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_hide_models>(global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_hide_models.CreateFromDiscriminatorValue); } },
                 { "hide_tokens", n => { HideTokens = n.GetObjectValue<global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_hide_tokens>(global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_hide_tokens.CreateFromDiscriminatorValue); } },
@@ -569,8 +605,12 @@ namespace GrimoireCli.Generated.Models
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_custom_login_message_enabled>("custom_login_message_enabled", CustomLoginMessageEnabled);
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_disable_folder_category_inference>("disable_folder_category_inference", DisableFolderCategoryInference);
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_guest_access_enabled>("guest_access_enabled", GuestAccessEnabled);
+            writer.WriteObjectValue<global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_hide_armies>("hide_armies", HideArmies);
+            writer.WriteObjectValue<global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_hide_armory>("hide_armory", HideArmory);
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_hide_audio>("hide_audio", HideAudio);
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_hide_campaigns>("hide_campaigns", HideCampaigns);
+            writer.WriteObjectValue<global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_hide_leagues>("hide_leagues", HideLeagues);
+            writer.WriteObjectValue<global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_hide_library>("hide_library", HideLibrary);
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_hide_maps>("hide_maps", HideMaps);
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_hide_models>("hide_models", HideModels);
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_hide_tokens>("hide_tokens", HideTokens);
@@ -1123,6 +1163,130 @@ namespace GrimoireCli.Generated.Models
             }
         }
         /// <summary>
+        /// Composed type wrapper for classes <see cref="bool"/>, <see cref="global::GrimoireCli.Generated.Models.SettingsPatch_hide_armiesMember1"/>
+        /// </summary>
+        [global::System.CodeDom.Compiler.GeneratedCode("Kiota", "1.0.0")]
+        public partial class SettingsPatch_hide_armies : IComposedTypeWrapper, IParsable
+        {
+            /// <summary>Composed type representation for type <see cref="bool"/></summary>
+            public bool? Boolean { get; set; }
+            /// <summary>Composed type representation for type <see cref="global::GrimoireCli.Generated.Models.SettingsPatch_hide_armiesMember1"/></summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+            public global::GrimoireCli.Generated.Models.SettingsPatch_hide_armiesMember1? SettingsPatchHideArmiesMember1 { get; set; }
+#nullable restore
+#else
+            public global::GrimoireCli.Generated.Models.SettingsPatch_hide_armiesMember1 SettingsPatchHideArmiesMember1 { get; set; }
+#endif
+            /// <summary>
+            /// Creates a new instance of the appropriate class based on discriminator value
+            /// </summary>
+            /// <returns>A <see cref="global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_hide_armies"/></returns>
+            /// <param name="parseNode">The parse node to use to read the discriminator value and create the object</param>
+            public static global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_hide_armies CreateFromDiscriminatorValue(IParseNode parseNode)
+            {
+                if(ReferenceEquals(parseNode, null)) throw new ArgumentNullException(nameof(parseNode));
+                var result = new global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_hide_armies();
+                if(parseNode.GetBoolValue() is bool booleanValue)
+                {
+                    result.Boolean = booleanValue;
+                }
+                else {
+                    result.SettingsPatchHideArmiesMember1 = new global::GrimoireCli.Generated.Models.SettingsPatch_hide_armiesMember1();
+                }
+                return result;
+            }
+            /// <summary>
+            /// The deserialization information for the current model
+            /// </summary>
+            /// <returns>A IDictionary&lt;string, Action&lt;IParseNode&gt;&gt;</returns>
+            public virtual IDictionary<string, Action<IParseNode>> GetFieldDeserializers()
+            {
+                if(SettingsPatchHideArmiesMember1 != null)
+                {
+                    return ParseNodeHelper.MergeDeserializersForIntersectionWrapper(SettingsPatchHideArmiesMember1);
+                }
+                return new Dictionary<string, Action<IParseNode>>();
+            }
+            /// <summary>
+            /// Serializes information the current object
+            /// </summary>
+            /// <param name="writer">Serialization writer to use to serialize this model</param>
+            public virtual void Serialize(ISerializationWriter writer)
+            {
+                if(ReferenceEquals(writer, null)) throw new ArgumentNullException(nameof(writer));
+                if(Boolean != null)
+                {
+                    writer.WriteBoolValue(null, Boolean);
+                }
+                else {
+                    writer.WriteObjectValue<global::GrimoireCli.Generated.Models.SettingsPatch_hide_armiesMember1>(null, SettingsPatchHideArmiesMember1);
+                }
+            }
+        }
+        /// <summary>
+        /// Composed type wrapper for classes <see cref="bool"/>, <see cref="global::GrimoireCli.Generated.Models.SettingsPatch_hide_armoryMember1"/>
+        /// </summary>
+        [global::System.CodeDom.Compiler.GeneratedCode("Kiota", "1.0.0")]
+        public partial class SettingsPatch_hide_armory : IComposedTypeWrapper, IParsable
+        {
+            /// <summary>Composed type representation for type <see cref="bool"/></summary>
+            public bool? Boolean { get; set; }
+            /// <summary>Composed type representation for type <see cref="global::GrimoireCli.Generated.Models.SettingsPatch_hide_armoryMember1"/></summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+            public global::GrimoireCli.Generated.Models.SettingsPatch_hide_armoryMember1? SettingsPatchHideArmoryMember1 { get; set; }
+#nullable restore
+#else
+            public global::GrimoireCli.Generated.Models.SettingsPatch_hide_armoryMember1 SettingsPatchHideArmoryMember1 { get; set; }
+#endif
+            /// <summary>
+            /// Creates a new instance of the appropriate class based on discriminator value
+            /// </summary>
+            /// <returns>A <see cref="global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_hide_armory"/></returns>
+            /// <param name="parseNode">The parse node to use to read the discriminator value and create the object</param>
+            public static global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_hide_armory CreateFromDiscriminatorValue(IParseNode parseNode)
+            {
+                if(ReferenceEquals(parseNode, null)) throw new ArgumentNullException(nameof(parseNode));
+                var result = new global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_hide_armory();
+                if(parseNode.GetBoolValue() is bool booleanValue)
+                {
+                    result.Boolean = booleanValue;
+                }
+                else {
+                    result.SettingsPatchHideArmoryMember1 = new global::GrimoireCli.Generated.Models.SettingsPatch_hide_armoryMember1();
+                }
+                return result;
+            }
+            /// <summary>
+            /// The deserialization information for the current model
+            /// </summary>
+            /// <returns>A IDictionary&lt;string, Action&lt;IParseNode&gt;&gt;</returns>
+            public virtual IDictionary<string, Action<IParseNode>> GetFieldDeserializers()
+            {
+                if(SettingsPatchHideArmoryMember1 != null)
+                {
+                    return ParseNodeHelper.MergeDeserializersForIntersectionWrapper(SettingsPatchHideArmoryMember1);
+                }
+                return new Dictionary<string, Action<IParseNode>>();
+            }
+            /// <summary>
+            /// Serializes information the current object
+            /// </summary>
+            /// <param name="writer">Serialization writer to use to serialize this model</param>
+            public virtual void Serialize(ISerializationWriter writer)
+            {
+                if(ReferenceEquals(writer, null)) throw new ArgumentNullException(nameof(writer));
+                if(Boolean != null)
+                {
+                    writer.WriteBoolValue(null, Boolean);
+                }
+                else {
+                    writer.WriteObjectValue<global::GrimoireCli.Generated.Models.SettingsPatch_hide_armoryMember1>(null, SettingsPatchHideArmoryMember1);
+                }
+            }
+        }
+        /// <summary>
         /// Composed type wrapper for classes <see cref="bool"/>, <see cref="global::GrimoireCli.Generated.Models.SettingsPatch_hide_audioMember1"/>
         /// </summary>
         [global::System.CodeDom.Compiler.GeneratedCode("Kiota", "1.0.0")]
@@ -1243,6 +1407,130 @@ namespace GrimoireCli.Generated.Models
                 }
                 else {
                     writer.WriteObjectValue<global::GrimoireCli.Generated.Models.SettingsPatch_hide_campaignsMember1>(null, SettingsPatchHideCampaignsMember1);
+                }
+            }
+        }
+        /// <summary>
+        /// Composed type wrapper for classes <see cref="bool"/>, <see cref="global::GrimoireCli.Generated.Models.SettingsPatch_hide_leaguesMember1"/>
+        /// </summary>
+        [global::System.CodeDom.Compiler.GeneratedCode("Kiota", "1.0.0")]
+        public partial class SettingsPatch_hide_leagues : IComposedTypeWrapper, IParsable
+        {
+            /// <summary>Composed type representation for type <see cref="bool"/></summary>
+            public bool? Boolean { get; set; }
+            /// <summary>Composed type representation for type <see cref="global::GrimoireCli.Generated.Models.SettingsPatch_hide_leaguesMember1"/></summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+            public global::GrimoireCli.Generated.Models.SettingsPatch_hide_leaguesMember1? SettingsPatchHideLeaguesMember1 { get; set; }
+#nullable restore
+#else
+            public global::GrimoireCli.Generated.Models.SettingsPatch_hide_leaguesMember1 SettingsPatchHideLeaguesMember1 { get; set; }
+#endif
+            /// <summary>
+            /// Creates a new instance of the appropriate class based on discriminator value
+            /// </summary>
+            /// <returns>A <see cref="global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_hide_leagues"/></returns>
+            /// <param name="parseNode">The parse node to use to read the discriminator value and create the object</param>
+            public static global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_hide_leagues CreateFromDiscriminatorValue(IParseNode parseNode)
+            {
+                if(ReferenceEquals(parseNode, null)) throw new ArgumentNullException(nameof(parseNode));
+                var result = new global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_hide_leagues();
+                if(parseNode.GetBoolValue() is bool booleanValue)
+                {
+                    result.Boolean = booleanValue;
+                }
+                else {
+                    result.SettingsPatchHideLeaguesMember1 = new global::GrimoireCli.Generated.Models.SettingsPatch_hide_leaguesMember1();
+                }
+                return result;
+            }
+            /// <summary>
+            /// The deserialization information for the current model
+            /// </summary>
+            /// <returns>A IDictionary&lt;string, Action&lt;IParseNode&gt;&gt;</returns>
+            public virtual IDictionary<string, Action<IParseNode>> GetFieldDeserializers()
+            {
+                if(SettingsPatchHideLeaguesMember1 != null)
+                {
+                    return ParseNodeHelper.MergeDeserializersForIntersectionWrapper(SettingsPatchHideLeaguesMember1);
+                }
+                return new Dictionary<string, Action<IParseNode>>();
+            }
+            /// <summary>
+            /// Serializes information the current object
+            /// </summary>
+            /// <param name="writer">Serialization writer to use to serialize this model</param>
+            public virtual void Serialize(ISerializationWriter writer)
+            {
+                if(ReferenceEquals(writer, null)) throw new ArgumentNullException(nameof(writer));
+                if(Boolean != null)
+                {
+                    writer.WriteBoolValue(null, Boolean);
+                }
+                else {
+                    writer.WriteObjectValue<global::GrimoireCli.Generated.Models.SettingsPatch_hide_leaguesMember1>(null, SettingsPatchHideLeaguesMember1);
+                }
+            }
+        }
+        /// <summary>
+        /// Composed type wrapper for classes <see cref="bool"/>, <see cref="global::GrimoireCli.Generated.Models.SettingsPatch_hide_libraryMember1"/>
+        /// </summary>
+        [global::System.CodeDom.Compiler.GeneratedCode("Kiota", "1.0.0")]
+        public partial class SettingsPatch_hide_library : IComposedTypeWrapper, IParsable
+        {
+            /// <summary>Composed type representation for type <see cref="bool"/></summary>
+            public bool? Boolean { get; set; }
+            /// <summary>Composed type representation for type <see cref="global::GrimoireCli.Generated.Models.SettingsPatch_hide_libraryMember1"/></summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+            public global::GrimoireCli.Generated.Models.SettingsPatch_hide_libraryMember1? SettingsPatchHideLibraryMember1 { get; set; }
+#nullable restore
+#else
+            public global::GrimoireCli.Generated.Models.SettingsPatch_hide_libraryMember1 SettingsPatchHideLibraryMember1 { get; set; }
+#endif
+            /// <summary>
+            /// Creates a new instance of the appropriate class based on discriminator value
+            /// </summary>
+            /// <returns>A <see cref="global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_hide_library"/></returns>
+            /// <param name="parseNode">The parse node to use to read the discriminator value and create the object</param>
+            public static global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_hide_library CreateFromDiscriminatorValue(IParseNode parseNode)
+            {
+                if(ReferenceEquals(parseNode, null)) throw new ArgumentNullException(nameof(parseNode));
+                var result = new global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_hide_library();
+                if(parseNode.GetBoolValue() is bool booleanValue)
+                {
+                    result.Boolean = booleanValue;
+                }
+                else {
+                    result.SettingsPatchHideLibraryMember1 = new global::GrimoireCli.Generated.Models.SettingsPatch_hide_libraryMember1();
+                }
+                return result;
+            }
+            /// <summary>
+            /// The deserialization information for the current model
+            /// </summary>
+            /// <returns>A IDictionary&lt;string, Action&lt;IParseNode&gt;&gt;</returns>
+            public virtual IDictionary<string, Action<IParseNode>> GetFieldDeserializers()
+            {
+                if(SettingsPatchHideLibraryMember1 != null)
+                {
+                    return ParseNodeHelper.MergeDeserializersForIntersectionWrapper(SettingsPatchHideLibraryMember1);
+                }
+                return new Dictionary<string, Action<IParseNode>>();
+            }
+            /// <summary>
+            /// Serializes information the current object
+            /// </summary>
+            /// <param name="writer">Serialization writer to use to serialize this model</param>
+            public virtual void Serialize(ISerializationWriter writer)
+            {
+                if(ReferenceEquals(writer, null)) throw new ArgumentNullException(nameof(writer));
+                if(Boolean != null)
+                {
+                    writer.WriteBoolValue(null, Boolean);
+                }
+                else {
+                    writer.WriteObjectValue<global::GrimoireCli.Generated.Models.SettingsPatch_hide_libraryMember1>(null, SettingsPatchHideLibraryMember1);
                 }
             }
         }

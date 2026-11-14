@@ -77,7 +77,7 @@ public class BooksCommandTests
     public void UpdateShowsItsRequestShapeFromTheGeneratedModel()
     {
         var output = RenderHelp(["books", "update"], full: true);
-        var expected = new GrimoireCli.Generated.Models.BookUpdate()
+        var expected = new GrimoireCli.Generated.Models.Backend__routers__books___schemas__BookUpdate()
             .GetFieldDeserializers().Keys;
         Assert.Equal(21, expected.Count);
         Assert.Contains("Request shape:", output);

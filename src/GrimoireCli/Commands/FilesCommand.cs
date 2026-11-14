@@ -78,10 +78,10 @@ public static class FilesCommand
             "The server refuses above 8 GiB with 413. The file is streamed and the",
             "request has no timeout, so a large upload runs until it finishes.",
             "",
-            "replace overwrites an indexed book's file in place and keeps its id",
-            "(record_id). 409 when the target is not an indexed book, while a scan",
-            "or OCR run is going, or while that book is being re-indexed; 404 when",
-            "--relative-dir does not exist.");
+            "replace overwrites an indexed book, map, token, audio file or model in",
+            "place and keeps its id (record_id). 409 when the target is not one, while",
+            "a scan or OCR run is going, or, for a book, while it is being",
+            "re-indexed; 404 when --relative-dir does not exist.");
         command.AddExamples(
             "grimoire-cli files upload --destination \"books/Call of Cthulhu/7e EN/core\" --file \"Keeper Rulebook.pdf\"");
         command.AddResponseExample<Generated.Models.UploadResponse>();
@@ -123,6 +123,11 @@ public static class FilesCommand
             sourcesOption, destinationOption, onConflictOption
         };
         command.AddRoleRequired("admin");
+        command.AddHelpSection("Notes", HelpSectionPosition.Top,
+            "A book moved into a system folder no scan has registered keeps its old",
+            "system and game type until the next rescan — e.g. books/ to a new",
+            "armory/ folder. A wargame book's factions are replaced by those its new",
+            "folders name.");
         command.AddExamples(
             "grimoire-cli files move --sources \"books/Keeper Rulebook.pdf\" --destination \"books/Call of Cthulhu/7e EN/core\"",
             "grimoire-cli files move --sources \"Berlin.pdf\" \"Cyberpirates.pdf\" --destination \"books/Shadowrun/5 DE\" --on-conflict rename");
@@ -188,6 +193,11 @@ public static class FilesCommand
             "A soft delete that empties a system folder also drops its system row,",
             "unless the system carries a custom name, description or cover, or a",
             "campaign references it.",
+            "",
+            "Deleting a map, soft or hard, first copies it into each campaign using",
+            "it and repoints their map pages, embeds and resource links to the copy;",
+            "where campaign upload settings or a non-image refuse the copy, they show",
+            "a missing-map placeholder.",
             "",
             "--delete-files also deletes the files, and cannot be undone. On a",
             "system folder it drops the system row too, custom name or not, unless",

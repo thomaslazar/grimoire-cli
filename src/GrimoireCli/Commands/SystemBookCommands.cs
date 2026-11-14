@@ -32,7 +32,10 @@ public static class SystemBookCommands
             "Page with --offset against total in the response.",
             "",
             "Variants are hidden; the account's explicit permission and access",
-            "settings filter the shelf server-side.");
+            "settings filter the shelf server-side.",
+            "",
+            "Books linked onto the system from another are included (is_linked);",
+            "--folder \"\" matches them too.");
         command.AddExamples(
             "grimoire-cli systems books list --id <system-id>",
             "grimoire-cli systems books list --id <system-id> --category core --folder errata",
@@ -67,6 +70,9 @@ public static class SystemBookCommands
             "not its subfolders. path is the subfolder below the category directory",
             "(\"\" for the category's own); dir is library-relative. Two directories",
             "can share a category and path.",
+            "",
+            "Books linked onto the system from another get one row per category",
+            "with path and dir both \"\" — no directory of this system to rescan.",
             "",
             "first is the active --sort's value for the folder's first book; null",
             "under title.",

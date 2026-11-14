@@ -89,6 +89,14 @@ namespace GrimoireCli.Generated.Models
 #else
         public global::GrimoireCli.Generated.Models.BookOut.BookOut_description Description { get; set; }
 #endif
+        /// <summary>The factions property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public List<global::GrimoireCli.Generated.Models.Backend__routers__systems___schemas__FactionRef>? Factions { get; set; }
+#nullable restore
+#else
+        public List<global::GrimoireCli.Generated.Models.Backend__routers__systems___schemas__FactionRef> Factions { get; set; }
+#endif
         /// <summary>The filename property</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
@@ -104,6 +112,22 @@ namespace GrimoireCli.Generated.Models
 #nullable restore
 #else
         public global::GrimoireCli.Generated.Models.BookOut.BookOut_file_size FileSize { get; set; }
+#endif
+        /// <summary>The game_system_id property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public global::GrimoireCli.Generated.Models.BookOut.BookOut_game_system_id? GameSystemId { get; set; }
+#nullable restore
+#else
+        public global::GrimoireCli.Generated.Models.BookOut.BookOut_game_system_id GameSystemId { get; set; }
+#endif
+        /// <summary>The game_type property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public string? GameType { get; set; }
+#nullable restore
+#else
+        public string GameType { get; set; }
 #endif
         /// <summary>The genres property</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
@@ -165,6 +189,8 @@ namespace GrimoireCli.Generated.Models
 #endif
         /// <summary>The is_explicit property</summary>
         public bool? IsExplicit { get; set; }
+        /// <summary>The is_linked property</summary>
+        public bool? IsLinked { get; set; }
         /// <summary>The is_missing property</summary>
         public bool? IsMissing { get; set; }
         /// <summary>The language property</summary>
@@ -182,6 +208,14 @@ namespace GrimoireCli.Generated.Models
 #nullable restore
 #else
         public string License { get; set; }
+#endif
+        /// <summary>The linked_from property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public global::GrimoireCli.Generated.Models.LinkedSystemRef? LinkedFrom { get; set; }
+#nullable restore
+#else
+        public global::GrimoireCli.Generated.Models.LinkedSystemRef LinkedFrom { get; set; }
 #endif
         /// <summary>The mime_type property</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
@@ -307,7 +341,9 @@ namespace GrimoireCli.Generated.Models
         public BookOut()
         {
             AdditionalData = new Dictionary<string, object>();
+            GameType = "ttrpg";
             HasCustomCover = false;
+            IsLinked = false;
             OcrPagesSkipped = 0;
             VariantCount = 0;
         }
@@ -339,8 +375,11 @@ namespace GrimoireCli.Generated.Models
                 { "cover_version", n => { CoverVersion = n.GetObjectValue<global::GrimoireCli.Generated.Models.BookOut.BookOut_cover_version>(global::GrimoireCli.Generated.Models.BookOut.BookOut_cover_version.CreateFromDiscriminatorValue); } },
                 { "day", n => { Day = n.GetObjectValue<global::GrimoireCli.Generated.Models.BookOut.BookOut_day>(global::GrimoireCli.Generated.Models.BookOut.BookOut_day.CreateFromDiscriminatorValue); } },
                 { "description", n => { Description = n.GetObjectValue<global::GrimoireCli.Generated.Models.BookOut.BookOut_description>(global::GrimoireCli.Generated.Models.BookOut.BookOut_description.CreateFromDiscriminatorValue); } },
+                { "factions", n => { Factions = n.GetCollectionOfObjectValues<global::GrimoireCli.Generated.Models.Backend__routers__systems___schemas__FactionRef>(global::GrimoireCli.Generated.Models.Backend__routers__systems___schemas__FactionRef.CreateFromDiscriminatorValue)?.AsList(); } },
                 { "file_size", n => { FileSize = n.GetObjectValue<global::GrimoireCli.Generated.Models.BookOut.BookOut_file_size>(global::GrimoireCli.Generated.Models.BookOut.BookOut_file_size.CreateFromDiscriminatorValue); } },
                 { "filename", n => { Filename = n.GetStringValue(); } },
+                { "game_system_id", n => { GameSystemId = n.GetObjectValue<global::GrimoireCli.Generated.Models.BookOut.BookOut_game_system_id>(global::GrimoireCli.Generated.Models.BookOut.BookOut_game_system_id.CreateFromDiscriminatorValue); } },
+                { "game_type", n => { GameType = n.GetStringValue(); } },
                 { "genres", n => { Genres = n.GetCollectionOfPrimitiveValues<string>()?.AsList(); } },
                 { "has_custom_cover", n => { HasCustomCover = n.GetBoolValue(); } },
                 { "has_thumbnail", n => { HasThumbnail = n.GetObjectValue<global::GrimoireCli.Generated.Models.BookOut.BookOut_has_thumbnail>(global::GrimoireCli.Generated.Models.BookOut.BookOut_has_thumbnail.CreateFromDiscriminatorValue); } },
@@ -349,10 +388,12 @@ namespace GrimoireCli.Generated.Models
                 { "index_failed", n => { IndexFailed = n.GetObjectValue<global::GrimoireCli.Generated.Models.BookOut.BookOut_index_failed>(global::GrimoireCli.Generated.Models.BookOut.BookOut_index_failed.CreateFromDiscriminatorValue); } },
                 { "indexed", n => { Indexed = n.GetObjectValue<global::GrimoireCli.Generated.Models.BookOut.BookOut_indexed>(global::GrimoireCli.Generated.Models.BookOut.BookOut_indexed.CreateFromDiscriminatorValue); } },
                 { "is_explicit", n => { IsExplicit = n.GetBoolValue(); } },
+                { "is_linked", n => { IsLinked = n.GetBoolValue(); } },
                 { "is_missing", n => { IsMissing = n.GetBoolValue(); } },
                 { "isbn", n => { Isbn = n.GetStringValue(); } },
                 { "language", n => { Language = n.GetStringValue(); } },
                 { "license", n => { License = n.GetStringValue(); } },
+                { "linked_from", n => { LinkedFrom = n.GetObjectValue<global::GrimoireCli.Generated.Models.LinkedSystemRef>(global::GrimoireCli.Generated.Models.LinkedSystemRef.CreateFromDiscriminatorValue); } },
                 { "mime_type", n => { MimeType = n.GetObjectValue<global::GrimoireCli.Generated.Models.BookOut.BookOut_mime_type>(global::GrimoireCli.Generated.Models.BookOut.BookOut_mime_type.CreateFromDiscriminatorValue); } },
                 { "month", n => { Month = n.GetObjectValue<global::GrimoireCli.Generated.Models.BookOut.BookOut_month>(global::GrimoireCli.Generated.Models.BookOut.BookOut_month.CreateFromDiscriminatorValue); } },
                 { "ocr_dpi", n => { OcrDpi = n.GetObjectValue<global::GrimoireCli.Generated.Models.BookOut.BookOut_ocr_dpi>(global::GrimoireCli.Generated.Models.BookOut.BookOut_ocr_dpi.CreateFromDiscriminatorValue); } },
@@ -389,8 +430,11 @@ namespace GrimoireCli.Generated.Models
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.BookOut.BookOut_cover_version>("cover_version", CoverVersion);
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.BookOut.BookOut_day>("day", Day);
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.BookOut.BookOut_description>("description", Description);
+            writer.WriteCollectionOfObjectValues<global::GrimoireCli.Generated.Models.Backend__routers__systems___schemas__FactionRef>("factions", Factions);
             writer.WriteStringValue("filename", Filename);
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.BookOut.BookOut_file_size>("file_size", FileSize);
+            writer.WriteObjectValue<global::GrimoireCli.Generated.Models.BookOut.BookOut_game_system_id>("game_system_id", GameSystemId);
+            writer.WriteStringValue("game_type", GameType);
             writer.WriteCollectionOfPrimitiveValues<string>("genres", Genres);
             writer.WriteBoolValue("has_custom_cover", HasCustomCover);
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.BookOut.BookOut_has_thumbnail>("has_thumbnail", HasThumbnail);
@@ -400,9 +444,11 @@ namespace GrimoireCli.Generated.Models
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.BookOut.BookOut_index_failed>("index_failed", IndexFailed);
             writer.WriteStringValue("isbn", Isbn);
             writer.WriteBoolValue("is_explicit", IsExplicit);
+            writer.WriteBoolValue("is_linked", IsLinked);
             writer.WriteBoolValue("is_missing", IsMissing);
             writer.WriteStringValue("language", Language);
             writer.WriteStringValue("license", License);
+            writer.WriteObjectValue<global::GrimoireCli.Generated.Models.LinkedSystemRef>("linked_from", LinkedFrom);
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.BookOut.BookOut_mime_type>("mime_type", MimeType);
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.BookOut.BookOut_month>("month", Month);
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.BookOut.BookOut_ocr_dpi>("ocr_dpi", OcrDpi);
@@ -945,6 +991,74 @@ namespace GrimoireCli.Generated.Models
                 }
                 else {
                     writer.WriteObjectValue<global::GrimoireCli.Generated.Models.BookOut_file_sizeMember1>(null, BookOutFileSizeMember1);
+                }
+            }
+        }
+        /// <summary>
+        /// Composed type wrapper for classes <see cref="global::GrimoireCli.Generated.Models.BookOut_game_system_idMember1"/>, <see cref="string"/>
+        /// </summary>
+        [global::System.CodeDom.Compiler.GeneratedCode("Kiota", "1.0.0")]
+        public partial class BookOut_game_system_id : IComposedTypeWrapper, IParsable
+        {
+            /// <summary>Composed type representation for type <see cref="global::GrimoireCli.Generated.Models.BookOut_game_system_idMember1"/></summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+            public global::GrimoireCli.Generated.Models.BookOut_game_system_idMember1? BookOutGameSystemIdMember1 { get; set; }
+#nullable restore
+#else
+            public global::GrimoireCli.Generated.Models.BookOut_game_system_idMember1 BookOutGameSystemIdMember1 { get; set; }
+#endif
+            /// <summary>Composed type representation for type <see cref="string"/></summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+            public string? String { get; set; }
+#nullable restore
+#else
+            public string String { get; set; }
+#endif
+            /// <summary>
+            /// Creates a new instance of the appropriate class based on discriminator value
+            /// </summary>
+            /// <returns>A <see cref="global::GrimoireCli.Generated.Models.BookOut.BookOut_game_system_id"/></returns>
+            /// <param name="parseNode">The parse node to use to read the discriminator value and create the object</param>
+            public static global::GrimoireCli.Generated.Models.BookOut.BookOut_game_system_id CreateFromDiscriminatorValue(IParseNode parseNode)
+            {
+                if(ReferenceEquals(parseNode, null)) throw new ArgumentNullException(nameof(parseNode));
+                var result = new global::GrimoireCli.Generated.Models.BookOut.BookOut_game_system_id();
+                if(parseNode.GetStringValue() is string stringValue)
+                {
+                    result.String = stringValue;
+                }
+                else {
+                    result.BookOutGameSystemIdMember1 = new global::GrimoireCli.Generated.Models.BookOut_game_system_idMember1();
+                }
+                return result;
+            }
+            /// <summary>
+            /// The deserialization information for the current model
+            /// </summary>
+            /// <returns>A IDictionary&lt;string, Action&lt;IParseNode&gt;&gt;</returns>
+            public virtual IDictionary<string, Action<IParseNode>> GetFieldDeserializers()
+            {
+                if(BookOutGameSystemIdMember1 != null)
+                {
+                    return ParseNodeHelper.MergeDeserializersForIntersectionWrapper(BookOutGameSystemIdMember1);
+                }
+                return new Dictionary<string, Action<IParseNode>>();
+            }
+            /// <summary>
+            /// Serializes information the current object
+            /// </summary>
+            /// <param name="writer">Serialization writer to use to serialize this model</param>
+            public virtual void Serialize(ISerializationWriter writer)
+            {
+                if(ReferenceEquals(writer, null)) throw new ArgumentNullException(nameof(writer));
+                if(String != null)
+                {
+                    writer.WriteStringValue(null, String);
+                }
+                else {
+                    writer.WriteObjectValue<global::GrimoireCli.Generated.Models.BookOut_game_system_idMember1>(null, BookOutGameSystemIdMember1);
                 }
             }
         }
