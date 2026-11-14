@@ -205,7 +205,7 @@ public class FilesCommandTests
     {
         var folder = FilesCommand.Create().Subcommands.Single(c => c.Name == "folder");
         Assert.Equal(
-            ["create", "markers", "scaffold", "contents"],
+            ["create", "markers", "scaffold", "contents", "access"],
             folder.Subcommands.Select(c => c.Name).ToArray());
     }
 
