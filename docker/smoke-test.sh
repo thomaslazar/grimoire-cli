@@ -3230,6 +3230,51 @@ ok "campaigns members sheet delete empties the slot"
 "$CLI" campaigns delete --id "$AST" >/dev/null 2>"$WORK/cli.err" \
   || { cat "$WORK/cli.err" >&2; fail "campaigns delete (assets) exited non-zero"; }
 
+# ---- links, folder access, media index ---------------------------------------
+# Every write here is undone in the same run, so a re-run converges.
+# The folder rule demotes campaign shares irreversibly, so its folder must not
+# hold the book the Smoke Campaign shares (books list's first book).
+syslist --include-children
+SR4=$(echo "$LIST_JSON" | jq -r '.[] | select(.name == "Shadowrun 4 DE") | .id')
+SR5=$(echo "$LIST_JSON" | jq -r '.[] | select(.name == "Shadowrun 5 DE") | .id')
+[ -n "$SR4" ] && [ -n "$SR5" ] || fail "no Shadowrun 4/5 DE fixtures"
+LINK_BOOK=$("$CLI" books list --system-id "$SR4" 2>"$WORK/cli.err" | jq -r '.books[0].id')
+[ -n "$LINK_BOOK" ] && [ "$LINK_BOOK" != "null" ] || fail "no Shadowrun 4 DE book to link"
+
+# linking a Shadowrun 4 DE book onto Shadowrun 5 DE, then removing the link
+"$CLI" books links add --id "$LINK_BOOK" --system-id "$SR5" >"$WORK/link.out" 2>"$WORK/cli.err" \
+  || { cat "$WORK/cli.err" >&2; fail "books links add exited non-zero"; }
+jq -e --arg s "$SR5" 'any(.[]; .id == $s)' "$WORK/link.out" >/dev/null \
+  || fail "the new link is not in the answer: $(cat "$WORK/link.out")"
+"$CLI" books links remove --id "$LINK_BOOK" --system-id "$SR5" >"$WORK/unlink.out" 2>"$WORK/cli.err" \
+  || { cat "$WORK/cli.err" >&2; fail "books links remove exited non-zero"; }
+jq -e --arg s "$SR5" 'all(.[]; .id != $s)' "$WORK/unlink.out" >/dev/null \
+  || fail "the link survived remove: $(cat "$WORK/unlink.out")"
+ok "books links add then remove converges"
+
+# restricting a Shadowrun 4 DE subfolder, listing it, lifting it
+RULE_PATH="books/Shadowrun/4 DE/adventures"
+SHARED_BOOK=$("$CLI" books list 2>"$WORK/cli.err" | jq -r '.books[0].id')
+"$CLI" files browse --path "$RULE_PATH" 2>"$WORK/cli.err" \
+  | jq -e --arg b "$SHARED_BOOK" 'all(.entries[]; .record_id != $b)' >/dev/null \
+  || fail "the rule folder holds the shared smoke book: $SHARED_BOOK"
+"$CLI" files folder access set --path "$RULE_PATH" --level gm >"$WORK/rule.out" 2>"$WORK/cli.err" \
+  || { cat "$WORK/cli.err" >&2; fail "files folder access set exited non-zero"; }
+jq -e '.level == "gm" and .books >= 1' "$WORK/rule.out" >/dev/null \
+  || fail "set should echo a gm rule covering a book: $(cat "$WORK/rule.out")"
+RULE_ECHO=$(jq -r '.path' "$WORK/rule.out")
+"$CLI" files folder access list 2>"$WORK/cli.err" \
+  | jq -e --arg p "$RULE_ECHO" 'any(.rules[]; .path == $p)' >/dev/null \
+  || fail "the rule is not listed"
+"$CLI" files folder access remove --path "$RULE_ECHO" >/dev/null 2>"$WORK/cli.err" \
+  || { cat "$WORK/cli.err" >&2; fail "files folder access remove exited non-zero"; }
+ok "files folder access set, list and remove converge"
+
+# reading the map index sorted by name
+"$CLI" maps index --sort name 2>"$WORK/cli.err" | jq -e '.entries | type == "array"' >/dev/null \
+  || { cat "$WORK/cli.err" >&2; fail "maps index should answer an entries array"; }
+ok "maps index answers entries"
+
 # ---- api keys ----
 # Key-mode calls use their own config file, so the admin session above is untouched.
 KEYCFG="$WORK/key-config.json"
