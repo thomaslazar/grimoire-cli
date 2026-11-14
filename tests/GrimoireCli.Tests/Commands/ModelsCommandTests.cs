@@ -187,4 +187,8 @@ public class ModelsCommandTests
     [Fact]
     public void FolderCountsSaysExplicitIsFilteredServerSide()
         => Assert.Contains("explicit permission filters the counts", Help(["models", "folder-counts"]));
+
+    [Fact]
+    public void IndexParsesWithTheBrowseFilters()
+        => Assert.Empty(ModelsCommand.Create().Parse(["index", "--sort", "name", "--order", "asc"]).Errors);
 }

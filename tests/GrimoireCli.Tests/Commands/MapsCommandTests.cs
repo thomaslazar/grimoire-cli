@@ -350,4 +350,23 @@ public class MapsCommandTests
     [Fact]
     public void PageAcceptsTheServerMaximum()
         => Assert.Empty(MapsCommand.Create().Parse(["page", "--id", "x", "--page", "1000000", "--output", "-"]).Errors);
+
+    [Fact]
+    public void IndexSitsRightAfterFolderCounts()
+    {
+        var names = MapsCommand.Create().Subcommands.Select(c => c.Name).ToList();
+        Assert.Equal(names.IndexOf("folder-counts") + 1, names.IndexOf("index"));
+    }
+
+    [Fact]
+    public void IndexTakesTheListFiltersAndMapType()
+        => Assert.Empty(MapsCommand.Create().Parse(
+            ["index", "--map-type", "battlemap", "--query", "x", "--tags", "[\"x\"]",
+             "--favorites", "--added-since", "2026-01-01T00:00:00Z", "--folder", "battlemaps",
+             "--sort", "name", "--order", "desc"]).Errors);
+
+    // Every other sort answers no entries, which reads as "empty library".
+    [Fact]
+    public void IndexSaysOnlyNameAndAddedAtProduceEntries()
+        => Assert.Contains("added_at", Help(["maps", "index"]));
 }
