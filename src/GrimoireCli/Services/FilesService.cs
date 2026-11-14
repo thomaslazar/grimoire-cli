@@ -88,6 +88,14 @@ public class FilesService
         return await _client.SendAsync(info, permissionHint: AdminHint, notFoundHint: NotFoundHint);
     }
 
+    /// <summary>GET /api/files/campaign-map-copies. What a delete of path would copy into each campaign using its maps.</summary>
+    public async Task<string> CampaignMapCopiesAsync(string path)
+        => await _client.SendAsync(CampaignMapCopiesRequest(path), permissionHint: AdminHint);
+
+    /// <summary>Internal (not private) so a test can pin it to its own builder's path.</summary>
+    internal RequestInformation CampaignMapCopiesRequest(string path)
+        => _client.Api.Api.Files.CampaignMapCopies.ToGetRequestInformation(c => c.QueryParameters.Path = path);
+
     /// <summary>POST /api/files/folder.</summary>
     public async Task<string> CreateFolderAsync(string parent, string name, string? containerKind, bool nsfw, bool framesContainer)
     {

@@ -134,6 +134,17 @@ public class FilesCommandTests
     }
 
     [Fact]
+    public void CampaignMapCopiesRequiresPath()
+    {
+        Assert.NotEmpty(FilesCommand.Create().Parse(["campaign-map-copies"]).Errors);
+        Assert.Empty(FilesCommand.Create().Parse(["campaign-map-copies", "--path", "maps/x.png"]).Errors);
+    }
+
+    [Fact]
+    public void CampaignMapCopiesIsAdminOnly()
+        => Assert.Contains("admin", Help(["files", "campaign-map-copies"]));
+
+    [Fact]
     public void MoveTakesRepeatableSourcesAndRequiresADestination()
     {
         Assert.NotEmpty(FilesCommand.Create().Parse(["move", "--sources", "a"]).Errors);
