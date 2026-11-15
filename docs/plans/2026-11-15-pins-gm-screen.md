@@ -365,11 +365,11 @@ Commands:
 
   Each row's description is the command's own description.
 
-- [ ] **Step 2: Coverage.** Add 15 `IMPLEMENTED` entries, in the style of their neighbours:
+- [ ] **Step 2: Coverage.** Add 16 `IMPLEMENTED` entries, in the style of their neighbours:
   - `GET /api/pins`, `POST /api/pins`, `DELETE /api/pins/{pin_id}`
-  - 12 routes under `/api/campaigns/{campaign_id}/gm-screen`. Read the exact paths from `docs/grimoire-api-coverage.md`.
+  - 13 routes under `/api/campaigns/{campaign_id}/gm-screen`. Read the exact paths from `docs/grimoire-api-coverage.md`.
 
-  Run `python3 tools/generate-api-coverage.py`, which needs the running stack. Expected: `270 covered`.
+  Run `python3 tools/generate-api-coverage.py`, which needs the running stack. Expected: `271 covered`.
 
 - [ ] **Step 3: API notes.** Add a `## Pins` section and a `## GM screen` section to `docs/grimoire-api-notes.md`. Place each next to the related sections, and write them in the style of the file's existing bullets: bold claim first, then the cite with the version, e.g. `(core.py:43-75, v1.11.0)`. Cover the behaviour in the spec's "Help must carry" lists and the pins bullets, using the spec's cites. Also add:
   - Panel `config` and `state` are cleaned forgivingly. Only an unknown kind is refused (`services/gm_screen/panels.py:1-21`).

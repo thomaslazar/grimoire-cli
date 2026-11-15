@@ -1622,15 +1622,15 @@ Read from `backend/routers/pins/` at tag `v1.11.0`. Backs `pins`.
 - **The router needs a non-guest**, with no role beyond that
   (`routers/pins/__init__.py:8`, v1.11.0).
 - **`list` wraps the rows** as `{"pins": [...]}`, oldest first, optionally for
-  one `collection`; an unknown collection is a 400 (`core.py:28-40`, v1.11.0).
+  one `collection`; an unknown collection is a 400 (`core.py:27-39`, v1.11.0).
 - **`target` is trimmed and stripped of slashes** before it is stored; blank is
   rejected, and it may be at most 1000 UTF-8 bytes. For `systems` it is a system
   id, for the other collections a folder path relative to that collection
   (`_schemas.py:25-34`, v1.11.0).
 - **Adding is idempotent**: a pin already held returns the existing one rather
   than a 409, including when two requests race. A collection holds at most 100
-  per user; past that is a 400 (`core.py:43-75`, v1.11.0).
-- **Another user's pin is a 404**, the same as a missing one (`core.py:82-90`,
+  per user; past that is a 400 (`core.py:42-75`, v1.11.0).
+- **Another user's pin is a 404**, the same as a missing one (`core.py:78-88`,
   v1.11.0).
 
 ## Campaigns
@@ -1872,14 +1872,14 @@ Read from `backend/routers/campaigns/gm_screen.py` and
   the fields sent change. A new `config` re-cleans the state against it
   (`gm_screen.py:205-242`, v1.11.0).
 - **`reset`** clears what each panel marks with `resets` for that scope;
-  `session` also clears `scene` (`panels.py:433-437`, `reset_state`, v1.11.0).
+  `session` also clears `scene` (`panels.py:433-437`, `reset_state` `panels.py:440-464`, v1.11.0).
 - **`layout` skips an id not on the board** rather than failing
   (`gm_screen.py:258-278`, v1.11.0).
 - **A board document is `{format: "grimoire://gm-screen/v1", name, panels}`**,
   and only `panels` is read: it must be a non-empty list of known kinds
-  (`boards.py` `parse_board`, `export_board`, v1.11.0).
+  (`boards.py:42-89`, v1.11.0).
 - **`export` drops a note's `page_id`** and keeps the slug, as an id means
-  nothing in another campaign (`boards.py` `export_board`, v1.11.0).
+  nothing in another campaign (`boards.py:92-115`, v1.11.0).
 - **`import`, `copy` and `apply-preset` share `_add_board`**: `replace: true`
   (the default) deletes the board first, `false` puts the new panels below it.
   A board holds at most 60 panels, over that a 400 (`gm_screen.py:126-134`,

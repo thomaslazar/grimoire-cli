@@ -1,7 +1,7 @@
 # Global pins and the GM screen
 
 Wraps two route families that are new in Grimoire 1.11.0, in one increment:
-the user's global pins (3 routes) and the campaign GM screen (12 routes).
+the user's global pins (3 routes) and the campaign GM screen (13 routes).
 Every command passes straight through to one endpoint. Source cites refer to
 v1.11.0, under `backend/`.
 
@@ -145,7 +145,7 @@ table      config mode list|join, columns [{id, label, entries}];
 - In the same change:
   - the README Commands table
   - `IMPLEMENTED` in `tools/generate-api-coverage.py`, then regenerate
-    `docs/grimoire-api-coverage.md` (expected: 270 covered)
+    `docs/grimoire-api-coverage.md` (expected: 271 covered)
   - in `docs/grimoire-api-notes.md`, a "Pins" section and a "GM screen" section
     covering the behaviour above
 - The version floor stays at 1.10.1. On older servers these routes return 404.

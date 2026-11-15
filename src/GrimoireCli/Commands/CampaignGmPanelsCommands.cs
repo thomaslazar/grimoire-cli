@@ -24,7 +24,7 @@ public static class CampaignGmPanelsCommands
         new("--panel-id") { Description = "Panel ID, from gm-screen get", Required = true };
 
     private static string[] Notes(params string[] more) =>
-        [CampaignGmScreenCommands.OwnerNote, .. CampaignGmScreenCommands.Locked, "", .. more];
+        [CampaignGmScreenCommands.OwnerNote, "", .. CampaignGmScreenCommands.Locked, "", .. more];
 
     private static Command CreateCreateCommand()
     {
@@ -34,7 +34,8 @@ public static class CampaignGmPanelsCommands
         var command = new Command("create", "Add a panel to the GM screen") { idOption, inputOption, stdinOption };
         JsonBodyInput.RequireExactlyOneSource(command, inputOption, stdinOption);
         GmPanelHelp.AddTo(command);
-        command.AddHelpSection("Notes", HelpSectionPosition.Top, Notes("A board holds at most 60 panels."));
+        command.AddHelpSection("Notes", HelpSectionPosition.Top, Notes("Without x or y a panel takes the first gap it fits. An unknown kind is a 400.",
+            "A board holds at most 60 panels."));
         command.AddExamples("echo '{\"kind\":\"counter\",\"title\":\"Fear\",\"config\":{\"min\":0,\"max\":12,\"resets\":\"session\"}}' | grimoire-cli campaigns gm-screen panels create --id <campaign-id> --stdin");
         command.AddRequestShape<Generated.Models.GmPanelCreate>();
         command.AddResponseExample<Generated.Models.GmPanelOut>();
