@@ -293,8 +293,8 @@ Verified against v1.5.6, backing `systems update`, `systems batch-update`,
   write side effect on the client's cookie jar.
 - **`GET /api/systems/{id}/factions` is not for league guests.** It depends on
   `require_not_guest` (`routers/systems/__init__.py:121`, v1.11.0), so a guest gets 403;
-  `armies factions` is their twin. A role-playing system returns an empty list
-  rather than an error (`routers/systems/__init__.py:118-119`, v1.11.0).
+  `armies factions` is their twin. A role-playing system returns an empty `factions` list
+  rather than an error (`list_system_factions`, `routers/systems/books.py:459-469`, v1.11.0).
 
 ## Content and rescan
 
@@ -1901,7 +1901,7 @@ Read from `backend/routers/armies/` and `backend/routers/leagues/` at `v1.11.0`.
 Cites are relative to `backend/`; `A/` is `routers/armies/`, `L/` is
 `routers/leagues/`. Backs `armies` and `leagues`.
 
-- **No role tag on any of it, bar five routes.** Every `/armies` and `/leagues`
+- **No role tag on any of it, bar four routes.** Every `/armies` and `/leagues`
   route depends on `require_wargame_access` (`A/__init__.py:36`,
   `L/__init__.py:42`): full accounts and league guests pass, a campaign guest gets
   403 (`auth.py:523-526`, v1.11.0). Only `POST /leagues` (`L/core.py:48`) and the
@@ -1984,8 +1984,9 @@ Cites are relative to `backend/`; `A/` is `routers/armies/`, `L/` is
   differ (400). The result is read from both scores, else must be given, and a
   contradiction is a 400 (`services/leagues.py:19-40`, v1.11.0). A player's army is
   snapshotted when logged; `update` re-snapshots a slot whose player changed
-  (`L/core.py:201-206`, v1.11.0). A recorder who is not a player can delete a game but not
-  edit it (`L/core.py:252`, v1.11.0).
+  (`L/core.py:201-206`, v1.11.0). `update` also runs `_plays_in` on the request body
+  (`L/core.py:252`, v1.11.0), so a recorder who is neither organiser nor admin can
+  edit only if the body names them as a player; `delete` has no such check.
 - **Standings** count current members only; sort is points, score difference,
   score for, name (`services/leagues.py:43-94`, v1.11.0).
 - **Guests need guest access on server-side**: `guests create` is 403 otherwise,
