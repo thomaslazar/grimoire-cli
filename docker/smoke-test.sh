@@ -377,8 +377,8 @@ ok "me reports the seeded admin account"
 # Requires docker/seed.sh to have run. Counts mirror the fixture set defined
 # there; changing a fixture must change these numbers. EXPECTED_SYSTEMS is the
 # top-level listing: container children are hidden unless asked for.
-EXPECTED_SYSTEMS=7
-EXPECTED_ALL_SYSTEMS=16
+EXPECTED_SYSTEMS=8
+EXPECTED_ALL_SYSTEMS=17
 
 # syslist/sysget capture the CLI's own exit status via a plain assignment,
 # then abort with fail(). They must be called directly (e.g. `syslist ...`
@@ -938,7 +938,7 @@ ok "systems cover delete removes the upload"
 # carries 3 books across 2 categories, specifically so a --limit below that
 # system's own total proves paging rather than a coincidence of the global
 # count already exceeding it.
-EXPECTED_BOOKS=18
+EXPECTED_BOOKS=21
 
 booklist() {
   LIST_JSON=$("$CLI" books list "$@" 2>"$WORK/cli.err") \
@@ -3362,10 +3362,28 @@ ok "maps index answers entries"
       "$CLI" armies delete --id "$id" >/dev/null 2>"$WORK/cli.err" \
         || { cat "$WORK/cli.err" >&2; fail "armies delete (sweep) exited non-zero"; }
     done
-# creating a hand-built army with one unit
-ARMY=$(echo '{"name":"Smoke Army","units":[{"id":"u1","name":"Smoke Unit"}]}' | "$CLI" armies create --stdin 2>"$WORK/cli.err" | jq -r .id) \
+# the armory fixture: exactly one wargame, with two factions, and ttrpg excludes it
+"$CLI" systems list --game-type wargame 2>"$WORK/cli.err" | jq -e 'length == 1 and .[0].name == "Grimdark Skirmish" and .[0].game_type == "wargame"' >/dev/null \
+  || { cat "$WORK/cli.err" >&2; fail "systems list --game-type wargame should hold only Grimdark Skirmish"; }
+"$CLI" systems list --game-type ttrpg 2>"$WORK/cli.err" | jq -e 'length > 0 and all(.[]; .game_type == "ttrpg")' >/dev/null \
+  || { cat "$WORK/cli.err" >&2; fail "systems list --game-type ttrpg should hold no wargame"; }
+WG=$("$CLI" systems list --game-type wargame 2>"$WORK/cli.err" | jq -r '.[0].id')
+"$CLI" systems factions --id "$WG" 2>"$WORK/cli.err" | jq -e '[.factions[].name] | sort == ["Ash Cult", "Iron Legion"]' >/dev/null \
+  || { cat "$WORK/cli.err" >&2; fail "systems factions should hold Ash Cult and Iron Legion"; }
+"$CLI" armies factions --system-id "$WG" 2>"$WORK/cli.err" | jq -e '[.factions[].name] | sort == ["Ash Cult", "Iron Legion"]' >/dev/null \
+  || { cat "$WORK/cli.err" >&2; fail "armies factions should hold Ash Cult and Iron Legion"; }
+"$CLI" armies games 2>"$WORK/cli.err" | jq -e --arg id "$WG" 'any(.[]; .id == $id)' >/dev/null \
+  || { cat "$WORK/cli.err" >&2; fail "armies games should include Grimdark Skirmish"; }
+"$CLI" books list --system-id "$WG" --category army-book 2>"$WORK/cli.err" | jq -e '.total == 2' >/dev/null \
+  || { cat "$WORK/cli.err" >&2; fail "the wargame should hold two army-book codexes"; }
+WG_FACTION=$("$CLI" armies factions --system-id "$WG" 2>"$WORK/cli.err" | jq -r '.factions[] | select(.name == "Iron Legion") | .id')
+ok "the armory fixture lists as a wargame with two factions and two codexes"
+# creating a hand-built army with one unit, in the wargame under one faction
+ARMY=$(jq -n --arg g "$WG" --arg f "$WG_FACTION" '{name:"Smoke Army",game_system_id:$g,faction_id:$f,units:[{id:"u1",name:"Smoke Unit"}]}' | "$CLI" armies create --stdin 2>"$WORK/cli.err" | jq -r .id) \
   || { cat "$WORK/cli.err" >&2; fail "armies create exited non-zero"; }
 [ -n "$ARMY" ] && [ "$ARMY" != "null" ] || fail "armies create should return an id"
+"$CLI" armies get --id "$ARMY" 2>"$WORK/cli.err" | jq -e --arg g "$WG" '.game_system_id == $g and .game_system_name == "Grimdark Skirmish"' >/dev/null \
+  || { cat "$WORK/cli.err" >&2; fail "the army should belong to Grimdark Skirmish"; }
 # setting the unit's progress
 "$CLI" armies progress --id "$ARMY" --unit-id u1 --experience 3 --honours Bloodied 2>"$WORK/cli.err" \
   | jq -e '.experience == 3 and .honours == ["Bloodied"]' >/dev/null \
@@ -3382,7 +3400,7 @@ ok "armies create, progress, export and list"
   || { cat "$WORK/cli.err" >&2; fail "systems factions on Shadowrun 4 DE should be an empty factions list"; }
 ok "systems factions is empty for a system without factions"
 # creating a league as admin, then adding admin and gm as members
-LGE=$(echo '{"name":"Smoke League"}' | "$CLI" leagues create --stdin 2>"$WORK/cli.err" | jq -r .id) \
+LGE=$(jq -n --arg g "$WG" '{name:"Smoke League",game_system_id:$g}' | "$CLI" leagues create --stdin 2>"$WORK/cli.err" | jq -r .id) \
   || { cat "$WORK/cli.err" >&2; fail "leagues create exited non-zero"; }
 [ -n "$LGE" ] && [ "$LGE" != "null" ] || fail "leagues create should return an id"
 LGE_ADMIN=$(echo "$ME_JSON" | jq -r .id)
@@ -3406,6 +3424,8 @@ LGE_GAME=$(jq -n --arg a "$LGE_ADMIN" --arg b "$LGE_GM" '{player_a_id:$a,player_
 jq -e --arg g "$LGE_GAME" --arg a "$LGE_ADMIN" \
   '(.games[] | select(.id == $g) | .result == "a") and .standings[0].user_id == $a' "$WORK/lget.out" >/dev/null \
   || fail "the game should be result a with admin on top: $(cat "$WORK/lget.out")"
+jq -e --arg g "$WG" '.game_system_id == $g and .game_system_name == "Grimdark Skirmish"' "$WORK/lget.out" >/dev/null \
+  || fail "the league should be set to Grimdark Skirmish: $(cat "$WORK/lget.out")"
 "$CLI" leagues games delete --id "$LGE" --game-id "$LGE_GAME" >/dev/null 2>"$WORK/cli.err" \
   || { cat "$WORK/cli.err" >&2; fail "leagues games delete exited non-zero"; }
 ok "leagues create, members, army registration and games log a 3-1 win for admin"
