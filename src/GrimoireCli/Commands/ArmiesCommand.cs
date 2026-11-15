@@ -23,6 +23,7 @@ public static class ArmiesCommand
         command.Subcommands.Add(CreateProgressCommand());
         command.Subcommands.Add(CreateGamesCommand());
         command.Subcommands.Add(CreateFactionsCommand());
+        command.Subcommands.Add(ArmyPublicationLinksCommands.Create());
         return command;
     }
 
