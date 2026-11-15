@@ -21,6 +21,7 @@ public static class LeaguesCommand
         command.Subcommands.Add(LeagueMembersCommands.Create());
         command.Subcommands.Add(LeagueGamesCommands.Create());
         command.Subcommands.Add(LeagueGuestsCommands.Create());
+        command.Subcommands.Add(LeagueBooksCommands.Create());
         return command;
     }
 
