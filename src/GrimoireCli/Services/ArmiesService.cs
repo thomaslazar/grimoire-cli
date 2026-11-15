@@ -91,7 +91,9 @@ public class ArmiesService
         => _client.Api.Api.Armies[id].Export.ToGetRequestInformation(c =>
         {
             // Sent only when set: the server defaults to text.
-            if (format is not null) c.QueryParameters.Format = format;
+            if (format is not null)
+                c.QueryParameters.FormatAsGetFormatQueryParameterType =
+                    Enum.Parse<Generated.Api.Armies.Item.Export.GetFormatQueryParameterType>(format, ignoreCase: true);
         });
 
     internal RequestInformation PublicationsRequest(string id) => _client.Api.Api.Armies[id].Publications.ToGetRequestInformation();
