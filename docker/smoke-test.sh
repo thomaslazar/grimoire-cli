@@ -2513,7 +2513,7 @@ sysget --id "$COVER_SRC_SYS"
   || fail "Das Schwarze Auge already has an uploaded cover_image — the smoke fixture has drifted, pick a different system for cover from-source: $GET_JSON"
 # listing books to pick one as the cover source
 booklist
-COVER_SRC_BOOK=$(echo "$LIST_JSON" | jq -r '.books[0].id')
+COVER_SRC_BOOK=$(echo "$LIST_JSON" | jq -r '.books[] | select(.title == "DSA5 Aventurien") | .id')
 
 # setting the system's cover from the book, expecting a .webp cover_image
 FROMSRC_JSON=$("$CLI" systems cover from-source --id "$COVER_SRC_SYS" --source-type book --source-id "$COVER_SRC_BOOK" 2>"$WORK/cli.err") \
@@ -2558,7 +2558,7 @@ SC_TRACK=$("$CLI" audio list 2>"$WORK/cli.err" | jq -r '.audio[0].id') \
 ok "audio cover get refuses a track with no set cover"
 
 # copying a book's cover onto the track, expecting a .webp cover_image
-SC_BOOK=$("$CLI" books list 2>/dev/null | jq -r '.books[0].id')
+SC_BOOK=$("$CLI" books list 2>/dev/null | jq -r '.books[] | select(.title == "DSA5 Aventurien") | .id')
 [ -n "$SC_BOOK" ] && [ "$SC_BOOK" != "null" ] || fail "no book fixture to copy a cover from"
 SET_JSON=$("$CLI" audio cover from-source --id "$SC_TRACK" --source-type book --source-id "$SC_BOOK" 2>"$WORK/cli.err") \
   || { cat "$WORK/cli.err" >&2; fail "audio cover from-source exited non-zero"; }
@@ -2608,7 +2608,7 @@ ok "addons verify-index rejects an untrusted index URL"
 # --- book reading ------------------------------------------------------------
 # Reads only: nothing to restore, nothing to converge.
 # finding a book fixture for the reading checks
-BR_BOOK=$("$CLI" books list 2>"$WORK/cli.err" | jq -r '.books[0].id') \
+BR_BOOK=$("$CLI" books list 2>"$WORK/cli.err" | jq -r '.books[] | select(.title == "DSA5 Aventurien") | .id') \
   || { cat "$WORK/cli.err" >&2; fail "books list exited non-zero"; }
 [ -n "$BR_BOOK" ] && [ "$BR_BOOK" != "null" ] || fail "no book fixture for the reading checks"
 
@@ -2650,7 +2650,7 @@ ok "books page-words refuses a page past the end"
 # --- binary endpoints --------------------------------------------------------
 # Reads only; downloads land in $WORK, which is fresh each run.
 # finding a book fixture for the binary endpoint checks
-BE_BOOK=$("$CLI" books list 2>"$WORK/cli.err" | jq -r '.books[0].id') \
+BE_BOOK=$("$CLI" books list 2>"$WORK/cli.err" | jq -r '.books[] | select(.title == "DSA5 Aventurien") | .id') \
   || { cat "$WORK/cli.err" >&2; fail "books list exited non-zero"; }
 [ -n "$BE_BOOK" ] && [ "$BE_BOOK" != "null" ] || fail "no book fixture for the binary checks"
 
@@ -2765,7 +2765,7 @@ fi
 ok "campaigns categories list/create find or make the smoke category"
 
 # finding a book fixture to link to the campaign
-CR_BOOK=$("$CLI" books list 2>"$WORK/cli.err" | jq -r '.books[0].id') \
+CR_BOOK=$("$CLI" books list 2>"$WORK/cli.err" | jq -r '.books[] | select(.title == "DSA5 Aventurien") | .id') \
   || { cat "$WORK/cli.err" >&2; fail "books list exited non-zero"; }
 [ -n "$CR_BOOK" ] && [ "$CR_BOOK" != "null" ] || fail "no book fixture to link"
 # The first run links the book; every later run finds it linked, which the
@@ -3328,7 +3328,7 @@ ok "books links add then remove converges"
 
 # restricting a Shadowrun 4 DE subfolder, listing it, lifting it
 RULE_PATH="books/Shadowrun/4 DE/adventures"
-SHARED_BOOK=$("$CLI" books list 2>"$WORK/cli.err" | jq -r '.books[0].id')
+SHARED_BOOK=$("$CLI" books list 2>"$WORK/cli.err" | jq -r '.books[] | select(.title == "DSA5 Aventurien") | .id')
 [ -n "$SHARED_BOOK" ] && [ "$SHARED_BOOK" != "null" ] || fail "no book to check against the rule folder"
 "$CLI" files browse --path "$RULE_PATH" 2>"$WORK/cli.err" \
   | jq -e --arg b "$SHARED_BOOK" 'all(.entries[]; .record_id != $b)' >/dev/null \
@@ -3368,6 +3368,7 @@ ok "maps index answers entries"
 "$CLI" systems list --game-type ttrpg 2>"$WORK/cli.err" | jq -e 'length > 0 and all(.[]; .game_type == "ttrpg")' >/dev/null \
   || { cat "$WORK/cli.err" >&2; fail "systems list --game-type ttrpg should hold no wargame"; }
 WG=$("$CLI" systems list --game-type wargame 2>"$WORK/cli.err" | jq -r '.[0].id')
+[ -n "$WG" ] && [ "$WG" != "null" ] || fail "no wargame system for the armory checks"
 "$CLI" systems factions --id "$WG" 2>"$WORK/cli.err" | jq -e '[.factions[].name] | sort == ["Ash Cult", "Iron Legion"]' >/dev/null \
   || { cat "$WORK/cli.err" >&2; fail "systems factions should hold Ash Cult and Iron Legion"; }
 "$CLI" armies factions --system-id "$WG" 2>"$WORK/cli.err" | jq -e '[.factions[].name] | sort == ["Ash Cult", "Iron Legion"]' >/dev/null \
@@ -3377,6 +3378,7 @@ WG=$("$CLI" systems list --game-type wargame 2>"$WORK/cli.err" | jq -r '.[0].id'
 "$CLI" books list --system-id "$WG" --category army-book 2>"$WORK/cli.err" | jq -e '.total == 2' >/dev/null \
   || { cat "$WORK/cli.err" >&2; fail "the wargame should hold two army-book codexes"; }
 WG_FACTION=$("$CLI" armies factions --system-id "$WG" 2>"$WORK/cli.err" | jq -r '.factions[] | select(.name == "Iron Legion") | .id')
+[ -n "$WG_FACTION" ] && [ "$WG_FACTION" != "null" ] || fail "no Iron Legion faction in the wargame"
 ok "the armory fixture lists as a wargame with two factions and two codexes"
 # creating a hand-built army with one unit, in the wargame under one faction
 ARMY=$(jq -n --arg g "$WG" --arg f "$WG_FACTION" '{name:"Smoke Army",game_system_id:$g,faction_id:$f,units:[{id:"u1",name:"Smoke Unit"}]}' | "$CLI" armies create --stdin 2>"$WORK/cli.err" | jq -r .id) \

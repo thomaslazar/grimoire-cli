@@ -75,8 +75,7 @@ public static class SystemsCommand
             "implies it.",
             "",
             "Wargame (armory/) systems are listed alongside role-playing ones, and",
-            "one of each may share a name: tell them apart by game_type, or pass",
-            "--game-type.",
+            "one of each may share a name: tell them apart by game_type.",
             "",
             "book_count and total_page_count include books linked onto a system.");
         command.AddExamples(
@@ -115,7 +114,7 @@ public static class SystemsCommand
         var bookSortOption = OptionHelpers.Choice("--book-sort", "Sort the books; default category", BookSortKeys);
         var bookDescOption = new Option<bool>("--book-desc") { Description = "Sort the books descending" };
         var genreOption = new Option<string?>("--genre") { Description = "Keep only books with this genre" };
-        var categoryOption = new Option<string?>("--category") { Description = "Keep only books in this category (core, supplement, adventure, …)" };
+        var categoryOption = new Option<string?>("--category") { Description = "Keep only books in this category (core, supplement, adventure, …; wargame: army-book, errata, mission-pack, campaign (a campaign book), unit-reference, painting-guide, lore, magazine, starter-set, supplement, core)" };
         var explicitOption = new Option<bool?>("--explicit") { Description = "Keep only books with this explicit flag (true | false)" };
         var includeBooksOption = new Option<bool?>("--include-books") { Description = "false returns books empty (true | false); default true" };
         var command = new Command("get", "Get one game system, with its books")

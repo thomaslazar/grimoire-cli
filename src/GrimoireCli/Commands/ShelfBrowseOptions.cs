@@ -20,7 +20,7 @@ internal sealed class ShelfBrowseOptions
     private readonly Option<bool?> _explicit = new("--explicit") { Description = "Keep only books with this explicit flag (true | false)" };
     private readonly Option<string?> _genre = new("--genre") { Description = "Only books with this genre" };
     private readonly Option<string?> _productCode = new("--product-code") { Description = "Only books whose product code starts with this" };
-    private readonly Option<string?> _category = new("--category") { Description = "Only books in this category (core, supplement, adventure, …)" };
+    private readonly Option<string?> _category = new("--category") { Description = "Only books in this category (core, supplement, adventure, …; wargame: army-book, errata, mission-pack, campaign (a campaign book), unit-reference, painting-guide, lore, magazine, starter-set, supplement, core)" };
     private readonly Option<string?> _folder = new("--folder") { Description = "Only books directly in this subfolder of --category" };
     private readonly Option<string?> _sort = OptionHelpers.Choice("--sort", "Row order; default title", Sorts);
     private readonly Option<string?> _order = OptionHelpers.Choice("--order", "Sort direction; default asc", Orders);

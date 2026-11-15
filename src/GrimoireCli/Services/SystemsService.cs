@@ -14,7 +14,7 @@ public class SystemsService
     public async Task<string> ListAsync(
         string? sort, bool desc, string? genre, string? family,
         string? parentSystem, string? edition, string? license, bool? isExplicit,
-        string? parentId, bool includeChildren, string? gameType = null)
+        string? parentId, bool includeChildren, string? gameType)
         => await _client.SendAsync(ListRequest(sort, desc, genre, family, parentSystem, edition, license, isExplicit, parentId, includeChildren, gameType));
 
     internal RequestInformation ListRequest(

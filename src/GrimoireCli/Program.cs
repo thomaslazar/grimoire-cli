@@ -19,7 +19,7 @@ catch (IOException)
 {
 }
 
-var rootCommand = new RootCommand("grimoire-cli — Grimoire TTRPG library CLI");
+var rootCommand = new RootCommand("grimoire-cli — Grimoire TTRPG and wargame library CLI");
 
 // Recursive so the flag works where a caller naturally writes it — after the
 // subcommand. Without it the token parses as an unmatched option, the command

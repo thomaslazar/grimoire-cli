@@ -1,5 +1,5 @@
 class GrimoireCli < Formula
-  desc "Command-line interface for Grimoire, a self-hosted TTRPG library manager"
+  desc "Command-line interface for Grimoire, a self-hosted TTRPG and wargame library manager"
   homepage "https://github.com/thomaslazar/grimoire-cli"
   version "@@VERSION@@"
   license "MIT"

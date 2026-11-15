@@ -14,9 +14,10 @@
 #
 # Re-runnable: the library is rebuilt from scratch each time. To reset the
 # database as well: docker compose -f docker/docker-compose.yml down, then
-# rm -rf docker/data docker/library/books — the boot scan indexes whatever
-# library tree is on disk, so a database-only reset leaves stale rows that
-# survive as is_missing and still count toward book_count.
+# rm -rf docker/data docker/library/{books,maps,models,tokens,audio,armory}
+# docker/addon-index/index.json — the boot scan indexes whatever library tree
+# is on disk, so a database-only reset leaves stale rows that survive as
+# is_missing and still count toward book_count.
 #
 # Renaming/re-marking a fixture folder (e.g. dropping "(nsfw)") needs that
 # database reset, not just a re-seed: rescan only ever sets is_explicit=true,
@@ -119,7 +120,8 @@ OPF
 say "wrote a hand-maintained (non-Grimoire) sidecar for Honey Heist"
 
 # A wargame system under armory/ (indexer/factions.py): a folder naming a wargame
-# category ("Core") files its books under it, any other folder is a faction.
+# category ("Core") files its books under it; "Factions" is itself an army-book
+# folder, and the folders directly under it are the factions.
 # Grimdark Skirmish is made up; "Codex" in the filename makes both army-book.
 wargame_book() {  # wargame_book <path under armory/> <pages>
   mkdir -p "$(dirname "$LIBRARY/armory/$1.pdf")"
