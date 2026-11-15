@@ -3,6 +3,94 @@
 All notable changes to grimoire-cli are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## v0.8.0 — 2026-11-15
+
+A minor release that targets Grimoire 1.11.0. It wraps almost everything
+1.11.0 added: wargames (armies, leagues, factions), the GM screen, wiki map
+pins, global pins, book links, folder access rules and the media index. The
+supported server floor rises to 1.11.0.
+
+### Highlights
+
+- **Wargames are supported.** The new `armies` commands build, import and
+  export army lists, including BattleScribe `.ros`/`.rosz` rosters, and track
+  each unit's progress. `leagues` runs a league: its members, logged games and
+  standings, guests, and shared books. `systems factions` and
+  `systems list --game-type` find the wargames in the library's new `armory/`
+  tree. A shared Categories section in the help lists the role-playing and
+  wargame category values side by side, so an agent can filter for codexes
+  without guessing.
+- **The GM screen is scriptable.** `campaigns gm-screen` reads, resets, lays
+  out, imports, copies and applies presets to a campaign's board, and
+  `campaigns gm-screen panels` edits single panels. The server types panel
+  config and state only as `{}`, so the help teaches every panel kind's keys.
+  Without that, a mistyped key would be dropped silently.
+- **Map pages and pins.** `campaigns wiki pins` places, moves and removes pins
+  on a wiki map page. `pins` manages your own shortcuts to folders and game
+  systems.
+- **More library control.** `books links` shows a book on another system's
+  shelf as well as its own. `files folder access` restricts a folder to GMs
+  or admins, and its help warns that the restriction demotes campaign and
+  league shares. `maps`, `tokens`, `models` and `audio` each gain an `index`
+  command for jump-to-letter and month navigation. `files campaign-map-copies`
+  previews what deleting a map would do to the campaigns that use it.
+- **Grimoire 1.11.0 is now the floor.** Two inputs would pass silently on
+  1.10.x. The server ignores `systems list --game-type` and returns every
+  system, and it saves a `"page_type":"map"` wiki page as a plain note. A
+  silently dropped input is exactly what the version range exists to catch, so
+  anyone on 1.10.x should stay on 0.7.6.
+
+### Features
+
+- feat: add armies commands and systems factions
+- feat: add armies publication-links commands
+- feat: add books links commands
+- feat: add campaigns gm-screen board commands
+- feat: add campaigns gm-screen panels commands
+- feat: add campaigns wiki pins commands
+- feat: add files campaign-map-copies
+- feat: add files folder access commands
+- feat: add index commands for maps, tokens, models and audio
+- feat: add leagues and leagues members commands
+- feat: add leagues books commands
+- feat: add leagues games and guests commands
+- feat: add pins commands
+- feat: add systems list --game-type
+- feat: target grimoire 1.11.0
+
+### Fixes
+
+- fix: correct pin visibility help and tidy pin docs
+- fix: keep smoke targets stable and finish wargame wording
+- fix: name every 404 cause in league hints
+- fix: raise the supported grimoire floor to 1.11.0
+- fix: say panel config replaces whole
+- fix: scope panel placement help to create and fix cites
+- fix: tighten armies and leagues help and hints
+- fix: tighten help for map copies, links and folder access
+- fix: use the typed armies export format
+
+### Tests
+
+- test: add an armory fixture to the smoke stack
+
+### Chores
+
+- chore: bump version to 0.8.0
+
+### Docs
+
+- docs: correct armies and leagues notes
+- docs: cover armies and leagues
+- docs: cover linked books, folder access rules and media index
+- docs: cover pins and the gm screen
+- docs: cover wiki map pins
+- docs: list both category sets in one Categories help section
+- docs: make wargame support discoverable
+- docs: spec and plan for armies and leagues
+- docs: spec and plan for pins and the gm screen
+- docs: spec and plan for wiki map pins
+
 ## v0.7.6 — 2026-11-08
 
 Patch release that makes large files work. Every command that sends or

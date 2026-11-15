@@ -660,7 +660,7 @@ public class GrimoireApiClient
         return observed;
     }
 
-    private static readonly string MinSupportedVersion = "1.10.1";
+    private static readonly string MinSupportedVersion = "1.11.0";
     private static readonly string MaxTestedVersion = "1.11.0";
 
     // The informational version carries CI's build stamp ("0.1.0+pr-1.a1b2c3d") so

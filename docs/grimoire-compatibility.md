@@ -17,13 +17,15 @@
 | 0.7.3 | 1.9.0 – 1.10.0 | superseded by 0.7.4 |
 | 0.7.4 | 1.10.1 | superseded by 0.7.5 |
 | 0.7.5 | 1.10.1 – 1.10.2 | superseded by 0.7.6 |
-| 0.7.6 | 1.10.1 – 1.10.2 | current, on `main` |
+| 0.7.6 | 1.10.1 – 1.10.2 | superseded by 0.8.0 |
+| 0.8.0 | 1.11.0 | current, on `main` |
 
 **The floor rises only when something forces it**, not on every server release.
 Each row above records a pairing that was necessary at the time — 1.5.6 → 1.6.0
 because the 1.6.x line changed the token lifetime and made the library writable,
 1.7.0, 1.7.2, 1.8.0 and then 1.9.0 because each added a flag older servers silently
-drop, and 1.10.1 because `books cover` needs routes older servers lack (below).
+drop, 1.10.1 because `books cover` needs routes older servers lack, and 1.11.0
+because `systems list --game-type` is a flag 1.10.x silently drops (below).
 Absent a reason like that, a bump raises `MaxTestedVersion` and leaves the floor
 where it is. Whoever stays on an older Grimoire stays on the grimoire-cli release
 its row names. Those releases get no further fixes: upstream has no LTS line, so
@@ -35,7 +37,7 @@ an older Grimoire does not know is dropped by Pydantic rather than rejected, so
 the command answers 200 and does nothing — the one failure the version warning
 exists to catch.
 
-`main` targets Grimoire 1.10.1 – 1.11.0. Reaching 1.6.0 was more than a version bump: it
+`main` targets Grimoire 1.11.0. Reaching 1.6.0 was more than a version bump: it
 shortened the access token from 30 days to 30 minutes and made the library
 writable, which is why the CLI renews its own session
 ([authentication.md](authentication.md)) and why the `files` endpoints exist at
@@ -293,10 +295,20 @@ Behaviour under existing commands changed, and the help text follows it:
 - **Search** treats `%` and `_` literally, caps `q` at 500 characters and
   answers an over-complex query with a 400.
 
+**0.8.0 raised the floor to 1.11.0.** It wraps the new routes listed above;
+an older server answers those 404. Two inputs instead pass silently on 1.10.x:
+
+- **`systems list --game-type`**: 1.10.x has no `game_type` filter
+  (`routers/systems/core.py` at v1.10.2), so `--game-type wargame` returns 200
+  with every role-playing system.
+- **`campaigns wiki create` with `"page_type":"map"`**: 1.10.x knows only
+  `note` and `session` (`routers/campaigns/_schemas.py:190` at v1.10.2), so the
+  page is saved as a `note` and its `map_id` is dropped.
+
 ## Runtime check
 
 `src/GrimoireCli/Api/GrimoireApiClient.cs` defines `MinSupportedVersion` and
-`MaxTestedVersion`, currently `"1.10.1"` and `"1.11.0"`. A check runs before the first
+`MaxTestedVersion`, currently `"1.11.0"` and `"1.11.0"`. A check runs before the first
 request of any command, calling `GET /api/about` and comparing the reported
 version against that range. It is throttled to once every 24 hours — a
 config with a recent `lastVersionCheck` skips the probe entirely — and
