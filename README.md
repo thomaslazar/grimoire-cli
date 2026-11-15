@@ -1,6 +1,6 @@
 # grimoire-cli
 
-A command-line interface for [Grimoire](https://github.com/hunter-read/grimoire), the self-hosted TTRPG library manager. Built for agent-driven metadata management — JSON in, JSON out.
+A command-line interface for [Grimoire](https://github.com/hunter-read/grimoire), the self-hosted TTRPG and wargame library manager. Built for agent-driven metadata management — JSON in, JSON out.
 
 Native AOT binary. No runtime required. ~14 MB.
 
@@ -10,6 +10,7 @@ Native AOT binary. No runtime required. ~14 MB.
 
 - **Metadata lookup** — search Grimoire's add-on sources and get a per-field diff against what you already have; applying is your own explicit `update`
 - **Library file management** — browse the tree with its indexing state, upload, move, rename and delete; create folders, mark containers, scaffold a system's category folders
+- **Wargames** — systems and factions in the `armory/` tree, army lists (BattleScribe import, export), and leagues with members, games, standings, guests and shared books
 - **Duplicate resolution** — scan for candidates, compare copies side by side, file one under another as a variant, promote a different copy, merge metadata across them
 - **Search and tags** — full-text page search plus `field:value` metadata filters, and tags across every resource type
 - **Backups** — take one before a bulk change, then list, download and manage the schedule
@@ -211,7 +212,7 @@ grimoire-cli config set server https://grimoire.example.com
 | `me` | Show the authenticated account (id, username, role, flags) |
 | `config get` | Show current configuration |
 | `config set <key> <value>` | Set a configuration value (`server` is the only valid key) |
-| `systems list [--sort name\|book_count\|page_count\|year] [--desc] [--genre <g>] [--family <f>] [--parent-system <p>] [--edition <e>] [--license <l>] [--explicit true\|false] [--parent-id <id>] [--include-children]` | List all game systems |
+| `systems list [--game-type ttrpg\|wargame] [--sort name\|book_count\|page_count\|year] [--desc] [--genre <g>] [--family <f>] [--parent-system <p>] [--edition <e>] [--license <l>] [--explicit true\|false] [--parent-id <id>] [--include-children]` | List all game systems |
 | `systems get --id <id> [--book-sort category\|title\|page_count\|year] [--book-desc] [--genre <g>] [--category <c>] [--explicit true\|false] [--include-books true\|false]` | Get a single game system, with its books |
 | `systems update --id <id> {--input <file> \| --stdin}` | Update one system's metadata (gm or admin) |
 | `systems batch-update {--input <file> \| --stdin}` | Update many systems in one transaction; exit 3 if partial (gm or admin) |

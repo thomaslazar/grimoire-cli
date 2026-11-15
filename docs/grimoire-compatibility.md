@@ -296,7 +296,7 @@ Behaviour under existing commands changed, and the help text follows it:
 ## Runtime check
 
 `src/GrimoireCli/Api/GrimoireApiClient.cs` defines `MinSupportedVersion` and
-`MaxTestedVersion`, currently `"1.10.1"` and `"1.10.1"`. A check runs before the first
+`MaxTestedVersion`, currently `"1.10.1"` and `"1.11.0"`. A check runs before the first
 request of any command, calling `GET /api/about` and comparing the reported
 version against that range. It is throttled to once every 24 hours — a
 config with a recent `lastVersionCheck` skips the probe entirely — and
