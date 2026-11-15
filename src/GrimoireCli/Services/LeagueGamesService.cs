@@ -9,6 +9,8 @@ public class LeagueGamesService
 {
     private const string LeagueNotFound = "No league with that ID. List yours with: grimoire-cli leagues list";
 
+    private const string GameNotFound = "No such league or game. Game IDs are in: grimoire-cli leagues get --id <league-id>";
+
     private readonly GrimoireApiClient _client;
 
     public LeagueGamesService(GrimoireApiClient client) => _client = client;
@@ -17,10 +19,10 @@ public class LeagueGamesService
     public async Task<string> CreateAsync(string id, string rawBody) => await _client.SendAsync(CreateRequest(id, rawBody), notFoundHint: LeagueNotFound);
 
     /// <summary>PUT /api/leagues/{id}/games/{game_id}. Raw body, as <see cref="CreateAsync"/>.</summary>
-    public async Task<string> UpdateAsync(string id, string gameId, string rawBody) => await _client.SendAsync(UpdateRequest(id, gameId, rawBody), notFoundHint: LeagueNotFound);
+    public async Task<string> UpdateAsync(string id, string gameId, string rawBody) => await _client.SendAsync(UpdateRequest(id, gameId, rawBody), notFoundHint: GameNotFound);
 
     /// <summary>DELETE /api/leagues/{id}/games/{game_id}. 204.</summary>
-    public async Task<string> DeleteAsync(string id, string gameId) => await _client.SendAsync(DeleteRequest(id, gameId), notFoundHint: LeagueNotFound);
+    public async Task<string> DeleteAsync(string id, string gameId) => await _client.SendAsync(DeleteRequest(id, gameId), notFoundHint: GameNotFound);
 
     internal RequestInformation CreateRequest(string id, string rawBody)
     {

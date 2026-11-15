@@ -90,7 +90,8 @@ public static class LeagueGuestsCommands
         var userIdOption = UserIdOption();
         var command = new Command("share", "Invite text and link carrying a guest's code") { idOption, userIdOption };
         command.AddHelpSection("Notes", HelpSectionPosition.Top,
-            [Organiser, Code, "The link is built from the server's BASE_URL."]);
+            [Organiser, "A guest who also plays in another organiser's league is a 403.", Code,
+            "The link is built from the server's BASE_URL."]);
         command.AddExamples("grimoire-cli leagues guests share --id <league-id> --user-id <user-id>");
         command.AddResponseExample<Generated.Models.GuestShareTemplate>();
         command.SetAction(async (parseResult, cancellationToken) =>

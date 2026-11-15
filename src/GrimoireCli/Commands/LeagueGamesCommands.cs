@@ -42,7 +42,7 @@ public static class LeagueGamesCommands
             "different, current members; the organiser is one only if added. A",
             "non-organiser can only log games they played in. played_on is",
             "YYYY-MM-DD. result (a, b or draw, from A's side) is inferred from the",
-            "scores when both are given and must match them; with neither scores nor",
+            "scores when both are given and must match them; without both scores or a",
             "result, 400.");
         command.AddExamples(
             "echo '{\"player_a_id\":\"<user-id>\",\"player_b_id\":\"<user-id>\",\"score_a\":12,\"score_b\":8,\"played_on\":\"2026-11-14\"}' | grimoire-cli leagues games create --id <league-id> --stdin");
