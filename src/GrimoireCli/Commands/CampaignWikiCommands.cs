@@ -25,6 +25,7 @@ public static class CampaignWikiCommands
         command.Subcommands.Add(CreateExportCommand());
         command.Subcommands.Add(CreateImportCommand());
         command.Subcommands.Add(CampaignWikiTemplateCommands.Create());
+        command.Subcommands.Add(CampaignWikiPinsCommands.Create());
         return command;
     }
 
