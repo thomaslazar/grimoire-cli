@@ -186,4 +186,22 @@ public class SystemsCommandTests
         Assert.DoesNotContain("Request shape:", output);
         Assert.Contains("Run --help-full", output);
     }
+
+    [Fact]
+    public void FactionsRoutesToTheSystemsFactionsEndpoint()
+    {
+        var client = new GrimoireCli.Api.GrimoireApiClient(new GrimoireCli.Configuration.AppConfig { Server = "http://example.test", AccessToken = "t" });
+        var info = new GrimoireCli.Services.SystemsService(client).FactionsRequest("s-1");
+        info.PathParameters["baseurl"] = "http://example.test";
+        Assert.Equal("GET", info.HttpMethod.ToString().ToUpperInvariant());
+        Assert.Equal("http://example.test/api/systems/s-1/factions", info.URI.AbsoluteUri);
+    }
+
+    [Fact]
+    public void FactionsHelpRendersAndCarriesNoRoleTag()
+    {
+        var help = RenderHelp(["systems", "factions"], full: false);
+        Assert.Contains("guests", help);
+        Assert.DoesNotContain("Role required:", help);
+    }
 }

@@ -51,6 +51,12 @@ public class SystemsService
             notFoundHint: "No system with that ID. List them with: grimoire-cli systems list");
     }
 
+    /// <summary>GET /api/systems/{id}/factions.</summary>
+    public async Task<string> FactionsAsync(string id)
+        => await _client.SendAsync(FactionsRequest(id), notFoundHint: "No system with that ID. List them with: grimoire-cli systems list");
+
+    internal RequestInformation FactionsRequest(string id) => _client.Api.Api.Systems[id].Factions.ToGetRequestInformation();
+
     /// <summary>
     /// PATCH /api/systems/{id}. The generated builder is used for the URL, method and
     /// path parameter only; its request model would transmit unknown keys

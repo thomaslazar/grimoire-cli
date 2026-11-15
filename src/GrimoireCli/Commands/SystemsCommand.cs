@@ -21,8 +21,27 @@ public static class SystemsCommand
         command.Subcommands.Add(CreateBatchTagCommand());
         command.Subcommands.Add(CoverCommands.Create());
         command.Subcommands.Add(SystemBookCommands.Create());
+        command.Subcommands.Add(CreateFactionsCommand());
         foreach (var metadata in MetadataCommands.Create("systems"))
             command.Subcommands.Add(metadata);
+        return command;
+    }
+
+    private static Command CreateFactionsCommand()
+    {
+        var idOption = new Option<string>("--id") { Description = "System ID", Required = true };
+        var command = new Command("factions", "List a system's factions, with book counts") { idOption };
+        command.AddHelpSection("Notes", HelpSectionPosition.Top,
+            "A role-playing system gives an empty list. League guests get 403; they",
+            "use armies factions.");
+        command.AddExamples("grimoire-cli systems factions --id <system-id>");
+        command.AddResponseExample<Generated.Models.SystemFactionsResponse>();
+        command.SetAction(async (parseResult, cancellationToken) =>
+        {
+            var (client, _) = CommandHelper.BuildClient();
+            ConsoleOutput.WriteRawJson(await new SystemsService(client).FactionsAsync(parseResult.GetValue(idOption)!));
+            return 0;
+        });
         return command;
     }
 
