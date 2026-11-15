@@ -156,7 +156,7 @@ jobs:
           printf "Architecture: %s\n" "${ARCH}" >> "${PKG_DIR}/DEBIAN/control"
           printf "Maintainer: Thomas Lazar <thomas@razal.de>\n" >> "${PKG_DIR}/DEBIAN/control"
           printf "Description: Command-line interface for Grimoire\n" >> "${PKG_DIR}/DEBIAN/control"
-          printf " A CLI tool for Grimoire, a self-hosted TTRPG library manager.\n" >> "${PKG_DIR}/DEBIAN/control"
+          printf " A CLI tool for Grimoire, a self-hosted TTRPG and wargame library manager.\n" >> "${PKG_DIR}/DEBIAN/control"
           printf "Homepage: https://github.com/thomaslazar/grimoire-cli\n" >> "${PKG_DIR}/DEBIAN/control"
           BIN="src/GrimoireCli/bin/Release/net10.0/${{ matrix.rid }}/publish/grimoire-cli"
           cp "$BIN" "${PKG_DIR}/usr/local/bin/grimoire-cli"

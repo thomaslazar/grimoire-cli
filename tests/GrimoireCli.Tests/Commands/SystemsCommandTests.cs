@@ -186,4 +186,43 @@ public class SystemsCommandTests
         Assert.DoesNotContain("Request shape:", output);
         Assert.Contains("Run --help-full", output);
     }
+
+    private static string ListUri(string? gameType)
+    {
+        var client = new GrimoireCli.Api.GrimoireApiClient(new GrimoireCli.Configuration.AppConfig { Server = "http://example.test", AccessToken = "t" });
+        var info = new GrimoireCli.Services.SystemsService(client).ListRequest(null, false, null, null, null, null, null, null, null, false, gameType);
+        info.PathParameters["baseurl"] = "http://example.test";
+        return info.URI.AbsoluteUri;
+    }
+
+    [Fact]
+    public void ListSendsGameTypeWhenSet() => Assert.Equal("http://example.test/api/systems?game_type=wargame", ListUri("wargame"));
+
+    [Fact]
+    public void ListSendsNoQueryWithoutGameType() => Assert.Equal("http://example.test/api/systems", ListUri(null));
+
+    [Fact]
+    public void ListRejectsAnUnknownGameType()
+    {
+        Assert.Empty(Root().Parse("systems list --game-type wargame").Errors);
+        Assert.NotEmpty(Root().Parse("systems list --game-type board").Errors);
+    }
+
+    [Fact]
+    public void FactionsRoutesToTheSystemsFactionsEndpoint()
+    {
+        var client = new GrimoireCli.Api.GrimoireApiClient(new GrimoireCli.Configuration.AppConfig { Server = "http://example.test", AccessToken = "t" });
+        var info = new GrimoireCli.Services.SystemsService(client).FactionsRequest("s-1");
+        info.PathParameters["baseurl"] = "http://example.test";
+        Assert.Equal("GET", info.HttpMethod.ToString().ToUpperInvariant());
+        Assert.Equal("http://example.test/api/systems/s-1/factions", info.URI.AbsoluteUri);
+    }
+
+    [Fact]
+    public void FactionsHelpRendersAndCarriesNoRoleTag()
+    {
+        var help = RenderHelp(["systems", "factions"], full: false);
+        Assert.Contains("guests", help);
+        Assert.DoesNotContain("Role required:", help);
+    }
 }

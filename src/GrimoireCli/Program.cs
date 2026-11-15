@@ -19,7 +19,7 @@ catch (IOException)
 {
 }
 
-var rootCommand = new RootCommand("grimoire-cli — Grimoire TTRPG library CLI");
+var rootCommand = new RootCommand("grimoire-cli — Grimoire TTRPG and wargame library CLI");
 
 // Recursive so the flag works where a caller naturally writes it — after the
 // subcommand. Without it the token parses as an unmatched option, the command
@@ -64,6 +64,8 @@ rootCommand.Subcommands.Add(LogsCommand.Create());
 rootCommand.Subcommands.Add(TagsCommand.Create());
 rootCommand.Subcommands.Add(DuplicatesCommand.Create());
 rootCommand.Subcommands.Add(CampaignsCommand.Create());
+rootCommand.Subcommands.Add(ArmiesCommand.Create());
+rootCommand.Subcommands.Add(LeaguesCommand.Create());
 rootCommand.Subcommands.Add(PinsCommand.Create());
 rootCommand.Subcommands.Add(GenresCommand.Create());
 rootCommand.Subcommands.Add(LicensesCommand.Create());

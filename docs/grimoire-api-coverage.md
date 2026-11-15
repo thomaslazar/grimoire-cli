@@ -15,7 +15,7 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | (untagged) | 0 / 1 |
 | addons | 8 / 10 |
 | api-keys | 0 / 6 |
-| armies | 0 / 14 |
+| armies | 14 / 14 |
 | audio | 16 / 17 |
 | audio-sets | 0 / 5 |
 | auth | 2 / 15 |
@@ -30,7 +30,7 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | duplicates | 13 / 18 |
 | favorites | 0 / 3 |
 | files | 10 / 17 |
-| leagues | 0 / 23 |
+| leagues | 23 / 23 |
 | library | 4 / 8 |
 | logs | 1 / 1 |
 | lookups | 15 / 15 |
@@ -45,13 +45,13 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | share | 0 / 4 |
 | share-links | 0 / 8 |
 | stats | 1 / 1 |
-| systems | 18 / 19 |
+| systems | 19 / 19 |
 | tags | 7 / 7 |
 | themes | 0 / 6 |
 | token-frames | 0 / 2 |
 | tokens | 12 / 12 |
 | users | 0 / 16 |
-| **Total** | **271 / 491** |
+| **Total** | **309 / 491** |
 
 2 operation(s) are internal-only (🔒) and excluded from covered counts.
 
@@ -91,20 +91,20 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 
 | Method | Path | Description | Perm | Key | CLI |
 |--------|------|-------------|------|-----|-----|
-| GET | `/api/armies` | List your armies |  | armies: read | — |
-| POST | `/api/armies` | Build an army by hand |  | armies: write | — |
-| GET | `/api/armies/games` | The wargames an army can be set to |  | armies: read | — |
-| GET | `/api/armies/games/{system_id}/factions` | A wargame's factions, for the army form |  | armies: read | — |
-| POST | `/api/armies/import` | Import a BattleScribe roster |  | armies: write | — |
-| PUT | `/api/armies/publication-links` | Link a cited publication to a library book (GM/admin) | gm or admin | armies: write | — |
-| DELETE | `/api/armies/publication-links` | Remove a publication link (GM/admin) | gm or admin | armies: write | — |
-| GET | `/api/armies/publication-links/books` | Find wargame books to link a publication to (GM/admin) | gm or admin | armies: read | — |
-| GET | `/api/armies/{army_id}` | Get an army |  | armies: read | — |
-| PATCH | `/api/armies/{army_id}` | Update an army |  | armies: write | — |
-| DELETE | `/api/armies/{army_id}` | Delete an army |  | armies: write | — |
-| GET | `/api/armies/{army_id}/export` | Export an army as its roster file or as text |  | armies: read | — |
-| GET | `/api/armies/{army_id}/publications` | The publications an army cites, and their library links |  | armies: read | — |
-| PUT | `/api/armies/{army_id}/units/{unit_id}/progress` | Set a unit's experience, honours and notes |  | armies: write | — |
+| GET | `/api/armies` | List your armies |  | armies: read | `armies list` ✅ |
+| POST | `/api/armies` | Build an army by hand |  | armies: write | `armies create` ✅ |
+| GET | `/api/armies/games` | The wargames an army can be set to |  | armies: read | `armies games` ✅ |
+| GET | `/api/armies/games/{system_id}/factions` | A wargame's factions, for the army form |  | armies: read | `armies factions` ✅ |
+| POST | `/api/armies/import` | Import a BattleScribe roster |  | armies: write | `armies import` ✅ |
+| PUT | `/api/armies/publication-links` | Link a cited publication to a library book (GM/admin) | gm or admin | armies: write | `armies publication-links set` ✅ |
+| DELETE | `/api/armies/publication-links` | Remove a publication link (GM/admin) | gm or admin | armies: write | `armies publication-links remove` ✅ |
+| GET | `/api/armies/publication-links/books` | Find wargame books to link a publication to (GM/admin) | gm or admin | armies: read | `armies publication-links books` ✅ |
+| GET | `/api/armies/{army_id}` | Get an army |  | armies: read | `armies get` ✅ |
+| PATCH | `/api/armies/{army_id}` | Update an army |  | armies: write | `armies update` ✅ |
+| DELETE | `/api/armies/{army_id}` | Delete an army |  | armies: write | `armies delete` ✅ |
+| GET | `/api/armies/{army_id}/export` | Export an army as its roster file or as text |  | armies: read | `armies export` ✅ |
+| GET | `/api/armies/{army_id}/publications` | The publications an army cites, and their library links |  | armies: read | `armies publications` ✅ |
+| PUT | `/api/armies/{army_id}/units/{unit_id}/progress` | Set a unit's experience, honours and notes |  | armies: write | `armies progress` ✅ |
 
 ## audio
 
@@ -444,29 +444,29 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 
 | Method | Path | Description | Perm | Key | CLI |
 |--------|------|-------------|------|-----|-----|
-| GET | `/api/leagues` | List your leagues |  | armies: read | — |
-| POST | `/api/leagues` | Create a league (GM/admin) | gm or admin | armies: write | — |
-| GET | `/api/leagues/{league_id}` | Get a league |  | armies: read | — |
-| PATCH | `/api/leagues/{league_id}` | Update a league |  | armies: write | — |
-| DELETE | `/api/leagues/{league_id}` | Delete a league |  | armies: write | — |
-| GET | `/api/leagues/{league_id}/books` | Books shared with the league |  | armies: read | — |
-| POST | `/api/leagues/{league_id}/books` | Share a book with the league (organiser) |  | armies: write | — |
-| PUT | `/api/leagues/{league_id}/books/order` | Reorder the league's books (organiser) |  | armies: write | — |
-| GET | `/api/leagues/{league_id}/books/search` | Find library books to share (organiser) |  | armies: read | — |
-| PATCH | `/api/leagues/{league_id}/books/{resource_id}` | Change who a shared book reaches (organiser) |  | armies: write | — |
-| DELETE | `/api/leagues/{league_id}/books/{resource_id}` | Stop sharing a book (organiser) |  | armies: write | — |
-| GET | `/api/leagues/{league_id}/eligible-members` | Users the organiser can add |  | armies: read | — |
-| POST | `/api/leagues/{league_id}/games` | Log a game |  | armies: write | — |
-| PUT | `/api/leagues/{league_id}/games/{game_id}` | Edit a game |  | armies: write | — |
-| DELETE | `/api/leagues/{league_id}/games/{game_id}` | Delete a game |  | armies: write | — |
-| GET | `/api/leagues/{league_id}/guests` | List the league's guests |  | — | — |
-| POST | `/api/leagues/{league_id}/guests` | Invite a guest |  | — | — |
-| DELETE | `/api/leagues/{league_id}/guests/{user_id}` | Remove a guest from the league |  | armies: write | — |
-| POST | `/api/leagues/{league_id}/guests/{user_id}/regenerate` | Give a guest a new code |  | — | — |
-| GET | `/api/leagues/{league_id}/guests/{user_id}/share` | Invite text for a guest's code |  | — | — |
-| POST | `/api/leagues/{league_id}/members` | Add a member |  | armies: write | — |
-| DELETE | `/api/leagues/{league_id}/members/{user_id}` | Remove a member, or leave |  | armies: write | — |
-| PUT | `/api/leagues/{league_id}/members/{user_id}/army` | Register the army a member plays |  | armies: write | — |
+| GET | `/api/leagues` | List your leagues |  | armies: read | `leagues list` ✅ |
+| POST | `/api/leagues` | Create a league (GM/admin) | gm or admin | armies: write | `leagues create` ✅ |
+| GET | `/api/leagues/{league_id}` | Get a league |  | armies: read | `leagues get` ✅ |
+| PATCH | `/api/leagues/{league_id}` | Update a league |  | armies: write | `leagues update` ✅ |
+| DELETE | `/api/leagues/{league_id}` | Delete a league |  | armies: write | `leagues delete` ✅ |
+| GET | `/api/leagues/{league_id}/books` | Books shared with the league |  | armies: read | `leagues books list` ✅ |
+| POST | `/api/leagues/{league_id}/books` | Share a book with the league (organiser) |  | armies: write | `leagues books add` ✅ |
+| PUT | `/api/leagues/{league_id}/books/order` | Reorder the league's books (organiser) |  | armies: write | `leagues books reorder` ✅ |
+| GET | `/api/leagues/{league_id}/books/search` | Find library books to share (organiser) |  | armies: read | `leagues books search` ✅ |
+| PATCH | `/api/leagues/{league_id}/books/{resource_id}` | Change who a shared book reaches (organiser) |  | armies: write | `leagues books update` ✅ |
+| DELETE | `/api/leagues/{league_id}/books/{resource_id}` | Stop sharing a book (organiser) |  | armies: write | `leagues books remove` ✅ |
+| GET | `/api/leagues/{league_id}/eligible-members` | Users the organiser can add |  | armies: read | `leagues eligible` ✅ |
+| POST | `/api/leagues/{league_id}/games` | Log a game |  | armies: write | `leagues games create` ✅ |
+| PUT | `/api/leagues/{league_id}/games/{game_id}` | Edit a game |  | armies: write | `leagues games update` ✅ |
+| DELETE | `/api/leagues/{league_id}/games/{game_id}` | Delete a game |  | armies: write | `leagues games delete` ✅ |
+| GET | `/api/leagues/{league_id}/guests` | List the league's guests |  | — | `leagues guests list` ✅ |
+| POST | `/api/leagues/{league_id}/guests` | Invite a guest |  | — | `leagues guests create` ✅ |
+| DELETE | `/api/leagues/{league_id}/guests/{user_id}` | Remove a guest from the league |  | armies: write | `leagues guests remove` ✅ |
+| POST | `/api/leagues/{league_id}/guests/{user_id}/regenerate` | Give a guest a new code |  | — | `leagues guests regenerate` ✅ |
+| GET | `/api/leagues/{league_id}/guests/{user_id}/share` | Invite text for a guest's code |  | — | `leagues guests share` ✅ |
+| POST | `/api/leagues/{league_id}/members` | Add a member |  | armies: write | `leagues members add` ✅ |
+| DELETE | `/api/leagues/{league_id}/members/{user_id}` | Remove a member, or leave |  | armies: write | `leagues members remove` ✅ |
+| PUT | `/api/leagues/{league_id}/members/{user_id}/army` | Register the army a member plays |  | armies: write | `leagues members army` ✅ |
 
 ## library
 
@@ -668,7 +668,7 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | POST | `/api/systems/{system_id}/cover` | Upload a system cover | gm or admin | systems: write | `systems cover upload` ✅ |
 | DELETE | `/api/systems/{system_id}/cover` | Remove an uploaded system cover | gm or admin | systems: write | `systems cover delete` ✅ |
 | POST | `/api/systems/{system_id}/cover/from-source` | Set a system cover from an existing image | gm or admin | systems: write | `systems cover from-source` ✅ |
-| GET | `/api/systems/{system_id}/factions` | List a wargame system's factions | not guest | systems: read | — |
+| GET | `/api/systems/{system_id}/factions` | List a wargame system's factions | not guest | systems: read | `systems factions` ✅ |
 | POST | `/api/systems/{system_id}/metadata-fetch` | Fetch metadata for review | gm or admin | systems: read | `systems metadata-fetch` ✅ |
 | POST | `/api/systems/{system_id}/metadata-search` | Search a metadata source | gm or admin | systems: read | `systems metadata-search` ✅ |
 | GET | `/api/systems/{system_id}/metadata-sources` | List metadata sources | gm or admin | systems: read | `systems metadata-sources` ✅ |

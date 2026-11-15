@@ -12,7 +12,7 @@ public class RootHelpTests
 {
     private static RootCommand BuildRoot(out Option<bool> debugOption, out Option<bool> logJsonOption, out Option<bool> prettyOption)
     {
-        var rootCommand = new RootCommand("grimoire-cli — Grimoire TTRPG library CLI");
+        var rootCommand = new RootCommand("grimoire-cli — Grimoire TTRPG and wargame library CLI");
         debugOption = new Option<bool>("--debug")
         {
             Description = "Enable debug-level logging (HTTP requests, token expiry, version check) to stderr.",

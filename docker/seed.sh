@@ -14,9 +14,10 @@
 #
 # Re-runnable: the library is rebuilt from scratch each time. To reset the
 # database as well: docker compose -f docker/docker-compose.yml down, then
-# rm -rf docker/data docker/library/books — the boot scan indexes whatever
-# library tree is on disk, so a database-only reset leaves stale rows that
-# survive as is_missing and still count toward book_count.
+# rm -rf docker/data docker/library/{books,maps,models,tokens,audio,armory}
+# docker/addon-index/index.json — the boot scan indexes whatever library tree
+# is on disk, so a database-only reset leaves stale rows that survive as
+# is_missing and still count toward book_count.
 #
 # Renaming/re-marking a fixture folder (e.g. dropping "(nsfw)") needs that
 # database reset, not just a re-seed: rescan only ever sets is_explicit=true,
@@ -52,7 +53,7 @@ say "authenticated"
 
 # 3. Build the fixture tree. Folder names carry edition and language because the
 #    scanner parses neither from the path — one folder is exactly one system.
-rm -rf "${LIBRARY:?}/books"
+rm -rf "${LIBRARY:?}/books" "${LIBRARY:?}/armory"
 mkdir -p "$LIBRARY/books"
 
 book() {  # book <system-folder> <category-folder> <filename> <pages>
@@ -118,7 +119,19 @@ cat > "$LIBRARY/books/one-page-rpgs/Honey Heist.opf" <<'OPF'
 OPF
 say "wrote a hand-maintained (non-Grimoire) sidecar for Honey Heist"
 
-EXPECTED_BOOKS=17
+# A wargame system under armory/ (indexer/factions.py): a folder naming a wargame
+# category ("Core") files its books under it; "Factions" is itself an army-book
+# folder, and the folders directly under it are the factions.
+# Grimdark Skirmish is made up; "Codex" in the filename makes both army-book.
+wargame_book() {  # wargame_book <path under armory/> <pages>
+  mkdir -p "$(dirname "$LIBRARY/armory/$1.pdf")"
+  python3 "$HERE/make-fixtures.py" "$LIBRARY/armory/$1.pdf" "$2"
+}
+wargame_book "Grimdark Skirmish/Core/Grimdark Skirmish Core Rules"        6
+wargame_book "Grimdark Skirmish/Factions/Iron Legion/Codex - Iron Legion" 4
+wargame_book "Grimdark Skirmish/Factions/Ash Cult/Codex - Ash Cult"       4
+
+EXPECTED_BOOKS=21
 say "wrote $EXPECTED_BOOKS fixture books"
 
 # Fixture cover image for the smoke test's cover-upload section. Generated
@@ -209,8 +222,8 @@ patch_system "Vampire The Masquerade 5 EN" '{"system_family":"World of Darkness"
 TOP=$(curl -sf "$SERVER/api/systems" -H "$AUTH" | jq 'length')
 ALL=$(curl -sf "$SERVER/api/systems?include_children=true" -H "$AUTH" | jq 'length')
 say "seed complete — $TOP top-level systems, $ALL including children"
-[ "$TOP" -eq 7 ] || fail "expected 7 top-level systems, got $TOP"
-[ "$ALL" -eq 16 ] || fail "expected 16 systems including children, got $ALL"
+[ "$TOP" -eq 8 ] || fail "expected 8 top-level systems, got $TOP"
+[ "$ALL" -eq 17 ] || fail "expected 17 systems including children, got $ALL"
 
 # 6. Generate the add-on index from the checked-in fixture manifest, so its
 # digest can never drift from what's on disk. Served to the grimoire container

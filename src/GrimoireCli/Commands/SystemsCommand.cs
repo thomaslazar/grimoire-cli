@@ -9,6 +9,7 @@ public static class SystemsCommand
 {
     private static readonly NLog.Logger _logger = NLog.LogManager.GetCurrentClassLogger();
     private static readonly string[] SystemSortKeys = ["name", "book_count", "page_count", "year"];
+    private static readonly string[] GameTypes = ["ttrpg", "wargame"];
     private static readonly string[] BookSortKeys = ["category", "title", "page_count", "year"];
 
     public static Command Create()
@@ -21,8 +22,27 @@ public static class SystemsCommand
         command.Subcommands.Add(CreateBatchTagCommand());
         command.Subcommands.Add(CoverCommands.Create());
         command.Subcommands.Add(SystemBookCommands.Create());
+        command.Subcommands.Add(CreateFactionsCommand());
         foreach (var metadata in MetadataCommands.Create("systems"))
             command.Subcommands.Add(metadata);
+        return command;
+    }
+
+    private static Command CreateFactionsCommand()
+    {
+        var idOption = new Option<string>("--id") { Description = "System ID", Required = true };
+        var command = new Command("factions", "List a system's factions, with book counts") { idOption };
+        command.AddHelpSection("Notes", HelpSectionPosition.Top,
+            "A role-playing system gives an empty list. Every guest gets 403; league",
+            "guests use armies factions.");
+        command.AddExamples("grimoire-cli systems factions --id <system-id>");
+        command.AddResponseExample<Generated.Models.SystemFactionsResponse>();
+        command.SetAction(async (parseResult, cancellationToken) =>
+        {
+            var (client, _) = CommandHelper.BuildClient();
+            ConsoleOutput.WriteRawJson(await new SystemsService(client).FactionsAsync(parseResult.GetValue(idOption)!));
+            return 0;
+        });
         return command;
     }
 
@@ -38,9 +58,10 @@ public static class SystemsCommand
         var explicitOption = new Option<bool?>("--explicit") { Description = "Filter by explicit flag (true | false); omit for both" };
         var parentIdOption = new Option<string?>("--parent-id") { Description = "List only the children of this container" };
         var includeChildrenOption = new Option<bool>("--include-children") { Description = "Include container children (hidden by default)" };
+        var gameTypeOption = OptionHelpers.Choice("--game-type", "Only role-playing (books/) or only wargame (armory/) systems; default both", GameTypes);
         var command = new Command("list", "List all game systems")
         {
-            sortOption, descOption, genreOption, familyOption,
+            gameTypeOption, sortOption, descOption, genreOption, familyOption,
             parentOption, editionOption, licenseOption, explicitOption,
             parentIdOption, includeChildrenOption
         };
@@ -62,7 +83,8 @@ public static class SystemsCommand
             "grimoire-cli systems list --sort book_count --desc",
             "grimoire-cli systems list --include-children --family Shadowrun",
             "grimoire-cli systems list --parent-id <container-id>",
-            "grimoire-cli systems list --explicit false");
+            "grimoire-cli systems list --explicit false",
+            "grimoire-cli systems list --game-type wargame");
         command.AddResponseExampleArray<Generated.Models.SystemSummary>();
         command.SetAction(async (parseResult, cancellationToken) =>
         {
@@ -78,7 +100,8 @@ public static class SystemsCommand
                 parseResult.GetValue(licenseOption),
                 parseResult.GetValue(explicitOption),
                 parseResult.GetValue(parentIdOption),
-                parseResult.GetValue(includeChildrenOption));
+                parseResult.GetValue(includeChildrenOption),
+                parseResult.GetValue(gameTypeOption));
             ConsoleOutput.WriteRawJson(result);
             return 0;
         });
@@ -91,7 +114,7 @@ public static class SystemsCommand
         var bookSortOption = OptionHelpers.Choice("--book-sort", "Sort the books; default category", BookSortKeys);
         var bookDescOption = new Option<bool>("--book-desc") { Description = "Sort the books descending" };
         var genreOption = new Option<string?>("--genre") { Description = "Keep only books with this genre" };
-        var categoryOption = new Option<string?>("--category") { Description = "Keep only books in this category (core, supplement, adventure, …)" };
+        var categoryOption = new Option<string?>("--category") { Description = "Keep only books in this category; see Categories" };
         var explicitOption = new Option<bool?>("--explicit") { Description = "Keep only books with this explicit flag (true | false)" };
         var includeBooksOption = new Option<bool?>("--include-books") { Description = "false returns books empty (true | false); default true" };
         var command = new Command("get", "Get one game system, with its books")
@@ -105,16 +128,12 @@ public static class SystemsCommand
             "books includes books linked onto the system from another (is_linked),",
             "and the counts include them.",
             "",
-            "--category takes the normalised value, not the folder name",
-            "('supplement', not 'supplements'), and is case-sensitive; --genre is",
-            "not. Values are open-ended: an unmapped folder becomes its own slug,",
-            "and a book with no subfolder under a system-agnostic root is",
-            "'uncategorized'.",
-            "",
-            "--book-desc applies only to --book-sort title|page_count|year.",
+            "--genre is case-insensitive. --book-desc applies only to --book-sort",
+            "title|page_count|year.",
             "",
             "--include-books false ignores the book filters: book_count and",
             "total_page_count then cover every book the account can see.");
+        BookCategoryHelp.AddTo(command);
         command.AddExamples(
             "grimoire-cli systems get --id <system-id>",
             "grimoire-cli systems get --id <system-id> --category core",

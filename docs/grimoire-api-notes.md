@@ -177,7 +177,7 @@ Applies to both `PATCH /api/systems/{id}` and `PATCH /api/books/{id}`
   own books only (`core.py:230-233`, `:257-260`).
 - **`GET /api/systems` lists wargames too**, as of 1.11.0: `game_type`
   (`ttrpg` | `wargame`) narrows it, and omitted means both (`core.py:52-58`,
-  `:88-89`, v1.11.0). The CLI does not send it.
+  `:88-89`, v1.11.0). `systems list --game-type` sends it.
 - **`GET /api/systems/{id}?include_books=false` returns `books: []`**, as of
   1.8.0, and computes `book_count` / `total_page_count` in SQL without the
   `explicit`, `category` and `genre` filters, so those three have no effect on
@@ -291,6 +291,10 @@ Verified against v1.5.6, backing `systems update`, `systems batch-update`,
   with a bearer token and no existing cookie, reusing that token rather than
   minting a new one (`routers/auth/core.py:364-367`, v1.11.0) — a bare read has a
   write side effect on the client's cookie jar.
+- **`GET /api/systems/{id}/factions` is not for league guests.** It depends on
+  `require_not_guest` (`routers/systems/__init__.py:121`, v1.11.0), so a guest gets 403;
+  `armies factions` is their twin. A role-playing system returns an empty `factions` list
+  rather than an error (`list_system_factions`, `routers/systems/books.py:459-469`, v1.11.0).
 
 ## Content and rescan
 
@@ -1890,3 +1894,118 @@ Read from `backend/routers/campaigns/gm_screen.py` and
   v1.11.0).
 - **Presets** need external downloads enabled, else 403; an unknown preset is
   a 404 and a failed download a 502 (`gm_screen.py:389-418`, v1.11.0).
+
+## Armies
+
+Read from `backend/routers/armies/` and `backend/routers/leagues/` at `v1.11.0`.
+Cites are relative to `backend/`; `A/` is `routers/armies/`, `L/` is
+`routers/leagues/`. Backs `armies` and `leagues`.
+
+- **No role tag on any of it, bar four routes.** Every `/armies` and `/leagues`
+  route depends on `require_wargame_access` (`A/__init__.py:36`,
+  `L/__init__.py:42`): full accounts and league guests pass, a campaign guest gets
+  403 (`auth.py:523-526`, v1.11.0). Only `POST /leagues` (`L/core.py:48`) and the
+  three `/armies/publication-links` routes (`A/core.py:254,263,280`) need
+  `require_gm_or_admin` (`auth.py:468-473`, v1.11.0).
+- **Army access is owner, admin, or a league-mate of a registered army.** A
+  viewer who may not see it gets 404 "Army not found"; only the owner or an admin
+  may change it, else 403 (`A/_helpers.py:24-60`, v1.11.0). An army only past
+  games reference is no longer viewable by league members.
+- **`armies list` is the caller's own armies**, admins included
+  (`A/core.py:29-40`, v1.11.0).
+- **`create`/`update` check the system and faction** (`A/_helpers.py:63-90`,
+  v1.11.0): a faction outside the library, a faction of another system, or a
+  system that is not a visible wargame is a 400; a faction alone sets the system;
+  `""` clears either. At most 500 units, each named (`services/armies/manual.py:60-84`, v1.11.0).
+- **`update` is partial.** A different `game_system_id` without `faction_id`
+  clears the faction (`A/core.py:139-145`, v1.11.0). `units` replaces a hand-built army's whole
+  list (omitted unit ids get new uuids, old progress entries stay) and is a 400 on
+  an imported army (`A/core.py:155-160`, v1.11.0).
+- **`import` sniffs content, not the extension**: `PK` is a zip needing a `.ros`
+  member, anything else is XML (`services/armies/battlescribe.py:63-95`, v1.11.0).
+  Over 20 MiB is a 413 (`A/core.py:77-79`, v1.11.0); a non-roster is a 400. System and faction
+  are matched by name on a best effort, otherwise null
+  (`services/armies/matching.py:16-55`, v1.11.0).
+- **`progress` replaces the unit's whole entry** (omitted fields reset to
+  `0`, `[]`, `""`) and does not check the unit id; it is truncated to 64
+  characters (`A/core.py:176-181`, v1.11.0). Unit ids are
+  `data.forces[].units[].id`, recursively.
+- **`export --format roster` is a 404 for a hand-built army**
+  (`A/core.py:210-221`, v1.11.0). Both formats send `Content-Disposition`.
+- **`delete` un-registers the army and blanks it in past games**; the games stay
+  (`ondelete="SET NULL"`, `models/leagues.py:83-85,147-154`, v1.11.0).
+- **`publications` gives a league guest empty `suggestions`**
+  (`services/armies/links.py:109-136`, v1.11.0).
+- **`publication-links set` is a global upsert**, keyed on `system_name`
+  (trimmed, lower-cased) plus `publication`, shared by every army that cites it;
+  an unseen book is a 404 (`A/core.py:262-271`, `services/armies/links.py:155-174`, v1.11.0).
+  `remove` takes query params and is 204 even when no link existed
+  (`A/core.py:277-286`, `services/armies/links.py:177-181`, v1.11.0). `books` lists
+  wargame books only, at most 10 (`services/armies/links.py:139-152`, v1.11.0).
+- **Names are stripped and a blank is a 422; `""` ids are read as null**
+  (`routers/_names.py:15-22`, v1.11.0).
+- **API keys cover both tags** under the `armies` permission (`api_keys.py:117-119`,
+  v1.11.0), except the four guest routes marked `api_keys.EXCLUDED` (list, create,
+  regenerate, share; `L/__init__.py:148-182`): an API key gets 403 there, a session
+  token does not. `DELETE …/guests/{user_id}` is not excluded (`L/__init__.py:184-194`, v1.11.0).
+
+## Leagues
+
+- **Organiser checks are in the handlers.** A caller outside the league gets 404
+  "League not found"; a member who is not the organiser gets 403 on a
+  manage route (`L/_helpers.py:39-46`, v1.11.0). An admin counts as organiser of
+  every league (`L/_helpers.py:31-32`, v1.11.0), and so does the creator.
+- **The organiser is not a member until added**, so is absent from the standings
+  and cannot play a game (`L/core.py:46-52`, v1.11.0). `points_limit` is stored,
+  never enforced.
+- **`leagues list`** shows leagues you organise or belong to, every league for an
+  admin (`L/core.py:33-43`, v1.11.0).
+- **`update` is partial** (`L/core.py:76-88`, v1.11.0): null `status` and points
+  are ignored, `game_system_id` `""` clears it. `status: "finished"` is a label
+  only, nothing reads it. Standings are computed on read, so changing win, draw
+  or loss points re-scores them retroactively (`L/_helpers.py:178-182`, v1.11.0).
+- **`delete` removes shares, games and memberships**; armies and guest accounts
+  stay (`L/core.py:91-105`, v1.11.0).
+- **`eligible` lists full accounts that are not yet members** (the organiser
+  included) (`L/core.py:111-124`, v1.11.0).
+- **`members add` is idempotent**; an unknown user or a guest is a 404
+  (`L/core.py:135-141`, v1.11.0). **`members remove`** with your own id leaves;
+  removing anyone else needs the organiser (`L/core.py:151-153`, v1.11.0). It
+  drops the army registration and the member's private book shares; games stay
+  and the leaver drops out of the standings (`L/_helpers.py:186-199`, v1.11.0).
+- **`members army` takes the member's own army only**: the army must belong to
+  that member (400 "That army is not theirs"), even for the organiser; an
+  omitted or `""` army clears (`L/core.py:168-178`, v1.11.0). Registering makes
+  the army readable by every league member.
+- **`games create`/`update` share `GameIn`**; `update` is replace-whole
+  (`L/core.py:197-200`, v1.11.0). A non-organiser must be one of the two players
+  (`L/core.py:209-212`, v1.11.0); changing a game needs the organiser, recorder or a
+  player (`L/core.py:233-239`, v1.11.0). Both players must be current members and
+  differ (400). The result is read from both scores, else must be given, and a
+  contradiction is a 400 (`services/leagues.py:19-40`, v1.11.0). A player's army is
+  snapshotted when logged; `update` re-snapshots a slot whose player changed
+  (`L/core.py:201-206`, v1.11.0). `update` also runs `_plays_in` on the request body
+  (`L/core.py:252`, v1.11.0), so a recorder who is neither organiser nor admin can
+  edit only if the body names them as a player; `delete` has no such check.
+- **Standings** count current members only; sort is points, score difference,
+  score for, name (`services/leagues.py:43-94`, v1.11.0).
+- **Guests need guest access on server-side**: `guests create` is 403 otherwise,
+  checked before the league lookup (`L/guests.py:39-41`, v1.11.0). `guest_code` is
+  null unless you are an admin or organiser of every league the guest is in.
+  `regenerate` revokes the guest's sessions (`L/guests.py:172-173`, v1.11.0) and is 403 for a
+  guest in other organisers' leagues (`L/guests.py:68-70`, v1.11.0). `remove` keeps the
+  account and its sessions: the guest can still sign in to their armies
+  (`L/guests.py:184-189`, v1.11.0).
+- **`books add` clamps restricted books to `organizer`** whatever
+  `visibility` asked (`L/books.py:41-51`, v1.11.0); check the response. Default
+  visibility is `organizer`; an already shared book is a 409
+  (`L/books.py:194-200`, v1.11.0). Shares apply only to `private` and must be
+  current members (`L/books.py:205-211`, v1.11.0).
+- **`books update` keeps or replaces shares**: a non-`private` result deletes
+  them all, `private` with `shared_user_ids` replaces them, omitted keeps them
+  (`L/books.py:229-236`, v1.11.0). `update` and `remove` take the league-resource
+  `id`, not `book_id`; unknown is a 404 (`L/books.py:99-103`, v1.11.0).
+- **`books reorder` takes league-resource ids**; unknown ids are ignored and
+  unlisted ones keep their old order (`L/books.py:241-257`, v1.11.0).
+- **`books list` shows a member only public and shared-with-them books**;
+  the organiser sees all, with `shared_user_ids` (`L/books.py:93-96`, v1.11.0).

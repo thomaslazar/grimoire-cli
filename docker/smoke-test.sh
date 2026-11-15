@@ -377,8 +377,8 @@ ok "me reports the seeded admin account"
 # Requires docker/seed.sh to have run. Counts mirror the fixture set defined
 # there; changing a fixture must change these numbers. EXPECTED_SYSTEMS is the
 # top-level listing: container children are hidden unless asked for.
-EXPECTED_SYSTEMS=7
-EXPECTED_ALL_SYSTEMS=16
+EXPECTED_SYSTEMS=8
+EXPECTED_ALL_SYSTEMS=17
 
 # syslist/sysget capture the CLI's own exit status via a plain assignment,
 # then abort with fail(). They must be called directly (e.g. `syslist ...`
@@ -938,7 +938,7 @@ ok "systems cover delete removes the upload"
 # carries 3 books across 2 categories, specifically so a --limit below that
 # system's own total proves paging rather than a coincidence of the global
 # count already exceeding it.
-EXPECTED_BOOKS=18
+EXPECTED_BOOKS=21
 
 booklist() {
   LIST_JSON=$("$CLI" books list "$@" 2>"$WORK/cli.err") \
@@ -2513,7 +2513,7 @@ sysget --id "$COVER_SRC_SYS"
   || fail "Das Schwarze Auge already has an uploaded cover_image — the smoke fixture has drifted, pick a different system for cover from-source: $GET_JSON"
 # listing books to pick one as the cover source
 booklist
-COVER_SRC_BOOK=$(echo "$LIST_JSON" | jq -r '.books[0].id')
+COVER_SRC_BOOK=$(echo "$LIST_JSON" | jq -r '.books[] | select(.title == "DSA5 Aventurien") | .id')
 
 # setting the system's cover from the book, expecting a .webp cover_image
 FROMSRC_JSON=$("$CLI" systems cover from-source --id "$COVER_SRC_SYS" --source-type book --source-id "$COVER_SRC_BOOK" 2>"$WORK/cli.err") \
@@ -2558,7 +2558,7 @@ SC_TRACK=$("$CLI" audio list 2>"$WORK/cli.err" | jq -r '.audio[0].id') \
 ok "audio cover get refuses a track with no set cover"
 
 # copying a book's cover onto the track, expecting a .webp cover_image
-SC_BOOK=$("$CLI" books list 2>/dev/null | jq -r '.books[0].id')
+SC_BOOK=$("$CLI" books list 2>/dev/null | jq -r '.books[] | select(.title == "DSA5 Aventurien") | .id')
 [ -n "$SC_BOOK" ] && [ "$SC_BOOK" != "null" ] || fail "no book fixture to copy a cover from"
 SET_JSON=$("$CLI" audio cover from-source --id "$SC_TRACK" --source-type book --source-id "$SC_BOOK" 2>"$WORK/cli.err") \
   || { cat "$WORK/cli.err" >&2; fail "audio cover from-source exited non-zero"; }
@@ -2608,7 +2608,7 @@ ok "addons verify-index rejects an untrusted index URL"
 # --- book reading ------------------------------------------------------------
 # Reads only: nothing to restore, nothing to converge.
 # finding a book fixture for the reading checks
-BR_BOOK=$("$CLI" books list 2>"$WORK/cli.err" | jq -r '.books[0].id') \
+BR_BOOK=$("$CLI" books list 2>"$WORK/cli.err" | jq -r '.books[] | select(.title == "DSA5 Aventurien") | .id') \
   || { cat "$WORK/cli.err" >&2; fail "books list exited non-zero"; }
 [ -n "$BR_BOOK" ] && [ "$BR_BOOK" != "null" ] || fail "no book fixture for the reading checks"
 
@@ -2650,7 +2650,7 @@ ok "books page-words refuses a page past the end"
 # --- binary endpoints --------------------------------------------------------
 # Reads only; downloads land in $WORK, which is fresh each run.
 # finding a book fixture for the binary endpoint checks
-BE_BOOK=$("$CLI" books list 2>"$WORK/cli.err" | jq -r '.books[0].id') \
+BE_BOOK=$("$CLI" books list 2>"$WORK/cli.err" | jq -r '.books[] | select(.title == "DSA5 Aventurien") | .id') \
   || { cat "$WORK/cli.err" >&2; fail "books list exited non-zero"; }
 [ -n "$BE_BOOK" ] && [ "$BE_BOOK" != "null" ] || fail "no book fixture for the binary checks"
 
@@ -2765,7 +2765,7 @@ fi
 ok "campaigns categories list/create find or make the smoke category"
 
 # finding a book fixture to link to the campaign
-CR_BOOK=$("$CLI" books list 2>"$WORK/cli.err" | jq -r '.books[0].id') \
+CR_BOOK=$("$CLI" books list 2>"$WORK/cli.err" | jq -r '.books[] | select(.title == "DSA5 Aventurien") | .id') \
   || { cat "$WORK/cli.err" >&2; fail "books list exited non-zero"; }
 [ -n "$CR_BOOK" ] && [ "$CR_BOOK" != "null" ] || fail "no book fixture to link"
 # The first run links the book; every later run finds it linked, which the
@@ -3328,7 +3328,7 @@ ok "books links add then remove converges"
 
 # restricting a Shadowrun 4 DE subfolder, listing it, lifting it
 RULE_PATH="books/Shadowrun/4 DE/adventures"
-SHARED_BOOK=$("$CLI" books list 2>"$WORK/cli.err" | jq -r '.books[0].id')
+SHARED_BOOK=$("$CLI" books list 2>"$WORK/cli.err" | jq -r '.books[] | select(.title == "DSA5 Aventurien") | .id')
 [ -n "$SHARED_BOOK" ] && [ "$SHARED_BOOK" != "null" ] || fail "no book to check against the rule folder"
 "$CLI" files browse --path "$RULE_PATH" 2>"$WORK/cli.err" \
   | jq -e --arg b "$SHARED_BOOK" 'all(.entries[]; .record_id != $b)' >/dev/null \
@@ -3349,6 +3349,108 @@ ok "files folder access set, list and remove converge"
 "$CLI" maps index --sort name 2>"$WORK/cli.err" | jq -e '.entries | type == "array"' >/dev/null \
   || { cat "$WORK/cli.err" >&2; fail "maps index should answer an entries array"; }
 ok "maps index answers entries"
+
+# ---- armies and leagues ----
+# deleting any smoke leagues and armies a previous run left behind, so re-runs converge
+"$CLI" leagues list 2>"$WORK/cli.err" | jq -r '.[] | select(.name == "Smoke League") | .id' \
+  | while read -r id; do
+      "$CLI" leagues delete --id "$id" >/dev/null 2>"$WORK/cli.err" \
+        || { cat "$WORK/cli.err" >&2; fail "leagues delete (sweep) exited non-zero"; }
+    done
+"$CLI" armies list 2>"$WORK/cli.err" | jq -r '.[] | select(.name == "Smoke Army") | .id' \
+  | while read -r id; do
+      "$CLI" armies delete --id "$id" >/dev/null 2>"$WORK/cli.err" \
+        || { cat "$WORK/cli.err" >&2; fail "armies delete (sweep) exited non-zero"; }
+    done
+# the armory fixture: exactly one wargame, with two factions, and ttrpg excludes it
+"$CLI" systems list --game-type wargame 2>"$WORK/cli.err" | jq -e 'length == 1 and .[0].name == "Grimdark Skirmish" and .[0].game_type == "wargame"' >/dev/null \
+  || { cat "$WORK/cli.err" >&2; fail "systems list --game-type wargame should hold only Grimdark Skirmish"; }
+"$CLI" systems list --game-type ttrpg 2>"$WORK/cli.err" | jq -e 'length > 0 and all(.[]; .game_type == "ttrpg")' >/dev/null \
+  || { cat "$WORK/cli.err" >&2; fail "systems list --game-type ttrpg should hold no wargame"; }
+WG=$("$CLI" systems list --game-type wargame 2>"$WORK/cli.err" | jq -r '.[0].id')
+[ -n "$WG" ] && [ "$WG" != "null" ] || fail "no wargame system for the armory checks"
+"$CLI" systems factions --id "$WG" 2>"$WORK/cli.err" | jq -e '[.factions[].name] | sort == ["Ash Cult", "Iron Legion"]' >/dev/null \
+  || { cat "$WORK/cli.err" >&2; fail "systems factions should hold Ash Cult and Iron Legion"; }
+"$CLI" armies factions --system-id "$WG" 2>"$WORK/cli.err" | jq -e '[.factions[].name] | sort == ["Ash Cult", "Iron Legion"]' >/dev/null \
+  || { cat "$WORK/cli.err" >&2; fail "armies factions should hold Ash Cult and Iron Legion"; }
+"$CLI" armies games 2>"$WORK/cli.err" | jq -e --arg id "$WG" 'any(.[]; .id == $id)' >/dev/null \
+  || { cat "$WORK/cli.err" >&2; fail "armies games should include Grimdark Skirmish"; }
+"$CLI" books list --system-id "$WG" --category army-book 2>"$WORK/cli.err" | jq -e '.total == 2' >/dev/null \
+  || { cat "$WORK/cli.err" >&2; fail "the wargame should hold two army-book codexes"; }
+WG_FACTION=$("$CLI" armies factions --system-id "$WG" 2>"$WORK/cli.err" | jq -r '.factions[] | select(.name == "Iron Legion") | .id')
+[ -n "$WG_FACTION" ] && [ "$WG_FACTION" != "null" ] || fail "no Iron Legion faction in the wargame"
+ok "the armory fixture lists as a wargame with two factions and two codexes"
+# creating a hand-built army with one unit, in the wargame under one faction
+ARMY=$(jq -n --arg g "$WG" --arg f "$WG_FACTION" '{name:"Smoke Army",game_system_id:$g,faction_id:$f,units:[{id:"u1",name:"Smoke Unit"}]}' | "$CLI" armies create --stdin 2>"$WORK/cli.err" | jq -r .id) \
+  || { cat "$WORK/cli.err" >&2; fail "armies create exited non-zero"; }
+[ -n "$ARMY" ] && [ "$ARMY" != "null" ] || fail "armies create should return an id"
+"$CLI" armies get --id "$ARMY" 2>"$WORK/cli.err" | jq -e --arg g "$WG" '.game_system_id == $g and .game_system_name == "Grimdark Skirmish"' >/dev/null \
+  || { cat "$WORK/cli.err" >&2; fail "the army should belong to Grimdark Skirmish"; }
+# setting the unit's progress
+"$CLI" armies progress --id "$ARMY" --unit-id u1 --experience 3 --honours Bloodied 2>"$WORK/cli.err" \
+  | jq -e '.experience == 3 and .honours == ["Bloodied"]' >/dev/null \
+  || { cat "$WORK/cli.err" >&2; fail "armies progress should echo experience 3 and Bloodied"; }
+# exporting as text to stdout
+ARMY_TXT=$("$CLI" armies export --id "$ARMY" --format text --output - 2>"$WORK/cli.err") \
+  || { cat "$WORK/cli.err" >&2; fail "armies export exited non-zero"; }
+echo "$ARMY_TXT" | grep -q "Smoke Army" || fail "the text export should name the army: $ARMY_TXT"
+"$CLI" armies list 2>"$WORK/cli.err" | jq -e --arg id "$ARMY" 'any(.[]; .id == $id)' >/dev/null \
+  || fail "armies list should hold the new army"
+ok "armies create, progress, export and list"
+# a Shadowrun 4 DE system has no factions
+"$CLI" systems factions --id "$SR4" 2>"$WORK/cli.err" | jq -e '.factions == []' >/dev/null \
+  || { cat "$WORK/cli.err" >&2; fail "systems factions on Shadowrun 4 DE should be an empty factions list"; }
+ok "systems factions is empty for a system without factions"
+# creating a league as admin, then adding admin and gm as members
+LGE=$(jq -n --arg g "$WG" '{name:"Smoke League",game_system_id:$g}' | "$CLI" leagues create --stdin 2>"$WORK/cli.err" | jq -r .id) \
+  || { cat "$WORK/cli.err" >&2; fail "leagues create exited non-zero"; }
+[ -n "$LGE" ] && [ "$LGE" != "null" ] || fail "leagues create should return an id"
+LGE_ADMIN=$(echo "$ME_JSON" | jq -r .id)
+LGE_GM=$("$CLI" leagues eligible --id "$LGE" 2>"$WORK/cli.err" | jq -r '[.[] | select(.name == "gm")][0].id') \
+  || { cat "$WORK/cli.err" >&2; fail "leagues eligible exited non-zero"; }
+[ -n "$LGE_GM" ] && [ "$LGE_GM" != "null" ] || fail "leagues eligible should list gm"
+"$CLI" leagues members add --id "$LGE" --user-id "$LGE_ADMIN" >/dev/null 2>"$WORK/cli.err" \
+  || { cat "$WORK/cli.err" >&2; fail "leagues members add (admin) exited non-zero"; }
+"$CLI" leagues members add --id "$LGE" --user-id "$LGE_GM" 2>"$WORK/cli.err" \
+  | jq -e '(.members | length) == 2' >/dev/null \
+  || { cat "$WORK/cli.err" >&2; fail "the league should hold two members"; }
+# registering the army for admin
+"$CLI" leagues members army --id "$LGE" --user-id "$LGE_ADMIN" --army-id "$ARMY" >/dev/null 2>"$WORK/cli.err" \
+  || { cat "$WORK/cli.err" >&2; fail "leagues members army exited non-zero"; }
+# logging a game, admin against gm, 3 to 1
+LGE_GAME=$(jq -n --arg a "$LGE_ADMIN" --arg b "$LGE_GM" '{player_a_id:$a,player_b_id:$b,score_a:3,score_b:1}' \
+  | "$CLI" leagues games create --id "$LGE" --stdin 2>"$WORK/cli.err" | jq -r '.games[0].id') \
+  || { cat "$WORK/cli.err" >&2; fail "leagues games create exited non-zero"; }
+"$CLI" leagues get --id "$LGE" >"$WORK/lget.out" 2>"$WORK/cli.err" \
+  || { cat "$WORK/cli.err" >&2; fail "leagues get exited non-zero"; }
+jq -e --arg g "$LGE_GAME" --arg a "$LGE_ADMIN" \
+  '(.games[] | select(.id == $g) | .result == "a") and .standings[0].user_id == $a' "$WORK/lget.out" >/dev/null \
+  || fail "the game should be result a with admin on top: $(cat "$WORK/lget.out")"
+jq -e --arg g "$WG" '.game_system_id == $g and .game_system_name == "Grimdark Skirmish"' "$WORK/lget.out" >/dev/null \
+  || fail "the league should be set to Grimdark Skirmish: $(cat "$WORK/lget.out")"
+"$CLI" leagues games delete --id "$LGE" --game-id "$LGE_GAME" >/dev/null 2>"$WORK/cli.err" \
+  || { cat "$WORK/cli.err" >&2; fail "leagues games delete exited non-zero"; }
+ok "leagues create, members, army registration and games log a 3-1 win for admin"
+# sharing a book with the league, making it public, then unsharing
+LGE_RES=$("$CLI" leagues books add --id "$LGE" --book-id "$SR4_BOOK" 2>"$WORK/cli.err" | jq -r '.id') \
+  || { cat "$WORK/cli.err" >&2; fail "leagues books add exited non-zero"; }
+[ -n "$LGE_RES" ] && [ "$LGE_RES" != "null" ] || fail "leagues books add should return an id"
+"$CLI" leagues books update --id "$LGE" --resource-id "$LGE_RES" --visibility public 2>"$WORK/cli.err" \
+  | jq -e '.visibility == "public"' >/dev/null \
+  || { cat "$WORK/cli.err" >&2; fail "leagues books update should make the book public"; }
+"$CLI" leagues books remove --id "$LGE" --resource-id "$LGE_RES" >/dev/null 2>"$WORK/cli.err" \
+  || { cat "$WORK/cli.err" >&2; fail "leagues books remove exited non-zero"; }
+ok "leagues books add, update and remove"
+# deleting the league, then the army
+"$CLI" leagues delete --id "$LGE" >/dev/null 2>"$WORK/cli.err" \
+  || { cat "$WORK/cli.err" >&2; fail "leagues delete exited non-zero"; }
+"$CLI" armies delete --id "$ARMY" >/dev/null 2>"$WORK/cli.err" \
+  || { cat "$WORK/cli.err" >&2; fail "armies delete exited non-zero"; }
+"$CLI" leagues list 2>"$WORK/cli.err" | jq -e 'all(.[]; .name != "Smoke League")' >/dev/null \
+  || fail "the smoke league is still listed"
+"$CLI" armies list 2>"$WORK/cli.err" | jq -e 'all(.[]; .name != "Smoke Army")' >/dev/null \
+  || fail "the smoke army is still listed"
+ok "leagues delete and armies delete leave nothing behind"
 
 # ---- api keys ----
 # Key-mode calls use their own config file, so the admin session above is untouched.
