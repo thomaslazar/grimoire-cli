@@ -114,7 +114,7 @@ public static class SystemsCommand
         var bookSortOption = OptionHelpers.Choice("--book-sort", "Sort the books; default category", BookSortKeys);
         var bookDescOption = new Option<bool>("--book-desc") { Description = "Sort the books descending" };
         var genreOption = new Option<string?>("--genre") { Description = "Keep only books with this genre" };
-        var categoryOption = new Option<string?>("--category") { Description = "Keep only books in this category (core, supplement, adventure, …; wargame: army-book, errata, mission-pack, campaign (a campaign book), unit-reference, painting-guide, lore, magazine, starter-set, supplement, core)" };
+        var categoryOption = new Option<string?>("--category") { Description = "Keep only books in this category; see Categories" };
         var explicitOption = new Option<bool?>("--explicit") { Description = "Keep only books with this explicit flag (true | false)" };
         var includeBooksOption = new Option<bool?>("--include-books") { Description = "false returns books empty (true | false); default true" };
         var command = new Command("get", "Get one game system, with its books")
@@ -128,16 +128,12 @@ public static class SystemsCommand
             "books includes books linked onto the system from another (is_linked),",
             "and the counts include them.",
             "",
-            "--category takes the normalised value, not the folder name",
-            "('supplement', not 'supplements'), and is case-sensitive; --genre is",
-            "not. Values are open-ended: an unmapped folder becomes its own slug,",
-            "and a book with no subfolder under a system-agnostic root is",
-            "'uncategorized'.",
-            "",
-            "--book-desc applies only to --book-sort title|page_count|year.",
+            "--genre is case-insensitive. --book-desc applies only to --book-sort",
+            "title|page_count|year.",
             "",
             "--include-books false ignores the book filters: book_count and",
             "total_page_count then cover every book the account can see.");
+        BookCategoryHelp.AddTo(command);
         command.AddExamples(
             "grimoire-cli systems get --id <system-id>",
             "grimoire-cli systems get --id <system-id> --category core",

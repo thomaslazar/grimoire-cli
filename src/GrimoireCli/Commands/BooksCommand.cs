@@ -39,7 +39,7 @@ public static class BooksCommand
     private static Command CreateListCommand()
     {
         var systemIdOption = new Option<string?>("--system-id") { Description = "Filter by game system" };
-        var categoryOption = new Option<string?>("--category") { Description = "Filter by category (core, supplement, adventure, …; wargame values below)" };
+        var categoryOption = new Option<string?>("--category") { Description = "Filter by category; see Categories" };
         var limitOption = new Option<int>("--limit")
         {
             Description = "Results per page (default 100, max 500)",
@@ -61,12 +61,6 @@ public static class BooksCommand
             "--limit 422s above 500; page with --offset against the total in the",
             "response.",
             "",
-            "--category is the normalised value, not the folder name ('supplement',",
-            "not 'supplements'), and is case-sensitive: Core matches nothing.",
-            "Wargame (armory/) books use army-book, errata, mission-pack, campaign,",
-            "unit-reference, painting-guide, lore, magazine, starter-set, supplement",
-            "and core; campaign there is a campaign book, not an adventure.",
-            "",
             "Undated books sort last under added_at either way, and never match",
             "--added-since. A time without an offset is UTC.",
             "",
@@ -74,6 +68,7 @@ public static class BooksCommand
             "Wargame (armory/) books are listed alongside role-playing ones.",
             "",
             "The account's explicit permission filters the list server-side.");
+        BookCategoryHelp.AddTo(command);
         command.AddExamples(
             "grimoire-cli books list",
             "grimoire-cli books list --system-id <system-id> --category core",

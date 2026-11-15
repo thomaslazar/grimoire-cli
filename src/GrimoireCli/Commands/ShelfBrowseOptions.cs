@@ -20,7 +20,7 @@ internal sealed class ShelfBrowseOptions
     private readonly Option<bool?> _explicit = new("--explicit") { Description = "Keep only books with this explicit flag (true | false)" };
     private readonly Option<string?> _genre = new("--genre") { Description = "Only books with this genre" };
     private readonly Option<string?> _productCode = new("--product-code") { Description = "Only books whose product code starts with this" };
-    private readonly Option<string?> _category = new("--category") { Description = "Only books in this category (core, supplement, adventure, …; wargame: army-book, errata, mission-pack, campaign (a campaign book), unit-reference, painting-guide, lore, magazine, starter-set, supplement, core)" };
+    private readonly Option<string?> _category = new("--category") { Description = "Only books in this category; see Categories" };
     private readonly Option<string?> _folder = new("--folder") { Description = "Only books directly in this subfolder of --category" };
     private readonly Option<string?> _sort = OptionHelpers.Choice("--sort", "Row order; default title", Sorts);
     private readonly Option<string?> _order = OptionHelpers.Choice("--order", "Sort direction; default asc", Orders);
@@ -50,12 +50,12 @@ internal sealed class ShelfBrowseOptions
             "--genre (exact, case-insensitive) and --product-code (a prefix) also",
             "take __grim:none__ / __grim:any__ for books with none / any.",
             "",
-            "--category is the normalised value and case-sensitive. --folder is the",
-            "subfolder below the category directory, \"\" for the category's own; it",
-            "needs --category.",
+            "--folder is the subfolder below the category directory, \"\" for the",
+            "category's own; it needs --category.",
             "",
             "Undated books never match --added-since; a time without an offset is",
             "UTC. Books with no year or date sort last either way.");
+        BookCategoryHelp.AddTo(command);
         command.AddHelpSection("Query syntax", HelpSectionPosition.Top,
             "Bare text matches the title, filename or product code. Fields, aliases",
             "in parens: title (name), filename (file), author (authors), artist",
