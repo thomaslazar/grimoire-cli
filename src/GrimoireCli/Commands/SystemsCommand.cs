@@ -9,6 +9,7 @@ public static class SystemsCommand
 {
     private static readonly NLog.Logger _logger = NLog.LogManager.GetCurrentClassLogger();
     private static readonly string[] SystemSortKeys = ["name", "book_count", "page_count", "year"];
+    private static readonly string[] GameTypes = ["ttrpg", "wargame"];
     private static readonly string[] BookSortKeys = ["category", "title", "page_count", "year"];
 
     public static Command Create()
@@ -57,9 +58,10 @@ public static class SystemsCommand
         var explicitOption = new Option<bool?>("--explicit") { Description = "Filter by explicit flag (true | false); omit for both" };
         var parentIdOption = new Option<string?>("--parent-id") { Description = "List only the children of this container" };
         var includeChildrenOption = new Option<bool>("--include-children") { Description = "Include container children (hidden by default)" };
+        var gameTypeOption = OptionHelpers.Choice("--game-type", "Only role-playing (books/) or only wargame (armory/) systems; default both", GameTypes);
         var command = new Command("list", "List all game systems")
         {
-            sortOption, descOption, genreOption, familyOption,
+            gameTypeOption, sortOption, descOption, genreOption, familyOption,
             parentOption, editionOption, licenseOption, explicitOption,
             parentIdOption, includeChildrenOption
         };
@@ -73,7 +75,8 @@ public static class SystemsCommand
             "implies it.",
             "",
             "Wargame (armory/) systems are listed alongside role-playing ones, and",
-            "one of each may share a name: tell them apart by game_type.",
+            "one of each may share a name: tell them apart by game_type, or pass",
+            "--game-type.",
             "",
             "book_count and total_page_count include books linked onto a system.");
         command.AddExamples(
@@ -81,7 +84,8 @@ public static class SystemsCommand
             "grimoire-cli systems list --sort book_count --desc",
             "grimoire-cli systems list --include-children --family Shadowrun",
             "grimoire-cli systems list --parent-id <container-id>",
-            "grimoire-cli systems list --explicit false");
+            "grimoire-cli systems list --explicit false",
+            "grimoire-cli systems list --game-type wargame");
         command.AddResponseExampleArray<Generated.Models.SystemSummary>();
         command.SetAction(async (parseResult, cancellationToken) =>
         {
@@ -97,7 +101,8 @@ public static class SystemsCommand
                 parseResult.GetValue(licenseOption),
                 parseResult.GetValue(explicitOption),
                 parseResult.GetValue(parentIdOption),
-                parseResult.GetValue(includeChildrenOption));
+                parseResult.GetValue(includeChildrenOption),
+                parseResult.GetValue(gameTypeOption));
             ConsoleOutput.WriteRawJson(result);
             return 0;
         });

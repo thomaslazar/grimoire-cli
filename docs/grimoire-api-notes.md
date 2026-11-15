@@ -177,7 +177,7 @@ Applies to both `PATCH /api/systems/{id}` and `PATCH /api/books/{id}`
   own books only (`core.py:230-233`, `:257-260`).
 - **`GET /api/systems` lists wargames too**, as of 1.11.0: `game_type`
   (`ttrpg` | `wargame`) narrows it, and omitted means both (`core.py:52-58`,
-  `:88-89`, v1.11.0). The CLI does not send it.
+  `:88-89`, v1.11.0). `systems list --game-type` sends it.
 - **`GET /api/systems/{id}?include_books=false` returns `books: []`**, as of
   1.8.0, and computes `book_count` / `total_page_count` in SQL without the
   `explicit`, `category` and `genre` filters, so those three have no effect on

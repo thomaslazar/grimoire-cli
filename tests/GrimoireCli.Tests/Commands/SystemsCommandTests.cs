@@ -187,6 +187,27 @@ public class SystemsCommandTests
         Assert.Contains("Run --help-full", output);
     }
 
+    private static string ListUri(string? gameType)
+    {
+        var client = new GrimoireCli.Api.GrimoireApiClient(new GrimoireCli.Configuration.AppConfig { Server = "http://example.test", AccessToken = "t" });
+        var info = new GrimoireCli.Services.SystemsService(client).ListRequest(null, false, null, null, null, null, null, null, null, false, gameType);
+        info.PathParameters["baseurl"] = "http://example.test";
+        return info.URI.AbsoluteUri;
+    }
+
+    [Fact]
+    public void ListSendsGameTypeWhenSet() => Assert.Equal("http://example.test/api/systems?game_type=wargame", ListUri("wargame"));
+
+    [Fact]
+    public void ListSendsNoQueryWithoutGameType() => Assert.Equal("http://example.test/api/systems", ListUri(null));
+
+    [Fact]
+    public void ListRejectsAnUnknownGameType()
+    {
+        Assert.Empty(Root().Parse("systems list --game-type wargame").Errors);
+        Assert.NotEmpty(Root().Parse("systems list --game-type board").Errors);
+    }
+
     [Fact]
     public void FactionsRoutesToTheSystemsFactionsEndpoint()
     {

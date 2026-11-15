@@ -14,9 +14,14 @@ public class SystemsService
     public async Task<string> ListAsync(
         string? sort, bool desc, string? genre, string? family,
         string? parentSystem, string? edition, string? license, bool? isExplicit,
-        string? parentId, bool includeChildren)
-    {
-        var info = _client.Api.Api.Systems.ToGetRequestInformation(c =>
+        string? parentId, bool includeChildren, string? gameType = null)
+        => await _client.SendAsync(ListRequest(sort, desc, genre, family, parentSystem, edition, license, isExplicit, parentId, includeChildren, gameType));
+
+    internal RequestInformation ListRequest(
+        string? sort, bool desc, string? genre, string? family,
+        string? parentSystem, string? edition, string? license, bool? isExplicit,
+        string? parentId, bool includeChildren, string? gameType)
+        => _client.Api.Api.Systems.ToGetRequestInformation(c =>
         {
             c.QueryParameters.Sort = sort;
             c.QueryParameters.Order = desc ? "desc" : null;
@@ -30,9 +35,8 @@ public class SystemsService
             // Sent only when true: the server default is false, so an omitted
             // parameter and an explicit false mean the same thing.
             c.QueryParameters.IncludeChildren = includeChildren ? true : null;
+            c.QueryParameters.GameType = gameType;
         });
-        return await _client.SendAsync(info);
-    }
 
     public async Task<string> GetAsync(
         string id, string? bookSort, bool bookDesc, string? genre, string? category, bool? isExplicit, bool? includeBooks)
