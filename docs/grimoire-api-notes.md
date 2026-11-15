@@ -692,6 +692,45 @@ the 1.8.0 stack; re-read at `v1.11.0`. Backs `systems books list`, `folder-count
   upper-cased leading-letter product-code prefixes and tags, over the whole
   visible shelf.
 
+## Book links
+
+Read from `backend/routers/books/links.py` and `services/book_links.py` at tag
+`v1.11.0`. Backs `books links list|add|remove`.
+
+- **A link shows a book on a second system's shelf**; it never changes who may
+  open it. All three routes answer the book's other systems, sorted by name
+  (`links.py:20-67`, `book_links.py:118-133`). `add` and `remove` need gm or
+  admin; `list` is open, and 404s an explicit book the caller may not see.
+- **`add` is idempotent** and 400s on: a book that is a version (`"Link the
+  main version of this book instead"`, `links.py:41-43`), the book's own system,
+  and a role-playing book onto a wargame system or the reverse
+  (`book_links.py:144-148`).
+- **`remove` 404s** with `"The book is not linked to that system"` when no such
+  link exists (`links.py:65`).
+- **Lists leave out systems hidden from the caller**, and the book's own system
+  (`book_links.py:118-133`).
+
+## Folder access rules
+
+Read from `backend/routers/settings/folder_access.py` and
+`services/folder_access.py` at tag `v1.11.0`. Backs `files folder access`.
+
+- **The path must be a folder inside `books/` or an armory folder**, not the
+  collection itself (`folder_access.py:47-60`); anything else is a 400.
+- **`set` 404s on a missing folder and replaces any existing level**; the
+  stored path takes the folder's on-disk spelling, so the echoed `path` may
+  differ in case from the request (`routers/settings/folder_access.py:116-149`).
+  Levels are `gm` and `admin`.
+- **`set` demotes campaign shares** of the books it covers to GM-only and league
+  shares to organiser-only, except books with an explicit open level; `remove`
+  does not restore them (`_demote_campaign_shares`, `:66-104`, `:152-166`). `remove` 404s when the folder has no rule.
+- **A book resolves to the stricter** of the folder's level and what its
+  system or category gives it; only the book's own level overrides
+  (`routers/settings/__init__.py:53-63`).
+- **Each rule is `{path, level, exists, books}`**: `books` counts books beneath
+  it, `exists` is false once the folder is gone or spelled differently
+  (`:48-63`). `list` is sorted by path and wrapped in `{"rules": [...]}`.
+
 ## Book folders
 
 Measured against `hunterreadca/grimoire:1.6.0` — the 1.6.0 RC, not the v1.5.6 the
@@ -1009,7 +1048,9 @@ tag `v1.7.0`; the upload conflict policy re-read at `v1.8.0`.
   `:135-180`). A rescan re-adds a soft-deleted map as a new record and does
   not undo the repointing. `GET /api/files/campaign-map-copies?path=` (admin)
   answers the same plan in advance, per campaign and outcome, deleting
-  nothing (`routers/files/core.py:429-450`, v1.11.0).
+  nothing (`routers/files/core.py:429-455`, v1.11.0). `outcome` is `copy`, or
+  why not: `too_large`, `uploads_disabled`, `not_image`, `file_missing`
+  (`routers/files/_schemas.py:185-201`).
 - **Folder access rules follow the tree too**, as of 1.11.0: a move or rename
   relinks them onto the new path (`folder_access.relink_rules`,
   `library_fs/moves.py:654`, v1.11.0) and a directory delete purges them
@@ -1231,6 +1272,14 @@ measured against the running 1.7.0 stack; the list parameters re-read at
 - **Map page and `vtt/image` answer 304 to a matching `If-None-Match`**, as of
   1.10.0: both send an `ETag` built from the file's content token, checked
   before anything renders (`routers/maps/core.py:262-265`, `:331-333`, v1.10.0).
+- **`GET /api/maps/index` is the rail for the sorted list**, as of 1.11.0: one
+  entry `{key, label, count, offset}` per run of items sharing a first letter
+  (`sort=name`) or an added month (`sort=added_at`). Any other sort answers
+  `[]` (`INDEXED_SORTS`, `services/browse/media.py:44`, `:276-333`, v1.11.0).
+  Digits and punctuation share `#`; undated items form a last run with an empty
+  label; `offset` is the entry's position in the list for the same filters. It
+  takes the list's filters but not `limit`/`offset`. `models`, `tokens` and
+  `audio` share the service and answer the same.
 
 ### Universal VTT routes
 

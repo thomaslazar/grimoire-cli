@@ -27,6 +27,7 @@ public static class FilesFolderCommands
         command.Subcommands.Add(CreateMarkersCommand());
         command.Subcommands.Add(CreateScaffoldCommand());
         command.Subcommands.Add(CreateContentsCommand());
+        command.Subcommands.Add(FolderAccessCommands.Create());
         return command;
     }
 

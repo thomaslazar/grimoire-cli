@@ -18,6 +18,7 @@ public static class FilesCommand
         command.Subcommands.Add(CreateMoveCommand());
         command.Subcommands.Add(CreateRenameCommand());
         command.Subcommands.Add(CreateDeleteCommand());
+        command.Subcommands.Add(CreateCampaignMapCopiesCommand());
         command.Subcommands.Add(FilesFolderCommands.Create());
         return command;
     }
@@ -217,6 +218,30 @@ public static class FilesCommand
                 parseResult.GetValue(pathOption)!,
                 parseResult.GetValue(confirmNameOption),
                 parseResult.GetValue(deleteFilesOption));
+            ConsoleOutput.WriteRawJson(result);
+            return 0;
+        });
+        return command;
+    }
+
+    private static Command CreateCampaignMapCopiesCommand()
+    {
+        var pathOption = new Option<string>("--path") { Description = "File or folder a delete would remove", Required = true };
+        var command = new Command("campaign-map-copies", "Campaigns a delete would copy maps into, and whether each copy fits")
+        {
+            pathOption
+        };
+        command.AddRoleRequired("admin");
+        command.AddHelpSection("Notes", HelpSectionPosition.Top,
+            "outcome is copy, or why not: too_large, uploads_disabled, not_image,",
+            "file_missing.");
+        command.AddExamples("grimoire-cli files campaign-map-copies --path \"maps/Dungeons\"");
+        command.AddResponseExample<Generated.Models.CampaignMapCopiesResponse>();
+        command.SetAction(async (parseResult, cancellationToken) =>
+        {
+            var (client, _) = CommandHelper.BuildClient();
+            var service = new FilesService(client);
+            var result = await service.CampaignMapCopiesAsync(parseResult.GetValue(pathOption)!);
             ConsoleOutput.WriteRawJson(result);
             return 0;
         });

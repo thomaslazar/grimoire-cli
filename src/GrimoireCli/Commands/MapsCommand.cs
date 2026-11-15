@@ -15,6 +15,7 @@ public static class MapsCommand
         var command = new Command("maps", "Read and edit map metadata");
         command.Subcommands.Add(CreateListCommand());
         command.Subcommands.Add(CreateFolderCountsCommand());
+        command.Subcommands.Add(CreateIndexCommand());
         command.Subcommands.Add(CreateGetCommand());
         command.Subcommands.Add(CreateThumbnailCommand());
         command.Subcommands.Add(CreateFileCommand());
@@ -86,6 +87,34 @@ public static class MapsCommand
             var (client, _) = CommandHelper.BuildClient();
             var service = new MapsService(client);
             var result = await service.FolderCountsAsync(
+                parseResult.GetValue(mapTypeOption),
+                browse.Read(parseResult));
+            ConsoleOutput.WriteRawJson(result);
+            return 0;
+        });
+        return command;
+    }
+
+    private static Command CreateIndexCommand()
+    {
+        var mapTypeOption = new Option<string?>("--map-type") { Description = "Filter by map type" };
+        var browse = new MediaBrowseOptions();
+        var command = new Command("index", "Where each letter or month starts in the sorted list")
+        {
+            mapTypeOption
+        };
+        browse.AddTo(command, "maps");
+        command.AddHelpSection("Notes", HelpSectionPosition.Top,
+            "Entries come only for --sort name (one per first letter, # for digits",
+            "and symbols) and --sort added_at (one per month); other sorts return",
+            "none. offset is the run's position in maps list for the same filters.");
+        command.AddExamples("grimoire-cli maps index --sort name");
+        command.AddResponseExample<Generated.Models.BrowseIndexResponse>();
+        command.SetAction(async (parseResult, cancellationToken) =>
+        {
+            var (client, _) = CommandHelper.BuildClient();
+            var service = new MapsService(client);
+            var result = await service.IndexAsync(
                 parseResult.GetValue(mapTypeOption),
                 browse.Read(parseResult));
             ConsoleOutput.WriteRawJson(result);

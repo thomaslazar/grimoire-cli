@@ -15,6 +15,7 @@ public static class TokensCommand
         var command = new Command("tokens", "Read and edit token metadata");
         command.Subcommands.Add(CreateListCommand());
         command.Subcommands.Add(CreateFolderCountsCommand());
+        command.Subcommands.Add(CreateIndexCommand());
         command.Subcommands.Add(CreateGetCommand());
         command.Subcommands.Add(CreateThumbnailCommand());
         command.Subcommands.Add(CreateFileCommand());
@@ -81,6 +82,28 @@ public static class TokensCommand
             var (client, _) = CommandHelper.BuildClient();
             var service = new TokensService(client);
             var result = await service.FolderCountsAsync(browse.Read(parseResult));
+            ConsoleOutput.WriteRawJson(result);
+            return 0;
+        });
+        return command;
+    }
+
+    private static Command CreateIndexCommand()
+    {
+        var browse = new MediaBrowseOptions();
+        var command = new Command("index", "Where each letter or month starts in the sorted list");
+        browse.AddTo(command, "tokens");
+        command.AddHelpSection("Notes", HelpSectionPosition.Top,
+            "Entries come only for --sort name (one per first letter, # for digits",
+            "and symbols) and --sort added_at (one per month); other sorts return",
+            "none. offset is the run's position in tokens list for the same filters.");
+        command.AddExamples("grimoire-cli tokens index --sort name");
+        command.AddResponseExample<Generated.Models.BrowseIndexResponse>();
+        command.SetAction(async (parseResult, cancellationToken) =>
+        {
+            var (client, _) = CommandHelper.BuildClient();
+            var service = new TokensService(client);
+            var result = await service.IndexAsync(browse.Read(parseResult));
             ConsoleOutput.WriteRawJson(result);
             return 0;
         });

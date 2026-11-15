@@ -57,6 +57,25 @@ public class TokensService
                     Enum.Parse<Generated.Api.Tokens.Groups.GetOrderQueryParameterType>(filter.Order, true);
         });
 
+    /// <summary>GET /api/tokens/index. Each first letter's (name sort) or month's (added_at sort) run, with its offset.</summary>
+    public async Task<string> IndexAsync(MediaBrowseFilter filter)
+        => await _client.SendAsync(IndexRequest(filter));
+
+    /// <summary>Internal (not private) so a test can pin it to its own builder's path.</summary>
+    internal RequestInformation IndexRequest(MediaBrowseFilter filter)
+        => _client.Api.Api.Tokens.Index.ToGetRequestInformation(c =>
+        {
+            c.QueryParameters.Q = filter.Query;
+            c.QueryParameters.Tags = filter.Tags;
+            c.QueryParameters.Favorites = filter.Favorites;
+            c.QueryParameters.AddedSince = filter.AddedSince;
+            c.QueryParameters.Folder = filter.Folder;
+            c.QueryParameters.Sort = filter.Sort;
+            if (filter.Order is not null)
+                c.QueryParameters.OrderAsGetOrderQueryParameterType =
+                    Enum.Parse<Generated.Api.Tokens.IndexNamespace.GetOrderQueryParameterType>(filter.Order, true);
+        });
+
     /// <summary>GET /api/tokens/{id}. Adds folder tags, pixel dimensions and the variant family.</summary>
     public async Task<string> GetAsync(string id)
     {

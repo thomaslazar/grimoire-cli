@@ -25,6 +25,7 @@ public static class BooksCommand
         command.Subcommands.Add(CreateRescanCommand());
         command.Subcommands.Add(CreateThumbnailCommand());
         command.Subcommands.Add(BookCoverCommands.Create());
+        command.Subcommands.Add(BookLinksCommands.Create());
         command.Subcommands.Add(CreateFileCommand());
         command.Subcommands.Add(CreatePageCommand());
         command.Subcommands.Add(CreateTocCommand());

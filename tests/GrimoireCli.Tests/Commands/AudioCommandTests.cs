@@ -272,4 +272,8 @@ public class AudioCommandTests
     [Fact]
     public void FolderCountsSaysCountsAreDirectContentsOnly()
         => Assert.Contains("not its subfolders", Help(["audio", "folder-counts"]));
+
+    [Fact]
+    public void IndexParsesWithTheBrowseFilters()
+        => Assert.Empty(AudioCommand.Create().Parse(["index", "--sort", "name", "--order", "asc"]).Errors);
 }

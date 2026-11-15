@@ -45,6 +45,11 @@ public class FilesServiceTests
     }
 
     [Fact]
+    public void CampaignMapCopiesSendsThePath()
+        => Assert.Equal("http://example.test/api/files/campaign-map-copies?path=maps%2Fdungeons",
+            Uri(new FilesService(Client()).CampaignMapCopiesRequest("maps/dungeons")));
+
+    [Fact]
     public void BrowseSendsPathAndLimitAsQueryParameters()
     {
         var info = Client().Api.Api.Files.Browse.ToGetRequestInformation(c =>

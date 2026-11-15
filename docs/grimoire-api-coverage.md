@@ -16,12 +16,12 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | addons | 8 / 10 |
 | api-keys | 0 / 6 |
 | armies | 0 / 14 |
-| audio | 15 / 17 |
+| audio | 16 / 17 |
 | audio-sets | 0 / 5 |
 | auth | 2 / 15 |
 | backups | 6 / 6 |
 | bookmarks | 0 / 4 |
-| books | 19 / 27 |
+| books | 22 / 27 |
 | campaigns | 80 / 109 |
 | characters | 0 / 25 |
 | codex | 0 / 11 |
@@ -29,19 +29,19 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | downloads | 1 / 1 |
 | duplicates | 13 / 18 |
 | favorites | 0 / 3 |
-| files | 9 / 17 |
+| files | 10 / 17 |
 | leagues | 0 / 23 |
 | library | 4 / 8 |
 | logs | 1 / 1 |
 | lookups | 15 / 15 |
 | maintenance | 3 / 4 |
-| maps | 15 / 24 |
-| models | 11 / 12 |
+| maps | 16 / 24 |
+| models | 12 / 12 |
 | pins | 0 / 3 |
 | rulesets | 0 / 17 |
 | saved-filters | 0 / 4 |
 | search | 2 / 2 |
-| settings | 0 / 8 |
+| settings | 3 / 8 |
 | share | 0 / 4 |
 | share-links | 0 / 8 |
 | stats | 1 / 1 |
@@ -49,9 +49,9 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | tags | 7 / 7 |
 | themes | 0 / 6 |
 | token-frames | 0 / 2 |
-| tokens | 11 / 12 |
+| tokens | 12 / 12 |
 | users | 0 / 16 |
-| **Total** | **241 / 491** |
+| **Total** | **252 / 491** |
 
 2 operation(s) are internal-only (🔒) and excluded from covered counts.
 
@@ -117,7 +117,7 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | POST | `/api/audio/bulk` | Bulk update audio tracks | gm or admin | audio: write | `audio batch-update` ✅ |
 | POST | `/api/audio/bulk/tags` | Bulk add tags to audio tracks | gm or admin | audio: write | `audio batch-tag` ✅ |
 | GET | `/api/audio/groups` | Folders holding matching audio tracks | not guest | audio: read | `audio folder-counts` ✅ |
-| GET | `/api/audio/index` | Where each letter starts in the flat list | not guest | audio: read | — |
+| GET | `/api/audio/index` | Where each letter starts in the flat list | not guest | audio: read | `audio index` ✅ |
 | GET | `/api/audio/{audio_id}` | Get an audio track |  | audio: read | `audio get` ✅ |
 | PATCH | `/api/audio/{audio_id}` | Update audio metadata | gm or admin | audio: write | `audio update` ✅ |
 | GET | `/api/audio/{audio_id}/artwork` | Audio artwork |  | audio: read | `audio artwork` ✅ |
@@ -204,9 +204,9 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | GET | `/api/books/{book_id}/page/{page_num}/words` | Get page word bounding boxes |  | books: read | `books page-words` ✅ |
 | POST | `/api/books/{book_id}/reindex` | Re-run OCR on a book (optional DPI override) | gm or admin | books: write | `books reindex` ✅ |
 | POST | `/api/books/{book_id}/rescan` | Re-read a book from disk and rebuild its search index | gm or admin | books: write | `books rescan` ✅ |
-| GET | `/api/books/{book_id}/systems` | List the other systems a book appears in | not guest | books: read | — |
-| POST | `/api/books/{book_id}/systems` | Show a book on another system's shelf | gm or admin | books: write | — |
-| DELETE | `/api/books/{book_id}/systems/{system_id}` | Take a book off another system's shelf | gm or admin | books: write | — |
+| GET | `/api/books/{book_id}/systems` | List the other systems a book appears in | not guest | books: read | `books links list` ✅ |
+| POST | `/api/books/{book_id}/systems` | Show a book on another system's shelf | gm or admin | books: write | `books links add` ✅ |
+| DELETE | `/api/books/{book_id}/systems/{system_id}` | Take a book off another system's shelf | gm or admin | books: write | `books links remove` ✅ |
 | GET | `/api/books/{book_id}/thumbnail` | Book cover thumbnail |  | books: read | `books thumbnail` ✅ |
 | GET | `/api/books/{book_id}/toc` | PDF table of contents |  | books: read | `books toc` ✅ |
 
@@ -423,7 +423,7 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | Method | Path | Description | Perm | Key | CLI |
 |--------|------|-------------|------|-----|-----|
 | GET | `/api/files/browse` | List a library folder with indexing state | admin | files: read | `files browse` ✅ |
-| GET | `/api/files/campaign-map-copies` | Campaigns that use a map a delete would remove, and whether each keeps a copy | admin | files: read | — |
+| GET | `/api/files/campaign-map-copies` | Campaigns that use a map a delete would remove, and whether each keeps a copy | admin | files: read | `files campaign-map-copies` ✅ |
 | POST | `/api/files/delete` | Remove a file or folder from the index, or from disk | admin | files: write | `files delete` ✅ |
 | POST | `/api/files/folder` | Create a folder, optionally as a container or NSFW | admin | files: write | `files folder create` ✅ |
 | DELETE | `/api/files/folder` | Delete a folder, recursively when confirmed by name | admin | files: write | — |
@@ -527,7 +527,7 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | POST | `/api/maps/bulk` | Bulk update maps | gm or admin | maps: write | `maps batch-update` ✅ |
 | POST | `/api/maps/bulk/tags` | Bulk add tags to maps | gm or admin | maps: write | `maps batch-tag` ✅ |
 | GET | `/api/maps/groups` | Folders holding matching maps | not guest | maps: read | `maps folder-counts` ✅ |
-| GET | `/api/maps/index` | Where each letter starts in the flat list | not guest | maps: read | — |
+| GET | `/api/maps/index` | Where each letter starts in the flat list | not guest | maps: read | `maps index` ✅ |
 | GET | `/api/maps/{map_id}` | Get a map |  | maps: read | `maps get` ✅ |
 | PATCH | `/api/maps/{map_id}` | Update map metadata | gm or admin | maps: write | `maps update` ✅ |
 | POST | `/api/maps/{map_id}/export` | Export map pages or cut-outs |  | maps: read | — |
@@ -556,7 +556,7 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | POST | `/api/models/bulk` | Bulk update models | gm or admin | models: write | `models batch-update` ✅ |
 | POST | `/api/models/bulk/tags` | Bulk add tags to models | gm or admin | models: write | `models batch-tag` ✅ |
 | GET | `/api/models/groups` | Folders holding matching 3D models | not guest | models: read | `models folder-counts` ✅ |
-| GET | `/api/models/index` | Where each letter starts in the flat list | not guest | models: read | — |
+| GET | `/api/models/index` | Where each letter starts in the flat list | not guest | models: read | `models index` ✅ |
 | GET | `/api/models/{model_id}` | Get a 3D model |  | models: read | `models get` ✅ |
 | PATCH | `/api/models/{model_id}` | Update model metadata | gm or admin | models: write | `models update` ✅ |
 | GET | `/api/models/{model_id}/file` | Download model file |  | models: read | `models file` ✅ |
@@ -614,9 +614,9 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 |--------|------|-------------|------|-----|-----|
 | GET | `/api/settings` | Get app settings | admin | settings: read | — |
 | PATCH | `/api/settings` | Update app settings | admin | settings: write | — |
-| GET | `/api/settings/folder-access` | List folder access restrictions | admin | settings: read | — |
-| PUT | `/api/settings/folder-access` | Restrict a folder | admin | settings: write | — |
-| DELETE | `/api/settings/folder-access` | Lift a folder's restriction | admin | settings: write | — |
+| GET | `/api/settings/folder-access` | List folder access restrictions | admin | settings: read | `files folder access list` ✅ |
+| PUT | `/api/settings/folder-access` | Restrict a folder | admin | settings: write | `files folder access set` ✅ |
+| DELETE | `/api/settings/folder-access` | Lift a folder's restriction | admin | settings: write | `files folder access remove` ✅ |
 | POST | `/api/settings/oidc-button-icon` | Upload the OIDC login-button icon | admin | — | — |
 | DELETE | `/api/settings/oidc-button-icon` | Remove the OIDC login-button icon | admin | — | — |
 | GET | `/api/settings/ui` | UI settings (any authenticated user) |  | settings: read | — |
@@ -714,7 +714,7 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | POST | `/api/tokens/bulk` | Bulk update tokens | gm or admin | tokens: write | `tokens batch-update` ✅ |
 | POST | `/api/tokens/bulk/tags` | Bulk add tags to tokens | gm or admin | tokens: write | `tokens batch-tag` ✅ |
 | GET | `/api/tokens/groups` | Folders holding matching tokens | not guest | tokens: read | `tokens folder-counts` ✅ |
-| GET | `/api/tokens/index` | Where each letter starts in the flat list | not guest | tokens: read | — |
+| GET | `/api/tokens/index` | Where each letter starts in the flat list | not guest | tokens: read | `tokens index` ✅ |
 | GET | `/api/tokens/{token_id}` | Get a token |  | tokens: read | `tokens get` ✅ |
 | PATCH | `/api/tokens/{token_id}` | Update token metadata | gm or admin | tokens: write | `tokens update` ✅ |
 | GET | `/api/tokens/{token_id}/file` | Download token file |  | tokens: read | `tokens file` ✅ |
