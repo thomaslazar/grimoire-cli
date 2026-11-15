@@ -15,8 +15,7 @@ public static class CampaignWikiPinsCommands
     private static readonly string[] Access =
     [
         "Needs edit rights on the map page, else 403; a page that is not a map",
-        "page is a 400. Only the campaign GM sets gm visibility or lifts it; 403",
-        "for anyone else.",
+        "page is a 400. Only the campaign GM sets gm visibility, else 403.",
     ];
 
     private static readonly string[] Target =
@@ -68,7 +67,7 @@ public static class CampaignWikiPinsCommands
             idOption, pageIdOption, xOption, yOption, labelOption, targetPageIdOption, targetTitleOption,
             iconOption, iconColorOption, visibilityOption
         };
-        command.AddHelpSection("Notes", HelpSectionPosition.Top, [.. Access, "", .. Target]);
+        command.AddHelpSection("Notes", HelpSectionPosition.Top, [.. Access, "", .. Target, "On create --target-page-id wins over --target-title if both are given."]);
         command.AddExamples("grimoire-cli campaigns wiki pins create --id <campaign-id> --page-id <page-id> --x 0.25 --y 0.5 --label Gate --target-title \"Thornwall Gate\"");
         command.AddResponseExample<Generated.Models.WikiMapPinOut>();
         command.SetAction(async (parseResult, cancellationToken) =>

@@ -1746,14 +1746,14 @@ at tag `v1.8.0`; starred items verified against the 1.8.0 stack. Backs
 - **Pins have no list route and no role dependency**, as of 1.11.0
   (`wiki_pins.py`, v1.11.0). Whoever can edit the map page manages its pins,
   else 403, and a page that is not a map page is a 400 (`:33-42`). Only the
-  campaign owner sets `gm` or lifts it, else 403 (`:45-50`). A pin the caller
+  campaign owner sets `gm`, else 403 (`:45-50`). A pin the caller
   can't see answers 404, as for a missing one: a `gm` pin to a non-owner, or a
   pin linking a page the caller can't read (`:89-93`, `_wiki_maps.py:163-177`).
   `target_title` reuses a visible page of that slug or creates a stub with the
   map page's visibility; `target_page_id` must be a visible page other than
   the map page, else 400 (`_wiki_maps.py:288-334`). On PATCH a non-blank
   `target_title` wins over `target_page_id`, `target_page_id: ""` unlinks, and
-  `""` clears `icon`/`icon_color` (`:110-125`). `x`/`y` are fractions of the
+  `""` clears `icon`/`icon_color` (`wiki_pins.py:113-127`). `x`/`y` are fractions of the
   picture, 0 to 1 (`_schemas.py:232-259`). GM pins are left out of backlinks
   (`_wiki_maps.py:220-245`).
 - **A title holding `|`, `[`, `]` or a line break is a 400**, as of 1.11.0

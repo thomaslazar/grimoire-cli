@@ -460,11 +460,11 @@ grimoire-cli config set server https://grimoire.example.com
 | `campaigns wiki templates import --id <campaign-id> --file <path>` | Add a note template from a .md file or template .zip |
 | `campaigns wiki templates export --id <campaign-id> --template-id <template-id> --output <path\|->` | Export a note template as a .zip |
 | `campaigns wiki templates use --id <campaign-id> --template-id <template-id>` | Create a wiki page from a note template |
+| `campaigns wiki templates catalogue --id <campaign-id> [--refresh]` | Browse the community note-template catalogue |
+| `campaigns wiki templates install --id <campaign-id> --source-id <catalogue-id> [--index-url <url>]` | Copy a catalogue template into the campaign |
 | `campaigns wiki pins create --id <campaign-id> --page-id <page-id> --x <0-1> --y <0-1> [--label <text>] [--target-page-id <page-id> \| --target-title <title>] [--icon <icon>] [--icon-color <colour>] [--visibility <page\|gm>]` | Add a pin to a map page |
 | `campaigns wiki pins update --id <campaign-id> --page-id <page-id> --pin-id <pin-id> [--x <0-1>] [--y <0-1>] [--label <text>] [--target-page-id <page-id>] [--target-title <title>] [--icon <icon>] [--icon-color <colour>] [--visibility <page\|gm>]` | Move or edit a pin on a map page |
 | `campaigns wiki pins delete --id <campaign-id> --page-id <page-id> --pin-id <pin-id>` | Remove a pin from a map page |
-| `campaigns wiki templates catalogue --id <campaign-id> [--refresh]` | Browse the community note-template catalogue |
-| `campaigns wiki templates install --id <campaign-id> --source-id <catalogue-id> [--index-url <url>]` | Copy a catalogue template into the campaign |
 | `self-test` | Verify binary integrity (AOT validation, no network required) |
 
 Every command supports `--help` with examples and caveats.
