@@ -1615,6 +1615,24 @@ Read from `backend/routers/downloads/` at tag `v1.7.1`, and verified against the
   early — the client's request timeout covers the full server-side build, not
   just the time to first byte.
 
+## Pins
+
+Read from `backend/routers/pins/` at tag `v1.11.0`. Backs `pins`.
+
+- **The router needs a non-guest**, with no role beyond that
+  (`routers/pins/__init__.py:8`, v1.11.0).
+- **`list` wraps the rows** as `{"pins": [...]}`, oldest first, optionally for
+  one `collection`; an unknown collection is a 400 (`core.py:27-39`, v1.11.0).
+- **`target` is trimmed and stripped of slashes** before it is stored; blank is
+  rejected, and it may be at most 1000 UTF-8 bytes. For `systems` it is a system
+  id, for the other collections a folder path relative to that collection
+  (`_schemas.py:25-34`, v1.11.0).
+- **Adding is idempotent**: a pin already held returns the existing one rather
+  than a 409, including when two requests race. A collection holds at most 100
+  per user; past that is a 400 (`core.py:42-75`, v1.11.0).
+- **Another user's pin is a 404**, the same as a missing one (`core.py:78-88`,
+  v1.11.0).
+
 ## Campaigns
 
 Read from `backend/routers/campaigns/` at tag `v1.7.2`, and verified against the
@@ -1837,3 +1855,38 @@ Read from `backend/routers/campaigns/schedule.py`, `calendar.py` and
   `/calendar/{token}/{campaign_id}.ics` authenticate by the token in the path
   for calendar apps; `subscription` returns their URLs, and
   `{id}/calendar.ics` serves the same events to an authenticated caller.
+
+## GM screen
+
+Read from `backend/routers/campaigns/gm_screen.py` and
+`backend/services/gm_screen/` at tag `v1.11.0`. Backs `campaigns gm-screen`.
+
+- **Only the campaign owner**, anyone else a 403; no role dependency on the
+  routes. Writes also refuse a locked campaign: 409 while archived, 403 while
+  the GM's campaign access is disabled (`gm_screen.py:46-58`; `_helpers.py:289-313`,
+  v1.11.0).
+- **Panel `config` and `state` are cleaned forgivingly.** Unknown keys and bad
+  values become defaults; only an unknown kind is refused
+  (`services/gm_screen/panels.py:1-21`, v1.11.0).
+- **`panels update` replaces `config` and `state` whole**, not key by key; only
+  the fields sent change. A new `config` re-cleans the state against it
+  (`gm_screen.py:205-242`, v1.11.0).
+- **`reset`** clears what each panel marks with `resets` for that scope;
+  `session` also clears `scene` (`panels.py:433-437`, `reset_state` `panels.py:440-464`, v1.11.0).
+- **`layout` skips an id not on the board** rather than failing
+  (`gm_screen.py:258-278`, v1.11.0).
+- **A board document is `{format: "grimoire://gm-screen/v1", name, panels}`**,
+  and only `panels` is read: it must be a non-empty list of known kinds
+  (`boards.py:42-89`, v1.11.0).
+- **`export` drops a note's `page_id`** and keeps the slug, as an id means
+  nothing in another campaign (`boards.py:92-115`, v1.11.0).
+- **`import`, `copy` and `apply-preset` share `_add_board`**: `replace: true`
+  (the default) deletes the board first, `false` puts the new panels below it.
+  A board holds at most 60 panels, over that a 400 (`gm_screen.py:126-134`,
+  v1.11.0).
+- **`copy` takes setup, not values**: counters back to start, clocks unticked,
+  initiative empty; notes match by slug. A source you don't own or this very
+  campaign is a 404, an empty source board a 400 (`gm_screen.py:337-359`,
+  v1.11.0).
+- **Presets** need external downloads enabled, else 403; an unknown preset is
+  a 404 and a failed download a 502 (`gm_screen.py:389-418`, v1.11.0).

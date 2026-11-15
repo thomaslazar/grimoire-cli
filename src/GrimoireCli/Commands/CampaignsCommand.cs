@@ -33,6 +33,7 @@ public static class CampaignsCommand
         command.Subcommands.Add(CampaignCalendarCommands.Create());
         command.Subcommands.Add(CampaignAvailabilityCommands.Create());
         command.Subcommands.Add(CampaignWikiCommands.Create());
+        command.Subcommands.Add(CampaignGmScreenCommands.Create());
         command.Subcommands.Add(CampaignMembersCommands.Create());
         command.Subcommands.Add(CampaignGuestsCommands.Create());
         command.Subcommands.Add(CreateInvitesCommand());

@@ -465,6 +465,22 @@ grimoire-cli config set server https://grimoire.example.com
 | `campaigns wiki pins create --id <campaign-id> --page-id <page-id> --x <0-1> --y <0-1> [--label <text>] [--target-page-id <page-id> \| --target-title <title>] [--icon <icon>] [--icon-color <colour>] [--visibility <page\|gm>]` | Add a pin to a map page |
 | `campaigns wiki pins update --id <campaign-id> --page-id <page-id> --pin-id <pin-id> [--x <0-1>] [--y <0-1>] [--label <text>] [--target-page-id <page-id>] [--target-title <title>] [--icon <icon>] [--icon-color <colour>] [--visibility <page\|gm>]` | Move or edit a pin on a map page |
 | `campaigns wiki pins delete --id <campaign-id> --page-id <page-id> --pin-id <pin-id>` | Remove a pin from a map page |
+| `campaigns gm-screen get --id <campaign-id>` | Get the GM screen's panels |
+| `campaigns gm-screen party --id <campaign-id>` | The party's characters and values for the GM screen |
+| `campaigns gm-screen export --id <campaign-id>` | Export the board as a document import reads |
+| `campaigns gm-screen sources --id <campaign-id>` | Other campaigns you run with a board to copy |
+| `campaigns gm-screen presets --id <campaign-id>` | Browse community GM screen presets |
+| `campaigns gm-screen reset --id <campaign-id> --scope scene\|session\|rest` | End a scene or session, or rest: clear marked panels |
+| `campaigns gm-screen layout --id <campaign-id> {--input <file> \| --stdin}` | Move and resize several panels at once |
+| `campaigns gm-screen import --id <campaign-id> {--input <file> \| --stdin} [--append]` | Put a board document on the GM screen |
+| `campaigns gm-screen copy --id <campaign-id> --source-id <campaign-id> [--append]` | Copy another campaign's board |
+| `campaigns gm-screen apply-preset --id <campaign-id> --preset-id <preset-id> [--index-url <url>] [--append]` | Apply a community GM screen preset |
+| `campaigns gm-screen panels create --id <campaign-id> {--input <file> \| --stdin}` | Add a panel to the GM screen |
+| `campaigns gm-screen panels update --id <campaign-id> --panel-id <panel-id> {--input <file> \| --stdin}` | Update a GM screen panel |
+| `campaigns gm-screen panels delete --id <campaign-id> --panel-id <panel-id>` | Remove a GM screen panel |
+| `pins list [--collection systems\|maps\|tokens\|audio\|models]` | List your pins |
+| `pins add --collection systems\|maps\|tokens\|audio\|models --target <id-or-path>` | Pin a folder or game system |
+| `pins remove --pin-id <pin-id>` | Unpin |
 | `self-test` | Verify binary integrity (AOT validation, no network required) |
 
 Every command supports `--help` with examples and caveats.
