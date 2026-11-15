@@ -642,6 +642,24 @@ syslist --include-children
 SR4=$(echo "$LIST_JSON" | jq -r '.[] | select(.name == "Shadowrun 4 DE") | .id')
 [ -n "$SR4" ] || fail "no Shadowrun 4 DE fixture to write to"
 
+# pinning Shadowrun 4 DE twice expecting one pin, then listing and removing it
+SYSPIN1=$("$CLI" pins add --collection systems --target "$SR4" 2>"$WORK/cli.err" | jq -r .id) \
+  || { cat "$WORK/cli.err" >&2; fail "pins add exited non-zero"; }
+SYSPIN2=$("$CLI" pins add --collection systems --target "$SR4" 2>"$WORK/cli.err" | jq -r .id) \
+  || { cat "$WORK/cli.err" >&2; fail "pins add (again) exited non-zero"; }
+[ -n "$SYSPIN1" ] && [ "$SYSPIN1" != "null" ] && [ "$SYSPIN1" = "$SYSPIN2" ] \
+  || fail "pinning twice should return one id, got '$SYSPIN1' and '$SYSPIN2'"
+"$CLI" pins list --collection systems 2>"$WORK/cli.err" \
+  | jq -e --arg id "$SYSPIN1" --arg t "$SR4" '.pins | any(.id == $id and .target == $t)' >/dev/null \
+  || fail "pins list should hold the system pin"
+ok "pins add is idempotent and pins list holds the pin"
+"$CLI" pins remove --pin-id "$SYSPIN1" >/dev/null 2>"$WORK/cli.err" \
+  || { cat "$WORK/cli.err" >&2; fail "pins remove exited non-zero"; }
+"$CLI" pins list --collection systems 2>"$WORK/cli.err" \
+  | jq -e --arg id "$SYSPIN1" '.pins | any(.id == $id) | not' >/dev/null \
+  || fail "pins list should not hold the pin after remove"
+ok "pins remove unpins"
+
 # updating Shadowrun 4 DE's description then reading it back expecting the new value
 echo '{"description":"smoke fixture description"}' \
   | "$CLI" systems update --id "$SR4" --stdin >"$WORK/upd.out" 2>"$WORK/upd.err" \
@@ -2904,6 +2922,39 @@ ok "campaigns wiki pins create and update place and move a pin"
 "$CLI" campaigns wiki delete --id "$WIKI" --page-id "$MAP" >/dev/null 2>"$WORK/cli.err" \
   || { cat "$WORK/cli.err" >&2; fail "wiki delete (map page) exited non-zero"; }
 ok "campaigns wiki pins delete removes the pin"
+
+# clearing the GM screen of leftovers, then running a counter through update, reset, export and import
+gmpanels() { "$CLI" campaigns gm-screen get --id "$WIKI" 2>"$WORK/cli.err"; }
+for GMP in $(gmpanels | jq -r '.panels[].id'); do
+  "$CLI" campaigns gm-screen panels delete --id "$WIKI" --panel-id "$GMP" >/dev/null 2>"$WORK/cli.err" \
+    || { cat "$WORK/cli.err" >&2; fail "gm-screen panels delete exited non-zero"; }
+done
+gmpanels | jq -e '.panels == []' >/dev/null || fail "the GM screen should start empty"
+GMP=$(echo '{"kind":"counter","title":"Smoke Fear","config":{"min":0,"max":10,"start":2,"resets":"scene"}}' \
+  | "$CLI" campaigns gm-screen panels create --id "$WIKI" --stdin 2>"$WORK/cli.err" | jq -r .id) \
+  || { cat "$WORK/cli.err" >&2; fail "gm-screen panels create exited non-zero"; }
+[ -n "$GMP" ] && [ "$GMP" != "null" ] || fail "gm-screen panels create returned no id"
+echo '{"state":{"value":7}}' \
+  | "$CLI" campaigns gm-screen panels update --id "$WIKI" --panel-id "$GMP" --stdin 2>"$WORK/cli.err" \
+  | jq -e '.state.value == 7' >/dev/null \
+  || fail "gm-screen panels update should set the counter to 7"
+ok "gm-screen panels create and update set a counter"
+"$CLI" campaigns gm-screen reset --id "$WIKI" --scope scene 2>"$WORK/cli.err" \
+  | jq -e --arg id "$GMP" '.panels[] | select(.id == $id) | .state.value == 2' >/dev/null \
+  || fail "gm-screen reset --scope scene should put the counter back to 2"
+ok "gm-screen reset clears a scene counter to its start"
+"$CLI" campaigns gm-screen export --id "$WIKI" >"$WORK/gm-board.json" 2>"$WORK/cli.err" \
+  || { cat "$WORK/cli.err" >&2; fail "gm-screen export exited non-zero"; }
+"$CLI" campaigns gm-screen import --id "$WIKI" --input "$WORK/gm-board.json" --append 2>"$WORK/cli.err" \
+  | jq -e '.panels | length == 2' >/dev/null \
+  || fail "gm-screen import --append should leave two panels"
+ok "gm-screen export and import --append round-trip a board"
+for GMP in $(gmpanels | jq -r '.panels[].id'); do
+  "$CLI" campaigns gm-screen panels delete --id "$WIKI" --panel-id "$GMP" >/dev/null 2>"$WORK/cli.err" \
+    || { cat "$WORK/cli.err" >&2; fail "gm-screen panels delete exited non-zero"; }
+done
+gmpanels | jq -e '.panels == []' >/dev/null || fail "the GM screen should be empty after delete"
+ok "gm-screen panels delete empties the board"
 
 # exporting the wiki as a JSON bundle expecting the remaining pages
 "$CLI" campaigns wiki export --id "$WIKI" --format json --output "$WORK/wiki.json" >/dev/null 2>"$WORK/cli.err" \

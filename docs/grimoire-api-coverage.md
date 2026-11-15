@@ -22,7 +22,7 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | backups | 6 / 6 |
 | bookmarks | 0 / 4 |
 | books | 22 / 27 |
-| campaigns | 83 / 109 |
+| campaigns | 96 / 109 |
 | characters | 0 / 25 |
 | codex | 0 / 11 |
 | content | 0 / 6 |
@@ -37,7 +37,7 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | maintenance | 3 / 4 |
 | maps | 16 / 24 |
 | models | 12 / 12 |
-| pins | 0 / 3 |
+| pins | 3 / 3 |
 | rulesets | 0 / 17 |
 | saved-filters | 0 / 4 |
 | search | 2 / 2 |
@@ -51,7 +51,7 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | token-frames | 0 / 2 |
 | tokens | 12 / 12 |
 | users | 0 / 16 |
-| **Total** | **255 / 491** |
+| **Total** | **271 / 491** |
 
 2 operation(s) are internal-only (🔒) and excluded from covered counts.
 
@@ -247,19 +247,19 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | GET | `/api/campaigns/{campaign_id}/eligible-members` | List users that can be invited |  | campaigns: read | `campaigns members eligible` ✅ |
 | POST | `/api/campaigns/{campaign_id}/files` | Upload a campaign file (GM); links it as a resource |  | campaigns: write | `campaigns files upload` ✅ |
 | GET | `/api/campaigns/{campaign_id}/files/{file_id}` | Download a campaign file (honours resource visibility) |  | campaigns: read | `campaigns files get` ✅ |
-| GET | `/api/campaigns/{campaign_id}/gm-screen` | Get the GM screen's panels |  | campaigns: read | — |
-| POST | `/api/campaigns/{campaign_id}/gm-screen/copy` | Copy another campaign's GM screen |  | campaigns: write | — |
-| GET | `/api/campaigns/{campaign_id}/gm-screen/export` | Export the GM screen as a board document |  | campaigns: read | — |
-| POST | `/api/campaigns/{campaign_id}/gm-screen/import` | Put a board document on the GM screen |  | campaigns: write | — |
-| PUT | `/api/campaigns/{campaign_id}/gm-screen/layout` | Move and resize GM screen panels |  | campaigns: write | — |
-| POST | `/api/campaigns/{campaign_id}/gm-screen/panels` | Add a panel to the GM screen |  | campaigns: write | — |
-| PATCH | `/api/campaigns/{campaign_id}/gm-screen/panels/{panel_id}` | Update a GM screen panel |  | campaigns: write | — |
-| DELETE | `/api/campaigns/{campaign_id}/gm-screen/panels/{panel_id}` | Remove a GM screen panel |  | campaigns: write | — |
-| GET | `/api/campaigns/{campaign_id}/gm-screen/party` | The party's characters and values for the GM screen |  | campaigns: read | — |
-| GET | `/api/campaigns/{campaign_id}/gm-screen/presets` | Browse community GM screen presets |  | campaigns: read | — |
-| POST | `/api/campaigns/{campaign_id}/gm-screen/presets/apply` | Apply a community GM screen preset |  | campaigns: write | — |
-| POST | `/api/campaigns/{campaign_id}/gm-screen/reset` | End a scene or session, or rest: clear marked panels |  | campaigns: write | — |
-| GET | `/api/campaigns/{campaign_id}/gm-screen/sources` | Other campaigns with a GM screen to copy |  | campaigns: read | — |
+| GET | `/api/campaigns/{campaign_id}/gm-screen` | Get the GM screen's panels |  | campaigns: read | `campaigns gm-screen get` ✅ |
+| POST | `/api/campaigns/{campaign_id}/gm-screen/copy` | Copy another campaign's GM screen |  | campaigns: write | `campaigns gm-screen copy` ✅ |
+| GET | `/api/campaigns/{campaign_id}/gm-screen/export` | Export the GM screen as a board document |  | campaigns: read | `campaigns gm-screen export` ✅ |
+| POST | `/api/campaigns/{campaign_id}/gm-screen/import` | Put a board document on the GM screen |  | campaigns: write | `campaigns gm-screen import` ✅ |
+| PUT | `/api/campaigns/{campaign_id}/gm-screen/layout` | Move and resize GM screen panels |  | campaigns: write | `campaigns gm-screen layout` ✅ |
+| POST | `/api/campaigns/{campaign_id}/gm-screen/panels` | Add a panel to the GM screen |  | campaigns: write | `campaigns gm-screen panels create` ✅ |
+| PATCH | `/api/campaigns/{campaign_id}/gm-screen/panels/{panel_id}` | Update a GM screen panel |  | campaigns: write | `campaigns gm-screen panels update` ✅ |
+| DELETE | `/api/campaigns/{campaign_id}/gm-screen/panels/{panel_id}` | Remove a GM screen panel |  | campaigns: write | `campaigns gm-screen panels delete` ✅ |
+| GET | `/api/campaigns/{campaign_id}/gm-screen/party` | The party's characters and values for the GM screen |  | campaigns: read | `campaigns gm-screen party` ✅ |
+| GET | `/api/campaigns/{campaign_id}/gm-screen/presets` | Browse community GM screen presets |  | campaigns: read | `campaigns gm-screen presets` ✅ |
+| POST | `/api/campaigns/{campaign_id}/gm-screen/presets/apply` | Apply a community GM screen preset |  | campaigns: write | `campaigns gm-screen apply-preset` ✅ |
+| POST | `/api/campaigns/{campaign_id}/gm-screen/reset` | End a scene or session, or rest: clear marked panels |  | campaigns: write | `campaigns gm-screen reset` ✅ |
+| GET | `/api/campaigns/{campaign_id}/gm-screen/sources` | Other campaigns with a GM screen to copy |  | campaigns: read | `campaigns gm-screen sources` ✅ |
 | POST | `/api/campaigns/{campaign_id}/guests` | Create a guest invite code for a GM campaign |  | — | `campaigns guests create` ✅ |
 | GET | `/api/campaigns/{campaign_id}/guests` | List a campaign's guests and their invite codes |  | — | `campaigns guests list` ✅ |
 | DELETE | `/api/campaigns/{campaign_id}/guests/{member_id}` | Remove a guest (deletes the guest account) |  | campaigns: write | `campaigns guests remove` ✅ |
@@ -566,9 +566,9 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 
 | Method | Path | Description | Perm | Key | CLI |
 |--------|------|-------------|------|-----|-----|
-| GET | `/api/pins` | List the user's pins |  | personal: read | — |
-| POST | `/api/pins` | Pin a folder or game system |  | personal: write | — |
-| DELETE | `/api/pins/{pin_id}` | Unpin |  | personal: write | — |
+| GET | `/api/pins` | List the user's pins |  | personal: read | `pins list` ✅ |
+| POST | `/api/pins` | Pin a folder or game system |  | personal: write | `pins add` ✅ |
+| DELETE | `/api/pins/{pin_id}` | Unpin |  | personal: write | `pins remove` ✅ |
 
 ## rulesets
 
