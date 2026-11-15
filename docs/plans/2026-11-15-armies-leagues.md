@@ -2,7 +2,7 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Wrap Grimoire 1.11.0's wargame routes: armies (14), leagues (22) and `GET /api/systems/{id}/factions`.
+**Goal:** Wrap Grimoire 1.11.0's wargame routes: armies (14), leagues (23) and `GET /api/systems/{id}/factions`.
 
 **Architecture:** Each command group has one command file and one service. Every command is a thin pass-through to a single endpoint. Bodies are JSON (`--input`/`--stdin`) where they nest, and flags where they are a handful of scalars. Docs and the smoke test come last.
 
@@ -323,8 +323,8 @@ Bodies use the generated league `BookAdd`, `BookUpdate` and `BookReorder` models
   - Place `armies` and `leagues` in `Program.cs` order.
   - Place `systems factions` with the other `systems` rows.
 - [ ] **Step 2: Coverage.**
-  - Add the 37 entries: 14 armies, 22 leagues, and `GET /api/systems/{system_id}/factions`. Take the exact paths from `docs/grimoire-api-coverage.md`.
-  - Run `python3 tools/generate-api-coverage.py`, which needs the running stack. Expected: 308 covered, up from 271. Report the real number if it differs.
+  - Add the 38 entries: 14 armies, 23 leagues, and `GET /api/systems/{system_id}/factions`. Take the exact paths from `docs/grimoire-api-coverage.md`.
+  - Run `python3 tools/generate-api-coverage.py`, which needs the running stack. Expected: 309 covered, up from 271. Report the real number if it differs.
 - [ ] **Step 3: API notes.**
   - Add `## Armies` and `## Leagues` sections, and a system-factions bullet in the systems section.
   - Use the house bullet style: a bold claim, then the cite with its version.

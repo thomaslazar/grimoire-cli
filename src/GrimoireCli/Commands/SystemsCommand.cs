@@ -32,8 +32,8 @@ public static class SystemsCommand
         var idOption = new Option<string>("--id") { Description = "System ID", Required = true };
         var command = new Command("factions", "List a system's factions, with book counts") { idOption };
         command.AddHelpSection("Notes", HelpSectionPosition.Top,
-            "A role-playing system gives an empty list. League guests get 403; they",
-            "use armies factions.");
+            "A role-playing system gives an empty list. Every guest gets 403; league",
+            "guests use armies factions.");
         command.AddExamples("grimoire-cli systems factions --id <system-id>");
         command.AddResponseExample<Generated.Models.SystemFactionsResponse>();
         command.SetAction(async (parseResult, cancellationToken) =>

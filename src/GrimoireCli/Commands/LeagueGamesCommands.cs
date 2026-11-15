@@ -77,7 +77,8 @@ public static class LeagueGamesCommands
         var command = new Command("update", "Edit a game") { idOption, gameIdOption, inputOption, stdinOption };
         JsonBodyInput.RequireExactlyOneSource(command, inputOption, stdinOption);
         command.AddHelpSection("Notes", HelpSectionPosition.Top,
-            "Organiser, admin, the recorder or either player only. Send the whole",
+            "Organiser, admin, the recorder or either player only; unless organiser or",
+            "admin, the recorder must also be a player in the body. Send the whole",
             "body: it replaces the whole game, and omitted fields reset. Same rules",
             "as create; a game whose player has left needs a new pairing.");
         command.AddExamples(

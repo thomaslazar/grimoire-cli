@@ -11,7 +11,7 @@ namespace GrimoireCli.Services;
 /// </summary>
 public class LeaguesService
 {
-    private const string LeagueNotFound = "No league with that ID. List yours with: grimoire-cli leagues list";
+    private const string LeagueNotFound = "No league with that ID that you're in. List yours with: grimoire-cli leagues list";
 
     private readonly GrimoireApiClient _client;
 

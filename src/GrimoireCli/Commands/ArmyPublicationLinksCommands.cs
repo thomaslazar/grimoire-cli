@@ -23,7 +23,7 @@ public static class ArmyPublicationLinksCommands
 
     private static Option<string?> SystemNameOption() => new("--system-name")
     {
-        Description = "Roster's game-system name (system_name in armies get)",
+        Description = "Roster's game-system name (system_name in armies get); omitted keys the link to \"\", matched only by hand-built armies",
     };
 
     private static Command CreateSetCommand()

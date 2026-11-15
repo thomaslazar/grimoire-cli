@@ -7,7 +7,7 @@ namespace GrimoireCli.Services;
 /// <summary>League membership (routers/leagues/__init__.py, core.py). Access is checked by the server; no call carries a permission hint.</summary>
 public class LeagueMembersService
 {
-    private const string LeagueNotFound = "No league with that ID. List yours with: grimoire-cli leagues list";
+    private const string LeagueNotFound = "No league with that ID that you're in. List yours with: grimoire-cli leagues list";
 
     private const string UserNotFound = "No such league or user. Candidates are in: grimoire-cli leagues eligible --id <league-id>";
     private const string MemberNotFound = "No such league, or that user is not a member. Members are in: grimoire-cli leagues get --id <league-id>";

@@ -28,10 +28,10 @@ public static class LeagueBooksCommands
     private static Option<string> ResourceIdOption() =>
         new("--resource-id") { Description = "Shared book's id from books list", Required = true };
 
-    private static Option<string[]?> SharedUserIdsOption() =>
+    private static Option<string[]?> SharedUserIdsOption(string description) =>
         new("--shared-user-ids")
         {
-            Description = "League members to share a private book with; replaces the set",
+            Description = description,
             AllowMultipleArgumentsPerToken = true,
             Arity = ArgumentArity.OneOrMore,
         };
@@ -45,8 +45,9 @@ public static class LeagueBooksCommands
         var idOption = LeagueIdOption();
         var command = new Command("list", "List the books shared with a league") { idOption };
         command.AddHelpSection("Notes", HelpSectionPosition.Top,
-            "id is the shared book's id for update, remove and reorder; book_id is the library book.",
-            "A member sees public books plus private ones shared with them.");
+            "id is the shared book's id for update, remove and reorder; book_id is",
+            "the library book. A member sees public books plus private ones shared",
+            "with them.");
         command.AddExamples("grimoire-cli leagues books list --id <league-id>");
         command.AddResponseExampleArray<Generated.Models.LeagueBook>();
         command.SetAction(async (parseResult, cancellationToken) =>
@@ -84,11 +85,12 @@ public static class LeagueBooksCommands
         var idOption = LeagueIdOption();
         var bookIdOption = new Option<string>("--book-id") { Description = "Library book ID", Required = true };
         var visibilityOption = OptionHelpers.Choice("--visibility", "Who sees it; default organizer", Visibilities);
-        var sharedOption = SharedUserIdsOption();
+        var sharedOption = SharedUserIdsOption("League members to share a private book with");
         var command = new Command("add", "Share a library book with a league") { idOption, bookIdOption, visibilityOption, sharedOption };
         command.AddHelpSection("Notes", HelpSectionPosition.Top,
             Organiser,
-            "A restricted book becomes organizer whatever is asked: check visibility in the response.",
+            "A restricted book becomes organizer whatever is asked: check visibility",
+            "in the response.",
             "409 when already shared.",
             "--shared-user-ids applies only to private and must be league members, else 400.");
         command.AddExamples("grimoire-cli leagues books add --id <league-id> --book-id <book-id> --visibility public");
@@ -111,7 +113,7 @@ public static class LeagueBooksCommands
         var idOption = LeagueIdOption();
         var resourceIdOption = ResourceIdOption();
         var visibilityOption = OptionHelpers.Choice("--visibility", "Who sees it", Visibilities);
-        var sharedOption = SharedUserIdsOption();
+        var sharedOption = SharedUserIdsOption("League members the private book is shared with; replaces the current set");
         var command = new Command("update", "Change a shared book's visibility or shares") { idOption, resourceIdOption, visibilityOption, sharedOption };
         command.Validators.Add(result =>
         {

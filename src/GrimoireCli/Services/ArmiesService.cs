@@ -12,7 +12,9 @@ namespace GrimoireCli.Services;
 /// </summary>
 public class ArmiesService
 {
-    private const string ArmyNotFound = "No army with that ID. List yours with: grimoire-cli armies list";
+    private const string ArmyNotFound = "No army with that ID that you can see. List yours with: grimoire-cli armies list";
+
+    private const string ExportNotFound = "No army with that ID that you can see, or --format roster on a hand-built army. List yours with: grimoire-cli armies list";
 
     private readonly GrimoireApiClient _client;
 
@@ -40,7 +42,7 @@ public class ArmiesService
 
     /// <summary>GET /api/armies/{id}/export. The army as text or as the imported roster file.</summary>
     public async Task<Stream> ExportAsync(string id, string? format)
-        => await _client.SendStreamAsync(ExportRequest(id, format), notFoundHint: ArmyNotFound);
+        => await _client.SendStreamAsync(ExportRequest(id, format), notFoundHint: ExportNotFound);
 
     /// <summary>GET /api/armies/{id}/publications.</summary>
     public async Task<string> PublicationsAsync(string id)

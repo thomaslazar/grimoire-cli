@@ -10,11 +10,11 @@ namespace GrimoireCli.Services;
 /// </summary>
 public class LeagueBooksService
 {
-    private const string LeagueNotFound = "No league with that ID. List yours with: grimoire-cli leagues list";
+    private const string LeagueNotFound = "No league with that ID that you're in. List yours with: grimoire-cli leagues list";
 
     private const string AddNotFound = "No such league or book. List leagues with: grimoire-cli leagues list; find book IDs with: grimoire-cli leagues books search --id <league-id> --query <text>";
 
-    private const string ResourceNotFound = "No such league or shared book. List them with: grimoire-cli leagues books list --id <league-id> (use its id, not book_id)";
+    private const string ResourceNotFound = "No such league, shared book, or library book. List them with: grimoire-cli leagues books list --id <league-id> (use its id, not book_id)";
 
     private readonly GrimoireApiClient _client;
 

@@ -1,7 +1,7 @@
 # Armies, leagues and system factions
 
 This increment wraps the wargame routes added in Grimoire 1.11.0: armies (14
-routes), leagues (22 routes) and `GET /api/systems/{id}/factions`. Every
+routes), leagues (23 routes) and `GET /api/systems/{id}/factions`. Every
 command is a thin pass-through to one endpoint. Source cites are v1.11.0 and
 relative to `backend/`. `A/` is `routers/armies/` and `L/` is
 `routers/leagues/`.
@@ -237,7 +237,7 @@ Each item names the commands whose Notes carry it.
 - In the same change:
   - the README Commands table
   - `IMPLEMENTED` in `tools/generate-api-coverage.py`, then regenerate
-    `docs/grimoire-api-coverage.md` (37 more routes covered)
+    `docs/grimoire-api-coverage.md` (38 more routes covered)
   - `docs/grimoire-api-notes.md`, with sections on armies, leagues and system
     factions taken from the behaviour above
 - The version floor stays at 1.10.1. These routes return 404 on older

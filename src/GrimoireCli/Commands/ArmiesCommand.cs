@@ -266,7 +266,9 @@ public static class ArmiesCommand
             "",
             "Unit ids are not checked. They are the data.forces[].units[].id values",
             "from armies get, recursively through children and forces.");
-        command.AddExamples("grimoire-cli armies progress --id <army-id> --unit-id <unit-id> --experience 6 --honours \"Slayer of Kings\"");
+        command.AddExamples(
+            "grimoire-cli armies progress --id <army-id> --unit-id <unit-id> --experience 6 --honours \"Slayer of Kings\"",
+            "grimoire-cli armies progress --id <army-id> --unit-id <unit-id> --honours \"Slayer of Kings\" Blooded");
         command.AddResponseExample<Generated.Models.UnitProgress>();
         command.SetAction(async (parseResult, cancellationToken) =>
         {

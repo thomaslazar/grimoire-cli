@@ -6,7 +6,7 @@ namespace GrimoireCli.Services;
 /// <summary>League guests (routers/leagues/guests.py). Access is checked by the server; no call carries a permission hint.</summary>
 public class LeagueGuestsService
 {
-    private const string LeagueNotFound = "No league with that ID. List yours with: grimoire-cli leagues list";
+    private const string LeagueNotFound = "No league with that ID that you're in. List yours with: grimoire-cli leagues list";
 
     private const string GuestNotFound = "No such league or guest. List guests with: grimoire-cli leagues guests list --id <league-id>";
 
