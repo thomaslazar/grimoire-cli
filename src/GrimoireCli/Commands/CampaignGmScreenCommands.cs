@@ -7,8 +7,8 @@ namespace GrimoireCli.Commands;
 public static class CampaignGmScreenCommands
 {
     private static readonly NLog.Logger _logger = NLog.LogManager.GetCurrentClassLogger();
-    private const string OwnerNote = "Only the campaign owner; anyone else gets 403.";
-    private static readonly string[] Locked =
+    internal const string OwnerNote = "Only the campaign owner; anyone else gets 403.";
+    internal static readonly string[] Locked =
     [
         "409 while the campaign is archived; 403 while the GM's campaign access",
         "is disabled.",
@@ -29,6 +29,7 @@ public static class CampaignGmScreenCommands
         command.Subcommands.Add(CreateImportCommand());
         command.Subcommands.Add(CreateCopyCommand());
         command.Subcommands.Add(CreateApplyPresetCommand());
+        command.Subcommands.Add(CampaignGmPanelsCommands.Create());
         return command;
     }
 
