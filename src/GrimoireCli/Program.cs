@@ -65,6 +65,7 @@ rootCommand.Subcommands.Add(TagsCommand.Create());
 rootCommand.Subcommands.Add(DuplicatesCommand.Create());
 rootCommand.Subcommands.Add(CampaignsCommand.Create());
 rootCommand.Subcommands.Add(ArmiesCommand.Create());
+rootCommand.Subcommands.Add(LeaguesCommand.Create());
 rootCommand.Subcommands.Add(PinsCommand.Create());
 rootCommand.Subcommands.Add(GenresCommand.Create());
 rootCommand.Subcommands.Add(LicensesCommand.Create());
