@@ -1734,6 +1734,28 @@ at tag `v1.8.0`; starred items verified against the 1.8.0 stack. Backs
   unlinks the map pins pointing at it if it was `group`, otherwise keeps them as
   GM-only (owner deleting their own page) or deletes them
   (`wiki.py:527`, `_wiki_maps.py:248-285`).
+- **A map page's picture must be an image the campaign already has**, as of
+  1.11.0. `map_id` must be a library image map (png, jpg, jpeg, gif, webp,
+  bmp) linked to the campaign, else 400 `Unknown map`, `A map page can only
+  show an image map` or `Link the map to the campaign first`; `map_file_id`
+  must be one of the campaign's image files, else 400 (`_wiki_maps.py:63-86`,
+  v1.11.0). A map page needs no picture to take pins. `get` returns `map`,
+  whose `source` is `library`, `file`, `missing` (the map left the library
+  with no campaign copy) or `none` (never given one), and `pins`
+  (`wiki.py:257-258`, `_wiki_maps.py:122-153`).
+- **Pins have no list route and no role dependency**, as of 1.11.0
+  (`wiki_pins.py`, v1.11.0). Whoever can edit the map page manages its pins,
+  else 403, and a page that is not a map page is a 400 (`:33-42`). Only the
+  campaign owner sets `gm`, else 403 (`:45-50`). A pin the caller
+  can't see answers 404, as for a missing one: a `gm` pin to a non-owner, or a
+  pin linking a page the caller can't read (`:89-93`, `_wiki_maps.py:163-177`).
+  `target_title` reuses a visible page of that slug or creates a stub with the
+  map page's visibility; `target_page_id` must be a visible page other than
+  the map page, else 400 (`_wiki_maps.py:288-334`). On PATCH a non-blank
+  `target_title` wins over `target_page_id`, `target_page_id: ""` unlinks, and
+  `""` clears `icon`/`icon_color` (`wiki_pins.py:113-127`). `x`/`y` are fractions of the
+  picture, 0 to 1 (`_schemas.py:232-259`). GM pins are left out of backlinks
+  (`_wiki_maps.py:220-245`).
 - **A title holding `|`, `[`, `]` or a line break is a 400**, as of 1.11.0
   (`check_page_title`, `_wiki_helpers.py:28-33`; `wiki.py:309,382`, v1.11.0).
   Update checks only a changed title, so an older page keeps saving.

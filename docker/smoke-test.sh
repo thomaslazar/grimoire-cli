@@ -2882,6 +2882,29 @@ ok "campaigns wiki reorder, hide and unhide"
   || fail "deleting the parent should move the child to the top level"
 ok "campaigns wiki delete moves children up"
 
+# pinning a place on a map page, moving it, then removing pin and page
+MAP=$(echo '{"title":"Smoke Map","page_type":"map"}' \
+  | "$CLI" campaigns wiki create --id "$WIKI" --stdin 2>"$WORK/cli.err" | jq -r .id) \
+  || { cat "$WORK/cli.err" >&2; fail "wiki create (map page) exited non-zero"; }
+PIN=$("$CLI" campaigns wiki pins create --id "$WIKI" --page-id "$MAP" --x 0.25 --y 0.5 --label Gate 2>"$WORK/cli.err" | jq -r .id) \
+  || { cat "$WORK/cli.err" >&2; fail "wiki pins create exited non-zero"; }
+[ -n "$PIN" ] && [ "$PIN" != "null" ] || fail "wiki pins create returned no id"
+"$CLI" campaigns wiki pins update --id "$WIKI" --page-id "$MAP" --pin-id "$PIN" --x 0.75 --visibility gm >/dev/null 2>"$WORK/cli.err" \
+  || { cat "$WORK/cli.err" >&2; fail "wiki pins update exited non-zero"; }
+"$CLI" campaigns wiki get --id "$WIKI" --page-id "$MAP" >"$WORK/map-page.out" 2>"$WORK/cli.err" \
+  || { cat "$WORK/cli.err" >&2; fail "wiki get (map page) exited non-zero"; }
+jq -e '.pins | length == 1 and .[0].x == 0.75 and .[0].y == 0.5 and .[0].visibility == "gm" and .[0].label == "Gate"' \
+  "$WORK/map-page.out" >/dev/null \
+  || fail "the map page should hold one moved gm pin: $(cat "$WORK/map-page.out")"
+ok "campaigns wiki pins create and update place and move a pin"
+"$CLI" campaigns wiki pins delete --id "$WIKI" --page-id "$MAP" --pin-id "$PIN" >/dev/null 2>"$WORK/cli.err" \
+  || { cat "$WORK/cli.err" >&2; fail "wiki pins delete exited non-zero"; }
+"$CLI" campaigns wiki get --id "$WIKI" --page-id "$MAP" | jq -e '.pins == []' >/dev/null \
+  || fail "the map page should have no pins after delete"
+"$CLI" campaigns wiki delete --id "$WIKI" --page-id "$MAP" >/dev/null 2>"$WORK/cli.err" \
+  || { cat "$WORK/cli.err" >&2; fail "wiki delete (map page) exited non-zero"; }
+ok "campaigns wiki pins delete removes the pin"
+
 # exporting the wiki as a JSON bundle expecting the remaining pages
 "$CLI" campaigns wiki export --id "$WIKI" --format json --output "$WORK/wiki.json" >/dev/null 2>"$WORK/cli.err" \
   || { cat "$WORK/cli.err" >&2; fail "wiki export (json) exited non-zero"; }
