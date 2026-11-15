@@ -22,7 +22,7 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | backups | 6 / 6 |
 | bookmarks | 0 / 4 |
 | books | 22 / 27 |
-| campaigns | 80 / 109 |
+| campaigns | 83 / 109 |
 | characters | 0 / 25 |
 | codex | 0 / 11 |
 | content | 0 / 6 |
@@ -51,7 +51,7 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | token-frames | 0 / 2 |
 | tokens | 12 / 12 |
 | users | 0 / 16 |
-| **Total** | **252 / 491** |
+| **Total** | **255 / 491** |
 
 2 operation(s) are internal-only (🔒) and excluded from covered counts.
 
@@ -320,9 +320,9 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | DELETE | `/api/campaigns/{campaign_id}/wiki/{page_id}` | Delete a wiki page |  | campaigns: write | `campaigns wiki delete` ✅ |
 | POST | `/api/campaigns/{campaign_id}/wiki/{page_id}/hide` | Hide a wiki page from your own view |  | campaigns: write | `campaigns wiki hide` ✅ |
 | DELETE | `/api/campaigns/{campaign_id}/wiki/{page_id}/hide` | Un-hide a wiki page you had hidden |  | campaigns: write | `campaigns wiki unhide` ✅ |
-| POST | `/api/campaigns/{campaign_id}/wiki/{page_id}/pins` | Add a pin to a map page |  | campaigns: write | — |
-| PATCH | `/api/campaigns/{campaign_id}/wiki/{page_id}/pins/{pin_id}` | Move or edit a pin on a map page |  | campaigns: write | — |
-| DELETE | `/api/campaigns/{campaign_id}/wiki/{page_id}/pins/{pin_id}` | Remove a pin from a map page |  | campaigns: write | — |
+| POST | `/api/campaigns/{campaign_id}/wiki/{page_id}/pins` | Add a pin to a map page |  | campaigns: write | `campaigns wiki pins create` ✅ |
+| PATCH | `/api/campaigns/{campaign_id}/wiki/{page_id}/pins/{pin_id}` | Move or edit a pin on a map page |  | campaigns: write | `campaigns wiki pins update` ✅ |
+| DELETE | `/api/campaigns/{campaign_id}/wiki/{page_id}/pins/{pin_id}` | Remove a pin from a map page |  | campaigns: write | `campaigns wiki pins delete` ✅ |
 
 ## characters
 
