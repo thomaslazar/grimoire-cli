@@ -68,8 +68,9 @@ public static class CampaignGmPanelsCommands
         JsonBodyInput.RequireExactlyOneSource(command, inputOption, stdinOption);
         GmPanelHelp.AddTo(command);
         command.AddHelpSection("Notes", HelpSectionPosition.Top,
-            Notes("Only the fields given change. state replaces the panel's state whole; a",
-                "new config re-cleans the state against it. An unknown panel id is a 404."));
+            Notes("Only the fields given change. config and state each replace whole: send",
+                "every key you want kept; a new config re-cleans the state against it.",
+                "An unknown panel id is a 404."));
         command.AddExamples("echo '{\"state\":{\"value\":3}}' | grimoire-cli campaigns gm-screen panels update --id <campaign-id> --panel-id <panel-id> --stdin");
         command.AddRequestShape<Generated.Models.GmPanelUpdate>();
         command.AddResponseExample<Generated.Models.GmPanelOut>();

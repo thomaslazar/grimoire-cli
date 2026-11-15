@@ -37,5 +37,5 @@ public class CampaignGmPanelsCommandTests
 
     [Fact]
     public void UpdateStatesStateReplacement()
-        => Assert.Contains("replaces the panel's state whole", RenderHelp("update"));
+        => Assert.Contains("each replace whole", RenderHelp("update"));
 }

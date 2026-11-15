@@ -8,9 +8,9 @@ internal static class GmPanelHelp
     public static void AddTo(Command command)
     {
         command.AddHelpSection("Panel kinds", HelpSectionPosition.Top,
-            "The grid is 12 columns; without x and y a panel takes the first gap it fits.",
+            "The grid is 12 columns; without x or y a panel takes the first gap it fits.",
             "Unknown keys and bad values in config and state silently become defaults;",
-            "only an unknown kind is a 400. resets is scene, session, rest or \"\" (never).",
+            "an unknown kind is a 400. resets is scene, session, rest or \"\" (never).",
             "A row's id is kept when given, so a later update can address it.",
             "",
             "note       config page_id or page_slug: a page in this campaign (an unknown",
