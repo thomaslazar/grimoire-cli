@@ -3350,6 +3350,86 @@ ok "files folder access set, list and remove converge"
   || { cat "$WORK/cli.err" >&2; fail "maps index should answer an entries array"; }
 ok "maps index answers entries"
 
+# ---- armies and leagues ----
+# deleting any smoke leagues and armies a previous run left behind, so re-runs converge
+"$CLI" leagues list 2>"$WORK/cli.err" | jq -r '.[] | select(.name == "Smoke League") | .id' \
+  | while read -r id; do
+      "$CLI" leagues delete --id "$id" >/dev/null 2>"$WORK/cli.err" \
+        || { cat "$WORK/cli.err" >&2; fail "leagues delete (sweep) exited non-zero"; }
+    done
+"$CLI" armies list 2>"$WORK/cli.err" | jq -r '.[] | select(.name == "Smoke Army") | .id' \
+  | while read -r id; do
+      "$CLI" armies delete --id "$id" >/dev/null 2>"$WORK/cli.err" \
+        || { cat "$WORK/cli.err" >&2; fail "armies delete (sweep) exited non-zero"; }
+    done
+# creating a hand-built army with one unit
+ARMY=$(echo '{"name":"Smoke Army","units":[{"id":"u1","name":"Smoke Unit"}]}' | "$CLI" armies create --stdin 2>"$WORK/cli.err" | jq -r .id) \
+  || { cat "$WORK/cli.err" >&2; fail "armies create exited non-zero"; }
+[ -n "$ARMY" ] && [ "$ARMY" != "null" ] || fail "armies create should return an id"
+# setting the unit's progress
+"$CLI" armies progress --id "$ARMY" --unit-id u1 --experience 3 --honours Bloodied 2>"$WORK/cli.err" \
+  | jq -e '.experience == 3 and .honours == ["Bloodied"]' >/dev/null \
+  || { cat "$WORK/cli.err" >&2; fail "armies progress should echo experience 3 and Bloodied"; }
+# exporting as text to stdout
+ARMY_TXT=$("$CLI" armies export --id "$ARMY" --format text --output - 2>"$WORK/cli.err") \
+  || { cat "$WORK/cli.err" >&2; fail "armies export exited non-zero"; }
+echo "$ARMY_TXT" | grep -q "Smoke Army" || fail "the text export should name the army: $ARMY_TXT"
+"$CLI" armies list 2>"$WORK/cli.err" | jq -e --arg id "$ARMY" 'any(.[]; .id == $id)' >/dev/null \
+  || fail "armies list should hold the new army"
+ok "armies create, progress, export and list"
+# a Shadowrun 4 DE system has no factions
+"$CLI" systems factions --id "$SR4" 2>"$WORK/cli.err" | jq -e '.factions == []' >/dev/null \
+  || { cat "$WORK/cli.err" >&2; fail "systems factions on Shadowrun 4 DE should be an empty factions list"; }
+ok "systems factions is empty for a system without factions"
+# creating a league as admin, then adding admin and gm as members
+LGE=$(echo '{"name":"Smoke League"}' | "$CLI" leagues create --stdin 2>"$WORK/cli.err" | jq -r .id) \
+  || { cat "$WORK/cli.err" >&2; fail "leagues create exited non-zero"; }
+[ -n "$LGE" ] && [ "$LGE" != "null" ] || fail "leagues create should return an id"
+LGE_ADMIN=$(echo "$ME_JSON" | jq -r .id)
+LGE_GM=$("$CLI" leagues eligible --id "$LGE" 2>"$WORK/cli.err" | jq -r '[.[] | select(.name == "gm")][0].id') \
+  || { cat "$WORK/cli.err" >&2; fail "leagues eligible exited non-zero"; }
+[ -n "$LGE_GM" ] && [ "$LGE_GM" != "null" ] || fail "leagues eligible should list gm"
+"$CLI" leagues members add --id "$LGE" --user-id "$LGE_ADMIN" >/dev/null 2>"$WORK/cli.err" \
+  || { cat "$WORK/cli.err" >&2; fail "leagues members add (admin) exited non-zero"; }
+"$CLI" leagues members add --id "$LGE" --user-id "$LGE_GM" 2>"$WORK/cli.err" \
+  | jq -e '(.members | length) == 2' >/dev/null \
+  || { cat "$WORK/cli.err" >&2; fail "the league should hold two members"; }
+# registering the army for admin
+"$CLI" leagues members army --id "$LGE" --user-id "$LGE_ADMIN" --army-id "$ARMY" >/dev/null 2>"$WORK/cli.err" \
+  || { cat "$WORK/cli.err" >&2; fail "leagues members army exited non-zero"; }
+# logging a game, admin against gm, 3 to 1
+LGE_GAME=$(jq -n --arg a "$LGE_ADMIN" --arg b "$LGE_GM" '{player_a_id:$a,player_b_id:$b,score_a:3,score_b:1}' \
+  | "$CLI" leagues games create --id "$LGE" --stdin 2>"$WORK/cli.err" | jq -r '.games[0].id') \
+  || { cat "$WORK/cli.err" >&2; fail "leagues games create exited non-zero"; }
+"$CLI" leagues get --id "$LGE" >"$WORK/lget.out" 2>"$WORK/cli.err" \
+  || { cat "$WORK/cli.err" >&2; fail "leagues get exited non-zero"; }
+jq -e --arg g "$LGE_GAME" --arg a "$LGE_ADMIN" \
+  '(.games[] | select(.id == $g) | .result == "a") and .standings[0].user_id == $a' "$WORK/lget.out" >/dev/null \
+  || fail "the game should be result a with admin on top: $(cat "$WORK/lget.out")"
+"$CLI" leagues games delete --id "$LGE" --game-id "$LGE_GAME" >/dev/null 2>"$WORK/cli.err" \
+  || { cat "$WORK/cli.err" >&2; fail "leagues games delete exited non-zero"; }
+ok "leagues create, members, army registration and games log a 3-1 win for admin"
+# sharing a book with the league, making it public, then unsharing
+LGE_RES=$("$CLI" leagues books add --id "$LGE" --book-id "$SR4_BOOK" 2>"$WORK/cli.err" | jq -r '.id') \
+  || { cat "$WORK/cli.err" >&2; fail "leagues books add exited non-zero"; }
+[ -n "$LGE_RES" ] && [ "$LGE_RES" != "null" ] || fail "leagues books add should return an id"
+"$CLI" leagues books update --id "$LGE" --resource-id "$LGE_RES" --visibility public 2>"$WORK/cli.err" \
+  | jq -e '.visibility == "public"' >/dev/null \
+  || { cat "$WORK/cli.err" >&2; fail "leagues books update should make the book public"; }
+"$CLI" leagues books remove --id "$LGE" --resource-id "$LGE_RES" >/dev/null 2>"$WORK/cli.err" \
+  || { cat "$WORK/cli.err" >&2; fail "leagues books remove exited non-zero"; }
+ok "leagues books add, update and remove"
+# deleting the league, then the army
+"$CLI" leagues delete --id "$LGE" >/dev/null 2>"$WORK/cli.err" \
+  || { cat "$WORK/cli.err" >&2; fail "leagues delete exited non-zero"; }
+"$CLI" armies delete --id "$ARMY" >/dev/null 2>"$WORK/cli.err" \
+  || { cat "$WORK/cli.err" >&2; fail "armies delete exited non-zero"; }
+"$CLI" leagues list 2>"$WORK/cli.err" | jq -e 'all(.[]; .name != "Smoke League")' >/dev/null \
+  || fail "the smoke league is still listed"
+"$CLI" armies list 2>"$WORK/cli.err" | jq -e 'all(.[]; .name != "Smoke Army")' >/dev/null \
+  || fail "the smoke army is still listed"
+ok "leagues delete and armies delete leave nothing behind"
+
 # ---- api keys ----
 # Key-mode calls use their own config file, so the admin session above is untouched.
 KEYCFG="$WORK/key-config.json"

@@ -248,6 +248,7 @@ grimoire-cli config set server https://grimoire.example.com
 | `systems metadata-sources --id <id>` | Sources that can supply metadata for this system (gm or admin) |
 | `systems metadata-search --id <id> --source-id <src> [--query]` | Ranked candidates from one source (gm or admin) |
 | `systems metadata-fetch --id <id> --source-id <src> {--identity <i> \| --paste <url>} [--query]` | Diff a candidate against the system; writes nothing (gm or admin) |
+| `systems factions --id <id>` | List a system's factions, with book counts |
 | `books metadata-sources --id <id>` | Sources that can supply metadata for this book (gm or admin) |
 | `books metadata-search --id <id> --source-id <src> [--query]` | Ranked candidates from one source (gm or admin) |
 | `books metadata-fetch --id <id> --source-id <src> {--identity <i> \| --paste <url>} [--query]` | Diff a candidate against the book; writes nothing (gm or admin) |
@@ -478,6 +479,43 @@ grimoire-cli config set server https://grimoire.example.com
 | `campaigns gm-screen panels create --id <campaign-id> {--input <file> \| --stdin}` | Add a panel to the GM screen |
 | `campaigns gm-screen panels update --id <campaign-id> --panel-id <panel-id> {--input <file> \| --stdin}` | Update a GM screen panel |
 | `campaigns gm-screen panels delete --id <campaign-id> --panel-id <panel-id>` | Remove a GM screen panel |
+| `armies list` | List your own armies |
+| `armies get --id <id>` | Get one army with its units |
+| `armies create {--input <file> \| --stdin}` | Create a hand-built army |
+| `armies update --id <id> {--input <file> \| --stdin}` | Update an army |
+| `armies delete --id <id>` | Delete an army |
+| `armies import --file <path> [--name <name>]` | Import a BattleScribe or New Recruit roster |
+| `armies export --id <id> [--format roster\|text] --output <path\|->` | Export an army as text or its original roster file |
+| `armies publications --id <id>` | List the publications an army cites, with their library links |
+| `armies progress --id <id> --unit-id <unit-id> [--experience <n>] [--honours <h> ...] [--notes <n>]` | Set a unit's progress; replaces its whole entry |
+| `armies games` | List the wargame systems an army can use |
+| `armies factions --system-id <id>` | List a wargame system's factions (usable by league guests) |
+| `armies publication-links set --publication <name> --book-id <id> [--system-name <s>] [--page-offset <n>]` | Link a roster publication to a library book (gm or admin) |
+| `armies publication-links remove --publication <name> [--system-name <s>]` | Remove a publication's link (gm or admin) |
+| `armies publication-links books --query <q>` | Find wargame books to link (gm or admin) |
+| `leagues list` | List your leagues |
+| `leagues get --id <id>` | Get a league with its members, games and standings |
+| `leagues create {--input <file> \| --stdin}` | Create a league you organise (gm or admin) |
+| `leagues update --id <id> {--input <file> \| --stdin}` | Update a league |
+| `leagues delete --id <id>` | Delete a league |
+| `leagues eligible --id <id>` | List users who can be added as members |
+| `leagues members add --id <id> --user-id <user-id>` | Add a user to the league |
+| `leagues members remove --id <id> --user-id <user-id>` | Remove a member, or leave with your own id |
+| `leagues members army --id <id> --user-id <user-id> [--army-id <id>]` | Register the army a member plays; omit `--army-id` to clear |
+| `leagues games create --id <id> {--input <file> \| --stdin}` | Log a game |
+| `leagues games update --id <id> --game-id <game-id> {--input <file> \| --stdin}` | Replace a logged game |
+| `leagues games delete --id <id> --game-id <game-id>` | Delete a game |
+| `leagues guests list --id <id>` | List the league's guests and their invite codes |
+| `leagues guests create --id <id> [--nickname <name>]` | Create a guest and their invite code |
+| `leagues guests regenerate --id <id> --user-id <user-id>` | Replace a guest's invite code |
+| `leagues guests share --id <id> --user-id <user-id>` | Invite text and link carrying a guest's code |
+| `leagues guests remove --id <id> --user-id <user-id>` | Remove a guest from the league |
+| `leagues books list --id <id>` | List the books shared with a league |
+| `leagues books search --id <id> --query <q>` | Find library books to share |
+| `leagues books add --id <id> --book-id <id> [--visibility public\|private\|organizer] [--shared-user-ids <id> ...]` | Share a library book with a league |
+| `leagues books update --id <id> --resource-id <id> [--visibility public\|private\|organizer] [--shared-user-ids <id> ...]` | Change a shared book's visibility or shares |
+| `leagues books remove --id <id> --resource-id <id>` | Stop sharing a book |
+| `leagues books reorder --id <id> --ordered-ids <id> ...` | Set the manual order of a league's books |
 | `pins list [--collection systems\|maps\|tokens\|audio\|models]` | List your pins |
 | `pins add --collection systems\|maps\|tokens\|audio\|models --target <id-or-path>` | Pin a folder or game system |
 | `pins remove --pin-id <pin-id>` | Unpin |
