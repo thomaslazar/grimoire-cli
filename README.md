@@ -156,6 +156,17 @@ grimoire-cli self-test
 
 grimoire-cli is a set of sharp primitives that AI agents compose into workflows. The CLI handles the Grimoire API; the agent makes the decisions.
 
+### Ready-made agent skills
+
+[grimoire-cli-skills](https://github.com/thomaslazar/grimoire-cli-skills) is a published set of agent skills built on this CLI: install it, import books, maps, tokens and audio, and audit shelf health, following an opinionated but overridable set of library conventions. It uses the open Agent Skills format, and installs as a Claude Code plugin or by clone/submodule:
+
+```bash
+/plugin marketplace add thomaslazar/grimoire-cli-skills
+/plugin install grimoire-cli-skills@grimoire-cli
+```
+
+Then ask your agent to "set up grimoire". The skills need grimoire-cli 0.8.0 or newer.
+
 ### Fill in metadata from a source
 
 You point an agent at a system whose metadata is thin. The agent:
