@@ -15,8 +15,10 @@ From `.devcontainer/Dockerfile` (base `mcr.microsoft.com/devcontainers/dotnet:10
 | `python3-fitz` | MuPDF bindings — the same library Grimoire reads PDFs with, used by `docker/seed.sh` to generate fixture PDFs |
 | `jq` | reading JSON responses and editing settings files |
 
-From `devcontainer.json`: the **docker-outside-of-docker** feature and the GitHub
-CLI. `post-create.sh` links the Claude Code session directory, installs plugins,
+From `devcontainer.json`: the **docker-outside-of-docker** feature, the GitHub
+CLI, and Node (the ponytail plugin's Claude Code hooks run under `node`). The
+feature versions are pinned in the committed `devcontainer-lock.json`.
+`post-create.sh` links the Claude Code session directory, installs plugins,
 and registers the status line.
 
 **Changing anything under `.devcontainer/` needs a container rebuild** — *Dev
