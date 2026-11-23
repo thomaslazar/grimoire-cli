@@ -66,6 +66,14 @@ namespace GrimoireCli.Generated.Models
 #endif
         /// <summary>The share_links_allowed property</summary>
         public bool? ShareLinksAllowed { get; set; }
+        /// <summary>The sidebar_stats property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public List<string>? SidebarStats { get; set; }
+#nullable restore
+#else
+        public List<string> SidebarStats { get; set; }
+#endif
         /// <summary>The username property</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
@@ -112,6 +120,7 @@ namespace GrimoireCli.Generated.Models
                 { "oidc_linked", n => { OidcLinked = n.GetBoolValue(); } },
                 { "role", n => { Role = n.GetObjectValue<global::GrimoireCli.Generated.Models.AuthMeResponse.AuthMeResponse_role>(global::GrimoireCli.Generated.Models.AuthMeResponse.AuthMeResponse_role.CreateFromDiscriminatorValue); } },
                 { "share_links_allowed", n => { ShareLinksAllowed = n.GetBoolValue(); } },
+                { "sidebar_stats", n => { SidebarStats = n.GetCollectionOfPrimitiveValues<string>()?.AsList(); } },
                 { "username", n => { Username = n.GetStringValue(); } },
             };
         }
@@ -133,6 +142,7 @@ namespace GrimoireCli.Generated.Models
             writer.WriteBoolValue("oidc_linked", OidcLinked);
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.AuthMeResponse.AuthMeResponse_role>("role", Role);
             writer.WriteBoolValue("share_links_allowed", ShareLinksAllowed);
+            writer.WriteCollectionOfPrimitiveValues<string>("sidebar_stats", SidebarStats);
             writer.WriteStringValue("username", Username);
             writer.WriteAdditionalData(AdditionalData);
         }

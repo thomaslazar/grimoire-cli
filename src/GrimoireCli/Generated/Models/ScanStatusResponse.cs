@@ -8,7 +8,7 @@ using System;
 namespace GrimoireCli.Generated.Models
 {
     /// <summary>
-    /// Live scan state, mirroring `_helpers._DEFAULT_STATUS`.The counters are Optional because the payload can come back from Valkey,where a status blob written by an older build may predate a counter that wasadded since; a strict model would raise on those. `phase` and `ocr_current`are None whenever no scan is in flight, which is the common case.
+    /// Live scan state, mirroring `services.library_scan.runner.DEFAULT_STATUS`.The counters are Optional because the payload can come back from Valkey,where a status blob written by an older build may predate a counter that wasadded since; a strict model would raise on those. `phase` and `ocr_current`are None whenever no scan is in flight, which is the common case.
     /// </summary>
     [global::System.CodeDom.Compiler.GeneratedCode("Kiota", "1.0.0")]
     public partial class ScanStatusResponse : IAdditionalDataHolder, IParsable

@@ -502,6 +502,14 @@ namespace GrimoireCli.Generated.Models
 #else
         public global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_show_stat_tokens ShowStatTokens { get; set; }
 #endif
+        /// <summary>The sidebar_stats property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public List<string>? SidebarStats { get; set; }
+#nullable restore
+#else
+        public List<string> SidebarStats { get; set; }
+#endif
         /// <summary>
         /// Instantiates a new <see cref="global::GrimoireCli.Generated.Models.SettingsPatch"/> and sets the default values.
         /// </summary>
@@ -588,6 +596,7 @@ namespace GrimoireCli.Generated.Models
                 { "show_stat_size", n => { ShowStatSize = n.GetObjectValue<global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_show_stat_size>(global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_show_stat_size.CreateFromDiscriminatorValue); } },
                 { "show_stat_systems", n => { ShowStatSystems = n.GetObjectValue<global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_show_stat_systems>(global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_show_stat_systems.CreateFromDiscriminatorValue); } },
                 { "show_stat_tokens", n => { ShowStatTokens = n.GetObjectValue<global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_show_stat_tokens>(global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_show_stat_tokens.CreateFromDiscriminatorValue); } },
+                { "sidebar_stats", n => { SidebarStats = n.GetCollectionOfPrimitiveValues<string>()?.AsList(); } },
             };
         }
         /// <summary>
@@ -658,6 +667,7 @@ namespace GrimoireCli.Generated.Models
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_show_stat_size>("show_stat_size", ShowStatSize);
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_show_stat_systems>("show_stat_systems", ShowStatSystems);
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.SettingsPatch.SettingsPatch_show_stat_tokens>("show_stat_tokens", ShowStatTokens);
+            writer.WriteCollectionOfPrimitiveValues<string>("sidebar_stats", SidebarStats);
             writer.WriteAdditionalData(AdditionalData);
         }
         /// <summary>

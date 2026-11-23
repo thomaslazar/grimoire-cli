@@ -606,17 +606,10 @@ set -e
 grep -qi "not found" "$WORK/nf.err" || fail "no not-found hint: $(cat "$WORK/nf.err")"
 ok "systems get on a missing id exits 2 with a hint"
 
-# An empty id, ".", and "../about" all miss the /api/systems/{id} route and land
-# on Grimoire's SPA catch-all, which answers with an HTML 200 instead of a JSON
-# 404. Each must be caught as a JSON-parse failure and exit 2 with a readable
-# message on stderr — not an unhandled JsonException and a raw stack trace.
-# `systems get` prints its response with no DTO layer in front of it now, so
-# this also exercises GrimoireApiClient.EnsureJson, the guard that keeps an
-# HTML body like this one off stdout — assert that explicitly, not just the
-# exit code, since a regression that printed the page would still exit 2.
-# The catch-all only answers GET: confirmed by curl that every write verb
-# (PATCH/POST/DELETE) against these same id shapes gets an ordinary JSON 405
-# instead, so no write command can be substituted here to exercise it.
+# An empty id, ".", and "../about" all miss the /api/systems/{id} route. As of
+# 1.11.1 Grimoire answers an unrouted /api path with a JSON 404
+# (backend/spa_fallback.py) rather than its SPA's HTML 200, so each must exit 2
+# with the not-found hint, an empty stdout, and no stack trace.
 # getting systems with empty, '.', and '../about' ids expecting exit 2, no stack trace
 for bad_id in "" "." "../about"; do
   set +e
@@ -625,8 +618,8 @@ for bad_id in "" "." "../about"; do
   [ "$rc" -eq 2 ] || fail "id '$bad_id' should exit 2, got $rc: $(cat "$WORK/badid.err")"
   [ ! -s "$WORK/badid.out" ] \
     || fail "id '$bad_id' printed to stdout instead of failing: $(cat "$WORK/badid.out")"
-  grep -qi "could not be parsed as JSON" "$WORK/badid.err" \
-    || fail "id '$bad_id' gave no not-JSON message: $(cat "$WORK/badid.err")"
+  grep -qi "not found" "$WORK/badid.err" \
+    || fail "id '$bad_id' gave no not-found hint: $(cat "$WORK/badid.err")"
   grep -qi "at System\.\|StackTrace\|Unhandled exception" "$WORK/badid.err" \
     && fail "id '$bad_id' leaked a stack trace: $(cat "$WORK/badid.err")"
 done

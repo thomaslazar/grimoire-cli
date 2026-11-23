@@ -41,6 +41,14 @@ namespace GrimoireCli.Generated.Models
 #endif
         /// <summary>The explicit_locked property</summary>
         public bool? ExplicitLocked { get; set; }
+        /// <summary>The sidebar_stats property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public List<string>? SidebarStats { get; set; }
+#nullable restore
+#else
+        public List<string> SidebarStats { get; set; }
+#endif
         /// <summary>
         /// Instantiates a new <see cref="global::GrimoireCli.Generated.Models.PreferencesResponse"/> and sets the default values.
         /// </summary>
@@ -71,6 +79,7 @@ namespace GrimoireCli.Generated.Models
                 { "display_name", n => { DisplayName = n.GetObjectValue<global::GrimoireCli.Generated.Models.PreferencesResponse.PreferencesResponse_display_name>(global::GrimoireCli.Generated.Models.PreferencesResponse.PreferencesResponse_display_name.CreateFromDiscriminatorValue); } },
                 { "email", n => { Email = n.GetObjectValue<global::GrimoireCli.Generated.Models.PreferencesResponse.PreferencesResponse_email>(global::GrimoireCli.Generated.Models.PreferencesResponse.PreferencesResponse_email.CreateFromDiscriminatorValue); } },
                 { "explicit_locked", n => { ExplicitLocked = n.GetBoolValue(); } },
+                { "sidebar_stats", n => { SidebarStats = n.GetCollectionOfPrimitiveValues<string>()?.AsList(); } },
             };
         }
         /// <summary>
@@ -84,6 +93,7 @@ namespace GrimoireCli.Generated.Models
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.PreferencesResponse.PreferencesResponse_display_name>("display_name", DisplayName);
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.PreferencesResponse.PreferencesResponse_email>("email", Email);
             writer.WriteBoolValue("explicit_locked", ExplicitLocked);
+            writer.WriteCollectionOfPrimitiveValues<string>("sidebar_stats", SidebarStats);
             writer.WriteAdditionalData(AdditionalData);
         }
         /// <summary>

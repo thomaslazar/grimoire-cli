@@ -38,6 +38,14 @@ namespace GrimoireCli.Generated.Models
 #else
         public global::GrimoireCli.Generated.Models.PreferencesUpdate.PreferencesUpdate_email Email { get; set; }
 #endif
+        /// <summary>The sidebar_stats property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public List<string>? SidebarStats { get; set; }
+#nullable restore
+#else
+        public List<string> SidebarStats { get; set; }
+#endif
         /// <summary>
         /// Instantiates a new <see cref="global::GrimoireCli.Generated.Models.PreferencesUpdate"/> and sets the default values.
         /// </summary>
@@ -66,6 +74,7 @@ namespace GrimoireCli.Generated.Models
                 { "allow_explicit", n => { AllowExplicit = n.GetObjectValue<global::GrimoireCli.Generated.Models.PreferencesUpdate.PreferencesUpdate_allow_explicit>(global::GrimoireCli.Generated.Models.PreferencesUpdate.PreferencesUpdate_allow_explicit.CreateFromDiscriminatorValue); } },
                 { "display_name", n => { DisplayName = n.GetObjectValue<global::GrimoireCli.Generated.Models.PreferencesUpdate.PreferencesUpdate_display_name>(global::GrimoireCli.Generated.Models.PreferencesUpdate.PreferencesUpdate_display_name.CreateFromDiscriminatorValue); } },
                 { "email", n => { Email = n.GetObjectValue<global::GrimoireCli.Generated.Models.PreferencesUpdate.PreferencesUpdate_email>(global::GrimoireCli.Generated.Models.PreferencesUpdate.PreferencesUpdate_email.CreateFromDiscriminatorValue); } },
+                { "sidebar_stats", n => { SidebarStats = n.GetCollectionOfPrimitiveValues<string>()?.AsList(); } },
             };
         }
         /// <summary>
@@ -78,6 +87,7 @@ namespace GrimoireCli.Generated.Models
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.PreferencesUpdate.PreferencesUpdate_allow_explicit>("allow_explicit", AllowExplicit);
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.PreferencesUpdate.PreferencesUpdate_display_name>("display_name", DisplayName);
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.PreferencesUpdate.PreferencesUpdate_email>("email", Email);
+            writer.WriteCollectionOfPrimitiveValues<string>("sidebar_stats", SidebarStats);
             writer.WriteAdditionalData(AdditionalData);
         }
         /// <summary>

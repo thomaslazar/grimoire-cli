@@ -2,7 +2,7 @@
 
 Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any) that implements it.
 
-- **Reference:** spec fetched live from the pinned stack's `/api/openapi.json` (v1.11.0, 374 paths, 491 operations) and the upstream router source read from the same container. Tested range: `1.10.1`-`1.11.0` (`GrimoireApiClient.cs`).
+- **Reference:** spec fetched live from the pinned stack's `/api/openapi.json` (v1.11.1, 377 paths, 494 operations) and the upstream router source read from the same container. Tested range: `1.11.0`-`1.11.1` (`GrimoireApiClient.cs`).
 - **Perm** column uses Grimoire's roles (`admin` / `gm or admin` / `not guest`); blank = any authenticated user. `?` = a dependency this script could not resolve.
 - **Key** column is the API key permission a route needs (`—`: no key can call it), derived from `backend/api_keys.py` in the same container.
 - ✅ = covered by a CLI command · — = not implemented · 🔒 = internal-only (no user-facing verb); 🔒 rows never count as covered.
@@ -37,6 +37,7 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | maintenance | 3 / 4 |
 | maps | 16 / 24 |
 | models | 12 / 12 |
+| oauth | 0 / 3 |
 | pins | 3 / 3 |
 | rulesets | 0 / 17 |
 | saved-filters | 0 / 4 |
@@ -51,7 +52,7 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | token-frames | 0 / 2 |
 | tokens | 12 / 12 |
 | users | 0 / 16 |
-| **Total** | **309 / 491** |
+| **Total** | **309 / 494** |
 
 2 operation(s) are internal-only (🔒) and excluded from covered counts.
 
@@ -561,6 +562,14 @@ Map of every Grimoire HTTP API operation and the `grimoire-cli` command (if any)
 | PATCH | `/api/models/{model_id}` | Update model metadata | gm or admin | models: write | `models update` ✅ |
 | GET | `/api/models/{model_id}/file` | Download model file |  | models: read | `models file` ✅ |
 | GET | `/api/models/{model_id}/thumbnail` | Model thumbnail |  | models: read | `models thumbnail` ✅ |
+
+## oauth
+
+| Method | Path | Description | Perm | Key | CLI |
+|--------|------|-------------|------|-----|-----|
+| GET | `/api/oauth/requests/{request_id}` | Describe a pending MCP sign-in request |  | — | — |
+| POST | `/api/oauth/requests/{request_id}/approve` | Approve a pending MCP sign-in request |  | — | — |
+| POST | `/api/oauth/requests/{request_id}/deny` | Deny a pending MCP sign-in request |  | — | — |
 
 ## pins
 

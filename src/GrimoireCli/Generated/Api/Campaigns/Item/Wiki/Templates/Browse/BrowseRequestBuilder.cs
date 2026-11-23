@@ -34,7 +34,7 @@ namespace GrimoireCli.Generated.Api.Campaigns.Item.Wiki.Templates.Browse
         {
         }
         /// <summary>
-        /// The community catalogue, as a folder tree.A dead or unreachable catalogue is reported as a 502 with the underlyingmessage, so the browser can say &quot;couldn&apos;t reach it&quot; rather than failingopaquely — the rest of the wiki is unaffected.
+        /// The community catalogue, as a folder tree.A dead or unreachable catalogue is reported as a 502, so the browser cansay &quot;couldn&apos;t reach it&quot; rather than failing opaquely — the rest of the wikiis unaffected. An admin gets the underlying message; anyone else a plainone, since it can name the configured source.
         /// </summary>
         /// <returns>A <see cref="global::GrimoireCli.Generated.Models.WikiTemplateBrowseOut"/></returns>
         /// <param name="cancellationToken">Cancellation token to use when cancelling requests</param>
@@ -57,7 +57,7 @@ namespace GrimoireCli.Generated.Api.Campaigns.Item.Wiki.Templates.Browse
             return await RequestAdapter.SendAsync<global::GrimoireCli.Generated.Models.WikiTemplateBrowseOut>(requestInfo, global::GrimoireCli.Generated.Models.WikiTemplateBrowseOut.CreateFromDiscriminatorValue, errorMapping, cancellationToken).ConfigureAwait(false);
         }
         /// <summary>
-        /// The community catalogue, as a folder tree.A dead or unreachable catalogue is reported as a 502 with the underlyingmessage, so the browser can say &quot;couldn&apos;t reach it&quot; rather than failingopaquely — the rest of the wiki is unaffected.
+        /// The community catalogue, as a folder tree.A dead or unreachable catalogue is reported as a 502, so the browser cansay &quot;couldn&apos;t reach it&quot; rather than failing opaquely — the rest of the wikiis unaffected. An admin gets the underlying message; anyone else a plainone, since it can name the configured source.
         /// </summary>
         /// <returns>A <see cref="RequestInformation"/></returns>
         /// <param name="requestConfiguration">Configuration for the request such as headers, query parameters, and middleware options.</param>
@@ -85,7 +85,7 @@ namespace GrimoireCli.Generated.Api.Campaigns.Item.Wiki.Templates.Browse
             return new global::GrimoireCli.Generated.Api.Campaigns.Item.Wiki.Templates.Browse.BrowseRequestBuilder(rawUrl, RequestAdapter);
         }
         /// <summary>
-        /// The community catalogue, as a folder tree.A dead or unreachable catalogue is reported as a 502 with the underlyingmessage, so the browser can say &quot;couldn&apos;t reach it&quot; rather than failingopaquely — the rest of the wiki is unaffected.
+        /// The community catalogue, as a folder tree.A dead or unreachable catalogue is reported as a 502, so the browser cansay &quot;couldn&apos;t reach it&quot; rather than failing opaquely — the rest of the wikiis unaffected. An admin gets the underlying message; anyone else a plainone, since it can name the configured source.
         /// </summary>
         [global::System.CodeDom.Compiler.GeneratedCode("Kiota", "1.0.0")]
         public partial class BrowseRequestBuilderGetQueryParameters 

@@ -8,7 +8,7 @@ using System;
 namespace GrimoireCli.Generated.Models
 {
     /// <summary>
-    /// What a map page shows, from ``_wiki_maps.resolve_page_map``.``source`` is ``library`` (a library map, by ``id``), ``file`` (thecampaign&apos;s own image, by ``id``), ``missing`` (its picture has gone, sothe page renders a placeholder with Replace map and keeps its pins), or``none`` (no picture chosen yet).
+    /// What a map page shows, from ``_wiki_maps.resolve_page_map``.``source`` is ``library`` (a library map, by ``id``), ``file`` (thecampaign&apos;s own image, by ``id``), ``missing`` (its picture has gone, sothe page renders a placeholder with Replace map and keeps its pins),``none`` (no picture chosen yet), or ``hidden`` (a picture this viewer maynot see, such as a map the campaign links as GM-only; no id or name).
     /// </summary>
     [global::System.CodeDom.Compiler.GeneratedCode("Kiota", "1.0.0")]
     public partial class WikiMapOut : IAdditionalDataHolder, IParsable
