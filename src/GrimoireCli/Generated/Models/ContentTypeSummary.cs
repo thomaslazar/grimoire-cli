@@ -33,6 +33,14 @@ namespace GrimoireCli.Generated.Models
 #else
         public global::GrimoireCli.Generated.Models.ContentTypeSummary_fields Fields { get; set; }
 #endif
+        /// <summary>The filter_depends property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public global::GrimoireCli.Generated.Models.ContentTypeSummary_filter_depends? FilterDepends { get; set; }
+#nullable restore
+#else
+        public global::GrimoireCli.Generated.Models.ContentTypeSummary_filter_depends FilterDepends { get; set; }
+#endif
         /// <summary>The filter_fields property</summary>
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
 #nullable enable
@@ -127,6 +135,7 @@ namespace GrimoireCli.Generated.Models
                 { "compact_display", n => { CompactDisplay = n.GetStringValue(); } },
                 { "entry_count", n => { EntryCount = n.GetIntValue(); } },
                 { "fields", n => { Fields = n.GetObjectValue<global::GrimoireCli.Generated.Models.ContentTypeSummary_fields>(global::GrimoireCli.Generated.Models.ContentTypeSummary_fields.CreateFromDiscriminatorValue); } },
+                { "filter_depends", n => { FilterDepends = n.GetObjectValue<global::GrimoireCli.Generated.Models.ContentTypeSummary_filter_depends>(global::GrimoireCli.Generated.Models.ContentTypeSummary_filter_depends.CreateFromDiscriminatorValue); } },
                 { "filter_fields", n => { FilterFields = n.GetCollectionOfPrimitiveValues<string>()?.AsList(); } },
                 { "icon", n => { Icon = n.GetStringValue(); } },
                 { "identity_field", n => { IdentityField = n.GetStringValue(); } },
@@ -147,6 +156,7 @@ namespace GrimoireCli.Generated.Models
             writer.WriteStringValue("compact_display", CompactDisplay);
             writer.WriteIntValue("entry_count", EntryCount);
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.ContentTypeSummary_fields>("fields", Fields);
+            writer.WriteObjectValue<global::GrimoireCli.Generated.Models.ContentTypeSummary_filter_depends>("filter_depends", FilterDepends);
             writer.WriteCollectionOfPrimitiveValues<string>("filter_fields", FilterFields);
             writer.WriteStringValue("icon", Icon);
             writer.WriteStringValue("identity_field", IdentityField);

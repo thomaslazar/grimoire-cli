@@ -515,6 +515,12 @@ v1.9.1; neither includes `language`. It exists only on books (`BookUpdate.langua
 expressed only through its name (the `Shadowrun 6 DE` convention), a tag, or
 per-book metadata.
 
+As of 1.11.1 a book's `language` is one of a fixed list of 27, stored as the
+lowercase English name (`german`). Any case, an ISO 639 code (`de`, `pt-BR`) or
+the native name (`Deutsch`) resolves to it; anything else is stored as `""`
+without an error, and over 200 characters is a 422 (`models/languages.py`,
+`routers/books/_schemas.py:50,90-93`, v1.11.1).
+
 ## Add-ons
 
 Verified against v1.5.6, backing the seven `addons` commands.
@@ -1681,9 +1687,11 @@ Read from `backend/routers/campaigns/` at tag `v1.7.2`, and verified against the
   `mode=delete_items` deletes its link rows directly (`categories.py:231-233`),
   skipping the file cleanup that `DELETE /resources/{id}` does for a `file`
   link (`resources.py:300-302`), so the upload stays on disk.
-- **Delete leaves files on disk.** `delete_campaign` removes rows only
-  (`core.py:358-384`, v1.10.0): the banner (`<id>.webp`, `<id>_sm.webp`) and uploaded
-  files stay under `campaign_uploads/`. Verified against the 1.8.0 stack.
+- **Delete removes its files**, as of 1.11.1: `delete_campaign` queues the
+  banner, uploads and members' uploads for removal once the delete commits
+  (`core.py:407`, v1.11.1); removing a member or guest does the same for their
+  uploads (`members.py:161`, `guests.py:172`, v1.11.1). Before 1.11.1 the rows
+  went and the files stayed under `campaign_uploads/`.
 - **Deleting a parent campaign keeps its children**, as of 1.11.0:
   `delete_campaign` calls `detach_child_campaigns` (`core.py:406`, v1.11.0), which
   nulls `parent_campaign_id` on every child (`services/campaigns/user_data.py:279-290`).
@@ -1708,7 +1716,8 @@ Read from `backend/routers/campaigns/` at tag `v1.7.2`, and verified against the
   archived (`core.py:352,383`); member status runs while access is disabled and
   then allows only a pure decline (`members.py:63`, `:75-83`); member remove
   always runs and re-checks only the owner removing someone else
-  (`members.py:130`, `:145`); wiki hide/unhide always run (`wiki.py:550,588`).
+  (`members.py:130`, `:145`); wiki hide/unhide always run (`wiki.py:550,588`),
+  though as of 1.11.1 unhide 403s a non-member (`wiki.py:606-608`, v1.11.1).
 - **Sharing with an unknown user id is a 400**, as of 1.11.0:
   `require_known_users` (`_helpers.py:233-245`, v1.11.0) answers "Can't share
   with a user who doesn't exist" before anything is kept. It guards resource
@@ -1764,7 +1773,9 @@ at tag `v1.8.0`; starred items verified against the 1.8.0 stack. Backs
   v1.11.0). A map page needs no picture to take pins. `get` returns `map`,
   whose `source` is `library`, `file`, `missing` (the map left the library
   with no campaign copy) or `none` (never given one), and `pins`
-  (`wiki.py:257-258`, `_wiki_maps.py:122-153`).
+  (`wiki.py:257-258`, `_wiki_maps.py:122-153`). As of 1.11.1 a picture the
+  caller cannot read is `hidden`, with `id` and `name` null
+  (`_wiki_maps.py:122,167,182`, v1.11.1).
 - **Pins have no list route and no role dependency**, as of 1.11.0
   (`wiki_pins.py`, v1.11.0). Whoever can edit the map page manages its pins,
   else 403, and a page that is not a map page is a 400 (`:33-42`). Only the
@@ -1846,12 +1857,13 @@ Read from `backend/routers/campaigns/schedule.py`, `calendar.py` and
   `is_cancelled` on every row for that date (`schedule.py:291-333`, v1.10.0); a second
   call undoes the first. It flips the caller's own row and copies that value
   to the rest; a caller with no row for the date is first recorded as
-  available (`schedule.py:306-330`, v1.10.0). It admits the owner or any admin, unlike the
-  campaign's other writes.
+  available (`schedule.py:306-330`, v1.10.0). As of 1.11.1 it admits the owner
+  only (`schedule.py:361-363`, v1.11.1); before, any admin too.
 - **`availability` `user_id` sets another member's row.**
   `AvailabilityUpdate.user_id` is `Optional[str]` (`_schemas.py:181`, v1.9.1);
   the owner or any admin may name another user, anyone else is a 403
-  (`schedule.py:242-248`, v1.10.0).
+  (`schedule.py:242-248`, v1.10.0). As of 1.11.1 a user who is neither the
+  owner nor an accepted member is a 404 (`schedule.py:305-308`, v1.11.1).
 - **Calendar subscription is session only.** The three
   `/calendar/subscription` routes carry `x-api-key-access: none`; minting
   also needs `BASE_URL` (400 otherwise).

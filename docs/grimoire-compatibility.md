@@ -18,7 +18,8 @@
 | 0.7.4 | 1.10.1 | superseded by 0.7.5 |
 | 0.7.5 | 1.10.1 – 1.10.2 | superseded by 0.7.6 |
 | 0.7.6 | 1.10.1 – 1.10.2 | superseded by 0.8.0 |
-| 0.8.0 | 1.11.0 | current, on `main` |
+| 0.8.0 | 1.11.0 | superseded by 0.8.1 |
+| 0.8.1 | 1.11.0 – 1.11.1 | current, on `main` |
 
 **The floor rises only when something forces it**, not on every server release.
 Each row above records a pairing that was necessary at the time — 1.5.6 → 1.6.0
@@ -37,7 +38,7 @@ an older Grimoire does not know is dropped by Pydantic rather than rejected, so
 the command answers 200 and does nothing — the one failure the version warning
 exists to catch.
 
-`main` targets Grimoire 1.11.0. Reaching 1.6.0 was more than a version bump: it
+`main` targets Grimoire 1.11.0 – 1.11.1. Reaching 1.6.0 was more than a version bump: it
 shortened the access token from 30 days to 30 minutes and made the library
 writable, which is why the CLI renews its own session
 ([authentication.md](authentication.md)) and why the `files` endpoints exist at
@@ -305,10 +306,33 @@ an older server answers those 404. Two inputs instead pass silently on 1.10.x:
   `note` and `session` (`routers/campaigns/_schemas.py:190` at v1.10.2), so the
   page is saved as a `note` and its `map_id` is dropped.
 
+**1.11.1 raised `MaxTestedVersion` and left the floor alone.** No route the
+CLI wraps was added or re-gated; the only new routes are `/api/oauth/requests`,
+which the CLI does not wrap. Behaviour under existing commands changed, and the
+help text follows it:
+
+- **`campaigns availability toggle-cancel`** admits the owner only; admins no
+  longer pass (`routers/campaigns/schedule.py:361-363`). **`availability set
+  --user-id`** 404s a user who is not in the campaign (`schedule.py:305-308`).
+- **`books update` / `batch-update`** resolve `language` against a fixed list;
+  an unknown value is stored as `""` without an error (`models/languages.py`).
+- **Deleting a campaign, member or guest** removes their uploaded files from
+  disk (`routers/campaigns/core.py:407`, `members.py:161`, `guests.py:172`).
+- **`campaigns schedule set`** validates its fields (HH:MM times, `monthly_week`,
+  at most 7 `days`, 600 `custom_dates`) with a 400 (`schedule.py:132-151`);
+  wiki page and template bodies over 1,000,000 characters are a 422.
+- **Paths and parents hide what the caller cannot see**: `relative_path`,
+  `parent_id`/`parent_name` and `scope_path` stop at a hidden container
+  (`services/reader_paths.py`). A wiki map page whose picture the caller cannot
+  read reports `source: hidden`.
+- **An unrouted `/api` path is a JSON 404**, not the SPA's HTML 200
+  (`backend/spa_fallback.py`), so `systems get --id ""` now exits 2 with the
+  not-found hint rather than a not-JSON error.
+
 ## Runtime check
 
 `src/GrimoireCli/Api/GrimoireApiClient.cs` defines `MinSupportedVersion` and
-`MaxTestedVersion`, currently `"1.11.0"` and `"1.11.0"`. A check runs before the first
+`MaxTestedVersion`, currently `"1.11.0"` and `"1.11.1"`. A check runs before the first
 request of any command, calling `GET /api/about` and comparing the reported
 version against that range. It is throttled to once every 24 hours — a
 config with a recent `lastVersionCheck` skips the probe entirely — and

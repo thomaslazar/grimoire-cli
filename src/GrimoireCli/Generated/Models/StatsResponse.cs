@@ -19,8 +19,14 @@ namespace GrimoireCli.Generated.Models
         public int? ArmoryBooks { get; set; }
         /// <summary>The audio property</summary>
         public int? Audio { get; set; }
+        /// <summary>The audio_size_mb property</summary>
+        public double? AudioSizeMb { get; set; }
+        /// <summary>The audio_variants property</summary>
+        public int? AudioVariants { get; set; }
         /// <summary>The books property</summary>
         public int? Books { get; set; }
+        /// <summary>The book_variants property</summary>
+        public int? BookVariants { get; set; }
         /// <summary>The game_systems property</summary>
         public int? GameSystems { get; set; }
         /// <summary>The indexed_books property</summary>
@@ -29,14 +35,42 @@ namespace GrimoireCli.Generated.Models
         public double? LibrarySizeMb { get; set; }
         /// <summary>The maps property</summary>
         public int? Maps { get; set; }
+        /// <summary>The maps_size_mb property</summary>
+        public double? MapsSizeMb { get; set; }
+        /// <summary>The map_variants property</summary>
+        public int? MapVariants { get; set; }
         /// <summary>The models property</summary>
         public int? Models { get; set; }
+        /// <summary>The models_size_mb property</summary>
+        public double? ModelsSizeMb { get; set; }
+        /// <summary>The model_variants property</summary>
+        public int? ModelVariants { get; set; }
         /// <summary>The tokens property</summary>
         public int? Tokens { get; set; }
+        /// <summary>The tokens_size_mb property</summary>
+        public double? TokensSizeMb { get; set; }
+        /// <summary>The token_variants property</summary>
+        public int? TokenVariants { get; set; }
         /// <summary>The total_pages property</summary>
         public int? TotalPages { get; set; }
         /// <summary>The total_size_mb property</summary>
         public double? TotalSizeMb { get; set; }
+        /// <summary>The ttrpg_books property</summary>
+        public int? TtrpgBooks { get; set; }
+        /// <summary>The ttrpg_pages property</summary>
+        public int? TtrpgPages { get; set; }
+        /// <summary>The ttrpg_size_mb property</summary>
+        public double? TtrpgSizeMb { get; set; }
+        /// <summary>The ttrpg_systems property</summary>
+        public int? TtrpgSystems { get; set; }
+        /// <summary>The wargame_books property</summary>
+        public int? WargameBooks { get; set; }
+        /// <summary>The wargame_pages property</summary>
+        public int? WargamePages { get; set; }
+        /// <summary>The wargame_size_mb property</summary>
+        public double? WargameSizeMb { get; set; }
+        /// <summary>The wargame_systems property</summary>
+        public int? WargameSystems { get; set; }
         /// <summary>
         /// Instantiates a new <see cref="global::GrimoireCli.Generated.Models.StatsResponse"/> and sets the default values.
         /// </summary>
@@ -44,6 +78,23 @@ namespace GrimoireCli.Generated.Models
         {
             AdditionalData = new Dictionary<string, object>();
             ArmoryBooks = 0;
+            AudioSizeMb = 0;
+            AudioVariants = 0;
+            BookVariants = 0;
+            MapsSizeMb = 0;
+            MapVariants = 0;
+            ModelsSizeMb = 0;
+            ModelVariants = 0;
+            TokensSizeMb = 0;
+            TokenVariants = 0;
+            TtrpgBooks = 0;
+            TtrpgPages = 0;
+            TtrpgSizeMb = 0;
+            TtrpgSystems = 0;
+            WargameBooks = 0;
+            WargamePages = 0;
+            WargameSizeMb = 0;
+            WargameSystems = 0;
         }
         /// <summary>
         /// Creates a new instance of the appropriate class based on discriminator value
@@ -65,15 +116,32 @@ namespace GrimoireCli.Generated.Models
             {
                 { "armory_books", n => { ArmoryBooks = n.GetIntValue(); } },
                 { "audio", n => { Audio = n.GetIntValue(); } },
+                { "audio_size_mb", n => { AudioSizeMb = n.GetDoubleValue(); } },
+                { "audio_variants", n => { AudioVariants = n.GetIntValue(); } },
+                { "book_variants", n => { BookVariants = n.GetIntValue(); } },
                 { "books", n => { Books = n.GetIntValue(); } },
                 { "game_systems", n => { GameSystems = n.GetIntValue(); } },
                 { "indexed_books", n => { IndexedBooks = n.GetIntValue(); } },
                 { "library_size_mb", n => { LibrarySizeMb = n.GetDoubleValue(); } },
+                { "map_variants", n => { MapVariants = n.GetIntValue(); } },
                 { "maps", n => { Maps = n.GetIntValue(); } },
+                { "maps_size_mb", n => { MapsSizeMb = n.GetDoubleValue(); } },
+                { "model_variants", n => { ModelVariants = n.GetIntValue(); } },
                 { "models", n => { Models = n.GetIntValue(); } },
+                { "models_size_mb", n => { ModelsSizeMb = n.GetDoubleValue(); } },
+                { "token_variants", n => { TokenVariants = n.GetIntValue(); } },
                 { "tokens", n => { Tokens = n.GetIntValue(); } },
+                { "tokens_size_mb", n => { TokensSizeMb = n.GetDoubleValue(); } },
                 { "total_pages", n => { TotalPages = n.GetIntValue(); } },
                 { "total_size_mb", n => { TotalSizeMb = n.GetDoubleValue(); } },
+                { "ttrpg_books", n => { TtrpgBooks = n.GetIntValue(); } },
+                { "ttrpg_pages", n => { TtrpgPages = n.GetIntValue(); } },
+                { "ttrpg_size_mb", n => { TtrpgSizeMb = n.GetDoubleValue(); } },
+                { "ttrpg_systems", n => { TtrpgSystems = n.GetIntValue(); } },
+                { "wargame_books", n => { WargameBooks = n.GetIntValue(); } },
+                { "wargame_pages", n => { WargamePages = n.GetIntValue(); } },
+                { "wargame_size_mb", n => { WargameSizeMb = n.GetDoubleValue(); } },
+                { "wargame_systems", n => { WargameSystems = n.GetIntValue(); } },
             };
         }
         /// <summary>
@@ -85,15 +153,32 @@ namespace GrimoireCli.Generated.Models
             if(ReferenceEquals(writer, null)) throw new ArgumentNullException(nameof(writer));
             writer.WriteIntValue("armory_books", ArmoryBooks);
             writer.WriteIntValue("audio", Audio);
+            writer.WriteDoubleValue("audio_size_mb", AudioSizeMb);
+            writer.WriteIntValue("audio_variants", AudioVariants);
             writer.WriteIntValue("books", Books);
+            writer.WriteIntValue("book_variants", BookVariants);
             writer.WriteIntValue("game_systems", GameSystems);
             writer.WriteIntValue("indexed_books", IndexedBooks);
             writer.WriteDoubleValue("library_size_mb", LibrarySizeMb);
             writer.WriteIntValue("maps", Maps);
+            writer.WriteDoubleValue("maps_size_mb", MapsSizeMb);
+            writer.WriteIntValue("map_variants", MapVariants);
             writer.WriteIntValue("models", Models);
+            writer.WriteDoubleValue("models_size_mb", ModelsSizeMb);
+            writer.WriteIntValue("model_variants", ModelVariants);
             writer.WriteIntValue("tokens", Tokens);
+            writer.WriteDoubleValue("tokens_size_mb", TokensSizeMb);
+            writer.WriteIntValue("token_variants", TokenVariants);
             writer.WriteIntValue("total_pages", TotalPages);
             writer.WriteDoubleValue("total_size_mb", TotalSizeMb);
+            writer.WriteIntValue("ttrpg_books", TtrpgBooks);
+            writer.WriteIntValue("ttrpg_pages", TtrpgPages);
+            writer.WriteDoubleValue("ttrpg_size_mb", TtrpgSizeMb);
+            writer.WriteIntValue("ttrpg_systems", TtrpgSystems);
+            writer.WriteIntValue("wargame_books", WargameBooks);
+            writer.WriteIntValue("wargame_pages", WargamePages);
+            writer.WriteDoubleValue("wargame_size_mb", WargameSizeMb);
+            writer.WriteIntValue("wargame_systems", WargameSystems);
             writer.WriteAdditionalData(AdditionalData);
         }
     }

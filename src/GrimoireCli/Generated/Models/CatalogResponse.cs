@@ -30,6 +30,14 @@ namespace GrimoireCli.Generated.Models
 #else
         public global::GrimoireCli.Generated.Models.CatalogResponse_filters_available FiltersAvailable { get; set; }
 #endif
+        /// <summary>The filters_without_parent property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public global::GrimoireCli.Generated.Models.CatalogResponse_filters_without_parent? FiltersWithoutParent { get; set; }
+#nullable restore
+#else
+        public global::GrimoireCli.Generated.Models.CatalogResponse_filters_without_parent FiltersWithoutParent { get; set; }
+#endif
         /// <summary>The page property</summary>
         public int? Page { get; set; }
         /// <summary>The page_size property</summary>
@@ -63,6 +71,7 @@ namespace GrimoireCli.Generated.Models
             {
                 { "entries", n => { Entries = n.GetCollectionOfObjectValues<global::GrimoireCli.Generated.Models.CatalogEntry>(global::GrimoireCli.Generated.Models.CatalogEntry.CreateFromDiscriminatorValue)?.AsList(); } },
                 { "filters_available", n => { FiltersAvailable = n.GetObjectValue<global::GrimoireCli.Generated.Models.CatalogResponse_filters_available>(global::GrimoireCli.Generated.Models.CatalogResponse_filters_available.CreateFromDiscriminatorValue); } },
+                { "filters_without_parent", n => { FiltersWithoutParent = n.GetObjectValue<global::GrimoireCli.Generated.Models.CatalogResponse_filters_without_parent>(global::GrimoireCli.Generated.Models.CatalogResponse_filters_without_parent.CreateFromDiscriminatorValue); } },
                 { "page", n => { Page = n.GetIntValue(); } },
                 { "page_size", n => { PageSize = n.GetIntValue(); } },
                 { "total", n => { Total = n.GetIntValue(); } },
@@ -77,6 +86,7 @@ namespace GrimoireCli.Generated.Models
             if(ReferenceEquals(writer, null)) throw new ArgumentNullException(nameof(writer));
             writer.WriteCollectionOfObjectValues<global::GrimoireCli.Generated.Models.CatalogEntry>("entries", Entries);
             writer.WriteObjectValue<global::GrimoireCli.Generated.Models.CatalogResponse_filters_available>("filters_available", FiltersAvailable);
+            writer.WriteObjectValue<global::GrimoireCli.Generated.Models.CatalogResponse_filters_without_parent>("filters_without_parent", FiltersWithoutParent);
             writer.WriteIntValue("page", Page);
             writer.WriteIntValue("page_size", PageSize);
             writer.WriteIntValue("total", Total);

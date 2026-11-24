@@ -367,6 +367,14 @@ namespace GrimoireCli.Generated.Models
         public bool? ShowStatSystems { get; set; }
         /// <summary>The show_stat_tokens property</summary>
         public bool? ShowStatTokens { get; set; }
+        /// <summary>The sidebar_stats property</summary>
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
+#nullable enable
+        public List<string>? SidebarStats { get; set; }
+#nullable restore
+#else
+        public List<string> SidebarStats { get; set; }
+#endif
         /// <summary>
         /// Instantiates a new <see cref="global::GrimoireCli.Generated.Models.SettingsResponse"/> and sets the default values.
         /// </summary>
@@ -489,6 +497,7 @@ namespace GrimoireCli.Generated.Models
                 { "show_stat_size", n => { ShowStatSize = n.GetBoolValue(); } },
                 { "show_stat_systems", n => { ShowStatSystems = n.GetBoolValue(); } },
                 { "show_stat_tokens", n => { ShowStatTokens = n.GetBoolValue(); } },
+                { "sidebar_stats", n => { SidebarStats = n.GetCollectionOfPrimitiveValues<string>()?.AsList(); } },
             };
         }
         /// <summary>
@@ -593,6 +602,7 @@ namespace GrimoireCli.Generated.Models
             writer.WriteBoolValue("show_stat_size", ShowStatSize);
             writer.WriteBoolValue("show_stat_systems", ShowStatSystems);
             writer.WriteBoolValue("show_stat_tokens", ShowStatTokens);
+            writer.WriteCollectionOfPrimitiveValues<string>("sidebar_stats", SidebarStats);
             writer.WriteAdditionalData(AdditionalData);
         }
     }

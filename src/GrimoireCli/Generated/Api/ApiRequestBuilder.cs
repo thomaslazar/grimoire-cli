@@ -34,6 +34,7 @@ using GrimoireCli.Generated.Api.Maps;
 using GrimoireCli.Generated.Api.ModelFolders;
 using GrimoireCli.Generated.Api.ModelsRequests;
 using GrimoireCli.Generated.Api.Naming;
+using GrimoireCli.Generated.Api.Oauth;
 using GrimoireCli.Generated.Api.ParentSystems;
 using GrimoireCli.Generated.Api.Pins;
 using GrimoireCli.Generated.Api.Rescan;
@@ -236,6 +237,11 @@ namespace GrimoireCli.Generated.Api
         public global::GrimoireCli.Generated.Api.Naming.NamingRequestBuilder Naming
         {
             get => new global::GrimoireCli.Generated.Api.Naming.NamingRequestBuilder(PathParameters, RequestAdapter);
+        }
+        /// <summary>The oauth property</summary>
+        public global::GrimoireCli.Generated.Api.Oauth.OauthRequestBuilder Oauth
+        {
+            get => new global::GrimoireCli.Generated.Api.Oauth.OauthRequestBuilder(PathParameters, RequestAdapter);
         }
         /// <summary>The parentSystems property</summary>
         public global::GrimoireCli.Generated.Api.ParentSystems.ParentSystemsRequestBuilder ParentSystems
