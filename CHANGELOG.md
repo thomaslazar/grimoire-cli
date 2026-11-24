@@ -3,6 +3,44 @@
 All notable changes to grimoire-cli are documented here.
 Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## v0.8.1 — 2026-11-24
+
+Patch release that adds Grimoire 1.11.1 to the tested range. No command was
+added or removed; the floor stays at 1.11.0, so the supported range is now
+1.11.0 – 1.11.1.
+
+### Highlights
+
+- **Grimoire 1.11.1 is tested.** Login no longer warns against it, and 1.11.0
+  servers stay supported: nothing here depends on the newer server.
+- **Campaign availability help matches 1.11.1's checks.** `campaigns
+  availability toggle-cancel` admits the campaign owner only, and `availability
+  set --user-id` answers 404 for a user who is not in the campaign. The help
+  said admins could cancel before.
+- **Silent and new refusals are documented where they bite.** `books update`
+  stores an unrecognised `language` as `""` with no error; `campaigns schedule
+  set` 400s a malformed field and caps `custom_dates` at 600; a wiki page body
+  over 1,000,000 characters is a 422; a book `category` with an invisible
+  character is a 422.
+- **Visibility now shapes paths.** A system whose container is hidden from the
+  caller lists at the top level with no parent, and the `templates catalogue`
+  answer for non-admins carries an empty `index_url` and a generic 502 message.
+
+### Features
+
+- feat: target grimoire 1.11.1
+
+### Chores
+
+- chore: bump version to 0.8.1
+- chore: support kiri as dev docker engine
+
+### Docs
+
+- docs: point to the grimoire-cli-skills skill set
+- docs: repin the source clone and image note to grimoire 1.11.1
+- docs: surface grimoire 1.11.1 input limits in help
+
 ## v0.8.0 — 2026-11-15
 
 A minor release that targets Grimoire 1.11.0. It wraps almost everything
