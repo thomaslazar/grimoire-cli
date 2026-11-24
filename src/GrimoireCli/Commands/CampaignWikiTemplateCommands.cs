@@ -269,7 +269,8 @@ public static class CampaignWikiTemplateCommands
             "Entries carry no template body; it is only readable once installed.",
             "",
             "403 when the server disables external installs; 502 when the only source",
-            "fails (with several, failing ones are skipped)."]);
+            "fails (with several, failing ones are skipped). Non-admins get an empty",
+            "index_url and a generic 502 message."]);
         command.AddExamples("grimoire-cli campaigns wiki templates catalogue --id <campaign-id>");
         command.AddResponseExample<Generated.Models.WikiTemplateBrowseOut>();
         command.SetAction(async (parseResult, cancellationToken) =>

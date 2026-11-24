@@ -54,7 +54,8 @@ public static class CampaignScheduleCommands
             "monthly uses days[0] and monthly_week (1-4, -1 = last, default 1); custom",
             "uses only custom_dates. time_utc is a legacy alias. enabled false keeps",
             "the definition but yields no sessions. next_sessions may include",
-            "yesterday."]);
+            "yesterday. A malformed field is a 400; custom_dates takes at most 600",
+            "dates, all within ten years of today."]);
         command.AddExamples(
             "echo '{\"frequency\":\"weekly\",\"days\":[2],\"time_local\":\"19:30\",\"timezone\":\"Europe/Berlin\"}' | grimoire-cli campaigns schedule set --id <campaign-id> --stdin");
         command.AddRequestShape<Generated.Models.ScheduleUpsert>();
